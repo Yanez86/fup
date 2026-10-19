@@ -204,6 +204,66 @@ table.t{width:100%;border-collapse:collapse;font-size:15px}
 table.t td,table.t th{padding:3px 4px;border-bottom:1px dashed var(--line);text-align:left;vertical-align:top}
 table.t th{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);font-weight:500}
 table.t td.r,table.t th.r{text-align:right}
+/* finestra Magazzini */
+.wh-hero{background:var(--ink);color:#fff;border:2px solid var(--ink2);box-shadow:inset 0 -4px 0 var(--accent);padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
+.wh-hero .lab{color:var(--hi)}
+.wh-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.wh-name{font:700 22px var(--f-disp);display:flex;align-items:center;gap:8px;min-width:0}
+.wh-prov{font:600 13px var(--f-body);padding:1px 6px;background:var(--accent);color:var(--ink);border:2px solid #fff}
+.wh-own{font-size:14px;color:var(--hi)}
+.wh-occ{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:2px;white-space:nowrap}
+.wh-occ b{font:700 20px var(--f-disp)}
+.wh-occ .num{font-size:14px;color:var(--hi)}
+.wh-bar{height:12px}
+.wh-hero .wh-bar{flex:none;background:var(--ink3);border-color:var(--ink2)}
+.wh-mgr{display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:8px;border-top:2px dashed var(--ink3)}
+.wh-mgr img,.wh-st img{width:40px;height:46px;background:#3a6db0;border:2px solid var(--ink);flex:none}
+.wh-mgr .lab{flex:1}
+.wh-warn{font-size:14px;color:#ff8a8d}
+.wh-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi.wh-k{border-top-width:6px;padding:5px 8px;display:flex;flex-direction:column;min-width:0}
+.kpi.wh-k.ok{border-top-color:var(--ok)}.kpi.wh-k.warn{border-top-color:var(--warn)}.kpi.wh-k.bad{border-top-color:var(--bad)}
+.wh-k .lab{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wh-k b{font-size:24px;line-height:1.15}
+.wh-k.bad b{color:var(--bad-t)}
+.wh-k .sm{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wh-st{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--panel2)}
+.wh-sm{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.wh-nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
+.wh-ld{display:flex;align-items:center;gap:8px;cursor:help}
+.wh-ld .bar{height:8px}
+.wh-ld b{font:600 15px var(--f-disp);min-width:42px;text-align:right}
+.wh-inq{color:var(--accent-d);font-weight:600}
+.wh-step{display:flex;align-items:center;flex:none}
+.wh-step .btn{width:38px;height:36px;padding:0;font-size:20px;line-height:1}
+.wh-step b{font:700 20px var(--f-disp);min-width:34px;text-align:center}
+.wh-sw{display:flex;align-items:center;gap:10px;padding:8px 10px;margin:4px 0;background:var(--panel);border:2px solid var(--ink);cursor:pointer}
+input.sw{appearance:none;-webkit-appearance:none;flex:none;width:52px;height:28px;margin:0;border:2px solid var(--ink);background:var(--line);position:relative;cursor:pointer}
+input.sw::after{content:'';position:absolute;left:2px;top:2px;width:20px;height:20px;background:#fff;border:2px solid var(--ink);box-sizing:border-box}
+input.sw:checked{background:var(--ok)}
+input.sw:checked::after{left:26px}
+input.sw:disabled{opacity:.45;cursor:not-allowed}
+.wh-chips{display:flex;flex-wrap:wrap;gap:6px}
+.wh-chips>span{font-size:14px;padding:2px 8px;background:var(--panel);border:2px solid var(--line);white-space:nowrap}
+.wh-chips b{font-family:var(--f-disp)}
+.wh-cl{display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid var(--panel2)}
+.wh-cl:last-child{border-bottom:0}
+.wh-cl svg{flex:none}
+.wh-sat{display:flex;align-items:center;gap:6px;flex:none;width:96px}
+.wh-sat .bar{height:8px;display:block}
+.wh-sat b{min-width:24px;text-align:right}
+.wh-money{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.wh-money>div{padding:4px 8px;background:var(--panel);border:2px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.wh-money .lab{font-size:11px}
+.wh-money b{font:600 16px var(--f-disp);white-space:nowrap}
+.wh-tech{display:flex;align-items:center;gap:8px}
+.wh-ics{flex:1;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.wh-acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.wh-acts>div{display:flex;flex-direction:column;gap:4px}
+.wh-acts .btn{display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.wh-acts .btn small{font:500 13px var(--f-body)}
+.wh-acts .sm{font-size:13px;text-align:center}
+.mob .wh-kpis,.mob .wh-money{grid-template-columns:repeat(2,minmax(0,1fr))}
 .staff{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:6px 10px;align-items:center;font-size:15px}
 .mini{width:48px;height:56px;background:#3a6db0;border:2px solid var(--ink)}
 .mport{width:96px;height:112px;flex:none;background:repeating-linear-gradient(180deg,#2f5fa0 0 8px,#3a6db0 8px 16px);border:3px solid var(--ink)}
@@ -1967,10 +2027,10 @@ const LOAD_ROLES=['pick','car','imp','capo','autCE','autB'];
 const overloaded=(w,k)=>{const l=staffLoad(w,k);return LOAD_ROLES.some(r=>l[r]>1.02)||l.fm>1;};
 function planLoad(){const v=S.clients.filter(c=>c.status==='attivo').reduce((a,c)=>{const t=clientLog(c,whById(c.wh));return a+t.out+t.in;},0), n=Math.floor(v/80);return n<=0?0:(S.office.plan>0?n/S.office.plan:9);}
 const loadCol=l=>l>1.02?'var(--bad)':l>0.85?'var(--warn)':'var(--ok)';
-// testo breve del carico: "carico 112%" oppure "nessuno: lavoro fermo"
+// testo breve del carico, quando non c'è la barra: "turni fatti dal manager" oppure "lavoro fermo"
 function loadTxt(r,l,have){
-  if(r==='capo'&&l===0) return 'turni organizzati dal manager';
-  if(r==='fm') return have?'in servizio':'<span class="bad">nessuno: niente manutenzione</span>';
+  if(r==='capo'&&l===0) return 'turni fatti dal manager';
+  if(r==='fm') return have?'<span class="ok">in servizio</span>':'<span class="bad">niente manutenzione</span>';
   if(l>=9) return `<span class="bad">nessuno: lavoro fermo</span>`;
   return `${kw('carico','carico')} <b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>${l>1.02?' <span class="bad">in affanno</span>':''}`;
 }
@@ -2926,32 +2986,58 @@ const VIEWS={
   const q=S.queue.filter(q=>q.wh===w.id);
   const mgrOpts=[w.mgr==='ceo'||!S.warehouses.some(x=>x.mgr==='ceo')?`<option value="ceo" ${w.mgr==='ceo'?'selected':''}>${esc(ceo().name)} (CEO)</option>`:'',...S.managers.filter(m=>m.hired&&!seatOf(m.id)&&(!m.wh||m.wh===w.id)).map(m=>`<option value="${m.id}" ${w.mgr===m.id?'selected':''}>${esc(m.name)}</option>`)].join('');
   const cl=S.clients.filter(c=>c.wh===w.id&&c.status!=='perso');
-  const ld=staffLoad(w,k), staffRow=(r,have)=>{const inq=q.filter(x=>x.role===r).length, l=ld[r];return `<img class="px mini" src="${have?IMG[r]:IMG.anon}" alt="${have?'':'Nessuno in questo ruolo'}" width="48" height="56"><span>${kw(ROLE_WK[r],ROLE[r])}<br><span class="sm">${loadTxt(r,l,have)}${inq?` · ${inq} in arrivo`:''}</span>${r!=='fm'&&!(r==='capo'&&l===0)&&l<9?loadBar(l):''}</span><b class="num ${l>1.02?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${have}</b><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi">+ Assumi</button>`;};
+  const ld=staffLoad(w,k);
+  // una riga per reparto: ritratto, nome, barra del carico e [− numero +]
+  const staffRow=(r,have)=>{const inq=q.filter(x=>x.role===r).length, l=ld[r], bar=r!=='fm'&&!(r==='capo'&&l===0)&&l<9;
+   return `<div class="wh-st"><img class="px" src="${have?IMG[r]:IMG.anon}" alt="${have?'':'Nessuno in questo ruolo'}" width="40" height="46">
+    <div class="wh-sm"><div class="wh-nm">${kw(ROLE_WK[r],ROLE[r])}</div>
+     ${bar?`<div class="wh-ld" data-tip="<div class='tt'>Carico di lavoro ${Math.round(l*100)}%</div>${l>1.02?'In affanno: KPI e morale peggiorano. Assumi qualcuno.':l>0.85?'Al limite: un picco di lavoro lo manda in affanno.':'Tutto sotto controllo.'}"><div class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></div><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b></div>`:`<div class="sm wh-nm">${loadTxt(r,l,have)}</div>`}
+     ${inq?`<div class="sm wh-inq">+${inq} in arrivo</div>`:''}</div>
+    <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia: ${esc(ROLE1[r]||ROLE[r])}" data-tip="Licenzia">−</button><b class="num ${bar&&l>1.02?'bad':''}">${have}</b><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi: ${esc(ROLE1[r]||ROLE[r])}" data-tip="Assumi">+</button></div></div>`;};
+  const thr=key=>{const v=cl.filter(c=>c.status==='attivo'&&c[key]!=null).map(c=>c[key]);return v.length?Math.max(...v):null;};
+  const sP=thr('sP'), sA=thr('sA'), mor=Math.round(w.morale), morC=mor>=60?'ok':mor>=45?'warn':'bad';
+  const satC=k.sm.obj&&k.satM<k.sm.obj-0.5?'bad':'';
+  const tile=(cls,lab,val,sub,tip)=>`<div class="kpi wh-k ${cls}" ${tip?`data-tip="${tip}"`:''}><div class="lab">${lab}</div><b>${val}</b><div class="sm">${sub}</div></div>`;
+  const mgrImg=w.mgr==='ceo'?ceoImg(ceo()):w.mgr?IMG['m_'+w.mgr]:IMG.anon;
+  const leas=Math.max(0,w.staff.autCE-w.motrici);
+  const occ=Math.round(k.sat*100);
   return `${tabs}
-  <div class="row"><span class="h3" style="font-size:19px">${esc(w.name)} (${w.prov})</span><span class="sm">${w.own?'di proprietà':'in affitto'} · ${eur(w.fixed)}/mese</span></div>
-  <div><div class="row"><span class="lab">${kw('saturazione','Occupazione')}</span><span class="num">${n0(k.stock)} / ${n0(k.cap)} posti · ${Math.round(k.sat*100)}%</span></div><div class="bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div></div>
-  <div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">
-   <div class="kpi" data-tip="${tipParts('Puntualità '+f1(k.P)+'%',k.pP,'')}"><div class="lab">${kw('puntualita')}</div><b>${f1(k.P)}%</b></div>
-   <div class="kpi" data-tip="${tipParts('Accuratezza '+f1(k.A)+'%',k.pA,'')}"><div class="lab">${kw('accuratezza')}</div><b>${f1(k.A)}%</b></div>
-   <div class="kpi" data-tip="${tipParts('Saturazione dei mezzi '+Math.round(k.satM)+'%',k.sm.pS,'')}"><div class="lab">${kw('saturazione_mezzi','Saturazione mezzi')}</div><b class="${k.sm.obj&&k.satM<k.sm.obj-0.5?'bad':''}">${Math.round(k.satM)}%</b></div>
+  <div class="wh-hero">
+   <div class="wh-top"><span class="wh-name">${esc(w.name)}<span class="wh-prov">${w.prov}</span></span><span class="wh-own">${w.own?'di proprietà':'in affitto'} · ${eur(w.fixed)}/mese</span></div>
+   <div class="wh-occ"><span class="lab">${kw('saturazione','Occupazione')}</span><span class="num"><b style="color:${barColor(k.sat)==='var(--ok)'?'#6fdc8c':barColor(k.sat)==='var(--warn)'?'#ffc53d':'#ff8a8d'}">${occ}%</b> ${n0(k.stock)} / ${n0(k.cap)} posti</span></div>
+   <div class="bar wh-bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div>
+   <label class="wh-mgr"><img class="px" src="${mgrImg}" alt="${w.mgr?'':'Posto vacante'}" width="40" height="46"><span class="lab">${kw('manager','Manager')}</span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
+   ${k.m.none?'<div class="wh-warn">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
   </div>
-  <div class="card"><div class="row"><span class="h3">Personale</span><span class="sm">${kw('morale','morale')} <b class="${w.morale>=60?'ok':w.morale>=45?'warn':'bad'}">${Math.round(w.morale)}</b></span></div>
+  <div class="wh-kpis">
+   ${tile(sP!=null?kpiCls(k.P,sP):'',kw('puntualita'),f1(k.P)+'%',sP!=null?'soglia '+f1(sP)+'%':'nessuna soglia',tipParts('Puntualità '+f1(k.P)+'%',k.pP,''))}
+   ${tile(sA!=null?kpiCls(k.A,sA):'',kw('accuratezza'),f1(k.A)+'%',sA!=null?'soglia '+f1(sA)+'%':'nessuna soglia',tipParts('Accuratezza '+f1(k.A)+'%',k.pA,''))}
+   ${tile(satC||(k.sm.obj?'ok':''),kw('saturazione_mezzi','Mezzi pieni'),Math.round(k.satM)+'%',k.sm.obj?'obiettivo '+k.sm.obj+'%':k.viaggi+' viaggi/mese',tipParts('Saturazione dei mezzi '+Math.round(k.satM)+'%',k.sm.pS,''))}
+   ${tile(morC,kw('morale'),mor,'su 100','')}
+  </div>
+  <div class="card"><div class="row"><span class="h3">Personale</span><span class="sm">${kw('carico','carico di lavoro')}</span></div>
    <div class="lab">Magazzino e ufficio</div>
-   <div class="staff">${['pick','car','capo','imp'].map(r=>staffRow(r,w.staff[r])).join('')}</div>
-   <label class="row" style="cursor:pointer"><span><input type="checkbox" data-act="coop" data-wh="${w.id}" ${w.coop?'checked':''} ${polOn('nocoop')?'disabled':''}> Magazzinieri e carrellisti in ${kw('cooperativa')}</span><span class="sm">${polOn('nocoop')?'vietata dalla policy':w.coop?'−20% di costo, più errori':'assunti direttamente'}</span></label>
+   ${['pick','car','capo','imp'].map(r=>staffRow(r,w.staff[r])).join('')}
+   <label class="wh-sw"><span class="wh-sm"><span>${kw('cooperativa','Facchini in cooperativa')}</span><span class="sm">${polOn('nocoop')?'vietata dalla policy':w.coop?'−20% di costo, più errori':'magazzinieri e carrellisti assunti da noi'}</span></span><input type="checkbox" class="sw" data-act="coop" data-wh="${w.id}" ${w.coop?'checked':''} ${polOn('nocoop')?'disabled':''} aria-label="Magazzinieri e carrellisti in cooperativa"></label>
    <div class="lab">Trasporti</div>
-   <div class="staff">${['autCE','autB'].map(r=>staffRow(r,w.staff[r])).join('')}</div>
-   <div class="sm">${kw('motrici')}: ${w.motrici} di proprietà${Math.max(0,w.staff.autCE-w.motrici)?` + ${Math.max(0,w.staff.autCE-w.motrici)} in leasing`:''}${w.staff.autB?` · ${w.staff.autB} furgoni in leasing`:''} · ${k.viaggi} viaggi al mese</div>
-   <label class="row" style="align-items:center"><span class="lab">${kw('obiettivo_sat','Obiettivo minimo di saturazione')}</span><select data-act="setsatobj" data-wh="${w.id}" aria-label="Obiettivo minimo di saturazione dei mezzi">${SAT_OBJ.map(v=>`<option value="${v}" ${(w.satObj||0)===v?'selected':''}>${v?'almeno '+v+'%':'nessuno'}</option>`).join('')}</select></label>
+   ${['autCE','autB'].map(r=>staffRow(r,w.staff[r])).join('')}
+   <div class="wh-chips"><span>${kw('motrici')} <b>${w.motrici}</b>${leas?` +${leas} in leasing`:''}</span><span>Furgoni <b>${w.staff.autB}</b></span><span>Viaggi <b>${k.viaggi}</b>/mese</span></div>
+   <label class="row" style="align-items:center"><span class="lab">${kw('obiettivo_sat','Obiettivo di carico')}</span><select data-act="setsatobj" data-wh="${w.id}" aria-label="Obiettivo minimo di saturazione dei mezzi">${SAT_OBJ.map(v=>`<option value="${v}" ${(w.satObj||0)===v?'selected':''}>${v?'almeno '+v+'%':'nessuno'}</option>`).join('')}</select></label>
    ${satObjTxt(k.sm)}
-   <label class="row" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><img class="px mini" src="${w.mgr==='ceo'?ceoImg(ceo()):w.mgr?IMG['m_'+w.mgr]:IMG.anon}" alt="${w.mgr?'':'Posto vacante'}" width="48" height="56"><span class="lab">${kw('manager','Manager')}</span></span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
-   ${k.m.none?'<div class="sm bad">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
   </div>
   ${strutturaCard(w,k,staffRow)}
-  <div class="card"><div class="row"><span class="h3">${kw('clienti')}</span><span class="sm">${kw('ricavi','ricavi')} ${eur(k.rev)}/mese</span></div>
-   ${cl.length?cl.map(c=>`<div class="row"><span><b>${esc(c.name)}</b>${c.status==='avvio'?` <span class="pill" style="background:var(--yellow)">dal ${shortDate(c.start)}</span>`:''}<br><span class="sm">${n0(c.stock)} posti · ${n0(c.pal)} pallet/mese</span></span><span class="sm">${c.status==='attivo'?`soddisf. <b class="${c.sat>=60?'ok':c.sat>=40?'warn':'bad'}">${Math.round(c.sat)}</b>`:''}</span></div>`).join(''):'<div class="sm">Nessun cliente: partecipa alle gare.</div>'}</div>
-  <div class="row"><span class="sm">${kw('costi','Costi del mese')}: personale ${eur(k.pers)}, mezzi ${eur(k.mezzi)}, immobile ${eur(k.fissi)}${k.manut?` (di cui manutenzione ${eur(k.manut)})`:''}</span><button class="btn sm2" data-act="opentech" data-tree="log" data-id="">Tecnologie</button></div>
-  <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center"><span class="sm">${kw('installazione','Installate')}:</span>${TECH.filter(t=>w.tech[t.id]).map(t=>{const l=techFactor(w,t)<0;return `<span role="img" aria-label="${esc(t.name)}" data-act="wiki" data-id="tech_${t.id}" data-tip="<div class='tt'>${esc(t.name)}</div><div>${esc(t.desc)}</div>${l?"<div style='color:#ffd23f'>In apprendimento: per qualche settimana peggiora i KPI</div>":''}${wikiHint()}" style="cursor:help;display:inline-flex">${techIcon(t,32,l)}</span>`;}).join('')||'<span class="sm">nessuna</span>'}</div>`;
+  <div class="card"><div class="row"><span class="h3">${kw('clienti')}</span><span class="sm">${kw('soddisfazione','soddisfazione')}</span></div>
+   ${cl.length?cl.map(c=>{const sc=c.sat>=60?'var(--ok)':c.sat>=40?'var(--warn)':'var(--bad)';
+    return `<div class="wh-cl">${logoSvg(c.name,32)}<span class="wh-sm"><b class="wh-nm">${esc(c.name)}</b><span class="sm wh-nm">${c.status==='avvio'?`<span class="pill" style="background:var(--yellow);color:var(--ink)">dal ${shortDate(c.start)}</span> `:''}${n0(c.stock)} posti · ${n0(c.pal)} pallet/mese</span></span>${c.status==='attivo'?`<span class="wh-sat"><span class="bar"><i style="width:${c.sat}%;background:${sc}"></i></span><b class="num">${Math.round(c.sat)}</b></span>`:''}</div>`;}).join(''):'<div class="sm">Nessun cliente: partecipa alle gare.</div>'}</div>
+  <div class="card"><div class="row"><span class="h3">${kw('costi','Conto del mese')}</span></div>
+   <div class="wh-money">
+    <div><span class="lab">${kw('ricavi','Ricavi')}</span><b class="ok">${eur(k.rev)}</b></div>
+    <div><span class="lab">Personale</span><b>${eur(k.pers)}</b></div>
+    <div><span class="lab">Mezzi</span><b>${eur(k.mezzi)}</b></div>
+    <div ${k.manut?`data-tip="Di cui manutenzione ${eur(k.manut)}"`:''}><span class="lab">Immobile</span><b>${eur(k.fissi)}</b></div>
+   </div>
+   <div class="wh-tech"><span class="lab">${kw('installazione','Tecnologie')}</span><span class="wh-ics">${TECH.filter(t=>w.tech[t.id]).map(t=>{const l=techFactor(w,t)<0;return `<span role="img" aria-label="${esc(t.name)}" data-act="wiki" data-id="tech_${t.id}" data-tip="<div class='tt'>${esc(t.name)}</div><div>${esc(t.desc)}</div>${l?"<div style='color:#ffd23f'>In apprendimento: per qualche settimana peggiora i KPI</div>":''}${wikiHint()}" style="cursor:help;display:inline-flex">${techIcon(t,30,l)}</span>`;}).join('')||'<span class="sm">nessuna installata</span>'}</span><button class="btn sm2" data-act="opentech" data-tree="log" data-id="">Installa</button></div>
+  </div>`;
  },
  clienti(){
   const act=S.clients.filter(c=>c.status!=='perso'); const lost=S.clients.filter(c=>c.status==='perso');
@@ -3307,13 +3393,15 @@ function strutturaCard(w,k,staffRow){
   const col=c>=MAINT.soglia?'var(--ok)':c>=40?'var(--warn)':'var(--bad)';
   const b=w.build;
   return `<div class="card"><div class="row"><span class="h3">${kw('manutenzione','Immobile')}</span><span class="sm">${n0(w.cap)} posti di base${w.exp?` · ${w.exp} ${w.exp>1?'ampliamenti':'ampliamento'}`:''}</span></div>
-   <div><div class="row"><span class="lab">${kw('manutenzione','Stato del magazzino')}</span><b class="num" style="color:${col}">${c}%</b></div><div class="bar"><i style="width:${c}%;background:${col}"></i></div></div>
-   <div class="sm">${pen?`<span class="bad">Sotto il ${MAINT.soglia}%: posti pallet e produttività −${f1(pen*100)}%.</span>`:`Sopra il ${MAINT.soglia}% il magazzino rende al massimo.`} ${fm?`Il facility manager lo tiene in ordine: manutenzione ${eur(manutMese(w))}/mese.`:'<b>Senza facility manager nessuno fa manutenzione</b>: lo stato scende ogni giorno e capitano guasti.'}</div>
-   <div class="staff">${staffRow('fm',w.staff.fm)}</div>
-   <div class="row" style="flex-wrap:wrap"><span class="sm">Riporta subito lo stato al 100%</span><button class="btn sm2" data-act="straord" data-wh="${w.id}" ${fm&&c<95&&S.cash>=sc?'':'disabled'}>Manutenzione straordinaria · ${eur(sc)}</button></div>
-   ${b?`<div><div class="row"><span class="lab">${kw('ampliamento','Ampliamento')} in corso: +${n0(b.add)} posti</span><b class="num">${b.left} giorni</b></div><div class="bar"><i style="width:${Math.round((1-b.left/b.total)*100)}%;background:var(--accent)"></i></div><div class="sm">Durante il cantiere la produttività cala del 5%.</div></div>`
-     :`<div class="row" style="flex-wrap:wrap"><span class="sm">${full?`Già ampliato ${MAINT.expMax} volte: non c'è più terreno.`:`${kw('ampliamento','Ampliamento')}: +${n0(expAdd(w))} posti in ${MAINT.expGg} giorni, ${w.own?'costi fissi':'affitto'} +${eur(expRent(w))}/mese`}</span>${full?'':`<button class="btn sm2 pri" data-act="amplia" data-wh="${w.id}" ${fm&&S.cash>=ec?'':'disabled'}>Amplia · ${eur(ec)}</button>`}</div>`}
-   ${fm?'':'<div class="sm">Manutenzione straordinaria e ampliamento richiedono un facility manager.</div>'}</div>`;
+   <div><div class="row"><span class="lab">${kw('manutenzione','Stato del magazzino')}</span><b class="num" style="color:${col}">${c}%</b></div><div class="bar wh-bar"><i style="width:${c}%;background:${col}"></i></div></div>
+   <div class="sm">${pen?`<span class="bad">Sotto il ${MAINT.soglia}%: posti e produttività −${f1(pen*100)}%.</span>`:`Sopra il ${MAINT.soglia}% rende al massimo.`} ${fm?`Manutenzione ${eur(manutMese(w))}/mese.`:'<b class="bad">Senza facility manager lo stato scende, capitano guasti e non si fanno lavori.</b>'}</div>
+   ${staffRow('fm',w.staff.fm)}
+   ${b?`<div><div class="row"><span class="lab">${kw('ampliamento','Ampliamento')}: +${n0(b.add)} posti</span><b class="num">${b.left} giorni</b></div><div class="bar wh-bar"><i style="width:${Math.round((1-b.left/b.total)*100)}%;background:var(--accent)"></i></div><div class="sm">Durante il cantiere la produttività cala del 5%.</div></div>`:''}
+   <div class="wh-acts">
+    <div><button class="btn" data-act="straord" data-wh="${w.id}" ${fm&&c<95&&S.cash>=sc?'':'disabled'}>Manutenzione<small>${eur(sc)}</small></button><span class="sm">Stato al 100% subito</span></div>
+    ${b?'':full?`<div><span class="sm">Già ampliato ${MAINT.expMax} volte: non c'è più terreno.</span></div>`:`<div><button class="btn pri" data-act="amplia" data-wh="${w.id}" ${fm&&S.cash>=ec?'':'disabled'}>Amplia<small>${eur(ec)}</small></button><span class="sm">+${n0(expAdd(w))} posti in ${MAINT.expGg} giorni, ${w.own?'costi fissi':'affitto'} +${eur(expRent(w))}/mese</span></div>`}
+   </div>
+   </div>`;
 }
 // carico dei reparti dopo un nuovo contratto, per le gare
 function ldSum(ld){const rs=LOAD_ROLES.filter(r=>ld[r]>0);if(!rs.length) return 'nessun reparto coinvolto';
@@ -3647,7 +3735,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.24',t:'Il menu in tasca',x:['Sul telefono i tasti in basso diventano un solo pulsante «Menu»: si apre un elenco da sinistra, diviso in Operazioni, Azienda e Informazioni, e ogni voce dice in una riga come sta il suo reparto (gare aperte, reparto in affanno, ricerca in corso).','La mappa e le finestre usano tutto lo schermo del telefono.','La casella della data ha sempre la stessa larghezza: i pulsanti accanto non si spostano più ogni giorno. Sul telefono il mese è abbreviato.','Restano due velocità più la pausa: la terza, troppo veloce per seguire il gioco, è stata tolta.']},
+ {v:'0.24',t:'Il menu in tasca',x:['Sul telefono i tasti in basso diventano un solo pulsante «Menu»: si apre un elenco da sinistra, diviso in Operazioni, Azienda e Informazioni, e ogni voce dice in una riga come sta il suo reparto (gare aperte, reparto in affanno, ricerca in corso).','La mappa e le finestre usano tutto lo schermo del telefono.','La casella della data ha sempre la stessa larghezza: i pulsanti accanto non si spostano più ogni giorno. Sul telefono il mese è abbreviato.','La scheda del magazzino è più chiara: in cima nome, occupazione e manager; quattro riquadri colorati per puntualità, accuratezza, mezzi pieni e morale (verde, giallo o rosso rispetto alle soglie dei clienti); per ogni reparto una barra del carico e i pulsanti − e +; un interruttore per la cooperativa e il conto del mese in quattro caselle.','Restano due velocità più la pausa: la terza, troppo veloce per seguire il gioco, è stata tolta.']},
  {v:'0.23',t:'Tutto a portata di dito',x:['Sul telefono il report KPI di un magazzino non si sovrappone più al testo sotto il foglio: le schede delle righe restano dentro il riquadro, sopra i grafici.','Sul computer le finestre non escono più dal fondo dello schermo: si accorciano e il contenuto scorre dentro con la rotellina, senza doverle trascinare in alto.','Sul telefono niente scorre più di lato: l\'albero delle tecnologie diventa un elenco per livelli e il report KPI mostra ogni riga del foglio come una scheda.','Sistemati i pulsanti con il testo più largo del pulsante (Tecnologie, Apri, schede delle gare).','I posti vuoti (dirigenti vacanti, magazzino senza manager, reparti senza personale) mostrano una sagoma anonima in ombra.']},
  {v:'0.22',t:'Dormici sopra',x:['15 nuovi clienti piccoli e locali: una panetteria di Orbassano, una distilleria di Bassano, le sedie di Manzano, i ricambi nautici di Lerici e altri.','Ci sono sempre almeno tre gare aperte (quattro con l\'Ufficio commerciale), ed escono più spesso i clienti piccoli e le zone di una sola provincia.','Negli eventi la scelta non ha effetto subito: il giorno dopo arriva una finestra che racconta com\'è andata, con gli effetti.']},
  {v:'0.21',t:'Il regolamento in bacheca',x:['Nuova finestra Policy aziendali: regole da accendere o spegnere per tutta l\'azienda, ognuna con un vantaggio e un prezzo. Dopo un cambio servono 90 giorni per cambiarla di nuovo.','12 policy: Zero straordinario, Sabato obbligatorio, Telefoni nell\'armadietto, Doppia spunta in uscita, Niente cooperative, Spending review, Il cliente ha sempre ragione, Limite 80 all\'ora, Smart working, Rotazione delle mansioni, Settimana corta e Corso sicurezza.','Si sbloccano con la nuova ricerca Regolamento aziendale e con altre tecnologie, comprese due nuove del Welfare: Lavoro agile e Settimana corta.','I manager hanno delle pretese: alcuni vogliono una policy, altri non la sopportano. Dopo un mese arriva l\'ultimatum: li accontenti, alzi lo stipendio perché la sopportino, oppure se ne vanno.','Nuovo evento: un concorrente prova a portarti via un manager. Pareggi l\'offerta, rilanci meno o lo lasci andare.']},
