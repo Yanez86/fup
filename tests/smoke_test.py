@@ -43,6 +43,13 @@ PINCH = r'''()=>{const mw=document.querySelector('#mapwrap'), m=document.querySe
 FITS = '''(sel)=>{const r=document.querySelector(sel).getBoundingClientRect();
   return r.left>=-1&&r.top>=-1&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1&&document.documentElement.scrollWidth<=innerWidth;}'''
 
+# telefono: dentro una finestra niente scorre di lato e nessun pulsante ha il testo più largo di lui
+NOSIDE = '''(sel)=>{const el=document.querySelector(sel), out=[];
+  [el.querySelector('.win-b'),...el.querySelectorAll('.win-b *')].forEach(e=>{const o=getComputedStyle(e).overflowX;
+    if((o==='auto'||o==='scroll'||e.classList.contains('win-b'))&&e.scrollWidth>e.clientWidth+1) out.push('scorre di lato: '+(e.className||e.tagName));});
+  el.querySelectorAll('button').forEach(b=>{if(b.offsetParent&&b.scrollWidth>b.clientWidth+1) out.push('testo fuori dal pulsante: '+b.innerText.slice(0,30));});
+  return out;}'''
+
 async def intro(pg, shot):
     # schermata introduttiva: il camioncino arriva, poi un tocco la chiude e resta la schermata iniziale
     await pg.wait_for_timeout(2900)
@@ -80,6 +87,8 @@ async def phone(b, w, h, name, errs):
     for wn in ['azienda','riepilogo','magazzini','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
         await pg.tap(f'#dock [data-id={wn}]')
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
+        bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
+        assert not bad, f'{name}: finestra {wn}: {bad}'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{wn}.png'))
         await pg.tap(f'#win-{wn} [data-act=close]')
     # parola chiave: primo tocco = tooltip, secondo tocco = enciclopedia
@@ -180,6 +189,7 @@ async def main():
         assert await pg.evaluate("document.querySelectorAll('#ov path.prov').length") == 0
         for w in ['azienda','magazzini','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
+            assert await pg.evaluate(FITS, f'#win-{w}'), f'finestra {w} esce dal fondo dello schermo'
         for t in ['log','org','mkt','wel']:
             await pg.click(f'#win-tecnologia [data-act=seltree][data-id={t}]')
             await pg.screenshot(path=os.path.join(OUT, f'shot_tree_{t}.png'))

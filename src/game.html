@@ -162,6 +162,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .mob .rp-tabs button{flex:1 0 30%;font-size:14px;padding:10px 6px;border-bottom:2px solid var(--ink)}
 .treebox{overflow-x:auto;padding:4px 2px 8px}
 .tnode{position:absolute;display:flex;align-items:center;gap:7px;padding:4px 6px;text-align:left;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 rgba(22,32,46,.12),2px 2px 0 var(--ink);font-size:13px;line-height:1.2}
+.tlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tlist .tnode{position:relative;min-height:64px;min-width:0}
+.tlist .tnode b{hyphens:auto;overflow-wrap:anywhere}
 .tnode .tn{display:flex;flex-direction:column;gap:2px;min-width:0}
 .tnode b{font-size:13.5px;line-height:1.15}
 .tnode span{font-size:12px}
@@ -175,7 +178,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .xbtn{width:30px;height:30px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font-family:var(--f-disp);font-size:13px;line-height:1;box-shadow:inset 0 -2px 0 #1d2a3b}
 .win-b{padding:14px;overflow:auto;min-height:0;display:flex;flex-direction:column;gap:10px}
 .tabs{display:flex;border-bottom:2px solid var(--ink);background:#dfe7ee;flex-wrap:wrap}
-.tabs button{flex:1;padding:7px 9px;border:0;border-right:2px solid var(--ink);background:#dfe7ee;color:var(--muted);font-family:var(--f-disp);font-size:15px;min-width:0}
+.tabs button{flex:1;padding:7px 9px;border:0;border-right:2px solid var(--ink);background:#dfe7ee;color:var(--muted);font-family:var(--f-disp);font-size:15px;max-width:100%;overflow-wrap:break-word}
 .tabs button:last-child{border-right:0}
 .tabs button[aria-selected="true"]{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:inset 0 3px 0 var(--accent)}
 .card{padding:8px 10px;background:#fff;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2);display:flex;flex-direction:column;gap:5px;min-width:0}
@@ -183,12 +186,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .card.pend{background:#fff9e3;box-shadow:inset 0 -3px 0 #f3e3a8}
 .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;min-width:0}
 .row > *{min-width:0}
+.row > .btn,.row > button{flex:none;max-width:100%}  /* i pulsanti non si stringono sotto il loro testo */
 .lab{font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
 .sm{font-size:14px;color:var(--muted)}
 .h3{margin:0;font-family:var(--f-disp);font-size:18px;font-weight:600}
 .bar{height:10px;background:var(--panel2);border:1px solid var(--ink);flex:1;min-width:40px}
 .bar i{display:block;height:100%;max-width:100%}
-.btn{padding:7px 12px;border:2px solid var(--ink);background:#fff;font-family:var(--f-disp);font-size:15px;box-shadow:inset 0 -3px 0 #c9d3dd, 2px 2px 0 var(--ink)}
+.btn{max-width:100%;overflow-wrap:break-word;padding:7px 12px;border:2px solid var(--ink);background:#fff;font-family:var(--f-disp);font-size:15px;box-shadow:inset 0 -3px 0 #c9d3dd, 2px 2px 0 var(--ink)}
 .btn.pri{background:var(--accent);box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l), 2px 2px 0 var(--ink);font-weight:600}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.sm2{padding:4px 9px;font-size:14px;box-shadow:inset 0 -2px 0 #c9d3dd, 1px 1px 0 var(--ink)}
@@ -198,7 +202,7 @@ table.t{width:100%;border-collapse:collapse;font-size:15px}
 table.t td,table.t th{padding:3px 4px;border-bottom:1px dashed var(--line);text-align:left;vertical-align:top}
 table.t th{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);font-weight:500}
 table.t td.r,table.t th.r{text-align:right}
-.staff{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:6px 10px;align-items:center;font-size:15px}
+.staff{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:6px 10px;align-items:center;font-size:15px}
 .mini{width:48px;height:56px;background:#3a6db0;border:2px solid var(--ink)}
 .mport{width:96px;height:112px;flex:none;background:repeating-linear-gradient(180deg,#2f5fa0 0 8px,#3a6db0 8px 16px);border:3px solid var(--ink)}
 select,input[type=text],input[type=number]{font:inherit;padding:5px 7px;border:2px solid var(--ink);background:#fff;min-width:0;max-width:100%}
@@ -414,13 +418,26 @@ html,body{overscroll-behavior:none}
 .mob .ttabs button:nth-child(n+3){border-bottom:0}
 .mob .win-b > *{flex-shrink:0}
 .mob .skills{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:400px){.mob .skills{grid-template-columns:minmax(0,1fr)}}
 .mob .btn{min-height:40px}
 .mob .btn.sm2{min-height:36px}
-.mob .xl-grid{max-height:none}
+.mob .xl-grid{max-height:none;overflow:visible}
+/* telefono: il foglio non scorre di lato, ogni riga diventa una scheda con «colonna: valore» */
+.mob .xl-grid table,.mob .xl-grid tbody,.mob .xl-grid tr{display:block;width:100%;min-width:0}
+.mob .xl-grid thead,.mob .xl-grid tbody th,.mob .xl-grid tr:has(td:first-of-type:empty){display:none}
+.mob .xl-grid tr{border:2px solid var(--ink);margin:8px;width:auto;background:#fff}
+.mob .xl-grid td{display:flex;justify-content:space-between;align-items:center;gap:10px;height:auto;min-height:30px;white-space:normal;text-align:right;border-width:0 0 1px}
+.mob .xl-grid td::before{content:attr(data-h);color:var(--muted);font-size:13px;text-align:left}
+.mob .xl-grid td:first-of-type{background:#dfe7ee;font-weight:700;justify-content:flex-start;text-align:left!important}
+.mob .xl-grid td:first-of-type::before{content:none}
+.mob .xl-grid td:empty{display:none}
+.mob .xl-tabs{flex-wrap:wrap}
+.mob .xl-menu{flex-wrap:wrap}
 .mob .lc-row,.mob .wk{grid-template-columns:minmax(0,1fr)}
 .mob .wk-list{max-height:32vh}
 .mob .wk:not(.q) .wk-list{display:none}
 .mob .xl-top{flex-wrap:wrap;gap:2px 8px}
+.mob .xl-file{min-width:0;overflow-wrap:anywhere}
 .mob .wk-home{grid-template-columns:minmax(0,1fr)}
 .mob #toasts{top:calc(var(--top-h) + 6px);left:max(8px, env(safe-area-inset-left, 0px));right:max(8px, env(safe-area-inset-right, 0px));width:auto;max-width:none}
 .mob #tip{max-width:min(340px, calc(100vw - 16px))}
@@ -486,7 +503,7 @@ html,body{overscroll-behavior:none}
 (function(){
 'use strict';
 /* ====================== DATI ====================== */
-const IMG={fm:'{{Q_facility}}',car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}'};
+const IMG={anon:'{{Q_anonimo}}',fm:'{{Q_facility}}',car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}'};
 const LON0=4.81, LAT1=47.0, KX=78.29*2, KY=111.111*2;
 const pt=(lon,lat)=>[ (lon-LON0)*KX, (LAT1-lat)*KY ];
 const CITIES=[
@@ -2620,7 +2637,7 @@ function initMapControls(){
   const up=e=>{ if(!pts.delete(e.pointerId)) return; mw.classList.remove('drag'); begin(); };
   mw.addEventListener('pointerup',up); mw.addEventListener('pointercancel',up);
   mw.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,view.s*(e.deltaY<0?1.15:1/1.15));},{passive:false});
-  addEventListener('resize',()=>{setMobile();fitMap();});
+  addEventListener('resize',()=>{setMobile();fitMap();fitAllWins();});
 }
 function renderMap(){
   const g=[];
@@ -2776,15 +2793,27 @@ function openWin(id,opts){
     el.innerHTML=`<header class="win-h"><span class="grip"></span><h2>${TITLES[id]}</h2><button class="xbtn" data-act="close" data-id="${id}" aria-label="Chiudi">x</button></header><div class="win-b"></div>`;
     $('#wins').appendChild(el); makeDraggable(el,id);
     const mx=Math.max(0,innerWidth-el.offsetWidth-16); if(p.x>mx){p.x=mx;el.style.left=p.x+'px';}
+    el.style.zIndex=++UI.z; renderWin(id); renderDock(); fitWin(el,id,true); return;
   }
-  el.style.zIndex=++UI.z; renderWin(id); renderDock();
+  el.style.zIndex=++UI.z; renderWin(id); renderDock(); fitWin(el,id);
 }
+// sul computer la finestra non esce mai dal fondo dello schermo: si accorcia (il contenuto scorre dentro) e,
+// se serve, all'apertura sale quanto basta per mostrarsi intera
+function fitWin(el,id,move){
+  if(MOB){el.style.maxHeight='';return;}
+  const TOP=64, GAP=12;
+  if(move){const nat=el.querySelector('.win-h').offsetHeight+el.querySelector('.win-b').scrollHeight+8;
+    const y=Math.max(TOP,Math.min(el.offsetTop,innerHeight-GAP-nat)); el.style.top=y+'px'; UI.pos[id]={x:el.offsetLeft,y};}
+  if(el.offsetTop>innerHeight-180){const y=Math.max(TOP,innerHeight-180); el.style.top=y+'px'; UI.pos[id]={x:el.offsetLeft,y};}
+  el.style.maxHeight=Math.max(160,innerHeight-el.offsetTop-GAP)+'px';
+}
+function fitAllWins(){Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id);if(el)fitWin(el,id);});}
 function closeWin(id){delete UI.open[id];const el=document.getElementById('win-'+id);if(el)el.remove();renderDock();}
 function makeDraggable(el,id){
   const h=el.querySelector('.win-h'); let d=null;
   el.addEventListener('pointerdown',()=>{el.style.zIndex=++UI.z;});
   h.addEventListener('pointerdown',e=>{if(MOB||e.target.closest('button'))return;d={x:e.clientX,y:e.clientY,l:el.offsetLeft,t:el.offsetTop};h.setPointerCapture(e.pointerId);});
-  h.addEventListener('pointermove',e=>{if(!d)return;const x=clamp(d.l+e.clientX-d.x,0,innerWidth-80),y=clamp(d.t+e.clientY-d.y,56,innerHeight-40);el.style.left=x+'px';el.style.top=y+'px';UI.pos[id]={x,y};});
+  h.addEventListener('pointermove',e=>{if(!d)return;const x=clamp(d.l+e.clientX-d.x,0,innerWidth-80),y=clamp(d.t+e.clientY-d.y,56,innerHeight-180);el.style.left=x+'px';el.style.top=y+'px';UI.pos[id]={x,y};fitWin(el,id);});
   h.addEventListener('pointerup',()=>d=null);
 }
 function renderWin(id){const el=document.getElementById('win-'+id);if(!el)return;const b=el.querySelector('.win-b');const st=b.scrollTop;b.innerHTML=(VIEWS[id]||(()=>''))();b.scrollTop=st;}
@@ -2862,7 +2891,7 @@ const VIEWS={
   const q=S.queue.filter(q=>q.wh===w.id);
   const mgrOpts=[w.mgr==='ceo'||!S.warehouses.some(x=>x.mgr==='ceo')?`<option value="ceo" ${w.mgr==='ceo'?'selected':''}>${esc(ceo().name)} (CEO)</option>`:'',...S.managers.filter(m=>m.hired&&!seatOf(m.id)&&(!m.wh||m.wh===w.id)).map(m=>`<option value="${m.id}" ${w.mgr===m.id?'selected':''}>${esc(m.name)}</option>`)].join('');
   const cl=S.clients.filter(c=>c.wh===w.id&&c.status!=='perso');
-  const ld=staffLoad(w,k), staffRow=(r,have)=>{const inq=q.filter(x=>x.role===r).length, l=ld[r];return `<img class="px mini" src="${IMG[r]}" alt="" width="48" height="56"><span>${kw(ROLE_WK[r],ROLE[r])}<br><span class="sm">${loadTxt(r,l,have)}${inq?` · ${inq} in arrivo`:''}</span>${r!=='fm'&&!(r==='capo'&&l===0)&&l<9?loadBar(l):''}</span><b class="num ${l>1.02?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${have}</b><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi">+ Assumi</button>`;};
+  const ld=staffLoad(w,k), staffRow=(r,have)=>{const inq=q.filter(x=>x.role===r).length, l=ld[r];return `<img class="px mini" src="${have?IMG[r]:IMG.anon}" alt="${have?'':'Nessuno in questo ruolo'}" width="48" height="56"><span>${kw(ROLE_WK[r],ROLE[r])}<br><span class="sm">${loadTxt(r,l,have)}${inq?` · ${inq} in arrivo`:''}</span>${r!=='fm'&&!(r==='capo'&&l===0)&&l<9?loadBar(l):''}</span><b class="num ${l>1.02?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${have}</b><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi">+ Assumi</button>`;};
   return `${tabs}
   <div class="row"><span class="h3" style="font-size:19px">${esc(w.name)} (${w.prov})</span><span class="sm">${w.own?'di proprietà':'in affitto'} · ${eur(w.fixed)}/mese</span></div>
   <div><div class="row"><span class="lab">${kw('saturazione','Occupazione')}</span><span class="num">${n0(k.stock)} / ${n0(k.cap)} posti · ${Math.round(k.sat*100)}%</span></div><div class="bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div></div>
@@ -2880,7 +2909,7 @@ const VIEWS={
    <div class="sm">${kw('motrici')}: ${w.motrici} di proprietà${Math.max(0,w.staff.autCE-w.motrici)?` + ${Math.max(0,w.staff.autCE-w.motrici)} in leasing`:''}${w.staff.autB?` · ${w.staff.autB} furgoni in leasing`:''} · ${k.viaggi} viaggi al mese</div>
    <label class="row" style="align-items:center"><span class="lab">${kw('obiettivo_sat','Obiettivo minimo di saturazione')}</span><select data-act="setsatobj" data-wh="${w.id}" aria-label="Obiettivo minimo di saturazione dei mezzi">${SAT_OBJ.map(v=>`<option value="${v}" ${(w.satObj||0)===v?'selected':''}>${v?'almeno '+v+'%':'nessuno'}</option>`).join('')}</select></label>
    ${satObjTxt(k.sm)}
-   <label class="row" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><img class="px mini" src="${w.mgr==='ceo'?ceoImg(ceo()):w.mgr?IMG['m_'+w.mgr]:IMG.imp}" alt="" width="48" height="56" style="${w.mgr?'':'opacity:.3'}"><span class="lab">${kw('manager','Manager')}</span></span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
+   <label class="row" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><img class="px mini" src="${w.mgr==='ceo'?ceoImg(ceo()):w.mgr?IMG['m_'+w.mgr]:IMG.anon}" alt="${w.mgr?'':'Posto vacante'}" width="48" height="56"><span class="lab">${kw('manager','Manager')}</span></span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
    ${k.m.none?'<div class="sm bad">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
   </div>
   ${strutturaCard(w,k,staffRow)}
@@ -2947,7 +2976,7 @@ const VIEWS={
     ${ROLES.map(r=>`<tr><td style="display:flex;align-items:center;gap:6px"><img class="px" src="${IMG[r]}" alt="" width="24" height="28">${kw(ROLE_WK[r],ROLE[r])}</td>${ks.map(([w,k])=>{const l=staffLoad(w,k)[r];return `<td class="r">${w.staff[r]} · ${r==='fm'?(l?'<span class="bad">manca</span>':'ok'):r==='capo'&&l===0?'–':l>=9?'<span class="bad">fermo</span>':`<b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>`}</td>`;}).join('')}</tr>`).join('')}</table>
    <div class="sm">Si assume e si licenzia dalla finestra di ogni magazzino.</div></div>
   <div class="card"><div class="row"><span class="h3">Sede</span></div>
-   <div class="staff"><img class="px mini" src="${IMG.plan}" alt="" width="48" height="56"><span>${kw('pianificatori',ROLE.plan)}<br><span class="sm">${pn?(pl>=9?'<span class="bad">nessuno: giri non organizzati</span>':`${kw('carico','carico')} <b style="color:${loadCol(pl)}">${Math.round(pl*100)}%</b>${pl>1.02?' <span class="bad">in affanno</span>':''}`):'i giri li organizzi tu'}${pq?` · ${pq} in arrivo`:''}</span>${pn&&pl<9?loadBar(pl):''}</span><b class="num ${pl>1.02?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${S.office.plan}</b><button class="btn sm2" data-act="fire" data-role="plan" ${S.office.plan<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="plan" aria-label="Assumi">+ Assumi</button></div>
+   <div class="staff"><img class="px mini" src="${S.office.plan?IMG.plan:IMG.anon}" alt="" width="48" height="56"><span>${kw('pianificatori',ROLE.plan)}<br><span class="sm">${pn?(pl>=9?'<span class="bad">nessuno: giri non organizzati</span>':`${kw('carico','carico')} <b style="color:${loadCol(pl)}">${Math.round(pl*100)}%</b>${pl>1.02?' <span class="bad">in affanno</span>':''}`):'i giri li organizzi tu'}${pq?` · ${pq} in arrivo`:''}</span>${pn&&pl<9?loadBar(pl):''}</span><b class="num ${pl>1.02?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${S.office.plan}</b><button class="btn sm2" data-act="fire" data-role="plan" ${S.office.plan<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="plan" aria-label="Assumi">+ Assumi</button></div>
    <div class="sm">${pn?`Organizzano i giri dei camion di tutti i magazzini. Ognuno che manca toglie 2 punti di puntualità ovunque; con la squadra al completo i km costano il 4% in meno.`:`Fino a 80 viaggi al mese i giri li organizzi tu. Poi serve un pianificatore ogni 80 viaggi.`}</div></div>
    <div class="card"><div class="row"><span class="h3">${kw('assunzioni')} in corso</span></div>${S.queue.length?S.queue.map(q=>`<div class="row sm"><span>${ROLE[q.role]}${q.wh?' · '+esc(whById(q.wh).name):' · sede'}</span><span>${q.days} giorni</span></div>`).join(''):'<div class="sm">Nessuna.</div>'}
    <div class="sm">Tempi più brevi con benefit, servizi di welfare del magazzino e reputazione alti. Gli autisti con patente CE sono i più difficili da trovare.</div></div>
@@ -2969,9 +2998,9 @@ const VIEWS={
   const lines=nodes.flatMap(t=>(t.req||[]).map(r=>{const a=TECH.find(x=>x.id===r); if(a.tree!==tree) return ''; const p1=pos(a),p2=pos(t); const x1=p1.x+NW,y1=p1.y+NH/2,x2=p2.x,y2=p2.y+NH/2,mx=x1+(x2-x1)/2;
     return `<path d="M${x1} ${y1}H${mx}V${y2}H${x2}" fill="none" stroke="${R(r)?'#2e9e48':'#8a96a6'}" stroke-width="3"/>`;})).join('');
   const sel=TECH.find(t=>t.id===UI.sel.tech&&t.tree===tree)||nodes.find(t=>st(t)==='open')||nodes[0];
-  const nodeHtml=nodes.map(t=>{const p=pos(t),s2=st(t);const bg={done:'#eaf6ec',run:'var(--accent)',lock:'#dfe7ee',open:'#ffffff'}[s2];
+  const nodeBtn=t=>{const p=pos(t),s2=st(t);const bg={done:'#eaf6ec',run:'var(--accent)',lock:'#dfe7ee',open:'#ffffff'}[s2];
     const sub=s2==='done'?'<span class="ok">Ricercata</span>':s2==='run'?`In corso · ${pj.left} g`:s2==='lock'?'Bloccata':`${eur(t.cost)} · ${techDays(t)} g`;
-    return `<button class="tnode" data-act="seltech" data-id="${t.id}" data-tip="<div class='tt'>${esc(t.name)}</div><div>${esc(t.txt||'')}</div><div class='sm'>${esc(t.desc)}</div>" aria-pressed="${sel&&sel.id===t.id}" style="left:${p.x}px;top:${p.y}px;width:${NW}px;height:${NH}px;background:${bg};${s2==='lock'?'color:var(--muted)':''}">${techIcon(t,40,s2==='lock')}<span class="tn"><b>${esc(t.name)}</b><span>${sub}</span></span></button>`;}).join('');
+    return `<button class="tnode" data-act="seltech" data-id="${t.id}" data-tip="<div class='tt'>${esc(t.name)}</div><div>${esc(t.txt||'')}</div><div class='sm'>${esc(t.desc)}</div>" aria-pressed="${sel&&sel.id===t.id}" style="${MOB?'':`left:${p.x}px;top:${p.y}px;width:${NW}px;height:${NH}px;`}background:${bg};${s2==='lock'?'color:var(--muted)':''}">${techIcon(t,40,s2==='lock')}<span class="tn"><b>${esc(t.name)}</b><span>${sub}</span></span></button>`;};
   let det='';
   if(sel){const s2=st(sel);const reqs=(sel.req||[]).map(r=>TECH.find(x=>x.id===r));
     const eff=[sel.A?`${kw('accuratezza')} +${f1(sel.A)}`:'',sel.P?`${kw('puntualita')} +${f1(sel.P)}`:'',sel.att?`${kw('attrattivita','attrattività')} +${sel.att}`:'',perWh(sel)?`${kw('installazione','installazione')} ${eur(sel.inst)} per magazzino, canone ${eur(welMese(sel))}/mese${sel.weeks?`, ${kw('apprendimento','apprendimento')} ${sel.weeks} ${sel.weeks===1?'settimana':'settimane'}`:', subito attivo'}`:''].filter(Boolean).join(' · ');
@@ -2984,14 +3013,17 @@ const VIEWS={
       ${reqs.length?`<div class="sm">Richiede: ${reqs.map(r=>`<span class="${R(r.id)?'ok':'bad'}">${esc(r.name)}</span>`).join(', ')}</div>`:''}
       ${act}</div>`;}
   const desc=TREES.find(x=>x[0]===tree)[2];
-  return tabs+pjHtml+`<div class="sm">${desc}</div><div class="treebox"><div style="position:relative;width:${W}px;height:${H}px"><svg width="${W}" height="${H}" style="position:absolute;inset:0" aria-hidden="true">${lines}</svg>${nodeHtml}</div></div>`+det;
+  // sul telefono l'albero diventa un elenco per livelli (niente scorrimento di lato); la scheda segue il livello scelto
+  if(MOB) return tabs+pjHtml+`<div class="sm">${desc}</div>`+[...Array(maxT)].map((_,i)=>{const tn=nodes.filter(t=>t.tier===i+1).sort((a,b)=>a.row-b.row);
+    return tn.length?`<div class="lab">Livello ${i+1}</div><div class="tlist">${tn.map(nodeBtn).join('')}</div>${sel&&sel.tier===i+1?det:''}`:'';}).join('');
+  return tabs+pjHtml+`<div class="sm">${desc}</div><div class="treebox"><div style="position:relative;width:${W}px;height:${H}px"><svg width="${W}" height="${H}" style="position:absolute;inset:0" aria-hidden="true">${lines}</svg>${nodes.map(nodeBtn).join('')}</div></div>`+det;
  },
  direzione(){
   if(!R('direzione')) return `<div class="card pend"><span class="h3">Serve la Struttura direzionale</span><div>La squadra dei dirigenti arriva con la ricerca <b>Struttura direzionale</b> nell'albero Sviluppo aziendale (richiede il Gestionale amministrativo).</div><div><button class="btn sm2 pri" data-act="opentech" data-tree="org" data-id="direzione">Apri l'albero</button></div></div>`;
   const pool=[...S.managers.filter(m=>m.hired&&!m.wh),...S.execs.filter(e=>e.hired)];
   const seats=DIR_ROLES.map(r=>{const p=personById(S.dirs[r.id]);const v=p?p.st[r.stat]:null;
     const opts=pool.filter(x=>!seatOf(x.id)||S.dirs[r.id]===x.id).map(x=>`<option value="${x.id}" ${S.dirs[r.id]===x.id?'selected':''}>${esc(x.name)} (${r.statN} ${x.st[r.stat]})</option>`).join('');
-    return `<div class="card" style="flex-direction:row;gap:10px;align-items:center"><img class="px mini" src="${p?IMG['m_'+p.id]:IMG.imp}" alt="" width="48" height="56" style="${p?'':'opacity:.3'}">
+    return `<div class="card" style="flex-direction:row;gap:10px;align-items:center"><img class="px mini" src="${p?IMG['m_'+p.id]:IMG.anon}" alt="${p?'':'Posto vacante'}" width="48" height="56">
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><div class="row"><b>${kw('dir_'+r.id,r.name)}</b>${statBadge(r.stat,v,14)}</div>
       <div class="sm ${p?(v>=10?'ok':'bad'):''}">${p?r.eff(v):'Posto vacante'}</div>
       <select data-act="setdir" data-role="${r.id}" aria-label="${r.name}"><option value="">Vacante</option>${opts}</select></div></div>`;}).join('');
@@ -3149,7 +3181,7 @@ const VIEWS={
   const cellSel=UI.sel.cell||'A1';
   let head=[], rows=[], fx={}, charts='', pre='';
   const short=d=>{const a=dateOf(d-7);return `${a.getUTCDate()}/${a.getUTCMonth()+1}`;};
-  const td=(ref,v,cls,f,al)=>{fx[ref]=f||v;return `<td data-act="cell" data-ref="${ref}" class="${cls||''}${ref===cellSel?' sel':''}" style="${al?'text-align:left':''}">${v}</td>`;};
+  const td=(ref,v,cls,f,al)=>{fx[ref]=f||v;return `<td data-act="cell" data-ref="${ref}" data-h="${esc(head[COLS.indexOf(ref[0])]||'')}" class="${cls||''}${ref===cellSel?' sel':''}" style="${al?'text-align:left':''}">${v}</td>`;};
   const pct=v=>v==null?'':f1(v)+'%';
   if(sh==='sum'){
     head=['Magazzino','Puntualità','Δ','Accuratezza','Δ','Occupazione','Morale','Margine sett.','Andamento P (8 sett.)'];
@@ -3578,6 +3610,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.23',t:'Tutto a portata di dito',x:['Sul computer le finestre non escono più dal fondo dello schermo: si accorciano e il contenuto scorre dentro con la rotellina, senza doverle trascinare in alto.','Sul telefono niente scorre più di lato: l\'albero delle tecnologie diventa un elenco per livelli e il report KPI mostra ogni riga del foglio come una scheda.','Sistemati i pulsanti con il testo più largo del pulsante (Tecnologie, Apri, schede delle gare).','I posti vuoti (dirigenti vacanti, magazzino senza manager, reparti senza personale) mostrano una sagoma anonima in ombra.']},
  {v:'0.22',t:'Dormici sopra',x:['15 nuovi clienti piccoli e locali: una panetteria di Orbassano, una distilleria di Bassano, le sedie di Manzano, i ricambi nautici di Lerici e altri.','Ci sono sempre almeno tre gare aperte (quattro con l\'Ufficio commerciale), ed escono più spesso i clienti piccoli e le zone di una sola provincia.','Negli eventi la scelta non ha effetto subito: il giorno dopo arriva una finestra che racconta com\'è andata, con gli effetti.']},
  {v:'0.21',t:'Il regolamento in bacheca',x:['Nuova finestra Policy aziendali: regole da accendere o spegnere per tutta l\'azienda, ognuna con un vantaggio e un prezzo. Dopo un cambio servono 90 giorni per cambiarla di nuovo.','12 policy: Zero straordinario, Sabato obbligatorio, Telefoni nell\'armadietto, Doppia spunta in uscita, Niente cooperative, Spending review, Il cliente ha sempre ragione, Limite 80 all\'ora, Smart working, Rotazione delle mansioni, Settimana corta e Corso sicurezza.','Si sbloccano con la nuova ricerca Regolamento aziendale e con altre tecnologie, comprese due nuove del Welfare: Lavoro agile e Settimana corta.','I manager hanno delle pretese: alcuni vogliono una policy, altri non la sopportano. Dopo un mese arriva l\'ultimatum: li accontenti, alzi lo stipendio perché la sopportino, oppure se ne vanno.','Nuovo evento: un concorrente prova a portarti via un manager. Pareggi l\'offerta, rilanci meno o lo lasci andare.']},
  {v:'0.20',t:'Chi è in affanno?',x:['Le committenti non dicono più quante persone assumere: nelle gare e nei magazzini ogni reparto mostra il suo carico di lavoro, con una barra verde, gialla o rossa.','Oltre il 100% un reparto è in affanno e i KPI scendono: sei tu a decidere quanti magazzinieri, carrellisti e autisti assumere, e quando.','Nella scheda della gara puntualità e accuratezza previste sono quelle con il personale che hai oggi, insieme al carico che avresti vincendo.','Nuova voce dell\'enciclopedia: Carico di lavoro.']},

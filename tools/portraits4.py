@@ -127,6 +127,18 @@ person('cc7',skin='chiara',hair='#4a3426',hairl='#6e4e38',hairstyle='messy',clot
 person('cc8',skin='media',hair='#b9bec5',hairl='#dfe3e8',hairstyle='perm',cloth='#1f9e8f',clothd='#157366',clothl='#3dd6c4',lips='#b0505a',glasses='#16202e')
 person('cc9',skin='media',hair='#5d636b',hairl='#8a9098',hairstyle='bald',cloth='#3a4658',clothd='#2a3442',clothl='#4f5d72',beard='#5d636b',collar=tie('#ff7a3d'))
 person('cc10',skin='chiara',hair='#ffd23f',hairl='#fff3c4',hairstyle='long',cloth='#2b3550',clothd='#1b2238',clothl='#44547a',lips='#c85a62',collar=cc_col('#ffd23f'))
+
+# posto vacante: sagoma anonima in ombra (p_anonimo), con un punto di domanda sul petto
+def anonimo():
+    c=Canvas()
+    torso=ell(24,58,24,18)&(yy<56); neck=rect(20,32,28,42); head=ell(24,23,9.8,12)|ell(24,27,9.3,8.5)
+    c.shaded(torso,'#2f3d52','#1f2a3a','#3d4d66',24,50,22,10)
+    c.shaded(neck,'#26334a','#1b2536','#2f3d52',24,36,4,5,td=0.25,tl=-0.6)
+    c.shaded(head,'#2f3d52','#1f2a3a','#3d4d66',22,22,10,12)
+    q=[(22,44),(23,43),(24,43),(25,43),(26,44),(26,45),(25,46),(24,47),(24,48),(24,50)]
+    c.px(q,'#8a96a6')
+    c.outline('#0c131d'); save2(c,'anonimo')
+anonimo()
 bg=Image.new('RGBA',(3*104,120),(42,58,80,255))
 for i,n in enumerate(['ottavio','giulia','roberto']):
     im=Image.open(OUT+f'p_{n}.png'); bg.alpha_composite(im,(4+i*104,4))
