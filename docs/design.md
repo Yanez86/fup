@@ -126,6 +126,29 @@ Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Opera
 - Sbloccati dalla "Struttura direzionale". Posti disponibili: operativo (Operazioni), commerciale (Negoziazione), risorse umane (Leadership), finanziario (Amministrazione), tecnologia (Innovazione).
 - I candidati sono i manager già assunti e non assegnati a un magazzino, oppure i dirigenti esterni Ottavio Ferri, Giulia Marchetti e Roberto "Bob" Colombo (head hunter 15.000 €).
 
+## Policy aziendali
+Regole per tutta l'azienda, accese o spente dalla finestra Policy (`POLICIES` in `src/game.html`, stato in `S.pol`). La finestra si apre con la ricerca **Regolamento aziendale** (Sviluppo aziendale, 8.000 €, 20 giorni); ogni policy richiede anche la sua tecnologia. Si possono accendere tutte quelle sbloccate; dopo un cambio servono 90 giorni (`POL_CD`) prima di cambiarla di nuovo. Zero straordinario e Sabato obbligatorio sono opposte.
+
+| Policy | Si sblocca con | Effetto |
+|---|---|---|
+| Zero straordinario | Regolamento | morale +4; penalità per personale insufficiente su P e A ×1,5 |
+| Sabato obbligatorio | Regolamento | penalità per personale insufficiente ×0,5; costo personale dei magazzini +8%; morale −5 |
+| Telefoni nell'armadietto | Regolamento | A +0,5; morale −2 |
+| Doppia spunta in uscita | Lettori barcode | A +1; produttività −5% |
+| Niente cooperative | Ufficio del personale | morale +3; reputazione +0,2/mese; cooperativa vietata (all'accensione 600 € a persona) |
+| Spending review | Controllo di gestione | costi fissi −5%; morale −2; niente nuove installazioni di servizi di welfare |
+| Il cliente ha sempre ragione | Key account management | soddisfazione +1/mese per ogni cliente attivo; morale −3; punteggio gare −2 |
+| Limite 80 all'ora per i bilici | Telematica GPS | gasolio −6%; P −0,5; reputazione +0,1/mese |
+| Smart working in sede | Lavoro agile (Welfare, 6.000 €) | morale +1; P −0,3; tempo di assunzione dei pianificatori ×0,7 |
+| Rotazione delle mansioni | Formazione strutturata | morale +2; apprendimento delle tecnologie ×0,8; produttività −2% |
+| Settimana corta | Settimana corta (Welfare, 30.000 €, dopo lo Sportello d'ascolto) | morale +6; attrattività +8; produttività −10% |
+| Corso sicurezza obbligatorio | Sicurezza muletti | A +0,3; morale +1; produttività −2% |
+
+**Pretese** (`POL_TAL`, dai talenti di manager e dirigenti assunti; il CEO non ne ha): *Ex sindacalista* vuole Zero straordinario e Niente cooperative, odia Sabato obbligatorio; *Stacanovista* vuole Sabato obbligatorio, odia Zero straordinario e Settimana corta; *Sempre al telefono* odia Telefoni nell'armadietto; *Excel-dipendente* vuole Doppia spunta; *Parla con i robot* la odia; *Braccino corto* vuole Spending review, *Mano larga* la odia; *Cena col buyer* vuole Il cliente ha sempre ragione; *Insonne* vuole Smart working, *Ha fatto il militare* lo odia e vuole il Corso sicurezza. Contano solo le policy sbloccate.
+- Ogni giorno con una pretesa non rispettata (e non tollerata) lo scontento `unh` sale di 1; senza pretese scende di 2.
+- A 30 arriva l'ultimatum: accontentare (la policy cambia subito, anche dentro i 90 giorni), aumento del 15% (tollera per sempre tutte le policy che oggi non digerisce) oppure tenere il punto (lascia l'azienda dopo 30 giorni; se nel frattempo la pretesa viene rispettata ritira le dimissioni).
+- Evento casuale «Un'offerta dalla concorrenza» per chi non ha avuto aumenti da oltre un anno: pareggiare (+20%, tollera le policy di oggi), controproposta +8% (50% accetta, altrimenti se ne va dopo 30 giorni), rifiutare (67% se ne va dopo 30 giorni).
+
 ## Eventi
 - Uno ogni 30-55 giorni (il primo verso il 25° giorno). Un evento non si ripete prima di 240 giorni; quelli con `once` capitano una sola volta.
 - Ogni evento ha 2-3 opzioni. Alcune opzioni richiedono un talento o un'abilità del CEO.
