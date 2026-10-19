@@ -7,6 +7,7 @@ s = open(A('src', 'game.html'), encoding='utf-8').read()
 def b64(f):
     return 'data:image/png;base64,' + base64.b64encode(open(A('assets', f), 'rb').read()).decode()
 s = s.replace('{{MAP}}', b64('mappa_nw.png'))
+s = s.replace('{{PROV}}', open(A('assets', 'province.json'), encoding='utf-8').read().strip())  # confini, da tools/province.py
 s = re.sub(r'\{\{P_(\w+)\}\}', lambda m: b64(f'ritratto_{m.group(1)}.png'), s)  # CEO
 s = re.sub(r'\{\{Q_(\w+)\}\}', lambda m: b64(f'p_{m.group(1)}.png'), s)         # manager, dirigenti, staff
 left = re.findall(r'\{\{\w+\}\}', s)

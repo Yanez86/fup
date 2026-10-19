@@ -33,7 +33,7 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 - **MOTORE**: `computeWH()` calcola KPI, costi e ricavi di un magazzino (i km arrivano da `clientLog`); `step()` fa avanzare un giorno; `weekEnd()` (report del lunedì in `S.weeks`); `monthEnd()`; gare (`newTender`, `bidEstimate`, `resolveTender`); helper `R(id)` (tecnologia ricercata), `dirStat(ruolo)`, `fixedMul()`, `capOf()`.
 - **EVENTI**: array `EVENTS` con `{id, src, title, text, cond, once?, setup?, opts:[{t, e, f, req?, reqT?}]}`. `fireEvent()` sceglie un evento tra quelli validi; ogni evento ha un'attesa di 240 giorni prima di poter tornare.
 - **SALVATAGGIO**: `localStorage` con chiave `KEY`. **Se cambi la forma di `S`, aumenta la versione della chiave** (`fup-salvataggio-vN`) oppure aggiungi una migrazione in `ACT.continue`.
-- **MAPPA**: proiezione `pt(lon,lat)`, pan/zoom, marker SVG, camion animati.
+- **MAPPA**: proiezione `pt(lon,lat)`, pan/zoom, marker SVG, camion animati. Lenti della mappa in `LENSES` (`UI.lens`, tasto L): ogni lente ha `draw()` che restituisce uno strato SVG disegnato sotto città e magazzini; `PROV` contiene i confini delle province.
 - **INTERFACCIA**: `DOCK` (menu a sinistra), `TITLES`, `VIEWS.<finestra>()` restituisce l'HTML della finestra; `renderAll()` ridisegna tutto, saltando le finestre con un campo attivo.
 - **AZIONI**: tutti i click passano da `data-act="nome"` → `ACT.nome(dataset, element)`. Per aggiungere un pulsante: `data-act` + `data-*` nell'HTML e una funzione in `ACT`.
 - **AVVIO**: schermata iniziale, scelta del CEO e del colore aziendale, game loop (`STEP` = ms per giorno per ogni velocità).
@@ -64,6 +64,7 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 ## Asset
 - I ritratti sono generati in Python (`tools/portraits*.py`, funzione `person(...)` con pelle, capelli, acconciatura, vestiti, occhiali, barba…). Per un nuovo personaggio aggiungi una chiamata in `portraits3.py` / `portraits4.py`, rigenera, poi usa `{{Q_nome}}` nell'oggetto `IMG` di `src/game.html`.
 - Mappa: `tools/map_nw.py` (coste e confini disegnati a mano, rumore per il rilievo). Proiezione: `LON0=4.81, LAT1=47.0`, 640×400 mostrata a 2x.
+- Province: `tools/province.py` scarica i confini ISTAT (openpolis/geojson-italy), li semplifica e scrive `assets/province.json`, che `build.py` incorpora al posto di `{{PROV}}`.
 - Il foglio `docs/KPI_Puntualita_Accuratezza.xlsx` è generato da `tools/kpi_xlsx.py`, `personaggi.py`, `eventi.py`, `simsheet.py`, `add_sheets.py`. Non è sincronizzato in automatico con il gioco: le formule autorevoli sono in `src/game.html` e in `docs/design.md`.
 
 ## Checklist prima di un commit

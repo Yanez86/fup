@@ -33,6 +33,13 @@ async def main():
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + PAGE)
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
+        # lente delle province
+        await pg.click('#lenses [data-act=lens][data-id=prov]')
+        n = await pg.evaluate("document.querySelectorAll('#ov path.prov').length")
+        assert n == 25, f'province disegnate: {n}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_lente_province.png'))
+        await pg.keyboard.press('KeyL')  # torna alla mappa normale
+        assert await pg.evaluate("document.querySelectorAll('#ov path.prov').length") == 0
         for w in ['azienda','magazzini','clienti','gare','report','personale','direzione','espansione','giornale','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
         for t in ['log','org','mkt']:
