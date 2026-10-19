@@ -26,8 +26,10 @@
   --f-body:'IBM Plex Sans Condensed', 'Arial Narrow', Arial, sans-serif;
   color-scheme: light;
 }
+/* sfondo scuro come la barra e il menu: su iPhone si vede sotto la barra di stato e sotto il menu, dove la mappa non arriva */
+html{background:var(--ink)}
 html,body{height:100%}
-body{margin:0;background:var(--sea);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;
+body{margin:0;background:var(--ink);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0}
 button{font:inherit;cursor:pointer;color:inherit}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--yellow);outline-offset:1px}
