@@ -46,7 +46,7 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 - **KPI separati**: Puntualità e Accuratezza (non OTIF), con soglie diverse per ogni cliente (`sP`, `sA`, `null` = non richiesta).
 - **Personaggi**: 6 abilità base (Operazioni, Precisione, Negoziazione, Leadership, Amministrazione, Innovazione) più talenti, cioè icone con tooltip, effetto e un testo di colore ironico.
 - **Personale**: per ogni magazzino magazzinieri, carrellisti, capiturno, impiegati di magazzino, autisti con patente B (furgoni) e con patente CE (bilici); in sede i pianificatori del traffico. Magazzinieri e carrellisti possono venire da una cooperativa.
-- **Tecnologie**: tre alberi in stile Civ (Logistica / Sviluppo aziendale / Mercato), **una ricerca alla volta**, con tempo di ricerca ridotto dall'Innovazione. Le tecnologie di Logistica, dopo la ricerca, vanno **installate in ogni magazzino** e hanno un periodo di apprendimento; le altre valgono per tutta l'azienda.
+- **Tecnologie**: quattro alberi in stile Civ (Logistica / Sviluppo aziendale / Mercato / Welfare), **una ricerca alla volta**, con tempo di ricerca ridotto dall'Innovazione. Le tecnologie di Logistica e i servizi di Welfare, dopo la ricerca, vanno **installati in ogni magazzino** (solo la Logistica ha un periodo di apprendimento); le altre valgono per tutta l'azienda. Ogni tecnologia ha `desc` (effetto) e `txt` (cos'è, in frasi semplici).
 - **Dirigenti**: 5 posti (operativo, commerciale, HR, finanza, tecnologia), sbloccati solo dalla ricerca "Struttura direzionale".
 - **Eventi**: tanti e vari (meteo, politica, locali, clienti, personale), divertenti ma credibili, **rari**: uno ogni 30-55 giorni.
 - **Mappa**: solo il Nord-Ovest è giocabile, il resto d'Italia è desaturato.
@@ -61,7 +61,7 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 - Ogni nuova meccanica o statistica deve avere una voce in `WIKI` e, dove compare nell'interfaccia, una parola chiave `kw()`. Se cambi una formula, aggiorna anche il testo della voce.
 - I grafici sono SVG fatti a mano (`lineChart()`, con crosshair e tooltip in `chartHover`): niente librerie; linee da 2px, le soglie tratteggiate, la legenda sempre presente e le etichette dirette al massimo per 4 serie; una sola scala per grafico.
 - Il report KPI imita Excel (barra verde, schede dei fogli, barra della formula), ma resta nella nostra tavolozza.
-- Cornici delle tecnologie: Logistica = quadrato arancione, Sviluppo aziendale = ottagono viola, Mercato = tondo verde.
+- Cornici delle tecnologie: Logistica = quadrato arancione, Sviluppo aziendale = ottagono viola, Mercato = tondo verde, Welfare = quadrato smussato rosso.
 - Interfaccia: mappa a tutto schermo con finestre mobili sopra (stile Paradox); sul telefono le finestre sono a tutto schermo. Font base grande e leggibile.
 
 ## Asset

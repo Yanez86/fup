@@ -165,6 +165,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .tnode .tn{display:flex;flex-direction:column;gap:2px;min-width:0}
 .tnode b{font-size:13.5px;line-height:1.15}
 .tnode span{font-size:12px}
+.ttxt{font-style:italic;color:var(--ink4)}
 .tnode[aria-pressed="true"]{outline:3px solid var(--yellow);outline-offset:1px}
 .win-h{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 10px;background:var(--ink);color:#fff;box-shadow:inset 0 -3px 0 var(--ink2), inset 0 2px 0 var(--ink3);cursor:move;user-select:none;touch-action:none}
 .win-h h2{flex:1;margin:0;font-family:var(--f-disp);font-size:19px;font-weight:600}
@@ -390,6 +391,10 @@ html,body{overscroll-behavior:none}
 .mob .xbtn{width:44px;height:40px;font-size:16px}
 .mob .win-b{padding:10px max(10px, env(safe-area-inset-right, 0px)) 16px 10px;overscroll-behavior:contain}
 .mob .tabs button{padding:10px 6px}
+.mob .ttabs{display:grid;grid-template-columns:1fr 1fr}
+.mob .ttabs button{border-bottom:2px solid var(--ink)}
+.mob .ttabs button:nth-child(2n){border-right:0}
+.mob .ttabs button:nth-child(n+3){border-bottom:0}
 .mob .win-b > *{flex-shrink:0}
 .mob .skills{grid-template-columns:repeat(2,minmax(0,1fr))}
 .mob .btn{min-height:40px}
@@ -626,33 +631,39 @@ function nazMissing(c){
 }
 const RIVALS=['Gruppo Bartolazzi','Logistix Global','F.lli Brambilla Autotrasporti','Cooperativa La Fatica'];
 const TECH=[
- {id:'barcode',tree:'log',tier:1,row:0,name:'Lettori barcode',year:2002,cost:6000,days:20,inst:12000,mese:150,A:1.5,weeks:2,desc:'Meno errori di prelievo.'},
- {id:'formazione',tree:'log',tier:1,row:1,name:'Formazione strutturata',year:2002,cost:3000,days:15,inst:4000,mese:250,A:0.5,mor:3,weeks:1,desc:'Personale più preparato: morale +3.'},
- {id:'gps',tree:'log',tier:1,row:2,name:'Telematica GPS',year:2004,cost:15000,days:30,inst:10000,mese:500,P:2,sm:2,weeks:3,desc:'Mezzi visibili in tempo reale: meno ritardi, saturazione dei mezzi +2.'},
- {id:'wms',tree:'log',tier:2,row:0,req:['barcode'],name:'WMS di base',year:2002,cost:40000,days:75,inst:25000,mese:800,A:1.5,P:0.5,weeks:6,desc:'Il magazzino sa dove sta ogni pallet.'},
- {id:'anticoll',tree:'log',tier:2,row:1,req:['formazione'],name:'Sicurezza muletti',year:2006,cost:12000,days:30,inst:20000,mese:150,A:0.5,mor:2,weeks:2,desc:'Sensori anti-collisione: meno danni e infortuni.'},
- {id:'rotte',tree:'log',tier:2,row:2,req:['gps'],name:'Pianificazione rotte',year:2007,cost:35000,days:50,inst:15000,mese:600,P:2,fuel:0.05,sm:5,weeks:4,desc:'Percorsi ottimizzati: gasolio −5%, saturazione dei mezzi +5.'},
- {id:'rf',tree:'log',tier:3,row:0,req:['wms'],name:'Radiofrequenza',year:2004,cost:25000,days:40,inst:30000,mese:400,A:1,P:0.5,prod:0.1,weeks:4,desc:'Terminali senza carta: produttività +10%.'},
- {id:'verticale',tree:'log',tier:3,row:1,req:['wms','anticoll'],name:'Magazzino verticale',year:2012,cost:80000,days:120,inst:400000,mese:2500,A:0.5,cap:0.2,weeks:10,desc:'Scaffalature automatiche: capacità +20%.'},
- {id:'sinergia',tree:'log',tier:3,row:2,req:['rotte'],name:'Sinergia in pianificazione',year:2008,cost:45000,days:60,inst:15000,mese:500,smC:7,smMax:30,weeks:6,desc:'Merce di clienti diversi sullo stesso camion: saturazione dei mezzi +7 per ogni cliente oltre il primo (massimo +30), se servono gli stessi canali.'},
- {id:'ptl',tree:'log',tier:4,row:0,req:['rf'],name:'Pick-to-light',year:2008,cost:40000,days:60,inst:80000,mese:600,A:2,P:0.5,prod:0.15,weeks:4,desc:'Picking guidato dalle luci: produttività +15%.'},
- {id:'amr',tree:'log',tier:5,row:0,req:['ptl','verticale'],name:'Robot mobili (AMR)',year:2018,cost:150000,days:150,inst:600000,mese:4000,A:1,P:1,prod:0.4,weeks:12,desc:'Robot che portano gli scaffali agli operatori: produttività +40%.'},
- {id:'gestionale',tree:'org',tier:1,row:0,name:'Gestionale amministrativo',year:2002,cost:15000,days:30,desc:'Fatture e paghe informatizzate: costi fissi −3%, ogni impiegato regge più volume.'},
- {id:'hr',tree:'org',tier:2,row:0,req:['gestionale'],name:'Ufficio del personale',year:2002,cost:20000,days:40,desc:'Selezione più rapida: tempi di assunzione −20%.'},
- {id:'direzione',tree:'org',tier:2,row:1,req:['gestionale'],name:'Struttura direzionale',year:2002,cost:50000,days:90,desc:'Sblocca la squadra dei dirigenti: cinque direttori che guidano tutta l\'azienda.'},
- {id:'welfare2',tree:'org',tier:3,row:0,req:['hr'],name:'Welfare aziendale',year:2004,cost:25000,days:45,desc:'Convenzioni e piattaforma welfare: costo delle voci di welfare −30%.'},
- {id:'controllo',tree:'org',tier:3,row:1,req:['direzione'],name:'Controllo di gestione',year:2003,cost:40000,days:60,desc:'Budget e analisi dei costi: costi fissi −4%.'},
- {id:'academy',tree:'org',tier:4,row:0,req:['welfare2'],name:'Academy aziendale',year:2010,cost:60000,days:90,desc:'Formazione interna: morale +3 e apprendimento delle tecnologie −30% ovunque.'},
- {id:'iso',tree:'org',tier:4,row:1,req:['controllo'],name:'Certificazione ISO 9001',year:2005,cost:45000,days:120,desc:'Accuratezza +0,5 ovunque, reputazione +5, punteggio nelle gare +3.'},
- {id:'commerciale',tree:'mkt',tier:1,row:0,name:'Ufficio commerciale',year:2002,cost:15000,days:30,desc:'Più gare: ce ne sono sempre almeno 3 aperte invece di 2.'},
- {id:'freddo',tree:'mkt',tier:1,row:1,name:'Catena del freddo',year:2002,cost:30000,days:45,desc:'Certificazione per freschi e farmaci: sblocca le gare che la richiedono.'},
- {id:'edi',tree:'mkt',tier:2,row:0,req:['commerciale'],name:'EDI con i clienti',year:2003,cost:30000,days:50,desc:'Ordini automatici: soddisfazione +1 al mese sopra soglia. Richiesto dalla grande distribuzione.'},
- {id:'marketing',tree:'mkt',tier:2,row:1,req:['commerciale'],name:'Marketing e fiere',year:2002,cost:25000,days:40,desc:'Stand alle fiere di settore: reputazione +5 subito e +0,2 al mese.'},
- {id:'kam',tree:'mkt',tier:3,row:0,req:['edi'],name:'Key account management',year:2005,cost:40000,days:60,desc:'Un referente per ogni grande cliente: soddisfazione +1 al mese, rinnovo da 40 invece di 50.'},
- {id:'accordi',tree:'mkt',tier:4,row:1,req:['kam'],name:'Accordi quadro nazionali',year:2006,cost:60000,days:90,desc:'Contratti nazionali con i grandi gruppi: sblocca le gare delle committenti S e A (servono anche 3 magazzini e reputazione 65).'},
- {id:'ecom',tree:'mkt',tier:4,row:0,req:['kam','marketing'],name:'Logistica e-commerce',year:2012,cost:70000,days:90,desc:'Sblocca le gare dei negozi online: tanti ordini, volumi alti, KPI esigenti.'}
+ {id:'barcode',tree:'log',tier:1,row:0,name:'Lettori barcode',year:2002,cost:6000,days:20,inst:12000,mese:150,A:1.5,weeks:2,desc:'Meno errori di prelievo.',txt:'Ogni collo ha la sua etichetta a barre. Il magazziniere spara il codice e il sistema controlla che sia l\'articolo giusto.'},
+ {id:'formazione',tree:'log',tier:1,row:1,name:'Formazione strutturata',year:2002,cost:3000,days:15,inst:4000,mese:250,A:0.5,mor:3,weeks:1,desc:'Personale più preparato: morale +3.',txt:'Corsi veri al posto del solito «guarda come faccio io». Chi sa cosa fare sbaglia meno e lavora più tranquillo.'},
+ {id:'gps',tree:'log',tier:1,row:2,name:'Telematica GPS',year:2004,cost:15000,days:30,inst:10000,mese:500,P:2,sm:2,weeks:3,desc:'Mezzi visibili in tempo reale: meno ritardi, saturazione dei mezzi +2.',txt:'Una scatoletta su ogni camion che dice dove si trova. Basta telefonate all\'autista per sapere quando arriva.'},
+ {id:'wms',tree:'log',tier:2,row:0,req:['barcode'],name:'WMS di base',year:2002,cost:40000,days:75,inst:25000,mese:800,A:1.5,P:0.5,weeks:6,desc:'Il magazzino sa dove sta ogni pallet.',txt:'Il programma che governa il magazzino. Sa dov\'è ogni pallet e dice al personale dove metterlo e dove prenderlo.'},
+ {id:'anticoll',tree:'log',tier:2,row:1,req:['formazione'],name:'Sicurezza muletti',year:2006,cost:12000,days:30,inst:20000,mese:150,A:0.5,mor:2,weeks:2,desc:'Sensori anti-collisione: meno danni e infortuni.',txt:'Sensori e luci blu sui muletti. Avvisano il carrellista quando qualcuno è troppo vicino.'},
+ {id:'rotte',tree:'log',tier:2,row:2,req:['gps'],name:'Pianificazione rotte',year:2007,cost:35000,days:50,inst:15000,mese:600,P:2,fuel:0.05,sm:5,weeks:4,desc:'Percorsi ottimizzati: gasolio −5%, saturazione dei mezzi +5.',txt:'Un programma calcola il giro migliore per ogni camion. Meno chilometri a vuoto, meno gasolio.'},
+ {id:'rf',tree:'log',tier:3,row:0,req:['wms'],name:'Radiofrequenza',year:2004,cost:25000,days:40,inst:30000,mese:400,A:1,P:0.5,prod:0.1,weeks:4,desc:'Terminali senza carta: produttività +10%.',txt:'Terminali portatili collegati al WMS. Le liste di prelievo arrivano sullo schermo, non più su carta.'},
+ {id:'verticale',tree:'log',tier:3,row:1,req:['wms','anticoll'],name:'Magazzino verticale',year:2012,cost:80000,days:120,inst:400000,mese:2500,A:0.5,cap:0.2,weeks:10,desc:'Scaffalature automatiche: capacità +20%.',txt:'Torri automatiche che portano la merce all\'operatore. Si sfrutta tutta l\'altezza del capannone.'},
+ {id:'sinergia',tree:'log',tier:3,row:2,req:['rotte'],name:'Sinergia in pianificazione',year:2008,cost:45000,days:60,inst:15000,mese:500,smC:7,smMax:30,weeks:6,desc:'Merce di clienti diversi sullo stesso camion: saturazione dei mezzi +7 per ogni cliente oltre il primo (massimo +30), se servono gli stessi canali.',txt:'I pianificatori mettono insieme la merce di clienti diversi diretta nella stessa zona. Si viaggia più pieni.'},
+ {id:'ptl',tree:'log',tier:4,row:0,req:['rf'],name:'Pick-to-light',year:2008,cost:40000,days:60,inst:80000,mese:600,A:2,P:0.5,prod:0.15,weeks:4,desc:'Picking guidato dalle luci: produttività +15%.',txt:'Una luce si accende sulla casella da cui prelevare e indica quanti pezzi prendere. Si va veloci e si sbaglia poco.'},
+ {id:'amr',tree:'log',tier:5,row:0,req:['ptl','verticale'],name:'Robot mobili (AMR)',year:2018,cost:150000,days:150,inst:600000,mese:4000,A:1,P:1,prod:0.4,weeks:12,desc:'Robot che portano gli scaffali agli operatori: produttività +40%.',txt:'Piccoli robot girano per il magazzino e portano gli scaffali a chi prepara gli ordini. Nessuno cammina più per chilometri.'},
+ {id:'gestionale',tree:'org',tier:1,row:0,name:'Gestionale amministrativo',year:2002,cost:15000,days:30,desc:'Fatture e paghe informatizzate: costi fissi −3%, ogni impiegato regge più volume.',txt:'Un unico programma per fatture, paghe e contabilità. Addio fogli Excel sparsi sulle scrivanie.'},
+ {id:'hr',tree:'org',tier:2,row:0,req:['gestionale'],name:'Ufficio del personale',year:2002,cost:20000,days:40,desc:'Selezione più rapida: tempi di assunzione −20%.',txt:'Un ufficio che si occupa solo di cercare, assumere e seguire le persone.'},
+ {id:'direzione',tree:'org',tier:2,row:1,req:['gestionale'],name:'Struttura direzionale',year:2002,cost:50000,days:90,desc:'Sblocca la squadra dei dirigenti: cinque direttori che guidano tutta l\'azienda.',txt:'L\'azienda smette di essere solo il CEO e qualche fedelissimo. Arrivano i direttori, ognuno con la sua area.'},
+ {id:'welfare2',tree:'org',tier:3,row:0,req:['hr'],name:'Welfare aziendale',year:2004,cost:25000,days:45,desc:'Convenzioni e piattaforma welfare: costo delle voci di welfare −30%, anche dei servizi installati nei magazzini.',txt:'Un portale con convenzioni e servizi per i dipendenti. Comprando in blocco si spende meno.'},
+ {id:'controllo',tree:'org',tier:3,row:1,req:['direzione'],name:'Controllo di gestione',year:2003,cost:40000,days:60,desc:'Budget e analisi dei costi: costi fissi −4%.',txt:'Budget, centri di costo e una riunione al mese sui numeri. Si scopre dove spariscono i soldi.'},
+ {id:'academy',tree:'org',tier:4,row:0,req:['welfare2'],name:'Academy aziendale',year:2010,cost:60000,days:90,desc:'Formazione interna: morale +3 e apprendimento delle tecnologie −30% ovunque.',txt:'Una scuola interna con aule e formatori. Chi ha esperienza insegna ai nuovi.'},
+ {id:'iso',tree:'org',tier:4,row:1,req:['controllo'],name:'Certificazione ISO 9001',year:2005,cost:45000,days:120,desc:'Accuratezza +0,5 ovunque, reputazione +5, punteggio nelle gare +3.',txt:'Procedure scritte, controlli e un ente esterno che verifica. I clienti si fidano di più.'},
+ {id:'commerciale',tree:'mkt',tier:1,row:0,name:'Ufficio commerciale',year:2002,cost:15000,days:30,desc:'Più gare: ce ne sono sempre almeno 3 aperte invece di 2.',txt:'Venditori che cercano nuovi clienti e seguono le gare. Non si aspetta più che squilli il telefono.'},
+ {id:'freddo',tree:'mkt',tier:1,row:1,name:'Catena del freddo',year:2002,cost:30000,days:45,desc:'Certificazione per freschi e farmaci: sblocca le gare che la richiedono.',txt:'Celle refrigerate, sonde e registri delle temperature. Servono per latticini, surgelati e farmaci.'},
+ {id:'edi',tree:'mkt',tier:2,row:0,req:['commerciale'],name:'EDI con i clienti',year:2003,cost:30000,days:50,desc:'Ordini automatici: soddisfazione +1 al mese sopra soglia. Richiesto dalla grande distribuzione.',txt:'I sistemi dell\'azienda e quelli del cliente si parlano da soli. Ordini e bolle viaggiano senza fax.'},
+ {id:'marketing',tree:'mkt',tier:2,row:1,req:['commerciale'],name:'Marketing e fiere',year:2002,cost:25000,days:40,desc:'Stand alle fiere di settore: reputazione +5 subito e +0,2 al mese.',txt:'Stand alle fiere, brochure e qualche cena con i buyer. Il nome dell\'azienda inizia a girare.'},
+ {id:'kam',tree:'mkt',tier:3,row:0,req:['edi'],name:'Key account management',year:2005,cost:40000,days:60,desc:'Un referente per ogni grande cliente: soddisfazione +1 al mese, rinnovo da 40 invece di 50.',txt:'Ogni grande cliente ha una persona di riferimento. Se c\'è un problema, sa subito a chi telefonare.'},
+ {id:'accordi',tree:'mkt',tier:4,row:1,req:['kam'],name:'Accordi quadro nazionali',year:2006,cost:60000,days:90,desc:'Contratti nazionali con i grandi gruppi: sblocca le gare delle committenti S e A (servono anche 3 magazzini e reputazione 65).',txt:'Contratti firmati con le sedi centrali dei grandi gruppi. Si gioca nel campionato nazionale.'},
+ {id:'ecom',tree:'mkt',tier:4,row:0,req:['kam','marketing'],name:'Logistica e-commerce',year:2012,cost:70000,days:90,desc:'Sblocca le gare dei negozi online: tanti ordini, volumi alti, KPI esigenti.',txt:'Tanti pacchi piccoli, resi e consegne a casa. Un mestiere diverso dal classico pallet.'},
+ {id:'acqua',tree:'wel',tier:1,row:0,name:'Boccioni d\'acqua',year:2002,cost:2000,days:10,inst:600,mese:90,mor:1,att:1,weeks:0,desc:'Morale +1 e il magazzino attira un po\' di più chi cerca lavoro.',txt:'Erogatori di acqua fresca in reparto e in banchina. D\'estate, sotto il tetto del capannone, fanno la differenza.'},
+ {id:'frutta',tree:'wel',tier:2,row:0,req:['acqua'],name:'Servizio frutta',year:2003,cost:5000,days:20,inst:300,mese:250,mor:2,att:2,weeks:0,desc:'Morale +2, attrattività +2.',txt:'Una cassetta di frutta fresca ogni mattina in sala pausa. Mele, banane e qualche mandarino molto conteso.'},
+ {id:'mensa',tree:'wel',tier:3,row:0,req:['frutta'],name:'Mensa aziendale',year:2004,cost:15000,days:40,inst:60000,mese:2500,mor:4,att:4,prod:0.03,weeks:0,desc:'Morale +4, attrattività +4, produttività +3%.',txt:'Un pasto caldo a metà turno, cucinato sul posto. Si mangia insieme e si torna in reparto con più energia.'},
+ {id:'pulmino',tree:'wel',tier:1,row:1,name:'Pulmini per i dipendenti',year:2002,cost:8000,days:20,inst:35000,mese:1200,mor:2,att:5,P:0.5,weeks:0,desc:'Morale +2, attrattività +5, puntualità +0,5.',txt:'Navette che passano dai paesi vicini e dalla stazione a ogni cambio turno. Chi non ha l\'auto arriva lo stesso, e in orario.'},
+ {id:'asilo',tree:'wel',tier:4,row:1,req:['mensa','pulmino'],name:'Asilo aziendale',year:2008,cost:40000,days:75,inst:150000,mese:4000,mor:5,att:8,weeks:0,desc:'Morale +5, attrattività +8.',txt:'Un asilo nido accanto al magazzino, con orari pensati per i turni. Per molti genitori è il motivo per restare.'},
+ {id:'cani',tree:'wel',tier:2,row:2,req:['acqua'],name:'Area cani',year:2010,cost:6000,days:20,inst:8000,mese:150,mor:2,att:3,weeks:0,desc:'Morale +2, attrattività +3.',txt:'Un recinto all\'ombra dove il cane aspetta la fine del turno, con ciotole e un po\' di prato. Il buonumore è contagioso.'}
 ];
-const TREES=[['log','Logistica','Tecnologie da installare in ogni magazzino.'],['org','Sviluppo aziendale','Organizzazione, persone e controllo: valgono per tutta l\'azienda.'],['mkt','Mercato','Accesso a nuovi clienti e gare: valgono per tutta l\'azienda.']];
+const TREES=[['log','Logistica','Tecnologie da installare in ogni magazzino.'],['org','Sviluppo aziendale','Organizzazione, persone e controllo: valgono per tutta l\'azienda.'],['mkt','Mercato','Accesso a nuovi clienti e gare: valgono per tutta l\'azienda.'],['wel','Welfare','Servizi per chi lavora: si ricercano una volta e poi si installano magazzino per magazzino. Alzano il morale e aiutano ad assumere.']];
 const WELFARE=[
  {id:'buoni',name:'Buoni pasto',cost:110,mor:5,att:6},
  {id:'assic',name:'Assicurazione sanitaria',cost:35,mor:4,att:7},
@@ -766,8 +777,8 @@ const TALENTS={
  'Cuore d\'oro':{t:'pos',fx:'Leadership +2 · Amministrazione −1',fl:'Conosce i nomi dei figli di tutti i carrellisti. E i loro problemi con la caldaia.',ic:['.YY.YY..','YYYYYYY.','YYWYYYY.','YYYYYYY.','.YYYYY..','..YYY...','...Y....','........']}
 };
 const TTYPE={pos:['Positivo','#eaf6ec','#6fdc8c'],neg:['Negativo','#fbecec','#ff8a8d'],mix:['Misto','#fff6dc','#ffd23f']};
-const TECH_IC={"barcode":["............",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","RRRRRRRRRRRR",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","............",".K.K.KK.K.K.","............"],"formazione":["............",".NNNNNNNNNN.",".NDDDDDDDDN.",".NDWWDDDDDN.",".NDDDWWWDDN.",".NDWWWDDDDN.",".NDDDDDWWDN.",".NDDDDDDDDN.",".NNNNNNNNNN.","....N..N....","...N....N...","............"],"gps":["....RRRR....","...RRRRRR...","..RRRWWRRR..","..RRWWWWRR..","..RRWWWWRR..","..RRRWWRRR..","...RRRRRR...","....RRRR....",".....RR.....","..GG.RR.GG..",".GGGGGGGGGG.","............"],"wms":["............",".KKKKKKKKKK.",".KBBBBBBBBK.",".KBYYBOOBBK.",".KBSSSSSSBK.",".KBGGBYYBBK.",".KBSSSSSSBK.",".KKKKKKKKKK.",".....KK.....","...KKKKKK...","............","............"],"anticoll":[".....YY.....","....YKKY....","....YKKY....","...YYKKYY...","...YYKKYY...","..YYYKKYYY..","..YYYKKYYY..",".YYYYYYYYYY.",".YYYYKKYYYY.","YYYYYYYYYYYY","KKKKKKKKKKKK","............"],"rotte":["..........R.",".........RRR","..........R.","........DD..",".....DDD....","....D.......","....D.......",".....DDD....","........D...",".G.......D..","GGG..DDDD...",".G.........."],"rf":["..........B.","........B..B","..KKKKK..B.B","..KBBBK...B.","..KBBBK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","...KKK......","............"],"verticale":["..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..DYY.OOBD..","..DDDDDDDD..","..DBB.YYOD..","..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..D......D..","..D......D..",".KKKKKKKKKK."],"sinergia":["............","............",".KKKKKKK....",".KRRYYBK....",".KRRYYBKKKK.",".KGGOOBKWBK.",".KGGOOBKBBKK",".KKKKKKKKKKK","..KK....KK..","..KK....KK..","............","............"],"ptl":["............","GGG.YYY.RRR.","GGG.YYY.RRR.","............","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","............"],"amr":[".....YY.....",".....KK.....","..KKKKKKKK..","..KSSSSSSK..","..KSBSSBSK..","..KSSSSSSK..","..KSRRRRSK..","..KKKKKKKK..",".KOOOOOOOOK.",".KOOOOOOOOK.",".KKKKKKKKKK.","..KK....KK.."],"gestionale":["..KKKKKKK...","..KWWWWWKK..","..KWKKKWWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWWWGGGK..","..KWWWGGGK..","..KWWWWWWK..","..KKKKKKKK.."],"hr":["............","...SSSS.....","..S.FF.S....",".S.FFFF.S...",".S.FFFF.S...",".S.BBBB.S...","..SBBBBS....","...SSSSN....",".......NN...","........NN..",".........NN.","............"],"direzione":["............","....YYYY....","....YYYY....",".....KK.....",".KKKKKKKKKK.",".K...KK...K.",".K...KK...K.","BBB.OOOO.GGG","BBB.OOOO.GGG","BBB.OOOO.GGG","............","............"],"welfare2":["............","..RR....RR..",".RRRR..RRRR.","RRRRRWWRRRRR","RRRRRWWRRRRR","RRRWWWWWWRRR",".RRWWWWWWRR.","..RRRWWRRR..","...RRWWRR...","....RRRR....",".....RR.....","............"],"controllo":["............","............","K.......GG..","K.......GG..","K....BB.GG..","K....BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","KKKKKKKKKKKK","............","............"],"academy":["............",".....KK.....","...KKKKKK...",".KKKKKKKKKK.","KKKKKKKKKKKK",".KKKKKKKKKKY","..KKKKKKKK.Y","..KDDDDDDK.Y","..KDDDDDDK.Y","...KKKKKK.YY","..........YY","............"],"iso":["..BB....BB..","...BB..BB...","....BBBB....","....YYYY....","..YYYYYYYY..",".YYYYWYYYYY.",".YYYWWWYYYY.",".YYYYWYYYYY.",".YYYYYYYYYY.","..YYYYYYYY..","....YYYY....","............"],"commerciale":["............","..KKKKKKKK..",".KRRRRRRRRK.","KRRKK..KKRRK","KRK......KRK",".K..KKKK..K.","...KRRRRK...","..KRWRWRRK..","..KRRWRWRK..","..KRWRWRRK..","..KKKKKKKK..","............"],"freddo":[".....BB.....","..B..BB..B..","...B.BB.B...","....BBBB....","BBBBBWWBBBBB","BBBBBWWBBBBB","....BBBB....","...B.BB.B...","..B..BB..B..",".....BB.....","............","............"],"edi":["KKKKK.......","KBBBK.......","KBBBK..O....","KKKKK.OOOOO.","..K....O....",".KKK........",".......KKKKK","....O..KBBBK","...OOOOKBBBK","....O..KKKKK",".........K..","........KKK."],"marketing":["............",".........KK.",".......KKOK.",".....KKOOOK.","..KKKOOOOOK.",".KWKOOOOOOK.",".KWKOOOOOOK.","..KKKOOOOOK.","...K.KKOOOK.","...K...KKOK.","...KK....KK.","............"],"accordi":["............",".KKKKKKKK...",".KGGWWRRK...",".KWWWWWWK...",".KWKKKKWK...",".KWWWWWWK...",".KWKKKWWK...",".KWWWWWYYY..",".KWKKWYRRY..",".KWWWWYRRY..",".KKKKKKYY...","........Y.."],"kam":["........Y...",".......YYY..","...FF...Y...","..FFFF......","..FFFF......","...FF.......",".DDDDDD.....","DDDWWDDD....","DDDDRDDD....","DDDDRDDD....","DDDDDDDD....","............"],"ecom":["............","KK..........",".K..........",".KOOOOOOOOK.",".KOWOOWOOOK.",".KOOOOOOOK..","..KOOOOOOK..","..KKKKKKKK..","..K.........","..KKKKKKKKK.","...KK...KK..","............"]};
-const TFRAME={log:{c:'#ff7a3d',bg:'#ffe8d9',cut:[0,0,0],shape:'Quadrato arancione'},org:{c:'#9b6bff',bg:'#ece3ff',cut:[3,2,1],shape:'Ottagono viola'},mkt:{c:'#2e9e48',bg:'#dff3d6',cut:[5,3,2,1,1],shape:'Tondo verde'}};
+const TECH_IC={"acqua":["....LLLL....", "...LBBBBL...", "...LBBBBL...", "...LBBBBL...", "....LLLL....", "...DDDDDD...", "...DKKKKD...", "...DWWWWD...", "...DDRBDD...", "...DDDDDD...", "...D....D...", "...DD..DD..."],"frutta":["......GN....", ".....GGN....", "...RRRNRR...", "..RWRRRRRR..", "..RWRRRRRR.Y", "..RRRRRRRRYY", "..RRRRRRRYY.", "...RRRRRYY..", "...RRRRYY...", "....RR.YY...", "......YY....", "............"],"mensa":["..S..S..S...", "...S..S..S..", "..S..S..S...", "............", "KKKKKKKKKKKK", "KOOOOYOOOGOK", "KWWWWWWWWWWK", ".KWWWWWWWWK.", "..KWWWWWWK..", "...KKKKKK...", "....KKKK....", "............"],"pulmino":["............", "............", "KKKKKKKKKK..", "KYLLYLLYLLK.", "KYLLYLLYLLYK", "KYYYYYYYYYYK", "KYYYYYYYYYYK", "KKKKKKKKKKKK", ".KDK....KDK.", "..K......K..", "............", "............"],"asilo":[".....KK.....", "....KRRK....", "...KRRRRK...", "..KRRRRRRK..", ".KRRRRRRRRK.", "KKKKKKKKKKKK", ".KCCCCCCCCK.", ".KCRRCRRCCK.", ".KCRRRRRCCK.", ".KCCRRRCCCK.", ".KCCCRCCCCK.", ".KKKKKKKKKK."],"cani":["..NN....NN..", "..NN....NN..", "............", "NN........NN", "NN..NNNN..NN", "...NNNNNN...", "..NNNNNNNN..", "..NNNNNNNN..", "...NNNNNN...", "............", "............", "............"],"barcode":["............",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","RRRRRRRRRRRR",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","............",".K.K.KK.K.K.","............"],"formazione":["............",".NNNNNNNNNN.",".NDDDDDDDDN.",".NDWWDDDDDN.",".NDDDWWWDDN.",".NDWWWDDDDN.",".NDDDDDWWDN.",".NDDDDDDDDN.",".NNNNNNNNNN.","....N..N....","...N....N...","............"],"gps":["....RRRR....","...RRRRRR...","..RRRWWRRR..","..RRWWWWRR..","..RRWWWWRR..","..RRRWWRRR..","...RRRRRR...","....RRRR....",".....RR.....","..GG.RR.GG..",".GGGGGGGGGG.","............"],"wms":["............",".KKKKKKKKKK.",".KBBBBBBBBK.",".KBYYBOOBBK.",".KBSSSSSSBK.",".KBGGBYYBBK.",".KBSSSSSSBK.",".KKKKKKKKKK.",".....KK.....","...KKKKKK...","............","............"],"anticoll":[".....YY.....","....YKKY....","....YKKY....","...YYKKYY...","...YYKKYY...","..YYYKKYYY..","..YYYKKYYY..",".YYYYYYYYYY.",".YYYYKKYYYY.","YYYYYYYYYYYY","KKKKKKKKKKKK","............"],"rotte":["..........R.",".........RRR","..........R.","........DD..",".....DDD....","....D.......","....D.......",".....DDD....","........D...",".G.......D..","GGG..DDDD...",".G.........."],"rf":["..........B.","........B..B","..KKKKK..B.B","..KBBBK...B.","..KBBBK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","...KKK......","............"],"verticale":["..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..DYY.OOBD..","..DDDDDDDD..","..DBB.YYOD..","..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..D......D..","..D......D..",".KKKKKKKKKK."],"sinergia":["............","............",".KKKKKKK....",".KRRYYBK....",".KRRYYBKKKK.",".KGGOOBKWBK.",".KGGOOBKBBKK",".KKKKKKKKKKK","..KK....KK..","..KK....KK..","............","............"],"ptl":["............","GGG.YYY.RRR.","GGG.YYY.RRR.","............","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","............"],"amr":[".....YY.....",".....KK.....","..KKKKKKKK..","..KSSSSSSK..","..KSBSSBSK..","..KSSSSSSK..","..KSRRRRSK..","..KKKKKKKK..",".KOOOOOOOOK.",".KOOOOOOOOK.",".KKKKKKKKKK.","..KK....KK.."],"gestionale":["..KKKKKKK...","..KWWWWWKK..","..KWKKKWWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWWWGGGK..","..KWWWGGGK..","..KWWWWWWK..","..KKKKKKKK.."],"hr":["............","...SSSS.....","..S.FF.S....",".S.FFFF.S...",".S.FFFF.S...",".S.BBBB.S...","..SBBBBS....","...SSSSN....",".......NN...","........NN..",".........NN.","............"],"direzione":["............","....YYYY....","....YYYY....",".....KK.....",".KKKKKKKKKK.",".K...KK...K.",".K...KK...K.","BBB.OOOO.GGG","BBB.OOOO.GGG","BBB.OOOO.GGG","............","............"],"welfare2":["............","..RR....RR..",".RRRR..RRRR.","RRRRRWWRRRRR","RRRRRWWRRRRR","RRRWWWWWWRRR",".RRWWWWWWRR.","..RRRWWRRR..","...RRWWRR...","....RRRR....",".....RR.....","............"],"controllo":["............","............","K.......GG..","K.......GG..","K....BB.GG..","K....BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","KKKKKKKKKKKK","............","............"],"academy":["............",".....KK.....","...KKKKKK...",".KKKKKKKKKK.","KKKKKKKKKKKK",".KKKKKKKKKKY","..KKKKKKKK.Y","..KDDDDDDK.Y","..KDDDDDDK.Y","...KKKKKK.YY","..........YY","............"],"iso":["..BB....BB..","...BB..BB...","....BBBB....","....YYYY....","..YYYYYYYY..",".YYYYWYYYYY.",".YYYWWWYYYY.",".YYYYWYYYYY.",".YYYYYYYYYY.","..YYYYYYYY..","....YYYY....","............"],"commerciale":["............","..KKKKKKKK..",".KRRRRRRRRK.","KRRKK..KKRRK","KRK......KRK",".K..KKKK..K.","...KRRRRK...","..KRWRWRRK..","..KRRWRWRK..","..KRWRWRRK..","..KKKKKKKK..","............"],"freddo":[".....BB.....","..B..BB..B..","...B.BB.B...","....BBBB....","BBBBBWWBBBBB","BBBBBWWBBBBB","....BBBB....","...B.BB.B...","..B..BB..B..",".....BB.....","............","............"],"edi":["KKKKK.......","KBBBK.......","KBBBK..O....","KKKKK.OOOOO.","..K....O....",".KKK........",".......KKKKK","....O..KBBBK","...OOOOKBBBK","....O..KKKKK",".........K..","........KKK."],"marketing":["............",".........KK.",".......KKOK.",".....KKOOOK.","..KKKOOOOOK.",".KWKOOOOOOK.",".KWKOOOOOOK.","..KKKOOOOOK.","...K.KKOOOK.","...K...KKOK.","...KK....KK.","............"],"accordi":["............",".KKKKKKKK...",".KGGWWRRK...",".KWWWWWWK...",".KWKKKKWK...",".KWWWWWWK...",".KWKKKWWK...",".KWWWWWYYY..",".KWKKWYRRY..",".KWWWWYRRY..",".KKKKKKYY...","........Y.."],"kam":["........Y...",".......YYY..","...FF...Y...","..FFFF......","..FFFF......","...FF.......",".DDDDDD.....","DDDWWDDD....","DDDDRDDD....","DDDDRDDD....","DDDDDDDD....","............"],"ecom":["............","KK..........",".K..........",".KOOOOOOOOK.",".KOWOOWOOOK.",".KOOOOOOOK..","..KOOOOOOK..","..KKKKKKKK..","..K.........","..KKKKKKKKK.","...KK...KK..","............"]};
+const TFRAME={log:{c:'#ff7a3d',bg:'#ffe8d9',cut:[0,0,0],shape:'Quadrato arancione'},org:{c:'#9b6bff',bg:'#ece3ff',cut:[3,2,1],shape:'Ottagono viola'},mkt:{c:'#2e9e48',bg:'#dff3d6',cut:[5,3,2,1,1],shape:'Tondo verde'},wel:{c:'#e0393e',bg:'#ffe1e1',cut:[2,1],shape:'Quadrato smussato rosso'}};
 function techIcon(t,sz,dim){
   const F=TFRAME[t.tree], N=16; const cut=r=>{const d=Math.min(r,N-1-r);return F.cut[d]||0;};
   const ins=(x,y)=>y>=0&&y<N&&x>=cut(y)&&x<N-cut(y);
@@ -1264,8 +1275,16 @@ wk('manager','pers','Manager di magazzino',`Il capo di un magazzino. Le sue Oper
 `Il manager usa tre [[abilita|abilità]]: [[st_op|Operazioni]] per la [[puntualita]], [[st_prec|Precisione]] per l'[[accuratezza]] e [[st_lead|Leadership]] per il [[morale]]. Senza manager il magazzino va avanti con valori scarsi (7, 7 e 6).
 
 All'inizio il manager è il [[ceo|CEO]]. Gli altri si assumono dalla finestra Personale e si assegnano dal menu a tendina del magazzino. Un manager senza magazzino può diventare un [[direzione|direttore]].`);
+wk('welfare_mag','pers','Welfare nei magazzini',`Servizi per chi lavora in un magazzino: boccioni d'acqua, frutta, mensa, pulmini, asilo e area cani. Si ricercano nell'albero Welfare e si installano sito per sito.`,
+`Ogni servizio si ricerca una volta nell'albero Welfare della finestra Tecnologia, poi si [[installazione|installa]] nei magazzini che vuoi, con un costo iniziale e un canone al mese. Funziona da subito, senza [[apprendimento]].
+
+Alza il [[morale]] di quel magazzino e la sua [[attrattivita|attrattività]]: le [[assunzioni]] per quel magazzino sono più veloci. La mensa aumenta anche la produttività del 3%, i pulmini la [[puntualita|puntualità]] di 0,5. Con il [[tech_welfare2|Welfare aziendale]] il canone costa il 30% in meno.
+
+È diverso dal [[welfare]] aziendale (buoni pasto, assicurazione…), che vale per tutti i dipendenti e si paga a testa.`);
+wk('attrattivita','pers','Attrattività',`Quanto l'azienda piace a chi cerca lavoro. Più è alta, più le assunzioni sono rapide.`,
+`Parte da 45 e sale con il [[welfare]] aziendale, la [[reputazione]] (metà dei punti sopra 50) e i [[welfare_mag|servizi di welfare]] installati nel magazzino in cui assumi. A 55 i tempi di [[assunzioni|assunzione]] sono quelli base; ogni punto in più o in meno li cambia del 2,5%, da −40% a +80%.`);
 wk('assunzioni','pers','Assunzioni',`Annuncio (economico ma lento) o agenzia interinale (veloce ma cara). Il nuovo arrivato si presenta dopo qualche giorno.`,
-`I tempi base con l'annuncio o con l'agenzia: [[magazzinieri]] 20 o 6 giorni, [[carrellisti]] 25 o 8, [[impiegati]] 20 o 7, [[autisti_b|autisti B]] 15 o 6, [[autisti_ce|autisti CE]] 40 o 16, [[capoturno|capiturno]] e [[pianificatori]] 25 o 8. Con la [[cooperativa]] magazzinieri e carrellisti arrivano in 3 giorni, gratis. Si accorciano con il [[welfare]], la [[reputazione]], l'[[tech_hr|ufficio del personale]] e il [[dir_hr|direttore HR]].
+`I tempi base con l'annuncio o con l'agenzia: [[magazzinieri]] 20 o 6 giorni, [[carrellisti]] 25 o 8, [[impiegati]] 20 o 7, [[autisti_b|autisti B]] 15 o 6, [[autisti_ce|autisti CE]] 40 o 16, [[capoturno|capiturno]] e [[pianificatori]] 25 o 8. Con la [[cooperativa]] magazzinieri e carrellisti arrivano in 3 giorni, gratis. Si accorciano con il [[welfare]], i [[welfare_mag|servizi di welfare del magazzino]], la [[reputazione]], l'[[tech_hr|ufficio del personale]] e il [[dir_hr|direttore HR]].
 
 Assumi in anticipo: quando vinci una [[gare|gara]] hai 30 giorni prima che il cliente parta.`);
 wk('licenziamenti','pers','Licenziamenti',`Costano un mese di stipendio di buonuscita e abbassano il morale del magazzino per 30 giorni.`,
@@ -1359,26 +1378,27 @@ wk('conto','eco','Conto economico',`Il riepilogo del mese scorso: ricavi meno co
 wk('gasolio','eco','Gasolio',`Il prezzo al litro: parte da 0,86 € nel 2002 e sale di circa 5 centesimi l'anno.`,
 `Ogni motrice consuma un quarto di litro al km. Il prezzo si aggiorna a fine mese con piccole oscillazioni. La [[tech_rotte|pianificazione rotte]] riduce i consumi del 5%.`);
 // Tecnologie (concetti)
-wk('tecnologie','tech','Tecnologie',`Tre alberi di ricerca: Logistica, Sviluppo aziendale e Mercato. Si ricerca una tecnologia alla volta.`,
-`Gli [[alberi]] sono come in Civilization: ogni tecnologia richiede quelle prima e alcune sono disponibili solo da un certo anno. Le tecnologie di Logistica vanno poi [[installazione|installate]] in ogni magazzino; le altre valgono subito per tutta l'azienda.`);
-wk('alberi','tech','Alberi tecnologici',`Logistica (quadrato arancione), Sviluppo aziendale (ottagono viola), Mercato (tondo verde).`,
+wk('tecnologie','tech','Tecnologie',`Quattro alberi di ricerca: Logistica, Sviluppo aziendale, Mercato e Welfare. Si ricerca una tecnologia alla volta.`,
+`Gli [[alberi]] sono come in Civilization: ogni tecnologia richiede quelle prima e alcune sono disponibili solo da un certo anno. Le tecnologie di Logistica e di [[welfare_mag|Welfare]] vanno poi [[installazione|installate]] in ogni magazzino; le altre valgono subito per tutta l'azienda.`);
+wk('alberi','tech','Alberi tecnologici',`Logistica (quadrato arancione), Sviluppo aziendale (ottagono viola), Mercato (tondo verde), Welfare (quadrato smussato rosso).`,
 `• Logistica: macchine e software di magazzino, migliorano [[puntualita]], [[accuratezza]] e produttività; vanno [[installazione|installate]].
 • Sviluppo aziendale: organizzazione e persone, valgono per tutta l'azienda; contiene la [[direzione|Struttura direzionale]].
 • Mercato: nuovi clienti e [[tech_richieste|tecnologie richieste]] dalle gare.
+• Welfare: [[welfare_mag|servizi per chi lavora]] (acqua, frutta, mensa, pulmini, asilo, area cani); vanno installati magazzino per magazzino.
 
 La forma della cornice dell'icona ti dice sempre a quale albero appartiene.`);
 wk('ricerca','tech','Ricerca',`Si paga all'avvio e dura un certo numero di giorni. Una sola alla volta; l'Innovazione la accorcia.`,
 `La durata scende del 3% per ogni punto di [[st_inn|Innovazione]] sopra 10 (si usa il valore più alto tra [[ceo|CEO]] e [[dir_tech|direttore tecnologia]]). Puoi annullarla e riavere metà dei soldi.`);
-wk('installazione','tech','Installazione',`Le tecnologie di Logistica, una volta ricercate, vanno comprate per ogni magazzino. Poi c'è un canone mensile.`,
-`L'installazione costa una volta, il canone si paga ogni mese. Dopo l'installazione c'è sempre un periodo di [[apprendimento]]. Alcune tecnologie si installano solo dove c'è già quella precedente (per esempio il WMS richiede i lettori barcode).`);
+wk('installazione','tech','Installazione',`Le tecnologie di Logistica e i servizi di Welfare, una volta ricercati, vanno comprate per ogni magazzino. Poi c'è un canone mensile.`,
+`L'installazione costa una volta, il canone si paga ogni mese. Dopo l'installazione di una tecnologia di Logistica c'è un periodo di [[apprendimento]]; i servizi di [[welfare_mag|Welfare]] funzionano da subito. Alcune tecnologie si installano solo dove c'è già quella precedente (per esempio il WMS richiede i lettori barcode).`);
 wk('apprendimento','tech','Apprendimento',`Le prime settimane dopo un'installazione il personale si abitua: i KPI peggiorano invece di migliorare.`,
 `Durante l'apprendimento la tecnologia dà metà del suo effetto, ma al contrario: se promette +2 di [[accuratezza]] ne toglie 1. Finito il periodo vale per intero.
 
 È più lungo con un CEO allergico ai gestionali e più corto con chi parla con i robot, con un CEO perito o ingegnere informatico ([[titoli|titoli di studio]]) o con l'[[tech_academy|Academy aziendale]]. Non installare tutto insieme prima di una scadenza importante!`);
 TECH.forEach(t=>{const tr=TREES.find(x=>x[0]===t.tree);const reqs=(t.req||[]).map(r=>{const a=TECH.find(x=>x.id===r);return `[[tech_${a.id}|${a.name}]]`;});
-  const eff=[t.A?`Accuratezza +${f1(t.A)}`:'',t.P?`Puntualità +${f1(t.P)}`:'',t.prod?`produttività +${Math.round(t.prod*100)}%`:'',t.mor?`morale +${t.mor}`:'',t.sm?`[[saturazione_mezzi|saturazione dei mezzi]] +${t.sm}`:'',t.smC?`[[saturazione_mezzi|saturazione dei mezzi]] +${t.smC} per ogni cliente oltre il primo, fino a +${t.smMax}`:''].filter(Boolean).join(', ');
-  wk('tech_'+t.id,'tech',t.name,t.desc,`${t.desc}\n\nAlbero: [[alberi|${tr[1]}]]. Disponibile dal ${t.year}. Ricerca: ${eur(t.cost)}, ${t.days} giorni di base.${reqs.length?` Richiede ${reqs.join(' e ')}.`:''}`+
-   (t.tree==='log'?`\n\n[[installazione|Installazione]]: ${eur(t.inst)} per magazzino, canone ${eur(t.mese)} al mese, [[apprendimento]] di ${t.weeks} settimane.${eff?` Effetto a regime: ${eff}.`:''}`:''),sz=>techIcon(t,sz));});
+  const eff=[t.A?`Accuratezza +${f1(t.A)}`:'',t.P?`Puntualità +${f1(t.P)}`:'',t.prod?`produttività +${Math.round(t.prod*100)}%`:'',t.mor?`morale +${t.mor}`:'',t.sm?`[[saturazione_mezzi|saturazione dei mezzi]] +${t.sm}`:'',t.smC?`[[saturazione_mezzi|saturazione dei mezzi]] +${t.smC} per ogni cliente oltre il primo, fino a +${t.smMax}`:'',t.att?`[[attrattivita|attrattività]] +${t.att}`:''].filter(Boolean).join(', ');
+  wk('tech_'+t.id,'tech',t.name,t.desc,`${t.txt?t.txt+'\n\n':''}${t.desc}\n\nAlbero: [[alberi|${tr[1]}]]. Disponibile dal ${t.year}. Ricerca: ${eur(t.cost)}, ${t.days} giorni di base.${reqs.length?` Richiede ${reqs.join(' e ')}.`:''}`+
+   (perWh(t)?`\n\n[[installazione|Installazione]]: ${eur(t.inst)} per magazzino, canone ${eur(t.mese)} al mese${t.weeks?`, [[apprendimento]] di ${t.weeks} settimane`:', nessun periodo di apprendimento'}.${eff?` Effetto a regime: ${eff}.`:''}`:''),sz=>techIcon(t,sz));});
 // Direzione
 wk('direzione','dir','Direzione',`Cinque posti da direttore che guidano tutta l'azienda. Si sbloccano con la ricerca Struttura direzionale.`,
 `Dopo la [[tech_direzione|Struttura direzionale]] puoi nominare un direttore per ogni area: [[dir_op|operativo]], [[dir_comm|commerciale]], [[dir_hr|risorse umane]], [[dir_fin|finanziario]] e [[dir_tech|tecnologia]]. Ognuno usa una sola [[abilita|abilità]]: sopra 10 aiuta, sotto 10 fa danni.
@@ -1471,6 +1491,10 @@ function dirStat(role){ if(!R('direzione')) return null; const p=personById(S.di
 function seatOf(id){return Object.keys(S.dirs).find(k=>S.dirs[k]===id)||null;}
 function fixedMul(){let m=1; if(R('gestionale')) m*=0.97; if(R('controllo')) m*=0.96; const f=dirStat('fin'); if(f!=null) m*=1-0.005*(f-10); return m;}
 function capOf(w){const t=TECH.find(x=>x.id==='verticale'); return Math.round(w.cap*(1+(w.tech.verticale&&techFactor(w,t)>0?t.cap:0)));}
+function perWh(t){return t.tree==='log'||t.tree==='wel';}
+// servizi di welfare installati in un magazzino: canone scontato dal Welfare aziendale
+function welMese(t){return t.tree==='wel'&&R('welfare2')?t.mese*0.7:t.mese;}
+function whAtt(wh){return wh?TECH.filter(t=>t.tree==='wel'&&wh.tech[t.id]).reduce((a,t)=>a+(t.att||0),0):0;}
 function techFactor(wh,t){
   const it=wh.tech[t.id]; if(!it) return 0;
   let weeks=t.weeks; const m=mgrStats(wh);
@@ -1514,6 +1538,8 @@ function computeWH(wh,extra){
   let tA=0,tP=0,tMor=0,tProd=0,tCan=0; const tparts=[];
   let fuelMul=1;
   TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t); tA+=(t.A||0)*f; tP+=(t.P||0)*f; tMor+=(t.mor||0)*(f>0?1:0); tProd+=(t.prod||0)*(f>0?1:0); if(f>0&&t.fuel) fuelMul*=1-t.fuel; tCan+=t.mese; });
+  // servizi di welfare del magazzino: niente apprendimento, valgono da subito
+  let wMor=0,wP=0; TECH.forEach(t=>{ if(t.tree!=='wel'||!wh.tech[t.id]) return; wMor+=t.mor||0; wP+=t.P||0; tProd+=t.prod||0; tCan+=welMese(t); });
   const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd);
   // carrellisti: tutti i movimenti (doppia produttività col muletto); magazzinieri: preparano i pallet in uscita
   const use=(load,n,per)=>load===0?0:(n>0?load/(n*per):9);
@@ -1524,7 +1550,7 @@ function computeWH(wh,extra){
   const pNeed=planNeed(), planShort=Math.max(0,pNeed-S.office.plan), giri=pNeed>0&&!planShort?0.96:1;
   const mP=modSum(wh,'P'), mA=modSum(wh,'A'), mMor=modSum(wh,'mor');
   const pP=[['Base',92],['Operazioni di '+m.name.split(' ')[0],0.4*(m.op-10)]];
-  if(tP) pP.push(['Tecnologie',tP]); if(mP) pP.push(['Eventi',mP]); const chP=chW('P'), chA=chW('A'); if(Math.abs(chP)>0.05) pP.push(['Canali di distribuzione',chP]);
+  if(tP) pP.push(['Tecnologie',tP]); if(wP) pP.push(['Pulmini per i dipendenti',wP]); if(mP) pP.push(['Eventi',mP]); const chP=chW('P'), chA=chW('A'); if(Math.abs(chP)>0.05) pP.push(['Canali di distribuzione',chP]);
   const dOp=dirStat('op'); if(dOp!=null) pP.push(['Direttore operativo',0.15*(dOp-10)]);
   if(uCE>1) pP.push(['Autisti CE insufficienti',-20*(uCE-1)]); if(uB>1) pP.push(['Autisti B insufficienti',-20*(uB-1)]);
   if(uCar>1.05) pP.push(['Carrellisti insufficienti',-8*(uCar-1.05)]); if(uPick>1.05) pP.push(['Magazzinieri insufficienti',-3*(uPick-1.05)]);
@@ -1540,7 +1566,7 @@ function computeWH(wh,extra){
   const P=clamp(pP.reduce((a,x)=>a+x[1],0),50,99.9), A=clamp(pA.reduce((a,x)=>a+x[1],0),50,99.9);
   const dHr=dirStat('hr');
   // morale verso cui tende il magazzino: le voci servono anche al Riepilogo (scheda Modificatori)
-  const pM=[['Base',58],['Leadership di '+m.name.split(' ')[0],0.6*(m.lead-10)],['Welfare',welfarePts('mor')],['Tecnologie',tMor],['Eventi',mMor],['Academy aziendale',R('academy')?3:0],['Direttore risorse umane',dHr!=null?0.3*(dHr-10):0],
+  const pM=[['Base',58],['Leadership di '+m.name.split(' ')[0],0.6*(m.lead-10)],['Welfare',welfarePts('mor')],['Tecnologie',tMor],['Welfare del magazzino',wMor],['Eventi',mMor],['Academy aziendale',R('academy')?3:0],['Direttore risorse umane',dHr!=null?0.3*(dHr-10):0],
     ['Magazzinieri insufficienti',-20*Math.max(0,uPick-1)],['Carrellisti insufficienti',-20*Math.max(0,uCar-1)],['Capiturno insufficienti',-4*capoShort],['Facchini in cooperativa',wh.coop?COOP.mor:0],
     ['Autisti insufficienti',-20*Math.max(0,Math.max(uB,uCE)-1)],['Personale che non sta dietro all\'obiettivo di carico',-0.5*sm.short]].filter((x,i)=>i===0||Math.abs(x[1])>0.05);
   const morT=clamp(pM.reduce((a,x)=>a+x[1],0),0,100);
@@ -1587,9 +1613,9 @@ function step(){
   // ricerca in corso
   if(S.project){ S.project.left--; if(S.project.left<=0){ const t=TECH.find(x=>x.id===S.project.tech); S.project=null; S.researched[t.id]=true;
     if(t.id==='iso'||t.id==='marketing') S.rep=clamp(S.rep+5,0,100);
-    news('La Gazzetta del Muletto',`Ricerca completata: ${t.name}`,t.tree==='log'?'Ora si può installare nei magazzini dalla finestra Tecnologia.':t.desc);
+    news('La Gazzetta del Muletto',`Ricerca completata: ${t.name}`,perWh(t)?'Ora si può installare nei magazzini dalla finestra Tecnologia.':t.desc);
     if(t.id==='direzione') modalInfo('La Gazzetta del Muletto','Nasce la squadra dei dirigenti','La struttura direzionale è pronta. Dal menu Direzione nomina fino a cinque direttori: ognuno guida un\'area di tutta l\'azienda con la sua abilità principale.');
-    else toast(`Ricerca completata: ${t.name}${t.tree==='log'?' · installala nei magazzini':''}`,'ok'); } }
+    else toast(`Ricerca completata: ${t.name}${perWh(t)?' · installala nei magazzini':''}`,'ok'); } }
   // gare
   // clienti in uscita dopo il recesso
   S.clients.filter(c=>c.exit&&c.status==='attivo'&&S.day>=c.exit.day).forEach(exitClient);
@@ -2392,7 +2418,7 @@ const VIEWS={
    ${L?`<table class="t num">${pl.map(([n,v])=>`<tr><td>${n}</td><td class="r ${v<0?'bad':''}">${eur(v)}</td></tr>`).join('')}<tr><th>Utile</th><th class="r ${L.util>=0?'ok':'bad'}" style="font-size:14px">${eur(L.util)}</th></tr></table>`:'<div class="sm">Disponibile dalla fine del primo mese.</div>'}</div>
    <div class="card"><div class="row"><span class="h3">${kw('welfare')}</span><span class="sm">costo per dipendente al mese</span></div>
    ${WELFARE.map(w=>`<label class="row" style="cursor:pointer"><span><input type="checkbox" data-act="welfare" data-id="${w.id}" ${S.welfare[w.id]?'checked':''}> ${w.name}</span><span class="sm">${eur(w.cost)} · morale +${w.mor}</span></label>`).join('')}
-   <div class="sm">Il welfare alza il morale e accorcia i tempi di assunzione.</div></div>
+   <div class="sm">Il welfare alza il morale e accorcia i tempi di assunzione.</div><div class="row"><span class="sm">Acqua, frutta, mensa, pulmini, asilo e area cani si installano nei singoli magazzini: ${kw('welfare_mag','albero Welfare')}.</span><button class="btn sm2" data-act="opentech" data-tree="wel" data-id="acqua">Apri</button></div></div>
    <div class="row"><button class="btn" data-act="save">Salva partita</button><button class="btn" data-act="restart">Nuova partita</button></div>`;
  },
  magazzini(){
@@ -2495,7 +2521,7 @@ const VIEWS={
  },
  tecnologia(){
   const tree=UI.sel.tree||'log'; const y=yearOf(S.day); const pj=S.project;
-  const tabs=`<div class="tabs" role="tablist">${TREES.map(([id,n])=>`<button role="tab" aria-selected="${id===tree}" data-act="seltree" data-id="${id}" style="display:flex;align-items:center;justify-content:center;gap:8px">${techIcon({id:'_',tree:id},22)}${n}</button>`).join('')}</div>`;
+  const tabs=`<div class="tabs ttabs" role="tablist">${TREES.map(([id,n])=>`<button role="tab" aria-selected="${id===tree}" data-act="seltree" data-id="${id}" style="display:flex;align-items:center;justify-content:center;gap:8px">${techIcon({id:'_',tree:id},22)}${n}</button>`).join('')}</div>`;
   const pjHtml=pj?(()=>{const t=TECH.find(x=>x.id===pj.tech);const done=1-pj.left/pj.total;return `<div class="card pend"><div class="row"><span class="h3">${kw('ricerca','Ricerca')} in corso: ${esc(t.name)}</span><b class="num">${pj.left} giorni</b></div>
    <div class="bar"><i style="width:${Math.round(done*100)}%;background:var(--accent)"></i></div>
    <div class="row"><span class="sm">Fine prevista: ${shortDate(S.day+pj.left)}. Una ricerca alla volta.</span><button class="btn sm2" data-act="canceltech">Annulla (rimborso 50%)</button></div></div>`;})():`<div class="sm">Nessuna ${kw('ricerca','ricerca')} in corso. Si ricerca una tecnologia alla volta; la durata dipende dall'Innovazione (${innUsed()}).</div>`;
@@ -2508,16 +2534,16 @@ const VIEWS={
   const sel=TECH.find(t=>t.id===UI.sel.tech&&t.tree===tree)||nodes.find(t=>st(t)==='open')||nodes[0];
   const nodeHtml=nodes.map(t=>{const p=pos(t),s2=st(t);const bg={done:'#eaf6ec',run:'var(--accent)',lock:'#dfe7ee',open:'#ffffff'}[s2];
     const sub=s2==='done'?'<span class="ok">Ricercata</span>':s2==='run'?`In corso · ${pj.left} g`:y<t.year?`Dal ${t.year}`:s2==='lock'?'Bloccata':`${eur(t.cost)} · ${techDays(t)} g`;
-    return `<button class="tnode" data-act="seltech" data-id="${t.id}" aria-pressed="${sel&&sel.id===t.id}" style="left:${p.x}px;top:${p.y}px;width:${NW}px;height:${NH}px;background:${bg};${s2==='lock'?'color:var(--muted)':''}">${techIcon(t,40,s2==='lock')}<span class="tn"><b>${esc(t.name)}</b><span>${sub}</span></span></button>`;}).join('');
+    return `<button class="tnode" data-act="seltech" data-id="${t.id}" data-tip="<div class='tt'>${esc(t.name)}</div><div>${esc(t.txt||'')}</div><div class='sm'>${esc(t.desc)}</div>" aria-pressed="${sel&&sel.id===t.id}" style="left:${p.x}px;top:${p.y}px;width:${NW}px;height:${NH}px;background:${bg};${s2==='lock'?'color:var(--muted)':''}">${techIcon(t,40,s2==='lock')}<span class="tn"><b>${esc(t.name)}</b><span>${sub}</span></span></button>`;}).join('');
   let det='';
   if(sel){const s2=st(sel);const reqs=(sel.req||[]).map(r=>TECH.find(x=>x.id===r));
-    const eff=[sel.A?`${kw('accuratezza')} +${f1(sel.A)}`:'',sel.P?`${kw('puntualita')} +${f1(sel.P)}`:'',sel.tree==='log'?`${kw('installazione','installazione')} ${eur(sel.inst)} per magazzino, canone ${eur(sel.mese)}/mese, ${kw('apprendimento','apprendimento')} ${sel.weeks} settimane`:''].filter(Boolean).join(' · ');
+    const eff=[sel.A?`${kw('accuratezza')} +${f1(sel.A)}`:'',sel.P?`${kw('puntualita')} +${f1(sel.P)}`:'',sel.att?`${kw('attrattivita','attrattività')} +${sel.att}`:'',perWh(sel)?`${kw('installazione','installazione')} ${eur(sel.inst)} per magazzino, canone ${eur(welMese(sel))}/mese${sel.weeks?`, ${kw('apprendimento','apprendimento')} ${sel.weeks} settimane`:', subito attivo'}`:''].filter(Boolean).join(' · ');
     let act='';
     if(s2==='open') act=`<button class="btn pri" data-act="research" data-id="${sel.id}" ${!pj&&S.cash>=sel.cost?'':'disabled'}>Avvia la ricerca · ${eur(sel.cost)} · ${techDays(sel)} giorni</button>${pj?'<span class="sm">C\'è già una ricerca in corso.</span>':''}`;
-    if(s2==='done'&&sel.tree==='log') act=S.warehouses.map(w=>{const it=w.tech[sel.id];const learn=it&&techFactor(w,sel)<0;
+    if(s2==='done'&&perWh(sel)) act=S.warehouses.map(w=>{const it=w.tech[sel.id];const learn=it&&techFactor(w,sel)<0;
       return `<div class="row"><span>${esc(w.name)}</span>${it?`<span class="sm ${learn?'warn':'ok'}">${learn?'in apprendimento':'attiva'}</span>`:`<button class="btn sm2 pri" data-act="install" data-id="${sel.id}" data-wh="${w.id}" ${S.cash>=sel.inst&&(sel.req||[]).every(r=>w.tech[r])?'':'disabled'}>Installa · ${eur(sel.inst)}</button>`}</div>`;}).join('')+((sel.req||[]).length?`<div class="sm">Si installa nei magazzini che hanno già ${reqs.map(r=>esc(r.name)).join(' e ')}.</div>`:'');
     det=`<div class="card"><div style="display:flex;gap:12px;align-items:center">${techIcon(sel,64,s2==='lock')}<div style="flex:1;display:flex;flex-direction:column;gap:3px"><div class="row"><span class="h3">${esc(sel.name)}</span><span class="sm">${s2==='done'?'Ricercata':'dal '+sel.year}</span></div><span class="sm">${kw('alberi',TREES.find(x=>x[0]===sel.tree)[1])} · cornice: ${TFRAME[sel.tree].shape.toLowerCase()}</span></div></div>
-      <div>${esc(sel.desc)}</div>${eff?`<div class="sm">${eff}</div>`:''}
+      ${sel.txt?`<div class="ttxt">${esc(sel.txt)}</div>`:''}<div><b>Effetto:</b> ${esc(sel.desc)}</div>${eff?`<div class="sm">${eff}</div>`:''}
       ${reqs.length?`<div class="sm">Richiede: ${reqs.map(r=>`<span class="${R(r.id)?'ok':'bad'}">${esc(r.name)}</span>`).join(', ')}</div>`:''}
       ${act}</div>`;}
   const desc=TREES.find(x=>x[0]===tree)[2];
@@ -2620,7 +2646,7 @@ const VIEWS={
     const w=whById(UI.sel.rpwh)||ws[0]; UI.sel.rpwh=w.id; const k=computeWH(w), C=ceo();
     const chips=ws.length>1?`<div class="xl-cli rp-whs">${ws.map(x=>`<button data-act="rpwh" data-id="${x.id}" aria-pressed="${x.id===w.id}">${esc(x.name)}</button>`).join('')}</div>`:'';
     const mods=S.mods.filter(m=>m.until>S.day);
-    const logT=TECH.filter(t=>S.researched[t.id]&&t.tree==='log'), othT=TECH.filter(t=>S.researched[t.id]&&t.tree!=='log');
+    const logT=TECH.filter(t=>S.researched[t.id]&&perWh(t)), othT=TECH.filter(t=>S.researched[t.id]&&!perWh(t));
     const mgrs=S.managers.filter(m=>m.hired), dirs=R('direzione')?DIR_ROLES.filter(r=>S.dirs[r.id]):[];
     const fm=fixedMul(), wf=WELFARE.filter(x=>S.welfare[x.id]);
     body=`<div class="card"><div class="row"><span class="h3">Da cosa dipendono i KPI</span><span class="sm">valori di oggi</span></div>${chips}
@@ -2774,7 +2800,7 @@ function bidEstHtml(t,e){
 /* ====================== AZIONI ====================== */
 function innUsed(){const d=dirStat('tech');return Math.max(ceo().st.inn,d==null?0:d);}
 function techDays(t){return Math.max(5,Math.round(t.days*clamp(1-0.03*(innUsed()-10),0.6,1.5)));}
-function hireDays(base){const att=40+welfarePts('att')+(S.rep-50)*0.5+5;const h=dirStat('hr');return Math.max(3,Math.round(base*clamp(1+(55-att)/40,0.6,1.8)*(R('hr')?0.8:1)*(h!=null?1-0.02*(h-10):1)));}
+function hireDays(base,wh){const att=40+welfarePts('att')+(S.rep-50)*0.5+5+whAtt(wh);const h=dirStat('hr');return Math.max(3,Math.round(base*clamp(1+(55-att)/40,0.6,1.8)*(R('hr')?0.8:1)*(h!=null?1-0.02*(h-10):1)));}
 const ACT={
  speed(d){setSpeed(+d.v);},
  toggle(d){const el=document.getElementById('win-'+d.id); if(MOB&&el&&+el.style.zIndex<UI.z) return openWin(d.id); UI.open[d.id]?closeWin(d.id):openWin(d.id);},
@@ -2789,8 +2815,8 @@ const ACT={
   if(w&&isCoop(w,r)) return showChoice(`Chiedi alla cooperativa: ${ROLE1[r]}`,`Il magazzino lavora con una cooperativa di facchinaggio: manda le persone in pochi giorni, senza costi di ricerca.`,[
    {t:`Cooperativa · ${COOP.days} giorni`,e:'0 €',f:()=>doHire(r,d.wh,COOP.days,0)}]);
   showChoice(`Assumi: ${ROLE[r].toLowerCase()}`,`Scegli il canale. Tempi stimati con welfare e reputazione attuali.`,[
-   {t:`Annuncio · ${hireDays(h.ann[0])} giorni`,e:`${eur(h.ann[1])}`,f:()=>doHire(r,d.wh,hireDays(h.ann[0]),h.ann[1])},
-   {t:`Agenzia interinale · ${hireDays(h.age[0])} giorni`,e:`${eur(h.age[1])}`,f:()=>doHire(r,d.wh,hireDays(h.age[0]),h.age[1])}]);
+   {t:`Annuncio · ${hireDays(h.ann[0],w)} giorni`,e:`${eur(h.ann[1])}`,f:()=>doHire(r,d.wh,hireDays(h.ann[0],w),h.ann[1])},
+   {t:`Agenzia interinale · ${hireDays(h.age[0],w)} giorni`,e:`${eur(h.age[1])}`,f:()=>doHire(r,d.wh,hireDays(h.age[0],w),h.age[1])}]);
  },
  fire(d){
   const r=d.role; const sal=RAL[r]*COEF/12;
@@ -2835,7 +2861,7 @@ const ACT={
  research(d){const t=TECH.find(x=>x.id===d.id); if(S.project||S.cash<t.cost||R(t.id))return; S.cash-=t.cost; S.cur.tech+=t.cost;
   const days=techDays(t); S.project={tech:t.id,left:days,total:days,cost:t.cost}; toast(`Ricerca avviata: ${t.name}, pronta tra ${days} giorni`,'ok'); renderAll();},
  install(d){const t=TECH.find(x=>x.id===d.id), w=whById(d.wh); if(!R(t.id)||w.tech[t.id]||S.cash<t.inst)return; S.cash-=t.inst; S.cur.tech+=t.inst; w.tech[t.id]={day:S.day};
-  toast(`${t.name} installato a ${w.name}: inizia l'apprendimento`,'ok'); renderAll();},
+  toast(t.weeks?`${t.name} installato a ${w.name}: inizia l'apprendimento`:`${t.name} attivo a ${w.name}`,'ok'); renderAll();},
  canceltech(){ if(!S.project)return; const r=S.project.cost*0.5; S.cash+=r; S.cur.tech-=r; toast(`Ricerca annullata: rimborsati ${eur(r)}`,'warn'); S.project=null; renderAll(); },
  setdir(d,el){const v=el.value||null; Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===v)S.dirs[k]=null;}); S.dirs[d.role]=v; if(v){const p=personById(v); toast(`${p.name} è il nuovo ${DIR_ROLES.find(r=>r.id===d.role).name.toLowerCase()}`,'ok');} renderAll();},
  hireexec(d){const e=S.execs.find(x=>x.id===d.id); if(S.cash<15000)return; S.cash-=15000; S.cur.altro+=15000; e.hired=true; toast(`${e.name} entra in azienda: nominalo in Direzione`,'ok'); renderAll();},
@@ -3067,6 +3093,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.15',t:'Acqua, frutta e asilo',x:['Nuovo albero Welfare: boccioni d\'acqua, servizio frutta, mensa, pulmini per i dipendenti, asilo aziendale e area cani.','I servizi di welfare si ricercano una volta e poi si installano magazzino per magazzino: alzano il morale e accorciano le assunzioni in quel sito.','Ogni tecnologia ha ora una breve descrizione di cosa è, oltre all\'effetto.']},
  {v:'0.14',t:'Sotto il cofano',x:['Nel Riepilogo la scheda Modificatori: da cosa dipendono puntualità, accuratezza e morale di ogni magazzino, voce per voce.','Talenti di CEO, manager e dirigenti con i loro effetti, tecnologie e dove sono installate, effetti degli eventi in corso con la scadenza.']},
  {v:'0.13',t:'Curriculum e visura',x:['Pulsanti «Suggerisci» per nome e cognome del CEO e per il nome dell\'azienda.','La creazione del CEO va a passaggi: identità (con soprannome e motto), abilità, studi e carattere.','Alla fine il CEO firma il suo curriculum vitae in formato europeo.','Ogni azienda ha logo, claim e colore, e si iscrive alla Camera di Commercio con tanto di timbro.']},
  {v:'0.12',t:'Tutti i numeri',x:['Nuova finestra Riepilogo dell\'azienda con cinque schede: panoramica, conti, operazioni, clienti e persone.','Grafici della cassa, dei ricavi e dei costi, dell\'utile di ogni mese, dei KPI e dei dipendenti.']},

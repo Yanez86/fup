@@ -175,7 +175,7 @@ async def main():
         assert await pg.evaluate("document.querySelectorAll('#ov path.prov').length") == 0
         for w in ['azienda','magazzini','clienti','gare','report','personale','direzione','espansione','giornale','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
-        for t in ['log','org','mkt']:
+        for t in ['log','org','mkt','wel']:
             await pg.click(f'#win-tecnologia [data-act=seltree][data-id={t}]')
             await pg.screenshot(path=os.path.join(OUT, f'shot_tree_{t}.png'))
         # ricerca + installazione + direzione
@@ -188,6 +188,14 @@ async def main():
         await pg.evaluate(CLEAR)
         await pg.click('#win-tecnologia [data-act=seltech][data-id=barcode]')
         await pg.click('#win-tecnologia [data-act=install]')
+        # welfare: ricerca simulata, installazione in un magazzino e morale che sale
+        await pg.evaluate("()=>{window.__FUP.S.researched.acqua=true;}")
+        await pg.click('#win-tecnologia [data-act=seltree][data-id=wel]')
+        await pg.click('#win-tecnologia [data-act=seltech][data-id=acqua]')
+        await pg.click('#win-tecnologia [data-act=install]')
+        ok = await pg.evaluate("()=>{const F=window.__FUP,w=F.S.warehouses[0];return !!w.tech.acqua;}")
+        assert ok, 'boccioni d\'acqua non installati'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_tree_wel_inst.png'))
         await pg.click('#dock [data-id=direzione]')  # chiude la finestra aperta prima...
         if not await pg.query_selector('#win-direzione'): await pg.click('#dock [data-id=direzione]')  # ...e la riapre in primo piano
         await pg.click('#win-direzione [data-act=hireexec][data-id=ottavio]')
