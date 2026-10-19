@@ -28,12 +28,12 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 
 ### Dentro `src/game.html` (sezioni marcate con `/* ===== NOME ===== */`)
 - **DATI**: `CITIES`, `SITES` (magazzini acquistabili), `CEOS` (4 personaggi iniziali), `MANAGERS`, `EXECS` (dirigenti), `DIR_ROLES`, `TENDER_POOL` (clienti parodia, con `req` per le tecnologie richieste), `RIVALS`, `TECH` (alberi), `TREES`, `WELFARE`, `RAL`, `HIRE`.
-- **UTILITÀ**: `TPAL` (tavolozza pixel art), `LOGO` (loghi dei clienti 12×12 su un riquadro 16×16, `logoSvg()`), `ZONES` / `ORIGINS` / `CINFO` (zona di distribuzione, provenienza della merce e ritiro/consegna per cliente; `clientLog()` calcola viaggi e km), `STATS` / `STAT_IC` (icone 8×8 delle abilità, `statChips()`, `statBadge()`), `TALENTS` (icona 8×8, effetto, testo di colore), `TECH_IC` (icone 12×12), `TFRAME` (cornici per albero), `techIcon()`, `talentIcons()`, formattatori (`eur`, `f1`, `esc`, date).
+- **UTILITÀ**: `TPAL` (tavolozza pixel art), `LOGO` (loghi dei clienti 12×12 su un riquadro 16×16, `logoSvg()`), `ZONES` / `ORIGINS` / `CINFO` (zona di distribuzione, provenienza della merce e ritiro/consegna per cliente; `clientLog()` calcola viaggi e km), `STATS` / `STAT_IC` (icone 8×8 delle abilità, `statChips()`, `statBadge()`), `TALENTS` (icona 8×8, effetto, testo di colore), `TECH_IC` (icone 12×12), `TFRAME` (cornici per albero), `techIcon()`, `talentIcons()`, formattatori (`eur`, `f1`, `esc`, date). Enciclopedia: `WIKI_CAT`, `WIKI` (voci `{n, s, t}` dove `s` è il testo breve del tooltip e `t` il testo lungo con collegamenti `[[id]]` o `[[id|testo]]`), `kw(id, testo)` crea una parola chiave con tooltip che al clic apre la voce.
 - **STATO**: `newGame()` crea l'oggetto globale `S`, l'unico stato di gioco (serializzabile in JSON).
 - **MOTORE**: `computeWH()` calcola KPI, costi e ricavi di un magazzino (i km arrivano da `clientLog`); `step()` fa avanzare un giorno; `weekEnd()` (report del lunedì in `S.weeks`); `monthEnd()`; gare (`newTender`, `bidEstimate`, `resolveTender`); helper `R(id)` (tecnologia ricercata), `dirStat(ruolo)`, `fixedMul()`, `capOf()`.
 - **EVENTI**: array `EVENTS` con `{id, src, title, text, cond, once?, setup?, opts:[{t, e, f, req?, reqT?}]}`. `fireEvent()` sceglie un evento tra quelli validi; ogni evento ha un'attesa di 240 giorni prima di poter tornare.
 - **SALVATAGGIO**: `localStorage` con chiave `KEY`. **Se cambi la forma di `S`, aumenta la versione della chiave** (`fup-salvataggio-vN`) oppure aggiungi una migrazione in `ACT.continue`.
-- **MAPPA**: proiezione `pt(lon,lat)`, pan/zoom, marker SVG, camion animati.
+- **MAPPA**: proiezione `pt(lon,lat)`, pan/zoom, marker SVG, camion animati. Lenti della mappa in `LENSES` (`UI.lens`, tasto L): ogni lente ha `draw()` che restituisce uno strato SVG disegnato sotto città e magazzini; `PROV` contiene i confini delle province.
 - **INTERFACCIA**: `DOCK` (menu a sinistra), `TITLES`, `VIEWS.<finestra>()` restituisce l'HTML della finestra; `renderAll()` ridisegna tutto, saltando le finestre con un campo attivo.
 - **AZIONI**: tutti i click passano da `data-act="nome"` → `ACT.nome(dataset, element)`. Per aggiungere un pulsante: `data-act` + `data-*` nell'HTML e una funzione in `ACT`.
 - **AVVIO**: schermata iniziale, scelta del CEO e del colore aziendale, game loop (`STEP` = ms per giorno per ogni velocità).
@@ -56,6 +56,7 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 - Grafica: pixel art moderna e colorata, bordi scuri `#16202e`, ombre nette, font *Pixelify Sans* (titoli) e *IBM Plex Sans Condensed* (testo). Colori dalla tavolozza `TPAL`. Le icone sono SVG con `shape-rendering="crispEdges"`.
 - Ogni abilità ha un colore fisso: Operazioni arancione, Precisione blu, Negoziazione giallo, Leadership rosso, Amministrazione verde, Innovazione viola. Mostra sempre le abilità con `statChips()` / `statBadge()`, mai come semplice testo.
 - Ogni nuovo cliente deve avere un logo in `LOGO` e una voce in `CINFO`.
+- Ogni nuova meccanica o statistica deve avere una voce in `WIKI` e, dove compare nell'interfaccia, una parola chiave `kw()`. Se cambi una formula, aggiorna anche il testo della voce.
 - I grafici sono SVG fatti a mano (`lineChart()`, con crosshair e tooltip in `chartHover`): niente librerie; linee da 2px, le soglie tratteggiate, la legenda sempre presente e le etichette dirette al massimo per 4 serie; una sola scala per grafico.
 - Il report KPI imita Excel (barra verde, schede dei fogli, barra della formula), ma resta nella nostra tavolozza.
 - Cornici delle tecnologie: Logistica = quadrato arancione, Sviluppo aziendale = ottagono viola, Mercato = tondo verde.
@@ -64,6 +65,7 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 ## Asset
 - I ritratti sono generati in Python (`tools/portraits*.py`, funzione `person(...)` con pelle, capelli, acconciatura, vestiti, occhiali, barba…). Per un nuovo personaggio aggiungi una chiamata in `portraits3.py` / `portraits4.py`, rigenera, poi usa `{{Q_nome}}` nell'oggetto `IMG` di `src/game.html`.
 - Mappa: `tools/map_nw.py` (coste e confini disegnati a mano, rumore per il rilievo). Proiezione: `LON0=4.81, LAT1=47.0`, 640×400 mostrata a 2x.
+- Province: `tools/province.py` scarica i confini ISTAT (openpolis/geojson-italy), li semplifica e scrive `assets/province.json`, che `build.py` incorpora al posto di `{{PROV}}`.
 - Il foglio `docs/KPI_Puntualita_Accuratezza.xlsx` è generato da `tools/kpi_xlsx.py`, `personaggi.py`, `eventi.py`, `simsheet.py`, `add_sheets.py`. Non è sincronizzato in automatico con il gioco: le formule autorevoli sono in `src/game.html` e in `docs/design.md`.
 
 ## Checklist prima di un commit

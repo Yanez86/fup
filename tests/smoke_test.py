@@ -33,6 +33,13 @@ async def main():
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + PAGE)
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
+        # lente delle province
+        await pg.click('#lenses [data-act=lens][data-id=prov]')
+        n = await pg.evaluate("document.querySelectorAll('#ov path.prov').length")
+        assert n == 25, f'province disegnate: {n}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_lente_province.png'))
+        await pg.keyboard.press('KeyL')  # torna alla mappa normale
+        assert await pg.evaluate("document.querySelectorAll('#ov path.prov').length") == 0
         for w in ['azienda','magazzini','clienti','gare','report','personale','direzione','espansione','giornale','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
         for t in ['log','org','mkt']:
@@ -55,6 +62,25 @@ async def main():
         await pg.screenshot(path=os.path.join(OUT, 'shot_direzione.png'))
         st = await pg.evaluate('()=>({barcode:!!window.__FUP.S.warehouses[0].tech.barcode, fin:window.__FUP.S.dirs.fin})')
         assert st['barcode'] and st['fin'] == 'ottavio', st
+        # enciclopedia: tutti i collegamenti [[id]] puntano a voci esistenti; parole chiave, ricerca e navigazione
+        bad = await pg.evaluate('''()=>{const W=window.__FUP.WIKI,out=[];Object.values(W).forEach(w=>(w.t||'').replace(/\\[\\[([^|\\]]+)/g,(m,id)=>{if(!W[id])out.push(w.id+' -> '+id);}));return out;}''')
+        assert not bad, bad
+        await pg.evaluate(CLEAR)
+        await pg.click('#dock [data-id=magazzini]')
+        if not await pg.query_selector('#win-magazzini'): await pg.click('#dock [data-id=magazzini]')
+        await pg.hover('#win-magazzini .kw[data-id=saturazione]')
+        assert await pg.is_visible('#tip'), 'tooltip parola chiave non visibile'
+        await pg.click('#win-magazzini .kw[data-id=saturazione]')
+        assert await pg.query_selector('#win-enciclopedia .wk-it[aria-current=true][data-id=saturazione]')
+        await pg.click('#win-enciclopedia .wk-txt .kw[data-id=accuratezza]')
+        await pg.click('#win-enciclopedia [data-act=wikiback]')
+        assert await pg.query_selector('#win-enciclopedia .wk-it[aria-current=true][data-id=saturazione]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_enciclopedia.png'))
+        await pg.fill('#wiki-q', 'muletti'); n = await pg.eval_on_selector_all('#wiki-list .wk-it', 'e=>e.length')
+        assert n >= 1, 'ricerca vuota'
+        await pg.click('#wiki-list .wk-it'); await pg.click('#win-enciclopedia [data-act=wikihome]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_enciclopedia_indice.png'))
+        await pg.click('#win-enciclopedia [data-act=close]')
         for ceo in ['gino','edoardo','valeria','marco']:
             print(await pg.evaluate(BOT, ceo))
         await b.close()

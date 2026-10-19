@@ -29,6 +29,7 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Viaggi di distribuzione = ceil(pallet/16). Km di un viaggio = 2 × distanza media tra il magazzino e i capoluoghi della zona × 1,3 + 30.
 - **Approvvigionamento** (`CINFO.src`, `ORIGINS`): da dove arriva la merce. Con `ritiro` andiamo noi a prenderla: ceil(pallet/33) viaggi a pieno carico, ciascuno di 2 × distanza × 1,3 + 20 km. Così servono più autisti e più gasolio, ma c'è anche più fatturato. Con `consegna` la merce la porta il cliente e per noi non ci sono costi.
 - Sulla mappa, "Mostra sulla mappa" dalla finestra Clienti disegna le linee verso la zona e la linea di arrivo della merce (arancione se il ritiro è nostro, bianca se consegna il cliente).
+- **Lenti della mappa** (`LENSES`, pulsanti in basso a destra o tasto L): cambiano cosa mostra la mappa, come le modalità mappa dei giochi Paradox. Per ora: *Mappa normale* e *Province* (le 25 province di Piemonte, Valle d'Aosta, Lombardia e Liguria con sigla, colori diversi tra province confinanti e bordo più spesso dove hai un magazzino; il tooltip mostra regione, capoluogo, tuoi magazzini e siti in affitto). Sono solo visualizzazione, non cambiano le regole.
 - Soddisfazione a fine mese: se entrambi i KPI sono sopra soglia +3 (+1 con EDI, +1 con KAM); entro 2 punti sotto la soglia −4; più sotto −10 e penale del 5%. Sotto 25 il cliente se ne va.
 - Rinnovo a 24 mesi se la soddisfazione è ≥ 50 (≥ 40 con KAM).
 
@@ -73,6 +74,11 @@ Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Opera
 - Uno ogni 30-55 giorni (il primo verso il 25° giorno). Un evento non si ripete prima di 240 giorni; quelli con `once` capitano una sola volta.
 - Ogni evento ha 2-3 opzioni. Alcune opzioni richiedono un talento o un'abilità del CEO.
 - Tipi di evento: meteo (nebbia, neve, afa, allerta Liguria), politica e storia (euro, ZTL, elezioni, Expo, lockdown, caro gasolio), vita locale (Giro, derby, parroco, vicino di capannone), clienti, personale e tecnologia.
+
+## Enciclopedia e parole chiave
+- Finestra "Enciclopedia di FUP" (icona del libro nel menu, tasto E): indice per categorie (basi, KPI, abilità, talenti, personale, clienti e gare, soldi e costi, tecnologie, direzione, gergo), ricerca, voci collegate tra loro, pulsanti Indietro e Indice.
+- Nell'interfaccia le parole chiave sono sottolineate a puntini: al passaggio del mouse un tooltip dà la spiegazione breve, al clic si apre la voce completa. Anche abilità, talenti, tecnologie installate e i riquadri della barra in alto aprono la loro voce.
+- Le voci di abilità, talenti, tecnologie e direttori sono generate dai dati del gioco; le altre sono scritte a mano in `WIKI` e i numeri vanno tenuti allineati alle formule di questo documento.
 
 ## Idee aperte
 - Espansione oltre il Nord-Ovest, concorrenti più attivi sulla mappa, flotta con tipi di mezzi diversi (motrici, bilici, frigo), contratti con i fornitori, uffici.
