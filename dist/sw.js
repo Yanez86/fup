@@ -1,7 +1,7 @@
 /* Service worker della web app: tiene in memoria il gioco per giocare anche senza connessione.
    La pagina si scarica sempre fresca quando c'è rete (così gli aggiornamenti arrivano subito), altrimenti si usa la copia salvata.
-   8410dccde0 viene sostituito da build.py: a ogni build cambia e la vecchia copia viene buttata. */
-const CACHE = 'fup-8410dccde0';
+   64d9f80291 viene sostituito da build.py: a ogni build cambia e la vecchia copia viene buttata. */
+const CACHE = 'fup-64d9f80291';
 const CORE = ['./', 'manifest.webmanifest', 'icona_180.png', 'icona_192.png', 'icona_512.png', 'icona_maskable_512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

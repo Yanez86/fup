@@ -93,7 +93,7 @@ Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Opera
 ## Eventi
 - Uno ogni 30-55 giorni (il primo verso il 25° giorno). Un evento non si ripete prima di 240 giorni; quelli con `once` capitano una sola volta.
 - Ogni evento ha 2-3 opzioni. Alcune opzioni richiedono un talento o un'abilità del CEO.
-- Eventi dei talenti (id `t_…`, `cond` con `hasTal()`): circa 40 eventi che compaiono solo se il CEO ha quel talento (es. Stacanovista → la moglie o il marito di un dipendente fa una scenata in ufficio). Entrano nella stessa estrazione degli altri eventi, quindi restano rari. Ogni talento di carattere nuovo ne ha uno, e il suo testo `fx` lo annuncia con «Eventi: …».
+- Eventi dei talenti (id `t_…`, `cond` con `hasTal()`): circa 40 eventi che compaiono solo se il CEO ha quel talento (es. Stacanovista → la moglie o il marito di un dipendente fa una scenata in ufficio). Entrano nella stessa estrazione degli altri eventi, quindi restano rari. Ogni talento di carattere nuovo ne ha uno; il testo `fx` dei talenti non li nomina, sono una sorpresa.
 - Tipi di evento: meteo (nebbia, neve, afa, allerta Liguria), politica e storia (euro, ZTL, elezioni, Expo, lockdown, caro gasolio), vita locale (Giro, derby, parroco, vicino di capannone), clienti, personale e tecnologia.
 
 ## Enciclopedia e parole chiave
