@@ -58,6 +58,11 @@ async def intro(pg, shot):
     await pg.tap('#intro') if await pg.evaluate("navigator.maxTouchPoints>0") else await pg.click('#intro')
     await pg.wait_for_selector('#intro:empty', state='attached')
 
+async def menu(pg, wid):
+    # telefono: le finestre si aprono dal menu che entra da sinistra
+    await pg.tap('#burger'); await pg.wait_for_timeout(220)
+    await pg.tap(f'#dock [data-id={wid}]'); await pg.wait_for_timeout(220)
+
 async def phone(b, w, h, name, errs):
     ctx = await b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, is_mobile=True, has_touch=True)
     pg = await ctx.new_page(); pg.on('pageerror', lambda e: errs.append(f'{name}: {e}'))
@@ -78,35 +83,42 @@ async def phone(b, w, h, name, errs):
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_visura.png'), full_page=True)
     await pg.tap('[data-act=startgame]'); await pg.tap('[data-act=closemodal]')
     await pg.wait_for_timeout(100)
-    for d in await pg.eval_on_selector_all('#dock button', 'e=>e.map(b=>b.dataset.id)'):
-        assert await pg.evaluate(FITS, f'#dock [data-id={d}]'), f'{name}: pulsante {d} fuori schermo'
+    # menu: un solo pulsante sulla mappa; aperto, l'elenco sta nello schermo e ha tutte le voci
+    assert await pg.evaluate(FITS, '#burger'), f'{name}: pulsante Menu fuori schermo'
+    assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
+    await pg.tap('#burger'); await pg.wait_for_timeout(250)
+    assert await pg.evaluate(FITS, '#dock'), f'{name}: menu aperto fuori schermo'
+    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 13, f'{name}: mancano voci nel menu'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_menu.png'))
+    await pg.tap('#dock .dh [data-act=menu]'); await pg.wait_for_timeout(250)
+    assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu non si chiude'
     zoom = await pg.evaluate(PINCH)
     assert zoom[1] > zoom[0] * 1.5, f'{name}: pinch non ha zoomato {zoom}'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_mappa.png'))
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
     for wn in ['azienda','riepilogo','magazzini','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
-        await pg.tap(f'#dock [data-id={wn}]')
+        await menu(pg, wn)
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
         bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
         assert not bad, f'{name}: finestra {wn}: {bad}'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{wn}.png'))
         await pg.tap(f'#win-{wn} [data-act=close]')
     # parola chiave: primo tocco = tooltip, secondo tocco = enciclopedia
-    await pg.tap('#dock [data-id=magazzini]')
+    await menu(pg, 'magazzini')
     await pg.tap('#win-magazzini .kw[data-id=saturazione]')
     assert await pg.is_visible('#tip') and not await pg.query_selector('#win-enciclopedia'), f'{name}: il primo tocco deve mostrare il tooltip'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_tooltip.png'))
     await pg.tap('#win-magazzini .kw[data-id=saturazione]')
     assert await pg.query_selector('#win-enciclopedia .wk-it[aria-current=true][data-id=saturazione]'), f'{name}: il secondo tocco deve aprire la voce'
     # il menu riporta davanti una finestra coperta invece di chiuderla
-    await pg.tap('#dock [data-id=magazzini]')
+    await menu(pg, 'magazzini')
     assert await pg.query_selector('#win-magazzini'), f'{name}: la finestra coperta è stata chiusa'
     # riepilogo dopo tre anni di gioco: ogni scheda resta dentro lo schermo
     await pg.evaluate(BOT, 'gino')
     for _ in range(5): await pg.evaluate(CLEAR)
     await pg.evaluate("()=>{window.__FUP.S.speed=0;document.querySelector('#modal').innerHTML='';document.querySelector('#toasts').innerHTML='';}")
     if await pg.query_selector('#win-magazzini'): await pg.tap('#win-magazzini [data-act=close]')
-    await pg.tap('#dock [data-id=riepilogo]')
+    await menu(pg, 'riepilogo')
     for t in ['gen','soldi','op','cli','pers','mod']:
         await pg.tap(f'#win-riepilogo [data-act=rptab][data-id={t}]')
         assert await pg.evaluate(FITS, '#win-riepilogo'), f'{name}: riepilogo {t} esce dallo schermo'

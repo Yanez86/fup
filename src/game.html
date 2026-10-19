@@ -65,7 +65,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .chip{display:flex;flex-direction:column;justify-content:center;line-height:1.1;padding:2px 10px;background:#1d2a3b;border:2px solid #2f4057;min-width:0}
 .chip span:first-child{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--hi)}
 .chip b{font-family:var(--f-disp);font-size:18px;font-weight:600}
-.date{font-family:var(--f-disp);font-size:17px;padding:3px 10px;background:var(--ink3);border:2px solid var(--ink4);box-shadow:inset 0 -2px 0 #1d2a3b}
+.date{font-family:var(--f-disp);font-size:17px;padding:3px 10px;min-width:calc(12em + 24px);text-align:center;white-space:nowrap;box-sizing:border-box;background:var(--ink3);border:2px solid var(--ink4);box-shadow:inset 0 -2px 0 #1d2a3b}
 .spd{display:flex;gap:4px}
 .spd button{width:36px;height:34px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font-family:var(--f-disp);font-weight:700;box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
 .spd button[aria-pressed="true"]{background:var(--accent);color:var(--ink);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
@@ -79,6 +79,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 #dock{position:fixed;left:max(12px, env(safe-area-inset-left, 0px));top:88px;z-index:25;display:flex;flex-direction:column;gap:6px;padding:6px;background:var(--ink);border:3px solid var(--ink2);box-shadow:inset 0 2px 0 var(--ink3), 5px 5px 0 rgba(12,19,29,.55)}
 #dock button{width:48px;height:44px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink4);background:var(--ink3);box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a;position:relative}
 #dock button.on{background:var(--accent);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
+#dock .di{display:flex;align-items:center;justify-content:center}
+#dock .dl,#burger,#dockshade{display:none}
 #dock .badge{position:absolute;right:-7px;top:-7px;min-width:20px;height:20px;padding:0 4px;background:var(--bad);color:#fff;border:2px solid #fff;font:700 12px/16px var(--f-body)}
 
 /* Finestre */
@@ -390,7 +392,7 @@ html,body{overscroll-behavior:none}
 .mob #top{gap:6px 8px;padding:4px max(8px, env(safe-area-inset-right, 0px)) 5px max(8px, env(safe-area-inset-left, 0px));padding-top:calc(4px + env(safe-area-inset-top, 0px))}
 .mob #top .logo{font-size:19px}
 .mob #top .logo small,.mob #top .spacer{display:none}
-.mob .date{font-size:14px;padding:3px 6px}
+.mob .date{font-size:14px;padding:3px 6px;min-width:calc(8.3em + 16px)}  /* sul telefono il mese è abbreviato */
 .mob .spd button,.mob .optb{width:38px;height:36px}
 .mob .paused{display:none}
 .mob #top .stats{gap:4px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
@@ -398,11 +400,28 @@ html,body{overscroll-behavior:none}
 .mob .chip{padding:1px 7px;flex:none}
 .mob .chip span:first-child{font-size:10px}
 .mob .chip b{font-size:15px}
-.mob #dock{top:auto;left:0;right:0;bottom:0;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px;padding:5px max(8px, env(safe-area-inset-right, 0px)) calc(5px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));border-width:3px 0 0;box-shadow:inset 0 2px 0 var(--ink3)}
-.mob #dock button{width:min(50px, calc((100vw - 40px) / 7));height:44px}  /* 7 per riga: due righe per 13 pulsanti */
-.mob.land #dock{top:var(--top-h);bottom:0;right:auto;display:grid;grid-template-columns:repeat(2,46px);grid-auto-rows:40px;align-content:start;gap:4px;padding:5px 5px calc(5px + env(safe-area-inset-bottom, 0px)) max(5px, env(safe-area-inset-left, 0px));border-width:0 3px 0 0;overflow-y:auto}
-.mob.land #dock button{width:46px;height:40px}
-.mob #lenses{right:8px;bottom:calc(var(--win-b) + 8px);padding:4px}
+/* menu del telefono: pulsante «Menu» in basso a destra, elenco che entra da sinistra sopra tutto */
+.mob #burger{position:fixed;right:max(12px, env(safe-area-inset-right, 0px));bottom:calc(14px + env(safe-area-inset-bottom, 0px));z-index:26;display:flex;align-items:center;gap:10px;height:54px;padding:0 16px;background:var(--accent);color:var(--ink);border:3px solid var(--ink);box-shadow:inset 0 -4px 0 var(--accent-d), inset 0 2px 0 var(--accent-l), 4px 4px 0 rgba(12,19,29,.55);font:700 19px var(--f-disp)}
+.mob #burger .bl{display:flex;flex-direction:column;gap:4px}.mob #burger .bl i{display:block;width:22px;height:4px;background:var(--ink)}
+.mob #burger .badge{position:absolute;right:-9px;top:-9px;min-width:22px;height:22px;padding:0 4px;background:var(--bad);color:#fff;border:2px solid #fff;font:700 12px/18px var(--f-body);text-align:center}
+.mob.menu #burger{display:none}
+.mob.menu #dockshade{display:block;position:fixed;inset:0;z-index:41;background:rgba(12,19,29,.55)}
+.mob #dock{top:0;bottom:0;left:0;width:min(86vw, 380px);z-index:42;display:block;overflow-y:auto;overscroll-behavior:contain;padding:calc(10px + env(safe-area-inset-top, 0px)) 10px calc(16px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px));border-width:0 3px 0 0;border-right-color:var(--accent);box-shadow:none;transform:translateX(-110%);visibility:hidden;transition:transform .18s steps(4), visibility 0s .18s}
+.mob.menu #dock{transform:none;visibility:visible;transition:transform .18s steps(4)}
+.mob #dock .dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;color:#fff}
+.mob #dock .dh b{font:700 22px var(--f-disp)}
+.mob #dock .dh .xbtn{width:44px;height:42px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font:700 16px var(--f-disp);box-shadow:inset 0 -3px 0 #1d2a3b}
+.mob #dock .dg{font:600 12px var(--f-body);letter-spacing:1.5px;text-transform:uppercase;color:var(--hi);margin:12px 0 6px}
+.mob #dock button[data-act=toggle]{width:100%;height:auto;min-height:50px;justify-content:flex-start;gap:12px;padding:5px 10px;margin-bottom:5px;text-align:left;color:#fff}
+.mob #dock button.on{color:var(--ink)}
+.mob #dock .di{position:relative;width:34px;flex:none}
+.mob #dock .di .badge{box-sizing:border-box;right:-9px;top:-11px;min-width:18px;height:18px;padding:0 3px;font-size:11px;line-height:14px}
+.mob #dock .dl{display:flex;flex-direction:column;min-width:0}
+.mob #dock .dl b{font:500 16px/1.2 var(--f-body)}
+.mob #dock .dl small{font:13px/1.25 var(--f-body)}
+.mob #dock .dl small.bad{color:#ff8a8d}.mob #dock .dl small.acc{color:var(--accent-l)}.mob #dock .dl small.mut{color:var(--hi)}
+.mob #dock button.on .dl small{color:var(--ink)}
+.mob #lenses{right:auto;left:max(8px, env(safe-area-inset-left, 0px));bottom:calc(14px + env(safe-area-inset-bottom, 0px));padding:4px}
 .mob #lenses .lab{display:none}
 .mob.haswin #lenses{display:none}
 .mob .win{left:var(--win-l) !important;right:0;top:var(--top-h) !important;bottom:var(--win-b);width:auto !important;max-width:none;max-height:none;border-width:0 0 0 3px;box-shadow:none}
@@ -411,6 +430,7 @@ html,body{overscroll-behavior:none}
 .mob .grip{display:none}
 .mob .xbtn{width:44px;height:40px;font-size:16px}
 .mob .win-b{padding:10px max(10px, env(safe-area-inset-right, 0px)) 16px 10px;overscroll-behavior:contain}
+.mob .win .win-b{padding-bottom:84px}  /* in fondo il contenuto scorre oltre il pulsante «Menu» */
 .mob .tabs button{padding:10px 6px}
 .mob .ttabs{display:grid;grid-template-columns:1fr 1fr}
 .mob .ttabs button{border-bottom:2px solid var(--ink)}
@@ -482,7 +502,6 @@ html,body{overscroll-behavior:none}
     <button data-act="speed" data-v="0" aria-label="Pausa (spazio)">II</button>
     <button data-act="speed" data-v="1" aria-label="Velocità 1">›</button>
     <button data-act="speed" data-v="2" aria-label="Velocità 2">››</button>
-    <button data-act="speed" data-v="3" aria-label="Velocità 3">›››</button>
   </div>
   <button class="optb" data-act="options" aria-label="Opzioni" title="Opzioni"><svg width="20" height="20" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="#16202e" d="M4 0h2v1h1v1h1v-1h1v1h1v1h-1v1h1v2h-1v1h1v1h-1v1h-1v-1h-1v1h-1v1h-2v-1h-1v-1h-1v1h-1v-1h-1v-1h1v-1h-1v-2h1v-1h-1v-1h1v-1h1v1h1v-1h1z"/><path fill="#d8e2ee" d="M4 1h2v1h1v1h1v4h-1v1h-1v1h-2v-1h-1v-1h-1v-4h1v-1h1z"/><path fill="#16202e" d="M4 4h2v2h-2z"/></svg></button>
   <span class="paused" id="paused" hidden>In pausa</span>
@@ -491,6 +510,8 @@ html,body{overscroll-behavior:none}
 </header>
 
 <nav id="dock" aria-label="Menu"></nav>
+<div id="dockshade" data-act="menu" aria-hidden="true"></div>
+<button id="burger" data-act="menu" aria-label="Apri il menu" aria-expanded="false"><span class="bl" aria-hidden="true"><i></i><i></i><i></i></span>Menu<span class="badge" id="burgerb" hidden></span></button>
 <nav id="lenses" aria-label="Lenti della mappa"></nav>
 <div id="wins"></div>
 <div id="toasts" aria-live="polite"></div>
@@ -1283,6 +1304,7 @@ const DAY0=Date.UTC(2002,0,1);
 const MESI=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
 const GG=['dom','lun','mar','mer','gio','ven','sab'];
 const dateOf=d=>new Date(DAY0+d*86400000);
+const fmtDateS=d=>{const t=dateOf(d);return `${GG[t.getUTCDay()]} ${t.getUTCDate()} ${MESI[t.getUTCMonth()].slice(0,3)} ${t.getUTCFullYear()}`};
 const fmtDate=d=>{const t=dateOf(d);return `${GG[t.getUTCDay()]} ${t.getUTCDate()} ${MESI[t.getUTCMonth()]} ${t.getUTCFullYear()}`};
 const shortDate=d=>{const t=dateOf(d);return `${t.getUTCDate()} ${MESI[t.getUTCMonth()].slice(0,3)} ${t.getUTCFullYear()}`};
 const yearOf=d=>dateOf(d).getUTCFullYear();
@@ -1306,7 +1328,7 @@ wk('riepilogo','basi','Riepilogo dell\'azienda',`La finestra con tutti i numeri 
 Panoramica: [[cassa]], utile e [[ricavi]] del mese scorso, [[reputazione]], clienti, magazzini, dipendenti e gare vinte, con l'andamento della cassa e l'utile di ogni mese. Conti: ricavi e [[costi]] mese per mese, dove vanno i soldi, [[penali]] pagate e il [[conto|conto economico]] anno per anno. Operazioni: [[puntualita]], [[accuratezza]], [[saturazione|occupazione]] e [[morale]] medi, i pallet movimentati e una tabella magazzino per magazzino. Clienti: quanto rende ogni cliente, la sua [[soddisfazione]], le soglie dei contratti e le [[gare]] vinte e perse. Persone: chi lavora per te, [[manager]], [[direzione|dirigenti]], [[welfare|benefit]] e [[alberi|alberi delle tecnologie]]. Modificatori: da cosa dipendono oggi [[puntualita]], [[accuratezza]] e [[morale]] di ogni magazzino, voce per voce; i [[talenti]] del CEO, dei manager e dei dirigenti con i loro effetti; le [[tecnologie]] ricercate e dove sono installate; gli effetti degli [[eventi]] ancora in corso, con la data di scadenza.
 
 I grafici si aggiornano alla fine di ogni mese, quando si chiudono i conti: ne servono almeno due per vedere una linea. I numeri di puntualità e accuratezza sono la media dei magazzini, non pesata sui volumi. Ogni riquadro si apre nell'enciclopedia.`);
-wk('tempo','basi','Tempo e velocità',`Il gioco avanza un giorno alla volta. Spazio mette in pausa, i tasti 1, 2 e 3 cambiano velocità.`,
+wk('tempo','basi','Tempo e velocità',`Il gioco avanza un giorno alla volta. Spazio mette in pausa, i tasti 1 e 2 cambiano velocità (normale e veloce).`,
 `Ogni giorno il gioco ricalcola tutti i magazzini: [[puntualita]], [[accuratezza]], [[morale]], costi e ricavi. Ogni lunedì arriva il [[report]] della settimana, alla fine di ogni mese si chiudono i conti: [[soddisfazione]] dei clienti, [[penali]], [[conto|conto economico]] e prezzo del [[gasolio]].
 
 Quando compare un [[eventi|evento]] o un messaggio importante il tempo si ferma da solo finché non rispondi.`);
@@ -2726,22 +2748,22 @@ function animTrucks(ts){
 }
 
 /* ====================== INTERFACCIA ====================== */
-// telefono: .mob su <html> mette le finestre a tutto schermo e il menu in basso (a sinistra se il telefono è in orizzontale).
+// telefono: .mob su <html> mette le finestre a tutto schermo; il menu diventa un elenco che entra da sinistra col pulsante «Menu» (setMenu).
 // TOUCH (schermo senza mouse) sceglie i testi dei comandi: «tocca» invece di «clic», niente tasti.
 const TOUCH=matchMedia('(hover: none)').matches;
 let MOB=false;
 function setMobile(){
   MOB=matchMedia('(max-width: 760px), (max-height: 500px)').matches;
   const h=document.documentElement; h.classList.toggle('mob',MOB); h.classList.toggle('land',MOB&&innerWidth>innerHeight);
+  if(!MOB&&UI.menu) setMenu(false);
+  if(S&&MOB!==UI.mobDock){UI.mobDock=MOB; renderDock(); renderTop();}
   layoutVars();
 }
 function layoutVars(){
   if(!MOB) return;
-  const r=document.documentElement.style, land=innerWidth>innerHeight;
+  const r=document.documentElement.style;
   r.setProperty('--top-h',Math.round($('#top').getBoundingClientRect().bottom)+'px');
-  const d=$('#dock').getBoundingClientRect(), on=d.width>0;
-  r.setProperty('--win-l',on&&land?Math.round(d.right)+'px':'0px');
-  r.setProperty('--win-b',on&&!land?Math.round(innerHeight-d.top)+'px':'0px');
+  r.setProperty('--win-l','0px'); r.setProperty('--win-b','0px');  // il menu è un pannello che si apre sopra: non toglie spazio
 }
 const DOCK=[
  ['azienda','Azienda e CEO','<svg width="22" height="24" viewBox="0 0 11 12" shape-rendering="crispEdges"><rect x="3" y="0" width="5" height="5" fill="#f2c79b"/><rect x="3" y="0" width="5" height="2" fill="#6b4a2b"/><rect x="1" y="6" width="9" height="6" fill="#ffd23f"/><rect x="5" y="6" width="1" height="4" fill="#16202e"/></svg>'],
@@ -2759,16 +2781,29 @@ const DOCK=[
  ['giornale','Il giornale','<svg width="24" height="20" viewBox="0 0 12 10" shape-rendering="crispEdges"><rect x="0" y="0" width="12" height="10" fill="#f4f1ec"/><rect x="1" y="1" width="10" height="2" fill="#16202e"/><rect x="1" y="4" width="4" height="4" fill="#8a96a6"/><rect x="6" y="4" width="5" height="1" fill="#16202e"/><rect x="6" y="6" width="5" height="1" fill="#16202e"/></svg>']
 ];
 const TITLES={policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP'};
+// sul telefono il menu è raggruppato e ogni voce dice in una riga come sta il suo reparto
+const DOCK_G=[['Operazioni',['magazzini','personale','clienti','gare','espansione']],['Azienda',['azienda','riepilogo','direzione','policy','tecnologia']],['Informazioni',['report','enciclopedia','giornale']]];
+function setMenu(on){UI.menu=!!on&&MOB; document.documentElement.classList.toggle('menu',UI.menu); const b=$('#burger'); if(b){b.setAttribute('aria-expanded',String(UI.menu)); b.setAttribute('aria-label',UI.menu?'Chiudi il menu':'Apri il menu');}}
 function renderDock(){
   const openT=S.tenders.filter(t=>!t.done&&!t.bid).length;
   const short=S.warehouses.filter(w=>w.kpi&&overloaded(w,w.kpi)).length;
   const planS=planLoad()>1.02?1:0;
   const B={gare:openT,magazzini:short,personale:planS,policy:staffPeople().filter(p=>p.quit||(p.unh||0)>=20).length};
+  const dirFree=R('direzione')&&Object.values(S.dirs).some(v=>!v);
   document.documentElement.classList.toggle('haswin',Object.keys(UI.open).length>0);  // sul telefono le lenti si nascondono sotto le finestre
-  $('#dock').innerHTML=DOCK.map(([id,t,ic])=>`<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${id==='magazzini'&&short?'Un reparto è in affanno: controlla il carico di lavoro':id==='personale'&&planS?'Pianificatori del traffico in affanno':id==='tecnologia'&&S.project?'Ricerca in corso: '+S.project.left+' giorni':id==='direzione'&&!R('direzione')?'Si sblocca con la ricerca Struttura direzionale':id==='policy'&&B.policy?'Un manager sta per andarsene':id==='policy'&&!R('regolamento')?'Si sblocca con la ricerca Regolamento aziendale':''}">${ic}${B[id]?`<span class="badge">${id==='gare'?B[id]:'!'}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}${id==='report'&&S.repNew?'<span class="badge">1</span>':''}${id==='direzione'&&R('direzione')&&Object.values(S.dirs).some(v=>!v)?'<span class="badge">!</span>':''}</button>`).join('');
+  const note=id=>id==='magazzini'&&short?['bad','Un reparto è in affanno']:id==='personale'&&planS?['bad','Pianificatori del traffico in affanno']:id==='gare'&&openT?['bad',openT===1?'1 gara aperta':openT+' gare aperte']:
+    id==='tecnologia'&&S.project?['acc','Ricerca in corso: '+S.project.left+' giorni']:id==='direzione'&&!R('direzione')?['mut','Si sblocca con la ricerca Struttura direzionale']:id==='direzione'&&dirFree?['bad','Ci sono posti da dirigente liberi']:
+    id==='policy'&&B.policy?['bad','Un manager sta per andarsene']:id==='policy'&&!R('regolamento')?['mut','Si sblocca con la ricerca Regolamento aziendale']:id==='report'&&S.repNew?['acc','Nuovo report del lunedì']:null;
+  const red=id=>B[id]?(id==='gare'?B[id]:'!'):id==='report'&&S.repNew?1:id==='direzione'&&dirFree?'!':0;
+  const btn=([id,t,ic])=>{const n=note(id), r=red(id);
+    return `<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${n?esc(n[1]):''}"><span class="di">${ic}${r?`<span class="badge">${r}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}</span><span class="dl"><b>${esc(t.replace(' (tasto E)',''))}</b>${n?`<small class="${n[0]}">${esc(n[1])}</small>`:''}</span></button>`;};
+  const D=Object.fromEntries(DOCK.map(x=>[x[0],x]));
+  $('#dock').innerHTML=MOB?`<div class="dh"><b>Menu</b><button class="xbtn" data-act="menu" aria-label="Chiudi il menu">x</button></div>`+DOCK_G.map(([g,ids])=>`<div class="dg">${g}</div>`+ids.map(id=>btn(D[id])).join('')).join(''):DOCK.map(btn).join('');
+  const tot=DOCK.reduce((a,[id])=>a+(+red(id)||(red(id)?1:0)),0), bb=$('#burgerb');
+  if(bb){bb.hidden=!tot; bb.textContent=tot;}
 }
 function renderTop(){
-  $('#date').textContent=fmtDate(S.day);
+  $('#date').textContent=MOB?fmtDateS(S.day):fmtDate(S.day);
   $('#coname').textContent=S.company.name; $('#cologo').innerHTML=coLogoSvg(S.company.logo,S.company.color,24);
   document.querySelectorAll('.spd button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===S.speed)));
   $('#paused').hidden=S.speed!==0;
@@ -3307,7 +3342,8 @@ function hireDays(base,wh,r){const att=45+welfarePts('att')+polSum('att')+(S.rep
   return Math.max(3,Math.round(base*clamp(1+(55-att)/40,0.6,1.8)*(R('hr')?0.8:1)*(h!=null?1-0.02*(h-10):1)*drv*(r==='plan'?polMul('planHire'):1)));}
 const ACT={
  speed(d){setSpeed(+d.v);},
- toggle(d){const el=document.getElementById('win-'+d.id); if(MOB&&el&&+el.style.zIndex<UI.z) return openWin(d.id); UI.open[d.id]?closeWin(d.id):openWin(d.id);},
+ menu(){setMenu(!UI.menu);},
+ toggle(d){const el=document.getElementById('win-'+d.id); if(MOB){setMenu(false); if(el) return openWin(d.id);} UI.open[d.id]?closeWin(d.id):openWin(d.id);},
  open(d){openWin(d.id);},
  close(d){closeWin(d.id);},
  openwh(d){openWin('magazzini',{wh:d.id});},
@@ -3444,7 +3480,8 @@ document.addEventListener('keydown',e=>{
   if($('#modal').innerHTML) return;
   if(e.code==='KeyE'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ACT.toggle({id:'enciclopedia'});return;}
   if(e.code==='Space'){e.preventDefault();setSpeed(S.speed?0:(UI.prevSpeed||1));if(S.speed)UI.prevSpeed=S.speed;}
-  if(['Digit1','Digit2','Digit3'].includes(e.code)){setSpeed(+e.code.slice(5));UI.prevSpeed=S.speed;}
+  if(['Digit1','Digit2'].includes(e.code)){setSpeed(+e.code.slice(5));UI.prevSpeed=S.speed;}
+  if(e.key==='Escape'&&UI.menu){setMenu(false);return;}
   if(e.code==='KeyL'){const i=LENSES.findIndex(l=>l.id===(UI.lens||'base'));ACT.lens({id:LENSES[(i+1)%LENSES.length].id});}
 });
 // tooltip
@@ -3610,6 +3647,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.24',t:'Il menu in tasca',x:['Sul telefono i tasti in basso diventano un solo pulsante «Menu»: si apre un elenco da sinistra, diviso in Operazioni, Azienda e Informazioni, e ogni voce dice in una riga come sta il suo reparto (gare aperte, reparto in affanno, ricerca in corso).','La mappa e le finestre usano tutto lo schermo del telefono.','La casella della data ha sempre la stessa larghezza: i pulsanti accanto non si spostano più ogni giorno. Sul telefono il mese è abbreviato.','Restano due velocità più la pausa: la terza, troppo veloce per seguire il gioco, è stata tolta.']},
  {v:'0.23',t:'Tutto a portata di dito',x:['Sul telefono il report KPI di un magazzino non si sovrappone più al testo sotto il foglio: le schede delle righe restano dentro il riquadro, sopra i grafici.','Sul computer le finestre non escono più dal fondo dello schermo: si accorciano e il contenuto scorre dentro con la rotellina, senza doverle trascinare in alto.','Sul telefono niente scorre più di lato: l\'albero delle tecnologie diventa un elenco per livelli e il report KPI mostra ogni riga del foglio come una scheda.','Sistemati i pulsanti con il testo più largo del pulsante (Tecnologie, Apri, schede delle gare).','I posti vuoti (dirigenti vacanti, magazzino senza manager, reparti senza personale) mostrano una sagoma anonima in ombra.']},
  {v:'0.22',t:'Dormici sopra',x:['15 nuovi clienti piccoli e locali: una panetteria di Orbassano, una distilleria di Bassano, le sedie di Manzano, i ricambi nautici di Lerici e altri.','Ci sono sempre almeno tre gare aperte (quattro con l\'Ufficio commerciale), ed escono più spesso i clienti piccoli e le zone di una sola provincia.','Negli eventi la scelta non ha effetto subito: il giorno dopo arriva una finestra che racconta com\'è andata, con gli effetti.']},
  {v:'0.21',t:'Il regolamento in bacheca',x:['Nuova finestra Policy aziendali: regole da accendere o spegnere per tutta l\'azienda, ognuna con un vantaggio e un prezzo. Dopo un cambio servono 90 giorni per cambiarla di nuovo.','12 policy: Zero straordinario, Sabato obbligatorio, Telefoni nell\'armadietto, Doppia spunta in uscita, Niente cooperative, Spending review, Il cliente ha sempre ragione, Limite 80 all\'ora, Smart working, Rotazione delle mansioni, Settimana corta e Corso sicurezza.','Si sbloccano con la nuova ricerca Regolamento aziendale e con altre tecnologie, comprese due nuove del Welfare: Lavoro agile e Settimana corta.','I manager hanno delle pretese: alcuni vogliono una policy, altri non la sopportano. Dopo un mese arriva l\'ultimatum: li accontenti, alzi lo stipendio perché la sopportino, oppure se ne vanno.','Nuovo evento: un concorrente prova a portarti via un manager. Pareggi l\'offerta, rilanci meno o lo lasci andare.']},
@@ -3732,7 +3770,7 @@ Object.assign(ACT,{
  startgame(){startKeep();const custom=startSel.ceo==='custom';
    if(custom){const e=ccErr(startSel.cc);if(e){startSel.err=e;showStart();return;}}
    startSel.err='';uid=1;newGame(startSel.ceo,coName(),startSel.color,custom?ccCeo(startSel.cc):null,{logo:startSel.logo,claim:startSel.claim.trim()});startSel.step='scelta';startSel.stamp=false;boot();},
- continue(){const sv=load();if(!sv)return;S=fillSave(migrateStaff(renameClients(sv.S)));S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();}
+ continue(){const sv=load();if(!sv)return;S=fillSave(migrateStaff(renameClients(sv.S)));S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;if(S.speed>2)S.speed=2;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();}
 });
 function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;
@@ -3741,7 +3779,7 @@ function boot(){
   if(S.day===0){ modalInfo('La Gazzetta del Muletto',`Benvenuto, ${ceo().name}`,`Hai un magazzino a ${S.warehouses[0].name} e un solo cliente, ${S.clients[0].name}. Con il magazzino quasi vuoto perdi soldi ogni mese: tieni d'occhio le Gare d'appalto, assumi in anticipo quando ne vinci una e controlla Puntualità e Accuratezza nel menu Magazzini. ${TOUCH?'Tocca › in alto per far scorrere il tempo. Le parole sottolineate a puntini si spiegano con un tocco; toccale di nuovo per aprire l\'Enciclopedia.':'Premi spazio per far scorrere il tempo. Le parole sottolineate a puntini si spiegano passandoci sopra; cliccale, o premi E, per aprire l\'Enciclopedia.'}`); }
 }
 /* ciclo di gioco */
-let acc=0,lastTick=performance.now(); const STEP=[0,1000,420,140];
+let acc=0,lastTick=performance.now(); const STEP=[0,1000,420];
 function loop(now){
   const dt=Math.min(now-lastTick,250); lastTick=now;  // tornando da un'altra app o scheda il tempo riparte da dove era
   if(S&&!S.over&&S.speed>0&&!$('#modal').innerHTML){acc+=dt; let n=0; while(S.speed>0&&acc>=STEP[S.speed]&&n<5){acc-=STEP[S.speed];step();n++; if(S.over)break;} if(n){syncTrucksMaybe();renderAll();}}
