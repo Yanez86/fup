@@ -465,6 +465,13 @@ const RANKS=[ // soglia minima della media, colori, effetti
  {r:'F',min:0,bg:'D',fg:'S',rev:0.88,comp:-6,win:-1,lost:1,fl:'Li prendi per riempire il capannone. Poi ti chiedi perché.'}
 ];
 const NAZ_REQ={tech:'accordi',wh:3,rep:65};
+// clausola penale: % del fatturato mensile per ogni punto di KPI sotto soglia (massimo PEN_MAX). Chi non è in elenco non prevede penali
+const PEN_PCT={'Saponaria Italia':1,'Supermercati Carrellone':3,'Tuttosubito Italia':3,'Fai-da-Te Planet':2,'Elettrofulmine':2,'FarmaSpa':4,'Spedizioni Tricolore':2,
+ 'Cosmetici Belletto':2,'Aeronautica Volavia':5,'Caseificio Stracchinelli':2,'Moda Grucciani':1,'Pneumatici Battistrada':2,'Crema Spalmella':1,'Scarpinando':1,
+ 'Salumificio Bresaolotti':2,'Cioccolateria Sabauda':1,'Lavatrix Elettrodomestici':1,'Surgelati Polo Sud':2,'Parafarmacie Croceverde':2,'Spesa Veloce':2,
+ 'Ortofrutta Fresco Fresco':2,'Bevande Spillatutto':1}, PEN_MAX=20;
+const penPct=c=>PEN_PCT[c.name]||0;
+const penTxt=c=>penPct(c)?`${penPct(c)}% del fatturato per ogni punto sotto soglia (max ${PEN_MAX}%)`:'nessuna penale nel contratto';
 const DUR_RANK={S:[24,36,36],A:[24,36],B:[12,24,36],C:[12,24],D:[12,24],F:[12,12,24]}; // durate possibili del contratto (mesi) per rank
 const minTenders=()=>R('commerciale')?3:2; // gare sempre aperte almeno
 // recesso anticipato: penale in mesi di fatturato, giorni di preavviso, reputazione persa
@@ -978,11 +985,17 @@ wk('soddisfazione','kpi','Soddisfazione del cliente',`Quanto il cliente è conte
 `Parte da 60. A fine mese si confrontano la puntualità e l'accuratezza medie del mese con le [[soglie]]:
 • sopra soglia: +3 (+1 con [[tech_edi|EDI]], +1 con [[tech_kam|Key account]]);
 • fino a 2 punti sotto: −4;
-• più di 2 punti sotto: −10 e una [[penali|penale]].
+• più di 2 punti sotto: −10.
+
+Se il contratto lo prevede, ogni punto sotto soglia costa anche una [[penali|penale]].
 
 Sotto 25 il cliente se ne va e perdi 3 di [[reputazione]]. Alla scadenza del [[contratto]] rinnova solo se la soddisfazione è almeno 50.`);
-wk('penali','kpi','Penali',`Multa del 5% del fatturato mensile del cliente quando i KPI sono più di 2 punti sotto la soglia.`,
-`Le penali si pagano a fine mese e compaiono nel [[conto|conto economico]]. Arrivano insieme al −10 di [[soddisfazione]]: due mesi così e il cliente è già a rischio.`);
+wk('penali','kpi','Penali',`Multa prevista da alcuni contratti quando i KPI del mese sono sotto la soglia: una percentuale del fatturato del cliente per ogni punto mancante.`,
+`Non tutti i clienti le prevedono: la clausola si legge nella [[gare|gara]] e nella scheda del cliente. Chi le ha chiede dall'1% (piccoli clienti) al 5% (aerospaziale) del fatturato mensile per ogni punto di [[puntualita]] o [[accuratezza]] sotto la [[soglie|soglia]], sommando i due KPI, fino a un massimo del 20%. Le più severe sono quelle dei grandi clienti, della farmaceutica e dei freschi.
+
+Esempio: contratto al 3%, puntualità 1,5 punti sotto e accuratezza 0,5 sotto → 2 punti × 3% = 6% del fatturato del mese.
+
+Si pagano a fine mese e compaiono nel [[conto|conto economico]]. La [[soddisfazione]] cala comunque, penale o no. Diverse dalla penale di [[recesso]], che si paga per uscire prima della scadenza.`);
 wk('saturazione','kpi','Saturazione',`Quanto è pieno il magazzino: posti pallet occupati diviso posti disponibili.`,
 `Un magazzino pieno rende, ma oltre l'85% di saturazione l'[[accuratezza]] cala in fretta: −2,5 punti ogni 10% in più. Le barre diventano gialle dal 70% e rosse dall'85%.
 
@@ -1463,7 +1476,10 @@ function monthEnd(){
     c.lastP=P; c.lastA=A;
     if(wv>=0){c.sat+=3+(R('edi')?1:0)+(R('kam')?1:0); S.rep+=0.15;}
     else if(wv>=-2){c.sat-=4;}
-    else {c.sat-=10; const p=0.05*clientRev(c); pen+=p;}
+    else {c.sat-=10;}
+    // penale da contratto: per ogni punto sotto soglia, se il cliente la prevede
+    const miss=Math.max(0,-wP)+(c.sA?Math.max(0,-wA):0), p=clientRev(c)*Math.min(PEN_MAX,penPct(c)*miss)/100; c.lastPen=p; pen+=p;
+    if(p>=1) news('Il Sole 24 Pallet',`Penale da ${c.name}`,`KPI sotto soglia di ${f1(miss)} punti: il contratto prevede ${eur(p)} di penale.`);
     c.sat=clamp(c.sat,0,100);
     if(c.sat<25){c.status='perso';S.rep-=rankOf(c).lost;toast(`${c.name} ha disdetto il contratto`,'bad');news('Il Sole 24 Pallet',`${c.name} lascia ${S.company.name}`,`"Ritardi ed errori non sono più accettabili", fa sapere il cliente.`);}
     else if(c.exit){ /* in uscita: niente rinnovo */ }
@@ -2226,10 +2242,11 @@ const VIEWS={
      <tr><td>${kw('puntualita')}</td><td class="r ${cP}">${f1(P)}%</td><td class="r">≥ ${f1(c.sP)}%</td></tr>
      <tr><td>${kw('accuratezza')}</td><td class="r ${cA}">${f1(A)}%</td><td class="r">${c.sA?'≥ '+f1(c.sA)+'%':'non richiesta'}</td></tr></table>
     <div class="row" style="align-items:center"><span class="lab">${kw('soddisfazione','Soddisfazione')}</span><div class="bar" style="max-width:160px"><i style="width:${c.sat}%;background:${c.sat>=60?'var(--ok)':c.sat>=40?'var(--warn)':'var(--bad)'}"></i></div><b class="num">${Math.round(c.sat)}</b></div>
+    <div class="sm">${kw('penali')}: ${penTxt(c)}${c.lastPen>=1?` · <b class="bad">ultimo mese ${eur(c.lastPen)}</b>`:''}</div>
     <div class="sm">${eur(clientRev(c))}/mese · ${kw('contratto','contratto')} di ${c.dur||24} mesi, scade il <b>${shortDate(c.end)}</b> (tra ${mesi} mesi)${c.exit?'':c.noRenew?' · <b class="warn">non verrà rinnovato</b>':c.sat<50?' · <b class="bad">rinnovo a rischio</b>':''}</div>
     ${c.exit?`<div class="sm bad">${kw('recesso','In uscita')}: l'ultimo camion parte il <b>${shortDate(c.exit.day)}</b>. Fino ad allora il contratto vale e i KPI contano.</div>`:
     `<div class="row"><button class="btn sm2" data-act="norenew" data-id="${c.id}" aria-pressed="${!!c.noRenew}">${c.noRenew?'Rinnova alla scadenza':'Non rinnovare'}</button><button class="btn sm2" data-act="recedi" data-id="${c.id}">Recedi dal contratto</button></div>`}`}
-   </div>`;}).join('')+(lost.length?`<div class="sm">Clienti persi: ${lost.map(c=>esc(c.name)+(c.ended==='recesso'?' (recesso)':c.ended==='scaduto'?' (non rinnovato)':c.ended==='rinuncia'?' (rinuncia)':'')).join(', ')}</div>`:'')+`<div class="sm">Ogni mese (${kw('soddisfazione','come funziona')}): sopra soglia +3 di soddisfazione; sotto di 2 punti al massimo −4; oltre −10 e penale del 5%. Sotto 25 il cliente se ne va.</div>`;
+   </div>`;}).join('')+(lost.length?`<div class="sm">Clienti persi: ${lost.map(c=>esc(c.name)+(c.ended==='recesso'?' (recesso)':c.ended==='scaduto'?' (non rinnovato)':c.ended==='rinuncia'?' (rinuncia)':'')).join(', ')}</div>`:'')+`<div class="sm">Ogni mese (${kw('soddisfazione','come funziona')}): sopra soglia +3 di soddisfazione; sotto di 2 punti al massimo −4; oltre −10. Sotto 25 il cliente se ne va. Le ${kw('penali')} dipendono dal contratto.</div>`;
  },
  gare(){
   const open=S.tenders.filter(t=>!t.done), done=S.tenders.filter(t=>t.done).slice(-4).reverse();
@@ -2246,6 +2263,7 @@ const VIEWS={
      ${logInfoHtml(sel,whById(UI.bid.wh))}
      <table class="t num"><tr><td>Volume</td><td class="r">${n0(sel.pal)} pallet/mese · ${n0(sel.stock)} posti</td></tr>
       <tr><td>${kw('puntualita')} ${kw('soglie','richiesta')}</td><td class="r">≥ ${f1(sel.sP)}%</td></tr><tr><td>${kw('accuratezza')} ${kw('soglie','richiesta')}</td><td class="r">${sel.sA?'≥ '+f1(sel.sA)+'%':'non richiesta'}</td></tr>
+      <tr><td>${kw('penali')}</td><td class="r ${penPct(sel)?'warn':''}">${penTxt(sel)}</td></tr>
       <tr><td>${kw('contratto','Avvio')}</td><td class="r">30 giorni dopo l'aggiudicazione · ${sel.dur||24} mesi</td></tr></table>
      <label class="row"><span class="lab">Magazzino</span><select data-act="bidwh" aria-label="Magazzino per la gara">${S.warehouses.map(w=>`<option value="${w.id}" ${w.id===UI.bid.wh?'selected':''}>${esc(w.name)}</option>`).join('')}</select></label>
      <label><span class="row"><span class="lab">${kw('prezzo')}</span><b class="num" id="bidmv">${UI.bid.mult>=1?'+':''}${Math.round((UI.bid.mult-1)*100)}%</b></span>
