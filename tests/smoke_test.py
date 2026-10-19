@@ -72,7 +72,7 @@ async def phone(b, w, h, name, errs):
     zoom = await pg.evaluate(PINCH)
     assert zoom[1] > zoom[0] * 1.5, f'{name}: pinch non ha zoomato {zoom}'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_mappa.png'))
-    for wn in ['azienda','magazzini','clienti','gare','report','personale','direzione','espansione','giornale','tecnologia','enciclopedia']:
+    for wn in ['azienda','riepilogo','magazzini','clienti','gare','report','personale','direzione','espansione','giornale','tecnologia','enciclopedia']:
         await pg.tap(f'#dock [data-id={wn}]')
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{wn}.png'))
@@ -87,6 +87,16 @@ async def phone(b, w, h, name, errs):
     # il menu riporta davanti una finestra coperta invece di chiuderla
     await pg.tap('#dock [data-id=magazzini]')
     assert await pg.query_selector('#win-magazzini'), f'{name}: la finestra coperta è stata chiusa'
+    # riepilogo dopo tre anni di gioco: ogni scheda resta dentro lo schermo
+    await pg.evaluate(BOT, 'gino')
+    for _ in range(5): await pg.evaluate(CLEAR)
+    await pg.evaluate("()=>{window.__FUP.S.speed=0;document.querySelector('#modal').innerHTML='';document.querySelector('#toasts').innerHTML='';}")
+    if await pg.query_selector('#win-magazzini'): await pg.tap('#win-magazzini [data-act=close]')
+    await pg.tap('#dock [data-id=riepilogo]')
+    for t in ['gen','soldi','op','cli','pers']:
+        await pg.tap(f'#win-riepilogo [data-act=rptab][data-id={t}]')
+        assert await pg.evaluate(FITS, '#win-riepilogo'), f'{name}: riepilogo {t} esce dallo schermo'
+        await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_riepilogo_{t}.png'))
     await ctx.close()
 
 async def main():
@@ -239,6 +249,20 @@ async def main():
         assert r['n'] >= 30 and not r['bad'], r
         for ceo in ['gino','edoardo','valeria','marco','custom']:
             print(await pg.evaluate(BOT, ceo))
+        # riepilogo dell'azienda dopo tre anni: storico mensile e tutte le schede
+        for _ in range(5): await pg.evaluate(CLEAR)
+        await pg.evaluate("()=>{window.__FUP.S.speed=0;document.querySelector('#modal').innerHTML='';document.querySelector('#toasts').innerHTML='';}")
+        h = await pg.evaluate('()=>{const S=window.__FUP.S;return {n:S.hist.length,g:S.tw.win+S.tw.lose+S.tw.skip}}')
+        assert h['n'] >= 6 and h['g'] > 0, h
+        await pg.click('#dock [data-id=riepilogo]')
+        if not await pg.query_selector('#win-riepilogo'): await pg.click('#dock [data-id=riepilogo]')
+        for t in ['gen','soldi','op','cli','pers']:
+            await pg.click(f'#win-riepilogo [data-act=rptab][data-id={t}]')
+            assert await pg.eval_on_selector_all('#win-riepilogo .rp-t', 'e=>e.length') >= 6, t
+            await pg.screenshot(path=os.path.join(OUT, f'shot_riepilogo_{t}.png'))
+        await pg.click('#win-riepilogo [data-act=rptab][data-id=gen]')
+        await pg.hover('#win-riepilogo svg[data-chart=rp_cash]')
+        assert 'Cassa' in await pg.inner_text('#tip'), 'tooltip del grafico della cassa'
         await b.close()
     if errs:
         print('ERRORI JS:', *errs, sep='\n  '); sys.exit(1)
