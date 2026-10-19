@@ -38,7 +38,7 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 - **INTERFACCIA**: `DOCK` (menu a sinistra), `TITLES`, `VIEWS.<finestra>()` restituisce l'HTML della finestra; `renderAll()` ridisegna tutto, saltando le finestre con un campo attivo.
 - **AZIONI**: tutti i click passano da `data-act="nome"` → `ACT.nome(dataset, element)`. Per aggiungere un pulsante: `data-act` + `data-*` nell'HTML e una funzione in `ACT`.
 - **Telefono**: `setMobile()` mette la classe `.mob` (e `.land` in orizzontale) su `<html>`; le regole CSS `.mob …` fanno il layout da telefono, `layoutVars()` misura barra e menu (`--top-h`, `--win-l`, `--win-b`). `TOUCH` sceglie i testi «tocca»/«clic». Tooltip al tocco nella sezione EVENTI DOM, pinch in `initMapControls()`.
-- **AVVIO**: schermata iniziale, pulsante «Installa come app» (`installCard()`), registrazione di `sw.js`, scelta del CEO e del colore aziendale, game loop (`STEP` = ms per giorno per ogni velocità).
+- **AVVIO**: schermata introduttiva (`showIntro()`, camioncino in pixel art `introTruck()` col pallet dell'icona; un clic o un tocco la chiude con `ACT.introgo`), elenco delle novità `CHANGELOG` (versione più recente in cima, `VER`, `newsCard()`), schermata iniziale, pulsante «Installa come app» (`installCard()`), registrazione di `sw.js`, scelta del CEO e del colore aziendale, game loop (`STEP` = ms per giorno per ogni velocità).
 - `window.__FUP` espone stato e funzioni per i test.
 
 ## Regole di design (non cambiarle senza chiedere)
@@ -76,5 +76,6 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 2. `python3 tests/smoke_test.py` termina con `OK`.
 3. Se hai toccato l'interfaccia, guarda gli screenshot in `tools/out/`.
 4. Se hai cambiato regole o formule, aggiorna `docs/design.md`.
-5. **Pubblica sempre tutto su `main`** (regola base di Davide): a fine lavoro unisci le modifiche in `main` e fai push, anche se la sessione lavora su un altro ramo.
-6. Committa anche `dist/fup.html`: a ogni push su `main` la GitHub Action `.github/workflows/pages.yml` lo pubblica su https://yanez86.github.io/fup/.
+5. Per le novità visibili a chi gioca aggiungi una riga in `CHANGELOG` (nuova versione in cima se è un blocco di lavoro nuovo), in italiano semplice.
+6. **Pubblica sempre tutto su `main`** (regola base di Davide): a fine lavoro unisci le modifiche in `main` e fai push, anche se la sessione lavora su un altro ramo.
+7. Committa anche `dist/fup.html`: a ogni push su `main` la GitHub Action `.github/workflows/pages.yml` lo pubblica su https://yanez86.github.io/fup/.
