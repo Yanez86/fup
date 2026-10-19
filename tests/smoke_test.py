@@ -76,7 +76,8 @@ async def phone(b, w, h, name, errs):
     zoom = await pg.evaluate(PINCH)
     assert zoom[1] > zoom[0] * 1.5, f'{name}: pinch non ha zoomato {zoom}'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_mappa.png'))
-    for wn in ['azienda','riepilogo','magazzini','clienti','gare','report','personale','direzione','espansione','giornale','tecnologia','enciclopedia']:
+    await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
+    for wn in ['azienda','riepilogo','magazzini','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
         await pg.tap(f'#dock [data-id={wn}]')
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{wn}.png'))
@@ -177,7 +178,7 @@ async def main():
         await pg.screenshot(path=os.path.join(OUT, 'shot_lente_province.png'))
         await pg.keyboard.press('KeyL')  # torna alla mappa normale
         assert await pg.evaluate("document.querySelectorAll('#ov path.prov').length") == 0
-        for w in ['azienda','magazzini','clienti','gare','report','personale','direzione','espansione','giornale','tecnologia']:
+        for w in ['azienda','magazzini','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
         for t in ['log','org','mkt','wel']:
             await pg.click(f'#win-tecnologia [data-act=seltree][data-id={t}]')
@@ -207,6 +208,28 @@ async def main():
         await pg.screenshot(path=os.path.join(OUT, 'shot_direzione.png'))
         st = await pg.evaluate('()=>({barcode:!!window.__FUP.S.warehouses[0].tech.barcode, fin:window.__FUP.S.dirs.fin})')
         assert st['barcode'] and st['fin'] == 'ottavio', st
+        # policy: accensione, attesa di 90 giorni, pretese dei manager, ultimatum con aumento e dimissioni
+        await pg.evaluate(CLEAR)
+        await pg.evaluate("()=>{const S=window.__FUP.S; ['regolamento','barcode','hr'].forEach(t=>S.researched[t]=true);}")
+        await pg.click('#dock [data-id=policy]')
+        if not await pg.query_selector('#win-policy'): await pg.click('#dock [data-id=policy]')
+        await pg.click('#win-policy [data-act=poltog][data-id=zerostra]')
+        assert await pg.evaluate("()=>window.__FUP.polOn('zerostra')"), 'zero straordinario non acceso'
+        assert await pg.eval_on_selector('#win-policy [data-act=poltog][data-id=zerostra]', 'e=>e.disabled'), 'la policy si può cambiare subito'
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; F.ACT.hiremgr({id:'davide'}); F.ACT.hiremgr({id:'rosa'});
+          const d=S.managers.find(x=>x.id==='davide'), r0=d.ral; let ult=0;
+          for(let i=0;i<40;i++){ F.step(); const m=document.querySelector('#modal'); const b=m.querySelector('[data-act=evopt]');
+            if(b&&m.textContent.includes('minaccia')){ ult++; m.querySelectorAll('[data-act=evopt]')[1].click(); } else if(m.innerHTML){const c=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(c) c.click();} }
+          const rosa=S.managers.find(x=>x.id==='rosa');
+          return {ult, tol:!!(d.tol||{}).zerostra, raise:d.ral>r0, g:F.grievances(d).length, rosa:F.grievances(rosa).map(x=>x.id)};}''')
+        assert r['ult'] >= 1 and r['tol'] and r['raise'] and r['g'] == 0, r
+        await pg.click('#dock [data-id=policy]')
+        if not await pg.query_selector('#win-policy'): await pg.click('#dock [data-id=policy]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_policy.png'))
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; F.ACT.hiremgr({id:'chiara'}); const c=S.managers.find(x=>x.id==='chiara'); c.unh=29;
+          F.step(); const m=document.querySelector('#modal'); const ok=m.textContent.includes('minaccia'); m.querySelectorAll('[data-act=evopt]')[2].click();
+          for(let i=0;i<31;i++){ F.step(); document.querySelector('#modal').innerHTML=''; } return {ok, hired:c.hired};}''')
+        assert r['ok'] and not r['hired'], f'dimissioni dopo il preavviso: {r}'
         # enciclopedia: tutti i collegamenti [[id]] puntano a voci esistenti; parole chiave, ricerca e navigazione
         bad = await pg.evaluate('''()=>{const W=window.__FUP.WIKI,out=[];Object.values(W).forEach(w=>(w.t||'').replace(/\\[\\[([^|\\]]+)/g,(m,id)=>{if(!W[id])out.push(w.id+' -> '+id);}));return out;}''')
         assert not bad, bad
