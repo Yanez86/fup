@@ -301,6 +301,27 @@ input.sw:disabled{opacity:.45;cursor:not-allowed}
 .card.cl-bad{background:#fff4f4;border-color:var(--bad-t);box-shadow:inset 0 -3px 0 #f6dede}
 .card.cl-bad .wh-chips>span{background:#fff}
 .cl-k .lab{letter-spacing:0}
+/* finestra Gare */
+.gr-list{display:flex;flex-direction:column;gap:5px}
+.gr-t{display:flex;align-items:center;gap:10px;padding:6px 10px;background:#fff;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2);text-align:left;font:inherit;color:var(--ink);min-width:0}
+.gr-t svg{flex:none}
+.gr-t[aria-pressed="true"]{background:#fff3e8;border-color:var(--accent-d);box-shadow:inset 4px 0 0 var(--accent), inset 0 -3px 0 #f3d9c4}
+.gr-dl{flex:none;white-space:nowrap}
+.gr-d{gap:8px}
+.gr-req b{font-size:17px}
+.gr-o{display:flex;flex-direction:column;gap:8px;margin-top:4px;padding:10px;background:#fff9e3;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 #f3e3a8}
+.gr-p{display:flex;flex-direction:column;gap:4px}
+.gr-p #bidmv{font:700 22px var(--f-disp)}
+.gr-p input{width:100%}
+.gr-pl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.gr-ch{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;padding:8px 10px;background:#fff;border:2px solid var(--ink);border-left-width:8px}
+.gr-ch.ok{border-left-color:var(--ok)}.gr-ch.warn{border-left-color:var(--warn)}.gr-ch.bad{border-left-color:var(--bad)}
+.gr-ch b{font:700 28px var(--f-disp);grid-row:span 2}
+.gr-ch .bar{height:8px;display:block}
+.gr-est .wh-k b{font-size:20px}
+.gr-ld{padding:6px 10px;background:#fff;border:2px solid var(--line)}
+.gr-b{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.gr-b .btn.pri{min-width:160px;font-size:17px}
 .mob .wh-kpis,.mob .wh-money{grid-template-columns:repeat(2,minmax(0,1fr))}
 .staff{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:6px 10px;align-items:center;font-size:15px}
 .mini{width:48px;height:56px;background:#3a6db0;border:2px solid var(--ink)}
@@ -1315,16 +1336,6 @@ function logInfoList(c,w){
    <div><span class="lab">${kw('zona','Distribuzione')}</span><b>${esc(z.n)}${z.cities.length>1?` · ${z.cities.length} province`:''}</b><span class="sm">${t.out} viaggi/mese · ${n0(t.oKm)} km andata e ritorno · ${veh}</span></div>
    <div><span class="lab">${kw('canali','Canali')}</span>${chBar(c,'100%')}<span class="sm">${t.chs.map(x=>`${x.n}: ${x.trips} ${x.veh==='B'?'furgoni':'bilici'} al ${Math.round(x.ld)}%`).join(' · ')}</span></div>
    <div><span class="lab">${kw('ritiro','Merce in arrivo da')}</span><b>${esc(o.n)}</b><span class="sm">${c.mode==='ritiro'?`<span style="color:var(--accent-d)">la andiamo a prendere noi</span>: ${t.in} viaggi/mese da ${n0(t.iKm)} km`:'la consegna il cliente con i suoi mezzi'}</span></div></div>`;
-}
-function logInfoHtml(c,w){
-  const t=clientLog(c,w), z=ZONES[c.zone]||ZONES.nordovest, o=ORIGINS[c.src]||ORIGINS.fornitori;
-  return `<table class="t num">
-   <tr><td>${kw('zona','Distribuzione')}</td><td class="r"><b>${esc(z.n)}</b>${z.cities.length>1?` · ${z.cities.length} province`:''}</td></tr>
-   <tr><td></td><td class="r sm">${t.out} viaggi/mese da ${n0(t.oKm)} km (andata e ritorno) con ${t.veh==='B'?kw('autisti_b','furgoni'):t.veh==='CE'?kw('autisti_ce','bilici'):kw('autisti_ce','bilici')+' e '+kw('autisti_b','furgoni')}</td></tr>
-   <tr><td>${kw('canali','Canali')}</td><td class="r">${chBar(c,160)}</td></tr>
-   <tr><td></td><td class="r sm">${t.chs.map(x=>`${x.n}: ${x.trips} ${x.veh==='B'?'furgoni':'bilici'} al ${Math.round(x.ld)}%`).join(' · ')}</td></tr>
-   <tr><td>${kw('ritiro','Merce in arrivo da')}</td><td class="r"><b>${esc(o.n)}</b></td></tr>
-   <tr><td></td><td class="r sm">${c.mode==='ritiro'?`<span style="color:var(--accent-d,#c8551f)">la andiamo a prendere noi</span>: ${t.in} viaggi/mese da ${n0(t.iKm)} km`:'la consegna il cliente con i suoi mezzi'}</td></tr></table>`;
 }
 const STATS=[
  {k:'op',n:'Operazioni',c:'#ff7a3d',bg:'#ffe8d9',d:'Organizzazione di magazzino e trasporti. Alza la Puntualità.'},
@@ -3122,30 +3133,37 @@ const VIEWS={
   const open=S.tenders.filter(t=>!t.done), done=S.tenders.filter(t=>t.done).slice(-4).reverse();
   if(!open.length&&!done.length) return `<div class="sm">Nessuna ${kw('gare','gara')} aperta: le committenti libere sono finite. Ne arriveranno quando qualche cliente cambia logistico.</div>`;
   const sel=open.find(t=>t.id===UI.sel.tender)||open[0];
+  const cell=(lab,val,sub,cls)=>`<div class="${cls||''}"><span class="lab">${lab}</span><b>${val}</b>${sub?`<span class="sm">${sub}</span>`:''}</div>`;
   let detail='';
   if(sel){
     if(UI.bid.t!==sel.id) UI.bid={t:sel.id,wh:sel.bid?sel.bid.wh:S.warehouses[0].id,mult:sel.bid?sel.bid.mult:1};
-    const e=bidEstimate(sel,UI.bid.wh,UI.bid.mult);
-    detail=`<div class="card pend">
-     <div style="display:flex;gap:10px;align-items:center">${logoSvg(sel.name,48)}<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-     <div class="row"><span class="h3" style="display:flex;align-items:center;gap:8px">${rankIcon(sel,26)}${esc(sel.name)}</span><span class="pill" style="background:var(--yellow)">scade il ${shortDate(sel.deadline)}</span></div>
-     <div class="sm">${kw('zona','Zona')}: <b>${esc(zoneName(sel.zone))}</b>${S.clients.some(c=>c.name===sel.name&&c.status!=='perso')?` · già nostra committente in: ${S.clients.filter(c=>c.name===sel.name&&c.status!=='perso').map(c=>esc(zoneName(c.zone))).join(', ')}`:''}</div>
-     <div class="sm">"${esc(sel.slogan)}" · ${esc(sel.sector)}</div></div></div>
-     ${logInfoHtml(sel,whById(UI.bid.wh))}
-     <table class="t num"><tr><td>Volume</td><td class="r">${n0(sel.pal)} pallet/mese · ${n0(sel.stock)} posti</td></tr>
-      <tr><td>${kw('puntualita')} ${kw('soglie','richiesta')}</td><td class="r">≥ ${f1(sel.sP)}%</td></tr><tr><td>${kw('accuratezza')} ${kw('soglie','richiesta')}</td><td class="r">${sel.sA?'≥ '+f1(sel.sA)+'%':'non richiesta'}</td></tr>
-      <tr><td>${kw('penali')}</td><td class="r ${penPct(sel)?'warn':''}">${penTxt(sel)}</td></tr>
-      <tr><td>${kw('contratto','Avvio')}</td><td class="r">30 giorni dopo l'aggiudicazione · ${sel.dur||24} mesi</td></tr></table>
-     <label class="row"><span class="lab">Magazzino</span><select data-act="bidwh" aria-label="Magazzino per la gara">${S.warehouses.map(w=>`<option value="${w.id}" ${w.id===UI.bid.wh?'selected':''}>${esc(w.name)}</option>`).join('')}</select></label>
-     <label><span class="row"><span class="lab">${kw('prezzo')}</span><b class="num" id="bidmv">${UI.bid.mult>=1?'+':''}${Math.round((UI.bid.mult-1)*100)}%</b></span>
-      <input type="range" min="80" max="120" step="1" value="${Math.round(UI.bid.mult*100)}" data-act="bidmult" aria-label="Prezzo rispetto al listino"></label>
-     <div id="bidest">${bidEstHtml(sel,e)}</div>
-     <div class="row">${sel.bid?`<span class="sm ok">Offerta inviata a ${Math.round((sel.bid.mult-1)*100)}%</span><button class="btn" data-act="withdraw" data-id="${sel.id}">Ritira</button>`:''}
-      <button class="btn pri" data-act="bid" data-id="${sel.id}" ${e&&e.fits?'':'disabled'}>${sel.bid?'Aggiorna offerta':'Invia offerta'}</button></div>
+    const e=bidEstimate(sel,UI.bid.wh,UI.bid.mult), ours=S.clients.filter(c=>c.name===sel.name&&c.status!=='perso');
+    detail=`<div class="card gr-d">
+     <div class="cl-h">${logoSvg(sel.name,48)}<div class="wh-sm"><b class="cl-n">${rankIcon(sel,22)}<span class="wh-nm">${esc(sel.name)}</span></b><span class="sm wh-nm">${esc(sel.sector)} · ${kw('zona','zona')} <b style="color:var(--ink)">${esc(zoneName(sel.zone))}</b></span><span class="sm wh-nm cl-slo">"${esc(sel.slogan)}"</span><span class="pill cl-st warn">scade il ${shortDate(sel.deadline)}</span></div></div>
+     ${ours.length?`<div class="sm">Già nostra committente in: ${ours.map(c=>esc(zoneName(c.zone))).join(', ')}</div>`:''}
+     <div class="lab">Cosa chiede</div>
+     <div class="wh-money gr-req">
+      ${cell('Volume',n0(sel.pal)+' pallet','al mese · '+n0(sel.stock)+' posti')}
+      ${cell(kw('puntualita'),'≥ '+f1(sel.sP)+'%',kw('soglie','soglia minima'))}
+      ${cell(kw('accuratezza'),sel.sA?'≥ '+f1(sel.sA)+'%':'—',sel.sA?'soglia minima':'non richiesta')}
+      ${cell(kw('contratto','Contratto'),(sel.dur||24)+' mesi','parte 30 giorni dopo')}
+     </div>
+     <div class="sm ${penPct(sel)?'warn':''}">${kw('penali')}: ${penTxt(sel)}</div>
+     <div class="cl-a"><button class="btn sm2" data-act="garelog" aria-expanded="${!!UI.gareLog}">${UI.gareLog?'▴ Nascondi i trasporti':'▾ Trasporti e canali'}</button></div>
+     ${UI.gareLog?logInfoList(sel,whById(UI.bid.wh)):''}
+     <div class="gr-o">
+      <div class="h3">La tua offerta</div>
+      <label class="row" style="align-items:center"><span class="lab">Magazzino</span><select data-act="bidwh" aria-label="Magazzino per la gara">${S.warehouses.map(w=>`<option value="${w.id}" ${w.id===UI.bid.wh?'selected':''}>${esc(w.name)}</option>`).join('')}</select></label>
+      <label class="gr-p"><span class="row" style="align-items:center"><span class="lab">${kw('prezzo','Prezzo sul listino')}</span><b class="num" id="bidmv">${UI.bid.mult>=1?'+':''}${Math.round((UI.bid.mult-1)*100)}%</b></span>
+       <input type="range" min="80" max="120" step="1" value="${Math.round(UI.bid.mult*100)}" data-act="bidmult" aria-label="Prezzo rispetto al listino"><span class="gr-pl"><span>−20% più facile vincere</span><span>+20% più margine</span></span></label>
+      <div id="bidest">${bidEstHtml(sel,e)}</div>
+      <div class="gr-b">${sel.bid?`<span class="sm ok">Offerta inviata a ${sel.bid.mult>=1?'+':''}${Math.round((sel.bid.mult-1)*100)}%</span><button class="btn" data-act="withdraw" data-id="${sel.id}">Ritira</button>`:''}
+       <button class="btn pri" data-act="bid" data-id="${sel.id}" ${e&&e.fits?'':'disabled'}>${sel.bid?'Aggiorna offerta':'Invia offerta'}</button></div>
+     </div>
     </div>`;
   }
-  return `${open.length>1?`<div class="tabs" role="tablist">${open.map(t=>`<button role="tab" aria-selected="${t.id===(sel&&sel.id)}" data-act="seltender" data-id="${t.id}" style="display:flex;align-items:center;justify-content:center;gap:6px">${rankIcon(t,18)}<span>${esc(t.name)}${t.bid?' ✓':''}<br><span class="sm">${esc(zoneName(t.zone))}</span></span></button>`).join('')}</div>`:''}${detail}
-   ${done.length?`<div class="lab">Risultati recenti</div>`+done.map(t=>`<div class="row sm"><span>${esc(t.name)} · ${esc(zoneName(t.zone))}</span><span class="${t.result&&t.result.win?'ok':'bad'}">${t.result?(t.result.win?'Vinta':t.bid?`Persa contro ${esc(t.result.by)}`:`Non partecipato · ${esc(t.result.by)}`):''}</span></div>`).join(''):''}`;
+  return `${open.length>1?`<div class="lab">${kw('gare','Gare aperte')} · ${open.length}</div><div class="gr-list">${open.map(t=>`<button class="gr-t" data-act="seltender" data-id="${t.id}" aria-pressed="${t.id===(sel&&sel.id)}">${logoSvg(t.name,28)}<span class="wh-sm"><b class="wh-nm">${esc(t.name)}</b><span class="sm wh-nm">${esc(zoneName(t.zone))}</span></span>${t.bid?'<span class="pill cl-st ok">✓ offerta</span>':`<span class="sm gr-dl">scade ${shortDate(t.deadline)}</span>`}</button>`).join('')}</div>`:''}${detail}
+   ${done.length?`<div class="lab">Risultati recenti</div><div class="card" style="gap:0">`+done.map(t=>{const w=t.result&&t.result.win;return `<div class="pr-q">${logoSvg(t.name,24)}<span class="wh-sm"><span class="wh-nm">${esc(t.name)}</span><span class="sm wh-nm">${esc(zoneName(t.zone))}${t.result&&!w?` · ${t.bid?'vinta da':'presa da'} ${esc(t.result.by)}`:''}</span></span><span class="pill cl-st ${w?'ok':t.bid?'bad':''}">${t.result?(w?'Vinta':t.bid?'Persa':'Non partecipato'):''}</span></div>`;}).join('')+'</div>':''}`;
  },
  personale(){
   const ks=S.warehouses.map(w=>[w,w.kpi||computeWH(w)]), pn=planNeed(), pl=planLoad(), pq=S.queue.filter(q=>q.role==='plan').length;
@@ -3492,15 +3510,19 @@ function bidEstHtml(t,e){
   if(e.naz.length) return `<div class="sm bad">Committente di rank ${rankOf(t).r}: lavora solo con grandi logistiche con accordi nazionali. Ti manca: ${e.naz.map(esc).join(', ')}.</div>`;
   if(e.missing.length) return `<div class="sm bad">Serve la ${kw('tech_richieste','tecnologia')}: ${e.missing.map(esc).join(', ')}. Cercala nella finestra Tecnologia.</div>`;
   if(!e.fits) return `<div class="sm bad">Non c'è spazio: servirebbero ${n0(Math.round(e.sat*e.cap))} posti su ${n0(e.cap)}.</div>`;
-  const ch=Math.round(e.chance*100);
-  return `<table class="t num"><tr><td>${kw('ricavi','Ricavi stimati')}</td><td class="r">${eur(e.rev)}/mese</td></tr>
-   <tr><td>${kw('saturazione','Occupazione')} dopo</td><td class="r ${e.sat>0.85?'bad':''}">${Math.round(e.sat*100)}%</td></tr>
-   <tr><td>Puntualità prevista</td><td class="r ${kpiCls(e.P0,t.sP)}">${f1(e.P0)}%</td></tr>
-   <tr><td>Accuratezza prevista</td><td class="r ${t.sA?kpiCls(e.A0,t.sA):''}">${f1(e.A0)}%</td></tr>
-   <tr><th colspan="2" style="text-align:left">${kw('carico','Carico di lavoro')} dopo, con il personale di oggi</th></tr>
-   ${LOAD_ROLES.filter(r=>e.ld[r]>0).map(r=>`<tr><td>&nbsp;&nbsp;${ROLE[r]}</td><td class="r"><b style="color:${loadCol(e.ld[r])}">${e.ld[r]>=9?'nessuno':Math.round(e.ld[r]*100)+'%'}</b>${e.ld[r]>1.02?' <span class="bad">in affanno</span>':''}</td></tr>`).join('')}
-   <tr><th>${kw('gare','Probabilità di vincere')}</th><th class="r ${ch>=60?'ok':ch>=35?'warn':'bad'}" style="font-size:15px">${ch}%</th></tr></table>
-   <div class="sm">KPI previsti con il personale che hai oggi: se un reparto va oltre il 100% è in affanno, e tocca a te decidere quanti assumere. La committente valuta il tuo progetto come se il magazzino fosse pronto a reggere il carico. Prezzo più basso = più probabilità, meno margine.</div>`;
+  const ch=Math.round(e.chance*100), chC=ch>=60?'ok':ch>=35?'warn':'bad', oC=e.sat>0.85?'bad':e.sat>0.7?'warn':'ok';
+  const pC=kpiCls(e.P0,t.sP), aC=t.sA?kpiCls(e.A0,t.sA):'';
+  const rs=LOAD_ROLES.filter(r=>e.ld[r]>0);
+  return `<div class="gr-ch ${chC}"><span class="lab">${kw('gare','Probabilità di vincere')}</span><b>${ch}%</b><span class="bar"><i style="width:${ch}%;background:var(--${chC})"></i></span></div>
+   <div class="wh-kpis c2 gr-est">
+    <div class="kpi wh-k"><div class="lab">${kw('ricavi','Ricavi')}</div><b>${eur(e.rev)}</b><div class="sm">al mese</div></div>
+    <div class="kpi wh-k ${oC}"><div class="lab">${kw('saturazione','Occupazione')}</div><b>${Math.round(e.sat*100)}%</b><div class="sm">dopo il contratto</div></div>
+    <div class="kpi wh-k ${pC}"><div class="lab">${kw('puntualita')}</div><b>${f1(e.P0)}%</b><div class="sm">prevista · soglia ${f1(t.sP)}%</div></div>
+    <div class="kpi wh-k ${aC}"><div class="lab">${kw('accuratezza')}</div><b>${f1(e.A0)}%</b><div class="sm">prevista${t.sA?' · soglia '+f1(t.sA)+'%':''}</div></div>
+   </div>
+   ${rs.length?`<div class="gr-ld"><div class="pr-hd"><span>${kw('carico','Carico')} dopo</span><span>personale di oggi</span></div>
+    ${rs.map(r=>{const l=e.ld[r];return `<div class="pr-r"><img class="px" src="${IMG[r]}" alt="" width="24" height="28"><span class="wh-nm">${ROLE[r]}</span><span class="pr-l">${l>=9?'<span class="bad">nessuno</span>':`<span class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></span><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>`}</span></div>`;}).join('')}</div>`:''}
+   <div class="sm">Oltre il 100% un reparto è in affanno: decidi tu quanti assumere. La committente valuta il progetto come se il magazzino reggesse il carico.</div>`;
 }
 
 /* ====================== AZIONI ====================== */
@@ -3518,6 +3540,7 @@ const ACT={
  openwh(d){openWin('magazzini',{wh:d.id});},
  site(d){UI.sel.site=d.id;openWin('espansione');},
  selwh(d){UI.sel.wh=d.id;renderWin('magazzini');renderWin('tecnologia');},
+ garelog(){UI.gareLog=!UI.gareLog;renderWin('gare');},
  seltender(d){UI.sel.tender=d.id;renderWin('gare');},
  hire(d){
   const r=d.role, h=HIRE[r], w=whById(d.wh);
@@ -3817,7 +3840,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.24',t:'Il menu in tasca',x:['Sul telefono i tasti in basso diventano un solo pulsante «Menu»: si apre un elenco da sinistra, diviso in Operazioni, Azienda e Informazioni, e ogni voce dice in una riga come sta il suo reparto (gare aperte, reparto in affanno, ricerca in corso).','La mappa e le finestre usano tutto lo schermo del telefono.','La casella della data ha sempre la stessa larghezza: i pulsanti accanto non si spostano più ogni giorno. Sul telefono il mese è abbreviato.','Nuova finestra Clienti: in cima ricavi, soddisfazione media e clienti a rischio; ogni cliente ha i suoi KPI a confronto con la soglia, un\'etichetta di stato (attivo, rinnovo a rischio, in uscita) e i dettagli su trasporti e contratto che si aprono con un tocco.','Anche la finestra Personale è più ordinata: quattro riquadri in cima (persone, reparti in affanno, assunzioni in arrivo, manager), per ogni magazzino l\'elenco dei reparti con una barra del carico, i manager divisi tra «in squadra» e «disponibili».','La scheda del magazzino è più chiara: in cima nome, occupazione e manager; quattro riquadri colorati per puntualità, accuratezza, mezzi pieni e morale (verde, giallo o rosso rispetto alle soglie dei clienti); per ogni reparto una barra del carico e i pulsanti − e +; un interruttore per la cooperativa e il conto del mese in quattro caselle.','Restano due velocità più la pausa: la terza, troppo veloce per seguire il gioco, è stata tolta.']},
+ {v:'0.24',t:'Il menu in tasca',x:['Sul telefono i tasti in basso diventano un solo pulsante «Menu»: si apre un elenco da sinistra, diviso in Operazioni, Azienda e Informazioni, e ogni voce dice in una riga come sta il suo reparto (gare aperte, reparto in affanno, ricerca in corso).','La mappa e le finestre usano tutto lo schermo del telefono.','La casella della data ha sempre la stessa larghezza: i pulsanti accanto non si spostano più ogni giorno. Sul telefono il mese è abbreviato.','Gare d\'appalto più semplici: l\'elenco delle gare aperte con logo e scadenza, i requisiti in quattro caselle e una sezione «La tua offerta» con la probabilità di vincere in grande, i KPI previsti a confronto con le soglie e il carico dei reparti dopo il contratto.','Nuova finestra Clienti: in cima ricavi, soddisfazione media e clienti a rischio; ogni cliente ha i suoi KPI a confronto con la soglia, un\'etichetta di stato (attivo, rinnovo a rischio, in uscita) e i dettagli su trasporti e contratto che si aprono con un tocco.','Anche la finestra Personale è più ordinata: quattro riquadri in cima (persone, reparti in affanno, assunzioni in arrivo, manager), per ogni magazzino l\'elenco dei reparti con una barra del carico, i manager divisi tra «in squadra» e «disponibili».','La scheda del magazzino è più chiara: in cima nome, occupazione e manager; quattro riquadri colorati per puntualità, accuratezza, mezzi pieni e morale (verde, giallo o rosso rispetto alle soglie dei clienti); per ogni reparto una barra del carico e i pulsanti − e +; un interruttore per la cooperativa e il conto del mese in quattro caselle.','Restano due velocità più la pausa: la terza, troppo veloce per seguire il gioco, è stata tolta.']},
  {v:'0.23',t:'Tutto a portata di dito',x:['Sul telefono il report KPI di un magazzino non si sovrappone più al testo sotto il foglio: le schede delle righe restano dentro il riquadro, sopra i grafici.','Sul computer le finestre non escono più dal fondo dello schermo: si accorciano e il contenuto scorre dentro con la rotellina, senza doverle trascinare in alto.','Sul telefono niente scorre più di lato: l\'albero delle tecnologie diventa un elenco per livelli e il report KPI mostra ogni riga del foglio come una scheda.','Sistemati i pulsanti con il testo più largo del pulsante (Tecnologie, Apri, schede delle gare).','I posti vuoti (dirigenti vacanti, magazzino senza manager, reparti senza personale) mostrano una sagoma anonima in ombra.']},
  {v:'0.22',t:'Dormici sopra',x:['15 nuovi clienti piccoli e locali: una panetteria di Orbassano, una distilleria di Bassano, le sedie di Manzano, i ricambi nautici di Lerici e altri.','Ci sono sempre almeno tre gare aperte (quattro con l\'Ufficio commerciale), ed escono più spesso i clienti piccoli e le zone di una sola provincia.','Negli eventi la scelta non ha effetto subito: il giorno dopo arriva una finestra che racconta com\'è andata, con gli effetti.']},
  {v:'0.21',t:'Il regolamento in bacheca',x:['Nuova finestra Policy aziendali: regole da accendere o spegnere per tutta l\'azienda, ognuna con un vantaggio e un prezzo. Dopo un cambio servono 90 giorni per cambiarla di nuovo.','12 policy: Zero straordinario, Sabato obbligatorio, Telefoni nell\'armadietto, Doppia spunta in uscita, Niente cooperative, Spending review, Il cliente ha sempre ragione, Limite 80 all\'ora, Smart working, Rotazione delle mansioni, Settimana corta e Corso sicurezza.','Si sbloccano con la nuova ricerca Regolamento aziendale e con altre tecnologie, comprese due nuove del Welfare: Lavoro agile e Settimana corta.','I manager hanno delle pretese: alcuni vogliono una policy, altri non la sopportano. Dopo un mese arriva l\'ultimatum: li accontenti, alzi lo stipendio perché la sopportino, oppure se ne vanno.','Nuovo evento: un concorrente prova a portarti via un manager. Pareggi l\'offerta, rilanci meno o lo lasci andare.']},
