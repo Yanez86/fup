@@ -169,7 +169,7 @@ async def main():
         # lente delle province
         await pg.click('#lenses [data-act=lens][data-id=prov]')
         n = await pg.evaluate("document.querySelectorAll('#ov path.prov').length")
-        assert n == 25, f'province disegnate: {n}'
+        assert n == 47, f'province disegnate: {n}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_lente_province.png'))
         await pg.keyboard.press('KeyL')  # torna alla mappa normale
         assert await pg.evaluate("document.querySelectorAll('#ov path.prov').length") == 0

@@ -1,6 +1,6 @@
 # CLAUDE.md: FUP, Fino all'ultimo pallet
 
-Gioco di strategia single player per browser (computer e telefono, installabile come web app), in stile grand strategy Paradox (Crusader Kings, Europa Universalis, Victoria). Il giocatore è il CEO di un'azienda di logistica e autotrasporto nell'Italia del Nord-Ovest dal 2002 in poi. Le aziende e i clienti sono parodie, la geografia è reale.
+Gioco di strategia single player per browser (computer e telefono, installabile come web app), in stile grand strategy Paradox (Crusader Kings, Europa Universalis, Victoria). Il giocatore è il CEO di un'azienda di logistica e autotrasporto nel Nord Italia (da Nizza a Trieste, fino all'Emilia-Romagna) dal 2002 in poi. Le aziende e i clienti sono parodie, la geografia è reale.
 
 ## Con chi lavori
 - Il proprietario del progetto (Davide) non è un programmatore. **Parla in italiano**, in modo semplice, senza gergo tecnico. Spiega cosa cambia *nel gioco*, non nel codice.
@@ -29,9 +29,9 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 
 ### Dentro `src/game.html` (sezioni marcate con `/* ===== NOME ===== */`)
 - **DATI**: `CITIES`, `SITES` (magazzini acquistabili), `CEOS` (4 personaggi iniziali), `MANAGERS`, `EXECS` (dirigenti), `DIR_ROLES`, `TENDER_POOL` (clienti parodia, con `req` per le tecnologie richieste), `RIVALS`, `TECH` (alberi), `TREES`, `WELFARE`, `RAL`, `HIRE`.
-- **UTILITÀ**: `TPAL` (tavolozza pixel art), `LOGO` (loghi dei clienti 12×12 su un riquadro 16×16, `logoSvg()`), `ZONES` / `ORIGINS` / `CINFO` (zona di distribuzione, provenienza della merce e ritiro/consegna per cliente; `clientLog()` calcola viaggi e km), `STATS` / `STAT_IC` (icone 8×8 delle abilità, `statChips()`, `statBadge()`), `TALENTS` (icona 8×8, effetto, testo di colore), `TECH_IC` (icone 12×12), `TFRAME` (cornici per albero), `techIcon()`, `talentIcons()`, formattatori (`eur`, `f1`, `esc`, date). Enciclopedia: `WIKI_CAT`, `WIKI` (voci `{n, s, t}` dove `s` è il testo breve del tooltip e `t` il testo lungo con collegamenti `[[id]]` o `[[id|testo]]`), `kw(id, testo)` crea una parola chiave con tooltip che al clic apre la voce.
+- **UTILITÀ**: `TPAL` (tavolozza pixel art), `LOGO` (loghi dei clienti 12×12 su un riquadro 16×16, `logoSvg()`), `REG` / `CITYPOP` / `ZONES` (province, gruppi di province, regioni e macroaree; `zoneW()`, `zoneOverlap()`) / `ORIGINS` / `CINFO` (zone possibili, provenienza della merce e ritiro/consegna per cliente; `clientLog()` calcola viaggi e km), `STATS` / `STAT_IC` (icone 8×8 delle abilità, `statChips()`, `statBadge()`), `TALENTS` (icona 8×8, effetto, testo di colore), `TECH_IC` (icone 12×12), `TFRAME` (cornici per albero), `techIcon()`, `talentIcons()`, formattatori (`eur`, `f1`, `esc`, date). Enciclopedia: `WIKI_CAT`, `WIKI` (voci `{n, s, t}` dove `s` è il testo breve del tooltip e `t` il testo lungo con collegamenti `[[id]]` o `[[id|testo]]`), `kw(id, testo)` crea una parola chiave con tooltip che al clic apre la voce.
 - **STATO**: `newGame()` crea l'oggetto globale `S`, l'unico stato di gioco (serializzabile in JSON).
-- **MOTORE**: `computeWH()` calcola KPI, costi e ricavi di un magazzino (i km arrivano da `clientLog`); `step()` fa avanzare un giorno; `weekEnd()` (report del lunedì in `S.weeks`); `monthEnd()`; gare (`newTender`, `bidEstimate`, `resolveTender`); helper `R(id)` (tecnologia ricercata), `dirStat(ruolo)`, `fixedMul()`, `capOf()`.
+- **MOTORE**: `computeWH()` calcola KPI, costi e ricavi di un magazzino (i km arrivano da `clientLog`); `step()` fa avanzare un giorno; `weekEnd()` (report del lunedì in `S.weeks`); `monthEnd()`; gare (`freeZones`, `zoneScale`, `newTender`, `bidEstimate`, `resolveTender`; `cname()` mostra la zona quando una committente ha più contratti); helper `R(id)` (tecnologia ricercata), `dirStat(ruolo)`, `fixedMul()`, `capOf()`.
 - **EVENTI**: array `EVENTS` con `{id, src, title, text, cond, once?, setup?, opts:[{t, d, e, f, req?, reqT?}]}`. `fireEvent()` sceglie un evento tra quelli validi; ogni evento ha un'attesa di 240 giorni prima di poter tornare.
 - **SALVATAGGIO**: `localStorage` con chiave `KEY`. **Se cambi la forma di `S`, aumenta la versione della chiave** (`fup-salvataggio-vN`) oppure aggiungi una migrazione in `ACT.continue`.
 - **MAPPA**: proiezione `pt(lon,lat)`, pan/zoom, marker SVG, camion animati. Lenti della mappa in `LENSES` (`UI.lens`, tasto L): ogni lente ha `draw()` che restituisce uno strato SVG disegnato sotto città e magazzini; `PROV` contiene i confini delle province.
@@ -49,7 +49,8 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 - **Tecnologie**: quattro alberi in stile Civ (Logistica / Sviluppo aziendale / Mercato / Welfare), **una ricerca alla volta**, con tempo di ricerca ridotto dall'Innovazione. Le tecnologie di Logistica e i servizi di Welfare, dopo la ricerca, vanno **installati in ogni magazzino** (solo la Logistica ha un periodo di apprendimento); le altre valgono per tutta l'azienda. Ogni tecnologia ha `desc` (effetto) e `txt` (cos'è, in frasi semplici).
 - **Dirigenti**: 5 posti (operativo, commerciale, HR, finanza, tecnologia), sbloccati solo dalla ricerca "Struttura direzionale".
 - **Eventi**: tanti e vari (meteo, politica, locali, clienti, personale), divertenti ma credibili, **rari**: uno ogni 30-55 giorni.
-- **Mappa**: solo il Nord-Ovest è giocabile, il resto d'Italia è desaturato.
+- **Mappa**: sono giocabili le 8 regioni del Nord (Emilia-Romagna compresa), il resto d'Italia è desaturato.
+- **Gare per zona**: la stessa committente può avere più gare e più contratti, uno per zona, purché le zone non abbiano province in comune.
 - Computer e telefono: ogni nuova finestra o pulsante va provato anche nel layout `.mob` (il test fa gli screenshot `shot_tel_*`). Pulsanti grandi abbastanza per il dito, niente comandi solo al passaggio del mouse o solo da tastiera.
 
 ## Stile
@@ -67,8 +68,8 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 ## Asset
 - I ritratti sono generati in Python (`tools/portraits*.py`, funzione `person(...)` con pelle, capelli, acconciatura, vestiti, occhiali, barba…). Per un nuovo personaggio aggiungi una chiamata in `portraits3.py` / `portraits4.py`, rigenera, poi usa `{{Q_nome}}` nell'oggetto `IMG` di `src/game.html`.
 - Icone della web app: `tools/icone.py` (pixel art 32×32 ingrandita) scrive `assets/icona_*.png`.
-- Mappa: `tools/map_nw.py` (coste e confini disegnati a mano, rumore per il rilievo). Proiezione: `LON0=4.81, LAT1=47.0`, 640×400 mostrata a 2x.
-- Province: `tools/province.py` scarica i confini ISTAT (openpolis/geojson-italy), li semplifica e scrive `assets/province.json`, che `build.py` incorpora al posto di `{{PROV}}`.
+- Mappa: `tools/map_nw.py` (coste disegnate a mano, rumore per il rilievo; l'area giocabile viene da `assets/province.json`, quindi rigenera prima le province). Proiezione: `LON0=4.81, LAT1=47.0`, 760×400 mostrata a 2x (`MW`×`MH` = 1520×800 in `game.html`).
+- Province: `tools/province.py [file.geojson]` legge i confini ISTAT (openpolis/geojson-italy, `limits_IT_provinces.geojson`) delle 8 regioni del Nord, li semplifica e scrive `assets/province.json`, che `build.py` incorpora al posto di `{{PROV}}`. Se il download diretto è bloccato, clona il repo openpolis/geojson-italy e passa il file.
 - Il foglio `docs/KPI_Puntualita_Accuratezza.xlsx` è generato da `tools/kpi_xlsx.py`, `personaggi.py`, `eventi.py`, `simsheet.py`, `add_sheets.py`. Non è sincronizzato in automatico con il gioco: le formule autorevoli sono in `src/game.html` e in `docs/design.md`.
 
 ## Checklist prima di un commit

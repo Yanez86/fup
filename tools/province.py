@@ -1,12 +1,12 @@
-"""Genera assets/province.json: i confini delle province del Nord-Ovest nelle coordinate della mappa (1280x800).
+"""Genera assets/province.json: i confini delle province del Nord Italia (fino all'Emilia-Romagna) nelle coordinate della mappa (1280x800).
 Fonte: openpolis/geojson-italy (ISTAT). Uso: python3 tools/province.py [file.geojson]
 Senza argomento scarica il file da GitHub. Il risultato viene incorporato da build.py al posto di {{PROV}}."""
 import json, os, sys, math, urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 URL = 'https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_provinces.geojson'
 LON0, LAT1, KX, KY = 4.81, 47.0, 78.29 * 2, 111.111 * 2   # stessa proiezione di pt() in game.html
-REG = {1: 'Piemonte', 2: "Valle d'Aosta", 3: 'Lombardia', 7: 'Liguria'}
-NAMES = {'AO': "Valle d'Aosta", 'MB': 'Monza e Brianza'}
+REG = {1: 'Piemonte', 2: "Valle d'Aosta", 3: 'Lombardia', 4: 'Trentino-Alto Adige', 5: 'Veneto', 6: 'Friuli-Venezia Giulia', 7: 'Liguria', 8: 'Emilia-Romagna'}
+NAMES = {'AO': "Valle d'Aosta", 'MB': 'Monza e Brianza', 'BZ': 'Bolzano', 'RE': 'Reggio Emilia'}
 # tavolozza della lente (lettere di TPAL), assegnata in modo che province confinanti abbiano colori diversi
 COLS = ['O', 'B', 'G', 'Y', 'P', 'T', 'R']
 

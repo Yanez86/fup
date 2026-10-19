@@ -3,7 +3,7 @@ ROOT=_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
 import numpy as np, json, math
 from PIL import Image
 from scipy import ndimage
-W,H=640,400
+W,H=760,400  # 2x in gioco: 1520x800, da Nizza a Trieste
 LON0=4.81; LAT1=47.0
 PXLAT=400/3.6; PXLON=PXLAT*0.7046
 xs=np.arange(W)+0.5; ys=np.arange(H)+0.5
@@ -158,7 +158,12 @@ rivers=[[(7.0,44.7),(7.68,45.07),(7.9,45.12),(8.2,45.15),(8.5,45.1),(8.85,45.03)
 [(10.5,46.82),(11.16,46.67),(11.35,46.5),(11.12,46.07),(11.0,45.7),(10.99,45.44),(11.6,45.15),(12.3,45.18)],
 [(12.0,43.75),(12.25,43.4),(12.4,43.1)],[(11.65,43.85),(11.25,43.77),(10.85,43.7),(10.4,43.72),(10.27,43.68)],
 [(4.6,43.4),(4.8,43.95),(4.85,44.9),(4.83,45.75),(5.6,45.9),(6.15,46.2)],[(9.2,44.0),(9.6,44.15),(9.85,44.1)],
-[(9.3,46.15),(9.5,46.15),(9.9,46.17),(10.2,46.25)]]
+[(9.3,46.15),(9.5,46.15),(9.9,46.17),(10.2,46.25)],
+[(12.6,46.6),(12.3,46.4),(12.22,46.14),(12.1,45.95),(12.25,45.75),(12.6,45.52)],
+[(11.6,46.0),(11.73,45.77),(11.9,45.5),(12.15,45.2)],
+[(12.95,46.45),(12.95,46.2),(13.0,45.95),(13.05,45.7)],
+[(13.55,46.25),(13.62,45.94),(13.55,45.75)],
+[(11.0,44.15),(11.25,44.45),(11.6,44.6),(12.1,44.6),(12.25,44.6)]]
 RIV=np.zeros_like(ITA)
 for rv in rivers:
     pts=[]
@@ -187,7 +192,13 @@ roads=[[(7.68,45.07),(8.05,45.2),(8.42,45.32),(8.62,45.45),(9.19,45.46),(9.67,45
 [(7.68,45.07),(7.88,45.47),(7.6,45.6),(7.32,45.74),(7.0,45.8)],
 [(9.19,45.46),(9.6,45.2),(9.69,45.05),(10.33,44.80),(10.93,44.65),(11.34,44.49)],
 [(9.19,45.46),(8.95,45.6),(8.83,45.82)],[(9.19,45.46),(9.1,45.65),(9.08,45.81)],
-[(10.99,45.44),(11.05,45.8),(11.12,46.07),(11.35,46.50)],[(7.55,44.39),(7.75,44.75)]]
+[(10.99,45.44),(11.05,45.8),(11.12,46.07),(11.35,46.50),(11.5,47.0)],[(7.55,44.39),(7.75,44.75)],
+[(11.55,45.5),(11.88,45.41),(12.23,45.48),(12.66,45.75),(13.0,45.8),(13.45,45.8),(13.77,45.65)],
+[(11.34,44.49),(11.62,44.84),(11.79,45.07),(11.88,45.41)],
+[(11.34,44.49),(12.04,44.22),(12.57,44.06),(12.75,43.95)],
+[(13.0,45.8),(13.23,46.06),(13.4,46.4),(13.6,46.52)],
+[(12.23,45.48),(12.24,45.67),(12.3,45.95),(12.22,46.14)],
+[(11.34,44.49),(11.25,44.2),(11.25,43.8)],[(12.04,44.22),(12.2,44.42)]]
 RD=np.zeros_like(ITA)
 for rv in roads:
     for a,bp in zip(rv,rv[1:]):
@@ -200,8 +211,16 @@ RDs=np.roll(np.roll(RD,1,0),1,1)&~RD&LAND
 C=np.where(RDs[...,None],C*0.55,C)
 C=np.where(RD[...,None],np.array([255,214,64]),C)
 
-nwpoly=[(10.45,47.6),(10.45,46.6),(10.55,46.0),(10.65,45.5),(11.4,45.15),(11.3,44.95),(10.5,44.95),(9.9,45.05),(9.55,44.85),(9.35,44.6),(9.6,44.45),(10.05,44.05),(10.1,43.0),(3.0,43.0),(3.0,47.6)]
-NW=pip(nwpoly)&ITA
+from PIL import ImageDraw
+gimg=Image.new('L',(W,H),0); gd=ImageDraw.Draw(gimg)
+for pr in json.load(open(ROOT+'/assets/province.json',encoding='utf-8')):
+    for r in pr['rings']: gd.polygon([(x/2,y/2) for x,y in r],fill=1)
+GEO=np.array(gimg)>0
+# la costa della mappa è "mossa" a mano: i pixel di terra vicino al mare e ai confini veri contano come Nord
+# (un pixel di costa fuori dai confini va alla parte più vicina: Nord o resto d'Italia lontano dalla costa)
+coast=ndimage.distance_transform_edt(ITA)<6
+south=ITA&~GEO&~coast&~((LATG>44.0)&(LONG>11.5))  # sull'Adriatico a nord di Cattolica è tutto Nord
+NW=ITA&(GEO|((ndimage.distance_transform_edt(~GEO)<ndimage.distance_transform_edt(~south))))
 other=ITA&~NW&LAND
 g2=C.mean(axis=2,keepdims=True)
 C=np.where(other[...,None],C*0.6+g2*0.25+np.array([210,205,190])*0.15,C)
@@ -214,5 +233,5 @@ step=14
 C=np.floor((C+B[...,None]*step)/step+0.5)*step
 C=np.clip(C,0,255).astype(np.uint8)
 Image.fromarray(C).save(ROOT+'/assets/mappa_nw.png')
-Image.fromarray(C).resize((1280,800),Image.NEAREST).save(ROOT+'/tools/out/preview_nw.png')
+Image.fromarray(C).resize((W*2,H*2),Image.NEAREST).save(ROOT+'/tools/out/preview_nw.png')
 print('ok', len(np.unique(C.reshape(-1,3),axis=0)))

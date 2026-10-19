@@ -40,8 +40,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 /* Mappa */
 #mapwrap{position:fixed;inset:0;overflow:hidden;cursor:grab;touch-action:none}
 #mapwrap.drag{cursor:grabbing}
-#map{position:absolute;left:0;top:0;width:1280px;height:800px;transform-origin:0 0}
-#map img{position:absolute;inset:0;width:1280px;height:800px}
+#map{position:absolute;left:0;top:0;width:1520px;height:800px;transform-origin:0 0}
+#map img{position:absolute;inset:0;width:1520px;height:800px}
 #map svg{position:absolute;inset:0;overflow:visible}
 .vign{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 55%, rgba(8,20,40,0) 55%, rgba(8,20,40,.4) 100%)}
 .lbl{font-family:var(--f-disp);font-weight:600;fill:var(--ink);stroke:#f4f7fa;stroke-width:3px;paint-order:stroke}
@@ -432,10 +432,10 @@ html,body{overscroll-behavior:none}
 @media (prefers-reduced-motion: reduce){ .toast{transition:none} }
 </style>
 
-<div id="mapwrap" aria-label="Mappa del Nord-Ovest">
+<div id="mapwrap" aria-label="Mappa del Nord Italia">
   <div id="map">
-    <img class="px" src="{{MAP}}" alt="Mappa in pixel art del Nord-Ovest italiano con Alpi, laghi, fiumi e autostrade">
-    <svg id="ov" width="1280" height="800" viewBox="0 0 1280 800" shape-rendering="crispEdges"></svg>
+    <img class="px" src="{{MAP}}" alt="Mappa in pixel art del Nord Italia con Alpi, Appennino, laghi, fiumi e autostrade">
+    <svg id="ov" width="1520" height="800" viewBox="0 0 1520 800" shape-rendering="crispEdges"></svg>
   </div>
 </div>
 <div class="vign" aria-hidden="true"></div>
@@ -473,7 +473,10 @@ const LON0=4.81, LAT1=47.0, KX=78.29*2, KY=111.111*2;
 const pt=(lon,lat)=>[ (lon-LON0)*KX, (LAT1-lat)*KY ];
 const CITIES=[
  ['Torino',7.68,45.07,1],['Milano',9.19,45.46,1],['Genova',8.93,44.41,1],['Aosta',7.32,45.74],['Novara',8.62,45.45],['Alessandria',8.61,44.91],['Asti',8.20,44.90],['Cuneo',7.55,44.39],['Vercelli',8.42,45.32],['Biella',8.05,45.56],['Varese',8.83,45.82],['Como',9.08,45.81],['Lecco',9.39,45.85],['Bergamo',9.67,45.70],['Brescia',10.21,45.54],['Lodi',9.50,45.31],['Pavia',9.16,45.19],['Cremona',10.02,45.13],['Mantova',10.79,45.16],['Savona',8.48,44.31],['La Spezia',9.82,44.10],['Imperia',8.03,43.88],['Sondrio',9.87,46.17],
- ['Piacenza',9.69,45.05,0,1],['Verona',10.99,45.44,0,1],['Lugano',8.95,46.0,0,1],['Nizza',7.27,43.70,0,1]];
+ ['Piacenza',9.69,45.05],['Parma',10.33,44.80],['Reggio Emilia',10.63,44.70],['Modena',10.93,44.65],['Bologna',11.34,44.49,1],['Ferrara',11.62,44.84],['Ravenna',12.20,44.42],['Forlì',12.04,44.22],['Rimini',12.57,44.06],
+ ['Verona',10.99,45.44],['Vicenza',11.55,45.55],['Padova',11.88,45.41],['Venezia',12.33,45.44,1],['Treviso',12.24,45.67],['Rovigo',11.79,45.07],['Belluno',12.22,46.14],
+ ['Trento',11.12,46.07],['Bolzano',11.35,46.50],['Udine',13.23,46.06],['Pordenone',12.66,45.96],['Gorizia',13.62,45.94],['Trieste',13.77,45.65],
+ ['Lugano',8.95,46.0,0,1],['Nizza',7.27,43.70,0,1],['Firenze',11.25,43.77,0,1],['Ancona',13.51,43.62,0,1],['Lubiana',14.51,46.05,0,1]];
 const SITES={
  rivalta:{name:'Rivalta Scrivia',prov:'AL',lon:8.86,lat:44.86,cap:2500,rent:7000},
  pioltello:{name:'Pioltello',prov:'MI',lon:9.33,lat:45.50,cap:4000,rent:12000},
@@ -483,7 +486,17 @@ const SITES={
  lodi:{name:'Lodi',prov:'LO',lon:9.47,lat:45.29,cap:2000,rent:6500},
  orio:{name:'Bergamo Orio',prov:'BG',lon:9.70,lat:45.66,cap:2500,rent:8000},
  mortara:{name:'Mortara',prov:'PV',lon:8.74,lat:45.25,cap:1800,rent:4500},
- brescia:{name:'Brescia Est',prov:'BS',lon:10.27,lat:45.52,cap:3000,rent:8500}
+ brescia:{name:'Brescia Est',prov:'BS',lon:10.27,lat:45.52,cap:3000,rent:8500},
+ piacenza:{name:'Piacenza Le Mose',prov:'PC',lon:9.74,lat:45.04,cap:3500,rent:9000},
+ fontevivo:{name:'Fontevivo',prov:'PR',lon:10.17,lat:44.85,cap:2200,rent:6000},
+ bologna:{name:'Interporto Bologna',prov:'BO',lon:11.39,lat:44.62,cap:4000,rent:11000},
+ ravenna:{name:'Ravenna Porto',prov:'RA',lon:12.25,lat:44.47,cap:2000,rent:5500},
+ verona:{name:'Verona Quadrante Europa',prov:'VR',lon:10.93,lat:45.41,cap:3800,rent:10500},
+ padova:{name:'Interporto Padova',prov:'PD',lon:11.94,lat:45.39,cap:3000,rent:8500},
+ marghera:{name:'Porto Marghera',prov:'VE',lon:12.23,lat:45.46,cap:2500,rent:7500},
+ trento:{name:'Interporto Trento',prov:'TN',lon:11.13,lat:46.11,cap:1600,rent:5000},
+ pordenone:{name:'Pordenone',prov:'PN',lon:12.67,lat:45.94,cap:1800,rent:4800},
+ fernetti:{name:'Trieste Fernetti',prov:'TS',lon:13.83,lat:45.70,cap:2000,rent:5500}
 };
 const CEOS=[
  {id:'gino',name:'Gino Bertolotti',age:52,origin:'Ex padroncino',site:'rivalta',cash:180000,motrici:3,fixed:3500,rep:45,company:'Trasporti Bertolotti',
@@ -562,7 +575,21 @@ const TENDER_POOL=[
  {name:'Acciaierie Tondino',slogan:'Il ferro si piega, le consegne no',sector:'Siderurgia',stock:1200,pal:500,sP:88,sA:null,diff:-2},
  {name:'Scatolificio Cartonetti',slogan:'Ogni scatola ha la sua scatola',sector:'Imballaggi',stock:800,pal:600,sP:90,sA:94,diff:-1},
  {name:'Parafarmacie Croceverde',slogan:'Sciroppi, cerotti e consigli non richiesti',sector:'Parafarmaco',stock:400,pal:300,sP:95,sA:98.5,diff:4},
- {name:'Ortofrutta Fresco Fresco',slogan:'Raccolto ieri, venduto oggi, pagato a 90 giorni',sector:'Ortofrutta',stock:300,pal:900,sP:96,sA:95,diff:3,req:['freddo']}
+ {name:'Ortofrutta Fresco Fresco',slogan:'Raccolto ieri, venduto oggi, pagato a 90 giorni',sector:'Ortofrutta',stock:300,pal:900,sP:96,sA:95,diff:3,req:['freddo']},
+ {name:'Prosciuttificio Stagionelli',slogan:'Diciotto mesi in cantina, diciotto minuti di ritardo in banchina',sector:'Salumi',stock:700,pal:450,sP:93,sA:97,diff:2,req:['freddo']},
+ {name:'Caseificio Scagliagrana',slogan:'Stagionato più del nostro gestionale',sector:'Formaggi stagionati',stock:1200,pal:400,sP:91,sA:96,diff:1},
+ {name:'Piastrelle Sassuolini',slogan:'Ogni pallet pesa una tonnellata, ogni scheggia è un reclamo',sector:'Ceramica',stock:1500,pal:700,sP:90,sA:95,diff:0},
+ {name:'Ricambi Pistoncino',slogan:'Dalla Motor Valley con fretta',sector:'Automotive',stock:500,pal:300,sP:95,sA:98.5,diff:4},
+ {name:'Piadificio Sfogliarola',slogan:'Calda in spiaggia, fredda in camion',sector:'Freschi',stock:300,pal:500,sP:95,sA:95,diff:2,req:['freddo']},
+ {name:'Cantine Bollicioso',slogan:'Il tappo salta, la consegna no',sector:'Vini e spumanti',stock:900,pal:400,sP:92,sA:97,diff:2},
+ {name:'Occhialeria Lentescura',slogan:'Vediamo lontano, consegniamo vicino',sector:'Occhialeria',stock:250,pal:120,sP:96,sA:99.5,diff:6},
+ {name:'Frutteti Melarossa',slogan:'Una mela al giorno, un bilico all\'ora',sector:'Ortofrutta',stock:1800,pal:700,sP:93,sA:95,diff:1,req:['freddo']},
+ {name:'Torrefazione Borascura',slogan:'Tostato col vento a cento all\'ora',sector:'Alimentare secco',stock:500,pal:300,sP:91,sA:96,diff:0},
+ {name:'Cucine Incastrella',slogan:'Le ante combaciano, i tempi quasi',sector:'Arredamento',stock:900,pal:300,sP:90,sA:96,diff:1},
+ {name:'Scarponi Ramponcino',slogan:'Tengono sul ghiaccio, scivolano sui termini di pagamento',sector:'Calzature sportive',stock:600,pal:250,sP:92,sA:97,diff:2},
+ {name:'Supermercati Sporta Piena',slogan:'Il buyer parla in dialetto e firma solo via EDI',sector:'GDO',stock:1300,pal:2000,sP:97,sA:96.5,diff:8,req:['edi']},
+ {name:'Pastificio Sfoglia Tirata',slogan:'Tirata a mano, consegnata a muletto',sector:'Freschi',stock:300,pal:400,sP:95,sA:97,diff:3,req:['freddo']},
+ {name:'Macchine Avvolgix',slogan:'Impacchettiamo il mondo, ma i nostri pezzi arrivano sciolti',sector:'Meccanica',stock:400,pal:120,sP:94,sA:98,diff:3}
 ];
 // RANK delle committenti: media di 4 voti 0-100. Il voto sui ricavi si calcola dai volumi; gli altri tre sono [desiderabilità, pubblicità, solidità]
 const RANK_F={
@@ -573,7 +600,9 @@ const RANK_F={
  'Scarpinando':[50,75,60],'Tuttosubito Italia':[50,98,85],'Spesa Veloce':[45,55,45],'Spedizioni Tricolore':[50,75,70],
  'Discount Prezzaccio':[15,10,25],'Mobili Truciolotto':[25,15,30],
  'Fai-da-Te Planet':[60,85,85],'Cosmetici Belletto':[80,85,80],'Aeronautica Volavia':[85,80,95],'Salumificio Bresaolotti':[70,65,70],'Cioccolateria Sabauda':[72,70,68],'Lavatrix Elettrodomestici':[60,65,70],'Cantine Tanninello':[60,50,55],'Crocchette Codamossa':[50,45,55],'Seterie del Lario':[60,55,60],'Materiali Edili Cazzuolini':[35,25,55],'Giocattoli Trottolino':[40,40,35],'Pellet Fiammella':[20,10,25],
- 'Torrefazione Tazzulella':[60,45,55],'Bevande Spillatutto':[45,40,50],'Surgelati Polo Sud':[65,60,70],'Dolciaria Cornettone':[60,55,60],'Acciaierie Tondino':[55,40,80],'Scatolificio Cartonetti':[40,20,60],'Parafarmacie Croceverde':[70,60,70],'Ortofrutta Fresco Fresco':[45,50,50]
+ 'Torrefazione Tazzulella':[60,45,55],'Bevande Spillatutto':[45,40,50],'Surgelati Polo Sud':[65,60,70],'Dolciaria Cornettone':[60,55,60],'Acciaierie Tondino':[55,40,80],'Scatolificio Cartonetti':[40,20,60],'Parafarmacie Croceverde':[70,60,70],'Ortofrutta Fresco Fresco':[45,50,50],
+ 'Prosciuttificio Stagionelli':[70,60,70],'Caseificio Scagliagrana':[65,55,70],'Piastrelle Sassuolini':[50,40,65],'Ricambi Pistoncino':[75,70,80],'Piadificio Sfogliarola':[55,50,50],'Cantine Bollicioso':[70,65,65],'Occhialeria Lentescura':[80,75,85],
+ 'Frutteti Melarossa':[55,55,60],'Torrefazione Borascura':[55,45,55],'Cucine Incastrella':[50,45,55],'Scarponi Ramponcino':[65,60,60],'Supermercati Sporta Piena':[55,80,80],'Pastificio Sfoglia Tirata':[60,55,60],'Macchine Avvolgix':[70,55,80]
 };
 const RANKS=[ // soglia minima della media, colori, effetti
  {r:'S',min:80,bg:'R',fg:'W',rev:1.15,comp:6,win:6,lost:10,fl:'Il nome che i commerciali scrivono in grassetto nel CV.'},
@@ -588,7 +617,8 @@ const NAZ_REQ={tech:'accordi',wh:3,rep:65};
 const PEN_PCT={'Saponaria Italia':1,'Supermercati Carrellone':3,'Tuttosubito Italia':3,'Fai-da-Te Planet':2,'Elettrofulmine':2,'FarmaSpa':4,'Spedizioni Tricolore':2,
  'Cosmetici Belletto':2,'Aeronautica Volavia':5,'Caseificio Stracchinelli':2,'Moda Grucciani':1,'Pneumatici Battistrada':2,'Crema Spalmella':1,'Scarpinando':1,
  'Salumificio Bresaolotti':2,'Cioccolateria Sabauda':1,'Lavatrix Elettrodomestici':1,'Surgelati Polo Sud':2,'Parafarmacie Croceverde':2,'Spesa Veloce':2,
- 'Ortofrutta Fresco Fresco':2,'Bevande Spillatutto':1}, PEN_MAX=20;
+ 'Ortofrutta Fresco Fresco':2,'Bevande Spillatutto':1,'Prosciuttificio Stagionelli':2,'Ricambi Pistoncino':3,'Piadificio Sfogliarola':2,'Occhialeria Lentescura':3,
+ 'Supermercati Sporta Piena':3,'Pastificio Sfoglia Tirata':2,'Scarponi Ramponcino':1,'Macchine Avvolgix':2}, PEN_MAX=20;
 const penPct=c=>PEN_PCT[c.name]||0;
 const penTxt=c=>penPct(c)?`${penPct(c)}% del fatturato per ogni punto sotto soglia (max ${PEN_MAX}%)`:'nessuna penale nel contratto';
 const DUR_RANK={S:[24,36,36],A:[24,36],B:[12,24,36],C:[12,24],D:[12,24],F:[12,12,24]}; // durate possibili del contratto (mesi) per rank
@@ -790,24 +820,52 @@ function techIcon(t,sz,dim){
   (TECH_IC[t.id]||[]).forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x+2}" y="${y+2}" width="1" height="1" fill="${TPAL[ch]}"/>`;}));
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="flex:none;${dim?'filter:grayscale(1) opacity(.55)':''}" aria-hidden="true">${r}</svg>`;
 }
-const LOGO={"Pastificio Mezzemaniche":{"bg":"R","ic":["....SS.S....","....SSSS....",".....SS.....","..YCYCYCYC..",".YCYCYCYCYC.","KKKKKKKKKKKK","KWWWWWWWWWWK",".KWBBBBBBWK.","..KWWWWWWK..","...KKKKKK...","............","............"]},"Mobilificio Brianzolo":{"bg":"C","ic":["............","............","..RRRRRRRR..",".RRRRRRRRRR.",".RRRRRRRRRR.","RRMRRRRRRMRR","RRMMMMMMMMRR","RRRRRRRRRRRR","RRRRRRRRRRRR",".M........M.",".M........M.","............"]},"Saponaria Italia":{"bg":"B","ic":[".....WW.....",".....WW.....","....WWWW....","....WWWW....","...WWWWWW...","..WWLWWWWW..","..WLLWWWWW..","..WLWWWWWW..","..WWWWWWWW..","...WWWWWW...","....WWWW....","............"]},"Caffè Portuale":{"bg":"N","ic":["...W..W.....","....W..W....","...W..W.....","............",".WWWWWWWW...",".WMMMMMMWWW.",".WWWWWWWWW.W",".WWWWWWWWWW.","..WWWWWWW...","...WWWWW....",".WWWWWWWWWW.","............"]},"Caseificio Stracchinelli":{"bg":"B","ic":["............","..........Y.","........YYY.","......YYYYY.","....YYYYOYY.","..YYYYYYYYY.","YYYOYYYYYYY.","YYYYYYYOYYY.","YYYYYYYYYYY.","YOYYYYYYYYY.","YYYYYYYYYYY.","............"]},"Ferramenta Bullonati":{"bg":"D","ic":["....SSSS....","...SSSSSS...","..SSSKKSSS..",".SSSKKKKSSS.",".SSKK..KKSS.",".SSKK..KKSS.",".SSSKKKKSSS.","..SSSKKSSS..","...SSSSSS...","....SSSS....","............","............"]},"Elettrofulmine":{"bg":"R","ic":["......YYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYYYYYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYY.......",".YY.........","Y...........","............"]},"FarmaSpa":{"bg":"W","ic":["....GGGG....","....GGGG....","....GGGG....","....GGGG....","GGGGGGGGGGGG","GGGGGWWGGGGG","GGGGGWWGGGGG","GGGGGGGGGGGG","....GGGG....","....GGGG....","....GGGG....","....GGGG...."]},"Supermercati Carrellone":{"bg":"R","ic":["............","WW..........",".W..........",".WWWWWWWWWW.",".W.W.W.W.WW.",".WWWWWWWWW..","..W.W.W.WW..","..WWWWWWW...","..W.........","..WWWWWWWW..","...WW...WW..","...WW...WW.."]},"Birrificio Schiumetti":{"bg":"G","ic":["............","..WWWWWW....",".WWWWWWWW...",".WYYYYYYW...",".KYYYYYYKKK.",".KYCYYYYK.K.",".KYCYYYYK.K.",".KYYYYYYKKK.",".KYYYYYYK...",".KYYYYYYK...",".KKKKKKKK...","............"]},"Acque Fonte Frizzantina":{"bg":"L","ic":[".....GG.....",".....GG.....","....GGGG....","...GGGGGG...","...GGGGGG...","...GWWWWG...","...GWRRWG...","...GRRRRG...","...GWRRWG...","...GWWWWG...","...GGGGGG...","....GGGG...."]},"Arredamenti Brugola":{"bg":"Y","ic":["........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","..DDDDDDDD..","..DDDDDDDD..","............","............"]},"Moda Grucciani":{"bg":"K","ic":[".....WW.....","....W..W....",".......W....","......W.....",".....WW.....","....W..W....","...W....W...","..W......W..",".W........W.","WWWWWWWWWWWW","............","............"]},"Pneumatici Battistrada":{"bg":"Y","ic":["...KKKKKK...","..KKKKKKKK..",".KKKSSSSKKK.","KKKS....SKKK","KKS......SKK","KKS..SS..SKK","KKS..SS..SKK","KKS......SKK","KKKS....SKKK",".KKKSSSSKKK.","..KKKKKKKK..","...KKKKKK..."]},"Crema Spalmella":{"bg":"C","ic":["...RRRRRR...","...RRRRRR...","..KKKKKKKK..","..KWWWWWWK..","..KMMMMMMK..","..KMWWMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KKKKKKKK..","............"]},"Riseria La Mondina":{"bg":"G","ic":["............","....W..W....","..W..W...W..","...WWWWWW...","..WWWWWWWW..",".WWWWWWWWWW.","KKKKKKKKKKKK","KRRRRRRRRRRK",".KRRRRRRRRK.","..KRRRRRRK..","...KKKKKK...","............"]},"Scarpinando":{"bg":"O","ic":["............","............",".KKKK.......",".KWWWK......",".KWKWWK.....",".KWWKWWKK...",".KWWWWWWWKK.",".KWWWWWWWWWK",".KRRRRRRRRRK",".KKKKKKKKKKK","............","............"]},"Tuttosubito Italia":{"bg":"K","ic":["............","............","....NNNNNNN.","....NNNYNNN.","WWW.NNNYNNN.","....NNNNNNN.",".WW.NNNNNNN.","....NNNNNNN.","WWW.NNNNNNN.","....NNNNNNN.","............","............"]},"Spesa Veloce":{"bg":"G","ic":["....KKKK....","...K....K...","..KKKKKKKK..","..KWWWWWWK..","..KWWWYWWK..","..KWWYYWWK..","..KWYYYYWK..","..KWWYYWWK..","..KWWYWWWK..","..KWWWWWWK..","..KKKKKKKK..","............"]},"Spedizioni Tricolore":{"bg":"L","ic":["............","............","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","............","............","............"]},"Discount Prezzaccio":{"bg":"Y","ic":["............",".RR......RR.",".RR.....RR..",".......RR...","......RR....",".....RR.....","....RR......","...RR.......","..RR.....RR.",".RR......RR.","............","............"]},"Mobili Truciolotto":{"bg":"F","ic":["............","..NN.NN..N..",".N..N..NN.N.","..NN..N..N..","............","NNNNNNNNNNNN","MMMMMMMMMMMM","NN........NN","N.N......N.N","N..........N","N..........N","............"]},"Fai-da-Te Planet":{"bg":"O","ic":["............","..KKKKKKKK..",".KSSSSSSSSK.",".KSWWSSSSSK.","..KKKNNKKK..",".....NN.....",".....NN.....",".....NN.....",".....NN.....",".....NN.....","....KMMK....","....KKKK...."]},"Cosmetici Belletto":{"bg":"P","ic":["............",".....RR.....","....RRR.....","....RRRR....","....RRRR....","...KKKKKK...","...KYYYYK...","...KKKKKK...","...KWWWWK...","...KWWWWK...","...KWWWWK...","...KKKKKK..."]},"Aeronautica Volavia":{"bg":"D","ic":[".....KK.....",".....WW.....",".....WW.....","....KWWK....",".KKKWWWWKKK.","KWWWWWWWWWWK",".KKKKWWKKKK.",".....WW.....",".....WW.....","....KWWK....","...KWWWWK...","....KKKK...."]},"Salumificio Bresaolotti":{"bg":"C","ic":["....KKKK....","..KKRRRRKK..",".KRRWRRRRRK.",".KRRRRRWRRK.","KRRWRRRRRRRK","KRRRRRWRRRRK","KRWRRRRRRWRK","KRRRRWRRRRRK",".KRRRRRRWRK.",".KRWRRRRRRK.","..KKRRRRKK..","....KKKK...."]},"Cioccolateria Sabauda":{"bg":"Y","ic":[".KKKKKKKKKK.",".KNNKNNKNNK.",".KMMKMMKMMK.",".KKKKKKKKKK.",".KNNKNNKNNK.",".KMMKMMKMMK.",".KKKKKKKKKK.",".KRRRRRRRRK.",".KRWWWWWWRK.",".KRRRRRRRRK.",".KRRRRRRRRK.",".KKKKKKKKKK."]},"Lavatrix Elettrodomestici":{"bg":"T","ic":[".KKKKKKKKKK.",".KWWWWWWWWK.",".KWRWGWWSWK.",".KKKKKKKKKK.",".KWWKKKKWWK.",".KWKBBBBKWK.",".KWKBLBBKWK.",".KWKBBLBKWK.",".KWKBBBBKWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KKKKKKKKKK."]},"Cantine Tanninello":{"bg":"R","ic":[".....NN.....",".....GG.....",".....GG.....","....KGGK....","...KGGGGK...","...KGGGGK...","...KCCCCK...","...KCRRCK...","...KCCCCK...","...KGGGGK...","...KGGGGK...","....KKKK...."]},"Crocchette Codamossa":{"bg":"G","ic":["............","...WW..WW...","...WW..WW...",".WW......WW.",".WW......WW.","....WWWW....","...WWWWWW...","..WWWWWWWW..","..WWWWWWWW..","...WW..WW...","............","............"]},"Seterie del Lario":{"bg":"T","ic":["..KKKKKKKK..","..KNNNNNNK..","...KPPPPK...","...KPPPPK...","...KPWPPK...","...KPPPPK...","...KPPWPK...","...KPPPPK...","...KPPPPK...","..KNNNNNNK..","..KKKKKKKK..","............"]},"Materiali Edili Cazzuolini":{"bg":"S","ic":["............","RRRRR.RRRRR.","RRRRR.RRRRR.","............","RR.RRRRR.RRR","RR.RRRRR.RRR","............","RRRRR.RRRRR.","RRRRR.RRRRR.","............","RR.RRRRR.RRR","RR.RRRRR.RRR"]},"Giocattoli Trottolino":{"bg":"Y","ic":[".....KK.....",".....KK.....","...KKKKKK...","..KRRRRRRK..",".KRRWRRRRRK.","KBBBBBBBBBBK","KBBBBBBBBBBK",".KGGGGGGGGK.","..KGGGGGGK..","...KGGGGK...","....KGGK....",".....KK....."]},"Pellet Fiammella":{"bg":"D","ic":[".....R......",".....RR.....","....RRR.....","....RRRR.R..","...RROORRR..","..RROOOORR..","..ROOYYOORR.",".RROYYYYORR.",".RROYYYYORR.","..RROYYORR..","...RRRRRR...","..NNNNNNNN.."]},"Torrefazione Tazzulella":{"bg": "C", "ic": ["............", "...N..N.....", "....N..N....", "...N..N.....", "............", ".KKKKKKKK...", ".KWWWWWWKKK.", ".KWMMMMWK.K.", ".KWWWWWWKKK.", "..KWWWWK....", ".KKKKKKKKK..", "............"]},"Bevande Spillatutto":{"bg": "B", "ic": ["............", "...WWWWW....", "..WWWWWWW...", "..KYYYYYKK..", "..KYYYYYK.K.", "..KYWYYYK.K.", "..KYWYYYK.K.", "..KYYYYYKK..", "..KYYYYYK...", "..KKKKKKK...", "............", "............"]},"Surgelati Polo Sud":{"bg": "L", "ic": ["....KKKK....", "...KKKKKK...", "...KWKKWK...", "...KKOOKK...", "..KKWWWWKK..", "..KWWWWWWK..", ".KKWWWWWWKK.", "..KWWWWWWK..", "..KWWWWWWK..", "...KWWWWK...", "...OO..OO...", "............"]},"Dolciaria Cornettone":{"bg": "R", "ic": ["............", "............", "....NNNN....", "..NFFNNFFN..", ".NFFNFFNFFN.", "NFFNFFFFNFFN", "NFNFFFFFFNFN", ".N.NFFFFN.N.", "....NNNN....", "............", "............", "............"]},"Acciaierie Tondino":{"bg": "D", "ic": ["............", ".SSSSSSSSSS.", ".SWWWWWWWWS.", "....SSSS....", "....SWSS....", "....SWSS....", "....SWSS....", "....SSSS....", ".SSSSSSSSSS.", ".SSSSSSSSSS.", "............", "............"]},"Scatolificio Cartonetti":{"bg": "G", "ic": ["............", "..NNNNNNNN..", ".NFFFFFFFFN.", "NFFFFFFFFFFN", "NNNNNNNNNNNN", "NFFFFKKFFFFN", "NFFFFKKFFFFN", "NFFFFFFFFFFN", "NFFFFFFFFFFN", "NNNNNNNNNNNN", "............", "............"]},"Parafarmacie Croceverde":{"bg": "W", "ic": ["............", "....GGGG....", "....GWWG....", "....GWWG....", ".GGGGWWGGGG.", ".GWWWWWWWWG.", ".GWWWWWWWWG.", ".GGGGWWGGGG.", "....GWWG....", "....GWWG....", "....GGGG....", "............"]},"Ortofrutta Fresco Fresco":{"bg": "C", "ic": ["......N.....", ".....N.GG...", "....N.GG....", "..RRRNRRR...", ".RRWRRRRRR..", ".RWRRRRRRR..", ".RRRRRRRRR..", ".RRRRRRRRR..", "..RRRRRRR...", "...RR.RR....", "............", "............"]}};
+const LOGO={"Pastificio Mezzemaniche":{"bg":"R","ic":["....SS.S....","....SSSS....",".....SS.....","..YCYCYCYC..",".YCYCYCYCYC.","KKKKKKKKKKKK","KWWWWWWWWWWK",".KWBBBBBBWK.","..KWWWWWWK..","...KKKKKK...","............","............"]},"Mobilificio Brianzolo":{"bg":"C","ic":["............","............","..RRRRRRRR..",".RRRRRRRRRR.",".RRRRRRRRRR.","RRMRRRRRRMRR","RRMMMMMMMMRR","RRRRRRRRRRRR","RRRRRRRRRRRR",".M........M.",".M........M.","............"]},"Saponaria Italia":{"bg":"B","ic":[".....WW.....",".....WW.....","....WWWW....","....WWWW....","...WWWWWW...","..WWLWWWWW..","..WLLWWWWW..","..WLWWWWWW..","..WWWWWWWW..","...WWWWWW...","....WWWW....","............"]},"Caffè Portuale":{"bg":"N","ic":["...W..W.....","....W..W....","...W..W.....","............",".WWWWWWWW...",".WMMMMMMWWW.",".WWWWWWWWW.W",".WWWWWWWWWW.","..WWWWWWW...","...WWWWW....",".WWWWWWWWWW.","............"]},"Caseificio Stracchinelli":{"bg":"B","ic":["............","..........Y.","........YYY.","......YYYYY.","....YYYYOYY.","..YYYYYYYYY.","YYYOYYYYYYY.","YYYYYYYOYYY.","YYYYYYYYYYY.","YOYYYYYYYYY.","YYYYYYYYYYY.","............"]},"Ferramenta Bullonati":{"bg":"D","ic":["....SSSS....","...SSSSSS...","..SSSKKSSS..",".SSSKKKKSSS.",".SSKK..KKSS.",".SSKK..KKSS.",".SSSKKKKSSS.","..SSSKKSSS..","...SSSSSS...","....SSSS....","............","............"]},"Elettrofulmine":{"bg":"R","ic":["......YYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYYYYYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYY.......",".YY.........","Y...........","............"]},"FarmaSpa":{"bg":"W","ic":["....GGGG....","....GGGG....","....GGGG....","....GGGG....","GGGGGGGGGGGG","GGGGGWWGGGGG","GGGGGWWGGGGG","GGGGGGGGGGGG","....GGGG....","....GGGG....","....GGGG....","....GGGG...."]},"Supermercati Carrellone":{"bg":"R","ic":["............","WW..........",".W..........",".WWWWWWWWWW.",".W.W.W.W.WW.",".WWWWWWWWW..","..W.W.W.WW..","..WWWWWWW...","..W.........","..WWWWWWWW..","...WW...WW..","...WW...WW.."]},"Birrificio Schiumetti":{"bg":"G","ic":["............","..WWWWWW....",".WWWWWWWW...",".WYYYYYYW...",".KYYYYYYKKK.",".KYCYYYYK.K.",".KYCYYYYK.K.",".KYYYYYYKKK.",".KYYYYYYK...",".KYYYYYYK...",".KKKKKKKK...","............"]},"Acque Fonte Frizzantina":{"bg":"L","ic":[".....GG.....",".....GG.....","....GGGG....","...GGGGGG...","...GGGGGG...","...GWWWWG...","...GWRRWG...","...GRRRRG...","...GWRRWG...","...GWWWWG...","...GGGGGG...","....GGGG...."]},"Arredamenti Brugola":{"bg":"Y","ic":["........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","..DDDDDDDD..","..DDDDDDDD..","............","............"]},"Moda Grucciani":{"bg":"K","ic":[".....WW.....","....W..W....",".......W....","......W.....",".....WW.....","....W..W....","...W....W...","..W......W..",".W........W.","WWWWWWWWWWWW","............","............"]},"Pneumatici Battistrada":{"bg":"Y","ic":["...KKKKKK...","..KKKKKKKK..",".KKKSSSSKKK.","KKKS....SKKK","KKS......SKK","KKS..SS..SKK","KKS..SS..SKK","KKS......SKK","KKKS....SKKK",".KKKSSSSKKK.","..KKKKKKKK..","...KKKKKK..."]},"Crema Spalmella":{"bg":"C","ic":["...RRRRRR...","...RRRRRR...","..KKKKKKKK..","..KWWWWWWK..","..KMMMMMMK..","..KMWWMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KKKKKKKK..","............"]},"Riseria La Mondina":{"bg":"G","ic":["............","....W..W....","..W..W...W..","...WWWWWW...","..WWWWWWWW..",".WWWWWWWWWW.","KKKKKKKKKKKK","KRRRRRRRRRRK",".KRRRRRRRRK.","..KRRRRRRK..","...KKKKKK...","............"]},"Scarpinando":{"bg":"O","ic":["............","............",".KKKK.......",".KWWWK......",".KWKWWK.....",".KWWKWWKK...",".KWWWWWWWKK.",".KWWWWWWWWWK",".KRRRRRRRRRK",".KKKKKKKKKKK","............","............"]},"Tuttosubito Italia":{"bg":"K","ic":["............","............","....NNNNNNN.","....NNNYNNN.","WWW.NNNYNNN.","....NNNNNNN.",".WW.NNNNNNN.","....NNNNNNN.","WWW.NNNNNNN.","....NNNNNNN.","............","............"]},"Spesa Veloce":{"bg":"G","ic":["....KKKK....","...K....K...","..KKKKKKKK..","..KWWWWWWK..","..KWWWYWWK..","..KWWYYWWK..","..KWYYYYWK..","..KWWYYWWK..","..KWWYWWWK..","..KWWWWWWK..","..KKKKKKKK..","............"]},"Spedizioni Tricolore":{"bg":"L","ic":["............","............","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","............","............","............"]},"Discount Prezzaccio":{"bg":"Y","ic":["............",".RR......RR.",".RR.....RR..",".......RR...","......RR....",".....RR.....","....RR......","...RR.......","..RR.....RR.",".RR......RR.","............","............"]},"Mobili Truciolotto":{"bg":"F","ic":["............","..NN.NN..N..",".N..N..NN.N.","..NN..N..N..","............","NNNNNNNNNNNN","MMMMMMMMMMMM","NN........NN","N.N......N.N","N..........N","N..........N","............"]},"Fai-da-Te Planet":{"bg":"O","ic":["............","..KKKKKKKK..",".KSSSSSSSSK.",".KSWWSSSSSK.","..KKKNNKKK..",".....NN.....",".....NN.....",".....NN.....",".....NN.....",".....NN.....","....KMMK....","....KKKK...."]},"Cosmetici Belletto":{"bg":"P","ic":["............",".....RR.....","....RRR.....","....RRRR....","....RRRR....","...KKKKKK...","...KYYYYK...","...KKKKKK...","...KWWWWK...","...KWWWWK...","...KWWWWK...","...KKKKKK..."]},"Aeronautica Volavia":{"bg":"D","ic":[".....KK.....",".....WW.....",".....WW.....","....KWWK....",".KKKWWWWKKK.","KWWWWWWWWWWK",".KKKKWWKKKK.",".....WW.....",".....WW.....","....KWWK....","...KWWWWK...","....KKKK...."]},"Salumificio Bresaolotti":{"bg":"C","ic":["....KKKK....","..KKRRRRKK..",".KRRWRRRRRK.",".KRRRRRWRRK.","KRRWRRRRRRRK","KRRRRRWRRRRK","KRWRRRRRRWRK","KRRRRWRRRRRK",".KRRRRRRWRK.",".KRWRRRRRRK.","..KKRRRRKK..","....KKKK...."]},"Cioccolateria Sabauda":{"bg":"Y","ic":[".KKKKKKKKKK.",".KNNKNNKNNK.",".KMMKMMKMMK.",".KKKKKKKKKK.",".KNNKNNKNNK.",".KMMKMMKMMK.",".KKKKKKKKKK.",".KRRRRRRRRK.",".KRWWWWWWRK.",".KRRRRRRRRK.",".KRRRRRRRRK.",".KKKKKKKKKK."]},"Lavatrix Elettrodomestici":{"bg":"T","ic":[".KKKKKKKKKK.",".KWWWWWWWWK.",".KWRWGWWSWK.",".KKKKKKKKKK.",".KWWKKKKWWK.",".KWKBBBBKWK.",".KWKBLBBKWK.",".KWKBBLBKWK.",".KWKBBBBKWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KKKKKKKKKK."]},"Cantine Tanninello":{"bg":"R","ic":[".....NN.....",".....GG.....",".....GG.....","....KGGK....","...KGGGGK...","...KGGGGK...","...KCCCCK...","...KCRRCK...","...KCCCCK...","...KGGGGK...","...KGGGGK...","....KKKK...."]},"Crocchette Codamossa":{"bg":"G","ic":["............","...WW..WW...","...WW..WW...",".WW......WW.",".WW......WW.","....WWWW....","...WWWWWW...","..WWWWWWWW..","..WWWWWWWW..","...WW..WW...","............","............"]},"Seterie del Lario":{"bg":"T","ic":["..KKKKKKKK..","..KNNNNNNK..","...KPPPPK...","...KPPPPK...","...KPWPPK...","...KPPPPK...","...KPPWPK...","...KPPPPK...","...KPPPPK...","..KNNNNNNK..","..KKKKKKKK..","............"]},"Materiali Edili Cazzuolini":{"bg":"S","ic":["............","RRRRR.RRRRR.","RRRRR.RRRRR.","............","RR.RRRRR.RRR","RR.RRRRR.RRR","............","RRRRR.RRRRR.","RRRRR.RRRRR.","............","RR.RRRRR.RRR","RR.RRRRR.RRR"]},"Giocattoli Trottolino":{"bg":"Y","ic":[".....KK.....",".....KK.....","...KKKKKK...","..KRRRRRRK..",".KRRWRRRRRK.","KBBBBBBBBBBK","KBBBBBBBBBBK",".KGGGGGGGGK.","..KGGGGGGK..","...KGGGGK...","....KGGK....",".....KK....."]},"Pellet Fiammella":{"bg":"D","ic":[".....R......",".....RR.....","....RRR.....","....RRRR.R..","...RROORRR..","..RROOOORR..","..ROOYYOORR.",".RROYYYYORR.",".RROYYYYORR.","..RROYYORR..","...RRRRRR...","..NNNNNNNN.."]},"Torrefazione Tazzulella":{"bg":"C","ic":["............","...N..N.....","....N..N....","...N..N.....","............",".KKKKKKKK...",".KWWWWWWKKK.",".KWMMMMWK.K.",".KWWWWWWKKK.","..KWWWWK....",".KKKKKKKKK..","............"]},"Bevande Spillatutto":{"bg":"B","ic":["............","...WWWWW....","..WWWWWWW...","..KYYYYYKK..","..KYYYYYK.K.","..KYWYYYK.K.","..KYWYYYK.K.","..KYYYYYKK..","..KYYYYYK...","..KKKKKKK...","............","............"]},"Surgelati Polo Sud":{"bg":"L","ic":["....KKKK....","...KKKKKK...","...KWKKWK...","...KKOOKK...","..KKWWWWKK..","..KWWWWWWK..",".KKWWWWWWKK.","..KWWWWWWK..","..KWWWWWWK..","...KWWWWK...","...OO..OO...","............"]},"Dolciaria Cornettone":{"bg":"R","ic":["............","............","....NNNN....","..NFFNNFFN..",".NFFNFFNFFN.","NFFNFFFFNFFN","NFNFFFFFFNFN",".N.NFFFFN.N.","....NNNN....","............","............","............"]},"Acciaierie Tondino":{"bg":"D","ic":["............",".SSSSSSSSSS.",".SWWWWWWWWS.","....SSSS....","....SWSS....","....SWSS....","....SWSS....","....SSSS....",".SSSSSSSSSS.",".SSSSSSSSSS.","............","............"]},"Scatolificio Cartonetti":{"bg":"G","ic":["............","..NNNNNNNN..",".NFFFFFFFFN.","NFFFFFFFFFFN","NNNNNNNNNNNN","NFFFFKKFFFFN","NFFFFKKFFFFN","NFFFFFFFFFFN","NFFFFFFFFFFN","NNNNNNNNNNNN","............","............"]},"Parafarmacie Croceverde":{"bg":"W","ic":["............","....GGGG....","....GWWG....","....GWWG....",".GGGGWWGGGG.",".GWWWWWWWWG.",".GWWWWWWWWG.",".GGGGWWGGGG.","....GWWG....","....GWWG....","....GGGG....","............"]},"Ortofrutta Fresco Fresco":{"bg":"C","ic":["......N.....",".....N.GG...","....N.GG....","..RRRNRRR...",".RRWRRRRRR..",".RWRRRRRRR..",".RRRRRRRRR..",".RRRRRRRRR..","..RRRRRRR...","...RR.RR....","............","............"]},"Prosciuttificio Stagionelli":{"bg":"C","ic":["............","..KK........",".KWWK.......","..KWWKK.....","...KRRRKK...","...KRWRRRK..","..KRRRWRRRK.","..KRRRRRWRK.","..KRWRRRRRK.","...KRRRRRK..","....KKKKK...","............"]},"Caseificio Scagliagrana":{"bg":"G","ic":["............","...NNNNNN...",".NNYYYYYYNN.","NYYYYYYYYYYN","NNYYYYYYYYNN","NFNNNNNNNNFN","NFFFNFFNFFFN","NFFFFFFFFFFN","NNFFFFFFFFNN",".NNNNNNNNNN.","............","............"]},"Piastrelle Sassuolini":{"bg":"D","ic":["............",".WWWW.BBBB..",".WBBW.BWWB..",".WBBW.BWWB..",".WWWW.BBBB..","............",".BBBB.WWWW..",".BWWB.WBBW..",".BWWB.WBBW..",".BBBB.WWWW..","............","............"]},"Ricambi Pistoncino":{"bg":"R","ic":["............","..KKKKKKKK..","..KSSSSSSK..","..KKKKKKKK..","..KSSSSSSK..","..KSSSSSSK..","..KKSSSSKK..","....KSSK....","....KSSK....","...KSSSSK...","...KSKKSK...","...KKKKKK..."]},"Piadificio Sfogliarola":{"bg":"G","ic":["............","............","............","....FFFFF...","..FFNFFFFFF.",".FFFFFFFNFF.","FFNFFFFFFFFF","FFFFFFNFFFNF","NNNNNNNNNNNN","............","............","............"]},"Cantine Bollicioso":{"bg":"P","ic":["....W.......","......W.....","...KKKKK....","...KYWYK....","...KYYYK....","...KYWYK....","....KYK.....","....KYK.....",".....K......",".....K......","...KKKKK....","............"]},"Occhialeria Lentescura":{"bg":"Y","ic":["............","............","............","KKKKK..KKKKK","KDDDKKKKDDDK","KDLDK..KDLDK","KDDDK..KDDDK",".KKK....KKK.","............","............","............","............"]},"Frutteti Melarossa":{"bg":"L","ic":["......N.....",".....NGG....","..RR.NGGG...",".RRRRRRRR...","RRWRRRRRRR..","RWRRRRRRRR..","RRRRRRRRRR..","RRRRRRRRRR..",".RRRRRRRR...","..RR..RR....","............","............"]},"Torrefazione Borascura":{"bg":"T","ic":["............","....MMMM....","...MMMMNM...","..MMMMNMMM..","..MMMNMMMM..","..MMMNMMMM..","..MMNMMMMM..","..MMMNMMMM..","...MMMNMM...","....MMMM....","............","............"]},"Cucine Incastrella":{"bg":"O","ic":["............",".KKKKKKKKKK.",".KWWWKWWWWK.",".KWWWKWWWWK.",".KKKKKKKKKK.","............",".KKKKKKKKKK.",".KWWKWWWWWK.",".KWYKWWYWWK.",".KWWKWWWWWK.",".KKKKKKKKKK.","............"]},"Scarponi Ramponcino":{"bg":"L","ic":["............","..KKKKK.....","..KRRRK.....","..KRYRK.....","..KRYRK.....","..KRRRKKK...","..KRRRRRRKK.",".KRRRRRRRRK.",".KKKKKKKKKK.",".KSKSKSKSKK.","............","............"]},"Supermercati Sporta Piena":{"bg":"G","ic":["............","....KKKK....","...K....K...","...K....K...",".KKKKKKKKKK.",".KWWWWWWWWK.",".KWOOWWRRWK.",".KWOOWWRRWK.",".KWWWWWWWWK.",".KWWWWWWWWK.",".KKKKKKKKKK.","............"]},"Pastificio Sfoglia Tirata":{"bg":"Y","ic":["............","............","....FFFF....","...FFFFFF...","..FFFKKFFF..","..FFK..KFF..","..FFK..KFF..","..FFFKKFFF..","...FFFFFF...",".NNNNNNNNNN.","NN........NN","............"]},"Macchine Avvolgix":{"bg":"B","ic":["............","...WWWWWW...","..W......W..",".W..NNNN..W.",".W.NFFFFN.W.",".W.NFFFFN.W.",".W.NFFFFN.W.",".W..NNNN..W.","..W......WW.","...WWWWWWW..",".........W..","............"]}};
 const STAT_IC={"op":[".O.OO.O.","OOOOOOOO",".OO..OO.","OO....OO","OO....OO",".OO..OO.","OOOOOOOO",".O.OO.O."],"prec":["..BBBB..",".BWWWWB.","BWWBBWWB","BWBRRBWB","BWBRRBWB","BWWBBWWB",".BWWWWB.","..BBBB.."],"neg":["..YYYY..",".YYYYYY.","YYYKKKYY","YYKYYYYY","YKKKKYYY","YYKYYYYY",".YYKKKY.","..YYYY.."],"lead":["KRRRRR..","KRRRRRR.","KRRRRRRR","KRRRRRR.","KRRRRR..","K.......","K.......","KK......"],"amm":["GGGGGGGG","GWWWWWWG","GGGGGGGG","GWGWGWGG","GGGGGGGG","GWGWGWGG","GGGGGGGG","GWGWGWGG"],"inn":["..PPPP..",".PPWPPP.","PPWPPPPP","PPPPPPPP",".PPPPPP.","..PPPP..","..SSSS..","...SS..."]};
 /* --- clienti: zone di distribuzione, provenienza merce, loghi --- */
 const REG={
  pie:['Torino','Novara','Alessandria','Asti','Cuneo','Vercelli','Biella','Verbania'],
  lom:['Milano','Varese','Como','Lecco','Bergamo','Brescia','Lodi','Pavia','Cremona','Mantova','Sondrio','Monza'],
- lig:['Genova','Savona','La Spezia','Imperia'], vda:['Aosta']
+ lig:['Genova','Savona','La Spezia','Imperia'], vda:['Aosta'],
+ er:['Piacenza','Parma','Reggio Emilia','Modena','Bologna','Ferrara','Ravenna','Forlì','Rimini'],
+ ven:['Verona','Vicenza','Padova','Venezia','Treviso','Rovigo','Belluno'],
+ taa:['Trento','Bolzano'], fvg:['Udine','Pordenone','Gorizia','Trieste']
 };
+// abitanti della provincia in centinaia di migliaia (circa): pesano i volumi delle gare quando la zona cambia
+const CITYPOP={Torino:22,Milano:40,Genova:8.2,Aosta:1.2,Novara:3.7,Alessandria:4.1,Asti:2.1,Cuneo:5.8,Vercelli:1.7,Biella:1.7,Varese:8.8,Como:6,Lecco:3.3,Bergamo:11,Brescia:12.5,Lodi:2.3,Pavia:5.3,Cremona:3.5,Mantova:4.1,Savona:2.7,'La Spezia':2.2,Imperia:2.1,Sondrio:1.8,
+ Piacenza:2.9,Parma:4.5,'Reggio Emilia':5.3,Modena:7,Bologna:10,Ferrara:3.4,Ravenna:3.9,Forlì:3.9,Rimini:3.4,Verona:9.2,Vicenza:8.5,Padova:9.3,Venezia:8.4,Treviso:8.8,Rovigo:2.3,Belluno:2,Trento:5.4,Bolzano:5.3,Udine:5.2,Pordenone:3.1,Gorizia:1.4,Trieste:2.3};
+const NO=[...REG.pie,...REG.lom,...REG.lig,...REG.vda], NE=[...REG.ven,...REG.taa,...REG.fvg,...REG.er];
+// tipi di zona: 'prov' una provincia, 'grp' alcune province, 'reg' una regione, 'macro' più regioni
 const ZONES={
- reg_pie:{n:'Piemonte',cities:REG.pie},
- reg_lom:{n:'Lombardia',cities:REG.lom},
- reg_lig:{n:'Liguria',cities:REG.lig},
- nordovest:{n:'Tutto il Nord-Ovest',cities:[...REG.pie,...REG.lom,...REG.lig,...REG.vda]},
- nord:{n:'Nord Italia',cities:[...REG.pie,...REG.lom,...REG.lig,...REG.vda,'Piacenza','Verona'],note:'consegne anche fuori dal Nord-Ovest'},
- italia:{n:'Tutta Italia',cities:[],avail:false,note:'disponibile quando la mappa si allargherà'}
+ reg_pie:{n:'Piemonte',k:'reg',cities:REG.pie},
+ reg_lom:{n:'Lombardia',k:'reg',cities:REG.lom},
+ reg_lig:{n:'Liguria',k:'reg',cities:REG.lig},
+ reg_er:{n:'Emilia-Romagna',k:'reg',cities:REG.er},
+ reg_ven:{n:'Veneto',k:'reg',cities:REG.ven},
+ reg_taa:{n:'Trentino-Alto Adige',k:'reg',cities:REG.taa},
+ reg_fvg:{n:'Friuli-Venezia Giulia',k:'reg',cities:REG.fvg},
+ nordovest:{n:'Tutto il Nord-Ovest',k:'macro',cities:NO},
+ nordest:{n:'Tutto il Nord-Est',k:'macro',cities:NE,note:'Veneto, Trentino-Alto Adige, Friuli-Venezia Giulia ed Emilia-Romagna'},
+ triveneto:{n:'Triveneto',k:'macro',cities:[...REG.ven,...REG.taa,...REG.fvg]},
+ nord:{n:'Nord Italia',k:'macro',cities:[...NO,...NE],note:'tutte le 8 regioni del Nord'},
+ grp_milano:{n:'Milano, Lodi e Pavia',k:'grp',cities:['Milano','Lodi','Pavia']},
+ grp_laghi:{n:'Laghi e Valtellina',k:'grp',cities:['Varese','Como','Lecco','Sondrio']},
+ grp_lomest:{n:'Lombardia orientale',k:'grp',cities:['Bergamo','Brescia','Cremona','Mantova']},
+ grp_bassopie:{n:'Basso Piemonte',k:'grp',cities:['Cuneo','Asti','Alessandria']},
+ grp_emilia:{n:'Emilia',k:'grp',cities:['Piacenza','Parma','Reggio Emilia','Modena','Bologna','Ferrara']},
+ grp_romagna:{n:'Romagna',k:'grp',cities:['Ravenna','Forlì','Rimini']},
+ grp_adriatico:{n:'Riviera adriatica',k:'grp',cities:['Venezia','Rovigo','Ferrara','Ravenna','Forlì','Rimini']},
+ grp_venpiana:{n:'Pianura veneta',k:'grp',cities:['Vicenza','Padova','Venezia','Treviso']},
+ grp_brennero:{n:'Asse del Brennero',k:'grp',cities:['Verona','Trento','Bolzano']},
+ grp_padana:{n:'Pianura Padana',k:'grp',cities:['Milano','Lodi','Pavia','Cremona','Mantova','Piacenza','Parma','Reggio Emilia','Modena','Verona','Rovigo','Ferrara']},
+ italia:{n:'Tutta Italia',k:'macro',cities:[],avail:false,note:'disponibile quando la mappa si allargherà'}
 };
-['Torino','Milano','Genova','Novara','Alessandria','Cuneo','Bergamo','Brescia','Pavia','Varese','Como'].forEach(c=>ZONES['prov_'+c]={n:'Provincia di '+c,cities:[c]});
+// ogni capoluogo è anche una zona da sola
+CITIES.filter(c=>!c[4]&&CITYPOP[c[0]]).forEach(c=>ZONES['prov_'+c[0]]={n:'Provincia di '+c[0],k:'prov',cities:[c[0]]});
 Object.values(ZONES).forEach(z=>{ if(z.avail===undefined) z.avail=true; z.cities=z.cities.filter(n=>CITIES.some(c=>c[0]===n)); });
+const zoneW=z=>(ZONES[z]||ZONES.nordovest).cities.reduce((a,n)=>a+(CITYPOP[n]||2),0);
+// due zone si sovrappongono se hanno almeno una provincia in comune: la stessa committente non può avere due contratti (o gare) sovrapposti
+const zoneOverlap=(a,b)=>{const A=(ZONES[a]||{cities:[]}).cities;return (ZONES[b]||{cities:[]}).cities.some(n=>A.includes(n));};
 const ORIGINS={
  gragnano:{n:'Stabilimento di Gragnano (NA)',lon:14.52,lat:40.69},
  meda:{n:'Fabbrica di Meda (MB)',lon:9.16,lat:45.66},
@@ -843,53 +901,81 @@ const ORIGINS={
  cremona:{n:'Stabilimento di Cremona',lon:10.02,lat:45.13},
  como:{n:'Seterie di Como',lon:9.08,lat:45.81},
  calusco:{n:'Cave di Calusco d\'Adda (BG)',lon:9.47,lat:45.69},
- borgosd:{n:'Segherie di Borgo San Dalmazzo (CN)',lon:7.49,lat:44.33}
+ borgosd:{n:'Segherie di Borgo San Dalmazzo (CN)',lon:7.49,lat:44.33},
+ langhirano:{n:'Prosciuttifici di Langhirano (PR)',lon:10.27,lat:44.61},
+ reggio:{n:'Magazzini di stagionatura di Reggio Emilia',lon:10.63,lat:44.70},
+ sassuolo:{n:'Distretto ceramico di Sassuolo (MO)',lon:10.78,lat:44.54},
+ panigale:{n:'Stabilimento di Borgo Panigale (BO)',lon:11.27,lat:44.51},
+ cesena:{n:'Laboratorio di Cesena (FC)',lon:12.24,lat:44.14},
+ valdobbiadene:{n:'Cantine di Valdobbiadene (TV)',lon:12.0,lat:45.9},
+ agordo:{n:'Stabilimento di Agordo (BL)',lon:12.03,lat:46.28},
+ valdinon:{n:'Consorzio della Val di Non (TN)',lon:11.05,lat:46.37},
+ portots:{n:'Porto di Trieste',lon:13.76,lat:45.63},
+ brugnera:{n:'Fabbrica di Brugnera (PN)',lon:12.54,lat:45.90},
+ montebelluna:{n:'Distretto di Montebelluna (TV)',lon:12.05,lat:45.78},
+ fornitorine:{n:'Centinaia di fornitori del Nord-Est',lon:11.9,lat:45.5},
+ bologna:{n:'Laboratorio di Bologna',lon:11.34,lat:44.49},
+ imola:{n:'Stabilimento di Imola (BO)',lon:11.71,lat:44.35}
 };
 // zones: la prima è quella del contratto iniziale; mode: 'ritiro' = andiamo noi a prendere la merce, 'consegna' = la porta il cliente
 // ch: canali di distribuzione in % dei pallet (vedi CHANNELS); i ritiri sono sempre con il bilico
 const CINFO={
- 'Pastificio Mezzemaniche':{zones:['reg_lig','reg_pie','prov_Alessandria'],src:'gragnano',mode:'consegna',ch:{gdo:60,horeca:25,dett:15}},
- 'Mobilificio Brianzolo':{zones:['reg_lom','nordovest'],src:'meda',mode:'ritiro',ch:{dett:80,ecom:20}},
- 'Saponaria Italia':{zones:['nordovest','reg_pie'],src:'casale',mode:'ritiro',ch:{gdo:80,dett:20}},
- 'Caffè Portuale':{zones:['reg_lig','reg_pie'],src:'portoge',mode:'ritiro',ch:{horeca:60,gdo:30,dett:10}},
- 'Caseificio Stracchinelli':{zones:['reg_lom','nordovest','prov_Milano'],src:'melzo',mode:'ritiro',ch:{gdo:55,horeca:30,dett:15}},
- 'Ferramenta Bullonati':{zones:['nordovest','reg_lom'],src:'lumezzane',mode:'ritiro',ch:{dett:75,gdo:25}},
- 'Elettrofulmine':{zones:['nordovest','nord'],src:'portoge',mode:'ritiro',ch:{gdo:50,dett:20,ecom:30}},
- 'FarmaSpa':{zones:['nordovest','nord'],src:'latina',mode:'consegna',ch:{dett:85,ecom:15}},
- 'Supermercati Carrellone':{zones:['reg_lom','nordovest'],src:'fornitori',mode:'consegna',ch:{gdo:100}},
- 'Birrificio Schiumetti':{zones:['nordovest','nord'],src:'udine',mode:'consegna',ch:{horeca:70,gdo:30}},
- 'Acque Fonte Frizzantina':{zones:['reg_lom','reg_pie','nordovest'],src:'pellegrino',mode:'ritiro',ch:{gdo:60,horeca:35,dett:5}},
- 'Arredamenti Brugola':{zones:['nordovest','reg_lom'],src:'svezia',mode:'consegna',ch:{dett:60,ecom:40}},
- 'Moda Grucciani':{zones:['nord','prov_Milano'],src:'atelier',mode:'ritiro',ch:{dett:75,ecom:25}},
- 'Pneumatici Battistrada':{zones:['reg_pie','nordovest','nord'],src:'settimo',mode:'ritiro',ch:{ind:100}},
- 'Crema Spalmella':{zones:['nordovest','reg_pie'],src:'alba',mode:'ritiro',ch:{gdo:75,dett:25}},
- 'Riseria La Mondina':{zones:['reg_lom','reg_pie','prov_Milano'],src:'vercelli',mode:'ritiro',ch:{gdo:55,horeca:35,dett:10}},
- 'Scarpinando':{zones:['nordovest','nord'],src:'erfurt',mode:'consegna',ch:{ecom:100}},
- 'Tuttosubito Italia':{zones:['nord','nordovest'],src:'mondo',mode:'consegna',ch:{ecom:100}},
- 'Spesa Veloce':{zones:['prov_Milano','prov_Torino'],src:'ortomercato',mode:'ritiro',ch:{ecom:100}},
+ 'Pastificio Mezzemaniche':{zones:['reg_lig','reg_pie','prov_Alessandria','reg_er','nordovest'],src:'gragnano',mode:'consegna',ch:{gdo:60,horeca:25,dett:15}},
+ 'Mobilificio Brianzolo':{zones:['reg_lom','nordovest','grp_milano','grp_laghi','reg_ven'],src:'meda',mode:'ritiro',ch:{dett:80,ecom:20}},
+ 'Saponaria Italia':{zones:['nordovest','reg_pie','nord','reg_lom','reg_er'],src:'casale',mode:'ritiro',ch:{gdo:80,dett:20}},
+ 'Caffè Portuale':{zones:['reg_lig','reg_pie','prov_Genova','reg_lom'],src:'portoge',mode:'ritiro',ch:{horeca:60,gdo:30,dett:10}},
+ 'Caseificio Stracchinelli':{zones:['reg_lom','nordovest','prov_Milano','grp_padana','reg_er','reg_ven'],src:'melzo',mode:'ritiro',ch:{gdo:55,horeca:30,dett:15}},
+ 'Ferramenta Bullonati':{zones:['nordovest','reg_lom','grp_lomest','reg_ven','nord'],src:'lumezzane',mode:'ritiro',ch:{dett:75,gdo:25}},
+ 'Elettrofulmine':{zones:['nordovest','nord','nordest','reg_ven','reg_er'],src:'portoge',mode:'ritiro',ch:{gdo:50,dett:20,ecom:30}},
+ 'FarmaSpa':{zones:['nordovest','nord','nordest','reg_er'],src:'latina',mode:'consegna',ch:{dett:85,ecom:15}},
+ 'Supermercati Carrellone':{zones:['reg_lom','nordovest','reg_er','grp_milano','prov_Bologna','reg_pie'],src:'fornitori',mode:'consegna',ch:{gdo:100}},
+ 'Birrificio Schiumetti':{zones:['nordovest','nord','reg_fvg','triveneto','nordest'],src:'udine',mode:'consegna',ch:{horeca:70,gdo:30}},
+ 'Acque Fonte Frizzantina':{zones:['reg_lom','reg_pie','nordovest','reg_er','reg_ven','grp_laghi'],src:'pellegrino',mode:'ritiro',ch:{gdo:60,horeca:35,dett:5}},
+ 'Arredamenti Brugola':{zones:['nordovest','reg_lom','nordest','grp_padana'],src:'svezia',mode:'consegna',ch:{dett:60,ecom:40}},
+ 'Moda Grucciani':{zones:['nord','prov_Milano','prov_Venezia','prov_Bologna'],src:'atelier',mode:'ritiro',ch:{dett:75,ecom:25}},
+ 'Pneumatici Battistrada':{zones:['reg_pie','nordovest','nord','reg_er','nordest'],src:'settimo',mode:'ritiro',ch:{ind:100}},
+ 'Crema Spalmella':{zones:['nordovest','reg_pie','nord','reg_lom'],src:'alba',mode:'ritiro',ch:{gdo:75,dett:25}},
+ 'Riseria La Mondina':{zones:['reg_lom','reg_pie','prov_Milano','reg_er','reg_ven'],src:'vercelli',mode:'ritiro',ch:{gdo:55,horeca:35,dett:10}},
+ 'Scarpinando':{zones:['nordovest','nord','nordest','reg_lom'],src:'erfurt',mode:'consegna',ch:{ecom:100}},
+ 'Tuttosubito Italia':{zones:['nord','nordovest','nordest','reg_er','reg_ven','grp_milano'],src:'mondo',mode:'consegna',ch:{ecom:100}},
+ 'Spesa Veloce':{zones:['prov_Milano','prov_Torino','prov_Bologna','prov_Padova','prov_Verona'],src:'ortomercato',mode:'ritiro',ch:{ecom:100}},
  'Spedizioni Tricolore':{zones:['italia'],src:'roma',mode:'consegna',ch:{ecom:70,dett:30}},
- 'Discount Prezzaccio':{zones:['reg_pie','prov_Torino','prov_Cuneo'],src:'fornitori',mode:'consegna',ch:{gdo:100}},
- 'Mobili Truciolotto':{zones:['reg_lom','prov_Milano'],src:'seveso',mode:'ritiro',ch:{dett:50,gdo:30,ecom:20}},
- 'Fai-da-Te Planet':{zones:['nordovest','nord'],src:'castelsg',mode:'consegna',ch:{gdo:70,ecom:30}},
- 'Cosmetici Belletto':{zones:['nordovest','nord'],src:'crema',mode:'ritiro',ch:{gdo:40,dett:40,ecom:20}},
+ 'Discount Prezzaccio':{zones:['reg_pie','prov_Torino','prov_Cuneo','grp_bassopie','reg_lig'],src:'fornitori',mode:'consegna',ch:{gdo:100}},
+ 'Mobili Truciolotto':{zones:['reg_lom','prov_Milano','grp_laghi','grp_lomest'],src:'seveso',mode:'ritiro',ch:{dett:50,gdo:30,ecom:20}},
+ 'Fai-da-Te Planet':{zones:['nordovest','nord','nordest','reg_er'],src:'castelsg',mode:'consegna',ch:{gdo:70,ecom:30}},
+ 'Cosmetici Belletto':{zones:['nordovest','nord','nordest'],src:'crema',mode:'ritiro',ch:{gdo:40,dett:40,ecom:20}},
  'Aeronautica Volavia':{zones:['nord','reg_lom'],src:'samarate',mode:'ritiro',ch:{ind:100}},
- 'Salumificio Bresaolotti':{zones:['reg_lom','nordovest','prov_Milano'],src:'chiavenna',mode:'ritiro',ch:{gdo:50,horeca:35,dett:15}},
- 'Cioccolateria Sabauda':{zones:['reg_pie','nordovest'],src:'pinerolo',mode:'ritiro',ch:{gdo:40,dett:35,horeca:15,ecom:10}},
- 'Lavatrix Elettrodomestici':{zones:['nordovest','nord'],src:'comerio',mode:'ritiro',ch:{gdo:45,dett:25,ecom:30}},
- 'Cantine Tanninello':{zones:['reg_pie','nordovest'],src:'barolo',mode:'ritiro',ch:{horeca:60,dett:25,gdo:15}},
- 'Crocchette Codamossa':{zones:['nordovest','reg_lom'],src:'cremona',mode:'consegna',ch:{gdo:50,dett:35,ecom:15}},
+ 'Salumificio Bresaolotti':{zones:['reg_lom','nordovest','prov_Milano','grp_laghi','reg_er','triveneto'],src:'chiavenna',mode:'ritiro',ch:{gdo:50,horeca:35,dett:15}},
+ 'Cioccolateria Sabauda':{zones:['reg_pie','nordovest','reg_lom','nord'],src:'pinerolo',mode:'ritiro',ch:{gdo:40,dett:35,horeca:15,ecom:10}},
+ 'Lavatrix Elettrodomestici':{zones:['nordovest','nord','nordest','reg_ven'],src:'comerio',mode:'ritiro',ch:{gdo:45,dett:25,ecom:30}},
+ 'Cantine Tanninello':{zones:['reg_pie','nordovest','reg_lom','reg_ven'],src:'barolo',mode:'ritiro',ch:{horeca:60,dett:25,gdo:15}},
+ 'Crocchette Codamossa':{zones:['nordovest','reg_lom','reg_er','nordest'],src:'cremona',mode:'consegna',ch:{gdo:50,dett:35,ecom:15}},
  'Seterie del Lario':{zones:['nord','reg_lom'],src:'como',mode:'ritiro',ch:{ind:100}},
- 'Materiali Edili Cazzuolini':{zones:['reg_lom','prov_Bergamo'],src:'calusco',mode:'ritiro',ch:{ind:100}},
- 'Giocattoli Trottolino':{zones:['nordovest','nord'],src:'portoge',mode:'consegna',ch:{gdo:50,dett:35,ecom:15}},
- 'Pellet Fiammella':{zones:['reg_pie','prov_Cuneo'],src:'borgosd',mode:'ritiro',ch:{dett:60,gdo:40}},
- 'Torrefazione Tazzulella':{zones:['reg_lig','reg_pie','nordovest'],src:'portoge',mode:'ritiro',ch:{horeca:75,dett:15,gdo:10}},
- 'Bevande Spillatutto':{zones:['prov_Milano','reg_lom'],src:'fornitori',mode:'consegna',ch:{horeca:90,dett:10}},
- 'Surgelati Polo Sud':{zones:['nordovest','nord'],src:'parma',mode:'consegna',ch:{horeca:60,gdo:30,ecom:10}},
- 'Dolciaria Cornettone':{zones:['reg_lom','nordovest'],src:'sanmartino',mode:'ritiro',ch:{horeca:50,gdo:40,dett:10}},
- 'Acciaierie Tondino':{zones:['reg_lom','prov_Bergamo','nord'],src:'darfo',mode:'ritiro',ch:{ind:100}},
- 'Scatolificio Cartonetti':{zones:['reg_pie','nordovest'],src:'vigevano',mode:'ritiro',ch:{ind:100}},
- 'Parafarmacie Croceverde':{zones:['prov_Torino','reg_pie','nordovest'],src:'fornitori',mode:'consegna',ch:{dett:70,ecom:30}},
- 'Ortofrutta Fresco Fresco':{zones:['prov_Milano','prov_Torino'],src:'ortomercato',mode:'ritiro',ch:{gdo:60,horeca:30,dett:10}}
+ 'Materiali Edili Cazzuolini':{zones:['reg_lom','prov_Bergamo','grp_lomest','grp_laghi'],src:'calusco',mode:'ritiro',ch:{ind:100}},
+ 'Giocattoli Trottolino':{zones:['nordovest','nord','nordest','reg_er'],src:'portoge',mode:'consegna',ch:{gdo:50,dett:35,ecom:15}},
+ 'Pellet Fiammella':{zones:['reg_pie','prov_Cuneo','grp_bassopie','reg_taa'],src:'borgosd',mode:'ritiro',ch:{dett:60,gdo:40}},
+ 'Torrefazione Tazzulella':{zones:['reg_lig','reg_pie','nordovest','reg_lom'],src:'portoge',mode:'ritiro',ch:{horeca:75,dett:15,gdo:10}},
+ 'Bevande Spillatutto':{zones:['prov_Milano','reg_lom','grp_milano','grp_laghi'],src:'fornitori',mode:'consegna',ch:{horeca:90,dett:10}},
+ 'Surgelati Polo Sud':{zones:['nordovest','nord','reg_er','grp_emilia','nordest'],src:'parma',mode:'consegna',ch:{horeca:60,gdo:30,ecom:10}},
+ 'Dolciaria Cornettone':{zones:['reg_lom','nordovest','reg_ven','triveneto','nordest'],src:'sanmartino',mode:'ritiro',ch:{horeca:50,gdo:40,dett:10}},
+ 'Acciaierie Tondino':{zones:['reg_lom','prov_Bergamo','nord','grp_lomest','reg_ven'],src:'darfo',mode:'ritiro',ch:{ind:100}},
+ 'Scatolificio Cartonetti':{zones:['reg_pie','nordovest','reg_lom','grp_padana'],src:'vigevano',mode:'ritiro',ch:{ind:100}},
+ 'Parafarmacie Croceverde':{zones:['prov_Torino','reg_pie','nordovest','prov_Milano','reg_lig'],src:'fornitori',mode:'consegna',ch:{dett:70,ecom:30}},
+ 'Ortofrutta Fresco Fresco':{zones:['prov_Milano','prov_Torino','prov_Bologna','prov_Verona','prov_Genova'],src:'ortomercato',mode:'ritiro',ch:{gdo:60,horeca:30,dett:10}},
+ 'Prosciuttificio Stagionelli':{zones:['grp_emilia','reg_er','grp_milano','nord'],src:'langhirano',mode:'ritiro',ch:{gdo:50,horeca:30,dett:20}},
+ 'Caseificio Scagliagrana':{zones:['reg_er','grp_padana','reg_lom','nord'],src:'reggio',mode:'ritiro',ch:{gdo:60,horeca:25,dett:15}},
+ 'Piastrelle Sassuolini':{zones:['reg_er','reg_lom','nordest','nord'],src:'sassuolo',mode:'ritiro',ch:{dett:70,gdo:30}},
+ 'Ricambi Pistoncino':{zones:['grp_emilia','reg_lom','nord'],src:'panigale',mode:'ritiro',ch:{ind:100}},
+ 'Piadificio Sfogliarola':{zones:['grp_romagna','reg_er','grp_adriatico','prov_Bologna'],src:'cesena',mode:'ritiro',ch:{gdo:60,horeca:40}},
+ 'Cantine Bollicioso':{zones:['reg_ven','triveneto','reg_lom','grp_adriatico','nord'],src:'valdobbiadene',mode:'ritiro',ch:{horeca:50,gdo:35,dett:15}},
+ 'Occhialeria Lentescura':{zones:['triveneto','reg_lom','nord'],src:'agordo',mode:'ritiro',ch:{dett:80,ecom:20}},
+ 'Frutteti Melarossa':{zones:['grp_brennero','reg_taa','triveneto','reg_lom','nord'],src:'valdinon',mode:'ritiro',ch:{gdo:70,dett:20,horeca:10}},
+ 'Torrefazione Borascura':{zones:['reg_fvg','triveneto','nordest','nord'],src:'portots',mode:'ritiro',ch:{horeca:70,gdo:30}},
+ 'Cucine Incastrella':{zones:['triveneto','reg_lom','reg_er','nord'],src:'brugnera',mode:'ritiro',ch:{dett:70,ecom:30}},
+ 'Scarponi Ramponcino':{zones:['triveneto','grp_laghi','reg_taa','nord'],src:'montebelluna',mode:'ritiro',ch:{dett:60,ecom:40}},
+ 'Supermercati Sporta Piena':{zones:['reg_ven','grp_venpiana','reg_fvg','triveneto','nordest'],src:'fornitorine',mode:'consegna',ch:{gdo:100}},
+ 'Pastificio Sfoglia Tirata':{zones:['prov_Bologna','grp_emilia','reg_er','grp_milano'],src:'bologna',mode:'ritiro',ch:{gdo:60,horeca:40}},
+ 'Macchine Avvolgix':{zones:['reg_er','reg_lom','reg_ven','nord'],src:'imola',mode:'ritiro',ch:{ind:100}}
 };
 const cinfo=c=>CINFO[c.name]||{zones:['nordovest'],src:'fornitori',mode:'consegna',ch:{gdo:50,dett:50}};
 // canali di distribuzione: veh = mezzo, sat = carico rispetto alla media, prezzo = tariffa di distribuzione, pick = lavoro di preparazione, P/A = effetto sui KPI
@@ -1094,8 +1180,8 @@ wk('eventi','basi','Eventi',`Imprevisti con una scelta da fare: meteo, politica,
 Gli effetti possono essere immediati (soldi, [[reputazione]], [[soddisfazione]]) oppure durare qualche settimana ([[morale]], [[puntualita]], [[accuratezza]]). Lo stesso evento non torna prima di 240 giorni.`);
 wk('giornale','basi','Il giornale',`L'archivio delle notizie: gare, contratti, ricerche concluse, scelte fatte negli eventi.`,
 `La Gazzetta del Muletto e Il Sole 24 Pallet raccontano cosa succede alla tua azienda e al mercato. Utile per ricordare chi ha vinto una [[gare|gara]] che hai perso e cosa hai deciso negli [[eventi]].`);
-wk('mappa','basi','Mappa',`Il Nord-Ovest in pixel art: magazzini, città servite e camion in viaggio.`,
-`Trascina per spostarti e usa la rotellina per lo zoom (sul telefono: un dito per spostarti, due dita per lo zoom). Solo Piemonte, Lombardia, Liguria e Valle d'Aosta sono giocabili: il resto d'Italia è grigio.
+wk('mappa','basi','Mappa',`Il Nord Italia in pixel art, da Nizza a Trieste: magazzini, città servite e camion in viaggio.`,
+`Trascina per spostarti e usa la rotellina per lo zoom (sul telefono: un dito per spostarti, due dita per lo zoom). Sono giocabili le otto regioni del Nord: Piemonte, Valle d'Aosta, Lombardia, Liguria, Trentino-Alto Adige, Veneto, Friuli-Venezia Giulia ed Emilia-Romagna. Il resto d'Italia è grigio.
 
 Clicca un [[magazzino]] per aprirlo. Dalla finestra Clienti puoi mostrare sulla mappa la [[zona]] di distribuzione di un cliente e il percorso del [[ritiro]].`);
 wk('espansione','basi','Espansione',`Affittare un nuovo magazzino: due mesi di affitto anticipati più 15.000 € di allestimento.`,
@@ -1215,7 +1301,7 @@ wk('fondazione','basi','Fondare l\'azienda',`Prima di iniziare scegli nome, logo
 • **Claim**: lo slogan sull'insegna, facoltativo (il pulsante «Suggerisci» ne propone uno);
 • **Colore**: tinge i pulsanti dell'interfaccia e lo sfondo del logo.
 
-Alla fine arriva la visura della Camera di Commercio, Industria, Artigianato e Bancali del Nord-Ovest: un timbro e l'azienda è iscritta. Nome, logo e claim sono solo d'immagine: non cambiano i numeri del gioco.`);
+Alla fine arriva la visura della Camera di Commercio, Industria, Artigianato e Bancali del Nord: un timbro e l'azienda è iscritta. Nome, logo e claim sono solo d'immagine: non cambiano i numeri del gioco.`);
 const TAL_ID={}; Object.keys(TALENTS).forEach((n,i)=>{TAL_ID[n]='tal_'+i; const t=TALENTS[n];
   wk('tal_'+i,'tal',n,t.fx,`${t.fx.split(' · ').join('\n• ').replace(/^/,'• ')}\n\n*${t.fl}*\n\nTipo: ${TTYPE[t.t][0].toLowerCase()}.${t.edu?' È un [[titoli|titolo di studio]].':''} Vedi [[talenti]].`,sz=>talentSvg(t.ic,sz));});
 // Personale
@@ -1342,8 +1428,14 @@ wk('canali','cli','Canali di distribuzione',`Dove finisce la merce del cliente: 
 • **Industria**: stabilimenti e cantieri. Bilici ([[autisti_ce|patente CE]]), carico ×1,1, orari flessibili (puntualità +0,5, accuratezza +0,3), picking ×0,7, tariffa ×0,9. **Chi lavora per l'industria non ha altri canali.**
 
 Gli effetti si pesano sui pallet di tutti i clienti del magazzino. Il carico dei canali sposta la [[saturazione_mezzi|saturazione dei mezzi]]: la saturazione del magazzino è la media, e ogni canale viaggia più pieno o più vuoto di così. La [[tech_sinergia|sinergia in pianificazione]] rende solo tra clienti che servono gli stessi canali.`);
-wk('zona','cli','Zona di distribuzione',`Dove il cliente vuole le consegne: una provincia, una regione, tutto il Nord-Ovest o il Nord Italia.`,
-`Più è grande la zona, più km per ogni viaggio. Ogni viaggio porta 16 pallet e si conta andata e ritorno, con il 30% in più per le strade vere. I km decidono quanti [[autisti]] servono e i costi dei mezzi, ma aumentano anche il prezzo del trasporto pagato dal cliente.
+wk('zona','cli','Zona di distribuzione',`Dove il cliente vuole le consegne: una provincia, alcune province, una regione, il Nord-Ovest, il Nord-Est o tutto il Nord.`,
+`Ogni gara è per una zona. Le zone sono di quattro tipi: una sola provincia (per esempio la Provincia di Bologna), un gruppo di province (Romagna, Lombardia orientale, Pianura Padana, Asse del Brennero…), una regione, oppure più regioni insieme (Nord-Ovest, Nord-Est, Triveneto, Nord Italia).
+
+**La stessa committente può fare più gare**, una per zona: puoi servire Supermercati Carrellone in Lombardia da Pioltello e in Emilia-Romagna da Bologna, con due contratti separati, ognuno con i suoi KPI, la sua soddisfazione e la sua scadenza. Le zone dello stesso cliente non possono sovrapporsi: se hai già la Lombardia, non arriverà una gara per la Provincia di Milano.
+
+I volumi dipendono dagli abitanti della zona: una gara per tutto il Nord vale molto più di una per la sola Provincia di Rimini (crescono un po' meno che in proporzione agli abitanti, da un terzo fino a poco più del doppio dei volumi di base del cliente).
+
+Più è grande la zona, più km per ogni viaggio. Ogni viaggio porta 16 pallet e si conta andata e ritorno, con il 30% in più per le strade vere. I km decidono quanti [[autisti]] servono e i costi dei mezzi, ma aumentano anche il prezzo del trasporto pagato dal cliente.
 
 La maggior parte dei clienti vuole i bilici, guidati dagli [[autisti_ce|autisti con patente CE]]. Chi fa tante consegne piccole (e-commerce, farmacie, boutique, profumerie, spesa a domicilio) vuole i furgoni, guidati dagli [[autisti_b|autisti con patente B]].`);
 wk('ritiro','cli','Ritiro o consegna',`Da dove arriva la merce: la consegna il cliente con i suoi mezzi, oppure la vai a prendere tu.`,
@@ -1690,17 +1782,27 @@ function monthEnd(){
   if(S.cash<0) toast('Cassa sotto zero: sotto i −50.000 € l\'azienda fallisce','bad');
   save();
 }
+// zone in cui una committente può ancora aprire una gara: non devono sovrapporsi a un suo contratto attivo o a una sua gara aperta
+function freeZones(tpl){
+  const busy=[...S.clients.filter(c=>c.name===tpl.name&&c.status!=='perso').map(c=>c.zone),...S.tenders.filter(x=>x.name===tpl.name&&!x.done).map(x=>x.zone)];
+  return cinfo(tpl).zones.filter(z=>ZONES[z]&&ZONES[z].avail&&!busy.some(b=>zoneOverlap(b,z)));
+}
+// volumi della gara rispetto a quelli di base (pensati per la prima zona della committente): crescono con gli abitanti serviti
+const zoneScale=(tpl,z)=>clamp(Math.pow(zoneW(z)/zoneW(cinfo(tpl).zones[0]),0.6),0.35,2.2);
 function newTender(){
-  const tpl=pick(TENDER_POOL.filter(t=>cinfo(t).zones.some(z=>ZONES[z].avail)&&(!(t.req||[]).includes('ecom')||R('ecom'))&&!S.clients.some(c=>c.name===t.name&&c.status!=='perso')&&!S.tenders.some(x=>x.name===t.name&&!x.done)));
+  const tpl=pick(TENDER_POOL.filter(t=>freeZones(t).length&&(!(t.req||[]).includes('ecom')||R('ecom'))));
   if(!tpl) return false;
-  const k=rnd(0.75,1.25);
-  const t={id:nid('t'),...tpl,stock:Math.round(tpl.stock*k/10)*10,pal:Math.round(tpl.pal*k/10)*10,open:S.day,deadline:S.day+45,dur:pick(DUR_RANK[rankOf(tpl).r]),bid:null,done:false,result:null};
-  {const ci=cinfo(tpl); t.zone=pick(ci.zones.filter(z=>ZONES[z].avail)); t.src=ci.src; t.mode=ci.mode;}
+  const zone=pick(freeZones(tpl)), k=rnd(0.75,1.25)*zoneScale(tpl,zone);
+  const t={id:nid('t'),...tpl,stock:Math.max(50,Math.round(tpl.stock*k/10)*10),pal:Math.max(50,Math.round(tpl.pal*k/10)*10),open:S.day,deadline:S.day+45,dur:pick(DUR_RANK[rankOf(tpl).r]),bid:null,done:false,result:null};
+  {const ci=cinfo(tpl); t.zone=zone; t.src=ci.src; t.mode=ci.mode;}
   S.tenders.push(t);
-  toast(`Nuova gara: ${t.name}, scade il ${shortDate(t.deadline)}`,'warn');
-  news('Il Sole 24 Pallet',`Gara d'appalto: ${t.name}`,`${n0(t.pal)} pallet al mese, ${n0(t.stock)} posti. Offerte entro il ${shortDate(t.deadline)}. Contratto di ${t.dur} mesi.`);
+  const zn=zoneName(t.zone), again=S.clients.some(c=>c.name===t.name&&c.status!=='perso');
+  toast(`Nuova gara: ${t.name} (${zn}), scade il ${shortDate(t.deadline)}`,'warn');
+  news('Il Sole 24 Pallet',`Gara d'appalto: ${t.name}, ${zn}`,`${again?'Già nostra committente in un\'altra zona, ora cerca un logistico anche qui. ':''}${n0(t.pal)} pallet al mese, ${n0(t.stock)} posti. Offerte entro il ${shortDate(t.deadline)}. Contratto di ${t.dur} mesi.`);
   return true;
 }
+// nome della committente con la zona, quando serve distinguere più contratti o gare della stessa azienda
+const cname=c=>c.name+(c.zone&&[...S.clients.filter(x=>x.status!=='perso'),...S.tenders.filter(x=>!x.done)].filter(x=>x.name===c.name).length>1?' · '+zoneName(c.zone):'');
 function bidEstimate(t,whId,mult){
   const w=whById(whId); if(!w) return null;
   const extra={...t,wh:w.id,mult,status:'attivo'};
@@ -1724,11 +1826,11 @@ function resolveTender(t){
   if(win){
     const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,zone:t.zone,src:t.src,mode:t.mode,wh:t.bid.wh,mult:t.bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+(t.dur||24)*30,dur:t.dur||24};
     S.clients.push(c); t.result={win:true}; S.tw.win++; S.rep=clamp(S.rep+rankOf(c).win,0,100);
-    toast(`Gara vinta: ${t.name}! Il contratto parte il ${shortDate(c.start)}`,'ok');
-    modalInfo('Il Sole 24 Pallet',`Gara vinta: ${t.name}`,`Il contratto parte il ${shortDate(c.start)} a ${whById(c.wh).name}. In quel magazzino servono in tutto ${needTxt(e.need)}: assumi adesso, perché un autista con patente CE arriva in 3–6 settimane.`);
+    toast(`Gara vinta: ${t.name} (${zoneName(t.zone)})! Il contratto parte il ${shortDate(c.start)}`,'ok');
+    modalInfo('Il Sole 24 Pallet',`Gara vinta: ${t.name}, ${zoneName(t.zone)}`,`Il contratto parte il ${shortDate(c.start)} a ${whById(c.wh).name}. In quel magazzino servono in tutto ${needTxt(e.need)}: assumi adesso, perché un autista con patente CE arriva in 3–6 settimane.`);
   } else {
     const by=pick(RIVALS); t.result={win:false,by,disc:Math.round(rnd(5,18))}; S.tw.lose++;
-    toast(`Gara persa: ${t.name} va a ${by}`,'bad');
+    toast(`Gara persa: ${t.name} (${zoneName(t.zone)}) va a ${by}`,'bad');
     news('Il Sole 24 Pallet',`${t.name} sceglie ${by}`,`Offerta con uno sconto del ${t.result.disc}%.`);
   }
 }
@@ -2164,13 +2266,13 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify({S,uid}));}catch(e){
 function load(){try{const r=localStorage.getItem(KEY);if(!r)return null;return JSON.parse(r);}catch(e){return null;}}
 
 /* ====================== MAPPA ====================== */
-const view={s:1,x:0,y:0};
+const view={s:1,x:0,y:0}, MW=1520, MH=800; // mappa: 760x400 in pixel art mostrata a 2x (da Nizza a Trieste)
 function fitMap(){
-  const W=innerWidth,H=innerHeight; const s0=Math.max(W/1280,H/800);
-  view.min=s0; if(view.s<s0||!view.init){view.s=s0;view.x=(W-1280*s0)/2;view.y=(H-800*s0)/2;view.init=1;}
+  const W=innerWidth,H=innerHeight; const s0=Math.max(W/MW,H/MH);
+  view.min=s0; if(view.s<s0||!view.init){view.s=s0;view.x=(W-MW*s0)/2;view.y=(H-MH*s0)/2;view.init=1;}
   clampView(); applyView();
 }
-function clampView(){const W=innerWidth,H=innerHeight;view.x=clamp(view.x,W-1280*view.s,0);view.y=clamp(view.y,H-800*view.s,0);}
+function clampView(){const W=innerWidth,H=innerHeight;view.x=clamp(view.x,W-MW*view.s,0);view.y=clamp(view.y,H-MH*view.s,0);}
 function applyView(){$('#map').style.transform=`translate(${view.x}px,${view.y}px) scale(${view.s})`;}
 // zoom tenendo fermo il punto (mx,my) dello schermo
 function zoomAt(mx,my,ns){ns=clamp(ns,view.min,view.min*3.2);view.x=mx-(mx-view.x)*ns/view.s;view.y=my-(my-view.y)*ns/view.s;view.s=ns;clampView();applyView();}
@@ -2207,9 +2309,9 @@ function renderMap(){
     z.cities.forEach(n=>{const c=CITIES.find(x=>x[0]===n); const [x,y]=pt(c[1],c[2]);
       g.push(`<line x1="${wx}" y1="${wy}" x2="${x}" y2="${y}" stroke="#16202e" stroke-width="5" opacity=".5"/><line x1="${wx}" y1="${wy}" x2="${x}" y2="${y}" stroke="${col}" stroke-width="3" stroke-dasharray="8 5"/><rect x="${x-9}" y="${y-9}" width="18" height="18" fill="none" stroke="${col}" stroke-width="3"/>`);});
     const o=ORIGINS[mc.src]||ORIGINS.fornitori; let [ox,oy]=pt(o.lon,o.lat); let off=false;
-    if(ox<20||ox>1260||oy<20||oy>780){off=true; const dx=ox-wx,dy=oy-wy; const t=Math.min(dx>0?(1240-wx)/dx:dx<0?(40-wx)/dx:1e9, dy>0?(740-wy)/dy:dy<0?(40-wy)/dy:1e9); ox=wx+dx*t; oy=wy+dy*t;}
+    if(ox<20||ox>MW-20||oy<20||oy>MH-20){off=true; const dx=ox-wx,dy=oy-wy; const t=Math.min(dx>0?(MW-40-wx)/dx:dx<0?(40-wx)/dx:1e9, dy>0?(740-wy)/dy:dy<0?(40-wy)/dy:1e9); ox=wx+dx*t; oy=wy+dy*t;}
     g.push(`<line x1="${ox}" y1="${oy}" x2="${wx}" y2="${wy}" stroke="#16202e" stroke-width="7" opacity=".5"/><line x1="${ox}" y1="${oy}" x2="${wx}" y2="${wy}" stroke="${mc.mode==='ritiro'?'#ff7a3d':'#ffffff'}" stroke-width="4"/>`);
-    g.push(`<g transform="translate(${Math.round(ox-12)},${Math.round(oy-12)})">${logoSvg(mc.name,24)}</g><text class="lbl" x="${ox+(ox>700?-16:16)}" y="${oy+(oy<60?28:-16)}" font-size="14" text-anchor="${ox>700?'end':'start'}">${off?'↗ ':''}${esc(o.n)} · ${mc.mode==='ritiro'?'ritiro nostro':'consegna il cliente'}</text>`);
+    g.push(`<g transform="translate(${Math.round(ox-12)},${Math.round(oy-12)})">${logoSvg(mc.name,24)}</g><text class="lbl" x="${ox+(ox>MW/2?-16:16)}" y="${oy+(oy<60?28:-16)}" font-size="14" text-anchor="${ox>MW/2?'end':'start'}">${off?'↗ ':''}${esc(o.n)} · ${mc.mode==='ritiro'?'ritiro nostro':'consegna il cliente'}</text>`);
   }
   // magazzini del giocatore
   S.warehouses.forEach(w=>{const s=SITES[w.site];const [x,y]=pt(s.lon,s.lat);
@@ -2222,7 +2324,7 @@ function renderMap(){
 }
 /* lenti della mappa: ogni lente aggiunge uno strato sotto città e magazzini. Per una nuova lente basta una voce in LENSES con draw() */
 const PROV={{PROV}};
-const PROV_CAP={TO:'Torino',VC:'Vercelli',NO:'Novara',CN:'Cuneo',AT:'Asti',AL:'Alessandria',AO:'Aosta',IM:'Imperia',SV:'Savona',GE:'Genova',SP:'La Spezia',VA:'Varese',CO:'Como',SO:'Sondrio',MI:'Milano',BG:'Bergamo',BS:'Brescia',PV:'Pavia',CR:'Cremona',MN:'Mantova',BI:'Biella',LC:'Lecco',LO:'Lodi',VB:'Verbania',MB:'Monza'};
+const PROV_CAP={TO:'Torino',VC:'Vercelli',NO:'Novara',CN:'Cuneo',AT:'Asti',AL:'Alessandria',AO:'Aosta',IM:'Imperia',SV:'Savona',GE:'Genova',SP:'La Spezia',VA:'Varese',CO:'Como',SO:'Sondrio',MI:'Milano',BG:'Bergamo',BS:'Brescia',PV:'Pavia',CR:'Cremona',MN:'Mantova',BI:'Biella',LC:'Lecco',LO:'Lodi',VB:'Verbania',MB:'Monza',PC:'Piacenza',PR:'Parma',RE:'Reggio Emilia',MO:'Modena',BO:'Bologna',FE:'Ferrara',RA:'Ravenna',FC:'Forlì',RN:'Rimini',VR:'Verona',VI:'Vicenza',PD:'Padova',VE:'Venezia',TV:'Treviso',RO:'Rovigo',BL:'Belluno',TN:'Trento',BZ:'Bolzano',UD:'Udine',PN:'Pordenone',GO:'Gorizia',TS:'Trieste'};
 function lensProv(){
   const fill=[],line=[],lab=[];
   PROV.forEach(p=>{
@@ -2241,7 +2343,7 @@ function lensProv(){
 const LENSES=[
  {id:'base',n:'Mappa normale',d:'Città, magazzini e siti in affitto.',
   ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="11" height="10" fill="#5fb4f0"/><rect x="0" y="3" width="7" height="7" fill="#8ed15b"/><rect x="2" y="1" width="6" height="3" fill="#8ed15b"/><rect x="5" y="4" width="2" height="2" fill="#16202e"/><rect x="2" y="7" width="2" height="2" fill="#fff"/></svg>'},
- {id:'prov',n:'Province',d:'Le 25 province di Piemonte, Valle d\'Aosta, Lombardia e Liguria. Passa sopra a una provincia per i dettagli.',draw:lensProv,
+ {id:'prov',n:'Province',d:'Le 47 province del Nord, dalla Valle d\'Aosta al Friuli e all\'Emilia-Romagna. Passa sopra a una provincia per i dettagli.',draw:lensProv,
   ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="5" height="5" fill="#ff7a3d"/><rect x="5" y="0" width="6" height="4" fill="#5fb4f0"/><rect x="0" y="5" width="4" height="5" fill="#ffd23f"/><rect x="4" y="5" width="7" height="5" fill="#2e9e48"/><rect x="5" y="4" width="6" height="1" fill="#2e9e48"/><rect x="4" y="0" width="1" height="10" fill="#16202e"/><rect x="0" y="4" width="11" height="1" fill="#16202e"/></svg>'}
 ];
 function renderLenses(){
@@ -2460,7 +2562,7 @@ const VIEWS={
    const mesi=Math.max(0,Math.round((c.end-S.day)/30));
    return `<div class="card ${bad?'bad':c.status==='avvio'?'pend':''}">
     <div style="display:flex;gap:10px;align-items:center">${logoSvg(c.name,48)}<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-     <div class="row"><b style="display:flex;align-items:center;gap:6px">${rankIcon(c,22)}${esc(c.name)}</b><span class="sm">${esc(w.name)}</span></div>
+     <div class="row"><b style="display:flex;align-items:center;gap:6px">${rankIcon(c,22)}${esc(cname(c))}</b><span class="sm">${esc(w.name)}</span></div>
      <div class="sm">"${esc(c.slogan)}" · ${esc(c.sector)}</div></div></div>
     ${logInfoHtml(c,w)}
     <div><button class="btn sm2" data-act="mapcli" data-id="${c.id}" aria-pressed="${UI.mapCli===c.id}">${UI.mapCli===c.id?'Nascondi dalla mappa':'Mostra sulla mappa'}</button></div>
@@ -2486,6 +2588,7 @@ const VIEWS={
     detail=`<div class="card pend">
      <div style="display:flex;gap:10px;align-items:center">${logoSvg(sel.name,48)}<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
      <div class="row"><span class="h3" style="display:flex;align-items:center;gap:8px">${rankIcon(sel,26)}${esc(sel.name)}</span><span class="pill" style="background:var(--yellow)">scade il ${shortDate(sel.deadline)}</span></div>
+     <div class="sm">${kw('zona','Zona')}: <b>${esc(zoneName(sel.zone))}</b>${S.clients.some(c=>c.name===sel.name&&c.status!=='perso')?` · già nostra committente in: ${S.clients.filter(c=>c.name===sel.name&&c.status!=='perso').map(c=>esc(zoneName(c.zone))).join(', ')}`:''}</div>
      <div class="sm">"${esc(sel.slogan)}" · ${esc(sel.sector)}</div></div></div>
      ${logInfoHtml(sel,whById(UI.bid.wh))}
      <table class="t num"><tr><td>Volume</td><td class="r">${n0(sel.pal)} pallet/mese · ${n0(sel.stock)} posti</td></tr>
@@ -2500,8 +2603,8 @@ const VIEWS={
       <button class="btn pri" data-act="bid" data-id="${sel.id}" ${e&&e.fits?'':'disabled'}>${sel.bid?'Aggiorna offerta':'Invia offerta'}</button></div>
     </div>`;
   }
-  return `${open.length>1?`<div class="tabs" role="tablist">${open.map(t=>`<button role="tab" aria-selected="${t.id===(sel&&sel.id)}" data-act="seltender" data-id="${t.id}" style="display:flex;align-items:center;justify-content:center;gap:6px">${rankIcon(t,18)}${esc(t.name)}${t.bid?' ✓':''}</button>`).join('')}</div>`:''}${detail}
-   ${done.length?`<div class="lab">Risultati recenti</div>`+done.map(t=>`<div class="row sm"><span>${esc(t.name)}</span><span class="${t.result&&t.result.win?'ok':'bad'}">${t.result?(t.result.win?'Vinta':t.bid?`Persa contro ${esc(t.result.by)}`:`Non partecipato · ${esc(t.result.by)}`):''}</span></div>`).join(''):''}`;
+  return `${open.length>1?`<div class="tabs" role="tablist">${open.map(t=>`<button role="tab" aria-selected="${t.id===(sel&&sel.id)}" data-act="seltender" data-id="${t.id}" style="display:flex;align-items:center;justify-content:center;gap:6px">${rankIcon(t,18)}<span>${esc(t.name)}${t.bid?' ✓':''}<br><span class="sm">${esc(zoneName(t.zone))}</span></span></button>`).join('')}</div>`:''}${detail}
+   ${done.length?`<div class="lab">Risultati recenti</div>`+done.map(t=>`<div class="row sm"><span>${esc(t.name)} · ${esc(zoneName(t.zone))}</span><span class="${t.result&&t.result.win?'ok':'bad'}">${t.result?(t.result.win?'Vinta':t.bid?`Persa contro ${esc(t.result.by)}`:`Non partecipato · ${esc(t.result.by)}`):''}</span></div>`).join(''):''}`;
  },
  personale(){
   const ks=S.warehouses.map(w=>[w,w.kpi||computeWH(w)]), pn=planNeed(), pq=S.queue.filter(q=>q.role==='plan').length;
@@ -2712,7 +2815,7 @@ const VIEWS={
       rows.push(`<tr class="tot"><th>${n}</th>${td('A'+n,'Totale azienda','','Totale azienda',1)}${td('B'+n,pct(m('P')),'',`=MEDIA(B2:B${n-1})`)}${td('C'+n,'','')}${td('D'+n,pct(m('A')),'',`=MEDIA(D2:D${n-1})`)}${td('E'+n,'','')}${td('F'+n,pct(m('sat')*100),'',`=MEDIA(F2:F${n-1})`)}${td('G'+n,Math.round(m('mor')),'',`=MEDIA(G2:G${n-1})`)}${td('H'+n,eur(ws.reduce((a,x)=>a+x.rev-x.cost,0)),'',`=SOMMA(H2:H${n-1})`)}${td('I'+n,'','')}</tr>`);}
   } else if(sh==='cli'){
     const cl=S.clients.filter(c=>c.status!=='perso'&&c.status!=='avvio'); const c=cl.find(x=>x.id===UI.sel.cli)||cl[0];
-    pre=`<div class="xl-cli">${cl.map(x=>`<button data-act="selcli" data-id="${x.id}" aria-pressed="${c&&x.id===c.id}">${logoSvg(x.name,20)}${esc(x.name)}</button>`).join('')||'<span class="sm">Nessun cliente attivo.</span>'}</div>`;
+    pre=`<div class="xl-cli">${cl.map(x=>`<button data-act="selcli" data-id="${x.id}" aria-pressed="${c&&x.id===c.id}">${logoSvg(x.name,20)}${esc(cname(x))}</button>`).join('')||'<span class="sm">Nessun cliente attivo.</span>'}</div>`;
     head=['Settimana','Puntualità','Richiesta','Accuratezza','Richiesta','Soddisfazione','Magazzino'];
     if(c){ const hs=W.map(x=>({d:x.d,...((x.cli||{})[c.id]||{})})).filter(x=>x.P!=null);
       hs.slice(-12).forEach((h,i)=>{const r=i+2;
@@ -2993,7 +3096,7 @@ const SUGG={
 function coNames(){const cog=startSel.ceo==='custom'?startSel.cc.cognome.trim():CEOS.find(c=>c.id===startSel.ceo).name.split(' ').pop();
   return [...(cog?[`Trasporti ${cog}`,`${cog} Logistica`,`Autotrasporti ${cog} & Figli`,`${cog} Express`,`F.lli ${cog} Spedizioni`]:[]),
     'Bancali Veloci','Rampa Nord Logistica','Transpallet Riuniti','Colli Sicuri','Ultimo Miglio & C.','Logistica Padana del Bancale','Interporto delle Langhe','Gommato Trasporti','Sponda Idraulica','Carica e Scarica'];}
-const PROVN={AL:'Alessandria',BG:'Bergamo',BS:'Brescia',GE:'Genova',LO:'Lodi',MI:'Milano',NO:'Novara',PV:'Pavia',TO:'Torino'};
+const PROVN=PROV_CAP; // sportello della Camera di Commercio: il capoluogo della provincia del magazzino
 const startCeo=()=>startSel.ceo==='custom'?CEOS.find(c=>c.id===startSel.cc.base):CEOS.find(c=>c.id===startSel.ceo);
 const defCo=()=>startSel.ceo==='custom'?ccCompany(startSel.cc):CEOS.find(c=>c.id===startSel.ceo).company;
 const coName=()=>(startSel.name||defCo()).trim()||defCo();
@@ -3075,7 +3178,7 @@ function stepVisura(){
   const B=startCeo(), s=SITES[B.site], C=startSel.ceo==='custom'?ccCeo(startSel.cc):B, nm=coName();
   const rea=s.prov+'-'+String(100000+[...nm].reduce((a,ch)=>(a*31+ch.charCodeAt(0))%900000,7)).slice(0,6);
   const row=(k,v)=>`<tr><td>${k}</td><td>${v}</td></tr>`;
-  return `<div class="visura"><div class="vis-h"><div class="vis-ente">Camera di Commercio, Industria, Artigianato e Bancali<br><b>del Nord-Ovest</b> · sportello di ${esc(PROVN[s.prov]||s.name)}</div><div class="sm">Registro delle Imprese<br>Visura ordinaria della società</div></div>
+  return `<div class="visura"><div class="vis-h"><div class="vis-ente">Camera di Commercio, Industria, Artigianato e Bancali<br><b>del Nord</b> · sportello di ${esc(PROVN[s.prov]||s.name)}</div><div class="sm">Registro delle Imprese<br>Visura ordinaria della società</div></div>
    <div class="insegna" style="border-color:${startSel.color}">${coLogoSvg(startSel.logo,startSel.color,56)}<div style="min-width:0"><b class="disp">${esc(nm)}</b>${startSel.claim.trim()?`<i>${esc(startSel.claim.trim())}</i>`:''}</div></div>
    <table class="t vis-t">${row('Denominazione',`<b>${esc(nm)} S.r.l.</b>`)}${row('Forma giuridica','Società a responsabilità limitata')}${row('Sede legale',`${esc(s.name)} (${s.prov})`)}${row('Numero REA',rea)}
     ${row('Attività prevalente','60.24 · Trasporto di merci su strada')}${row('Oggetto sociale','Trasporto, deposito e movimentazione di merci per conto terzi, fino all\'ultimo pallet.')}
@@ -3093,6 +3196,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.16',t:'Tutto il Nord',x:['La mappa arriva fino a Trieste: Emilia-Romagna, Veneto, Trentino-Alto Adige e Friuli-Venezia Giulia sono giocabili, con 22 nuove città e 47 province nella lente.','10 nuovi magazzini in affitto, da Piacenza Le Mose a Trieste Fernetti.','14 nuove committenti: prosciutto, ceramica, motori, piadine, spumanti, occhiali, mele, caffè, cucine, scarponi e altro.','Gare per zona: una provincia, un gruppo di province (Romagna, Pianura Padana, Asse del Brennero…), una regione o più regioni. La stessa committente può aprire più gare per zone diverse e avere più contratti con te.','I volumi di una gara dipendono dagli abitanti della zona.']},
  {v:'0.15',t:'Acqua, frutta e asilo',x:['Nuovo albero Welfare: boccioni d\'acqua, servizio frutta, mensa, pulmini per i dipendenti, asilo aziendale e area cani.','I servizi di welfare si ricercano una volta e poi si installano magazzino per magazzino: alzano il morale e accorciano le assunzioni in quel sito.','Ogni tecnologia ha ora una breve descrizione di cosa è, oltre all\'effetto.']},
  {v:'0.14',t:'Sotto il cofano',x:['Nel Riepilogo la scheda Modificatori: da cosa dipendono puntualità, accuratezza e morale di ogni magazzino, voce per voce.','Talenti di CEO, manager e dirigenti con i loro effetti, tecnologie e dove sono installate, effetti degli eventi in corso con la scadenza.']},
  {v:'0.13',t:'Curriculum e visura',x:['Pulsanti «Suggerisci» per nome e cognome del CEO e per il nome dell\'azienda.','La creazione del CEO va a passaggi: identità (con soprannome e motto), abilità, studi e carattere.','Alla fine il CEO firma il suo curriculum vitae in formato europeo.','Ogni azienda ha logo, claim e colore, e si iscrive alla Camera di Commercio con tanto di timbro.']},
@@ -3147,7 +3251,7 @@ function stepScelta(){const sv=load();
     <b class="disp" style="font-size:18px">${cc&&ccName(cc)?esc(ccName(cc)):'Crea il tuo CEO'}</b><span class="sm">Nome, abilità, titolo di studio e carattere li scegli tu</span>
     ${cc?`<span>${statChips(ccStats(cc),14)}</span>${talentIcons(ccTal(cc),32)}`:`<span class="sm" style="color:var(--ink)">${CC_PTS} punti da distribuire tra abilità e talenti</span>`}</button>`;})();
   return `<div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
-   <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord-Ovest. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
+   <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord Italia, da Torino a Trieste. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
    ${newsCard()}
    ${installCard()}
    ${sv&&sv.S&&!sv.S.over?`<div class="card pend"><div class="row"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><button class="btn pri" data-act="continue">Continua la partita</button></div></div>`:''}
@@ -3230,6 +3334,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,mod,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS};
+window.__FUP={get S(){return S;},step,mod,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW};
 })();
 </script>
