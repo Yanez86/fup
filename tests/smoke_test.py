@@ -301,6 +301,28 @@ async def main():
           evs.forEach(e=>e.opts.forEach((o,i)=>{const ev={...e};try{if(ev.setup)ev.setup(ev);if(!ev.text)bad.push(e.id+': testo');o.f.call(ev);}catch(x){bad.push(e.id+'/'+i+': '+x);}}));
           return {n:evs.length,bad};}''')
         assert r['n'] >= 30 and not r['bad'], r
+        # ogni committente ha logo, zone valide e provenienza; tante gare piccole
+        r = await pg.evaluate('''()=>{const F=window.__FUP,bad=[];F.newGame('marco');
+          F.TENDER_POOL.forEach(t=>{const ci=F.CINFO[t.name];if(!F.LOGO[t.name])bad.push(t.name+': logo');if(!ci){bad.push(t.name+': CINFO');return;}
+            ci.zones.forEach(z=>{if(!F.ZONES[z])bad.push(t.name+': zona '+z);});if(!F.ORIGINS[ci.src])bad.push(t.name+': origine');});
+          F.EVENTS.forEach(e=>{const ev={...e};if(ev.setup)try{ev.setup(ev);}catch(x){}(ev.opts||[]).concat(e.opts).forEach(o=>{if(!o.r)bad.push(e.id+': testo del risultato');});});
+          const S=F.S;let small=0,n=0;for(let i=0;i<300;i++){S.tenders=[];F.newTender();const t=S.tenders[0];n++;if(F.ZONES[t.zone].k==='prov'||F.ZONES[t.zone].k==='grp')small++;}
+          return {bad,small:small/n,open:F.S.tenders.length};}''')
+        assert not r['bad'] and r['small'] > 0.4, r
+        # eventi: l'effetto della scelta arriva il giorno dopo, con il racconto di com'è andata
+        await pg.evaluate("()=>{const F=window.__FUP;F.newGame('marco');F.S.speed=0;document.querySelector('#modal').innerHTML='';F.S.nextEvent=1e9;const e=F.EVENTS.find(x=>x.id==='cesto');F.S.seen={};const old=e.cond;e.cond=()=>true;F.EVENTS.forEach(x=>{if(x!==e)F.S.seen[x.id]=F.S.day;});F.fireEvent();e.cond=old;}")
+        cash0 = await pg.evaluate('()=>window.__FUP.S.cash')
+        await pg.click('#modal [data-act=evopt][data-i="0"]')
+        r = await pg.evaluate('()=>{const S=window.__FUP.S;return {cash:S.cash,pend:S.evPend.length,altro:S.cur.altro}}')
+        assert r['cash'] == cash0 and r['pend'] == 1, r
+        altro0 = r['altro']
+        await pg.evaluate("()=>{const F=window.__FUP;F.step();}")
+        txt = await pg.inner_text('#modal')
+        assert "Com'è andata" in txt and 'panettone' in txt, txt
+        await pg.screenshot(path=os.path.join(OUT, 'shot_evento_risultato.png'))
+        r = await pg.evaluate('()=>{const S=window.__FUP.S;return {altro:S.cur.altro,pend:S.evPend.length}}')
+        assert r['altro'] - altro0 == 2500 and r['pend'] == 0, r
+        await pg.click('#modal [data-act=closemodal]')
         for ceo in ['gino','edoardo','valeria','marco','custom']:
             print(await pg.evaluate(BOT, ceo))
         # riepilogo dell'azienda dopo tre anni: storico mensile e tutte le schede
