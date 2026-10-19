@@ -3253,7 +3253,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.16',t:'Chi ripara il portone?',x:['Nuova figura in ogni magazzino: il facility manager. Senza di lui niente manutenzione, il magazzino si rovina e capitano guasti.','Lo stato del magazzino va da 0 a 100: sotto il 70% si perdono posti pallet e produttività.','Manutenzione straordinaria per tornare subito al 100%.','I magazzini si possono ampliare fino a tre volte, con un cantiere di 90 giorni.','12 nuovi servizi di welfare: caffè, sala pausa, spogliatoi, lavanderia, palestra, presidio medico, sportello d\'ascolto, corsi di italiano, raffrescatori, orto, colonnine di ricarica.']},
+ {v:'0.17',t:'Chi ripara il portone?',x:['Le novità ora stanno in fondo alla schermata iniziale.','Nuova figura in ogni magazzino: il facility manager. Senza di lui niente manutenzione, il magazzino si rovina e capitano guasti.','Lo stato del magazzino va da 0 a 100: sotto il 70% si perdono posti pallet e produttività.','Manutenzione straordinaria per tornare subito al 100%.','I magazzini si possono ampliare fino a tre volte, con un cantiere di 90 giorni.','12 nuovi servizi di welfare: caffè, sala pausa, spogliatoi, lavanderia, palestra, presidio medico, sportello d\'ascolto, corsi di italiano, raffrescatori, orto, colonnine di ricarica.']},
  {v:'0.16',t:'Tutto il Nord',x:['La mappa arriva fino a Trieste: Emilia-Romagna, Veneto, Trentino-Alto Adige e Friuli-Venezia Giulia sono giocabili, con 22 nuove città e 47 province nella lente.','10 nuovi magazzini in affitto, da Piacenza Le Mose a Trieste Fernetti.','14 nuove committenti: prosciutto, ceramica, motori, piadine, spumanti, occhiali, mele, caffè, cucine, scarponi e altro.','Gare per zona: una provincia, un gruppo di province (Romagna, Pianura Padana, Asse del Brennero…), una regione o più regioni. La stessa committente può aprire più gare per zone diverse e avere più contratti con te.','I volumi di una gara dipendono dagli abitanti della zona.']},
  {v:'0.15',t:'Acqua, frutta e asilo',x:['Nuovo albero Welfare: boccioni d\'acqua, servizio frutta, mensa, pulmini per i dipendenti, asilo aziendale e area cani.','I servizi di welfare si ricercano una volta e poi si installano magazzino per magazzino: alzano il morale e accorciano le assunzioni in quel sito.','Ogni tecnologia ha ora una breve descrizione di cosa è, oltre all\'effetto.']},
  {v:'0.14',t:'Sotto il cofano',x:['Nel Riepilogo la scheda Modificatori: da cosa dipendono puntualità, accuratezza e morale di ogni magazzino, voce per voce.','Talenti di CEO, manager e dirigenti con i loro effetti, tecnologie e dove sono installate, effetti degli eventi in corso con la scadenza.']},
@@ -3310,7 +3310,6 @@ function stepScelta(){const sv=load();
     ${cc?`<span>${statChips(ccStats(cc),14)}</span>${talentIcons(ccTal(cc),32)}`:`<span class="sm" style="color:var(--ink)">${CC_PTS} punti da distribuire tra abilità e talenti</span>`}</button>`;})();
   return `<div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
    <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord Italia, da Torino a Trieste. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
-   ${newsCard()}
    ${installCard()}
    ${sv&&sv.S&&!sv.S.over?`<div class="card pend"><div class="row"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><button class="btn pri" data-act="continue">Continua la partita</button></div></div>`:''}
    <div class="lab">Scegli il tuo CEO</div><div class="ceos five">${st}</div>`;}
@@ -3320,7 +3319,7 @@ function showStart(){
   const next={scelta:nextBtn(startSel.ceo==='custom'?'Crea il CEO':'Avanti: l\'azienda'),cc1:nextBtn('Avanti: abilità'),cc2:nextBtn('Avanti: studi e carattere'),cc3:nextBtn('Vedi il curriculum'),cv:nextBtn('Confermo, è tutto vero'),az:nextBtn('Iscrivi alla Camera di Commercio'),
     visura:startSel.stamp?`<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Inizia la partita ›</button>`:`<button class="btn pri" data-act="stamp" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Timbra la visura</button>`}[k];
   $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP · versione ${VER}</span><span>Nord-Ovest, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
-   ${k!=='scelta'?stepper():''}${body}${stNav(next)}</div></div>`;
+   ${k!=='scelta'?stepper():''}${body}${stNav(next)}${k==='scelta'?newsCard():''}</div></div>`;
   if(lastStep!==k){$('#start').scrollTop=0;lastStep=k;}
 }
 let lastStep='';
