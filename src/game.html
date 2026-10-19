@@ -278,9 +278,9 @@ const DIR_ROLES=[
 const TENDER_POOL=[
  {name:'Caseificio Galbanone',slogan:'Così buono che si sente',sector:'Freschi',stock:600,pal:480,sP:93,sA:96,diff:0,req:['freddo']},
  {name:'Ferramenta Bullonati',slogan:'Ogni vite ha il suo dado',sector:'Ferramenta',stock:500,pal:250,sP:90,sA:97,diff:-3},
- {name:'ElettroUnieuri',slogan:'Io non sono mica scemo',sector:'Elettronica',stock:900,pal:600,sP:90,sA:99,diff:5},
+ {name:'ElettroUnieuri',slogan:'Io non sono mica scemo',sector:'Elettronica',stock:900,pal:600,sP:94,sA:99,diff:5},
  {name:'FarmaSpa',slogan:'Lotti tracciati, sonni tranquilli',sector:'Farmaceutico',stock:400,pal:200,sP:97,sA:99.5,diff:8,req:['freddo']},
- {name:'Esselonga',slogan:'Il buyer vuole tre copie a mano',sector:'GDO',stock:1500,pal:2400,sP:98,sA:95,diff:10,req:['edi']},
+ {name:'Esselonga',slogan:'Il buyer vuole tre copie a mano',sector:'GDO',stock:1500,pal:2400,sP:98,sA:97,diff:10,req:['edi']},
  {name:'Birrificio Mortetti',slogan:'Baffi e luppolo dal 1859',sector:'Bevande',stock:800,pal:700,sP:92,sA:95,diff:0},
  {name:'Acque San Pellegrinetto',slogan:'Bollicine di montagna, quasi',sector:'Bevande',stock:1200,pal:900,sP:91,sA:94,diff:2},
  {name:'Arredamenti Ikeo',slogan:'Montalo tu, se ci riesci',sector:'Arredamento',stock:1000,pal:300,sP:90,sA:97,diff:3},
@@ -289,10 +289,45 @@ const TENDER_POOL=[
  {name:'Crema Spalmella',slogan:'Il cucchiaino è compreso nel prezzo',sector:'Dolciario',stock:500,pal:450,sP:95,sA:97,diff:4},
  {name:'Riso Scotto dei Navigli',slogan:'Chicchi lombardi, mai scotti',sector:'Alimentare secco',stock:650,pal:280,sP:91,sA:null,diff:-2},
  {name:'Zalandini',slogan:'Resi gratuiti, anche dei calzini',sector:'E-commerce moda',stock:900,pal:1200,sP:96,sA:98,diff:4,req:['ecom']},
- {name:'Amazzonia Italia',slogan:'Lo vuoi? È già in viaggio',sector:'E-commerce',stock:2000,pal:3000,sP:98,sA:98,diff:10,req:['ecom','edi']},
+ {name:'Amazzonia Italia',slogan:'Lo vuoi? È già in viaggio',sector:'E-commerce',stock:2000,pal:3000,sP:98,sA:99,diff:10,req:['ecom','edi']},
  {name:'Spesa Veloce',slogan:'La spesa a casa in un\'ora',sector:'E-commerce alimentare',stock:600,pal:900,sP:97,sA:97,diff:3,req:['ecom','freddo']},
- {name:'Spedizioni Tricolore',slogan:'Da Aosta a Lampedusa in 48 ore',sector:'Pacchi',stock:1500,pal:2500,sP:95,sA:97,diff:6}
+ {name:'Spedizioni Tricolore',slogan:'Da Aosta a Lampedusa in 48 ore',sector:'Pacchi',stock:1500,pal:2500,sP:97,sA:98,diff:6},
+ {name:'Discount Prezzaccio',slogan:'Sottocosto, anche il trasportatore',sector:'GDO discount',stock:500,pal:700,sP:88,sA:null,diff:-6},
+ {name:'Mobili Truciolotto',slogan:'Si monta da solo. E si smonta da solo',sector:'Arredamento low cost',stock:400,pal:150,sP:85,sA:92,diff:-6}
 ];
+// RANK delle committenti: media di 4 voti 0-100. Il voto sui ricavi si calcola dai volumi; gli altri tre sono [desiderabilità, pubblicità, solidità]
+const RANK_F={
+ 'Pastificio Rummolo':[55,40,60],'Mobilificio Brianzolo':[50,35,50],'Unilevante Italia':[60,60,65],'Caffè Portuale':[55,35,55],
+ 'Caseificio Galbanone':[70,70,75],'Ferramenta Bullonati':[40,15,45],'ElettroUnieuri':[70,80,85],'FarmaSpa':[85,85,95],
+ 'Esselonga':[55,95,90],'Birrificio Mortetti':[55,50,55],'Acque San Pellegrinetto':[45,50,55],'Arredamenti Ikeo':[55,65,60],
+ 'Moda Armandi':[65,85,70],'Pneumatici Pirello':[70,75,80],'Crema Spalmella':[70,80,75],'Riso Scotto dei Navigli':[60,35,55],
+ 'Zalandini':[50,75,60],'Amazzonia Italia':[50,98,85],'Spesa Veloce':[45,55,45],'Spedizioni Tricolore':[50,75,70],
+ 'Discount Prezzaccio':[15,10,25],'Mobili Truciolotto':[25,15,30]
+};
+const RANKS=[ // soglia minima della media, colori, effetti
+ {r:'S',min:80,bg:'R',fg:'W',rev:1.15,comp:6,win:6,lost:10,fl:'Il nome che i commerciali scrivono in grassetto nel CV.'},
+ {r:'A',min:68,bg:'O',fg:'W',rev:1.08,comp:3,win:4,lost:7,fl:'Clienti da accordo quadro: una firma a Milano, venti magazzini in Italia.'},
+ {r:'B',min:58,bg:'Y',fg:'K',rev:1.03,comp:0,win:2,lost:4,fl:'Buoni clienti: pagano, crescono e ogni tanto ringraziano.'},
+ {r:'C',min:46,bg:'G',fg:'W',rev:1,comp:0,win:1,lost:3,fl:'Il pane quotidiano del magazzino.'},
+ {r:'D',min:36,bg:'B',fg:'K',rev:0.97,comp:-3,win:0,lost:2,fl:'Pagano a 120 giorni, se va bene.'},
+ {r:'F',min:0,bg:'D',fg:'S',rev:0.88,comp:-6,win:-1,lost:1,fl:'Li prendi per riempire il capannone. Poi ti chiedi perché.'}
+];
+const NAZ_REQ={tech:'accordi',wh:3,rep:65}; // requisiti per le committenti S e A
+function rankScore(c){
+  const b=TENDER_POOL.find(t=>t.name===c.name)||c, f=RANK_F[c.name]||[50,40,50];
+  const ric=Math.max(0,Math.min(100,Math.round(10+(2*b.pal+b.stock)/60)));
+  return {ric,des:f[0],pub:f[1],sol:f[2],avg:(ric+f[0]+f[1]+f[2])/4};
+}
+const rankOf=c=>{const a=rankScore(c).avg;return RANKS.find(x=>a>=x.min);};
+const isNaz=c=>['S','A'].includes(rankOf(c).r);
+// requisiti mancanti per partecipare a una gara di rank S o A
+function nazMissing(c){
+  if(!isNaz(c)) return [];
+  const m=[]; if(!R(NAZ_REQ.tech)) m.push('ricerca Accordi quadro nazionali');
+  if(S.warehouses.length<NAZ_REQ.wh) m.push(`almeno ${NAZ_REQ.wh} magazzini (ne hai ${S.warehouses.length})`);
+  if(S.rep<NAZ_REQ.rep) m.push(`reputazione ${NAZ_REQ.rep} (hai ${Math.round(S.rep)})`);
+  return m;
+}
 const RIVALS=['Gruppo Bartolazzi','Logistix Global','F.lli Brambilla Autotrasporti','Cooperativa La Fatica'];
 const TECH=[
  {id:'barcode',tree:'log',tier:1,row:0,name:'Lettori barcode',year:2002,cost:6000,days:20,inst:12000,mese:150,A:1.5,weeks:2,desc:'Meno errori di prelievo.'},
@@ -317,6 +352,7 @@ const TECH=[
  {id:'edi',tree:'mkt',tier:2,row:0,req:['commerciale'],name:'EDI con i clienti',year:2003,cost:30000,days:50,desc:'Ordini automatici: soddisfazione +1 al mese sopra soglia. Richiesto dalla grande distribuzione.'},
  {id:'marketing',tree:'mkt',tier:2,row:1,req:['commerciale'],name:'Marketing e fiere',year:2002,cost:25000,days:40,desc:'Stand alle fiere di settore: reputazione +5 subito e +0,2 al mese.'},
  {id:'kam',tree:'mkt',tier:3,row:0,req:['edi'],name:'Key account management',year:2005,cost:40000,days:60,desc:'Un referente per ogni grande cliente: soddisfazione +1 al mese, rinnovo da 40 invece di 50.'},
+ {id:'accordi',tree:'mkt',tier:4,row:1,req:['kam'],name:'Accordi quadro nazionali',year:2006,cost:60000,days:90,desc:'Contratti nazionali con i grandi gruppi: sblocca le gare delle committenti S e A (servono anche 3 magazzini e reputazione 65).'},
  {id:'ecom',tree:'mkt',tier:4,row:0,req:['kam','marketing'],name:'Logistica e-commerce',year:2012,cost:70000,days:90,desc:'Sblocca le gare dei negozi online: tanti ordini, volumi alti, KPI esigenti.'}
 ];
 const TREES=[['log','Logistica','Tecnologie da installare in ogni magazzino.'],['org','Sviluppo aziendale','Organizzazione, persone e controllo: valgono per tutta l\'azienda.'],['mkt','Mercato','Accesso a nuovi clienti e gare: valgono per tutta l\'azienda.']];
@@ -356,7 +392,7 @@ const TALENTS={
  'Tifo sfegatato':{t:'mix',fx:'Leadership +1 · Eventi speciali nei giorni del derby',fl:'Il giorno del derby il magazzino si ferma. Anche lui.',ic:['..KKKK..','.KWWWWK.','KWWKKWWK','KWKKKKWK','KWWKKWWK','KWWWWWWK','.KWWWWK.','..KKKK..']}
 };
 const TTYPE={pos:['Positivo','#eaf6ec','#6fdc8c'],neg:['Negativo','#fbecec','#ff8a8d'],mix:['Misto','#fff6dc','#ffd23f']};
-const TECH_IC={"barcode":["............",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","RRRRRRRRRRRR",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","............",".K.K.KK.K.K.","............"],"formazione":["............",".NNNNNNNNNN.",".NDDDDDDDDN.",".NDWWDDDDDN.",".NDDDWWWDDN.",".NDWWWDDDDN.",".NDDDDDWWDN.",".NDDDDDDDDN.",".NNNNNNNNNN.","....N..N....","...N....N...","............"],"gps":["....RRRR....","...RRRRRR...","..RRRWWRRR..","..RRWWWWRR..","..RRWWWWRR..","..RRRWWRRR..","...RRRRRR...","....RRRR....",".....RR.....","..GG.RR.GG..",".GGGGGGGGGG.","............"],"wms":["............",".KKKKKKKKKK.",".KBBBBBBBBK.",".KBYYBOOBBK.",".KBSSSSSSBK.",".KBGGBYYBBK.",".KBSSSSSSBK.",".KKKKKKKKKK.",".....KK.....","...KKKKKK...","............","............"],"anticoll":[".....YY.....","....YKKY....","....YKKY....","...YYKKYY...","...YYKKYY...","..YYYKKYYY..","..YYYKKYYY..",".YYYYYYYYYY.",".YYYYKKYYYY.","YYYYYYYYYYYY","KKKKKKKKKKKK","............"],"rotte":["..........R.",".........RRR","..........R.","........DD..",".....DDD....","....D.......","....D.......",".....DDD....","........D...",".G.......D..","GGG..DDDD...",".G.........."],"rf":["..........B.","........B..B","..KKKKK..B.B","..KBBBK...B.","..KBBBK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","...KKK......","............"],"verticale":["..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..DYY.OOBD..","..DDDDDDDD..","..DBB.YYOD..","..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..D......D..","..D......D..",".KKKKKKKKKK."],"ptl":["............","GGG.YYY.RRR.","GGG.YYY.RRR.","............","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","............"],"amr":[".....YY.....",".....KK.....","..KKKKKKKK..","..KSSSSSSK..","..KSBSSBSK..","..KSSSSSSK..","..KSRRRRSK..","..KKKKKKKK..",".KOOOOOOOOK.",".KOOOOOOOOK.",".KKKKKKKKKK.","..KK....KK.."],"gestionale":["..KKKKKKK...","..KWWWWWKK..","..KWKKKWWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWWWGGGK..","..KWWWGGGK..","..KWWWWWWK..","..KKKKKKKK.."],"hr":["............","...SSSS.....","..S.FF.S....",".S.FFFF.S...",".S.FFFF.S...",".S.BBBB.S...","..SBBBBS....","...SSSSN....",".......NN...","........NN..",".........NN.","............"],"direzione":["............","....YYYY....","....YYYY....",".....KK.....",".KKKKKKKKKK.",".K...KK...K.",".K...KK...K.","BBB.OOOO.GGG","BBB.OOOO.GGG","BBB.OOOO.GGG","............","............"],"welfare2":["............","..RR....RR..",".RRRR..RRRR.","RRRRRWWRRRRR","RRRRRWWRRRRR","RRRWWWWWWRRR",".RRWWWWWWRR.","..RRRWWRRR..","...RRWWRR...","....RRRR....",".....RR.....","............"],"controllo":["............","............","K.......GG..","K.......GG..","K....BB.GG..","K....BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","KKKKKKKKKKKK","............","............"],"academy":["............",".....KK.....","...KKKKKK...",".KKKKKKKKKK.","KKKKKKKKKKKK",".KKKKKKKKKKY","..KKKKKKKK.Y","..KDDDDDDK.Y","..KDDDDDDK.Y","...KKKKKK.YY","..........YY","............"],"iso":["..BB....BB..","...BB..BB...","....BBBB....","....YYYY....","..YYYYYYYY..",".YYYYWYYYYY.",".YYYWWWYYYY.",".YYYYWYYYYY.",".YYYYYYYYYY.","..YYYYYYYY..","....YYYY....","............"],"commerciale":["............","..KKKKKKKK..",".KRRRRRRRRK.","KRRKK..KKRRK","KRK......KRK",".K..KKKK..K.","...KRRRRK...","..KRWRWRRK..","..KRRWRWRK..","..KRWRWRRK..","..KKKKKKKK..","............"],"freddo":[".....BB.....","..B..BB..B..","...B.BB.B...","....BBBB....","BBBBBWWBBBBB","BBBBBWWBBBBB","....BBBB....","...B.BB.B...","..B..BB..B..",".....BB.....","............","............"],"edi":["KKKKK.......","KBBBK.......","KBBBK..O....","KKKKK.OOOOO.","..K....O....",".KKK........",".......KKKKK","....O..KBBBK","...OOOOKBBBK","....O..KKKKK",".........K..","........KKK."],"marketing":["............",".........KK.",".......KKOK.",".....KKOOOK.","..KKKOOOOOK.",".KWKOOOOOOK.",".KWKOOOOOOK.","..KKKOOOOOK.","...K.KKOOOK.","...K...KKOK.","...KK....KK.","............"],"kam":["........Y...",".......YYY..","...FF...Y...","..FFFF......","..FFFF......","...FF.......",".DDDDDD.....","DDDWWDDD....","DDDDRDDD....","DDDDRDDD....","DDDDDDDD....","............"],"ecom":["............","KK..........",".K..........",".KOOOOOOOOK.",".KOWOOWOOOK.",".KOOOOOOOK..","..KOOOOOOK..","..KKKKKKKK..","..K.........","..KKKKKKKKK.","...KK...KK..","............"]};
+const TECH_IC={"barcode":["............",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","RRRRRRRRRRRR",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","............",".K.K.KK.K.K.","............"],"formazione":["............",".NNNNNNNNNN.",".NDDDDDDDDN.",".NDWWDDDDDN.",".NDDDWWWDDN.",".NDWWWDDDDN.",".NDDDDDWWDN.",".NDDDDDDDDN.",".NNNNNNNNNN.","....N..N....","...N....N...","............"],"gps":["....RRRR....","...RRRRRR...","..RRRWWRRR..","..RRWWWWRR..","..RRWWWWRR..","..RRRWWRRR..","...RRRRRR...","....RRRR....",".....RR.....","..GG.RR.GG..",".GGGGGGGGGG.","............"],"wms":["............",".KKKKKKKKKK.",".KBBBBBBBBK.",".KBYYBOOBBK.",".KBSSSSSSBK.",".KBGGBYYBBK.",".KBSSSSSSBK.",".KKKKKKKKKK.",".....KK.....","...KKKKKK...","............","............"],"anticoll":[".....YY.....","....YKKY....","....YKKY....","...YYKKYY...","...YYKKYY...","..YYYKKYYY..","..YYYKKYYY..",".YYYYYYYYYY.",".YYYYKKYYYY.","YYYYYYYYYYYY","KKKKKKKKKKKK","............"],"rotte":["..........R.",".........RRR","..........R.","........DD..",".....DDD....","....D.......","....D.......",".....DDD....","........D...",".G.......D..","GGG..DDDD...",".G.........."],"rf":["..........B.","........B..B","..KKKKK..B.B","..KBBBK...B.","..KBBBK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","...KKK......","............"],"verticale":["..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..DYY.OOBD..","..DDDDDDDD..","..DBB.YYOD..","..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..D......D..","..D......D..",".KKKKKKKKKK."],"ptl":["............","GGG.YYY.RRR.","GGG.YYY.RRR.","............","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","............"],"amr":[".....YY.....",".....KK.....","..KKKKKKKK..","..KSSSSSSK..","..KSBSSBSK..","..KSSSSSSK..","..KSRRRRSK..","..KKKKKKKK..",".KOOOOOOOOK.",".KOOOOOOOOK.",".KKKKKKKKKK.","..KK....KK.."],"gestionale":["..KKKKKKK...","..KWWWWWKK..","..KWKKKWWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWWWGGGK..","..KWWWGGGK..","..KWWWWWWK..","..KKKKKKKK.."],"hr":["............","...SSSS.....","..S.FF.S....",".S.FFFF.S...",".S.FFFF.S...",".S.BBBB.S...","..SBBBBS....","...SSSSN....",".......NN...","........NN..",".........NN.","............"],"direzione":["............","....YYYY....","....YYYY....",".....KK.....",".KKKKKKKKKK.",".K...KK...K.",".K...KK...K.","BBB.OOOO.GGG","BBB.OOOO.GGG","BBB.OOOO.GGG","............","............"],"welfare2":["............","..RR....RR..",".RRRR..RRRR.","RRRRRWWRRRRR","RRRRRWWRRRRR","RRRWWWWWWRRR",".RRWWWWWWRR.","..RRRWWRRR..","...RRWWRR...","....RRRR....",".....RR.....","............"],"controllo":["............","............","K.......GG..","K.......GG..","K....BB.GG..","K....BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","KKKKKKKKKKKK","............","............"],"academy":["............",".....KK.....","...KKKKKK...",".KKKKKKKKKK.","KKKKKKKKKKKK",".KKKKKKKKKKY","..KKKKKKKK.Y","..KDDDDDDK.Y","..KDDDDDDK.Y","...KKKKKK.YY","..........YY","............"],"iso":["..BB....BB..","...BB..BB...","....BBBB....","....YYYY....","..YYYYYYYY..",".YYYYWYYYYY.",".YYYWWWYYYY.",".YYYYWYYYYY.",".YYYYYYYYYY.","..YYYYYYYY..","....YYYY....","............"],"commerciale":["............","..KKKKKKKK..",".KRRRRRRRRK.","KRRKK..KKRRK","KRK......KRK",".K..KKKK..K.","...KRRRRK...","..KRWRWRRK..","..KRRWRWRK..","..KRWRWRRK..","..KKKKKKKK..","............"],"freddo":[".....BB.....","..B..BB..B..","...B.BB.B...","....BBBB....","BBBBBWWBBBBB","BBBBBWWBBBBB","....BBBB....","...B.BB.B...","..B..BB..B..",".....BB.....","............","............"],"edi":["KKKKK.......","KBBBK.......","KBBBK..O....","KKKKK.OOOOO.","..K....O....",".KKK........",".......KKKKK","....O..KBBBK","...OOOOKBBBK","....O..KKKKK",".........K..","........KKK."],"marketing":["............",".........KK.",".......KKOK.",".....KKOOOK.","..KKKOOOOOK.",".KWKOOOOOOK.",".KWKOOOOOOK.","..KKKOOOOOK.","...K.KKOOOK.","...K...KKOK.","...KK....KK.","............"],"accordi":["............",".KKKKKKKK...",".KGGWWRRK...",".KWWWWWWK...",".KWKKKKWK...",".KWWWWWWK...",".KWKKKWWK...",".KWWWWWYYY..",".KWKKWYRRY..",".KWWWWYRRY..",".KKKKKKYY...","........Y.."],"kam":["........Y...",".......YYY..","...FF...Y...","..FFFF......","..FFFF......","...FF.......",".DDDDDD.....","DDDWWDDD....","DDDDRDDD....","DDDDRDDD....","DDDDDDDD....","............"],"ecom":["............","KK..........",".K..........",".KOOOOOOOOK.",".KOWOOWOOOK.",".KOOOOOOOK..","..KOOOOOOK..","..KKKKKKKK..","..K.........","..KKKKKKKKK.","...KK...KK..","............"]};
 const TFRAME={log:{c:'#ff7a3d',bg:'#ffe8d9',cut:[0,0,0],shape:'Quadrato arancione'},org:{c:'#9b6bff',bg:'#ece3ff',cut:[3,2,1],shape:'Ottagono viola'},mkt:{c:'#2e9e48',bg:'#dff3d6',cut:[5,3,2,1,1],shape:'Tondo verde'}};
 function techIcon(t,sz,dim){
   const F=TFRAME[t.tree], N=16; const cut=r=>{const d=Math.min(r,N-1-r);return F.cut[d]||0;};
@@ -369,7 +405,7 @@ function techIcon(t,sz,dim){
   (TECH_IC[t.id]||[]).forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x+2}" y="${y+2}" width="1" height="1" fill="${TPAL[ch]}"/>`;}));
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="flex:none;${dim?'filter:grayscale(1) opacity(.55)':''}" aria-hidden="true">${r}</svg>`;
 }
-const LOGO={"Pastificio Rummolo":{"bg":"R","ic":["....SS.S....","....SSSS....",".....SS.....","..YCYCYCYC..",".YCYCYCYCYC.","KKKKKKKKKKKK","KWWWWWWWWWWK",".KWBBBBBBWK.","..KWWWWWWK..","...KKKKKK...","............","............"]},"Mobilificio Brianzolo":{"bg":"C","ic":["............","............","..RRRRRRRR..",".RRRRRRRRRR.",".RRRRRRRRRR.","RRMRRRRRRMRR","RRMMMMMMMMRR","RRRRRRRRRRRR","RRRRRRRRRRRR",".M........M.",".M........M.","............"]},"Unilevante Italia":{"bg":"B","ic":[".....WW.....",".....WW.....","....WWWW....","....WWWW....","...WWWWWW...","..WWLWWWWW..","..WLLWWWWW..","..WLWWWWWW..","..WWWWWWWW..","...WWWWWW...","....WWWW....","............"]},"Caffè Portuale":{"bg":"N","ic":["...W..W.....","....W..W....","...W..W.....","............",".WWWWWWWW...",".WMMMMMMWWW.",".WWWWWWWWW.W",".WWWWWWWWWW.","..WWWWWWW...","...WWWWW....",".WWWWWWWWWW.","............"]},"Caseificio Galbanone":{"bg":"B","ic":["............","..........Y.","........YYY.","......YYYYY.","....YYYYOYY.","..YYYYYYYYY.","YYYOYYYYYYY.","YYYYYYYOYYY.","YYYYYYYYYYY.","YOYYYYYYYYY.","YYYYYYYYYYY.","............"]},"Ferramenta Bullonati":{"bg":"D","ic":["....SSSS....","...SSSSSS...","..SSSKKSSS..",".SSSKKKKSSS.",".SSKK..KKSS.",".SSKK..KKSS.",".SSSKKKKSSS.","..SSSKKSSS..","...SSSSSS...","....SSSS....","............","............"]},"ElettroUnieuri":{"bg":"R","ic":["......YYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYYYYYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYY.......",".YY.........","Y...........","............"]},"FarmaSpa":{"bg":"W","ic":["....GGGG....","....GGGG....","....GGGG....","....GGGG....","GGGGGGGGGGGG","GGGGGWWGGGGG","GGGGGWWGGGGG","GGGGGGGGGGGG","....GGGG....","....GGGG....","....GGGG....","....GGGG...."]},"Esselonga":{"bg":"R","ic":["............","...WWWWWW...","..WWWWWWWW..","..WWW.......","..WWW.......","...WWWWWW...","....WWWWWW..",".......WWW..",".......WWW..","..WWWWWWWW..","...WWWWWW...","............"]},"Birrificio Mortetti":{"bg":"G","ic":["............","..WWWWWW....",".WWWWWWWW...",".WYYYYYYW...",".KYYYYYYKKK.",".KYCYYYYK.K.",".KYCYYYYK.K.",".KYYYYYYKKK.",".KYYYYYYK...",".KYYYYYYK...",".KKKKKKKK...","............"]},"Acque San Pellegrinetto":{"bg":"L","ic":[".....GG.....",".....GG.....","....GGGG....","...GGGGGG...","...GGGGGG...","...GWWWWG...","...GWRRWG...","...GRRRRG...","...GWRRWG...","...GWWWWG...","...GGGGGG...","....GGGG...."]},"Arredamenti Ikeo":{"bg":"B","ic":["........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","..YYYYYYYY..","..YYYYYYYY..","............","............"]},"Moda Armandi":{"bg":"K","ic":[".....WW.....","....W..W....",".......W....","......W.....",".....WW.....","....W..W....","...W....W...","..W......W..",".W........W.","WWWWWWWWWWWW","............","............"]},"Pneumatici Pirello":{"bg":"Y","ic":["...KKKKKK...","..KKKKKKKK..",".KKKSSSSKKK.","KKKS....SKKK","KKS......SKK","KKS..SS..SKK","KKS..SS..SKK","KKS......SKK","KKKS....SKKK",".KKKSSSSKKK.","..KKKKKKKK..","...KKKKKK..."]},"Crema Spalmella":{"bg":"C","ic":["...RRRRRR...","...RRRRRR...","..KKKKKKKK..","..KWWWWWWK..","..KMMMMMMK..","..KMWWMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KKKKKKKK..","............"]},"Riso Scotto dei Navigli":{"bg":"G","ic":["............","....W..W....","..W..W...W..","...WWWWWW...","..WWWWWWWW..",".WWWWWWWWWW.","KKKKKKKKKKKK","KRRRRRRRRRRK",".KRRRRRRRRK.","..KRRRRRRK..","...KKKKKK...","............"]},"Zalandini":{"bg":"O","ic":["............","..W.........","..WW........","..WWW.......","..WWWW......","..WWWWW.....","..WWWWWW....","..WWWWW.....","..WWWW......","..WWW.......","..WW........","..W........."]},"Amazzonia Italia":{"bg":"K","ic":["............",".NNNNNNNNNN.",".NNNNYYNNNN.",".NNNNYYNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.","............",".O........O.","..O......OO.","...OOOOOOO.."]},"Spesa Veloce":{"bg":"G","ic":["....KKKK....","...K....K...","..KKKKKKKK..","..KWWWWWWK..","..KWWWYWWK..","..KWWYYWWK..","..KWYYYYWK..","..KWWYYWWK..","..KWWYWWWK..","..KWWWWWWK..","..KKKKKKKK..","............"]},"Spedizioni Tricolore":{"bg":"L","ic":["............","............","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","............","............","............"]}};
+const LOGO={"Pastificio Rummolo":{"bg":"R","ic":["....SS.S....","....SSSS....",".....SS.....","..YCYCYCYC..",".YCYCYCYCYC.","KKKKKKKKKKKK","KWWWWWWWWWWK",".KWBBBBBBWK.","..KWWWWWWK..","...KKKKKK...","............","............"]},"Mobilificio Brianzolo":{"bg":"C","ic":["............","............","..RRRRRRRR..",".RRRRRRRRRR.",".RRRRRRRRRR.","RRMRRRRRRMRR","RRMMMMMMMMRR","RRRRRRRRRRRR","RRRRRRRRRRRR",".M........M.",".M........M.","............"]},"Unilevante Italia":{"bg":"B","ic":[".....WW.....",".....WW.....","....WWWW....","....WWWW....","...WWWWWW...","..WWLWWWWW..","..WLLWWWWW..","..WLWWWWWW..","..WWWWWWWW..","...WWWWWW...","....WWWW....","............"]},"Caffè Portuale":{"bg":"N","ic":["...W..W.....","....W..W....","...W..W.....","............",".WWWWWWWW...",".WMMMMMMWWW.",".WWWWWWWWW.W",".WWWWWWWWWW.","..WWWWWWW...","...WWWWW....",".WWWWWWWWWW.","............"]},"Caseificio Galbanone":{"bg":"B","ic":["............","..........Y.","........YYY.","......YYYYY.","....YYYYOYY.","..YYYYYYYYY.","YYYOYYYYYYY.","YYYYYYYOYYY.","YYYYYYYYYYY.","YOYYYYYYYYY.","YYYYYYYYYYY.","............"]},"Ferramenta Bullonati":{"bg":"D","ic":["....SSSS....","...SSSSSS...","..SSSKKSSS..",".SSSKKKKSSS.",".SSKK..KKSS.",".SSKK..KKSS.",".SSSKKKKSSS.","..SSSKKSSS..","...SSSSSS...","....SSSS....","............","............"]},"ElettroUnieuri":{"bg":"R","ic":["......YYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYYYYYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYY.......",".YY.........","Y...........","............"]},"FarmaSpa":{"bg":"W","ic":["....GGGG....","....GGGG....","....GGGG....","....GGGG....","GGGGGGGGGGGG","GGGGGWWGGGGG","GGGGGWWGGGGG","GGGGGGGGGGGG","....GGGG....","....GGGG....","....GGGG....","....GGGG...."]},"Esselonga":{"bg":"R","ic":["............","...WWWWWW...","..WWWWWWWW..","..WWW.......","..WWW.......","...WWWWWW...","....WWWWWW..",".......WWW..",".......WWW..","..WWWWWWWW..","...WWWWWW...","............"]},"Birrificio Mortetti":{"bg":"G","ic":["............","..WWWWWW....",".WWWWWWWW...",".WYYYYYYW...",".KYYYYYYKKK.",".KYCYYYYK.K.",".KYCYYYYK.K.",".KYYYYYYKKK.",".KYYYYYYK...",".KYYYYYYK...",".KKKKKKKK...","............"]},"Acque San Pellegrinetto":{"bg":"L","ic":[".....GG.....",".....GG.....","....GGGG....","...GGGGGG...","...GGGGGG...","...GWWWWG...","...GWRRWG...","...GRRRRG...","...GWRRWG...","...GWWWWG...","...GGGGGG...","....GGGG...."]},"Arredamenti Ikeo":{"bg":"B","ic":["........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","..YYYYYYYY..","..YYYYYYYY..","............","............"]},"Moda Armandi":{"bg":"K","ic":[".....WW.....","....W..W....",".......W....","......W.....",".....WW.....","....W..W....","...W....W...","..W......W..",".W........W.","WWWWWWWWWWWW","............","............"]},"Pneumatici Pirello":{"bg":"Y","ic":["...KKKKKK...","..KKKKKKKK..",".KKKSSSSKKK.","KKKS....SKKK","KKS......SKK","KKS..SS..SKK","KKS..SS..SKK","KKS......SKK","KKKS....SKKK",".KKKSSSSKKK.","..KKKKKKKK..","...KKKKKK..."]},"Crema Spalmella":{"bg":"C","ic":["...RRRRRR...","...RRRRRR...","..KKKKKKKK..","..KWWWWWWK..","..KMMMMMMK..","..KMWWMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KKKKKKKK..","............"]},"Riso Scotto dei Navigli":{"bg":"G","ic":["............","....W..W....","..W..W...W..","...WWWWWW...","..WWWWWWWW..",".WWWWWWWWWW.","KKKKKKKKKKKK","KRRRRRRRRRRK",".KRRRRRRRRK.","..KRRRRRRK..","...KKKKKK...","............"]},"Zalandini":{"bg":"O","ic":["............","..W.........","..WW........","..WWW.......","..WWWW......","..WWWWW.....","..WWWWWW....","..WWWWW.....","..WWWW......","..WWW.......","..WW........","..W........."]},"Amazzonia Italia":{"bg":"K","ic":["............",".NNNNNNNNNN.",".NNNNYYNNNN.",".NNNNYYNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.","............",".O........O.","..O......OO.","...OOOOOOO.."]},"Spesa Veloce":{"bg":"G","ic":["....KKKK....","...K....K...","..KKKKKKKK..","..KWWWWWWK..","..KWWWYWWK..","..KWWYYWWK..","..KWYYYYWK..","..KWWYYWWK..","..KWWYWWWK..","..KWWWWWWK..","..KKKKKKKK..","............"]},"Spedizioni Tricolore":{"bg":"L","ic":["............","............","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","............","............","............"]},"Discount Prezzaccio":{"bg":"Y","ic":["............",".RR......RR.",".RR.....RR..",".......RR...","......RR....",".....RR.....","....RR......","...RR.......","..RR.....RR.",".RR......RR.","............","............"]},"Mobili Truciolotto":{"bg":"F","ic":["............","..NN.NN..N..",".N..N..NN.N.","..NN..N..N..","............","NNNNNNNNNNNN","MMMMMMMMMMMM","NN........NN","N.N......N.N","N..........N","N..........N","............"]}};
 const STAT_IC={"op":[".O.OO.O.","OOOOOOOO",".OO..OO.","OO....OO","OO....OO",".OO..OO.","OOOOOOOO",".O.OO.O."],"prec":["..BBBB..",".BWWWWB.","BWWBBWWB","BWBRRBWB","BWBRRBWB","BWWBBWWB",".BWWWWB.","..BBBB.."],"neg":["..YYYY..",".YYYYYY.","YYYKKKYY","YYKYYYYY","YKKKKYYY","YYKYYYYY",".YYKKKY.","..YYYY.."],"lead":["KRRRRR..","KRRRRRR.","KRRRRRRR","KRRRRRR.","KRRRRR..","K.......","K.......","KK......"],"amm":["GGGGGGGG","GWWWWWWG","GGGGGGGG","GWGWGWGG","GGGGGGGG","GWGWGWGG","GGGGGGGG","GWGWGWGG"],"inn":["..PPPP..",".PPWPPP.","PPWPPPPP","PPPPPPPP",".PPPPPP.","..PPPP..","..SSSS..","...SS..."]};
 /* --- clienti: zone di distribuzione, provenienza merce, loghi --- */
 const REG={
@@ -406,7 +442,8 @@ const ORIGINS={
  erfurt:{n:'Hub di Erfurt (Germania)',lon:11.03,lat:50.98},
  mondo:{n:'Fornitori di mezzo mondo',lon:9.19,lat:45.46},
  ortomercato:{n:'Ortomercato di Milano',lon:9.24,lat:45.44},
- roma:{n:'Hub di Roma',lon:12.50,lat:41.90}
+ roma:{n:'Hub di Roma',lon:12.50,lat:41.90},
+ seveso:{n:'Capannone di Seveso (MB)',lon:9.14,lat:45.65}
 };
 // zones: la prima è quella del contratto iniziale; mode: 'ritiro' = andiamo noi a prendere la merce, 'consegna' = la porta il cliente
 const CINFO={
@@ -429,7 +466,9 @@ const CINFO={
  'Zalandini':{zones:['nordovest','nord'],src:'erfurt',mode:'consegna'},
  'Amazzonia Italia':{zones:['nord','nordovest'],src:'mondo',mode:'consegna'},
  'Spesa Veloce':{zones:['prov_Milano','prov_Torino'],src:'ortomercato',mode:'ritiro'},
- 'Spedizioni Tricolore':{zones:['italia'],src:'roma',mode:'consegna'}
+ 'Spedizioni Tricolore':{zones:['italia'],src:'roma',mode:'consegna'},
+ 'Discount Prezzaccio':{zones:['reg_pie','prov_Torino','prov_Cuneo'],src:'fornitori',mode:'consegna'},
+ 'Mobili Truciolotto':{zones:['reg_lom','prov_Milano'],src:'seveso',mode:'ritiro'}
 };
 const cinfo=c=>CINFO[c.name]||{zones:['nordovest'],src:'fornitori',mode:'consegna'};
 function distKm(lo1,la1,lo2,la2){const r=Math.PI/180,a=Math.sin((la2-la1)*r/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin((lo2-lo1)*r/2)**2;return 6371*2*Math.asin(Math.sqrt(a));}
@@ -442,6 +481,19 @@ function clientLog(c,w){
   const o=ORIGINS[c.src]||ORIGINS.fornitori, iKm=Math.round(2*distKm(s.lon,s.lat,o.lon,o.lat)*1.3+20);
   const inn=c.mode==='ritiro'?Math.ceil(c.pal/33):0;
   return {oKm,out,iKm,in:inn,km:out*oKm+inn*iKm};
+}
+const RGLYPH={S:['.####','#....','#....','.###.','....#','....#','####.'],A:['.###.','#...#','#...#','#####','#...#','#...#','#...#'],B:['####.','#...#','#...#','####.','#...#','#...#','####.'],
+ C:['.####','#....','#....','#....','#....','#....','.####'],D:['####.','#...#','#...#','#...#','#...#','#...#','####.'],F:['#####','#....','#....','####.','#....','#....','#....']};
+function rankTip(c){const k=rankScore(c),x=rankOf(c);
+  const bar=(n,v)=>`<div class='tr'><span>${n}</span><b>${v}</b></div>`;
+  return `<div class='tt'>Rank ${x.r}</div>${bar('Ricavi promessi',k.ric)}${bar('Desiderabilità',k.des)}${bar('Pubblicità',k.pub)}${bar('Solidità',k.sol)}${bar('Media',Math.round(k.avg))}<div style='margin-top:5px'>Prezzo ${sgnp((x.rev-1)*100)} sul listino · vincerlo: reputazione ${x.win>=0?'+':'−'}${Math.abs(x.win)} · perderlo: −${x.lost}</div>${isNaz(c)?`<div>Solo per grandi logistiche: accordi quadro nazionali, ${NAZ_REQ.wh} magazzini, reputazione ${NAZ_REQ.rep}.</div>`:''}<div style='margin-top:5px;color:#c9d3dd;font-style:italic'>${x.fl}</div>`;}
+function rankIcon(c,sz){
+  const x=rankOf(c), N=14; let r='';
+  for(let y=0;y<N;y++)for(let X=0;X<N;X++){ const cut=(X+y<2)||(N-1-X+y<2)||(X+N-1-y<2)||(2*N-2-X-y<2); if(cut) continue;
+    const edge=X===0||y===0||X===N-1||y===N-1||X+y===2||N-1-X+y===2||X+N-1-y===2||2*N-2-X-y===2;
+    r+=`<rect x="${X}" y="${y}" width="1" height="1" fill="${edge?'#16202e':(y===1||X===1)&&!edge?'rgba(255,255,255,.35)':TPAL[x.bg]}"/>`; }
+  RGLYPH[x.r].forEach((row,y)=>[...row].forEach((ch,X)=>{if(ch==='#'){r+=`<rect x="${X+5}" y="${y+4}" width="1" height="1" fill="#16202e" opacity=".45"/><rect x="${X+4}" y="${y+3}" width="1" height="1" fill="${TPAL[x.fg]}"/>`;}}));
+  return `<span class="rank" role="img" aria-label="Rank ${x.r}" data-tip="${rankTip(c)}" style="display:inline-flex;flex:none"><svg width="${sz}" height="${sz}" viewBox="0 0 14 14" shape-rendering="crispEdges">${r}</svg></span>`;
 }
 function logoSvg(name,sz){
   const L=LOGO[name]||{bg:'S',ic:[]}, N=16; let r='';
@@ -564,7 +616,7 @@ function addWarehouse(site,own,fixed,motrici){
 }
 const ceo=()=>CEOS.find(c=>c.id===S.ceoId);
 const whById=id=>S.warehouses.find(w=>w.id===id);
-const clientRev=c=>{const w=S&&whById(c.wh); const t=w?clientLog(c,w):{oKm:240,in:0,iKm:0}; return (c.stock*T_ST+2*c.pal*T_MO+c.pal*(18+0.05*t.oKm)+t.in*t.iKm*1.5)*c.mult;};
+const clientRev=c=>{const w=S&&whById(c.wh); const t=w?clientLog(c,w):{oKm:240,in:0,iKm:0}; return (c.stock*T_ST+2*c.pal*T_MO+c.pal*(18+0.05*t.oKm)+t.in*t.iKm*1.5)*c.mult*rankOf(c).rev;};
 function news(src,title,text){S.news.unshift({day:S.day,src,title,text}); if(S.news.length>80)S.news.pop();}
 
 /* ====================== MOTORE ====================== */
@@ -692,7 +744,7 @@ function monthEnd(){
     else if(wv>=-2){c.sat-=4;}
     else {c.sat-=10; const p=0.05*clientRev(c); pen+=p;}
     c.sat=clamp(c.sat,0,100);
-    if(c.sat<25){c.status='perso';S.rep-=3;toast(`${c.name} ha disdetto il contratto`,'bad');news('Il Sole 24 Pallet',`${c.name} lascia ${S.company.name}`,`"Ritardi ed errori non sono più accettabili", fa sapere il cliente.`);}
+    if(c.sat<25){c.status='perso';S.rep-=rankOf(c).lost;toast(`${c.name} ha disdetto il contratto`,'bad');news('Il Sole 24 Pallet',`${c.name} lascia ${S.company.name}`,`"Ritardi ed errori non sono più accettabili", fa sapere il cliente.`);}
     else if(S.day>=c.end){
       if(c.sat>=(R('kam')?40:50)){c.end=S.day+24*30;toast(`${c.name} rinnova per altri due anni`,'ok');news('Il Sole 24 Pallet',`${c.name} rinnova`,`Contratto prolungato di 24 mesi.`);}
       else {c.status='perso';toast(`${c.name} non rinnova`,'bad');news('Il Sole 24 Pallet',`${c.name} non rinnova`,`Il cliente passa alla concorrenza.`);}
@@ -725,13 +777,13 @@ function bidEstimate(t,whId,mult){
   const needMag=Math.ceil(k.mov/k.prod), needAut=Math.ceil(k.km/5200);
   const save={...w.staff}; w.staff={mag:Math.max(w.staff.mag,needMag),aut:Math.max(w.staff.aut,needAut)};
   const k2=computeWH(w,extra); w.staff=save;
-  const missing=(t.req||[]).filter(r=>!R(r)).map(r=>TECH.find(x=>x.id===r).name);
-  const fits=k.stock<=k.cap&&!missing.length;
+  const missing=(t.req||[]).filter(r=>!R(r)).map(r=>TECH.find(x=>x.id===r).name), naz=nazMissing(t);
+  const fits=k.stock<=k.cap&&!missing.length&&!naz.length;
   const gP=k2.P-t.sP, gA=t.sA?k2.A-t.sA:3; const dC=dirStat('comm');
   const score=50+(1-mult)*120+clamp(gP*4,-20,10)+clamp(gA*4,-20,10)+(S.rep-50)*0.4+(ceo().st.neg-10)+(dC!=null?0.8*(dC-10):0)+(R('iso')?3:0);
-  const comp=55+t.diff;
+  const comp=55+t.diff+rankOf(t).comp;
   const chance=fits?1/(1+Math.exp(-(score-comp)/6)):0;
-  return {P:k2.P,A:k2.A,sat:k.stock/k.cap,cap:k.cap,missing,fits,chance,rev:clientRev(extra),needMag,needAut,staff:w.staff};
+  return {P:k2.P,A:k2.A,sat:k.stock/k.cap,cap:k.cap,missing,naz,fits,chance,rev:clientRev(extra),needMag,needAut,staff:w.staff};
 }
 function resolveTender(t){
   t.done=true;
@@ -740,7 +792,7 @@ function resolveTender(t){
   const win=e&&Math.random()<e.chance;
   if(win){
     const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,zone:t.zone,src:t.src,mode:t.mode,wh:t.bid.wh,mult:t.bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+24*30};
-    S.clients.push(c); t.result={win:true};
+    S.clients.push(c); t.result={win:true}; S.rep=clamp(S.rep+rankOf(c).win,0,100);
     toast(`Gara vinta: ${t.name}! Il contratto parte il ${shortDate(c.start)}`,'ok');
     modalInfo('Il Sole 24 Pallet',`Gara vinta: ${t.name}`,`Il contratto parte il ${shortDate(c.start)} a ${whById(c.wh).name}. Servono circa ${e.needMag} magazzinieri e ${e.needAut} autisti in quel magazzino: assumi adesso, perché un autista arriva in 2–5 settimane.`);
   } else {
@@ -1130,7 +1182,7 @@ const VIEWS={
    const mesi=Math.max(0,Math.round((c.end-S.day)/30));
    return `<div class="card ${bad?'bad':c.status==='avvio'?'pend':''}">
     <div style="display:flex;gap:10px;align-items:center">${logoSvg(c.name,48)}<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-     <div class="row"><b>${esc(c.name)}</b><span class="sm">${esc(w.name)}</span></div>
+     <div class="row"><b style="display:flex;align-items:center;gap:6px">${rankIcon(c,22)}${esc(c.name)}</b><span class="sm">${esc(w.name)}</span></div>
      <div class="sm">"${esc(c.slogan)}" · ${esc(c.sector)}</div></div></div>
     ${logInfoHtml(c,w)}
     <div><button class="btn sm2" data-act="mapcli" data-id="${c.id}" aria-pressed="${UI.mapCli===c.id}">${UI.mapCli===c.id?'Nascondi dalla mappa':'Mostra sulla mappa'}</button></div>
@@ -1152,7 +1204,7 @@ const VIEWS={
     const e=bidEstimate(sel,UI.bid.wh,UI.bid.mult);
     detail=`<div class="card pend">
      <div style="display:flex;gap:10px;align-items:center">${logoSvg(sel.name,48)}<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-     <div class="row"><span class="h3">${esc(sel.name)}</span><span class="pill" style="background:var(--yellow)">scade il ${shortDate(sel.deadline)}</span></div>
+     <div class="row"><span class="h3" style="display:flex;align-items:center;gap:8px">${rankIcon(sel,26)}${esc(sel.name)}</span><span class="pill" style="background:var(--yellow)">scade il ${shortDate(sel.deadline)}</span></div>
      <div class="sm">"${esc(sel.slogan)}" · ${esc(sel.sector)}</div></div></div>
      ${logInfoHtml(sel,whById(UI.bid.wh))}
      <table class="t num"><tr><td>Volume</td><td class="r">${n0(sel.pal)} pallet/mese · ${n0(sel.stock)} posti</td></tr>
@@ -1166,7 +1218,7 @@ const VIEWS={
       <button class="btn pri" data-act="bid" data-id="${sel.id}" ${e&&e.fits?'':'disabled'}>${sel.bid?'Aggiorna offerta':'Invia offerta'}</button></div>
     </div>`;
   }
-  return `${open.length>1?`<div class="tabs" role="tablist">${open.map(t=>`<button role="tab" aria-selected="${t.id===(sel&&sel.id)}" data-act="seltender" data-id="${t.id}">${esc(t.name)}${t.bid?' ✓':''}</button>`).join('')}</div>`:''}${detail}
+  return `${open.length>1?`<div class="tabs" role="tablist">${open.map(t=>`<button role="tab" aria-selected="${t.id===(sel&&sel.id)}" data-act="seltender" data-id="${t.id}" style="display:flex;align-items:center;justify-content:center;gap:6px">${rankIcon(t,18)}${esc(t.name)}${t.bid?' ✓':''}</button>`).join('')}</div>`:''}${detail}
    ${done.length?`<div class="lab">Risultati recenti</div>`+done.map(t=>`<div class="row sm"><span>${esc(t.name)}</span><span class="${t.result&&t.result.win?'ok':'bad'}">${t.result?(t.result.win?'Vinta':t.bid?`Persa contro ${esc(t.result.by)}`:`Non partecipato · ${esc(t.result.by)}`):''}</span></div>`).join(''):''}`;
  },
  personale(){
@@ -1303,6 +1355,7 @@ const VIEWS={
 };
 function bidEstHtml(t,e){
   if(!e) return '';
+  if(e.naz.length) return `<div class="sm bad">Committente di rank ${rankOf(t).r}: lavora solo con grandi logistiche con accordi nazionali. Ti manca: ${e.naz.map(esc).join(', ')}.</div>`;
   if(e.missing.length) return `<div class="sm bad">Serve la tecnologia: ${e.missing.map(esc).join(', ')}. Cercala nella finestra Tecnologia.</div>`;
   if(!e.fits) return `<div class="sm bad">Non c'è spazio: servirebbero ${n0(Math.round(e.sat*e.cap))} posti su ${n0(e.cap)}.</div>`;
   const ch=Math.round(e.chance*100);
@@ -1419,7 +1472,7 @@ function showStart(){
     <span class="sm" style="color:var(--ink)">${esc(s.name)} (${s.prov}) · ${n0(s.cap)} posti · ${eur(c.cash)}</span>
     <span>${statChips(c.st,14)}</span>
     ${talentIcons(c.tal,32)}
-    <span class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,24)} Cliente storico: ${esc(c.client.name)}</span></button>`;}).join('');
+    <span class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,24)} Cliente storico: ${esc(c.client.name)} ${rankIcon(c.client,18)}</span></button>`;}).join('');
   const C=CEOS.find(c=>c.id===startSel.ceo);
   $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP</span><span>Nord-Ovest, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
    <div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
@@ -1458,6 +1511,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else showStart(); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT};
+window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,rankOf,rankScore,TENDER_POOL,CEOS};
 })();
 </script>

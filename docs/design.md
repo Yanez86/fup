@@ -32,6 +32,13 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Soddisfazione a fine mese: se entrambi i KPI sono sopra soglia +3 (+1 con EDI, +1 con KAM); entro 2 punti sotto la soglia −4; più sotto −10 e penale del 5%. Sotto 25 il cliente se ne va.
 - Rinnovo a 24 mesi se la soddisfazione è ≥ 50 (≥ 40 con KAM).
 
+## Rank delle committenti
+- Ogni committente ha un **rank** da S (le migliori) a F (le peggiori), mostrato come medaglia in pixel art (`rankIcon()`) nelle gare, nella lista clienti e nella scelta del CEO; il tooltip mostra i quattro voti.
+- Rank = media di 4 voti 0-100: **ricavi promessi** = clamp(10 + (2·pallet + posti)/60; 0; 100) sui volumi base del cliente; **desiderabilità**, **pubblicità** e **solidità** fissi in `RANK_F`.
+- Soglie della media: S ≥ 80, A ≥ 68, B ≥ 58, C ≥ 46, D ≥ 36, F sotto.
+- Effetti (`RANKS`): prezzo sul listino S +15%, A +8%, B +3%, C 0, D −3%, F −12%; difficoltà della gara S +6, A +3, D −3, F −6; reputazione alla vittoria S +6, A +4, B +2, C +1, D 0, F −1; reputazione se il cliente disdice S −10, A −7, B −4, C −3, D −2, F −1.
+- **S e A solo per grandi logistiche** (`NAZ_REQ`): per fare un'offerta servono la ricerca "Accordi quadro nazionali" (Mercato, dopo KAM), almeno 3 magazzini e reputazione ≥ 65. Hanno anche soglie KPI più severe.
+
 ## Report KPI settimanale
 - Ogni lunedì si chiude la settimana: per ogni magazzino si salvano le medie di Puntualità, Accuratezza, saturazione e morale, insieme ai pallet movimentati, ai viaggi, ai ricavi e ai costi (vengono conservate le ultime 26 settimane in `S.weeks`).
 - I grafici a linee del report (passando il mouse si leggono i valori di ogni settimana):
@@ -43,7 +50,7 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 
 ## Gare (tender)
 - Arriva una gara ogni 28-46 giorni (20-35 con l'Ufficio commerciale). Alcune richiedono tecnologie: catena del freddo, EDI, e-commerce.
-- Punteggio = 50 + (1−moltiplicatore)·120 + margine P·4 + margine A·4 (ciascuno tra −20 e +10) + (reputazione−50)·0,4 + (Negoziazione CEO−10) + direttore commerciale·0,8·(Neg−10) + ISO 3. Si confronta con 55 + difficoltà della gara, con probabilità logistica (scala 6).
+- Punteggio = 50 + (1−moltiplicatore)·120 + margine P·4 + margine A·4 (ciascuno tra −20 e +10) + (reputazione−50)·0,4 + (Negoziazione CEO−10) + direttore commerciale·0,8·(Neg−10) + ISO 3. Si confronta con 55 + difficoltà della gara + modificatore del rank, con probabilità logistica (scala 6).
 
 ## Personale e recruiting
 - Giorni per assumere = base × clamp(1 + (55 − attrattività)/40; 0,6; 1,8) × (Ufficio del personale 0,8) × (1 − 0,02·(Leadership del direttore HR − 10)).
@@ -54,7 +61,7 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Operazioni = ingranaggio arancione, Precisione = bersaglio blu, Negoziazione = moneta gialla, Leadership = bandiera rossa, Amministrazione = calcolatrice verde, Innovazione = lampadina viola.
 
 ## Tecnologie
-- Tre alberi: **Logistica** (barcode → WMS → radiofrequenza → pick-to-light → AMR; formazione → sicurezza muletti → magazzino verticale; GPS → pianificazione rotte), **Sviluppo aziendale** (gestionale → ufficio del personale → welfare → Academy; gestionale → struttura direzionale → controllo di gestione → ISO 9001), **Mercato** (ufficio commerciale → EDI → KAM → e-commerce; marketing; catena del freddo).
+- Tre alberi: **Logistica** (barcode → WMS → radiofrequenza → pick-to-light → AMR; formazione → sicurezza muletti → magazzino verticale; GPS → pianificazione rotte), **Sviluppo aziendale** (gestionale → ufficio del personale → welfare → Academy; gestionale → struttura direzionale → controllo di gestione → ISO 9001), **Mercato** (ufficio commerciale → EDI → KAM → e-commerce / accordi quadro nazionali; marketing; catena del freddo).
 - Una ricerca alla volta. Giorni = base × clamp(1 − 0,03·(Innovazione − 10); 0,6; 1,5). Si usa l'Innovazione più alta tra quella del CEO e quella del direttore tecnologia. Annullando una ricerca si recupera il 50% del costo.
 - Logistica: dopo la ricerca si paga l'installazione in ogni magazzino, più un canone mensile. Durante le settimane di apprendimento l'effetto è negativo, poi diventa positivo (Academy −30% sui tempi di apprendimento).
 
