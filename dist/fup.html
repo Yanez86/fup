@@ -263,6 +263,26 @@ input.sw:disabled{opacity:.45;cursor:not-allowed}
 .wh-acts .btn{display:flex;flex-direction:column;align-items:center;line-height:1.15}
 .wh-acts .btn small{font:500 13px var(--f-body)}
 .wh-acts .sm{font-size:13px;text-align:center}
+/* finestra Personale */
+.pr-hd{display:flex;justify-content:space-between;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.pr-r,.pr-q{display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--panel2);font-size:15px}
+.pr-r:last-child{border-bottom:0}
+.pr-r img,.pr-q img{flex:none;width:24px;height:28px}
+.pr-r .wh-nm,.pr-q .wh-nm{flex:1;min-width:0}
+.pr-r>b{font:700 17px var(--f-disp);min-width:22px;text-align:right}
+.pr-l{display:flex;align-items:center;gap:6px;width:112px;flex:none;justify-content:flex-end}
+.pr-l .bar{height:8px;display:block}
+.pr-l b{font:600 14px var(--f-disp);min-width:40px;text-align:right}
+.pr-m{gap:7px}
+.pr-mh{display:flex;gap:12px;align-items:center}
+.pr-mh .mport{width:72px;height:84px;border-width:2px}
+.pr-mn{font-size:17px}
+.pr-mh .pill{align-self:flex-start;background:var(--ok);color:#fff;border-color:var(--ink)}
+.pr-mh .pill.pr-free{background:var(--yellow);color:var(--ink)}
+.pr-tal{display:flex;align-items:center;gap:8px}
+.pr-ma{display:flex;justify-content:flex-end}
+.pr-ma .btn.pri{min-width:140px}
+.wh-kpis.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .mob .wh-kpis,.mob .wh-money{grid-template-columns:repeat(2,minmax(0,1fr))}
 .staff{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:6px 10px;align-items:center;font-size:15px}
 .mini{width:48px;height:56px;background:#3a6db0;border:2px solid var(--ink)}
@@ -3092,19 +3112,43 @@ const VIEWS={
  },
  personale(){
   const ks=S.warehouses.map(w=>[w,w.kpi||computeWH(w)]), pn=planNeed(), pl=planLoad(), pq=S.queue.filter(q=>q.role==='plan').length;
-  return `<div class="card"><div class="row"><span class="h3">Organico</span><span class="sm">persone · ${kw('carico','carico di lavoro')}</span></div>
-   <table class="t num"><tr><th></th>${ks.map(([w])=>`<th class="r"><button class="btn sm2" data-act="openwh" data-id="${w.id}">${esc(w.name)}</button></th>`).join('')}</tr>
-    ${ROLES.map(r=>`<tr><td style="display:flex;align-items:center;gap:6px"><img class="px" src="${IMG[r]}" alt="" width="24" height="28">${kw(ROLE_WK[r],ROLE[r])}</td>${ks.map(([w,k])=>{const l=staffLoad(w,k)[r];return `<td class="r">${w.staff[r]} · ${r==='fm'?(l?'<span class="bad">manca</span>':'ok'):r==='capo'&&l===0?'–':l>=9?'<span class="bad">fermo</span>':`<b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>`}</td>`;}).join('')}</tr>`).join('')}</table>
-   <div class="sm">Si assume e si licenzia dalla finestra di ogni magazzino.</div></div>
-  <div class="card"><div class="row"><span class="h3">Sede</span></div>
-   <div class="staff"><img class="px mini" src="${S.office.plan?IMG.plan:IMG.anon}" alt="" width="48" height="56"><span>${kw('pianificatori',ROLE.plan)}<br><span class="sm">${pn?(pl>=9?'<span class="bad">nessuno: giri non organizzati</span>':`${kw('carico','carico')} <b style="color:${loadCol(pl)}">${Math.round(pl*100)}%</b>${pl>1.02?' <span class="bad">in affanno</span>':''}`):'i giri li organizzi tu'}${pq?` · ${pq} in arrivo`:''}</span>${pn&&pl<9?loadBar(pl):''}</span><b class="num ${pl>1.02?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${S.office.plan}</b><button class="btn sm2" data-act="fire" data-role="plan" ${S.office.plan<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="plan" aria-label="Assumi">+ Assumi</button></div>
-   <div class="sm">${pn?`Organizzano i giri dei camion di tutti i magazzini. Ognuno che manca toglie 2 punti di puntualità ovunque; con la squadra al completo i km costano il 4% in meno.`:`Fino a 80 viaggi al mese i giri li organizzi tu. Poi serve un pianificatore ogni 80 viaggi.`}</div></div>
-   <div class="card"><div class="row"><span class="h3">${kw('assunzioni')} in corso</span></div>${S.queue.length?S.queue.map(q=>`<div class="row sm"><span>${ROLE[q.role]}${q.wh?' · '+esc(whById(q.wh).name):' · sede'}</span><span>${q.days} giorni</span></div>`).join(''):'<div class="sm">Nessuna.</div>'}
-   <div class="sm">Tempi più brevi con benefit, servizi di welfare del magazzino e reputazione alti. Gli autisti con patente CE sono i più difficili da trovare.</div></div>
-   <div class="lab">${kw('manager','Manager')} disponibili</div>
-   ${S.managers.map(m=>`<div class="card" style="flex-direction:row;gap:12px;align-items:flex-start"><img class="px mport" src="${IMG['m_'+m.id]}" alt="Ritratto di ${esc(m.name)}" width="96" height="112"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px"><div class="row"><b>${esc(m.name)}, ${m.age}</b><span class="sm">${m.hired?(seatOf(m.id)?esc(DIR_ROLES.find(r=>r.id===seatOf(m.id)).name):m.wh?'a '+esc(whById(m.wh).name):'senza incarico'):eur(m.ral)+' l\'anno'}</span></div>
-     <div class="sm">${esc(m.role)}</div><div>${statChips(m.st,14)}</div>${talentIcons(m.tal||[],28)}${demHtml(m)}
-     <div>${m.hired?`<button class="btn sm2" data-act="firemgr" data-id="${m.id}">Licenzia (${eur(m.ral/12*COEF)})</button>`:`<button class="btn sm2 pri" data-act="hiremgr" data-id="${m.id}">Assumi</button>`}</div></div></div>`).join('')}`;
+  const tot=ks.reduce((a,[w])=>a+staffTot(w),0)+S.office.plan;
+  const hot=ks.reduce((a,[w,k])=>{const l=staffLoad(w,k);return a+LOAD_ROLES.filter(r=>l[r]>1.02).length+(l.fm>0?1:0);},0)+(pn&&pl>1.02?1:0);
+  const hired=S.managers.filter(m=>m.hired), free=S.managers.filter(m=>!m.hired);
+  const tile=(cls,lab,val,sub)=>`<div class="kpi wh-k ${cls}"><div class="lab">${lab}</div><b>${val}</b><div class="sm">${sub}</div></div>`;
+  // reparto in una riga: ritratto, nome, persone, barra del carico
+  const roleRow=(w,k,r)=>{const l=staffLoad(w,k)[r], n=w.staff[r], bar=r!=='fm'&&!(r==='capo'&&l===0)&&l<9;
+   const txt=r==='fm'?(l?'<span class="bad">manca</span>':'<span class="ok">ok</span>'):r==='capo'&&l===0?'<span class="sm">dal manager</span>':l>=9?'<span class="bad">fermo</span>':'';
+   return `<div class="pr-r"><img class="px" src="${n?IMG[r]:IMG.anon}" alt="" width="24" height="28"><span class="wh-nm">${kw(ROLE_WK[r],ROLE[r])}</span><b class="num ${bar&&l>1.02?'bad':''}">${n}</b><span class="pr-l">${bar?`<span class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></span><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>`:txt}</span></div>`;};
+  const mgrCard=m=>{const where=m.hired?(seatOf(m.id)?esc(DIR_ROLES.find(r=>r.id===seatOf(m.id)).name):m.wh?'a '+esc(whById(m.wh).name):'senza incarico'):'';
+   return `<div class="card pr-m${m.hired&&(m.quit||(m.unh||0)>=20)?' bad':''}"><div class="pr-mh"><img class="px mport" src="${IMG['m_'+m.id]}" alt="Ritratto di ${esc(m.name)}" width="72" height="84">
+     <div class="wh-sm"><b class="pr-mn">${esc(m.name)}, ${m.age}</b><span class="sm">${esc(m.role)}</span>
+      ${m.hired?`<span class="pill ${m.wh||seatOf(m.id)?'':'pr-free'}">${where}</span>`:`<span class="sm"><b class="num" style="color:var(--ink)">${eur(m.ral)}</b> l'anno</span>`}</div></div>
+     <div>${statChips(m.st,14)}</div>
+     ${(m.tal||[]).length?`<div class="pr-tal"><span class="lab">${kw('talenti','Talenti')}</span>${talentIcons(m.tal,24)}</div>`:''}
+     ${demHtml(m)}
+     <div class="pr-ma">${m.hired?`<button class="btn sm2" data-act="firemgr" data-id="${m.id}">Licenzia · ${eur(m.ral/12*COEF)}</button>`:`<button class="btn pri" data-act="hiremgr" data-id="${m.id}">Assumi</button>`}</div></div>`;};
+  return `<div class="wh-kpis c2">
+   ${tile('','Persone',tot,'in tutta l\'azienda')}
+   ${tile(hot?'bad':'ok',kw('carico','In affanno'),hot,hot===1?'reparto':'reparti')}
+   ${tile(S.queue.length?'warn':'',kw('assunzioni','In arrivo'),S.queue.length,S.queue.length===1?'assunzione':'assunzioni')}
+   ${tile('',kw('manager','Manager'),hired.length,'su '+S.managers.length+' disponibili')}
+  </div>
+  ${ks.map(([w,k])=>`<div class="card"><div class="row" style="align-items:center"><span class="h3 wh-nm">${esc(w.name)}</span><button class="btn sm2" data-act="openwh" data-id="${w.id}">Apri il magazzino</button></div>
+   <div class="pr-hd"><span>Reparto</span><span>persone · ${kw('carico','carico')}</span></div>
+   ${ROLES.map(r=>roleRow(w,k,r)).join('')}</div>`).join('')}
+  <div class="card"><div class="row"><span class="h3">Sede</span><span class="sm">si assume e si licenzia da qui</span></div>
+   <div class="wh-st"><img class="px" src="${S.office.plan?IMG.plan:IMG.anon}" alt="" width="40" height="46">
+    <div class="wh-sm"><div class="wh-nm">${kw('pianificatori',ROLE.plan)}</div>
+     ${pn&&pl<9?`<div class="wh-ld"><div class="bar"><i style="width:${Math.min(100,pl*100/1.5)}%;background:${loadCol(pl)}"></i></div><b style="color:${loadCol(pl)}">${Math.round(pl*100)}%</b></div>`:`<div class="sm wh-nm">${pn?'<span class="bad">nessuno: giri non organizzati</span>':'i giri li organizzi tu'}</div>`}
+     ${pq?`<div class="sm wh-inq">+${pq} in arrivo</div>`:''}</div>
+    <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="plan" ${S.office.plan<=0?'disabled':''} aria-label="Licenzia: pianificatore del traffico" data-tip="Licenzia">−</button><b class="num ${pl>1.02?'bad':''}">${S.office.plan}</b><button class="btn sm2 pri" data-act="hire" data-role="plan" aria-label="Assumi: pianificatore del traffico" data-tip="Assumi">+</button></div></div>
+   <div class="sm">${pn?`Organizzano i giri dei camion di tutti i magazzini: ognuno che manca toglie 2 punti di puntualità ovunque, con la squadra al completo i km costano il 4% in meno.`:`Fino a 80 viaggi al mese i giri li organizzi tu, poi serve un pianificatore ogni 80 viaggi.`}</div></div>
+  <div class="card"><div class="row"><span class="h3">${kw('assunzioni')} in corso</span><span class="sm">${S.queue.length||'nessuna'}</span></div>
+   ${S.queue.map(q=>`<div class="pr-q"><img class="px" src="${IMG[q.role]}" alt="" width="24" height="28"><span class="wh-nm">${ROLE1[q.role]||ROLE[q.role]} <span class="sm">${q.wh?esc(whById(q.wh).name):'sede'}</span></span><span class="pill">${q.days} ${q.days===1?'giorno':'giorni'}</span></div>`).join('')}
+   <div class="sm">Fanno prima benefit, welfare del magazzino e reputazione alta. Gli autisti CE sono i più difficili da trovare.</div></div>
+  ${hired.length?`<div class="lab">${kw('manager','Manager')} in squadra</div>${hired.map(mgrCard).join('')}`:''}
+  ${free.length?`<div class="lab">${kw('manager','Manager')} disponibili</div>${free.map(mgrCard).join('')}`:''}`;
  },
  tecnologia(){
   const tree=UI.sel.tree||'log'; const pj=S.project;
@@ -3735,7 +3779,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.24',t:'Il menu in tasca',x:['Sul telefono i tasti in basso diventano un solo pulsante «Menu»: si apre un elenco da sinistra, diviso in Operazioni, Azienda e Informazioni, e ogni voce dice in una riga come sta il suo reparto (gare aperte, reparto in affanno, ricerca in corso).','La mappa e le finestre usano tutto lo schermo del telefono.','La casella della data ha sempre la stessa larghezza: i pulsanti accanto non si spostano più ogni giorno. Sul telefono il mese è abbreviato.','La scheda del magazzino è più chiara: in cima nome, occupazione e manager; quattro riquadri colorati per puntualità, accuratezza, mezzi pieni e morale (verde, giallo o rosso rispetto alle soglie dei clienti); per ogni reparto una barra del carico e i pulsanti − e +; un interruttore per la cooperativa e il conto del mese in quattro caselle.','Restano due velocità più la pausa: la terza, troppo veloce per seguire il gioco, è stata tolta.']},
+ {v:'0.24',t:'Il menu in tasca',x:['Sul telefono i tasti in basso diventano un solo pulsante «Menu»: si apre un elenco da sinistra, diviso in Operazioni, Azienda e Informazioni, e ogni voce dice in una riga come sta il suo reparto (gare aperte, reparto in affanno, ricerca in corso).','La mappa e le finestre usano tutto lo schermo del telefono.','La casella della data ha sempre la stessa larghezza: i pulsanti accanto non si spostano più ogni giorno. Sul telefono il mese è abbreviato.','Anche la finestra Personale è più ordinata: quattro riquadri in cima (persone, reparti in affanno, assunzioni in arrivo, manager), per ogni magazzino l\'elenco dei reparti con una barra del carico, i manager divisi tra «in squadra» e «disponibili».','La scheda del magazzino è più chiara: in cima nome, occupazione e manager; quattro riquadri colorati per puntualità, accuratezza, mezzi pieni e morale (verde, giallo o rosso rispetto alle soglie dei clienti); per ogni reparto una barra del carico e i pulsanti − e +; un interruttore per la cooperativa e il conto del mese in quattro caselle.','Restano due velocità più la pausa: la terza, troppo veloce per seguire il gioco, è stata tolta.']},
  {v:'0.23',t:'Tutto a portata di dito',x:['Sul telefono il report KPI di un magazzino non si sovrappone più al testo sotto il foglio: le schede delle righe restano dentro il riquadro, sopra i grafici.','Sul computer le finestre non escono più dal fondo dello schermo: si accorciano e il contenuto scorre dentro con la rotellina, senza doverle trascinare in alto.','Sul telefono niente scorre più di lato: l\'albero delle tecnologie diventa un elenco per livelli e il report KPI mostra ogni riga del foglio come una scheda.','Sistemati i pulsanti con il testo più largo del pulsante (Tecnologie, Apri, schede delle gare).','I posti vuoti (dirigenti vacanti, magazzino senza manager, reparti senza personale) mostrano una sagoma anonima in ombra.']},
  {v:'0.22',t:'Dormici sopra',x:['15 nuovi clienti piccoli e locali: una panetteria di Orbassano, una distilleria di Bassano, le sedie di Manzano, i ricambi nautici di Lerici e altri.','Ci sono sempre almeno tre gare aperte (quattro con l\'Ufficio commerciale), ed escono più spesso i clienti piccoli e le zone di una sola provincia.','Negli eventi la scelta non ha effetto subito: il giorno dopo arriva una finestra che racconta com\'è andata, con gli effetti.']},
  {v:'0.21',t:'Il regolamento in bacheca',x:['Nuova finestra Policy aziendali: regole da accendere o spegnere per tutta l\'azienda, ognuna con un vantaggio e un prezzo. Dopo un cambio servono 90 giorni per cambiarla di nuovo.','12 policy: Zero straordinario, Sabato obbligatorio, Telefoni nell\'armadietto, Doppia spunta in uscita, Niente cooperative, Spending review, Il cliente ha sempre ragione, Limite 80 all\'ora, Smart working, Rotazione delle mansioni, Settimana corta e Corso sicurezza.','Si sbloccano con la nuova ricerca Regolamento aziendale e con altre tecnologie, comprese due nuove del Welfare: Lavoro agile e Settimana corta.','I manager hanno delle pretese: alcuni vogliono una policy, altri non la sopportano. Dopo un mese arriva l\'ultimatum: li accontenti, alzi lo stipendio perché la sopportino, oppure se ne vanno.','Nuovo evento: un concorrente prova a portarti via un manager. Pareggi l\'offerta, rilanci meno o lo lasci andare.']},

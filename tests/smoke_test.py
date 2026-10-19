@@ -278,7 +278,7 @@ async def main():
         await pg.evaluate(CLEAR)
         await pg.click('#dock [data-id=personale]')
         if not await pg.query_selector('#win-personale'): await pg.click('#dock [data-id=personale]')
-        assert await pg.eval_on_selector_all('#win-personale table.t tr', 'e=>e.length') == 8
+        assert await pg.eval_on_selector_all('#win-personale .pr-r', 'e=>e.length') == 7
         await pg.screenshot(path=os.path.join(OUT, 'shot_personale.png'))
         await pg.click('#win-personale [data-act=openwh]')
         assert await pg.eval_on_selector_all('#win-magazzini [data-act=hire]', 'e=>e.length') == 7
