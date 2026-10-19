@@ -1,17 +1,19 @@
 """Test automatico: apre il gioco in Chromium headless, clicca tutti i menu, prova alberi tecnologici e direzione,
-poi fa giocare un bot semplice 3 anni con ognuno dei 4 CEO. Fallisce se ci sono errori JavaScript.
+crea un CEO personalizzato, prova il gioco su un telefono (verticale e orizzontale: finestre, tocchi, zoom con due dita),
+poi fa giocare un bot semplice 3 anni con ognuno dei 4 CEO e con uno creato. Fallisce se ci sono errori JavaScript.
 Uso: python3 tools/build.py && python3 tests/smoke_test.py   (richiede: pip install playwright && playwright install chromium)"""
 import asyncio, os, sys
 from playwright.async_api import async_playwright
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'tools', 'out'); os.makedirs(OUT, exist_ok=True)
-HTML = open(os.path.join(ROOT, 'dist', 'fup.html'), encoding='utf-8').read()
-PAGE = os.path.join(OUT, 'test_page.html')
-open(PAGE, 'w', encoding='utf-8').write('<!doctype html><html><head><meta charset="utf-8"></head><body>' + HTML + '</body></html>')
+PAGE = os.path.join(ROOT, 'dist', 'fup.html')
 
 CLEAR = '''()=>{const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}}'''
 BOT = '''(ceo)=>{
- const F=window.__FUP; F.newGame(ceo); const S=F.S; const out=[];
+ const F=window.__FUP; const out=[];
+ if(ceo==='custom') F.newGame(null,F.ccCeo(Object.assign(F.ccNew(),{nome:'Ornella',cognome:'Bancalini',base:'valeria',edu:'Ingegnere dei trasporti',tal:['Calma olimpica','Parla con i robot']})));
+ else F.newGame(ceo);
+ const S=F.S;
  const clr=()=>{const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}};
  for(let d=0; d<365*3 && !S.over; d++){
    S.speed=1; clr();
@@ -27,13 +29,82 @@ BOT = '''(ceo)=>{
  }
  return {ceo, day:S.day, over:S.over, cash:Math.round(S.cash), clienti:S.clients.filter(c=>c.status==='attivo').length};}'''
 
+# telefono: ogni finestra resta dentro lo schermo, la pagina non scorre di lato, tooltip al tocco, pinch sulla mappa
+PINCH = r'''()=>{const mw=document.querySelector('#mapwrap'), m=document.querySelector('#map'), s0=m.style.transform;
+  const ev=(t,id,x,y)=>mw.dispatchEvent(new PointerEvent(t,{pointerId:id,clientX:x,clientY:y,pointerType:'touch',bubbles:true,isPrimary:id===1}));
+  ev('pointerdown',1,150,400); ev('pointerdown',2,250,400);
+  for(let i=1;i<=5;i++){ev('pointermove',1,150-i*15,400);ev('pointermove',2,250+i*15,400);}
+  ev('pointerup',1,75,400); ev('pointerup',2,325,400);
+  const sc=t=>+((t.match(/scale\(([\d.]+)\)/)||[])[1]||0); return [sc(s0),sc(m.style.transform)];}'''
+FITS = '''(sel)=>{const r=document.querySelector(sel).getBoundingClientRect();
+  return r.left>=-1&&r.top>=-1&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1&&document.documentElement.scrollWidth<=innerWidth;}'''
+
+async def phone(b, w, h, name, errs):
+    ctx = await b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    pg = await ctx.new_page(); pg.on('pageerror', lambda e: errs.append(f'{name}: {e}'))
+    await pg.goto('file://' + PAGE)
+    assert await pg.evaluate("document.documentElement.classList.contains('mob')"), 'layout telefono non attivo'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_avvio.png'))
+    await pg.tap('[data-act=startgame]'); await pg.tap('[data-act=closemodal]')
+    await pg.wait_for_timeout(100)
+    for d in await pg.eval_on_selector_all('#dock button', 'e=>e.map(b=>b.dataset.id)'):
+        assert await pg.evaluate(FITS, f'#dock [data-id={d}]'), f'{name}: pulsante {d} fuori schermo'
+    zoom = await pg.evaluate(PINCH)
+    assert zoom[1] > zoom[0] * 1.5, f'{name}: pinch non ha zoomato {zoom}'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_mappa.png'))
+    for wn in ['azienda','magazzini','clienti','gare','report','personale','direzione','espansione','giornale','tecnologia','enciclopedia']:
+        await pg.tap(f'#dock [data-id={wn}]')
+        assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
+        await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{wn}.png'))
+        await pg.tap(f'#win-{wn} [data-act=close]')
+    # parola chiave: primo tocco = tooltip, secondo tocco = enciclopedia
+    await pg.tap('#dock [data-id=magazzini]')
+    await pg.tap('#win-magazzini .kw[data-id=saturazione]')
+    assert await pg.is_visible('#tip') and not await pg.query_selector('#win-enciclopedia'), f'{name}: il primo tocco deve mostrare il tooltip'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_tooltip.png'))
+    await pg.tap('#win-magazzini .kw[data-id=saturazione]')
+    assert await pg.query_selector('#win-enciclopedia .wk-it[aria-current=true][data-id=saturazione]'), f'{name}: il secondo tocco deve aprire la voce'
+    # il menu riporta davanti una finestra coperta invece di chiuderla
+    await pg.tap('#dock [data-id=magazzini]')
+    assert await pg.query_selector('#win-magazzini'), f'{name}: la finestra coperta è stata chiusa'
+    await ctx.close()
+
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch()
+        errs = []
+        await phone(b, 390, 844, 'verticale', errs)
+        await phone(b, 844, 390, 'orizzontale', errs)
         pg = await b.new_page(viewport={'width': 1440, 'height': 860})
-        errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + PAGE)
+        # i tooltip devono stare sopra a tutto: schermata iniziale (talenti dei CEO) e finestre aperte
+        TIP_ON_TOP = '''(()=>{const t=document.querySelector('#tip'),r=t.getBoundingClientRect();t.style.pointerEvents='auto';const e=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);t.style.pointerEvents='';return !t.hidden&&!!e&&!!e.closest('#tip');})()'''
+        await pg.hover('#start .ceo[data-id=edoardo] .tal')
+        assert await pg.evaluate(TIP_ON_TOP), 'tooltip del talento coperto nella schermata iniziale'
+        # creazione del CEO: senza nome e titolo non si parte
+        await pg.click('[data-act=pickceo][data-id=custom]')
+        await pg.click('[data-act=startgame]')
+        assert 'nome e cognome' in await pg.inner_text('#start [role=alert]')
+        await pg.fill('#cc-nome', 'Ornella'); await pg.fill('#cc-cognome', 'Bancalini')
+        await pg.click('[data-act=ccedu][data-n="Laureato in scienze umanistiche"]')
+        await pg.click('[data-act=ccedu][data-n="Ingegnere informatico"]')   # cambia titolo
+        for n in ['Calma olimpica', 'Insonne', 'Cena col buyer', 'Stacanovista']:  # il quarto non entra
+            await pg.click(f'[data-act=cctal][data-n="{n}"]', force=True)
+        for _ in range(3): await pg.click('[data-act=ccst][data-k=op][data-d="1"]')
+        await pg.click('[data-act=ccimg][data-d="1"]'); await pg.click('[data-act=ccbase][data-id=marco]')
+        assert await pg.input_value('#cc-nome') == 'Ornella' and await pg.input_value('#coname-in') == 'Trasporti Bancalini'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_crea_ceo.png'), full_page=True)
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
+        c = await pg.evaluate('()=>{const S=window.__FUP.S;return {id:S.ceoId,n:S.custom.name,tal:S.custom.tal,st:S.custom.st,co:S.company.name,wh:S.warehouses[0].site,cl:S.clients[0].name}}')
+        assert c['id'] == 'custom' and c['n'] == 'Ornella Bancalini' and c['co'] == 'Trasporti Bancalini', c
+        assert c['tal'] == ['Ingegnere informatico', 'Calma olimpica', 'Insonne', 'Cena col buyer'], c['tal']
+        # 8 di base, +3 in Operazioni; Ingegnere informatico Inn +4 Lead −2; Calma +1 Lead; Insonne Op −2 Prec −2; Cena Neg +4
+        assert c['st'] == {'op': 9, 'prec': 6, 'neg': 12, 'lead': 7, 'amm': 8, 'inn': 12}, c['st']
+        assert c['wh'] == 'voltri' and c['cl'] == 'Caffè Portuale', c
+        await pg.click('#dock [data-id=azienda]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_azienda_ceo_creato.png'))
+        await pg.click('#dock [data-id=azienda]')
         # lente delle province
         await pg.click('#lenses [data-act=lens][data-id=prov]')
         n = await pg.evaluate("document.querySelectorAll('#ov path.prov').length")
@@ -71,6 +142,9 @@ async def main():
         if not await pg.query_selector('#win-magazzini'): await pg.click('#dock [data-id=magazzini]')
         await pg.hover('#win-magazzini .kw[data-id=saturazione]')
         assert await pg.is_visible('#tip'), 'tooltip parola chiave non visibile'
+        assert await pg.evaluate(TIP_ON_TOP), 'tooltip coperto da una finestra'
+        await pg.hover('#top .chip[data-id=cassa]')
+        assert await pg.evaluate(TIP_ON_TOP), 'tooltip della barra in alto coperto dalle finestre'
         await pg.click('#win-magazzini .kw[data-id=saturazione]')
         assert await pg.query_selector('#win-enciclopedia .wk-it[aria-current=true][data-id=saturazione]')
         await pg.click('#win-enciclopedia .wk-txt .kw[data-id=accuratezza]')
@@ -108,7 +182,16 @@ async def main():
         assert st['imp'] is None and sum(st['st'].values()) == 8+3 and st['st']['autB'] > 0, st
         assert st['q'] == ['imp:true', 'autCE:true'], st
         assert await pg.evaluate('()=>window.__FUP.S.office.plan===0 && window.__FUP.S.warehouses[0].coop===false')
-        for ceo in ['gino','edoardo','valeria','marco']:
+        # eventi dei talenti: ognuno compare con il suo talento e tutte le scelte funzionano
+        r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame(null,F.ccCeo(Object.assign(F.ccNew(),{nome:'Prova',cognome:'Eventi',edu:'Autodidatta'})));
+          const S=F.S,evs=F.EVENTS.filter(e=>e.id.startsWith('t_')),bad=[];S.custom.tal=[];
+          evs.forEach(e=>{const nm=(e.cond.toString().match(/hasTal[(]'(.+?)'[)]/)||[])[1];if(!nm||!F.TALENTS[nm.replace(/\\\\/g,'')])bad.push(e.id+': talento?');});
+          if(evs.some(e=>{try{return e.cond();}catch(x){return true;}}))bad.push('evento senza talento');
+          S.custom.tal=Object.keys(F.TALENTS);
+          evs.forEach(e=>e.opts.forEach((o,i)=>{const ev={...e};try{if(ev.setup)ev.setup(ev);if(!ev.text)bad.push(e.id+': testo');o.f.call(ev);}catch(x){bad.push(e.id+'/'+i+': '+x);}}));
+          return {n:evs.length,bad};}''')
+        assert r['n'] >= 30 and not r['bad'], r
+        for ceo in ['gino','edoardo','valeria','marco','custom']:
             print(await pg.evaluate(BOT, ceo))
         await b.close()
     if errs:

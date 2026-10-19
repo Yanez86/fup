@@ -4,6 +4,9 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 
 ## Partita
 - Si sceglie uno dei 4 CEO (Gino, Edoardo, Valeria, Marco), il nome dell'azienda e il colore. Ogni CEO ha un magazzino di proprietà, un cliente iniziale, una cassa, delle motrici e dei talenti propri.
+- In alternativa il giocatore **crea il proprio CEO** (quinta scheda): nome, cognome, età, ritratto (10 a scelta, `p_cc1`…`p_cc10`) e punto di partenza (magazzino, cassa, motrici e cliente storico di uno dei 4 CEO, senza le tecnologie iniziali di Marco).
+  - 58 punti. Ogni punto di abilità costa 1 (da 1 a 18 prima dei talenti). Un **titolo di studio** obbligatorio (34 talenti con `edu`) e fino a 3 talenti di carattere.
+  - Ogni talento costa la somma dei suoi effetti sulle abilità (letti dal testo `fx` con `talMods()`): Operazioni +3 e Leadership −1 = 2 punti; i talenti con soli malus restituiscono punti. Abilità finale = punti + talenti, tra 0 e 20.
 - Si parte a gennaio 2002. Le tecnologie e gli eventi hanno un anno minimo.
 - Si va in fallimento se a fine mese la cassa è sotto −50.000 €.
 
@@ -82,7 +85,7 @@ Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Opera
 ## Tecnologie
 - Tre alberi: **Logistica** (barcode → WMS → radiofrequenza → pick-to-light → AMR; formazione → sicurezza muletti → magazzino verticale; GPS → pianificazione rotte → sinergia in pianificazione), **Sviluppo aziendale** (gestionale → ufficio del personale → welfare → Academy; gestionale → struttura direzionale → controllo di gestione → ISO 9001), **Mercato** (ufficio commerciale → EDI → KAM → e-commerce / accordi quadro nazionali; marketing; catena del freddo).
 - Una ricerca alla volta. Giorni = base × clamp(1 − 0,03·(Innovazione − 10); 0,6; 1,5). Si usa l'Innovazione più alta tra quella del CEO e quella del direttore tecnologia. Annullando una ricerca si recupera il 50% del costo.
-- Logistica: dopo la ricerca si paga l'installazione in ogni magazzino, più un canone mensile. Durante le settimane di apprendimento l'effetto è negativo, poi diventa positivo (Academy −30% sui tempi di apprendimento).
+- Logistica: dopo la ricerca si paga l'installazione in ogni magazzino, più un canone mensile. Durante le settimane di apprendimento l'effetto è negativo, poi diventa positivo (moltiplicatori sui tempi di apprendimento: Academy ×0,7; nel magazzino guidato dal CEO i talenti con `learn`: Allergico al gestionale ×1,5, Parla con i robot ×0,7, Ingegnere informatico ×0,8, Diplomato perito informatico ×0,85).
 
 ## Dirigenti
 - Sbloccati dalla "Struttura direzionale". Posti disponibili: operativo (Operazioni), commerciale (Negoziazione), risorse umane (Leadership), finanziario (Amministrazione), tecnologia (Innovazione).
@@ -91,12 +94,20 @@ Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Opera
 ## Eventi
 - Uno ogni 30-55 giorni (il primo verso il 25° giorno). Un evento non si ripete prima di 240 giorni; quelli con `once` capitano una sola volta.
 - Ogni evento ha 2-3 opzioni. Alcune opzioni richiedono un talento o un'abilità del CEO.
+- Presentazione: `text` è un breve racconto (2-3 frasi: cosa succede, chi è coinvolto, cosa c'è in gioco). Ogni opzione ha `t` (titolo), `d` (una frase che racconta cosa fai e come la prendono) ed `e` (gli effetti sul gioco, mostrati a parte sotto «Effetti»). Se l'evento sceglie un cliente (`ev.c`) o un magazzino (`ev.w` / `ev.wh`), la finestra li mostra sotto il titolo. Nel giornale resta il racconto con la scelta fatta.
+- Eventi dei talenti (id `t_…`, `cond` con `hasTal()`): circa 40 eventi che compaiono solo se il CEO ha quel talento (es. Stacanovista → la moglie o il marito di un dipendente fa una scenata in ufficio). Entrano nella stessa estrazione degli altri eventi, quindi restano rari. Ogni talento di carattere nuovo ne ha uno; il testo `fx` dei talenti non li nomina, sono una sorpresa.
 - Tipi di evento: meteo (nebbia, neve, afa, allerta Liguria), politica e storia (euro, ZTL, elezioni, Expo, lockdown, caro gasolio), vita locale (Giro, derby, parroco, vicino di capannone), clienti, personale e tecnologia.
 
 ## Enciclopedia e parole chiave
 - Finestra "Enciclopedia di FUP" (icona del libro nel menu, tasto E): indice per categorie (basi, KPI, abilità, talenti, personale, clienti e gare, soldi e costi, tecnologie, direzione, gergo), ricerca, voci collegate tra loro, pulsanti Indietro e Indice.
-- Nell'interfaccia le parole chiave sono sottolineate a puntini: al passaggio del mouse un tooltip dà la spiegazione breve, al clic si apre la voce completa. Anche abilità, talenti, tecnologie installate e i riquadri della barra in alto aprono la loro voce.
+- Nell'interfaccia le parole chiave sono sottolineate a puntini: al passaggio del mouse (o al primo tocco sul telefono) un tooltip dà la spiegazione breve, al clic (o al secondo tocco) si apre la voce completa. Anche abilità, talenti, tecnologie installate e i riquadri della barra in alto aprono la loro voce.
 - Le voci di abilità, talenti, tecnologie e direttori sono generate dai dati del gioco; le altre sono scritte a mano in `WIKI` e i numeri vanno tenuti allineati alle formule di questo documento.
+
+## Telefono e web app
+- Il gioco funziona su computer e su telefono. Sotto i 760 px di larghezza (o 500 di altezza) si attiva il layout da telefono: finestre a tutto schermo, una sopra l'altra; menu in basso su due righe in verticale, a sinistra su due colonne in orizzontale; barra in alto compatta (cassa, mese scorso, reputazione).
+- Comandi al tocco: un dito sposta la mappa, due dita fanno lo zoom. Primo tocco su una parola chiave = tooltip, secondo tocco = voce dell'enciclopedia (dentro l'enciclopedia i collegamenti si aprono subito). Tenere premuto un pulsante mostra il suo tooltip. Il menu riporta davanti una finestra coperta invece di chiuderla.
+- Web app: da GitHub Pages si installa sulla schermata Home (manifest, icone da `tools/icone.py`, service worker `sw.js` che tiene una copia per giocare senza rete; la pagina si scarica fresca quando c'è connessione).
+- Salvataggio automatico ogni volta che il gioco va in secondo piano. Tornando nel gioco il tempo riparte da dove era: i giorni non scorrono mentre l'app è chiusa.
 
 ## Idee aperte
 - Espansione oltre il Nord-Ovest, concorrenti più attivi sulla mappa, flotta con tipi di mezzi diversi (motrici, bilici, frigo), contratti con i fornitori, uffici.

@@ -113,7 +113,25 @@ def giulia_col(c):
     c.px([(21,41),(22,42),(23,42),(24,43),(25,42),(26,42),(27,41)],'#e2b84a')
 person('giulia',skin='media',hair='#a3482c',hairl='#c86a40',hairstyle='bob',cloth='#e8a317',clothd='#b97f0c',clothl='#ffd36b',lips='#b8323a',earring='#e2b84a',collar=giulia_col)
 person('roberto',skin='scura',hair='#c9ced4',hairl='#eef1f4',hairstyle='short',cloth='#4a2f5c',clothd='#33203f',clothl='#6b4a82',collar=tie('#e0393e'))
+# ritratti a scelta per il CEO creato dal giocatore (p_cc1 ... p_cc10)
+def cc_col(col):
+    def f(c): c.px([(21,41),(22,42),(23,42),(24,42),(25,42),(26,42),(27,41)],col)
+    return f
+person('cc1',skin='media',hair='#2c2420',hairl='#463830',hairstyle='short',cloth='#26365c',clothd='#1b2238',clothl='#3a4f80',collar=tie('#ffd23f'))
+person('cc2',skin='chiara',hair='#b98a4e',hairl='#d9ad6c',hairstyle='bob',cloth='#2e9e48',clothd='#1f7a34',clothl='#5cc472',lips='#c85a62',earring='#e2b84a',collar=cc_col('#f4f5f7'))
+person('cc3',skin='scura',hair='#2c2420',hairl='#4a3c34',hairstyle='buzz',cloth='#e0393e',clothd='#a8262b',clothl='#ff6a6e',beard='#2c2420')
+person('cc4',skin='media',hair='#7a3220',hairl='#a3482c',hairstyle='long',cloth='#4a5f7a',clothd='#33445a',clothl='#6b819e',glasses='#16202e',lips='#a83a3a')
+person('cc5',skin='chiara',hair='#9aa0a8',hairl='#c9ced4',hairstyle='short',cloth='#5a3e2b',clothd='#3e2a1c',clothl='#7a5a40',mustache='#9aa0a8',collar=tie('#5fb4f0'))
+person('cc6',skin='scura',hair='#1c1612',hairl='#3d2419',hairstyle='curly',cloth='#9b6bff',clothd='#6f43cf',clothl='#c8adff',lips='#8f3a3a',earring='#e2b84a')
+person('cc7',skin='chiara',hair='#4a3426',hairl='#6e4e38',hairstyle='messy',cloth='#ff7a3d',clothd='#c8551f',clothl='#ffb07a',glasses='#8a5f36',beard='#4a3426')
+person('cc8',skin='media',hair='#b9bec5',hairl='#dfe3e8',hairstyle='perm',cloth='#1f9e8f',clothd='#157366',clothl='#3dd6c4',lips='#b0505a',glasses='#16202e')
+person('cc9',skin='media',hair='#5d636b',hairl='#8a9098',hairstyle='bald',cloth='#3a4658',clothd='#2a3442',clothl='#4f5d72',beard='#5d636b',collar=tie('#ff7a3d'))
+person('cc10',skin='chiara',hair='#ffd23f',hairl='#fff3c4',hairstyle='long',cloth='#2b3550',clothd='#1b2238',clothl='#44547a',lips='#c85a62',collar=cc_col('#ffd23f'))
 bg=Image.new('RGBA',(3*104,120),(42,58,80,255))
 for i,n in enumerate(['ottavio','giulia','roberto']):
     im=Image.open(OUT+f'p_{n}.png'); bg.alpha_composite(im,(4+i*104,4))
 bg.save(ROOT+'/tools/out/exec_preview.png')
+bg=Image.new('RGBA',(10*104,120),(42,58,80,255))
+for i in range(10):
+    im=Image.open(OUT+f'p_cc{i+1}.png'); bg.alpha_composite(im,(4+i*104,4))
+bg.save(ROOT+'/tools/out/cc_preview.png')

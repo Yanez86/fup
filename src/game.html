@@ -1,5 +1,18 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>FUP – Fino all'ultimo pallet</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<!-- web app: si installa sulla schermata Home del telefono (manifest, icone e sw.js sono accanto a index.html) -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#16202e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FUP">
+<link rel="apple-touch-icon" href="icona_180.png">
+<link rel="icon" type="image/png" href="{{ICON}}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap">
 <style>
 /* Layout: mappa a tutto schermo con pan e zoom, barra risorse in alto, menu a sinistra, finestre fluttuanti trascinabili sopra. Look unico (pixel art chiara su mappa), senza tema scuro alternativo. */
@@ -13,8 +26,10 @@
   --f-body:'IBM Plex Sans Condensed', 'Arial Narrow', Arial, sans-serif;
   color-scheme: light;
 }
+/* sfondo scuro come la barra e il menu: su iPhone si vede sotto la barra di stato e sotto il menu, dove la mappa non arriva */
+html{background:var(--ink)}
 html,body{height:100%}
-body{margin:0;background:var(--sea);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;
+body{margin:0;background:var(--ink);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0}
 button{font:inherit;cursor:pointer;color:inherit}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--yellow);outline-offset:1px}
@@ -53,6 +68,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .spd{display:flex;gap:4px}
 .spd button{width:36px;height:34px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font-family:var(--f-disp);font-weight:700;box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
 .spd button[aria-pressed="true"]{background:var(--accent);color:var(--ink);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
+.optb{width:36px;height:34px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink4);background:var(--ink3);box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
+.optb:hover{border-color:#fff}
 .spacer{flex:1}
 .stats{display:flex;gap:6px;flex-wrap:wrap}
 .paused{font-family:var(--f-disp);font-size:15px;padding:3px 8px;background:var(--bad);border:2px solid #fff}
@@ -64,6 +81,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 #dock .badge{position:absolute;right:-7px;top:-7px;min-width:20px;height:20px;padding:0 4px;background:var(--bad);color:#fff;border:2px solid #fff;font:700 12px/16px var(--f-body)}
 
 /* Finestre */
+/* le finestre si ordinano tra loro dentro #wins, senza mai salire sopra barra, modali e tooltip */
+#wins{position:relative;z-index:20}
 .win{position:fixed;z-index:20;width:440px;max-width:calc(100vw - 32px);max-height:calc(100vh - 110px);display:flex;flex-direction:column;background:var(--panel);border:3px solid var(--ink2);box-shadow:inset 0 0 0 2px #fff, 6px 6px 0 rgba(12,19,29,.55)}
 .win.wide{width:640px}
 .win.xwide{width:960px}
@@ -147,7 +166,7 @@ table.t td.r,table.t th.r{text-align:right}
 .staff{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:6px 10px;align-items:center;font-size:15px}
 .mini{width:48px;height:56px;background:#3a6db0;border:2px solid var(--ink)}
 .mport{width:96px;height:112px;flex:none;background:repeating-linear-gradient(180deg,#2f5fa0 0 8px,#3a6db0 8px 16px);border:3px solid var(--ink)}
-select,input[type=text]{font:inherit;padding:5px 7px;border:2px solid var(--ink);background:#fff;min-width:0;max-width:100%}
+select,input[type=text],input[type=number]{font:inherit;padding:5px 7px;border:2px solid var(--ink);background:#fff;min-width:0;max-width:100%}
 input[type=range]{width:100%;accent-color:var(--accent)}
 .split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .chbar i{display:block;height:100%}
@@ -185,7 +204,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .wk-home .kws{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:14px}
 
 /* Tooltip, notifiche, modali */
-#tip{position:fixed;z-index:60;max-width:320px;padding:9px 11px;background:var(--ink);color:#fff;border:2px solid var(--ink2);box-shadow:inset 0 2px 0 var(--ink3), 4px 4px 0 rgba(12,19,29,.5);font-size:14px;line-height:1.45;pointer-events:none}
+#tip{position:fixed;z-index:1000;max-width:320px;padding:9px 11px;background:var(--ink);color:#fff;border:2px solid var(--ink2);box-shadow:inset 0 2px 0 var(--ink3), 4px 4px 0 rgba(12,19,29,.5);font-size:14px;line-height:1.45;pointer-events:none}
 #tip .tt{font-family:var(--f-disp);font-size:16px;color:var(--yellow)}
 #tip .tr{display:flex;justify-content:space-between;gap:12px}
 #toasts{position:fixed;right:max(16px, env(safe-area-inset-right, 0px));top:76px;z-index:40;display:flex;flex-direction:column;gap:6px;width:340px;max-width:calc(100vw - 32px);pointer-events:none}
@@ -197,6 +216,17 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .src{display:flex;justify-content:space-between;padding:7px 12px;background:var(--ink);color:#fff;font-family:var(--f-disp);font-size:16px}
 .opt{text-align:left;padding:9px 12px;border:2px solid var(--ink);background:#fff;box-shadow:inset 0 -3px 0 #c9d3dd, 2px 2px 0 var(--ink);font-size:15px}
 .opt small{display:block;color:var(--muted);font-size:14px}
+.opt:disabled{opacity:.55;cursor:not-allowed;background:var(--panel2)}
+/* finestra evento: scena, chi è coinvolto, risposte raccontate */
+.ev-who{display:flex;flex-wrap:wrap;gap:6px}
+.ev-who span{display:inline-flex;align-items:center;gap:6px;padding:2px 8px 2px 3px;background:#fff;border:2px solid var(--ink);font-size:14px;font-weight:600}
+.ev-x{margin:0;line-height:1.5;font-size:16px;padding:10px 12px;background:#fff;border-left:4px solid var(--accent)}
+.ev-q{font-family:var(--f-disp);font-size:16px;margin-top:2px}
+.opt b{display:block;font-size:16px}
+.opt .ev-d{display:block;margin:2px 0 4px;line-height:1.4}
+.opt .ev-e{display:block;padding-top:4px;border-top:1px dashed var(--line);font-size:14px;color:var(--muted)}
+.opt .ev-e i{font-style:normal;font-weight:600;color:var(--ink)}
+.opt .pill{float:right;margin-left:6px;background:var(--yellow)} .opt .pill.ok{background:#bfe8c8}
 
 /* Avvio */
 #start:empty,#modal:empty{display:none}
@@ -207,14 +237,80 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .ceo{display:flex;flex-direction:column;gap:6px;padding:10px;background:#fff;border:3px solid var(--ink);cursor:pointer;text-align:left;box-shadow:inset 0 -3px 0 var(--panel2)}
 .ceo[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 3px var(--accent), 4px 4px 0 var(--ink)}
 .sw{width:30px;height:30px;border:3px solid var(--ink)}
+.ceos.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.ccbox{gap:10px}
+.cc-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.cc-por{display:flex;align-items:center;gap:6px}
+.cc-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 90px;gap:8px}
+.cc-fields label{display:flex;flex-direction:column;gap:4px}
+.cc-base{display:flex;gap:8px;flex-wrap:wrap}
+.btn[aria-pressed="true"]{background:var(--accent-l);border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--accent), 2px 2px 0 var(--ink)}
+.cc-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cc-st{display:flex;align-items:center;gap:6px}
+.cc-st b.v{min-width:22px;text-align:center;font-size:17px}
+.cc-pick{display:flex;gap:6px;flex-wrap:wrap}
+.talpick{width:42px;height:42px;padding:0;cursor:pointer}
+.talpick[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:1px;box-shadow:3px 3px 0 var(--ink)}
+.talpick:disabled{opacity:.35;cursor:not-allowed}
 .sw[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
 @media (max-width:900px){.ceos{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:640px){
-  .ceos{grid-template-columns:minmax(0,1fr)}
-  #top .stats .chip.opt2{display:none}
-  #dock{top:auto;bottom:calc(12px + env(safe-area-inset-bottom, 0px));flex-direction:row;left:50%;transform:translateX(-50%)}
-  .win{left:16px !important;right:16px;top:96px !important;width:auto !important}
-}
+@media (max-width:640px){.ceos{grid-template-columns:minmax(0,1fr)}}
+
+/* Telefono (classe .mob su <html>, vedi setMobile): finestre a tutto schermo tra la barra in alto e il menu,
+   menu in basso (in verticale) o a sinistra su due colonne (in orizzontale), pulsanti grandi per il dito.
+   --top-h, --win-l e --win-b sono misurati in JS. */
+html,body{overscroll-behavior:none}
+.mob body{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.mob input[type=text]{-webkit-user-select:text;user-select:text;font-size:16px}
+.mob #top{gap:6px 8px;padding:4px max(8px, env(safe-area-inset-right, 0px)) 5px max(8px, env(safe-area-inset-left, 0px));padding-top:calc(4px + env(safe-area-inset-top, 0px))}
+.mob #top .logo{font-size:19px}
+.mob #top .logo small,.mob #top .spacer{display:none}
+.mob .date{font-size:14px;padding:3px 6px}
+.mob .spd button,.mob .optb{width:38px;height:36px}
+.mob .paused{display:none}
+.mob #top .stats{gap:4px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.mob #top .stats .chip.opt2{display:none}
+.mob .chip{padding:1px 7px;flex:none}
+.mob .chip span:first-child{font-size:10px}
+.mob .chip b{font-size:15px}
+.mob #dock{top:auto;left:0;right:0;bottom:0;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:5px;padding:5px max(8px, env(safe-area-inset-right, 0px)) calc(5px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));border-width:3px 0 0;box-shadow:inset 0 2px 0 var(--ink3)}
+.mob #dock button{width:50px;height:44px}
+.mob.land #dock{top:var(--top-h);bottom:0;right:auto;display:grid;grid-template-columns:repeat(2,46px);grid-auto-rows:40px;align-content:start;gap:4px;padding:5px 5px calc(5px + env(safe-area-inset-bottom, 0px)) max(5px, env(safe-area-inset-left, 0px));border-width:0 3px 0 0;overflow-y:auto}
+.mob.land #dock button{width:46px;height:40px}
+.mob #lenses{right:8px;bottom:calc(var(--win-b) + 8px);padding:4px}
+.mob #lenses .lab{display:none}
+.mob.haswin #lenses{display:none}
+.mob .win{left:var(--win-l) !important;right:0;top:var(--top-h) !important;bottom:var(--win-b);width:auto !important;max-width:none;max-height:none;border-width:0 0 0 3px;box-shadow:none}
+.mob .win-h{cursor:default;padding:4px 6px 4px 12px}
+.mob .win-h h2{font-size:20px}
+.mob .grip{display:none}
+.mob .xbtn{width:44px;height:40px;font-size:16px}
+.mob .win-b{padding:10px max(10px, env(safe-area-inset-right, 0px)) 16px 10px;overscroll-behavior:contain}
+.mob .tabs button{padding:10px 6px}
+.mob .win-b > *{flex-shrink:0}
+.mob .skills{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mob .btn{min-height:40px}
+.mob .btn.sm2{min-height:36px}
+.mob .xl-grid{max-height:none}
+.mob .lc-row,.mob .wk{grid-template-columns:minmax(0,1fr)}
+.mob .wk-list{max-height:32vh}
+.mob .wk:not(.q) .wk-list{display:none}
+.mob .xl-top{flex-wrap:wrap;gap:2px 8px}
+.mob .wk-home{grid-template-columns:minmax(0,1fr)}
+.mob #toasts{top:calc(var(--top-h) + 6px);left:max(8px, env(safe-area-inset-left, 0px));right:max(8px, env(safe-area-inset-right, 0px));width:auto;max-width:none}
+.mob #tip{max-width:min(340px, calc(100vw - 16px))}
+.mob .ovl{padding:8px}
+.mob .modal{max-height:calc(100dvh - 16px)}
+.mob #start{padding:10px max(8px, env(safe-area-inset-right, 0px)) 16px max(8px, env(safe-area-inset-left, 0px))}
+.mob #start h1{font-size:34px}
+.mob .ceos{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mob .ceo{padding:6px}
+.mob .cc-top{grid-template-columns:minmax(0,1fr);justify-items:center}
+.mob .cc-top > *{width:100%}
+.mob .cc-por{justify-content:center}
+.mob .cc-fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 64px}
+.mob .cc-stats{grid-template-columns:minmax(0,1fr)}
+.mob.land .cc-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media (prefers-reduced-motion: reduce){ .toast{transition:none} }
 </style>
 
@@ -235,6 +331,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     <button data-act="speed" data-v="2" aria-label="Velocità 2">››</button>
     <button data-act="speed" data-v="3" aria-label="Velocità 3">›››</button>
   </div>
+  <button class="optb" data-act="options" aria-label="Opzioni" title="Opzioni"><svg width="20" height="20" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="#16202e" d="M4 0h2v1h1v1h1v-1h1v1h1v1h-1v1h1v2h-1v1h1v1h-1v1h-1v-1h-1v1h-1v1h-2v-1h-1v-1h-1v1h-1v-1h-1v-1h1v-1h-1v-2h1v-1h-1v-1h1v-1h1v1h1v-1h1z"/><path fill="#d8e2ee" d="M4 1h2v1h1v1h1v4h-1v1h-1v1h-2v-1h-1v-1h-1v-4h1v-1h1z"/><path fill="#16202e" d="M4 4h2v2h-2z"/></svg></button>
   <span class="paused" id="paused" hidden>In pausa</span>
   <div class="spacer"></div>
   <div class="stats num" id="stats"></div>
@@ -252,7 +349,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 (function(){
 'use strict';
 /* ====================== DATI ====================== */
-const IMG={car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}'};
+const IMG={car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}'};
 const LON0=4.81, LAT1=47.0, KX=78.29*2, KY=111.111*2;
 const pt=(lon,lat)=>[ (lon-LON0)*KX, (LAT1-lat)*KY ];
 const CITIES=[
@@ -271,7 +368,7 @@ const SITES={
 };
 const CEOS=[
  {id:'gino',name:'Gino Bertolotti',age:52,origin:'Ex padroncino',site:'rivalta',cash:180000,motrici:3,fixed:3500,rep:45,company:'Trasporti Bertolotti',
-  st:{op:17,prec:9,neg:5,lead:14,amm:6,inn:2},tal:['Un milione di km al volante','Allergico al gestionale','Dialetto stretto'],allergic:true,
+  st:{op:17,prec:9,neg:5,lead:14,amm:6,inn:2},tal:['Un milione di km al volante','Allergico al gestionale','Dialetto stretto'],
   bio:'Trent\'anni sulle strade d\'Europa, poi il capannone di Rivalta comprato con la liquidazione. Diffida di tutto ciò che ha una presa elettrica.',
   client:{name:'Pastificio Mezzemaniche',slogan:'Al dente o rimborsati',sector:'Alimentare secco',stock:700,pal:300,sP:92,sA:null}},
  {id:'edoardo',name:'Edoardo Ferretti',age:31,origin:'Figlio del fondatore',site:'pioltello',cash:320000,motrici:2,fixed:5500,rep:50,company:'Ferretti Logistica',
@@ -283,7 +380,7 @@ const CEOS=[
   bio:'Quindici anni di slide e KPI in una multinazionale. Dorme quattro ore a notte e lo considera un vantaggio competitivo.',
   client:{name:'Saponaria Italia',slogan:'Detersivi per un mondo più bianco',sector:'Largo consumo',stock:900,pal:500,sP:92,sA:95}},
  {id:'marco',name:'Marco Pellegrino',age:36,origin:'Ingegnere gestionale',site:'voltri',cash:200000,motrici:1,fixed:3000,rep:42,company:'Pellegrino Smart Logistics',
-  st:{op:9,prec:13,neg:5,lead:5,amm:11,inn:17},tal:['Excel-dipendente','Parla con i robot','Calma olimpica'],robots:true,startTech:['barcode'],
+  st:{op:9,prec:13,neg:5,lead:5,amm:11,inn:17},tal:['Excel-dipendente','Parla con i robot','Calma olimpica'],startTech:['barcode'],
   bio:'Ha progettato magazzini automatici per altri, ora ne vuole uno suo. Ogni pallet ha un codice, ogni codice un foglio Excel.',
   client:{name:'Caffè Portuale',slogan:'Tostato col sale del porto',sector:'Alimentare secco',stock:600,pal:250,sP:90,sA:97}}
 ];
@@ -461,16 +558,16 @@ const T_ST=5.5,T_MO=3.8,T_DI=30;
 const TPAL={K:'#16202e',W:'#ffffff',Y:'#ffd23f',O:'#ff7a3d',R:'#e0393e',G:'#2e9e48',B:'#5fb4f0',N:'#8a5f36',S:'#c3d0dc',D:'#4a5f7a',T:'#1f9e8f',F:'#f2c79b',P:'#9b6bff',C:'#fff3c4',L:'#bfe6ff',M:'#6b3e1f'};
 const TALENTS={
  'Un milione di km al volante':{t:'mix',fx:'Operazioni +4 · Leadership +1 · Innovazione −2 · Morale degli autisti +5',fl:'Conosce a memoria ogni Autogrill tra Rivalta e Rotterdam.',ic:['..KKKK..','.K....K.','K..KK..K','KKKKKKKK','K..KK..K','K..KK..K','.K.KK.K.','..KKKK..']},
- 'Allergico al gestionale':{t:'neg',fx:'Innovazione −4 · Apprendimento delle tecnologie +50% nel suo magazzino',fl:'Ha stampato il manuale del WMS per usarlo come fermaporta.',ic:['R..S.S.R','.R.S.SR.','..RSSR..','..SRRS..','..SRRS..','..RSSR..','.R.KK.R.','R..KK..R']},
+ 'Allergico al gestionale':{t:'neg',learn:1.5,fx:'Innovazione −4 · Apprendimento delle tecnologie +50% nel suo magazzino',fl:'Ha stampato il manuale del WMS per usarlo come fermaporta.',ic:['R..S.S.R','.R.S.SR.','..RSSR..','..SRRS..','..SRRS..','..RSSR..','.R.KK.R.','R..KK..R']},
  'Dialetto stretto':{t:'mix',fx:'Leadership +2 · Negoziazione −2 · Operai +10 di opinione, multinazionali −10',fl:'In magazzino lo capiscono tutti. In multinazionale nessuno.',ic:['YYYYYYYY','YWWWWWWY','YWKWKWWY','YWWWWKWY','YYYYYYYY','.YY.....','.Y......','........']},
- 'Laureato in Bocconi':{t:'mix',fx:'Amministrazione +3 · Negoziazione +1 · Operazioni −1',fl:'Cita Porter anche quando ordina il caffè.',ic:['........','...KK...','.KKKKKK.','KKKKKKKK','.KKKKKKY','..KKKK.Y','..KKKK.Y','.......Y']},
- 'Papà ha sempre ragione':{t:'neg',fx:'Leadership −2 · Tenuta allo stress −5 · Il fondatore interviene negli eventi',fl:'Il fondatore passa «solo per un caffè». Alle 8. Tutti i giorni.',ic:['..SSSS..','.SFFFFS.','.FKFFKF.','.FFFFFF.','.FSSSSF.','..FFFF..','..DDDD..','.DDDDDD.']},
+ 'Laureato in Bocconi':{t:'mix',edu:1,fx:'Amministrazione +3 · Negoziazione +1 · Operazioni −1',fl:'Cita Porter anche quando ordina il caffè.',ic:['........','...KK...','.KKKKKK.','KKKKKKKK','.KKKKKKY','..KKKK.Y','..KKKK.Y','.......Y']},
+ 'Papà ha sempre ragione':{t:'neg',fx:'Leadership −2 · Tenuta allo stress −5',fl:'Il fondatore passa «solo per un caffè». Alle 8. Tutti i giorni.',ic:['..SSSS..','.SFFFFS.','.FKFFKF.','.FFFFFF.','.FSSSSF.','..FFFF..','..DDDD..','.DDDDDD.']},
  'Sempre al telefono':{t:'mix',fx:'Negoziazione +2 · Precisione −1 · Tenuta allo stress −5',fl:'Risponde ai clienti anche dall\'ombrellone a Varazze.',ic:['..KKKK.O','..KBBKO.','..KBBK.O','..KBBK..','..KKKK..','..KWKK..','..KKKK..','........']},
  'Parla per acronimi':{t:'mix',fx:'Negoziazione +2 · Leadership −3 · Bonus nelle gare dei clienti grandi',fl:'ASAP, KPI, ROI: le sue mail sembrano codici fiscali.',ic:['........','......G.','....G.G.','..O.G.G.','..O.G.G.','R.O.G.G.','R.O.G.G.','KKKKKKKK']},
  'Stacanovista':{t:'mix',fx:'Operazioni +2 · Tenuta allo stress −15',fl:'Considera il weekend un\'invenzione dei sindacati.',ic:['..KKKK..','.KWWWWK.','KWWKWWWK','KWWKWWWK','KWWKKKWK','KWWWWWWK','.KWWWWK.','..KKKK..']},
- 'Cena col buyer':{t:'pos',fx:'Negoziazione +4 · Tenuta allo stress −10 · Scelte speciali negli eventi con i clienti',fl:'Le trattative migliori le chiude al secondo tiramisù.',ic:['.K....K.','.KRRRRK.','.KRRRRK.','..KRRK..','...KK...','...KK...','...KK...','..KKKK..']},
+ 'Cena col buyer':{t:'pos',fx:'Negoziazione +4 · Tenuta allo stress −10',fl:'Le trattative migliori le chiude al secondo tiramisù.',ic:['.K....K.','.KRRRRK.','.KRRRRK.','..KRRK..','...KK...','...KK...','...KK...','..KKKK..']},
  'Excel-dipendente':{t:'mix',fx:'Precisione +3 · Amministrazione +2 · Leadership −2',fl:'Ha un foglio Excel anche per la lista della spesa.',ic:['GGGGGGGG','GWWGWWWG','GGGGGGGG','GWWGWWWG','GGGGGGGG','GWWGWWWG','GGGGGGGG','........']},
- 'Parla con i robot':{t:'mix',fx:'Innovazione +3 · Leadership −2 · Apprendimento delle tecnologie −30%',fl:'Chiama i robot del magazzino per nome. Loro, per ora, non rispondono.',ic:['...RR...','...KK...','SSSSSSSS','SBBSSBBS','SSSSSSSS','SKKKKKKS','SSSSSSSS','.S....S.']},
+ 'Parla con i robot':{t:'mix',learn:0.7,fx:'Innovazione +3 · Leadership −2 · Apprendimento delle tecnologie −30%',fl:'Chiama i robot del magazzino per nome. Loro, per ora, non rispondono.',ic:['...RR...','...KK...','SSSSSSSS','SBBSSBBS','SSSSSSSS','SKKKKKKS','SSSSSSSS','.S....S.']},
  'Calma olimpica':{t:'pos',fx:'Leadership +1 · Tenuta allo stress +20',fl:'Durante l\'alluvione ha chiesto se c\'era ancora caffè.',ic:['........','..TTTT..','.T....T.','T..TT..T','T.T..T.T','.T....T.','..TTTT..','........']},
  'Ha fatto il militare':{t:'mix',fx:'Leadership +3 · Precisione +1 · Tenuta allo stress +5 · Dipendenti giovani −10 di opinione',fl:'Fa l\'appello alle 6:00. Anche quando non serve.',ic:['...YY...','...YY...','YYYYYYYY','.YYYYYY.','..YYYY..','.YY..YY.','YY....YY','........']},
  'Ex sindacalista':{t:'pos',fx:'Leadership +3 · Negoziazione +1 · Vertenze sindacali −50%',fl:'Conosce il contratto nazionale meglio di chi l\'ha scritto.',ic:['......R.','....RRR.','KRRRRRR.','KRRRRRR.','KRRRRRR.','....RRR.','..K...R.','..K.....']},
@@ -479,7 +576,73 @@ const TALENTS={
  'Mano larga':{t:'mix',fx:'Leadership +2 · Amministrazione −2 · Morale +5, costi del magazzino +5%',fl:'Offre la pizza a tutto il turno di notte. Il commercialista piange.',ic:['..R..R..','...RR...','OOOROOOO','OOOROOOO','YYYRYYYY','YYYRYYYY','YYYRYYYY','YYYRYYYY']},
  'Ansia da prestazione':{t:'mix',fx:'Precisione +2 · Tenuta allo stress −20',fl:'Rilegge ogni bolla tre volte. Poi una quarta.',ic:['...B....','...B....','..BBB...','.BBWBB..','.BBBWB..','.BBBBB..','..BBB...','........']},
  'Insonne':{t:'neg',fx:'Operazioni −2 · Precisione −2 · Tenuta allo stress −10',fl:'Risponde alle mail alle 3:47. E si aspetta una risposta.',ic:['..YYY...','.YY.....','YY......','YY....W.','YY......','.YY...W.','..YYY...','........']},
- 'Tifo sfegatato':{t:'mix',fx:'Leadership +1 · Eventi speciali nei giorni del derby',fl:'Il giorno del derby il magazzino si ferma. Anche lui.',ic:['..KKKK..','.KWWWWK.','KWWKKWWK','KWKKKKWK','KWWKKWWK','KWWWWWWK','.KWWWWK.','..KKKK..']}
+ 'Tifo sfegatato':{t:'mix',fx:'Leadership +1',fl:'Il giorno del derby il magazzino si ferma. Anche lui.',ic:['..KKKK..','.KWWWWK.','KWWKKWWK','KWKKKKWK','KWWKKWWK','KWWWWWWK','.KWWWWK.','..KKKK..']},
+ /* titoli di studio (edu:true): uno a testa per i personaggi creati dal giocatore */
+ 'Licenza media':{t:'mix',edu:1,fx:'Operazioni +2 · Amministrazione −1',fl:'A quattordici anni ha scelto il muletto. Il muletto non l\'ha mai deluso.',ic:['......KK','.....KYK','....KYK.','...KYK..','..KYK...','.KFK....','.KK.....','K.......']},
+ 'Diplomato ragioniere':{t:'pos',edu:1,fx:'Amministrazione +3 · Innovazione −1',fl:'Fa le somme a mente più in fretta del gestionale. E lo dice.',ic:['.KKKKKK.','.KGGGGK.','.KKKKKK.','.KWKWKK.','.KKKKKK.','.KWKWKK.','.KKKKKK.','........']},
+ 'Diplomato perito industriale':{t:'pos',edu:1,fx:'Operazioni +2 · Innovazione +1',fl:'Ripara la reggiatrice con una forcina. Funziona meglio di prima.',ic:['...DD...','.D.DD.D.','..DDDD..','DDD..DDD','DDD..DDD','..DDDD..','.D.DD.D.','...DD...']},
+ 'Diplomato perito informatico':{t:'mix',edu:1,fx:'Innovazione +3 · Leadership −1 · Apprendimento delle tecnologie −15% nel suo magazzino',fl:'Ha installato Linux sul terminale della pesa. Nessuno ha più il coraggio di toccarlo.',learn:0.85,ic:['KKKKKKKK','KBBBBBBK','KBGBBBBK','KBBBGBBK','KBBBBBBK','KKKKKKKK','...KK...','..KKKK..']},
+ 'Diplomato geometra':{t:'pos',edu:1,fx:'Precisione +2 · Operazioni +1',fl:'Misura le corsie col metro rigido. Due volte.',ic:['K.......','KK......','KYK.....','KYYK....','KY.YK...','KY..YK..','KYYYYYK.','KKKKKKKK']},
+ 'Maturità classica':{t:'mix',edu:1,fx:'Negoziazione +2 · Leadership +1 · Operazioni −1',fl:'Traduce Cicerone a vista. Le bolle doganali, meno.',ic:['KKKKKKKK','.KSSSSK.','.KSKSKK.','.KSKSKK.','.KSKSKK.','.KSKSKK.','.KSSSSK.','KKKKKKKK']},
+ 'Maturità scientifica':{t:'pos',edu:1,fx:'Precisione +1 · Innovazione +2',fl:'Per lui un bancale è un parallelepipedo con delle pretese.',ic:['........','BBBBBBBB','.B...B..','.B...B..','.B...B..','.B...B..','.B...BB.','........']},
+ 'Diplomato all\'alberghiero':{t:'mix',edu:1,fx:'Negoziazione +2 · Leadership +1 · Precisione −1',fl:'Le riunioni con i clienti finiscono sempre con un risotto.',ic:['.WW..WW.','WWWWWWWW','WWWWWWWW','.WWWWWW.','.WWWWWW.','.KKKKKK.','.WWWWWW.','........']},
+ 'Diplomato al nautico':{t:'mix',edu:1,fx:'Operazioni +2 · Leadership +1 · Amministrazione −1',fl:'Chiama il piazzale «la banchina» e i bilici «le navi».',ic:['...DD...','..D..D..','...DD...','DDDDDDDD','...DD...','D..DD..D','DD.DD.DD','.DDDDDD.']},
+ 'Qualifica professionale':{t:'pos',edu:1,fx:'Operazioni +2 · Precisione +1 · Negoziazione −1',fl:'Tre anni di centro di formazione e mani d\'oro. Il resto l\'ha imparato in turno di notte.',ic:['.D...D..','.DD.DD..','..DDD...','...D....','...DD...','....DD..','.....DD.','......DD']},
+ 'Ingegnere gestionale':{t:'mix',edu:1,fx:'Precisione +2 · Amministrazione +2 · Leadership −1',fl:'Ha un diagramma di Gantt anche per le ferie.',ic:['KKKKKKKK','KOOOOWWK','KWWBBBWK','KWWWGGGK','KYYWWWWK','KWWWWRRK','KKKKKKKK','........']},
+ 'Ingegnere meccanico':{t:'mix',edu:1,fx:'Operazioni +2 · Innovazione +2 · Negoziazione −1',fl:'Sa perché il carrello fa quel rumore. Purtroppo te lo spiega.',ic:['...OO...','.O.OO.O.','..OOOO..','OOOKKOOO','OOOKKOOO','..OOOO..','.O.OO.O.','...OO...']},
+ 'Ingegnere informatico':{t:'mix',edu:1,fx:'Innovazione +4 · Leadership −2 · Apprendimento delle tecnologie −20% nel suo magazzino',fl:'Ha scritto lui il WMS. Solo lui sa come funziona, e ci tiene che resti così.',learn:0.8,ic:['........','.P....P.','P....P.P','P...P..P','P..P...P','P.P....P','.P....P.','........']},
+ 'Ingegnere dei trasporti':{t:'pos',edu:1,fx:'Operazioni +3 · Precisione +1 · Negoziazione −1',fl:'Ha calcolato il percorso ottimo per andare al bar. Ci mette di più, ma ottimo.',ic:['........','OOOOO...','OOOOOBB.','OOOOOBBB','OOOOOOOO','.KK..KK.','.KK..KK.','........']},
+ 'Laureato in economia':{t:'pos',edu:1,fx:'Amministrazione +2 · Negoziazione +2 · Operazioni −1',fl:'Sa leggere un bilancio. Un transpallet, ancora no.',ic:['...KK...','..K..K..','...KK...','.NNNNNN.','NNNYNNNN','NNYYYNNN','NNNYNNNN','.NNNNNN.']},
+ 'Laureato in giurisprudenza':{t:'mix',edu:1,fx:'Negoziazione +3 · Amministrazione +1 · Innovazione −1',fl:'Legge le clausole penali dei contratti come fossero gialli. E trova sempre l\'assassino.',ic:['...KK...','KKKKKKKK','.K....K.','K.K..K.K','YYY..YYY','...KK...','...KK...','..KKKK..']},
+ 'Laureato in lettere':{t:'mix',edu:1,fx:'Negoziazione +2 · Leadership +1 · Operazioni −2',fl:'Le sue mail di sollecito sono così belle che i clienti le incorniciano. Poi non pagano.',ic:['WWWKKWWW','WKWKKWKW','WWWKKWWW','WKWKKWKW','WWWKKWWW','WKWKKWKW','KKKKKKKK','........']},
+ 'Laureato in scienze umanistiche':{t:'mix',edu:1,fx:'Leadership +2 · Negoziazione +1 · Operazioni −1 · Amministrazione −1',fl:'Ha una tesi sull\'antropologia del capoturno. I capiturno non l\'hanno letta.',ic:['......PP','.....PPP','....PPP.','...PPP..','..PPP...','..PP....','.K......','K.......']},
+ 'Laureato in filosofia':{t:'mix',edu:1,fx:'Leadership +2 · Innovazione +1 · Operazioni −2',fl:'In inventario si chiede se il pallet mancante sia mai esistito davvero.',ic:['..WWWW..','.WWKKWW.','WWWWWKWW','WWWWKWWW','WWWKWWWW','.WWWWWW.','...KW...','..W.....']},
+ 'Laureato in psicologia':{t:'mix',edu:1,fx:'Leadership +3 · Precisione −1',fl:'Ai colloqui chiede ai carrellisti com\'era il rapporto con il loro primo muletto.',ic:['R..R..R.','R..R..R.','R..R..R.','.R.R.R..','..RRR...','...R....','...R....','..RRR...']},
+ 'Laureato in scienze politiche':{t:'mix',edu:1,fx:'Negoziazione +2 · Leadership +1 · Precisione −1',fl:'Ha fondato una corrente interna al magazzino 3. Ha già due scissioni.',ic:['...WW...','...WK...','..KWWK..','KKKKKKKK','KBBBBBBK','KBBKKBBK','KBBBBBBK','KKKKKKKK']},
+ 'Laureato in lingue':{t:'pos',edu:1,fx:'Negoziazione +3 · Operazioni −1',fl:'Litiga con gli autisti stranieri in cinque lingue. Con quelli di Bergamo serve l\'interprete.',ic:['RRRRR...','RWWWR...','RRRRR...','.R.BBBBB','...BWWWB','...BBBBB','.....B..','........']},
+ 'Laureato in matematica':{t:'mix',edu:1,fx:'Precisione +3 · Innovazione +1 · Negoziazione −2',fl:'Ha dimostrato che la saturazione al 100% esiste solo in teoria. Poi è andato in magazzino a controllare.',ic:['BBBBBBB.','.B......','..B.....','...B....','..B.....','.B......','BBBBBBB.','........']},
+ 'Laureato in chimica':{t:'pos',edu:1,fx:'Precisione +2 · Innovazione +1',fl:'Sa a memoria tutte le classi ADR. Le canticchia sotto la doccia.',ic:['..KKKK..','...KK...','...KK...','..KGGK..','.KGGGGK.','KGGWGGGK','KGGGGWGK','KKKKKKKK']},
+ 'Laureato in architettura':{t:'mix',edu:1,fx:'Innovazione +2 · Precisione +1 · Amministrazione −1',fl:'Vuole un capannone «che dialoghi con il territorio». Il territorio è la tangenziale.',ic:['...KK...','..KRRK..','.KRRRRK.','KRRRRRRK','.KWWWWK.','.KWKKWK.','.KWKKWK.','.KKKKKK.']},
+ 'Laureato in agraria':{t:'pos',edu:1,fx:'Operazioni +1 · Precisione +1',fl:'Riconosce una pesca matura dall\'odore della cella frigo. A dieci metri.',ic:['...Y....','..YYY...','...Y.Y..','..YYYY..','.Y.Y....','..YYY...','...G....','...G....']},
+ 'Laureato in scienze della comunicazione':{t:'mix',edu:1,fx:'Negoziazione +2 · Innovazione +1 · Precisione −2',fl:'Ha rifatto il logo aziendale tre volte. I camion sono ancora del colore vecchio.',ic:['.K...K..','..K.K...','...K....','KKKKKKKK','KOOOOOKK','KOWOOOKK','KOOOOOKK','KKKKKKKK']},
+ 'Medicina, mai finita':{t:'mix',edu:1,fx:'Precisione +2 · Leadership +1 · Amministrazione −1',fl:'Gli manca l\'ultimo esame dal 1994. In magazzino lo chiamano comunque «dottore».',ic:['........','...RR...','...RR...','.RRRRRR.','.RRRRRR.','...RR...','...RR...','........']},
+ 'Master in supply chain':{t:'pos',edu:1,fx:'Operazioni +2 · Precisione +1 · Amministrazione +1 · Leadership −1',fl:'Dice «lead time» anche al ristorante, aspettando la pizza.',ic:['........','.NNNNNN.','.NMNNMN.','.NNNNNN.','.NMNNMN.','.NNNNNN.','KKKKKKKK','K.K..K.K']},
+ 'MBA all\'estero':{t:'mix',edu:1,fx:'Negoziazione +3 · Amministrazione +2 · Operazioni −2',fl:'Due anni a Londra e un mutuo da 80.000 sterline. Rimpiange solo il mutuo.',ic:['..KKKK..','..K..K..','KKKKKKKK','KNNNNNNK','KNNYYNNK','KNNNNNNK','KNNNNNNK','KKKKKKKK']},
+ 'Dottorato di ricerca':{t:'mix',edu:1,fx:'Innovazione +4 · Precisione +1 · Operazioni −2 · Negoziazione −1',fl:'Ha pubblicato tre articoli sul pallet ottimo. Il pallet ottimo non è mai arrivato.',ic:['........','...KK...','.KKKKKK.','KKKKKKKK','.KKKKKKP','..KKKK.P','..KKKK.P','.......P']},
+ 'Fuoricorso eterno':{t:'neg',edu:1,fx:'Leadership +1 · Amministrazione −2 · Precisione −1',fl:'Iscritto a Ingegneria dal 1989. Conosce il bar della facoltà meglio del preside.',ic:['KKKKKKKK','.KYYYYK.','..KYYK..','...KK...','...KK...','..K..K..','.KYYYYK.','KKKKKKKK']},
+ 'Autodidatta':{t:'mix',edu:1,fx:'Innovazione +2 · Operazioni +1 · Amministrazione −1',fl:'Ha imparato tutto dai manuali dei muletti e dai forum di notte.',ic:['........','RRRRRR..','.BBBBBB.','GGGGGG..','..YYYYYY','OOOOOO..','.PPPPPP.','KKKKKKKK']},
+ /* talenti di carattere con una storia: ognuno apre un evento dedicato (vedi EVENTI, cond hasTal) */
+ 'Pendolare della Torino-Milano':{t:'mix',fx:'Operazioni +1 · Amministrazione −1',fl:'Conosce per nome tutti i capotreno. Nessuno di loro sa dirgli quando parte.',ic:['.KKKKKK.','KLLLLLLK','KLLLLLLK','KSSSSSSK','KYSSSSYK','KSSSSSSK','.KKKKKK.','K......K']},
+ 'Vegano convinto':{t:'mix',fx:'Precisione +1 · Leadership −1',fl:'Legge le etichette dei bancali di salumi con lo sguardo di chi ha visto troppo.',ic:['......GG','....GGGG','..GGGGGG','.GGGGGG.','.GGGGG..','.GGG....','.G......','G.......']},
+ 'Collezionista di multe':{t:'neg',fx:'Amministrazione −2',fl:'L\'autovelox della tangenziale gli manda gli auguri di compleanno.',ic:['KKKKKK..','KSSSSK..','KSKKSK..','KSKKSKY.','KSSSSK.Y','KKKKKK..','..KK....','..KK....']},
+ 'Re del karaoke':{t:'pos',fx:'Leadership +2',fl:'Il suo «Azzurro» ha chiuso più contratti di tutto l\'ufficio commerciale.',ic:['.KKK..P.','KSSSK.PP','KSSSK.P.','.KKK.PP.','..K..PP.','..K.....','.KKK....','........']},
+ 'Fumatore incallito':{t:'mix',fx:'Negoziazione +1 · Leadership +1 · Precisione −1',fl:'Le migliori informazioni sui concorrenti le raccoglie nella pausa sigaretta con gli autisti.',ic:['......S.','.....S..','......S.','.....S..','........','WWWWWWOR','WWWWWWOR','........']},
+ 'Maratoneta':{t:'pos',fx:'Leadership +1 · Operazioni +1',fl:'Arriva in ufficio di corsa da Moncalieri. Si cambia nello spogliatoio dei carrellisti.',ic:['R......R','.R....R.','..R..R..','...RR...','..YYYY..','.YYKYYY.','.YYKYYY.','..YYYY..']},
+ 'Superstizioso':{t:'mix',fx:'Precisione −1 · Negoziazione +1',fl:'Ha un cornetto rosso appeso a ogni muletto. Il responsabile sicurezza ha rinunciato.',ic:['......RR','.....RR.','....RRR.','...RRR..','..RRR...','.RRR....','.RR.....','YY......']},
+ 'Divorziato due volte':{t:'neg',fx:'Amministrazione −1 · Negoziazione +1',fl:'Ha due ex, tre avvocati e un\'ottima conoscenza del diritto di famiglia.',ic:['.RR.RR..','RRRKRRR.','RRKRRRR.','RRRKRRR.','.RKRRR..','..RKR...','...R....','........']},
+ 'Tre figli piccoli':{t:'mix',fx:'Leadership +1 · Operazioni −1',fl:'Negozia con i buyer come con un bambino di quattro anni: con pazienza e un biscotto pronto.',ic:['FF.FF.FF','FF.FF.FF','........','RR.BB.YY','RR.BB.YY','RR.BB.YY','K..K..K.','........']},
+ 'Guru dei social':{t:'mix',fx:'Negoziazione +2 · Precisione −1',fl:'Scrive «Cosa mi ha insegnato un pallet rotto sulla leadership». Ha 4.000 follower e nessun pallet.',ic:['....BB..','...BBB..','...BB...','BBBBBBBB','BBBBBBBB','BBBBBBB.','BBBBBBB.','BBBBBB..']},
+ 'Cuoco provetto':{t:'pos',fx:'Negoziazione +1 · Leadership +1',fl:'Il suo brasato al Barolo vale due punti di sconto in qualunque trattativa.',ic:['........','.SSSS...','SYYYYS..','SYWWYSNN','SYYYYS..','.SSSS...','........','........']},
+ 'Ipocondriaco':{t:'neg',fx:'Operazioni −1 · Precisione +1',fl:'Ha un termometro in ogni cassetto e il numero del pronto soccorso tra i preferiti.',ic:['...KK...','...KWK..','...KWK..','...KRK..','...KRK..','..KRRRK.','..KRRRK.','...KKK..']},
+ 'Collezionista di camion d\'epoca':{t:'mix',fx:'Operazioni +1 · Amministrazione −1',fl:'Ha un autocarro del 1958 in cortile. Funziona meglio di metà della flotta.',ic:['........','.....RR.','....RWWR','NNNNRRRR','NNNNRRRR','RRRRRRRR','.KK...KK','.KK...KK']},
+ 'Consigliere comunale':{t:'mix',fx:'Negoziazione +2 · Amministrazione −1',fl:'Il martedì sera discute di rotonde. Il mercoledì mattina guarda i camion girarci intorno.',ic:['GGWWRR..','.GGWWRR.','..GGWWRR','...GGWWR','....GGWW','.....GGW','......GG','.......G']},
+ 'Cacciatore':{t:'mix',fx:'Leadership +1 · Negoziazione −1',fl:'A settembre l\'ufficio è chiuso. Il cliente lo sa, ma chiama lo stesso.',ic:['N.N..N.N','.NN..NN.','..NNNN..','..NFFN..','..NKKN..','...NN...','........','........']},
+ 'Ex calciatore di serie C':{t:'mix',fx:'Leadership +2 · Precisione −1',fl:'Tre presenze in serie C nel 1987. Le racconta tutte e tre, ogni lunedì.',ic:['..KK....','..KK....','..KK....','..KKK...','..KKKKK.','.KKKKKKK','.SSSSSSS','.S.S.S.S']},
+ 'Ha un cugino per tutto':{t:'pos',fx:'Negoziazione +1 · Amministrazione +1',fl:'Un cugino gommista, uno elettricista, uno all\'Agenzia delle Entrate. Il terzo non lo nomina mai.',ic:['.Y....Y.','YYY..YYY','.Y.KK.Y.','..K..K..','..K..K..','.Y.KK.Y.','YYY..YYY','.Y....Y.']},
+ 'Allergico ai pollini':{t:'neg',fx:'Operazioni −1',fl:'Da marzo a maggio firma i contratti tra uno starnuto e l\'altro.',ic:['..Y.Y...','.YYYYY..','..YOY...','.YYYYY..','..Y.Y...','...G....','.GGG....','...G....']},
+ 'Smemorato':{t:'neg',fx:'Precisione −2 · Leadership +1',fl:'Il suo ufficio è tappezzato di post-it. Non ricorda cosa vogliano dire.',ic:['YYYYYYY.','YKKKKYY.','YYYYYYY.','YKKKYYY.','YYYYYYY.','YKKYYYY.','YYYYYY..','YYYYY...']},
+ 'Golfista':{t:'mix',fx:'Negoziazione +3 · Operazioni −2',fl:'Non sa dove sia il magazzino di Mortara, ma conosce ogni buca del circolo.',ic:['..RRR...','..RRRR..','..RRR...','..K.....','..K.....','..K.....','GGKGGGGG','GGGGGGWG']},
+ 'Maniaco dell\'ordine':{t:'mix',fx:'Precisione +2 · Leadership −1',fl:'Passa il dito sulle scaffalature. Poi lo guarda. Poi guarda te.',ic:['.B...B..','BBB.BBB.','.B...B..','...B....','..BBB...','...B..B.','.....BBB','......B.']},
+ 'Motociclista':{t:'mix',fx:'Leadership +1 · Operazioni −1',fl:'Arriva in giacca di pelle anche alle riunioni con le banche.',ic:['..KKKK..','.KRRRRK.','KRRRRRRK','KRRBBBBK','KRRBBBBK','KRRRRRRK','.KKKKKK.','........']},
+ 'Complottista':{t:'neg',fx:'Innovazione −2 · Leadership −1 · Negoziazione +1',fl:'È convinto che i codici a barre servano a schedare i magazzinieri. Ne ha le prove su un forum.',ic:['...SS...','..SSSS..','.SSSSSS.','SSSSSSSS','.FFFFFF.','.FKFFKF.','.FFFFFF.','..FFFF..']},
+ 'Nostalgico della lira':{t:'mix',fx:'Amministrazione +1 · Innovazione −2',fl:'Converte ancora tutto in lire. «Un caffè a 1.936 lire? Ma siamo matti?»',ic:['..SSSS..','.SSSSSS.','SSKSSSSS','SSKSSSSS','SSKSSSSS','SSKKKSSS','.SSSSSS.','..SSSS..']},
+ 'Cantautore incompreso':{t:'mix',fx:'Innovazione +1 · Leadership +1 · Amministrazione −1',fl:'Ha scritto «Pallet d\'amore». In tre accordi. Lo suona alla cena di Natale, ogni anno.',ic:['......KK','.....KK.','....KK..','.NNNK...','NNNNN...','NNKNN...','NNNNN...','.NNN....']},
+ 'Gatto in ufficio':{t:'pos',fx:'Leadership +1',fl:'Il gatto si chiama Bancale. Ha più autorità del capoturno.',ic:['K......K','KK....KK','KKKKKKKK','KYKKKKYK','KKKKKKKK','KKKPPKKK','.KKKKKK.','..KKKK..']},
+ 'Ottimista patologico':{t:'mix',fx:'Leadership +2 · Amministrazione −2',fl:'Ogni anno annuncia che «quest\'anno raddoppiamo». Ci crede davvero.',ic:['Y..Y..Y.','.Y.Y.Y..','..YYY...','YYYYYYY.','..YYY...','.Y.Y.Y..','Y..Y..Y.','........']},
+ 'Pessimista cosmico':{t:'mix',fx:'Amministrazione +2 · Leadership −2',fl:'«Andrà male». Di solito ha ragione, e non sa se esserne contento.',ic:['..SSSS..','.SSSSSS.','SSSSSSSS','.SSSSSS.','........','.B..B..B','B..B..B.','........']},
+ 'Pignolo sulle virgole':{t:'mix',fx:'Precisione +3 · Negoziazione −2',fl:'Ha rimandato indietro un contratto da un milione per un punto e virgola.',ic:['.KKKK...','K.LL.K..','KLL..K..','K....K..','.KKKK...','....KK..','.....KK.','......KK']},
+ 'Fortunato al gratta e vinci':{t:'pos',fx:'Nessun effetto sulle abilità',fl:'Ha vinto un muletto a una lotteria di paese. Lo usa ancora.',ic:['.GG.GG..','GGGGGGG.','.GGGGG..','GGGGGGG.','.GG.GG..','...N....','....N...','........']},
+ 'Cuore d\'oro':{t:'pos',fx:'Leadership +2 · Amministrazione −1',fl:'Conosce i nomi dei figli di tutti i carrellisti. E i loro problemi con la caldaia.',ic:['.YY.YY..','YYYYYYY.','YYWYYYY.','YYYYYYY.','.YYYYY..','..YYY...','...Y....','........']}
 };
 const TTYPE={pos:['Positivo','#eaf6ec','#6fdc8c'],neg:['Negativo','#fbecec','#ff8a8d'],mix:['Misto','#fff6dc','#ffd23f']};
 const TECH_IC={"barcode":["............",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","RRRRRRRRRRRR",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","............",".K.K.KK.K.K.","............"],"formazione":["............",".NNNNNNNNNN.",".NDDDDDDDDN.",".NDWWDDDDDN.",".NDDDWWWDDN.",".NDWWWDDDDN.",".NDDDDDWWDN.",".NDDDDDDDDN.",".NNNNNNNNNN.","....N..N....","...N....N...","............"],"gps":["....RRRR....","...RRRRRR...","..RRRWWRRR..","..RRWWWWRR..","..RRWWWWRR..","..RRRWWRRR..","...RRRRRR...","....RRRR....",".....RR.....","..GG.RR.GG..",".GGGGGGGGGG.","............"],"wms":["............",".KKKKKKKKKK.",".KBBBBBBBBK.",".KBYYBOOBBK.",".KBSSSSSSBK.",".KBGGBYYBBK.",".KBSSSSSSBK.",".KKKKKKKKKK.",".....KK.....","...KKKKKK...","............","............"],"anticoll":[".....YY.....","....YKKY....","....YKKY....","...YYKKYY...","...YYKKYY...","..YYYKKYYY..","..YYYKKYYY..",".YYYYYYYYYY.",".YYYYKKYYYY.","YYYYYYYYYYYY","KKKKKKKKKKKK","............"],"rotte":["..........R.",".........RRR","..........R.","........DD..",".....DDD....","....D.......","....D.......",".....DDD....","........D...",".G.......D..","GGG..DDDD...",".G.........."],"rf":["..........B.","........B..B","..KKKKK..B.B","..KBBBK...B.","..KBBBK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","...KKK......","............"],"verticale":["..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..DYY.OOBD..","..DDDDDDDD..","..DBB.YYOD..","..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..D......D..","..D......D..",".KKKKKKKKKK."],"sinergia":["............","............",".KKKKKKK....",".KRRYYBK....",".KRRYYBKKKK.",".KGGOOBKWBK.",".KGGOOBKBBKK",".KKKKKKKKKKK","..KK....KK..","..KK....KK..","............","............"],"ptl":["............","GGG.YYY.RRR.","GGG.YYY.RRR.","............","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","............"],"amr":[".....YY.....",".....KK.....","..KKKKKKKK..","..KSSSSSSK..","..KSBSSBSK..","..KSSSSSSK..","..KSRRRRSK..","..KKKKKKKK..",".KOOOOOOOOK.",".KOOOOOOOOK.",".KKKKKKKKKK.","..KK....KK.."],"gestionale":["..KKKKKKK...","..KWWWWWKK..","..KWKKKWWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWWWGGGK..","..KWWWGGGK..","..KWWWWWWK..","..KKKKKKKK.."],"hr":["............","...SSSS.....","..S.FF.S....",".S.FFFF.S...",".S.FFFF.S...",".S.BBBB.S...","..SBBBBS....","...SSSSN....",".......NN...","........NN..",".........NN.","............"],"direzione":["............","....YYYY....","....YYYY....",".....KK.....",".KKKKKKKKKK.",".K...KK...K.",".K...KK...K.","BBB.OOOO.GGG","BBB.OOOO.GGG","BBB.OOOO.GGG","............","............"],"welfare2":["............","..RR....RR..",".RRRR..RRRR.","RRRRRWWRRRRR","RRRRRWWRRRRR","RRRWWWWWWRRR",".RRWWWWWWRR.","..RRRWWRRR..","...RRWWRR...","....RRRR....",".....RR.....","............"],"controllo":["............","............","K.......GG..","K.......GG..","K....BB.GG..","K....BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","KKKKKKKKKKKK","............","............"],"academy":["............",".....KK.....","...KKKKKK...",".KKKKKKKKKK.","KKKKKKKKKKKK",".KKKKKKKKKKY","..KKKKKKKK.Y","..KDDDDDDK.Y","..KDDDDDDK.Y","...KKKKKK.YY","..........YY","............"],"iso":["..BB....BB..","...BB..BB...","....BBBB....","....YYYY....","..YYYYYYYY..",".YYYYWYYYYY.",".YYYWWWYYYY.",".YYYYWYYYYY.",".YYYYYYYYYY.","..YYYYYYYY..","....YYYY....","............"],"commerciale":["............","..KKKKKKKK..",".KRRRRRRRRK.","KRRKK..KKRRK","KRK......KRK",".K..KKKK..K.","...KRRRRK...","..KRWRWRRK..","..KRRWRWRK..","..KRWRWRRK..","..KKKKKKKK..","............"],"freddo":[".....BB.....","..B..BB..B..","...B.BB.B...","....BBBB....","BBBBBWWBBBBB","BBBBBWWBBBBB","....BBBB....","...B.BB.B...","..B..BB..B..",".....BB.....","............","............"],"edi":["KKKKK.......","KBBBK.......","KBBBK..O....","KKKKK.OOOOO.","..K....O....",".KKK........",".......KKKKK","....O..KBBBK","...OOOOKBBBK","....O..KKKKK",".........K..","........KKK."],"marketing":["............",".........KK.",".......KKOK.",".....KKOOOK.","..KKKOOOOOK.",".KWKOOOOOOK.",".KWKOOOOOOK.","..KKKOOOOOK.","...K.KKOOOK.","...K...KKOK.","...KK....KK.","............"],"accordi":["............",".KKKKKKKK...",".KGGWWRRK...",".KWWWWWWK...",".KWKKKKWK...",".KWWWWWWK...",".KWKKKWWK...",".KWWWWWYYY..",".KWKKWYRRY..",".KWWWWYRRY..",".KKKKKKYY...","........Y.."],"kam":["........Y...",".......YYY..","...FF...Y...","..FFFF......","..FFFF......","...FF.......",".DDDDDD.....","DDDWWDDD....","DDDDRDDD....","DDDDRDDD....","DDDDDDDD....","............"],"ecom":["............","KK..........",".K..........",".KOOOOOOOOK.",".KOWOOWOOOK.",".KOOOOOOOK..","..KOOOOOOK..","..KKKKKKKK..","..K.........","..KKKKKKKKK.","...KK...KK..","............"]};
@@ -718,8 +881,12 @@ function chartHover(e){
 }
 document.addEventListener('pointermove',chartHover);
 function talentSvg(rows,sz){let r='';rows.forEach((row,y)=>{[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${TPAL[ch]}"/>`;});});return `<svg width="${sz}" height="${sz}" viewBox="-1 -1 10 10" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
+// effetti sulle abilità letti dal testo fx ("Operazioni +2 · Leadership −1"): il testo resta l'unica fonte
+function talMods(n){const o={};((TALENTS[n]||{}).fx||'').replace(/(Operazioni|Precisione|Negoziazione|Leadership|Amministrazione|Innovazione) ([+−-]\d+)/g,(m,a,v)=>{const k=STATS.find(x=>x.n===a).k;o[k]=(o[k]||0)+parseInt(v.replace('−','-'),10);});return o;}
+const talCost=n=>Object.values(talMods(n)).reduce((a,v)=>a+v,0);
+function talTip(n,extra){const t=TALENTS[n],ty=TTYPE[t.t];return `<div class='tt'>${esc(n)}</div><div style='color:${ty[2]};font-weight:600'>${ty[0]}${t.edu?' · titolo di studio':''}</div><div>${esc(t.fx)}</div><div style='margin-top:5px;color:#c9d3dd;font-style:italic'>${esc(t.fl)}</div>${extra||''}${wikiHint()}`;}
 function talentIcons(list,sz){sz=sz||36;return `<span style="display:flex;gap:6px;flex-wrap:wrap">${list.map(n=>{const t=TALENTS[n];if(!t)return '';const ty=TTYPE[t.t];
-  const tip=`<div class='tt'>${esc(n)}</div><div style='color:${ty[2]};font-weight:600'>${ty[0]}</div><div>${esc(t.fx)}</div><div style='margin-top:5px;color:#c9d3dd;font-style:italic'>${esc(t.fl)}</div>${wikiHint()}`;
+  const tip=talTip(n);
   return `<span class="tal" role="img" aria-label="${esc(n)}: ${esc(t.fx)}" data-act="wiki" data-id="${TAL_ID[n]}" data-tip="${tip}" style="width:${sz+8}px;height:${sz+8}px;background:${ty[1]}">${talentSvg(t.ic,sz)}</span>`;}).join('')}</span>`;}
 
 const $=s=>document.querySelector(s);
@@ -748,7 +915,9 @@ wk('fup','basi','Come si gioca',`Sei il CEO di un'azienda di logistica: tieni la
 
 Il ciclo è sempre lo stesso: vinci una [[gare|gara d'appalto]], [[assunzioni|assumi]] in anticipo le persone che servono, tieni [[puntualita]] e [[accuratezza]] sopra le [[soglie]] del cliente e incassa. Se la [[cassa]] scende sotto i −50.000 € l'azienda fallisce.
 
-Le parole sottolineate a puntini, come [[saturazione]], si spiegano passandoci sopra con il mouse: cliccale per aprire la voce completa. Questa enciclopedia si apre anche con il tasto E.`);
+Le parole sottolineate a puntini, come [[saturazione]], si spiegano passandoci sopra con il mouse: cliccale per aprire la voce completa. Questa enciclopedia si apre anche con il tasto E.
+
+Sul telefono: il primo tocco su una parola sottolineata mostra la spiegazione, il secondo apre la voce; tenendo premuto un pulsante si scopre a cosa serve. FUP si può installare come app dalla schermata iniziale.`);
 wk('tempo','basi','Tempo e velocità',`Il gioco avanza un giorno alla volta. Spazio mette in pausa, i tasti 1, 2 e 3 cambiano velocità.`,
 `Ogni giorno il gioco ricalcola tutti i magazzini: [[puntualita]], [[accuratezza]], [[morale]], costi e ricavi. Ogni lunedì arriva il [[report]] della settimana, alla fine di ogni mese si chiudono i conti: [[soddisfazione]] dei clienti, [[penali]], [[conto|conto economico]] e prezzo del [[gasolio]].
 
@@ -766,13 +935,13 @@ wk('reputazione','basi','Reputazione',`Quanto è stimata l'azienda nel settore, 
 
 Sale di 0,15 al mese per ogni cliente servito sopra le [[soglie]], di 3 punti quando apri un nuovo [[magazzino]] e di 5 con le ricerche [[tech_marketing|Marketing e fiere]] e [[tech_iso|Certificazione ISO 9001]]. Scende di 3 punti ogni volta che un cliente disdice per servizio scadente. Molti [[eventi]] la muovono in un senso o nell'altro.`);
 wk('eventi','basi','Eventi',`Imprevisti con una scelta da fare: meteo, politica, clienti, personale. Ne arriva uno ogni 30-55 giorni.`,
-`Quando arriva un evento il tempo si ferma e devi scegliere una risposta. Alcune risposte sono disponibili solo con un'abilità alta o con un certo [[talenti|talento]]: il pulsante ti dice cosa serve.
+`Quando arriva un evento il tempo si ferma: la finestra racconta cosa è successo e, se c'entra un cliente o un magazzino, li mostra in alto. Ogni risposta dice cosa fai e, sotto, quali sono gli effetti sul gioco. Alcune risposte sono disponibili solo con un'abilità alta o con un certo [[talenti|talento]]: il pulsante ti dice cosa serve.
 
 Gli effetti possono essere immediati (soldi, [[reputazione]], [[soddisfazione]]) oppure durare qualche settimana ([[morale]], [[puntualita]], [[accuratezza]]). Lo stesso evento non torna prima di 240 giorni.`);
 wk('giornale','basi','Il giornale',`L'archivio delle notizie: gare, contratti, ricerche concluse, scelte fatte negli eventi.`,
 `La Gazzetta del Muletto e Il Sole 24 Pallet raccontano cosa succede alla tua azienda e al mercato. Utile per ricordare chi ha vinto una [[gare|gara]] che hai perso e cosa hai deciso negli [[eventi]].`);
 wk('mappa','basi','Mappa',`Il Nord-Ovest in pixel art: magazzini, città servite e camion in viaggio.`,
-`Trascina per spostarti e usa la rotellina per lo zoom. Solo Piemonte, Lombardia, Liguria e Valle d'Aosta sono giocabili: il resto d'Italia è grigio.
+`Trascina per spostarti e usa la rotellina per lo zoom (sul telefono: un dito per spostarti, due dita per lo zoom). Solo Piemonte, Lombardia, Liguria e Valle d'Aosta sono giocabili: il resto d'Italia è grigio.
 
 Clicca un [[magazzino]] per aprirlo. Dalla finestra Clienti puoi mostrare sulla mappa la [[zona]] di distribuzione di un cliente e il percorso del [[ritiro]].`);
 wk('espansione','basi','Espansione',`Affittare un nuovo magazzino: due mesi di affitto anticipati più 15.000 € di allestimento.`,
@@ -859,9 +1028,26 @@ STATS.forEach(s=>wk('st_'+s.k,'abil',s.n,s.d,STAT_TXT[s.k],sz=>statIcon(s.k,sz))
 wk('talenti','tal','Talenti',`Tratti di carattere, mostrati come icone. Cambiano le abilità e a volte aprono scelte speciali.`,
 `Ogni personaggio ha uno o più talenti. Il colore del riquadro dice se è positivo (verde), negativo (rosso) o misto (giallo). Passa il mouse su un'icona per leggere l'effetto e la sua piccola storia.
 
-Gli effetti sulle [[abilita|abilità]] sono già sommati nei numeri. Altri effetti valgono solo in certe situazioni: tempi di [[apprendimento]], [[morale]], scelte negli [[eventi]].`);
+Gli effetti sulle [[abilita|abilità]] sono già sommati nei numeri. Altri effetti valgono solo in certe situazioni: tempi di [[apprendimento]], [[morale]], scelte negli [[eventi]].
+
+Un tipo speciale di talento è il [[titoli|titolo di studio]]: chi [[crea_ceo|crea il proprio CEO]] ne sceglie uno.`);
+wk('titoli','tal','Titoli di studio',`Talenti che raccontano la scuola o l'università del personaggio. Il CEO creato dal giocatore ne ha esattamente uno.`,
+`Dalla licenza media al dottorato di ricerca, passando per il ragioniere, il perito, l'ingegnere e le lauree umanistiche. Ogni titolo sposta qualche punto tra le [[abilita|abilità]]: chi ha studiato ingegneria guadagna in Innovazione ma perde in Leadership, chi ha fatto lettere tratta meglio ma conosce poco il magazzino.
+
+Alcuni titoli tecnici (perito informatico, ingegnere informatico) accorciano anche l'[[apprendimento]] delle tecnologie nel magazzino guidato dal CEO.
+
+Quando [[crea_ceo|crei il tuo CEO]] il saldo dei punti del titolo (bonus meno malus) si paga con i punti da distribuire.`);
+wk('crea_ceo','basi','Creare il proprio CEO',`Nella schermata iniziale puoi creare un CEO tuo: nome, cognome, età, ritratto, abilità, titolo di studio e carattere.`,
+`Nella schermata iniziale scegli la quinta scheda, «Crea il tuo CEO».
+
+• **Punto di partenza**: il magazzino, la cassa e il cliente storico di uno dei quattro CEO già pronti.
+• **Punti**: hai 58 punti. Ogni punto in un'[[abilita|abilità]] costa 1 (minimo 1, massimo 18 prima dei talenti).
+• **[[titoli|Titolo di studio]]**: obbligatorio, uno solo.
+• **Carattere**: fino a 3 [[talenti]] a scelta.
+
+I talenti si pagano con gli stessi punti: un talento con Operazioni +3 e Leadership −1 costa 2 punti, un talento con soli malus te ne restituisce. Il valore finale di un'abilità va da 0 a 20.`);
 const TAL_ID={}; Object.keys(TALENTS).forEach((n,i)=>{TAL_ID[n]='tal_'+i; const t=TALENTS[n];
-  wk('tal_'+i,'tal',n,t.fx,`${t.fx.split(' · ').join('\n• ').replace(/^/,'• ')}\n\n*${t.fl}*\n\nTipo: ${TTYPE[t.t][0].toLowerCase()}. Vedi [[talenti]].`,sz=>talentSvg(t.ic,sz));});
+  wk('tal_'+i,'tal',n,t.fx,`${t.fx.split(' · ').join('\n• ').replace(/^/,'• ')}\n\n*${t.fl}*\n\nTipo: ${TTYPE[t.t][0].toLowerCase()}.${t.edu?' È un [[titoli|titolo di studio]].':''} Vedi [[talenti]].`,sz=>talentSvg(t.ic,sz));});
 // Personale
 wk('personale','pers','Personale',`Sei mestieri per ogni magazzino (magazzinieri, carrellisti, capiturno, impiegati, autisti B e CE) più i pianificatori del traffico in sede.`,
 `Ogni magazzino ha il suo organico, e ogni mestiere fa un lavoro diverso:
@@ -1029,7 +1215,7 @@ wk('installazione','tech','Installazione',`Le tecnologie di Logistica, una volta
 wk('apprendimento','tech','Apprendimento',`Le prime settimane dopo un'installazione il personale si abitua: i KPI peggiorano invece di migliorare.`,
 `Durante l'apprendimento la tecnologia dà metà del suo effetto, ma al contrario: se promette +2 di [[accuratezza]] ne toglie 1. Finito il periodo vale per intero.
 
-È più lungo con un CEO allergico ai gestionali e più corto con chi parla con i robot o con l'[[tech_academy|Academy aziendale]]. Non installare tutto insieme prima di una scadenza importante!`);
+È più lungo con un CEO allergico ai gestionali e più corto con chi parla con i robot, con un CEO perito o ingegnere informatico ([[titoli|titoli di studio]]) o con l'[[tech_academy|Academy aziendale]]. Non installare tutto insieme prima di una scadenza importante!`);
 TECH.forEach(t=>{const tr=TREES.find(x=>x[0]===t.tree);const reqs=(t.req||[]).map(r=>{const a=TECH.find(x=>x.id===r);return `[[tech_${a.id}|${a.name}]]`;});
   const eff=[t.A?`Accuratezza +${f1(t.A)}`:'',t.P?`Puntualità +${f1(t.P)}`:'',t.prod?`produttività +${Math.round(t.prod*100)}%`:'',t.mor?`morale +${t.mor}`:'',t.sm?`[[saturazione_mezzi|saturazione dei mezzi]] +${t.sm}`:'',t.smC?`[[saturazione_mezzi|saturazione dei mezzi]] +${t.smC} per ogni cliente oltre il primo, fino a +${t.smMax}`:''].filter(Boolean).join(', ');
   wk('tech_'+t.id,'tech',t.name,t.desc,`${t.desc}\n\nAlbero: [[alberi|${tr[1]}]]. Disponibile dal ${t.year}. Ricerca: ${eur(t.cost)}, ${t.days} giorni di base.${reqs.length?` Richiede ${reqs.join(' e ')}.`:''}`+
@@ -1058,7 +1244,7 @@ wk('otif','gergo','OTIF',`On Time In Full: il KPI che unisce puntualità e compl
 wk('tender','gergo','Tender',`Il nome inglese (e da riunione) della gara d'appalto.`,`Vedi [[gare]]. Se il buyer dice "tender", di solito è già tardi per il listino pieno.`);
 const wikiIds=()=>Object.keys(WIKI);
 let WIKI_ON=false;  // false nella schermata iniziale: lì i clic sulle parole chiave non aprono l'enciclopedia
-const wikiHint=()=>WIKI_ON?`<div style='color:#c9d3dd;margin-top:4px;font-size:13px'>Clic: apri l'enciclopedia</div>`:'';
+const wikiHint=()=>WIKI_ON?`<div style='color:#c9d3dd;margin-top:4px;font-size:13px'>${TOUCH?'Tocca di nuovo':'Clic'}: apri l'enciclopedia</div>`:'';
 function wikiTip(id){const w=WIKI[id];if(!w)return '';return `<div class='tt'>${esc(w.n)}</div><div>${esc(w.s)}</div>${wikiHint()}`;}
 // parola chiave: testo sottolineato a puntini, tooltip con la spiegazione breve, clic = voce completa
 function kw(id,label){const w=WIKI[id];if(!w)return label==null?id:label;return `<span class="kw" data-act="wiki" data-id="${id}" tabindex="0" role="button" data-tip="${wikiTip(id)}">${label==null?esc(w.n):label}</span>`;}
@@ -1089,9 +1275,9 @@ const wikiBacklinks=id=>Object.values(WIKI).filter(w=>w.id!==id&&w.t&&(w.t.inclu
 /* ====================== STATO ====================== */
 let S=null; let UI={open:{},sel:{},tab:{},z:30,pos:{},bid:{}}; let uid=1;
 const nid=p=>p+(uid++);
-function newGame(ceoId,coName,color){
-  const C=CEOS.find(c=>c.id===ceoId);
-  S={v:1,day:0,speed:0,ceoId,company:{name:coName||C.company,color},cash:C.cash,rep:C.rep,fuel:0.86,
+function newGame(ceoId,coName,color,custom){
+  const C=custom||CEOS.find(c=>c.id===ceoId); if(custom) ceoId='custom';
+  S={v:1,day:0,speed:0,ceoId,custom:custom||null,company:{name:coName||C.company,color},cash:C.cash,rep:C.rep,fuel:0.86,
      warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0},managers:MANAGERS.map(m=>({...m,hired:false,wh:null})),
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextTender:12,nextEvent:25,project:null,seen:{},over:false,uid:1,
      execs:EXECS.map(e=>({...e,hired:false})),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false};
@@ -1108,7 +1294,8 @@ function addWarehouse(site,own,fixed,motrici){
   const wh={id:nid('w'),site,name:s.name,prov:s.prov,cap:s.cap,own,fixed:own?fixed:s.rent,motrici:motrici||0,mgr:null,staff:noStaff(),coop:false,morale:62,tech:{},acc:{P:0,A:0,n:0},kpi:null};
   S.warehouses.push(wh); return wh;
 }
-const ceo=()=>CEOS.find(c=>c.id===S.ceoId);
+const ceo=()=>S.custom||CEOS.find(c=>c.id===S.ceoId);
+const ceoImg=C=>IMG[C.img||C.id];
 const whById=id=>S.warehouses.find(w=>w.id===id);
 const clientRev=c=>{const w=S&&whById(c.wh); const t=w?clientLog(c,w):{oKm:240,in:0,iKm:0}; return (c.stock*T_ST+2*c.pal*T_MO+c.pal*(18+0.05*t.oKm)*chAvg(c,'price')+t.in*t.iKm*1.5)*c.mult*rankOf(c).rev;};
 function news(src,title,text){S.news.unshift({day:S.day,src,title,text}); if(S.news.length>80)S.news.pop();}
@@ -1128,7 +1315,7 @@ function capOf(w){const t=TECH.find(x=>x.id==='verticale'); return Math.round(w.
 function techFactor(wh,t){
   const it=wh.tech[t.id]; if(!it) return 0;
   let weeks=t.weeks; const m=mgrStats(wh);
-  if(m.ceo && ceo().allergic) weeks*=1.5; if(m.ceo && ceo().robots) weeks*=0.7; if(R('academy')) weeks*=0.7;
+  if(m.ceo) ceo().tal.forEach(n=>{const l=TALENTS[n]&&TALENTS[n].learn; if(l) weeks*=l;}); if(R('academy')) weeks*=0.7;
   return (S.day-it.day)<weeks*7 ? -0.5 : 1;
 }
 // pianificatori del traffico, in sede: il CEO regge da solo fino a 80 viaggi al mese
@@ -1350,205 +1537,388 @@ function gameOver(){
 /* ====================== EVENTI ====================== */
 function mod(scope,o,days){S.mods.push({scope,...o,until:S.day+days});}
 function anyWH(){return S.warehouses[0];}
+const hasTal=n=>ceo().tal.includes(n);
+const actC=()=>{const l=S.clients.filter(c=>c.status==='attivo');return l.length?pick(l):null;};
 const EVENTS=[
  {id:'nebbia',src:'Radio Traffico Nord-Ovest',title:'Nebbia in Val Padana',cond:()=>[10,11,0,1].includes(monthOf(S.day)),
-  text:'Visibilità sotto i 50 metri da Pavia a Brescia. Gli autisti chiedono di rallentare.',
-  opts:[{t:'Rallenta tutto',e:'Puntualità −6 per 7 giorni',f:()=>mod('all',{P:-6},7)},
-        {t:'Si viaggia lo stesso',e:'Puntualità −2; rischio incidente',f:()=>{mod('all',{P:-2},7); if(Math.random()<0.15){S.cash-=9000;S.rep-=4;toast('Un camion è finito fuori strada: 9.000 € di danni','bad');}}},
-        {t:'"Conosco ogni curva"',e:'Puntualità −1, nessun rischio',req:()=>ceo().tal.includes('Un milione di km al volante'),reqT:'Un milione di km al volante',f:()=>mod('all',{P:-1},7)}]},
+  text:'Stamattina la Val Padana è sparita sotto la nebbia: visibilità sotto i 50 metri da Pavia a Brescia, e la radio parla già di tamponamenti sulla A4. Gli autisti chiamano uno dopo l\'altro: vogliono sapere se possono rallentare, anche a costo di arrivare tardi dai clienti.',
+  opts:[{t:'Rallenta tutto',d:'Mandi un messaggio a tutti: velocità ridotta, fari accesi e nessuna fretta. I clienti aspetteranno.',e:'Puntualità −6 per 7 giorni',f:()=>mod('all',{P:-6},7)},
+        {t:'Si viaggia lo stesso',d:'Confermi gli orari: i clienti non pagano per la nebbia. Gli autisti partono, poco convinti.',e:'Puntualità −2; rischio incidente',f:()=>{mod('all',{P:-2},7); if(Math.random()<0.15){S.cash-=9000;S.rep-=4;toast('Un camion è finito fuori strada: 9.000 € di danni','bad');}}},
+        {t:'"Conosco ogni curva"',d:'Prendi tu il telefono e guidi gli autisti curva per curva, come facevi una volta.',e:'Puntualità −1, nessun rischio',req:()=>ceo().tal.includes('Un milione di km al volante'),reqT:'Un milione di km al volante',f:()=>mod('all',{P:-1},7)}]},
  {id:'camion_dedicato',src:'Ufficio traffico',title:'"Il mio camion non lo divido con nessuno"',cond:()=>S.warehouses.some(w=>w.tech.sinergia&&S.clients.filter(c=>c.wh===w.id&&c.status==='attivo').length>=2),
   text:'',
   setup:ev=>{const w=pick(S.warehouses.filter(w=>w.tech.sinergia&&S.clients.filter(c=>c.wh===w.id&&c.status==='attivo').length>=2));ev.w=w;ev.c=pick(S.clients.filter(c=>c.wh===w.id&&c.status==='attivo'));
-    ev.text=`Il responsabile acquisti di ${ev.c.name} ha visto i suoi bancali sullo stesso bilico di un altro cliente. "Paghiamo noi, il camion è nostro". A ${w.name} l'ufficio traffico alza gli occhi al cielo.`;},
-  opts:[{t:'Camion dedicato per tre mesi',e:'Saturazione dei mezzi −10 nel magazzino, soddisfazione +6',f:function(){mod(this.w.id,{sm:-10},90);this.c.sat=clamp(this.c.sat+6,0,100);}},
-        {t:'Spiega che il prezzo regge solo così',e:'Soddisfazione −6',f:function(){this.c.sat=clamp(this.c.sat-6,0,100);}},
-        {t:'Mostragli i grafici dei km risparmiati',e:'Nessun effetto: si convince',req:()=>ceo().st.neg>=13||ceo().tal.includes('Parla per acronimi'),reqT:'Negoziazione 13 o Parla per acronimi',f:()=>{}}]},
+    ev.text=`Il responsabile acquisti di ${ev.c.name} è passato da ${w.name} e ha visto i suoi bancali sullo stesso bilico di un altro cliente. Ora chiama indignato: "Paghiamo noi, il camion è nostro". In ufficio traffico alzano gli occhi al cielo: è proprio mettendo insieme i carichi che il prezzo sta in piedi.`;},
+  opts:[{t:'Camion dedicato per tre mesi',d:'Gli dai un camion tutto per lui per tre mesi. Lui è contento, i tuoi mezzi viaggiano mezzi vuoti.',e:'Saturazione dei mezzi −10 nel magazzino, soddisfazione +6',f:function(){mod(this.w.id,{sm:-10},90);this.c.sat=clamp(this.c.sat+6,0,100);}},
+        {t:'Spiega che il prezzo regge solo così',d:'Gli spieghi con calma che, senza carichi condivisi, la tariffa sarebbe un\'altra. Non la prende bene.',e:'Soddisfazione −6',f:function(){this.c.sat=clamp(this.c.sat-6,0,100);}},
+        {t:'Mostragli i grafici dei km risparmiati',d:'Gli mandi i numeri: meno km, meno gasolio, prezzo più basso. Dopo dieci minuti risponde «ok».',e:'Nessun effetto: si convince',req:()=>ceo().st.neg>=13||ceo().tal.includes('Parla per acronimi'),reqT:'Negoziazione 13 o Parla per acronimi',f:()=>{}}]},
  {id:'sciopero',src:'Il Sole 24 Pallet',title:'Sciopero nazionale degli autotrasportatori',cond:()=>Math.random()<0.5,
-  text:'Le associazioni fermano i camion per 5 giorni contro il caro gasolio.',
-  opts:[{t:'Aderisci',e:'Puntualità −15 per 5 giorni, morale +8, reputazione +2',f:()=>{mod('all',{P:-15,mor:8},5);S.rep+=2;}},
-        {t:'Lavora lo stesso',e:'Morale −8; rischio blocchi ai caselli',f:()=>{mod('all',{mor:-8},20); if(Math.random()<0.25){mod('all',{P:-10},3);toast('Camion bloccati ai caselli','bad');}}},
-        {t:'Media tra sindacati e clienti',e:'Puntualità −6, morale +4',req:()=>ceo().st.lead>=14,reqT:'Leadership 14',f:()=>mod('all',{P:-6,mor:4},5)}]},
+  text:'Le associazioni dei trasportatori hanno proclamato cinque giorni di fermo contro il caro gasolio. Ai caselli si vedono già i primi presìdi e i tuoi autisti aspettano di sapere da che parte stai. I clienti, invece, aspettano solo la merce.',
+  opts:[{t:'Aderisci',d:'Fermi i camion e ti unisci alla protesta. Gli autisti apprezzano, i clienti un po\' meno.',e:'Puntualità −15 per 5 giorni, morale +8, reputazione +2',f:()=>{mod('all',{P:-15,mor:8},5);S.rep+=2;}},
+        {t:'Lavora lo stesso',d:'Fai partire i camion come sempre. In piazzale qualcuno ti guarda storto, e ai caselli ci sono i presìdi.',e:'Morale −8; rischio blocchi ai caselli',f:()=>{mod('all',{mor:-8},20); if(Math.random()<0.25){mod('all',{P:-10},3);toast('Camion bloccati ai caselli','bad');}}},
+        {t:'Media tra sindacati e clienti',d:'Passi due giorni al telefono tra sindacati e clienti e trovi un accordo: si viaggia a metà.',e:'Puntualità −6, morale +4',req:()=>ceo().st.lead>=14,reqT:'Leadership 14',f:()=>mod('all',{P:-6,mor:4},5)}]},
  {id:'ispettorato',src:'Il Mattinale del Ministero',title:'Controllo dell\'Ispettorato del Lavoro',cond:()=>true,
-  text:'Gli ispettori si presentano alle 7:00 in magazzino e chiedono tutte le buste paga.',
-  opts:[{t:'Collabora',e:'Multa casuale tra 0 e 8.000 €',f:()=>{const m=Math.round(rnd(0,8000)/100)*100;S.cash-=m;toast(m?`Multa di ${eur(m)}`:'Nessuna irregolarità',m?'bad':'ok');}},
-        {t:'Chiedi un rinvio',e:'Reputazione −3',f:()=>{S.rep-=3;}},
-        {t:'"Abbiamo tutto in ordine"',e:'Nessuna multa, reputazione +2',req:()=>ceo().st.amm>=12,reqT:'Amministrazione 12',f:()=>{S.rep+=2;}}]},
+  text:'Alle 7:00 due ispettori del lavoro si presentano in magazzino con una cartellina a testa. Vogliono buste paga, contratti e registri delle presenze degli ultimi due anni. L\'impiegata dell\'amministrazione ti guarda come per dire: speriamo bene.',
+  opts:[{t:'Collabora',d:'Apri gli archivi e metti tutto a disposizione. Se qualcosa non torna, lo scoprirete insieme.',e:'Multa casuale tra 0 e 8.000 €',f:()=>{const m=Math.round(rnd(0,8000)/100)*100;S.cash-=m;toast(m?`Multa di ${eur(m)}`:'Nessuna irregolarità',m?'bad':'ok');}},
+        {t:'Chiedi un rinvio',d:'Chiedi di tornare la settimana prossima per preparare i documenti. Gli ispettori annotano e se ne vanno, poco contenti.',e:'Reputazione −3',f:()=>{S.rep-=3;}},
+        {t:'"Abbiamo tutto in ordine"',d:'Consegni i raccoglitori già in ordine, con gli indici colorati. Gli ispettori se ne vanno prima di pranzo.',e:'Nessuna multa, reputazione +2',req:()=>ceo().st.amm>=12,reqT:'Amministrazione 12',f:()=>{S.rep+=2;}}]},
  {id:'natale',src:'La Gazzetta del Muletto',title:'Cena di Natale finita male',cond:()=>monthOf(S.day)===11,
-  text:'Il capo turno e l\'impiegata del traffico hanno litigato al karaoke. Non si parlano più.',
-  opts:[{t:'Organizza un chiarimento',e:'−300 €, tutto si sistema',f:()=>{S.cash-=300;}},
-        {t:'Lascia che si arrangino',e:'Puntualità −2 per 2 mesi',f:()=>mod('all',{P:-2},60)}]},
+  text:'Alla cena di Natale il capoturno e l\'impiegata del traffico si sono contesi il microfono del karaoke. È finita a urla su chi stonava di più, davanti a tutti. Da allora non si parlano e i turni si organizzano a bigliettini.',
+  opts:[{t:'Organizza un chiarimento',d:'Li porti a pranzo insieme e fai da paciere. Al dolce ridono già della serata.',e:'−300 €, tutto si sistema',f:()=>{S.cash-=300;}},
+        {t:'Lascia che si arrangino',d:'Non sono affari tuoi. Intanto i messaggi tra magazzino e traffico arrivano tardi, o non arrivano.',e:'Puntualità −2 per 2 mesi',f:()=>mod('all',{P:-2},60)}]},
  {id:'furto',src:'La Gazzetta del Muletto',title:'Furto di gasolio',cond:()=>true,
-  text:'Di notte qualcuno ha svuotato tre serbatoi nel piazzale.',
-  opts:[{t:'Installa telecamere',e:'−8.000 €',f:()=>{S.cash-=8000;}},
-        {t:'Fidati del guardiano (74 anni)',e:'−1.500 € di gasolio; può ricapitare',f:()=>{S.cash-=1500;S.seen.furto=0;}}]},
+  text:'Di notte qualcuno è entrato nel piazzale e ha svuotato i serbatoi di tre camion. Stamattina gli autisti hanno trovato i tappi per terra e nessuna traccia dei ladri. Il guardiano notturno dice di non aver sentito nulla.',
+  opts:[{t:'Installa telecamere',d:'Fai montare telecamere e luci nel piazzale. Costa, ma la notte dormi meglio.',e:'−8.000 €',f:()=>{S.cash-=8000;}},
+        {t:'Fidati del guardiano (74 anni)',d:'Il guardiano giura che non ricapiterà. Ricompri il gasolio e speri che abbia ragione.',e:'−1.500 € di gasolio; può ricapitare',f:()=>{S.cash-=1500;S.seen.furto=0;}}]},
  {id:'superenalotto',src:'La Gazzetta del Muletto',title:'Vincita al Superenalotto',cond:()=>S.warehouses.some(w=>w.staff.pick>=2),
-  text:'Un magazziniere vince 2 milioni e si licenzia sul gruppo WhatsApp aziendale.',
-  opts:[{t:'Fagli gli auguri',e:'Perdi un magazziniere, morale +3',f:()=>{const w=S.warehouses.find(w=>w.staff.pick>=2);w.staff.pick--;mod('all',{mor:3},30);}},
-        {t:'Chiedigli un investimento',e:'30% di ottenere 100.000 € a tasso zero',f:()=>{const w=S.warehouses.find(w=>w.staff.pick>=2);w.staff.pick--; if(Math.random()<0.3){S.cash+=100000;toast('Ha detto sì: 100.000 € in cassa','ok');} else toast('Ha detto no e ha comprato una barca','warn');}}]},
+  text:'Un tuo magazziniere ha vinto 2 milioni al Superenalotto. Lo hai saputo come tutti: dalle dimissioni scritte sul gruppo WhatsApp aziendale, con tre emoji di champagne. In magazzino non si parla d\'altro.',
+  opts:[{t:'Fagli gli auguri',d:'Gli fai i complimenti e lo saluti con una pacca sulla spalla. In magazzino si brinda per lui.',e:'Perdi un magazziniere, morale +3',f:()=>{const w=S.warehouses.find(w=>w.staff.pick>=2);w.staff.pick--;mod('all',{mor:3},30);}},
+        {t:'Chiedigli un investimento',d:'Prima che sparisca gli proponi di investire nell\'azienda. Ci pensa su mentre svuota l\'armadietto.',e:'30% di ottenere 100.000 € a tasso zero',f:()=>{const w=S.warehouses.find(w=>w.staff.pick>=2);w.staff.pick--; if(Math.random()<0.3){S.cash+=100000;toast('Ha detto sì: 100.000 € in cassa','ok');} else toast('Ha detto no e ha comprato una barca','warn');}}]},
  {id:'prete',src:'La Gazzetta del Muletto',title:'Il parroco benedice i camion',cond:()=>true,
-  text:'Il parroco propone la benedizione annuale della flotta, con offerta libera.',
-  opts:[{t:'Accetta e fai una donazione',e:'−500 €, morale +4',f:()=>{S.cash-=500;mod('all',{mor:4},60);}},
-        {t:'Rifiuta gentilmente',e:'Morale −2',f:()=>mod('all',{mor:-2},30)}]},
+  text:'Il parroco del paese passa a trovarti con l\'acqua santa e un gran sorriso. Propone, come ogni anno, la benedizione della flotta nel piazzale, con offerta libera. Gli autisti più anziani ci tengono parecchio.',
+  opts:[{t:'Accetta e fai una donazione',d:'Raduni tutti nel piazzale per la benedizione e lasci un\'offerta generosa. Anche i più scettici si fanno il segno della croce.',e:'−500 €, morale +4',f:()=>{S.cash-=500;mod('all',{mor:4},60);}},
+        {t:'Rifiuta gentilmente',d:'Ringrazi il parroco, ma quest\'anno non è il momento. Gli autisti più anziani ci restano male.',e:'Morale −2',f:()=>mod('all',{mor:-2},30)}]},
  {id:'ordine',src:'La Gazzetta del Muletto',title:'Ordine alle 17:58 di venerdì',cond:()=>S.clients.some(c=>c.status==='attivo'),
-  text:'"Ci serve per lunedì alle 6, è vitale." Il cliente è al telefono e non ha intenzione di riattaccare.',
-  opts:[{t:'Accetta',e:'Straordinari −2.000 €, morale −4, soddisfazione +8',f:function(){S.cash-=2000;mod('all',{mor:-4},20);const c=this.c;c.sat=clamp(c.sat+8,0,100);}},
-        {t:'Rifiuta con cortesia',e:'Soddisfazione −6',f:function(){const c=this.c;c.sat=clamp(c.sat-6,0,100);}}],
+  text:'Sono le 17:58 di venerdì e il magazzino si sta svuotando. Il cliente è al telefono: "Ci serve tutto per lunedì alle 6, è vitale". Non ha intenzione di riattaccare finché non dici di sì.',
+  opts:[{t:'Accetta',d:'Richiami due squadre per il sabato. Il cliente ti ringrazia, le squadre molto meno.',e:'Straordinari −2.000 €, morale −4, soddisfazione +8',f:function(){S.cash-=2000;mod('all',{mor:-4},20);const c=this.c;c.sat=clamp(c.sat+8,0,100);}},
+        {t:'Rifiuta con cortesia',d:'Gli spieghi che con così poco preavviso non si può fare. Ti saluta in modo freddo.',e:'Soddisfazione −6',f:function(){const c=this.c;c.sat=clamp(c.sat-6,0,100);}}],
   setup:ev=>{ev.c=pick(S.clients.filter(c=>c.status==='attivo'));ev.title=`Ordine alle 17:58 di venerdì: ${ev.c.name}`;}},
  {id:'afa',src:'Radio Traffico Nord-Ovest',title:'Afa record',cond:()=>[6,7].includes(monthOf(S.day)),
-  text:'40 °C nel magazzino. I muletti scaldano, le persone pure.',
-  opts:[{t:'Ventilatori e acqua per tutti',e:'−3.000 €, morale +5',f:()=>{S.cash-=3000;mod('all',{mor:5},30);}},
-        {t:'Turni all\'alba',e:'Accuratezza −1 per 15 giorni',f:()=>mod('all',{A:-1},15)}]},
+  text:'Il termometro in magazzino segna 40 °C. I muletti si surriscaldano, le persone pure, e nel pomeriggio il ritmo del picking crolla. Qualcuno ha già portato un ventilatore da casa.',
+  opts:[{t:'Ventilatori e acqua per tutti',d:'Compri ventilatori industriali e riempi il frigo di bottiglie d\'acqua. Il magazzino respira.',e:'−3.000 €, morale +5',f:()=>{S.cash-=3000;mod('all',{mor:5},30);}},
+        {t:'Turni all\'alba',d:'Sposti i turni alle 5 del mattino per evitare il caldo. Mezzo magazzino lavora a occhi chiusi.',e:'Accuratezza −1 per 15 giorni',f:()=>mod('all',{A:-1},15)}]},
  {id:'decreto',src:'Il Mattinale del Ministero',title:'Decreto Semplificazione',cond:()=>true,
-  text:'Un decreto di 340 pagine semplifica le pratiche di trasporto. Nessuno ha capito cosa cambi.',
-  opts:[{t:'Studiatelo con calma',e:'Puntualità −2 per un mese',f:()=>mod('all',{P:-2},30)},
-        {t:'Assumi un consulente',e:'−6.000 €',f:()=>{S.cash-=6000;}},
-        {t:'"L\'ho già letto stanotte"',e:'Nessun effetto',req:()=>ceo().tal.includes('Excel-dipendente')||ceo().tal.includes('Stacanovista'),reqT:'Excel-dipendente o Stacanovista',f:()=>{}}]},
+  text:'È uscito il Decreto Semplificazione: 340 pagine che promettono di rendere più semplici le pratiche di trasporto. L\'associazione di categoria ha mandato una circolare di altre 40 pagine per spiegarlo. Nessuno ha ancora capito cosa cambi.',
+  opts:[{t:'Studiatelo con calma',d:'Lo fai leggere all\'ufficio traffico, un capitolo al giorno. Nel frattempo le pratiche rallentano.',e:'Puntualità −2 per un mese',f:()=>mod('all',{P:-2},30)},
+        {t:'Assumi un consulente',d:'Chiami un consulente che lo legge al posto vostro e vi dice solo cosa cambia.',e:'−6.000 €',f:()=>{S.cash-=6000;}},
+        {t:'"L\'ho già letto stanotte"',d:'Arrivi in ufficio con il decreto già evidenziato e un riassunto di una pagina. Nessuno osa chiederti quando dormi.',e:'Nessun effetto',req:()=>ceo().tal.includes('Excel-dipendente')||ceo().tal.includes('Stacanovista'),reqT:'Excel-dipendente o Stacanovista',f:()=>{}}]},
  {id:'matrimonio',src:'La Gazzetta del Muletto',title:'Matrimonio del figlio del cliente',cond:()=>S.clients.some(c=>c.status==='attivo'&&c.sat>=70),
   text:'Il titolare ti invita al matrimonio del figlio. Trecento invitati, tre giorni di festa.',
-  opts:[{t:'Vai con un regalo all\'altezza',e:'−2.500 €, soddisfazione +15',f:function(){S.cash-=2500;this.c.sat=clamp(this.c.sat+15,0,100);}},
-        {t:'Manda un biglietto',e:'Soddisfazione −5',f:function(){this.c.sat=clamp(this.c.sat-5,0,100);}}],
-  setup:ev=>{ev.c=pick(S.clients.filter(c=>c.status==='attivo'&&c.sat>=70));ev.text=`Il titolare di ${ev.c.name} ti invita al matrimonio del figlio. Trecento invitati, tre giorni di festa.`;}},
+  opts:[{t:'Vai con un regalo all\'altezza',d:'Ci vai con l\'abito buono e un regalo all\'altezza. Il titolare ti presenta a mezza sala come «il mio uomo dei camion».',e:'−2.500 €, soddisfazione +15',f:function(){S.cash-=2500;this.c.sat=clamp(this.c.sat+15,0,100);}},
+        {t:'Manda un biglietto',d:'Mandi un biglietto di auguri e un mazzo di fiori. Il titolare lo legge di fretta.',e:'Soddisfazione −5',f:function(){this.c.sat=clamp(this.c.sat-5,0,100);}}],
+  setup:ev=>{ev.c=pick(S.clients.filter(c=>c.status==='attivo'&&c.sat>=70));ev.text=`Il titolare di ${ev.c.name} ti ha mandato una partecipazione con i bordi dorati: si sposa il figlio. Trecento invitati, tre giorni di festa e, si dice, un tavolo riservato ai fornitori di fiducia. Un'assenza verrebbe notata.`;}},
  {id:'gestionale',src:'La Gazzetta del Muletto',title:'Il gestionale si aggiorna da solo',cond:()=>S.warehouses.some(w=>w.tech.wms),
-  text:'Venerdì sera il WMS ha installato un aggiornamento. Lunedì nessuno riesce a stampare le bolle.',
-  opts:[{t:'Chiama l\'assistenza',e:'−1.200 €, accuratezza −4 per 2 giorni',f:()=>{S.cash-=1200;mod('all',{A:-4},2);}},
-        {t:'Bolle a mano',e:'Accuratezza −8 per 2 giorni',f:()=>mod('all',{A:-8},2)}]},
+  text:'Venerdì sera il WMS ha installato da solo un aggiornamento. Lunedì mattina le stampanti non riconoscono più i modelli delle bolle e i camion aspettano in banchina. L\'assistenza risponde con un messaggio registrato.',
+  opts:[{t:'Chiama l\'assistenza',d:'Paghi l\'intervento urgente del tecnico. In due giorni le bolle tornano a uscire.',e:'−1.200 €, accuratezza −4 per 2 giorni',f:()=>{S.cash-=1200;mod('all',{A:-4},2);}},
+        {t:'Bolle a mano',d:'Tiri fuori i blocchetti e si scrivono le bolle a penna. Qualche numero sarà sbagliato.',e:'Accuratezza −8 per 2 giorni',f:()=>mod('all',{A:-8},2)}]},
  {id:'neve',src:'Radio Traffico Nord-Ovest',title:'Neve al Frejus',cond:()=>[11,0,1,2].includes(monthOf(S.day)),
-  text:'Il traforo è chiuso ai mezzi pesanti e la coda arriva a Susa. I camion per la Francia sono fermi.',
-  opts:[{t:'Aspetta che riaprano',e:'Puntualità −4 per 5 giorni',f:()=>mod('all',{P:-4},5)},
-        {t:'Devia dal Monte Bianco',e:'−4.000 € di pedaggi, puntualità −1',f:()=>{S.cash-=4000;mod('all',{P:-1},5);}}]},
+  text:'Una nevicata ha chiuso il traforo del Frejus ai mezzi pesanti. La coda arriva fino a Susa e i camion diretti in Francia sono fermi, con gli autisti che chiamano dall\'autogrill. Nessuno sa dire quando riaprirà.',
+  opts:[{t:'Aspetta che riaprano',d:'Fai aspettare i camion in area di sosta finché il traforo riapre. I clienti francesi aspettano con loro.',e:'Puntualità −4 per 5 giorni',f:()=>mod('all',{P:-4},5)},
+        {t:'Devia dal Monte Bianco',d:'Mandi i camion verso il Monte Bianco. Più km e più pedaggi, ma la merce arriva.',e:'−4.000 € di pedaggi, puntualità −1',f:()=>{S.cash-=4000;mod('all',{P:-1},5);}}]},
  {id:'allerta',src:'Radio Traffico Nord-Ovest',title:'Allerta rossa in Liguria',cond:()=>[8,9,10].includes(monthOf(S.day)),
-  text:'Piogge torrenziali sul genovese: autostrade a singhiozzo, il porto lavora a metà.',
-  opts:[{t:'Ferma i mezzi per due giorni',e:'Puntualità −8 per 4 giorni',f:()=>mod('all',{P:-8},4)},
-        {t:'Si parte con prudenza',e:'Puntualità −3; rischio danni seri',f:()=>{mod('all',{P:-3},4); if(Math.random()<0.25){S.cash-=20000;toast('Un rimorchio allagato: 20.000 € di merce rovinata','bad');}}}]},
+  text:'La Protezione civile ha diramato l\'allerta rossa sul genovese. Piove da due giorni, le autostrade chiudono e riaprono a singhiozzo e il porto lavora a metà. Gli autisti diretti in Liguria aspettano istruzioni.',
+  opts:[{t:'Ferma i mezzi per due giorni',d:'Tieni i camion in deposito per due giorni. Nessun rischio, ma le consegne slittano.',e:'Puntualità −8 per 4 giorni',f:()=>mod('all',{P:-8},4)},
+        {t:'Si parte con prudenza',d:'Fai partire i camion con l\'ordine di fermarsi al primo segnale di pericolo. Speri che basti.',e:'Puntualità −3; rischio danni seri',f:()=>{mod('all',{P:-3},4); if(Math.random()<0.25){S.cash-=20000;toast('Un rimorchio allagato: 20.000 € di merce rovinata','bad');}}}]},
  {id:'ztl',src:'Il Mattinale del Ministero',title:'Milano lancia "Zero Camion"',cond:()=>yearOf(S.day)>=2008,once:true,
-  text:'Nuova ZTL in centro: dentro solo mezzi Euro 5 e solo dalle 10 alle 12.',
-  opts:[{t:'Rinnova parte della flotta',e:'−25.000 €',f:()=>{S.cash-=25000;}},
-        {t:'Consegne all\'alba coi furgoni',e:'Puntualità −2 per 3 mesi',f:()=>mod('all',{P:-2},90)}]},
+  text:'Il Comune di Milano ha presentato "Zero Camion": una nuova ZTL in centro dove entrano solo mezzi Euro 5, e solo dalle 10 alle 12. Metà della tua flotta è più vecchia. I clienti in centro vogliono la merce come prima.',
+  opts:[{t:'Rinnova parte della flotta',d:'Compri qualche mezzo nuovo in regola con la ZTL. Una spesa grossa, ma in centro si entra.',e:'−25.000 €',f:()=>{S.cash-=25000;}},
+        {t:'Consegne all\'alba coi furgoni',d:'Consegni all\'alba con i furgoni, prima che la ZTL si accenda. Funziona, ma qualche ritardo scappa.',e:'Puntualità −2 per 3 mesi',f:()=>mod('all',{P:-2},90)}]},
  {id:'elezioni',src:'Il Sole 24 Pallet',title:'Elezioni anticipate',cond:()=>Math.random()<0.4,
-  text:'Tutti i partiti promettono "una grande riforma dell\'autotrasporto". Nessuno dice quale.',
-  opts:[{t:'Aspetta e guarda',e:'Nessun effetto',f:()=>{}},
-        {t:'Organizza un convegno di categoria',e:'−3.000 €, reputazione +3',f:()=>{S.cash-=3000;S.rep+=3;}}]},
+  text:'Il governo è caduto e si vota tra due mesi. Tutti i partiti promettono "una grande riforma dell\'autotrasporto", ma nessuno dice quale. L\'associazione di categoria ti chiede se vuoi farti sentire.',
+  opts:[{t:'Aspetta e guarda',d:'Lasci che i politici facciano campagna senza di te. Tanto le promesse cambiano ogni settimana.',e:'Nessun effetto',f:()=>{}},
+        {t:'Organizza un convegno di categoria',d:'Affitti una sala e inviti candidati e trasportatori a un convegno. Il giornale locale ti dedica mezza pagina.',e:'−3.000 €, reputazione +3',f:()=>{S.cash-=3000;S.rep+=3;}}]},
  {id:'moda',src:'La Gazzetta del Muletto',title:'Settimana della moda',cond:()=>[1,8].includes(monthOf(S.day)),
-  text:'Milano è bloccata da fotografi e monopattini. Un consegnatore è finito per sbaglio in passerella.',
-  opts:[{t:'Fai finta di niente',e:'Puntualità −2 per 7 giorni',f:()=>mod('all',{P:-2},7)},
-        {t:'Cavalca la notizia sui social',e:'Reputazione +3',f:()=>{S.rep+=3;}}]},
+  text:'È la settimana della moda e Milano è bloccata da fotografi, influencer e monopattini. Ieri un tuo consegnatore, cercando l\'entrata di servizio, è finito per sbaglio in passerella con due colli in mano. Il video gira già.',
+  opts:[{t:'Fai finta di niente',d:'Nessun commento, e i furgoni girano alla larga dal centro. Le consegne in città rallentano.',e:'Puntualità −2 per 7 giorni',f:()=>mod('all',{P:-2},7)},
+        {t:'Cavalca la notizia sui social',d:'Pubblichi il video sui social: «Le nostre consegne arrivano ovunque». Lo rilanciano anche le riviste di moda.',e:'Reputazione +3',f:()=>{S.rep+=3;}}]},
  {id:'giro',src:'Radio Traffico Nord-Ovest',title:'Passa il Giro d\'Italia',cond:()=>monthOf(S.day)===4,
-  text:'La tappa attraversa le Langhe: strade chiuse dalle 11 alle 17.',
-  opts:[{t:'Anticipa le consegne',e:'Straordinari −1.500 €',f:()=>{S.cash-=1500;}},
-        {t:'Tutti a bordo strada a fare il tifo',e:'Puntualità −3 per 2 giorni, morale +4',f:()=>mod('all',{P:-3,mor:4},2)}]},
+  text:'Il Giro d\'Italia attraversa le Langhe: strade chiuse dalle 11 alle 17 su metà dei percorsi di consegna. Gli autisti hanno già capito che sarà una giornata strana. Qualcuno ha portato la bandiera.',
+  opts:[{t:'Anticipa le consegne',d:'Riorganizzi i giri per partire alle 5 e chiudere prima del passaggio della corsa. Gli straordinari si pagano.',e:'Straordinari −1.500 €',f:()=>{S.cash-=1500;}},
+        {t:'Tutti a bordo strada a fare il tifo',d:'Fermi i camion, porti tutti a bordo strada e applaudi la corsa. Le consegne arrivano il giorno dopo.',e:'Puntualità −3 per 2 giorni, morale +4',f:()=>mod('all',{P:-3,mor:4},2)}]},
  {id:'derby',src:'La Gazzetta del Muletto',title:'Derby della Madonnina',cond:()=>true,
-  text:'Metà magazzino è interista, metà milanista. Il lunedì dopo il derby nessuno si rivolge la parola.',
-  opts:[{t:'Vieta le sciarpe in magazzino',e:'Morale −2',f:()=>mod('all',{mor:-2},20)},
-        {t:'Organizza la partitella aziendale',e:'−800 €, morale +4',f:()=>{S.cash-=800;mod('all',{mor:4},40);}}]},
+  text:'Domenica c\'è stato il derby di Milano e il magazzino è diviso in due: interisti da una parte, milanisti dall\'altra. Stamattina nessuno si rivolge la parola e le liste di picking passano di mano senza un saluto. Qualcuno ha appeso una sciarpa sul muletto avversario.',
+  opts:[{t:'Vieta le sciarpe in magazzino',d:'Vieti sciarpe e magliette in magazzino. Le tensioni calano, l\'entusiasmo pure.',e:'Morale −2',f:()=>mod('all',{mor:-2},20)},
+        {t:'Organizza la partitella aziendale',d:'Organizzi una partitella tra le due tifoserie, con grigliata finale. Vince il magazzino.',e:'−800 €, morale +4',f:()=>{S.cash-=800;mod('all',{mor:4},40);}}]},
  {id:'cane',src:'La Gazzetta del Muletto',title:'Il cane del capo turno',cond:()=>true,
-  text:'Il capo turno porta in magazzino Brutus, un cane di 60 kg "buonissimo". Mezza squadra ha paura.',
-  opts:[{t:'Brutus diventa la mascotte',e:'Morale +3, accuratezza −0,5 per 30 giorni',f:()=>mod('all',{mor:3,A:-0.5},30)},
-        {t:'Brutus resta a casa',e:'Morale −1',f:()=>mod('all',{mor:-1},20)}]},
+  text:'Il capoturno si è presentato con Brutus, un cane di 60 kg che secondo lui è "buonissimo". Brutus gira tra le corsie annusando i bancali e scodinzolando contro gli scaffali. Mezza squadra lo adora, l\'altra metà lavora con un occhio sempre su di lui.',
+  opts:[{t:'Brutus diventa la mascotte',d:'Brutus diventa la mascotte del magazzino, con tanto di cuccia in banchina. Qualche collo finisce nel posto sbagliato.',e:'Morale +3, accuratezza −0,5 per 30 giorni',f:()=>mod('all',{mor:3,A:-0.5},30)},
+        {t:'Brutus resta a casa',d:'Chiedi gentilmente al capoturno di lasciare Brutus a casa. Lui ci resta male, la squadra respira.',e:'Morale −1',f:()=>mod('all',{mor:-1},20)}]},
  {id:'tiktok',src:'La Gazzetta del Muletto',title:'Autista virale su TikTok',cond:()=>yearOf(S.day)>=2020,
-  text:'Un autista balla sul cassone in autostrada: 3 milioni di visualizzazioni e il logo dell\'azienda ben visibile.',
-  opts:[{t:'Richiamo ufficiale',e:'Reputazione −2, morale −2',f:()=>{S.rep-=2;mod('all',{mor:-2},20);}},
-        {t:'Fallo testimonial aziendale',e:'Reputazione +4, ma il rischio resta',f:()=>{S.rep+=4; if(Math.random()<0.3){S.cash-=5000;toast('Multa della Polstrada: 5.000 €','bad');}}}]},
+  text:'Un tuo autista ha pubblicato un video in cui balla sul cassone durante una sosta in autostrada. In due giorni ha fatto 3 milioni di visualizzazioni, e il logo dell\'azienda si vede benissimo. Ti chiamano giornalisti, clienti e anche la Polstrada.',
+  opts:[{t:'Richiamo ufficiale',d:'Lo convochi in ufficio e gli fai un richiamo scritto. Il video sparisce, ma in piazzale si mugugna.',e:'Reputazione −2, morale −2',f:()=>{S.rep-=2;mod('all',{mor:-2},20);}},
+        {t:'Fallo testimonial aziendale',d:'Gli proponi di fare video per l\'azienda. Diventa famoso, ma continua a ballare dove non dovrebbe.',e:'Reputazione +4, ma il rischio resta',f:()=>{S.rep+=4; if(Math.random()<0.3){S.cash-=5000;toast('Multa della Polstrada: 5.000 €','bad');}}}]},
  {id:'buyer',src:'Il Sole 24 Pallet',title:'Cambio di buyer',cond:()=>S.clients.some(c=>c.status==='attivo'),
-  text:'Il nuovo buyer arriva da una multinazionale e vuole "rivedere tutte le condizioni".',
-  opts:[{t:'Concedi uno sconto del 3% per tre mesi',e:'Soddisfazione +6',f:function(){this.c.sat=clamp(this.c.sat+6,0,100);S.cash-=Math.round(clientRev(this.c)*0.09);}},
-        {t:'Difendi i prezzi',e:'Soddisfazione −8',f:function(){this.c.sat=clamp(this.c.sat-8,0,100);}},
-        {t:'Invitalo a pranzo',e:'Soddisfazione +4',req:()=>ceo().st.neg>=13,reqT:'Negoziazione 13',f:function(){this.c.sat=clamp(this.c.sat+4,0,100);}}],
+  text:'Il nuovo buyer arriva da una multinazionale e vuole "rivedere tutte le condizioni". Alla prima riunione ha detto "benchmark" quattro volte e "saving" sei. Vuole una risposta entro venerdì.',
+  opts:[{t:'Concedi uno sconto del 3% per tre mesi',d:'Gli offri uno sconto del 3% per tre mesi. Lui annota tutto e sorride per la prima volta.',e:'Soddisfazione +6',f:function(){this.c.sat=clamp(this.c.sat+6,0,100);S.cash-=Math.round(clientRev(this.c)*0.09);}},
+        {t:'Difendi i prezzi',d:'Gli mostri cosa comprende la tariffa e non molli un euro. Lui scrive «da rivedere» sul suo blocco.',e:'Soddisfazione −8',f:function(){this.c.sat=clamp(this.c.sat-8,0,100);}},
+        {t:'Invitalo a pranzo',d:'Lo porti in trattoria e parli di tutto tranne che di prezzi. Al caffè ti dà del tu.',e:'Soddisfazione +4',req:()=>ceo().st.neg>=13,reqT:'Negoziazione 13',f:function(){this.c.sat=clamp(this.c.sat+4,0,100);}}],
   setup:ev=>{ev.c=pick(S.clients.filter(c=>c.status==='attivo'));ev.title=`Cambio di buyer da ${ev.c.name}`;}},
  {id:'blackfriday',src:'Il Sole 24 Pallet',title:'Black Friday',cond:()=>yearOf(S.day)>=2015&&monthOf(S.day)===10,
-  text:'I clienti triplicano gli ordini per una settimana. Il magazzino scricchiola.',
-  opts:[{t:'Interinali e turni extra',e:'−6.000 €, morale −2',f:()=>{S.cash-=6000;mod('all',{mor:-2},10);}},
-        {t:'Si fa quel che si può',e:'Puntualità −5, accuratezza −2 per 10 giorni',f:()=>mod('all',{P:-5,A:-2},10)}]},
+  text:'È arrivato il Black Friday e i clienti hanno triplicato gli ordini per una settimana. Le baie sono piene, il WMS rallenta e i carrellisti saltano la pausa. Il magazzino scricchiola.',
+  opts:[{t:'Interinali e turni extra',d:'Chiami gli interinali e allunghi i turni. Costa caro, ma la merce esce.',e:'−6.000 €, morale −2',f:()=>{S.cash-=6000;mod('all',{mor:-2},10);}},
+        {t:'Si fa quel che si può',d:'Lavori con la squadra che hai e accetti qualche ritardo e qualche errore.',e:'Puntualità −5, accuratezza −2 per 10 giorni',f:()=>mod('all',{P:-5,A:-2},10)}]},
  {id:'fallimento',src:'Il Sole 24 Pallet',title:'Un cliente non paga',cond:()=>S.clients.some(c=>c.status==='attivo'),
-  text:'Un cliente è in concordato preventivo: l\'ultima fattura rischia di sparire.',
-  opts:[{t:'Accetta il 40% subito',e:'Perdi il 60% di una mensilità',f:function(){S.cash-=Math.round(clientRev(this.c)*0.6);}},
-        {t:'Fai causa',e:'50%: recuperi tutto o perdi tutto più le spese',f:function(){if(Math.random()<0.5)toast('Causa vinta: fattura recuperata','ok');else{S.cash-=Math.round(clientRev(this.c))+3000;toast('Causa persa','bad');}}}],
+  text:'Il cliente ha chiesto il concordato preventivo: in pratica non riesce a pagare i suoi debiti. Il suo avvocato ti offre il 40% dell\'ultima fattura, subito e senza discutere. Il tuo, di avvocato, dice che in tribunale potresti avere tutto o niente.',
+  opts:[{t:'Accetta il 40% subito',d:'Accetti il 40% e chiudi la pratica. Meglio poco oggi che niente fra tre anni.',e:'Perdi il 60% di una mensilità',f:function(){S.cash-=Math.round(clientRev(this.c)*0.6);}},
+        {t:'Fai causa',d:'Affidi tutto all\'avvocato e vai in tribunale. Testa o croce, con le spese legali in palio.',e:'50%: recuperi tutto o perdi tutto più le spese',f:function(){if(Math.random()<0.5)toast('Causa vinta: fattura recuperata','ok');else{S.cash-=Math.round(clientRev(this.c))+3000;toast('Causa persa','bad');}}}],
   setup:ev=>{ev.c=pick(S.clients.filter(c=>c.status==='attivo'));ev.title=`${ev.c.name} non paga una fattura`;}},
  {id:'klaus',src:'La Gazzetta del Muletto',title:'Pranzo con Klaus',cond:()=>true,
-  text:'Klaus, direttore logistico di un gruppo tedesco, è a Milano e vuole "capire come lavorano gli italiani".',
-  opts:[{t:'Ristorante stellato',e:'−1.200 €, reputazione +3',f:()=>{S.cash-=1200;S.rep+=3;}},
-        {t:'Trattoria del camionista',e:'50%: reputazione +5 o −2',f:()=>{S.rep+=Math.random()<0.5?5:-2;}}]},
+  text:'Klaus, direttore logistico di un grande gruppo tedesco, è a Milano per qualche giorno. Vuole pranzare con te per "capire come lavorano gli italiani" e forse, un giorno, affidarvi qualche carico. Ha precisato che ha solo un\'ora.',
+  opts:[{t:'Ristorante stellato',d:'Prenoti un ristorante stellato in centro. Klaus apprezza e prende appunti anche sul vino.',e:'−1.200 €, reputazione +3',f:()=>{S.cash-=1200;S.rep+=3;}},
+        {t:'Trattoria del camionista',d:'Lo porti nella trattoria dove mangiano i camionisti. O lo conquisti, o non lo rivedi più.',e:'50%: reputazione +5 o −2',f:()=>{S.rep+=Math.random()<0.5?5:-2;}}]},
  {id:'brambilla',src:'La Gazzetta del Muletto',title:'Lite col cavalier Brambilla',cond:()=>true,
-  text:'Il vicino di capannone sostiene che i nostri camion rovinano la sua aiuola e minaccia di chiamare il sindaco.',
-  opts:[{t:'Rifai l\'aiuola',e:'−700 €',f:()=>{S.cash-=700;}},
-        {t:'Ignoralo',e:'30% di multa comunale da 4.000 €',f:()=>{if(Math.random()<0.3){S.cash-=4000;toast('Multa comunale: 4.000 €','bad');}}}]},
+  text:'Il cavalier Brambilla, il vicino di capannone, si è presentato in ufficio con delle foto. Sostiene che i tuoi camion, in manovra, gli rovinano l\'aiuola all\'ingresso. Se non fai qualcosa chiamerà il sindaco: giocano a bocce insieme.',
+  opts:[{t:'Rifai l\'aiuola',d:'Fai rifare l\'aiuola da un giardiniere, con due rose in più. Brambilla torna a salutarti.',e:'−700 €',f:()=>{S.cash-=700;}},
+        {t:'Ignoralo',d:'Gli rispondi che l\'aiuola è sul suolo comunale e torni al lavoro. Brambilla prende il telefono.',e:'30% di multa comunale da 4.000 €',f:()=>{if(Math.random()<0.3){S.cash-=4000;toast('Multa comunale: 4.000 €','bad');}}}]},
  {id:'duore',src:'Il Sole 24 Pallet',title:'Consegne in 2 ore',cond:()=>yearOf(S.day)>=2014,once:true,
-  text:'I clienti hanno scoperto la consegna in giornata e ora la vogliono tutti, sempre.',
-  opts:[{t:'Investi in furgoni elettrici',e:'−30.000 €, reputazione +4',f:()=>{S.cash-=30000;S.rep+=4;}},
-        {t:'Spiega che non è il tuo mestiere',e:'Reputazione −2',f:()=>{S.rep-=2;}}]},
+  text:'I clienti hanno scoperto la consegna in due ore e ora la vogliono tutti, per tutto, sempre. Le piattaforme online la offrono gratis e i tuoi clienti chiedono perché tu no. La tua flotta, però, è fatta per i bilici, non per le corse in città.',
+  opts:[{t:'Investi in furgoni elettrici',d:'Compri una piccola flotta di furgoni elettrici per le consegne veloci in città. Sui giornali ci finisci bene.',e:'−30.000 €, reputazione +4',f:()=>{S.cash-=30000;S.rep+=4;}},
+        {t:'Spiega che non è il tuo mestiere',d:'Spieghi ai clienti che il tuo mestiere è un altro: bancali, non pacchetti. Qualcuno ti dà del vecchio.',e:'Reputazione −2',f:()=>{S.rep-=2;}}]},
  {id:'euro',src:'Il Sole 24 Pallet',title:'Arriva l\'euro',cond:()=>yearOf(S.day)===2002&&monthOf(S.day)<=3,once:true,
-  text:'Gli impiegati convertono ancora tutto in lire a mano. Due fatture sono uscite con mille volte l\'importo.',
-  opts:[{t:'Corso di formazione',e:'−1.000 €',f:()=>{S.cash-=1000;}},
-        {t:'"Si abitueranno"',e:'Accuratezza −1 per 60 giorni',f:()=>mod('all',{A:-1},60)}]},
+  text:'Dal primo gennaio c\'è l\'euro, ma in amministrazione convertono ancora tutto in lire con la calcolatrice. Due fatture sono uscite con un importo mille volte più alto. Un cliente ha chiamato ridendo, l\'altro no.',
+  opts:[{t:'Corso di formazione',d:'Paghi un corso di mezza giornata e regali a tutti la calcolatrice convertitrice. Gli errori finiscono.',e:'−1.000 €',f:()=>{S.cash-=1000;}},
+        {t:'"Si abitueranno"',d:'Lasci tempo al tempo. Per un paio di mesi le fatture vanno ricontrollate a mano.',e:'Accuratezza −1 per 60 giorni',f:()=>mod('all',{A:-1},60)}]},
  {id:'expo',src:'Il Sole 24 Pallet',title:'Expo Milano 2015',cond:()=>yearOf(S.day)===2015&&monthOf(S.day)>=3&&monthOf(S.day)<=9,once:true,
-  text:'Sei mesi di padiglioni da rifornire. Gli organizzatori cercano trasportatori affidabili.',
-  opts:[{t:'Candidati come fornitore',e:'+40.000 €, puntualità −2 per 60 giorni',f:()=>{S.cash+=40000;mod('all',{P:-2},60);}},
-        {t:'Lascia perdere',e:'Nessun effetto',f:()=>{}}]},
+  text:'Milano ospita l\'Expo: sei mesi di padiglioni, ristoranti e mostre da rifornire ogni giorno. Gli organizzatori cercano trasportatori affidabili, disposti a lavorare con orari e permessi complicati. È un\'occasione rara, ma impegnativa.',
+  opts:[{t:'Candidati come fornitore',d:'Presenti la candidatura e ottieni un lotto di consegne. Entrano soldi, ma la squadra è tirata.',e:'+40.000 €, puntualità −2 per 60 giorni',f:()=>{S.cash+=40000;mod('all',{P:-2},60);}},
+        {t:'Lascia perdere',d:'Resti sui tuoi clienti di sempre. L\'Expo lo guarderai in TV.',e:'Nessun effetto',f:()=>{}}]},
  {id:'pandemia',src:'Il Mattinale del Ministero',title:'Lockdown nazionale',cond:()=>yearOf(S.day)===2020&&monthOf(S.day)>=2,once:true,
-  text:'Il paese si ferma, la logistica no. Mascherine introvabili, autisti preoccupati, scaffali dei supermercati vuoti.',
-  opts:[{t:'Protocolli, DPI e premio per chi lavora',e:'−20.000 €, morale +6, reputazione +5',f:()=>{S.cash-=20000;mod('all',{mor:6},90);S.rep+=5;}},
-        {t:'Avanti con quello che c\'è',e:'Morale −8, puntualità −4 per 90 giorni',f:()=>mod('all',{mor:-8,P:-4},90)}]},
+  text:'Il paese si ferma per il lockdown, ma la logistica no: senza camion i supermercati restano vuoti. Le mascherine sono introvabili, gli autisti hanno paura e le famiglie chiamano preoccupate. Tutti aspettano di capire cosa farai.',
+  opts:[{t:'Protocolli, DPI e premio per chi lavora',d:'Compri mascherine e gel a qualunque prezzo, scrivi i protocolli e dai un premio a chi lavora. Tutti si sentono protetti.',e:'−20.000 €, morale +6, reputazione +5',f:()=>{S.cash-=20000;mod('all',{mor:6},90);S.rep+=5;}},
+        {t:'Avanti con quello che c\'è',d:'Si va avanti con quello che c\'è. I turni si svuotano e chi resta lavora con la paura addosso.',e:'Morale −8, puntualità −4 per 90 giorni',f:()=>mod('all',{mor:-8,P:-4},90)}]},
  {id:'gasolio22',src:'Il Sole 24 Pallet',title:'Caro gasolio',cond:()=>yearOf(S.day)===2022,once:true,
-  text:'Il gasolio supera i 2 euro al litro. I clienti non vogliono sentir parlare di adeguamenti.',
-  opts:[{t:'Assorbi il costo',e:'−15.000 €',f:()=>{S.cash-=15000;}},
-        {t:'Applica la clausola gasolio',e:'Soddisfazione di tutti i clienti −5',f:()=>S.clients.forEach(c=>{if(c.status==='attivo')c.sat=clamp(c.sat-5,0,100);})}]},
+  text:'Il gasolio ha superato i 2 euro al litro e un pieno di un bilico costa come una vacanza. I contratti prevedono una clausola di adeguamento, ma i clienti non vogliono sentirne parlare. Il commercialista ti chiede come vuoi coprire la differenza.',
+  opts:[{t:'Assorbi il costo',d:'Ti fai carico della differenza senza dire niente ai clienti. Il conto in banca se ne accorge.',e:'−15.000 €',f:()=>{S.cash-=15000;}},
+        {t:'Applica la clausola gasolio',d:'Applichi la clausola a tutti. Sulla carta hai ragione, ma i clienti la prendono male.',e:'Soddisfazione di tutti i clienti −5',f:()=>S.clients.forEach(c=>{if(c.status==='attivo')c.sat=clamp(c.sat-5,0,100);})}]},
  {id:'stagista',src:'La Gazzetta del Muletto',title:'Lo stagista ha cancellato il database',cond:()=>true,
-  text:'"Volevo solo fare pulizia." L\'anagrafica articoli non c\'è più. Il backup è di tre settimane fa.',
-  opts:[{t:'Ripristina il backup e reinserisci a mano',e:'Accuratezza −2 per 15 giorni',f:()=>mod('all',{A:-2},15)},
-        {t:'Chiama il tecnico esterno',e:'−4.000 €',f:()=>{S.cash-=4000;}},
-        {t:'"Ci penso io"',e:'Tutto recuperato in una notte',req:()=>ceo().st.inn>=13,reqT:'Innovazione 13',f:()=>{}}]},
+  text:'Lo stagista voleva solo "fare un po\' di pulizia" nel gestionale. Ha cancellato l\'intera anagrafica degli articoli e l\'ultimo backup è di tre settimane fa. Adesso è chiuso in bagno da mezz\'ora.',
+  opts:[{t:'Ripristina il backup e reinserisci a mano',d:'Ripristini il backup e l\'ufficio reinserisce a mano gli articoli nuovi. Per due settimane qualche codice salta.',e:'Accuratezza −2 per 15 giorni',f:()=>mod('all',{A:-2},15)},
+        {t:'Chiama il tecnico esterno',d:'Chiami un tecnico informatico che recupera i dati dal disco. Costa, ma non si perde nulla.',e:'−4.000 €',f:()=>{S.cash-=4000;}},
+        {t:'"Ci penso io"',d:'Ti siedi alla tastiera, apri i log del database e alle 4 del mattino è tutto a posto.',e:'Tutto recuperato in una notte',req:()=>ceo().st.inn>=13,reqT:'Innovazione 13',f:()=>{}}]},
  {id:'muletto',src:'La Gazzetta del Muletto',title:'Muletto contro scaffale',cond:()=>true,
-  text:'Una campata è venuta giù come un domino. Nessun ferito, ma 40 pallet sono a terra.',
-  opts:[{t:'Ripara subito',e:'−7.000 €',f:()=>{S.cash-=7000;}},
-        {t:'Transenna e lavora intorno',e:'Accuratezza −2, puntualità −2 per 20 giorni',f:()=>mod('all',{A:-2,P:-2},20)}],
-  setup:ev=>{if(S.warehouses.some(w=>w.tech.anticoll)){ev.text='Il sensore anti-collisione ha frenato il muletto a dieci centimetri dallo scaffale. Il carrellista vuole offrire da bere al tecnico.';ev.opts=[{t:'Brindisi!',e:'Morale +2',f:()=>mod('all',{mor:2},20)}];}}},
+  text:'Un carrellista ha preso male una curva e una campata di scaffali è venuta giù come un domino. Per fortuna nessuno si è fatto male, ma 40 pallet sono a terra e un corridoio è bloccato. Il carrellista è seduto su un bancale, bianco in faccia.',
+  opts:[{t:'Ripara subito',d:'Chiami subito la ditta delle scaffalature per rimettere tutto in sicurezza.',e:'−7.000 €',f:()=>{S.cash-=7000;}},
+        {t:'Transenna e lavora intorno',d:'Metti le transenne e si lavora intorno al corridoio bloccato. Si va più piano e si sbaglia di più.',e:'Accuratezza −2, puntualità −2 per 20 giorni',f:()=>mod('all',{A:-2,P:-2},20)}],
+  setup:ev=>{if(S.warehouses.some(w=>w.tech.anticoll)){ev.text='Un carrellista ha preso male una curva, ma il sensore anti-collisione ha frenato il muletto a dieci centimetri dallo scaffale. Nessun danno, solo un grande spavento. Il carrellista, ancora pallido, vuole offrire da bere al tecnico che l\'ha installato.';ev.opts=[{t:'Brindisi!',d:'A fine turno offri da bere a tutta la squadra, tecnico compreso. Il sensore si è ripagato in un colpo.',e:'Morale +2',f:()=>mod('all',{mor:2},20)}];}}},
  {id:'pizza',src:'La Gazzetta del Muletto',title:'Pizza per il turno di notte',cond:()=>true,
-  text:'Il turno di notte chiede una pizza il venerdì "come fanno da Brambilla".',
-  opts:[{t:'Pizza per tutti',e:'−400 € al mese, morale +3',f:()=>{S.cash-=400;mod('all',{mor:3},60);}},
-        {t:'"Non siamo da Brambilla"',e:'Morale −2',f:()=>mod('all',{mor:-2},30)}]},
+  text:'Il turno di notte ti ha lasciato una lettera firmata da tutti. Chiedono una pizza il venerdì, "come fanno da Brambilla", il vicino di capannone. Sembra poco, ma lo chiedono con molta serietà.',
+  opts:[{t:'Pizza per tutti',d:'Ogni venerdì alle 2 di notte arrivano le pizze in banchina. Il turno di notte ti adotta.',e:'−400 € al mese, morale +3',f:()=>{S.cash-=400;mod('all',{mor:3},60);}},
+        {t:'"Non siamo da Brambilla"',d:'Rispondi che ognuno ha il suo stile. Il turno di notte se lo segna.',e:'Morale −2',f:()=>mod('all',{mor:-2},30)}]},
  {id:'telepass',src:'Radio Traffico Nord-Ovest',title:'Telepass in tilt',cond:()=>true,
-  text:'Un guasto blocca i caselli della tangenziale di Milano per un pomeriggio intero.',
-  opts:[{t:'Pazienza',e:'Puntualità −3 per 2 giorni',f:()=>mod('all',{P:-3},2)},
-        {t:'Strade provinciali',e:'−600 € di gasolio',f:()=>{S.cash-=600;}}]},
+  text:'Un guasto al sistema del Telepass ha bloccato i caselli della tangenziale di Milano. Le code sono di chilometri e la radio consiglia di "evitare la zona" per tutto il pomeriggio. I tuoi camion sono già in fila.',
+  opts:[{t:'Pazienza',d:'Lasci i camion in coda e avvisi i clienti del ritardo.',e:'Puntualità −3 per 2 giorni',f:()=>mod('all',{P:-3},2)},
+        {t:'Strade provinciali',d:'Fai uscire i camion e li mandi per le provinciali. Più km, ma si arriva.',e:'−600 € di gasolio',f:()=>{S.cash-=600;}}]},
  {id:'cesto',src:'La Gazzetta del Muletto',title:'Il cesto natalizio',cond:()=>monthOf(S.day)===11,
-  text:'Quest\'anno il cesto per i dipendenti: panettone artigianale o la solita bottiglia di spumante?',
-  opts:[{t:'Cesto ricco',e:'−2.500 €, morale +4',f:()=>{S.cash-=2500;mod('all',{mor:4},45);}},
-        {t:'Spumante e auguri',e:'−300 €',f:()=>{S.cash-=300;}}]},
+  text:'Si avvicina Natale e in ufficio si discute del cesto per i dipendenti. C\'è chi propone il panettone artigianale con salumi e vino buono, e chi ricorda che "la solita bottiglia di spumante va benissimo". Tutti aspettano la tua decisione.',
+  opts:[{t:'Cesto ricco',d:'Scegli il cesto ricco, con panettone artigianale e una bottiglia di Barbera. In magazzino si fanno le foto.',e:'−2.500 €, morale +4',f:()=>{S.cash-=2500;mod('all',{mor:4},45);}},
+        {t:'Spumante e auguri',d:'Spumante, auguri e una stretta di mano a tutti. Nessuno si lamenta, nessuno si entusiasma.',e:'−300 €',f:()=>{S.cash-=300;}}]},
  {id:'coop_sciopero',src:'La Gazzetta del Muletto',title:'Sciopero dei facchini',cond:()=>S.warehouses.some(w=>w.coop),
-  setup:ev=>{const w=S.warehouses.find(w=>w.coop);ev.wh=w.id;ev.text=`A ${w.name} i facchini della cooperativa bloccano il cancello: chiedono il contratto nazionale vero, non quello «multiservizi». Il sindacalista è già in diretta su una TV locale.`;},
+  setup:ev=>{const w=S.warehouses.find(w=>w.coop);ev.wh=w.id;ev.text=`A ${w.name} i facchini della cooperativa hanno bloccato il cancello con un presidio. Chiedono il contratto nazionale della logistica, non quello «multiservizi» che la cooperativa applica da anni. Il sindacalista è già in diretta su una TV locale e i camion non entrano.`;},
   text:'',
-  opts:[{t:'Paga l\'adeguamento',e:'−6.000 € una tantum, morale +4',f:function(){S.cash-=6000;S.cur.altro+=6000;mod('all',{mor:4},60);}},
-        {t:'Aspetta che passi',e:'Puntualità −10 per 10 giorni in quel magazzino',f:()=>{const w=S.warehouses.find(w=>w.coop);mod(w.id,{P:-10,mor:-5},10);}},
-        {t:'Tavolo con sindacato e cooperativa',e:'Puntualità −3 per 5 giorni, nessun costo',req:()=>ceo().st.lead>=13,reqT:'Leadership 13',f:()=>{const w=S.warehouses.find(w=>w.coop);mod(w.id,{P:-3},5);}}]},
+  opts:[{t:'Paga l\'adeguamento',d:'Paghi tu l\'adeguamento dei contratti. Il presidio si scioglie in un\'ora.',e:'−6.000 € una tantum, morale +4',f:function(){S.cash-=6000;S.cur.altro+=6000;mod('all',{mor:4},60);}},
+        {t:'Aspetta che passi',d:'Non tratti: la cooperativa non è affar tuo. Il cancello resta bloccato per giorni.',e:'Puntualità −10 per 10 giorni in quel magazzino',f:()=>{const w=S.warehouses.find(w=>w.coop);mod(w.id,{P:-10,mor:-5},10);}},
+        {t:'Tavolo con sindacato e cooperativa',d:'Metti allo stesso tavolo sindacato e cooperativa e non li fai alzare finché non firmano.',e:'Puntualità −3 per 5 giorni, nessun costo',req:()=>ceo().st.lead>=13,reqT:'Leadership 13',f:()=>{const w=S.warehouses.find(w=>w.coop);mod(w.id,{P:-3},5);}}]},
  {id:'coop_ispettorato',src:'Il Sole 24 Pallet',title:'L\'Ispettorato del lavoro in banchina',cond:()=>S.warehouses.some(w=>w.coop),
-  text:'Due ispettori controllano i facchini della cooperativa: buste paga, turni, straordinari. Il presidente della cooperativa non risponde al telefono da stamattina.',
-  opts:[{t:'Paga la sanzione in solido',e:'−15.000 €, reputazione −3',f:()=>{S.cash-=15000;S.cur.altro+=15000;S.rep=clamp(S.rep-3,0,100);}},
-        {t:'Assumi direttamente i facchini',e:'Fine della cooperativa in quel magazzino, 600 € a persona, morale +5',f:()=>{const w=S.warehouses.find(w=>w.coop);const c=600*(w.staff.pick+w.staff.car);w.coop=false;S.cash-=c;S.cur.altro+=c;mod(w.id,{mor:5},60);}},
-        {t:'"Abbiamo verificato tutto noi"',e:'Nessuna multa',req:()=>ceo().st.amm>=13,reqT:'Amministrazione 13',f:()=>{}}]},
+  text:'Due ispettori del lavoro sono in banchina e controllano i facchini della cooperativa: buste paga, turni, straordinari mai pagati. Il presidente della cooperativa non risponde al telefono da stamattina. Per legge, se mancano dei soldi, li deve mettere chi ha dato l\'appalto: tu.',
+  opts:[{t:'Paga la sanzione in solido',d:'Paghi la sanzione e chiudi la faccenda. La notizia, però, gira tra i clienti.',e:'−15.000 €, reputazione −3',f:()=>{S.cash-=15000;S.cur.altro+=15000;S.rep=clamp(S.rep-3,0,100);}},
+        {t:'Assumi direttamente i facchini',d:'Assumi i facchini direttamente in azienda. Costa, ma da oggi rispondi tu di loro, e loro lo apprezzano.',e:'Fine della cooperativa in quel magazzino, 600 € a persona, morale +5',f:()=>{const w=S.warehouses.find(w=>w.coop);const c=600*(w.staff.pick+w.staff.car);w.coop=false;S.cash-=c;S.cur.altro+=c;mod(w.id,{mor:5},60);}},
+        {t:'"Abbiamo verificato tutto noi"',d:'Mostri agli ispettori i controlli che fai ogni mese sulla cooperativa. Non trovano niente da contestarti.',e:'Nessuna multa',req:()=>ceo().st.amm>=13,reqT:'Amministrazione 13',f:()=>{}}]},
  {id:'coop_sparita',src:'La Gazzetta del Muletto',title:'La cooperativa è sparita',cond:()=>S.warehouses.some(w=>w.coop&&w.staff.pick+w.staff.car>=4),
-  text:'La cooperativa ha chiuso nella notte: partita IVA cessata, sede legale in un garage di Rozzano. Metà dei facchini non si presenta, l\'altra metà chiede chi li pagherà.',
-  opts:[{t:'Trova un\'altra cooperativa',e:'−5.000 €, perdi un quarto dei facchini, morale −5',f:()=>{const w=S.warehouses.find(w=>w.coop&&w.staff.pick+w.staff.car>=4);S.cash-=5000;S.cur.altro+=5000;w.staff.pick-=Math.floor(w.staff.pick/4);w.staff.car-=Math.floor(w.staff.car/4);mod(w.id,{mor:-5},30);}},
-        {t:'Assumili tutti tu',e:'Fine della cooperativa, 600 € a persona, morale +8',f:()=>{const w=S.warehouses.find(w=>w.coop&&w.staff.pick+w.staff.car>=4);const c=600*(w.staff.pick+w.staff.car);w.coop=false;S.cash-=c;S.cur.altro+=c;mod(w.id,{mor:8},60);}}]},
+  text:'Stanotte la cooperativa ha chiuso: partita IVA cessata, sede legale in un garage di Rozzano, telefoni muti. Metà dei facchini non si è presentata, l\'altra metà è in banchina e chiede chi li pagherà. I camion da caricare, intanto, arrivano.',
+  opts:[{t:'Trova un\'altra cooperativa',d:'Chiami un\'altra cooperativa che manda subito gente. Una parte dei facchini, però, non torna più.',e:'−5.000 €, perdi un quarto dei facchini, morale −5',f:()=>{const w=S.warehouses.find(w=>w.coop&&w.staff.pick+w.staff.car>=4);S.cash-=5000;S.cur.altro+=5000;w.staff.pick-=Math.floor(w.staff.pick/4);w.staff.car-=Math.floor(w.staff.car/4);mod(w.id,{mor:-5},30);}},
+        {t:'Assumili tutti tu',d:'Assumi tutti i facchini rimasti con un contratto vero. Ti costa, ma ti seguirebbero ovunque.',e:'Fine della cooperativa, 600 € a persona, morale +8',f:()=>{const w=S.warehouses.find(w=>w.coop&&w.staff.pick+w.staff.car>=4);const c=600*(w.staff.pick+w.staff.car);w.coop=false;S.cash-=c;S.cur.altro+=c;mod(w.id,{mor:8},60);}}]},
  {id:'concorrente',src:'Il Sole 24 Pallet',title:'Un concorrente ruba un autista',cond:()=>S.warehouses.some(w=>w.staff.autCE>=2),
-  text:'Un rivale offre 200 € in più al mese al tuo autista migliore.',
-  opts:[{t:'Pareggia l\'offerta',e:'−2.400 € e morale +2',f:()=>{S.cash-=2400;mod('all',{mor:2},30);}},
-        {t:'Lascialo andare',e:'Perdi un autista con patente CE',f:()=>{const w=S.warehouses.find(w=>w.staff.autCE>=2);w.staff.autCE--;}}]},
+  text:'Il tuo autista migliore ti confida che un concorrente gli ha offerto 200 € in più al mese. Ha quindici anni di patente CE e non ha mai graffiato un camion. Dice che gli dispiace, ma ha un mutuo.',
+  opts:[{t:'Pareggia l\'offerta',d:'Gli alzi lo stipendio e pareggi l\'offerta. Lui resta, e gli altri lo vengono a sapere.',e:'−2.400 € e morale +2',f:()=>{S.cash-=2400;mod('all',{mor:2},30);}},
+        {t:'Lascialo andare',d:'Gli stringi la mano e gli auguri buona fortuna. Tocca cercare un altro autista.',e:'Perdi un autista con patente CE',f:()=>{const w=S.warehouses.find(w=>w.staff.autCE>=2);w.staff.autCE--;}}]},
  {id:'olimpiadi',src:'Il Sole 24 Pallet',title:'Olimpiadi invernali di Torino',cond:()=>yearOf(S.day)===2006&&monthOf(S.day)<=1,once:true,
-  text:'Torino ospita le Olimpiadi: impianti, atleti e sponsor hanno bisogno di trasporti.',
-  opts:[{t:'Noleggia tre camion extra per i Giochi',e:'+18.000 € di ricavi, puntualità −2 per un mese',f:()=>{S.cash+=18000;S.cur.altro-=18000;mod('all',{P:-2},30);S.rep+=3;}},
-        {t:'Resta concentrato sui clienti',e:'Nessun effetto',f:()=>{}}]},
+  text:'Torino ospita le Olimpiadi invernali e la città è un cantiere a cielo aperto. Impianti, villaggi degli atleti e sponsor cercano trasporti e pagano bene chi garantisce le consegne. Le strade, però, sono piene di transenne.',
+  opts:[{t:'Noleggia tre camion extra per i Giochi',d:'Noleggi tre camion in più e ti metti a disposizione dei Giochi. Lavoro extra, e il tuo logo finisce in qualche foto.',e:'+18.000 € di ricavi, puntualità −2 per un mese',f:()=>{S.cash+=18000;S.cur.altro-=18000;mod('all',{P:-2},30);S.rep+=3;}},
+        {t:'Resta concentrato sui clienti',d:'Lasci le Olimpiadi ad altri e resti sui clienti di sempre.',e:'Nessun effetto',f:()=>{}}]},
  {id:'crisi',src:'Il Sole 24 Pallet',title:'Crisi finanziaria',cond:()=>yearOf(S.day)===2008&&monthOf(S.day)>=8,once:true,
-  text:'Le banche chiudono i rubinetti. I clienti riducono gli ordini e pagano in ritardo.',
-  opts:[{t:'Taglia i costi',e:'Reputazione −6, cassa +15.000 €',f:()=>{S.rep-=6;S.cash+=15000;}},
-        {t:'Resisti senza licenziare',e:'Cassa −20.000 €, reputazione +5, morale +5',f:()=>{S.cash-=20000;S.rep+=5;mod('all',{mor:5},90);}}]}
+  text:'Una grande banca americana è fallita e la crisi è arrivata anche in Italia. Le banche non concedono più fidi, i clienti riducono gli ordini e pagano sempre più tardi. Il commercialista ti consiglia di tagliare.',
+  opts:[{t:'Taglia i costi',d:'Riduci i costi e non rinnovi i contratti in scadenza. In cassa respiri, ma in paese se ne parla.',e:'Reputazione −6, cassa +15.000 €',f:()=>{S.rep-=6;S.cash+=15000;}},
+        {t:'Resisti senza licenziare',d:'Tieni tutti al loro posto e intacchi le riserve. La squadra non lo dimenticherà.',e:'Cassa −20.000 €, reputazione +5, morale +5',f:()=>{S.cash-=20000;S.rep+=5;mod('all',{mor:5},90);}}]},
+ /* --- eventi legati ai talenti del CEO: compaiono solo se il CEO ha quel talento --- */
+ {id:'t_scenata',src:'La Gazzetta del Muletto',title:'Scenata in ufficio',cond:()=>hasTal('Stacanovista'),
+  setup:ev=>{ev.chi=pick(['la moglie del capoturno','il marito dell\'impiegata del traffico','la moglie di un carrellista','il marito della pianificatrice']);
+    ev.text=`Alle 19:40 ${ev.chi} entra in ufficio con la cena in un contenitore di plastica: "Se deve vivere qui, almeno che mangi!". Da tre settimane nessuno esce prima delle otto, perché tu non esci mai. Tutto il turno guarda te.`;},
+  opts:[{t:'Chiedi scusa: per un mese si esce alle 18',d:'Chiedi scusa davanti a tutti e per un mese si stacca alle 18, tu compreso. Il lavoro rallenta, l\'aria migliora.',e:'Puntualità −3 per 30 giorni, morale +6',f:()=>mod('all',{P:-3,mor:6},30)},
+        {t:'"Qui si lavora, gentilmente"',d:'Rispondi che l\'ufficio non è una mensa. Il turno torna a lavorare in silenzio.',e:'Morale −8 per 2 mesi, reputazione −2',f:()=>{mod('all',{mor:-8},60);S.rep-=2;}},
+        {t:'Offri una cena a tutte le famiglie',d:'Prenoti una pizzeria e inviti tutte le famiglie. Alla fine brinda con te anche chi era venuto a protestare.',e:'−1.500 €, morale +5',req:()=>ceo().st.lead>=12,reqT:'Leadership 12',f:()=>{S.cash-=1500;mod('all',{mor:5},60);}}]},
+ {id:'t_papa',src:'La Gazzetta del Muletto',title:'Papà ha venduto un camion',cond:()=>hasTal('Papà ha sempre ragione')&&S.warehouses[0].motrici>1,
+  text:'Il fondatore, tuo padre, ha venduto una motrice a un amico del bar, "a un prezzo d\'affezione". Sul conto sono arrivati 4.000 €, ma il camion ne valeva 25.000. Lui è convinto di aver fatto un affare e lo racconta a tutti.',
+  opts:[{t:'Lascia stare, è papà',d:'Lasci correre: è papà, e l\'azienda l\'ha fondata lui.',e:'+4.000 €, una motrice in meno',f:()=>{S.cash+=4000;S.warehouses[0].motrici--;}},
+        {t:'Annulla la vendita',d:'Chiami l\'amico e annulli la vendita. Al bar non ti salutano più.',e:'Al bar ti tolgono il saluto: reputazione −2',f:()=>{S.rep-=2;}},
+        {t:'Rinegozia con l\'amico del bar',d:'Vai al bar, offri un caffè all\'amico e gli fai capire quanto vale davvero quel camion.',e:'+15.000 €, una motrice in meno',req:()=>ceo().st.neg>=12,reqT:'Negoziazione 12',f:()=>{S.cash+=15000;S.warehouses[0].motrici--;}}]},
+ {id:'t_derby',src:'La Gazzetta del Muletto',title:'Domenica c\'è il derby',cond:()=>hasTal('Tifo sfegatato'),
+  text:'Domenica c\'è il derby e la città non parla d\'altro. Metà del magazzino ha chiesto il turno libero, l\'altra metà guarderà la partita di nascosto sul telefono. Tu hai la sciarpa al collo da venerdì.',
+  opts:[{t:'Maxischermo in mensa per tutti',d:'Monti un maxischermo in mensa e la partita si guarda tutti insieme. Per un paio di giorni si lavora con la testa altrove.',e:'−800 €, morale +6, puntualità −3 per 2 giorni',f:()=>{S.cash-=800;mod('all',{mor:6},30);mod('all',{P:-3},2);}},
+        {t:'Turno normale, telefoni negli armadietti',d:'Turno normale e telefoni chiusi negli armadietti. Il tuo compreso, con grande sofferenza.',e:'Morale −5 per 15 giorni',f:()=>mod('all',{mor:-5},15)},
+        {t:'Sfida di calcetto tra i turni prima della partita',d:'Organizzi un torneo di calcetto tra i turni prima della partita. Tutti arrivano al fischio d\'inizio sudati e contenti.',e:'Morale +4',req:()=>ceo().st.lead>=13,reqT:'Leadership 13',f:()=>mod('all',{mor:4},30)}]},
+ {id:'t_dialetto',src:'Ufficio commerciale',title:'Problemi di traduzione',cond:()=>hasTal('Dialetto stretto')&&actC(),
+  setup:ev=>{ev.c=actC();ev.text=`In videochiamata con la sede estera di ${ev.c.name} hai detto "va bin, a l'è tut a post". I sottotitoli automatici hanno scritto "il magazzino è in fiamme". Ora ti chiamano dall'ufficio sicurezza.`;},
+  opts:[{t:'Spiega tutto con una mail in inglese',d:'Scrivi una mail lunga e precisa in inglese. Si chiarisce tutto, ma resta un po\' di imbarazzo.',e:'Soddisfazione −3',f:function(){this.c.sat=clamp(this.c.sat-3,0,100);}},
+        {t:'Invitali a cena nelle Langhe',d:'Inviti i loro dirigenti a cena nelle Langhe. Dopo il secondo bicchiere il dialetto lo parlano anche loro.',e:'−1.200 €, soddisfazione +8',f:function(){S.cash-=1200;this.c.sat=clamp(this.c.sat+8,0,100);}}]},
+ {id:'t_insonne',src:'Posta elettronica',title:'Mail alle 3:47',cond:()=>hasTal('Insonne'),
+  text:'Stanotte non dormivi e hai mandato quattordici mail tra le 2 e le 5. Una è finita al cliente sbagliato, con il listino di un altro cliente in allegato. Te ne sei accorto alle 7, quando hanno risposto.',
+  opts:[{t:'Chiedi scusa a tutti',d:'Mandi una mail di scuse a tutti i destinatari. Fa ridere qualcuno e preoccupa altri.',e:'Reputazione −2',f:()=>{S.rep-=2;}},
+        {t:'"Era un test di trasparenza"',d:'Rispondi che era un esperimento di trasparenza sui prezzi. Il cliente non sa se crederci, ma ti stima.',e:'Reputazione +1',req:()=>ceo().st.neg>=13,reqT:'Negoziazione 13',f:()=>{S.rep+=1;}},
+        {t:'Telefono spento dopo le 22, da oggi',d:'Da oggi il telefono si spegne alle 22. Le mail aspettano il mattino, e anche tu ne guadagni.',e:'Puntualità −1 per 15 giorni, morale +3',f:()=>mod('all',{P:-1,mor:3},15)}]},
+ {id:'t_militare',src:'La Gazzetta del Muletto',title:'L\'appello delle 6:00',cond:()=>hasTal('Ha fatto il militare'),
+  text:'Da un mese hai introdotto l\'appello a inizio turno, con tanto di "Presente!" e righe dritte in banchina. I ventenni del turno di notte ne hanno fatto un video con la musica di un film di guerra. Lo hanno visto anche in Regione.',
+  opts:[{t:'Smetti subito',d:'Abolisci l\'appello e ci ridi su insieme a loro.',e:'Morale +2',f:()=>mod('all',{mor:2},30)},
+        {t:'Insisti: disciplina',d:'Tieni l\'appello: si arriva puntuali e lo sanno tutti. Ma l\'umore cala.',e:'Puntualità +3 e morale −6 per un mese',f:()=>mod('all',{P:3,mor:-6},30)},
+        {t:'Trasformalo in un rito con caffè e brioche',d:'Trasformi l\'appello in una colazione con caffè e brioche. Diventa il momento più atteso del turno.',e:'−400 €, morale +5, reputazione +2',req:()=>ceo().st.lead>=14,reqT:'Leadership 14',f:()=>{S.cash-=400;mod('all',{mor:5},60);S.rep+=2;}}]},
+ {id:'t_ombrellone',src:'Radio Traffico Nord-Ovest',title:'Ferie a Varazze',cond:()=>hasTal('Sempre al telefono')&&monthOf(S.day)===7,
+  text:'Sei in ferie a Varazze da un\'ora e hai già fatto undici telefonate dall\'ombrellone. Tuo figlio, stanco di aspettare, ha seppellito il telefono sotto la sabbia, vicino alla torretta del bagnino. Ora ti guarda e aspetta.',
+  opts:[{t:'Lascialo lì: ferie vere',d:'Lasci il telefono dove sta e ti fai un bagno. In azienda se la cavano, più o meno.',e:'Puntualità −2 per 7 giorni',f:()=>mod('all',{P:-2},7)},
+        {t:'Scava',d:'Scavi a mani nude davanti a tutta la spiaggia. Il lavoro è salvo, il rapporto con tuo figlio un po\' meno.',e:'Nessun effetto sul lavoro. Tuo figlio non ti parla per una settimana',f:()=>{}}]},
+ {id:'t_pizza',src:'La Gazzetta del Muletto',title:'La pizza del venerdì',cond:()=>hasTal('Mano larga'),
+  text:'Mesi fa hai promesso la pizza al turno di notte ogni venerdì, e la promessa l\'hai mantenuta. Il pizzaiolo ora ti manda gli auguri a Natale. Insieme agli auguri è arrivata una fattura da 2.400 €.',
+  opts:[{t:'Paga e continua',d:'Paghi e ordini anche per questo venerdì. Il turno di notte ti voterebbe sindaco.',e:'−2.400 €, morale +5 per 2 mesi',f:()=>{S.cash-=2400;mod('all',{mor:5},60);}},
+        {t:'Basta pizza',d:'Annunci che la pizza del venerdì finisce qui. In banchina cala il gelo.',e:'Morale −6 per un mese',f:()=>mod('all',{mor:-6},30)}]},
+ {id:'t_carta',src:'La Gazzetta del Muletto',title:'La rivolta della carta igienica',cond:()=>hasTal('Braccino corto'),
+  text:'Per risparmiare hai fatto comprare la carta igienica del discount. Stamattina la RSU ha appeso un cartello in bagno: "Qui si risparmia anche sulla dignità". Accanto, come prova, un rotolo sottile come la carta velina.',
+  opts:[{t:'Torna alla carta di prima',d:'Torni alla carta di prima e la RSU toglie il cartello.',e:'−300 €, morale +3',f:()=>{S.cash-=300;mod('all',{mor:3},30);}},
+        {t:'Tieni duro: ogni centesimo conta',d:'Fai togliere il cartello e la carta resta quella. Ogni centesimo conta, ma lo pensi solo tu.',e:'+300 €, morale −5',f:()=>{S.cash+=300;mod('all',{mor:-5},30);}}]},
+ {id:'t_treno',src:'Radio Traffico Nord-Ovest',title:'Regionale soppresso',cond:()=>hasTal('Pendolare della Torino-Milano'),
+  text:'Il regionale delle 6:42 per Milano è soppresso. Il successivo è "in ritardo di 90 minuti, ci scusiamo per il disagio". Alle 8 hai una riunione importante con un cliente e sei ancora sul binario.',
+  opts:[{t:'Taxi fino in ufficio',d:'Prendi un taxi e arrivi giusto in tempo, un po\' spettinato.',e:'−180 €',f:()=>{S.cash-=180;}},
+        {t:'Fai la riunione dal binario',d:'Fai la riunione al telefono, tra un annuncio e l\'altro. Il cliente sente più treni che numeri.',e:'Puntualità −2 per 3 giorni',f:()=>mod('all',{P:-2},3)},
+        {t:'Organizza un furgone condiviso con i colleghi pendolari',d:'Organizzi un furgone aziendale per te e i colleghi pendolari. Da oggi si viaggia insieme e si arriva puntuali.',e:'Morale +3 per 2 mesi',req:()=>ceo().st.op>=12,reqT:'Operazioni 12',f:()=>mod('all',{mor:3},60)}]},
+ {id:'t_grigliata',src:'La Gazzetta del Muletto',title:'Grigliata aziendale',cond:()=>hasTal('Vegano convinto')&&[5,6,7,8].includes(monthOf(S.day)),
+  text:'Il comitato del personale ha organizzato la grigliata di fine turno nel piazzale. Ci sono tre quintali di salamelle, costine e un unico panetto di tofu: il tuo. Tutti aspettano di vedere cosa fai.',
+  opts:[{t:'Partecipa con il tuo tofu',d:'Grigli il tuo tofu accanto alle salamelle e ridi con tutti delle battute.',e:'Morale +3',f:()=>mod('all',{mor:3},30)},
+        {t:'Proponi una grigliata solo di verdure',d:'Proponi di rifarla l\'anno prossimo solo con le verdure. Il giornale locale ti loda, il piazzale no.',e:'Morale −5, reputazione +1 sul giornale locale',f:()=>{mod('all',{mor:-5},30);S.rep+=1;}}]},
+ {id:'t_multe',src:'Il Mattinale del Ministero',title:'Patente sospesa',cond:()=>hasTal('Collezionista di multe'),
+  text:'L\'autovelox della tangenziale di Novara ti ha fotografato per la quarta volta in un mese. Oggi è arrivata la lettera: patente sospesa per sessanta giorni. E hai appuntamenti con clienti in tutto il Nord-Ovest.',
+  opts:[{t:'Fatti accompagnare da un autista',d:'Ti fai accompagnare da un autista ai tuoi appuntamenti. Lui, però, manca alle consegne.',e:'Puntualità −2 per 60 giorni: un autista in meno sulle consegne',f:()=>mod('all',{P:-2},60)},
+        {t:'Ricorso dall\'avvocato',d:'Ti affidi a un avvocato specializzato in multe. Ha un sito pieno di recensioni entusiaste.',e:'−1.500 €; una volta su due va bene',f:()=>{S.cash-=1500;if(Math.random()<0.5)toast('Ricorso accolto: patente restituita','ok');else{mod('all',{P:-2},60);toast('Ricorso respinto','bad');}}}]},
+ {id:'t_karaoke',src:'Ufficio commerciale',title:'Serata karaoke con il cliente',cond:()=>hasTal('Re del karaoke')&&actC(),
+  setup:ev=>{ev.c=actC();ev.text=`Il buyer di ${ev.c.name} ha prenotato un karaoke a Lodi per la cena di fine anno. Ti guarda e ti porge il microfono.`;},
+  opts:[{t:'Duetto su "Azzurro"',d:'Prendi il microfono e attacchi "Azzurro" insieme a lui. Il locale canta con voi, se non sbagli la strofa.',e:'Soddisfazione +10, con un piccolo rischio di figuraccia',f:function(){if(Math.random()<0.8)this.c.sat=clamp(this.c.sat+10,0,100);else{this.c.sat=clamp(this.c.sat-4,0,100);toast('Hai sbagliato la strofa. Due volte.','warn');}}},
+        {t:'Lascia cantare lui',d:'Gli lasci la scena e applaudi con convinzione.',e:'Soddisfazione +4',f:function(){this.c.sat=clamp(this.c.sat+4,0,100);}}]},
+ {id:'t_fumo',src:'Il Mattinale del Ministero',title:'Divieto di fumo nel piazzale',cond:()=>hasTal('Fumatore incallito'),
+  text:'L\'ASL ha imposto il divieto di fumo in tutto il piazzale, banchine comprese. Il cartello è proprio sotto la tua finestra. Tutti sanno che il primo a dover rinunciare sei tu.',
+  opts:[{t:'Dai il buon esempio e smetti',d:'Butti l\'ultimo pacchetto davanti a tutti. Da quel giorno ti guardano con rispetto.',e:'Morale +4: ti rispettano',f:()=>mod('all',{mor:4},60)},
+        {t:'Area fumatori coperta e a norma',d:'Fai costruire un\'area fumatori coperta e in regola, lontana dalle banchine.',e:'−2.500 €, morale +2',f:()=>{S.cash-=2500;mod('all',{mor:2},60);}},
+        {t:'Fuma di nascosto dietro i bancali',d:'Continui a fumare dietro i bancali del corridoio 9. Prima o poi qualcuno ti vedrà.',e:'Nessun costo… se non ti beccano',f:()=>{if(Math.random()<0.35){S.cash-=1000;S.rep-=3;toast('Multato dall\'ASL dietro i bancali: −1.000 €','bad');}}}]},
+ {id:'t_maratona',src:'La Gazzetta del Muletto',title:'Maratona di Torino',cond:()=>hasTal('Maratoneta')&&[9,10].includes(monthOf(S.day)),
+  text:'Domenica c\'è la maratona di Torino e tre magazzinieri si sono iscritti. Ti chiedono di correre con loro, "per fare squadra". Sanno che tu la corri ogni anno.',
+  opts:[{t:'Sponsorizza la squadra aziendale',d:'Paghi iscrizione e maglietta con il logo a chiunque voglia correre. Al traguardo c\'è anche il giornale.',e:'−3.000 €, reputazione +4, morale +4',f:()=>{S.cash-=3000;S.rep+=4;mod('all',{mor:4},60);}},
+        {t:'Corri con loro, maglietta fatta in casa',d:'Corri con loro, con una maglietta scritta a pennarello. Arrivate insieme, stremati.',e:'Morale +3',f:()=>mod('all',{mor:3},30)},
+        {t:'Corri da solo, per il tempo',d:'Corri per conto tuo, per migliorare il tuo tempo. I magazzinieri ti vedono partire e non ti rivedono più.',e:'Nessun effetto',f:()=>{}}]},
+ {id:'t_gatto_nero',src:'La Gazzetta del Muletto',title:'Gatto nero nel piazzale',cond:()=>hasTal('Superstizioso')&&actC(),
+  setup:ev=>{ev.c=actC();ev.text=`Un gatto nero ha attraversato il piazzale proprio mentre partiva il bilico per ${ev.c.name}. L'autista ti guarda: aspetta un tuo segnale.`;},
+  opts:[{t:'Fermi tutti: si parte domani',d:'Fai scaricare il bilico e lo fai partire domani. Il cliente non capisce, tu dormi tranquillo.',e:'Puntualità −6 per 2 giorni',f:()=>mod('all',{P:-6},2)},
+        {t:'Corno rosso sullo specchietto e via',d:'Appendi un cornetto rosso allo specchietto e dai il via. Per sicurezza ne compri una scatola.',e:'−20 € di cornetti',f:()=>{S.cash-=20;}},
+        {t:'Adotta il gatto',d:'Prendi in braccio il gatto e lo porti in ufficio. Da oggi è di casa.',e:'Morale +3',f:()=>mod('all',{mor:3},60)}]},
+ {id:'t_avvocato',src:'Il Mattinale del Ministero',title:'L\'avvocato dell\'ex',cond:()=>hasTal('Divorziato due volte'),
+  text:'L\'avvocato del tuo secondo matrimonio sostiene che il magazzino era "bene comune della famiglia". Come prova allega una foto del matrimonio scattata davanti alle baie di carico. La lettera è arrivata in ufficio, e l\'hanno letta tutti.',
+  opts:[{t:'Paga e chiudi la questione',d:'Paghi la cifra richiesta pur di non pensarci più.',e:'−15.000 €',f:()=>{S.cash-=15000;}},
+        {t:'Vai in causa',d:'Ti affidi al tuo avvocato e vai in tribunale. Le udienze dureranno mesi.',e:'−4.000 € di avvocati; se perdi altri −20.000 €',f:()=>{S.cash-=4000;if(Math.random()<0.4){S.cash-=20000;toast('Causa persa: −20.000 €','bad');}else toast('Causa vinta','ok');}},
+        {t:'Chiedi aiuto alla prima ex, che lo detesta',d:'Chiami la tua prima ex, che detesta quell\'avvocato e sa esattamente come zittirlo.',e:'−2.000 €',req:()=>ceo().st.neg>=12,reqT:'Negoziazione 12',f:()=>{S.cash-=2000;}}]},
+ {id:'t_recita',src:'La Gazzetta del Muletto',title:'La recita di Natale',cond:()=>hasTal('Tre figli piccoli')&&monthOf(S.day)===11,
+  text:'Giovedì alle 10 c\'è la recita di Natale dei tuoi figli. Alla stessa ora è fissata la riunione sul budget dell\'anno prossimo, con tutti i responsabili. Il più piccolo fa la stella cometa e te lo ricorda ogni sera.',
+  opts:[{t:'Vai alla recita',d:'Vai alla recita e sposti la riunione. In ufficio lo vengono a sapere e ti stimano di più.',e:'Puntualità −1 per 3 giorni, morale +3: l\'hanno saputo tutti',f:()=>mod('all',{P:-1,mor:3},3)},
+        {t:'Vai in riunione',d:'Vai in riunione e chiedi a qualcuno di filmare la recita. Non è la stessa cosa, per nessuno.',e:'Morale −2 a casa e in ufficio',f:()=>mod('all',{mor:-2},15)}]},
+ {id:'t_social',src:'La Gazzetta del Muletto',title:'Il tuo post è virale',cond:()=>hasTal('Guru dei social'),
+  text:'Il tuo post "Cosa mi ha insegnato un pallet rotto sulla leadership" ha fatto 40.000 visualizzazioni. Ti scrivono colleghi, clienti e sconosciuti. Un concorrente ha commentato: "E i pallet chi li paga?".',
+  opts:[{t:'Pubblica la seconda parte',d:'Pubblichi la seconda parte, ancora più ispirata. Può andare benissimo, o diventare un meme.',e:'Reputazione +5, oppure −4 se esageri',f:()=>{if(Math.random()<0.6){S.rep+=5;toast('Seconda parte: altri 60.000 like','ok');}else{S.rep-=4;toast('Hai pubblicato la foto di un magazzino in disordine','bad');}}},
+        {t:'Rispondi a tutti i commenti',d:'Passi la settimana a rispondere ai commenti, uno per uno. In ufficio ti vedono poco.',e:'Reputazione +2, puntualità −2 per 7 giorni',f:()=>{S.rep+=2;mod('all',{P:-2},7);}}]},
+ {id:'t_brasato',src:'Ufficio commerciale',title:'Il buyer viene a pranzo',cond:()=>hasTal('Cuoco provetto')&&actC(),
+  setup:ev=>{ev.c=actC();ev.text=`Il buyer di ${ev.c.name} viene a vedere il magazzino e si ferma a pranzo. In mensa ti guardano: sanno che hai portato la pentola da casa.`;},
+  opts:[{t:'Cucina tu: brasato al Barolo',d:'Cucini tu un brasato al Barolo e lo servi in mensa con tutti. Il buyer chiede la ricetta.',e:'−300 €, soddisfazione +12',f:function(){S.cash-=300;this.c.sat=clamp(this.c.sat+12,0,100);}},
+        {t:'Ristorante stellato in Langa',d:'Prenoti un ristorante stellato in Langa. Elegante, ma meno personale.',e:'−1.500 €, soddisfazione +6',f:function(){S.cash-=1500;this.c.sat=clamp(this.c.sat+6,0,100);}}]},
+ {id:'t_ipocondria',src:'La Gazzetta del Muletto',title:'Sintomi letti su internet',cond:()=>hasTal('Ipocondriaco'),
+  text:'Da due giorni hai mal di testa e un formicolio alla mano. Secondo un forum su internet sono i sintomi di tre malattie rare. Hai già prenotato sette visite specialistiche.',
+  opts:[{t:'Settimana di esami',d:'Ti prendi una settimana per fare tutti gli esami. Stai benissimo, ma l\'ufficio va avanti senza di te.',e:'Puntualità −3 per 7 giorni (stai benissimo)',f:()=>mod('all',{P:-3},7)},
+        {t:'Ascolta il medico di base: "È stress"',d:'Vai dal medico di base, che ti guarda e dice: «È stress». Torni al lavoro.',e:'Nessun effetto',f:()=>{}}]},
+ {id:'t_epoca',src:'La Gazzetta del Muletto',title:'Asta di un camion d\'epoca',cond:()=>hasTal('Collezionista di camion d\'epoca'),
+  text:'All\'asta di Alessandria c\'è un autocarro del 1958 perfettamente restaurato, con le cromature lucide e il motore originale. Con il tuo logo sopra farebbe un figurone alle fiere di settore. Il banditore ti ha già notato.',
+  opts:[{t:'Compralo',d:'Alzi la paletta e porti a casa il camion. Alle fiere tutti si fermano a fotografarlo.',e:'−18.000 €, reputazione +5',f:()=>{S.cash-=18000;S.rep+=5;}},
+        {t:'Fai solo una foto',d:'Fai una foto, sospiri e torni a casa a mani vuote.',e:'Nessun effetto, un po\' di malinconia',f:()=>{}}]},
+ {id:'t_rotonda',src:'Il Mattinale del Ministero',title:'La rotonda davanti al magazzino',cond:()=>hasTal('Consigliere comunale'),
+  text:'In consiglio comunale si vota una rotonda proprio davanti al tuo magazzino. I bilici entrerebbero molto più in fretta. L\'opposizione ha già pronta la parola "conflitto d\'interessi".',
+  opts:[{t:'Vota a favore',d:'Voti sì. I bilici entreranno più in fretta, ma l\'opposizione ti attacca sul giornale.',e:'Puntualità +3 per 6 mesi, reputazione −3',f:()=>{mod('all',{P:3},180);S.rep-=3;}},
+        {t:'Astieniti',d:'Esci dall\'aula al momento del voto. Nessuno può dirti niente, e qualcuno ti loda.',e:'Reputazione +2',f:()=>{S.rep+=2;}}]},
+ {id:'t_caccia',src:'La Gazzetta del Muletto',title:'Apertura della caccia',cond:()=>hasTal('Cacciatore')&&monthOf(S.day)===8&&actC(),
+  setup:ev=>{ev.c=actC();ev.text=`Domenica apre la caccia. Hai chiuso l'ufficio il venerdì pomeriggio. Il buyer di ${ev.c.name} ha chiamato sei volte e adesso chiede se può venire anche lui.`;},
+  opts:[{t:'Portalo a caccia',d:'Gli presti un fucile e lo porti con te all\'alba. Speri che la caccia gli piaccia.',e:'Soddisfazione +8, oppure −8 se scopri che è animalista',f:function(){if(Math.random()<0.7)this.c.sat=clamp(this.c.sat+8,0,100);else{this.c.sat=clamp(this.c.sat-8,0,100);toast('Era animalista. Lo hai scoperto al primo sparo.','bad');}}},
+        {t:'Torna in ufficio a richiamarlo',d:'Torni in ufficio di domenica mattina e lo richiami. La caccia aspetterà.',e:'Nessun effetto',f:()=>{}}]},
+ {id:'t_calcio',src:'Ufficio commerciale',title:'Partita contro il cliente',cond:()=>hasTal('Ex calciatore di serie C')&&actC(),
+  setup:ev=>{ev.c=actC();ev.text=`Torneo di calcetto aziendale: in finale c'è ${ev.c.name}. Il loro centravanti è il responsabile acquisti. Tu hai ancora le scarpe del 1987.`;},
+  opts:[{t:'Gioca per vincere',d:'Giochi come ai tempi della serie C e segni tre gol. I tuoi esultano, il cliente no.',e:'Morale +5, soddisfazione −4',f:function(){mod('all',{mor:5},30);this.c.sat=clamp(this.c.sat-4,0,100);}},
+        {t:'Sbaglia un rigore, con classe',d:'Al momento del rigore calci piano e centrale. Il loro portiere para e il cliente ti offre da bere.',e:'Soddisfazione +8, morale −3',f:function(){this.c.sat=clamp(this.c.sat+8,0,100);mod('all',{mor:-3},30);}}]},
+ {id:'t_cugino',src:'La Gazzetta del Muletto',title:'Il nipote del cugino',cond:()=>hasTal('Ha un cugino per tutto'),
+  text:'Tuo cugino, quello che ti ha trovato il gommista e l\'elettricista, ti chiede di assumere il nipote. "È bravo, ha solo bisogno di una possibilità". Il nipote ha 19 anni e un motorino truccato.',
+  opts:[{t:'Assumilo come magazziniere',d:'Lo assumi in magazzino e gli dai una possibilità. La squadra lo guarda con sospetto.',e:'Un magazziniere in più nel primo magazzino, morale −2',f:()=>{S.warehouses[0].staff.pick++;mod('all',{mor:-2},30);}},
+        {t:'Di\' di no',d:'Dici di no, con gentilezza. Tuo cugino ci resta male, e lo fa sapere al gommista.',e:'Il gommista non ti fa più lo sconto: −1.500 €',f:()=>{S.cash-=1500;}}]},
+ {id:'t_pollini',src:'Radio Traffico Nord-Ovest',title:'Primavera in tangenziale',cond:()=>hasTal('Allergico ai pollini')&&[3,4].includes(monthOf(S.day)),
+  text:'È primavera e starnutisci da dieci giorni. Ieri hai firmato un\'offerta per un cliente con uno starnuto a metà, e ci è finito uno zero in più. Per fortuna non è ancora partita.',
+  opts:[{t:'Ricontrolla tutto tu',d:'Ricontrolli di persona ogni documento in uscita, tra un fazzoletto e l\'altro.',e:'Puntualità −2 per 7 giorni',f:()=>mod('all',{P:-2},7)},
+        {t:'Fai controllare all\'impiegata',d:'Chiedi all\'impiegata di controllare al posto tuo. È brava, ma ha già mille cose da fare.',e:'Accuratezza −2 per 7 giorni',f:()=>mod('all',{A:-2},7)}]},
+ {id:'t_scadenza',src:'Ufficio amministrazione',title:'Una scadenza dimenticata',cond:()=>hasTal('Smemorato'),
+  text:'Oggi scadeva l\'assicurazione di tutta la flotta. Te ne sei ricordato alle 23:58, guardando un camion dalla finestra. Domattina i mezzi devono partire.',
+  opts:[{t:'Paga la mora',d:'Rinnovi domattina e paghi la mora. I camion partono comunque.',e:'−2.500 €',f:()=>{S.cash-=2500;}},
+        {t:'Chiama l\'assicuratore a casa',d:'Chiami l\'assicuratore a casa, a mezzanotte, e lo convinci a fare la pratica subito.',e:'−500 €',req:()=>ceo().st.amm>=12,reqT:'Amministrazione 12',f:()=>{S.cash-=500;}}]},
+ {id:'t_golf',src:'Ufficio commerciale',title:'Torneo di golf',cond:()=>hasTal('Golfista')&&actC(),
+  setup:ev=>{ev.c=actC();ev.text=`Il direttore logistico di ${ev.c.name} ti invita al torneo del suo circolo. Ha un handicap terribile e un ego enorme.`;},
+  opts:[{t:'Perdi apposta',d:'Sbagli tre buche apposta e gli lasci vincere il torneo. Lui ti racconta ogni colpo a cena.',e:'−1.200 € di iscrizione, soddisfazione +10',f:function(){S.cash-=1200;this.c.sat=clamp(this.c.sat+10,0,100);}},
+        {t:'Gioca per vincere',d:'Giochi al massimo. Se perde, potrebbe ammirarti o non perdonarti.',e:'−1.200 €; soddisfazione +15 se ti ammira, −5 se se la lega al dito',f:function(){S.cash-=1200;if(Math.random()<0.5)this.c.sat=clamp(this.c.sat+15,0,100);else this.c.sat=clamp(this.c.sat-5,0,100);}},
+        {t:'Declina: c\'è da lavorare',d:'Ringrazi e declini: c\'è un magazzino da mandare avanti.',e:'Nessun effetto',f:()=>{}}]},
+ {id:'t_guanto',src:'La Gazzetta del Muletto',title:'Ispezione col guanto bianco',cond:()=>hasTal('Maniaco dell\'ordine'),
+  text:'Hai passato il guanto bianco sulle scaffalature del corridoio 4. Era grigio. Il capoturno finge di essere al telefono.',
+  opts:[{t:'Pulizia straordinaria nel weekend',d:'Organizzi una pulizia straordinaria nel weekend. Gli scaffali brillano, la squadra sbuffa.',e:'−2.000 €, accuratezza +2 per un mese, morale −3',f:()=>{S.cash-=2000;mod('all',{A:2,mor:-3},30);}},
+        {t:'Impresa di pulizie fissa',d:'Prendi un\'impresa di pulizie fissa. Il magazzino resta in ordine e nessuno rinuncia al sabato.',e:'−4.000 €, accuratezza +3 per 3 mesi',f:()=>{S.cash-=4000;mod('all',{A:3},90);}},
+        {t:'Fai finta di niente (soffri in silenzio)',d:'Ti togli il guanto, sorridi e vai avanti. Ci pensi tutta la notte.',e:'Nessun effetto',f:()=>{}}]},
+ {id:'t_moto',src:'Radio Traffico Nord-Ovest',title:'Caduta sul Turchino',cond:()=>hasTal('Motociclista'),
+  text:'Domenica sei scivolato con la moto su una curva del passo del Turchino. Niente di grave, ma hai il braccio ingessato per due settimane. Il medico ti consiglia riposo.',
+  opts:[{t:'Lavora da casa',d:'Lavori da casa, con il portatile sul cuscino.',e:'Puntualità −2 per 14 giorni',f:()=>mod('all',{P:-2},14)},
+        {t:'In ufficio col gesso',d:'Torni in ufficio con il gesso. Tutti vogliono firmartelo.',e:'Puntualità −1 e morale +3 per 14 giorni: sei un eroe',f:()=>mod('all',{P:-1,mor:3},14)}]},
+ {id:'t_complotto',src:'La Gazzetta del Muletto',title:'I codici a barre ci schedano',cond:()=>hasTal('Complottista'),
+  text:'In riunione hai spiegato che i codici a barre servono a schedare i magazzinieri. Hai stampato le prove da un forum. Gli impiegati si scambiano occhiate.',
+  opts:[{t:'Ritratta: era una battuta',d:'Dici che era una battuta e cambi argomento. Non tutti ci credono.',e:'Reputazione −1',f:()=>{S.rep-=1;}},
+        {t:'Vieta le pistole barcode per un mese',d:'Fai mettere via le pistole barcode per un mese. Si torna alla carta, e agli errori.',e:'Accuratezza −3 per 30 giorni, morale +2 tra i diffidenti',f:()=>mod('all',{A:-3,mor:2},30)},
+        {t:'Scrivi una lettera al giornale locale',d:'Scrivi al giornale locale per denunciare la schedatura. La lettera viene pubblicata, purtroppo.',e:'Reputazione −4',f:()=>{S.rep-=4;}}]},
+ {id:'t_lira',src:'Ufficio commerciale',title:'Preventivo in lire',cond:()=>hasTal('Nostalgico della lira')&&yearOf(S.day)<=2004&&actC(),
+  setup:ev=>{ev.c=actC();ev.text=`Hai mandato a ${ev.c.name} il preventivo per il nuovo anno in lire. Il buyer ha creduto per un'ora di pagare 1.936 volte di più.`;},
+  opts:[{t:'Correggi e chiedi scusa',d:'Mandi subito il preventivo in euro con una mail di scuse.',e:'Soddisfazione −3',f:function(){this.c.sat=clamp(this.c.sat-3,0,100);}},
+        {t:'"Era uno sconto per i nostalgici"',d:'Richiami il buyer: era uno scherzo per i nostalgici, e c\'è anche uno sconto vero. Ride, e firma.',e:'Soddisfazione +5',req:()=>ceo().st.neg>=12,reqT:'Negoziazione 12',f:function(){this.c.sat=clamp(this.c.sat+5,0,100);}}]},
+ {id:'t_inno',src:'La Gazzetta del Muletto',title:'L\'inno aziendale',cond:()=>hasTal('Cantautore incompreso'),
+  text:'Hai scritto l\'inno aziendale: "Pallet d\'amore". Il turno di notte lo canta con un tono che non riesci a decifrare.',
+  opts:[{t:'Registralo in uno studio vero',d:'Prenoti uno studio di registrazione e lo incidi con il coro del turno di notte.',e:'−1.500 €, morale +4, reputazione +1',f:()=>{S.cash-=1500;mod('all',{mor:4},60);S.rep+=1;}},
+        {t:'Tienilo nel cassetto',d:'Lo rimetti nel cassetto, insieme alle altre canzoni.',e:'Nessun effetto',f:()=>{}}]},
+ {id:'t_gatto',src:'Ufficio acquisti',title:'Il gatto ha premuto Invio',cond:()=>hasTal('Gatto in ufficio'),
+  text:'Bancale, il gatto dell\'ufficio, ha passeggiato sulla tastiera del computer degli acquisti. È partito un ordine di 4.000 rotoli di film estensibile, già confermato dal fornitore. Bancale dorme sul monitor, soddisfatto.',
+  opts:[{t:'Tieni il film: prima o poi serve',d:'Tieni tutti i rotoli e li impili in un angolo. Basteranno per anni.',e:'−3.000 €',f:()=>{S.cash-=3000;}},
+        {t:'Annulla e paga la penale',d:'Chiami il fornitore e annulli l\'ordine, pagando la penale.',e:'−800 €',f:()=>{S.cash-=800;}},
+        {t:'Nomina Bancale responsabile acquisti',d:'Annulli l\'ordine e appendi in ufficio la foto di Bancale con la targhetta «Responsabile acquisti».',e:'−800 €, morale +4',f:()=>{S.cash-=800;mod('all',{mor:4},60);}}]},
+ {id:'t_budget',src:'La Gazzetta del Muletto',title:'"Quest\'anno raddoppiamo"',cond:()=>hasTal('Ottimista patologico')&&monthOf(S.day)===0,
+  text:'L\'hai detto all\'assemblea di inizio anno, davanti a tutti. Qualcuno ha applaudito, qualcuno ha cercato il curriculum.',
+  opts:[{t:'Assumi subito un magazziniere in più',d:'Per dimostrare che fai sul serio, assumi subito un magazziniere in più.',e:'Un magazziniere in più nel primo magazzino, morale +3',f:()=>{S.warehouses[0].staff.pick++;mod('all',{mor:3},60);}},
+        {t:'Ridimensiona: "intendevo i sorrisi"',d:'Alla riunione successiva spieghi che intendevi raddoppiare i sorrisi. Qualcuno sospira.',e:'Morale −2',f:()=>mod('all',{mor:-2},30)}]},
+ {id:'t_scatola',src:'Ufficio amministrazione',title:'La scatola delle scarpe',cond:()=>hasTal('Pessimista cosmico')&&S.cash<0,once:true,
+  text:'Da anni tieni 10.000 € in una scatola di scarpe nell\'armadio, "per quando andrà male". Il conto in banca è in rosso. È andata male.',
+  opts:[{t:'Versali in cassa',d:'Prendi la scatola dall\'armadio e porti i soldi in banca.',e:'+10.000 €',f:()=>{S.cash+=10000;}},
+        {t:'No: può andare ancora peggio',d:'Rimetti la scatola al suo posto: il peggio deve ancora venire.',e:'Nessun effetto',f:()=>{S.seen.t_scatola=undefined;}}]},
+ {id:'t_virgola',src:'Ufficio commerciale',title:'Una virgola fuori posto',cond:()=>hasTal('Pignolo sulle virgole')&&actC(),
+  setup:ev=>{ev.c=actC();ev.text=`Rileggendo per la quinta volta il contratto di ${ev.c.name} hai trovato una virgola fuori posto. Vale 6.000 € l'anno, a tuo favore.`;},
+  opts:[{t:'Faglielo notare',d:'Telefoni al cliente e gli segnali l\'errore. Apprezza l\'onestà e lo racconta in giro.',e:'Soddisfazione +8, reputazione +2',f:function(){this.c.sat=clamp(this.c.sat+8,0,100);S.rep+=2;}},
+        {t:'Taci e incassa',d:'Non dici niente e lasci il contratto com\'è. Speri che nessuno lo rilegga.',e:'+6.000 €; se se ne accorgono, soddisfazione −15',f:function(){S.cash+=6000;if(Math.random()<0.3){this.c.sat=clamp(this.c.sat-15,0,100);toast('Se ne sono accorti','bad');}}}]},
+ {id:'t_gratta',src:'La Gazzetta del Muletto',title:'Gratta e vinci all\'autogrill',cond:()=>hasTal('Fortunato al gratta e vinci'),
+  text:'All\'autogrill di Novara il resto del caffè è un gratta e vinci. Senti un formicolio nelle dita.',
+  opts:[{t:'Gratta',d:'Prendi una moneta e gratti, lì al bancone.',e:'Chissà',f:()=>{const r=Math.random();if(r<0.1){S.cash+=50000;toast('Hai vinto 50.000 €!','ok');}else if(r<0.5){S.cash+=500;toast('Hai vinto 500 €','ok');}else toast('Ritenta, sarai più fortunato','warn');}},
+        {t:'Regalalo all\'autista di turno',d:'Lo regali all\'autista che sta pagando il caffè. Se vince, almeno sarà contento lui.',e:'Morale +2',f:()=>mod('all',{mor:2},30)}]},
+ {id:'t_anticipo',src:'Ufficio del personale',title:'Un anticipo per la caldaia',cond:()=>hasTal('Cuore d\'oro'),
+  text:'Un carrellista ti chiede 3.000 € di anticipo: la caldaia di casa si è rotta e ha due bambini piccoli. Lo dice guardando per terra.',
+  opts:[{t:'Dagli l\'anticipo',d:'Gli dai l\'anticipo in busta paga, senza fare domande.',e:'−3.000 €, morale +5 per 2 mesi',f:()=>{S.cash-=3000;mod('all',{mor:5},60);}},
+        {t:'Prestito aziendale a rate',d:'Gli proponi un prestito aziendale da restituire a piccole rate. Lui ringrazia, sollevato.',e:'Morale +3',req:()=>ceo().st.amm>=11,reqT:'Amministrazione 11',f:()=>mod('all',{mor:3},60)},
+        {t:'"Mi dispiace, non possiamo"',d:'Gli spieghi che l\'azienda non può. Se ne va senza dire niente.',e:'Morale −3',f:()=>mod('all',{mor:-3},30)}]}
 ];
 function fireEvent(){
   const el=EVENTS.filter(e=>(!e.once||!S.seen[e.id])&&(S.seen[e.id]===undefined||S.day-S.seen[e.id]>240)&&e.cond());
   if(!el.length) return;
   const base=pick(el); const ev={...base}; if(ev.setup) ev.setup(ev);
   S.seen[ev.id]=S.day; UI.ev=ev; const wasSpeed=S.speed; UI.evSpeed=wasSpeed; setSpeed(0);
-  const opts=ev.opts.map((o,i)=>{const ok=!o.req||o.req();return `<button class="opt" data-act="evopt" data-i="${i}" ${ok?'':'disabled'}>${o.req?`<span class="pill" style="background:var(--yellow)">${esc(o.reqT)}</span> `:''}${esc(o.t)}<small>${esc(o.e)}</small></button>`}).join('');
-  showModal(`<div class="src"><span>${esc(ev.src)}</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:21px">${esc(ev.title)}</h3><p style="margin:0;line-height:1.45">${esc(ev.text)}</p>${opts}</div>`);
+  const opts=ev.opts.map((o,i)=>{const ok=!o.req||o.req();return `<button class="opt" data-act="evopt" data-i="${i}" ${ok?'':'disabled'}>${o.req?`<span class="pill${ok?' ok':''}">${ok?'':'Serve '}${esc(o.reqT)}</span>`:''}<b>${esc(o.t)}</b>${o.d?`<span class="ev-d">${esc(o.d)}</span>`:''}<small class="ev-e"><i>Effetti:</i> ${esc(o.e)}</small></button>`}).join('');
+  // chi è coinvolto: il cliente (con logo) e il magazzino, se l'evento ne ha scelto uno
+  const w=ev.w||(ev.wh&&S.warehouses.find(x=>x.id===ev.wh));
+  const who=[ev.c?`<span>${logoSvg(ev.c.name,24)}${esc(ev.c.name)}</span>`:'',w?`<span>${pinIcon()}${esc(w.name)}</span>`:''].join('');
+  showModal(`<div class="src"><span>${esc(ev.src)}</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:21px">${esc(ev.title)}</h3>${who?`<div class="ev-who">${who}</div>`:''}<p class="ev-x">${esc(ev.text)}</p><div class="ev-q">Cosa fai?</div>${opts}</div>`);
 }
+function pinIcon(){const P=['..XXXX..','.XOOOOX.','XOOXXOOX','XOOXXOOX','.XOOOOX.','..XOOX..','...XX...'];let r='';P.forEach((row,y)=>[...row].forEach((c,x)=>{if(c!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${c==='X'?TPAL.K:TPAL.O}"/>`;}));return `<svg width="18" height="16" viewBox="-1 -1 10 9" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
 function modalInfo(src,title,text){
   UI.evSpeed=S.speed; setSpeed(0);
   showModal(`<div class="src"><span>${esc(src)}</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:20px">${esc(title)}</h3><p style="margin:0;line-height:1.45">${esc(text)}</p><button class="btn pri" data-act="closemodal">Ok</button></div>`);
@@ -1597,14 +1967,26 @@ function fitMap(){
 }
 function clampView(){const W=innerWidth,H=innerHeight;view.x=clamp(view.x,W-1280*view.s,0);view.y=clamp(view.y,H-800*view.s,0);}
 function applyView(){$('#map').style.transform=`translate(${view.x}px,${view.y}px) scale(${view.s})`;}
+// zoom tenendo fermo il punto (mx,my) dello schermo
+function zoomAt(mx,my,ns){ns=clamp(ns,view.min,view.min*3.2);view.x=mx-(mx-view.x)*ns/view.s;view.y=my-(my-view.y)*ns/view.s;view.s=ns;clampView();applyView();}
 function initMapControls(){
-  const mw=$('#mapwrap'); let drag=null;
-  mw.addEventListener('pointerdown',e=>{ if(e.target.closest('.mk')) return; drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y};mw.classList.add('drag');mw.setPointerCapture(e.pointerId);});
-  mw.addEventListener('pointermove',e=>{if(!drag)return;view.x=drag.vx+e.clientX-drag.x;view.y=drag.vy+e.clientY-drag.y;clampView();applyView();});
-  const up=()=>{drag=null;mw.classList.remove('drag');}; mw.addEventListener('pointerup',up); mw.addEventListener('pointercancel',up);
-  mw.addEventListener('wheel',e=>{e.preventDefault();const f=e.deltaY<0?1.15:1/1.15;const ns=clamp(view.s*f,view.min,view.min*3.2);
-    const mx=e.clientX,my=e.clientY;view.x=mx-(mx-view.x)*ns/view.s;view.y=my-(my-view.y)*ns/view.s;view.s=ns;clampView();applyView();},{passive:false});
-  addEventListener('resize',fitMap);
+  // un dito (o il mouse) trascina, due dita allargano e stringono; il trascinamento parte solo dopo qualche pixel, così i tocchi restano clic
+  const mw=$('#mapwrap'), pts=new Map(); let drag=null, pinch=null;
+  const mid=()=>{const [a,b]=[...pts.values()];return {x:(a.x+b.x)/2,y:(a.y+b.y)/2,d:Math.hypot(a.x-b.x,a.y-b.y)||1};};
+  const begin=()=>{ drag=null; pinch=null;
+    if(pts.size===1){const [p]=pts.values(); drag={x:p.x,y:p.y,vx:view.x,vy:view.y,on:false};}
+    else if(pts.size===2){const m=mid(); pinch={...m,s:view.s,vx:view.x,vy:view.y}; mw.classList.add('drag');} };
+  mw.addEventListener('pointerdown',e=>{ if(e.target.closest('.mk')||pts.size>=2) return; pts.set(e.pointerId,{x:e.clientX,y:e.clientY}); begin(); });
+  mw.addEventListener('pointermove',e=>{ const p=pts.get(e.pointerId); if(!p) return; p.x=e.clientX; p.y=e.clientY;
+    if(pinch){const m=mid(), ns=clamp(pinch.s*m.d/pinch.d,view.min,view.min*3.2); view.s=ns;
+      view.x=m.x-(pinch.x-pinch.vx)*ns/pinch.s; view.y=m.y-(pinch.y-pinch.vy)*ns/pinch.s; clampView(); applyView(); return;}
+    if(!drag) return;
+    if(!drag.on){ if(Math.hypot(p.x-drag.x,p.y-drag.y)<6) return; drag.on=true; mw.classList.add('drag'); try{mw.setPointerCapture(e.pointerId);}catch(_){} }
+    view.x=drag.vx+p.x-drag.x; view.y=drag.vy+p.y-drag.y; clampView(); applyView(); });
+  const up=e=>{ if(!pts.delete(e.pointerId)) return; mw.classList.remove('drag'); begin(); };
+  mw.addEventListener('pointerup',up); mw.addEventListener('pointercancel',up);
+  mw.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,view.s*(e.deltaY<0?1.15:1/1.15));},{passive:false});
+  addEventListener('resize',()=>{setMobile();fitMap();});
 }
 function renderMap(){
   const g=[];
@@ -1658,7 +2040,7 @@ const LENSES=[
   ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="5" height="5" fill="#ff7a3d"/><rect x="5" y="0" width="6" height="4" fill="#5fb4f0"/><rect x="0" y="5" width="4" height="5" fill="#ffd23f"/><rect x="4" y="5" width="7" height="5" fill="#2e9e48"/><rect x="5" y="4" width="6" height="1" fill="#2e9e48"/><rect x="4" y="0" width="1" height="10" fill="#16202e"/><rect x="0" y="4" width="11" height="1" fill="#16202e"/></svg>'}
 ];
 function renderLenses(){
-  $('#lenses').innerHTML='<span class="lab">Lenti</span>'+LENSES.map(l=>`<button data-act="lens" data-id="${l.id}" aria-pressed="${(UI.lens||'base')===l.id}" aria-label="Lente: ${esc(l.n)}" data-tip="<div class='tt'>${esc(l.n)}</div>${esc(l.d)}<br><span class='sm'>Tasto L per cambiare lente</span>">${l.ic}</button>`).join('');
+  $('#lenses').innerHTML='<span class="lab">Lenti</span>'+LENSES.map(l=>`<button data-act="lens" data-id="${l.id}" aria-pressed="${(UI.lens||'base')===l.id}" aria-label="Lente: ${esc(l.n)}" data-tip="<div class='tt'>${esc(l.n)}</div>${esc(l.d)}${TOUCH?'':"<br><span class='sm'>Tasto L per cambiare lente</span>"}">${l.ic}</button>`).join('');
 }
 // camion animati (solo estetica)
 let trucks=[], lastT=0;
@@ -1687,6 +2069,23 @@ function animTrucks(ts){
 }
 
 /* ====================== INTERFACCIA ====================== */
+// telefono: .mob su <html> mette le finestre a tutto schermo e il menu in basso (a sinistra se il telefono è in orizzontale).
+// TOUCH (schermo senza mouse) sceglie i testi dei comandi: «tocca» invece di «clic», niente tasti.
+const TOUCH=matchMedia('(hover: none)').matches;
+let MOB=false;
+function setMobile(){
+  MOB=matchMedia('(max-width: 760px), (max-height: 500px)').matches;
+  const h=document.documentElement; h.classList.toggle('mob',MOB); h.classList.toggle('land',MOB&&innerWidth>innerHeight);
+  layoutVars();
+}
+function layoutVars(){
+  if(!MOB) return;
+  const r=document.documentElement.style, land=innerWidth>innerHeight;
+  r.setProperty('--top-h',Math.round($('#top').getBoundingClientRect().bottom)+'px');
+  const d=$('#dock').getBoundingClientRect(), on=d.width>0;
+  r.setProperty('--win-l',on&&land?Math.round(d.right)+'px':'0px');
+  r.setProperty('--win-b',on&&!land?Math.round(innerHeight-d.top)+'px':'0px');
+}
 const DOCK=[
  ['azienda','Azienda e CEO','<svg width="22" height="24" viewBox="0 0 11 12" shape-rendering="crispEdges"><rect x="3" y="0" width="5" height="5" fill="#f2c79b"/><rect x="3" y="0" width="5" height="2" fill="#6b4a2b"/><rect x="1" y="6" width="9" height="6" fill="#ffd23f"/><rect x="5" y="6" width="1" height="4" fill="#16202e"/></svg>'],
  ['magazzini','Magazzini','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="0" y="3" width="12" height="8" fill="#d8e3ee"/><rect x="1" y="0" width="10" height="3" fill="#8a96a6"/><rect x="4" y="6" width="4" height="5" fill="#3a4658"/></svg>'],
@@ -1706,6 +2105,7 @@ function renderDock(){
   const short=S.warehouses.filter(w=>w.kpi&&ROLES.some(r=>w.staff[r]<w.kpi.need[r])).length;
   const planS=S.office.plan<planNeed()?1:0;
   const B={gare:openT,magazzini:short,personale:planS};
+  document.documentElement.classList.toggle('haswin',Object.keys(UI.open).length>0);  // sul telefono le lenti si nascondono sotto le finestre
   $('#dock').innerHTML=DOCK.map(([id,t,ic])=>`<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${id==='magazzini'&&short?'Personale insufficiente in un magazzino':id==='personale'&&planS?'Servono pianificatori del traffico in sede':id==='tecnologia'&&S.project?'Ricerca in corso: '+S.project.left+' giorni':id==='direzione'&&!R('direzione')?'Si sblocca con la ricerca Struttura direzionale':''}">${ic}${B[id]?`<span class="badge">${id==='gare'?B[id]:'!'}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}${id==='report'&&S.repNew?'<span class="badge">1</span>':''}${id==='direzione'&&R('direzione')&&Object.values(S.dirs).some(v=>!v)?'<span class="badge">!</span>':''}</button>`).join('');
 }
 function renderTop(){
@@ -1741,12 +2141,12 @@ function closeWin(id){delete UI.open[id];const el=document.getElementById('win-'
 function makeDraggable(el,id){
   const h=el.querySelector('.win-h'); let d=null;
   el.addEventListener('pointerdown',()=>{el.style.zIndex=++UI.z;});
-  h.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;d={x:e.clientX,y:e.clientY,l:el.offsetLeft,t:el.offsetTop};h.setPointerCapture(e.pointerId);});
+  h.addEventListener('pointerdown',e=>{if(MOB||e.target.closest('button'))return;d={x:e.clientX,y:e.clientY,l:el.offsetLeft,t:el.offsetTop};h.setPointerCapture(e.pointerId);});
   h.addEventListener('pointermove',e=>{if(!d)return;const x=clamp(d.l+e.clientX-d.x,0,innerWidth-80),y=clamp(d.t+e.clientY-d.y,56,innerHeight-40);el.style.left=x+'px';el.style.top=y+'px';UI.pos[id]={x,y};});
   h.addEventListener('pointerup',()=>d=null);
 }
 function renderWin(id){const el=document.getElementById('win-'+id);if(!el)return;const b=el.querySelector('.win-b');const st=b.scrollTop;b.innerHTML=(VIEWS[id]||(()=>''))();b.scrollTop=st;}
-function renderAll(){renderTop();const ae=document.activeElement;Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id);if(el&&ae&&el.contains(ae)&&ae.matches('select,input'))return;if(id==='enciclopedia')return;if(id!=='gare'||!UI.bidEditing)renderWin(id);});renderDock();}
+function renderAll(){renderTop();const ae=document.activeElement;Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id);if(el&&ae&&el.contains(ae)&&ae.matches('select,input'))return;if(id==='enciclopedia')return;if(id!=='gare'||!UI.bidEditing)renderWin(id);});renderDock();layoutVars();}
 function satObjTxt(sm){
   if(!sm.obj) return `<div class="sm">Senza obiettivo i camion partono pieni al ${Math.round(sm.nat)}%: è il carico che viene da sé.</div>`;
   const tip=tipParts('Capacità di pianificazione '+Math.round(sm.pot)+'%',[['Base',sm.nat],...sm.cP],'');
@@ -1764,7 +2164,7 @@ const VIEWS={
   const sk=[['Operazioni','op'],['Precisione','prec'],['Negoziazione','neg'],['Leadership','lead'],['Amministrazione','amm'],['Innovazione','inn']];
   const pl=L?[[kw('ricavi','Ricavi'),L.ric],[kw('costi','Personale'),-L.pers],[kw('costi','Mezzi e gasolio'),-L.mezzi],[kw('costi','Immobili e fissi'),-L.fissi],[kw('costi','Tecnologie'),-L.tech],[kw('costi','Manager'),-L.mgr],[kw('welfare','Welfare'),-L.welf],[kw('penali','Penali'),-L.pen],[kw('costi','Altro'),-L.altro]].filter(x=>Math.abs(x[1])>0.5):[];
   return `<div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
-   <div class="portrait" style="width:120px;height:140px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none"><img class="px" src="${IMG[C.id]}" alt="Ritratto di ${esc(C.name)}" width="120" height="140"></div>
+   <div class="portrait" style="width:120px;height:140px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none"><img class="px" src="${ceoImg(C)}" alt="Ritratto di ${esc(C.name)}" width="120" height="140"></div>
    <div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:4px">
      <div class="h3" style="font-size:20px">${esc(C.name)}</div><div class="sm">${C.age} anni · ${esc(C.origin)} · CEO di ${esc(S.company.name)}</div>
      <div class="sm" style="color:var(--ink)">${esc(C.bio)}</div>
@@ -1802,7 +2202,7 @@ const VIEWS={
    <div class="sm">${kw('motrici')}: ${w.motrici} di proprietà${Math.max(0,w.staff.autCE-w.motrici)?` + ${Math.max(0,w.staff.autCE-w.motrici)} in leasing`:''}${w.staff.autB?` · ${w.staff.autB} furgoni in leasing`:''} · ${k.viaggi} viaggi al mese</div>
    <label class="row" style="align-items:center"><span class="lab">${kw('obiettivo_sat','Obiettivo minimo di saturazione')}</span><select data-act="setsatobj" data-wh="${w.id}" aria-label="Obiettivo minimo di saturazione dei mezzi">${SAT_OBJ.map(v=>`<option value="${v}" ${(w.satObj||0)===v?'selected':''}>${v?'almeno '+v+'%':'nessuno'}</option>`).join('')}</select></label>
    ${satObjTxt(k.sm)}
-   <label class="row" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><img class="px mini" src="${w.mgr==='ceo'?IMG[ceo().id]:w.mgr?IMG['m_'+w.mgr]:IMG.imp}" alt="" width="48" height="56" style="${w.mgr?'':'opacity:.3'}"><span class="lab">${kw('manager','Manager')}</span></span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
+   <label class="row" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><img class="px mini" src="${w.mgr==='ceo'?ceoImg(ceo()):w.mgr?IMG['m_'+w.mgr]:IMG.imp}" alt="" width="48" height="56" style="${w.mgr?'':'opacity:.3'}"><span class="lab">${kw('manager','Manager')}</span></span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
    ${k.m.none?'<div class="sm bad">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
   </div>
   <div class="card"><div class="row"><span class="h3">${kw('clienti')}</span><span class="sm">${kw('ricavi','ricavi')} ${eur(k.rev)}/mese</span></div>
@@ -2005,10 +2405,10 @@ const VIEWS={
      ${bl.length?`<div class="lab">Se ne parla anche in</div><div class="wk-see">${bl.map(id=>kw(id)).join('')}</div>`:''}`;
   } else {
     art=`<div class="wk-head">${catIcon('basi',40)}<div style="flex:1;min-width:0"><div class="lab">Indice</div><h3 class="h3" style="font-size:23px">Enciclopedia di FUP</h3></div>${nav}</div>
-     <div class="wk-txt"><p>Tutto quello che serve sapere per non finire sotto un bancale. Le <span class="kw" style="cursor:default">parole sottolineate a puntini</span> sparse nel gioco si spiegano passandoci sopra con il mouse; con un clic si apre qui la voce completa. Si comincia da ${kw('fup')}.</p></div>
+     <div class="wk-txt"><p>Tutto quello che serve sapere per non finire sotto un bancale. Le <span class="kw" style="cursor:default">parole sottolineate a puntini</span> sparse nel gioco si spiegano ${TOUCH?'con un tocco; toccandole di nuovo':'passandoci sopra con il mouse; con un clic'} si apre qui la voce completa. Si comincia da ${kw('fup')}.</p></div>
      <div class="wk-home">${WIKI_CAT.map(([c,cn])=>`<div class="card"><div class="row">${catIcon(c,20)}<b>${esc(cn)}</b></div><div class="kws">${Object.values(WIKI).filter(w=>w.cat===c).map(w=>kw(w.id)).join('')}</div></div>`).join('')}</div>`;
   }
-  return `<div class="wk">${side}<article class="wk-art">${art}</article></div>`;
+  return `<div class="wk${UI.wikiQ?' q':''}">${side}<article class="wk-art">${art}</article></div>`;
  },
  giornale(){
   return S.news.slice(0,30).map(n=>`<div class="card"><div class="row"><span class="lab">${esc(n.src)}</span><span class="sm">${shortDate(n.day)}</span></div><b>${esc(n.title)}</b><div class="sm" style="color:var(--ink)">${esc(n.text)}</div></div>`).join('')||'<div class="sm">Nessuna notizia.</div>';
@@ -2036,7 +2436,7 @@ function techDays(t){return Math.max(5,Math.round(t.days*clamp(1-0.03*(innUsed()
 function hireDays(base){const att=40+welfarePts('att')+(S.rep-50)*0.5+5;const h=dirStat('hr');return Math.max(3,Math.round(base*clamp(1+(55-att)/40,0.6,1.8)*(R('hr')?0.8:1)*(h!=null?1-0.02*(h-10):1)));}
 const ACT={
  speed(d){setSpeed(+d.v);},
- toggle(d){UI.open[d.id]?closeWin(d.id):openWin(d.id);},
+ toggle(d){const el=document.getElementById('win-'+d.id); if(MOB&&el&&+el.style.zIndex<UI.z) return openWin(d.id); UI.open[d.id]?closeWin(d.id):openWin(d.id);},
  open(d){openWin(d.id);},
  close(d){closeWin(d.id);},
  openwh(d){openWin('magazzini',{wh:d.id});},
@@ -2114,7 +2514,7 @@ const ACT={
  bidmult(d,el){UI.bid.mult=(+el.value)/100;const sel=S.tenders.find(t=>t.id===UI.bid.t);$('#bidmv').textContent=(UI.bid.mult>=1?'+':'')+Math.round((UI.bid.mult-1)*100)+'%';$('#bidest').innerHTML=bidEstHtml(sel,bidEstimate(sel,UI.bid.wh,UI.bid.mult));},
  bid(d){const t=S.tenders.find(x=>x.id===d.id);t.bid={wh:UI.bid.wh,mult:UI.bid.mult};toast(`Offerta inviata per ${t.name}`,'ok');renderAll();},
  withdraw(d){const t=S.tenders.find(x=>x.id===d.id);t.bid=null;renderAll();},
- evopt(d){const ev=UI.ev;const o=ev.opts[+d.i];o.f.call(ev);S.rep=clamp(S.rep,0,100);closeModal();news(ev.src,ev.title,`${ev.text} Scelta: ${o.t}.`);renderAll();},
+ evopt(d){const ev=UI.ev;const o=ev.opts[+d.i];o.f.call(ev);S.rep=clamp(S.rep,0,100);closeModal();news(ev.src,ev.title,`${ev.text} Scelta: «${o.t}». ${o.d||''}`.trim());renderAll();},
  choice(d){const f=UI.choice[+d.i];closeModal();f();renderAll();},
  closemodal(){closeModal();},
  wiki(d,el){
@@ -2127,7 +2527,10 @@ const ACT={
  wikiback(){ if(!(UI.wikiBack||[]).length) return; UI.wiki=UI.wikiBack.pop(); wikiShow(); },
  wikihome(){ (UI.wikiBack=UI.wikiBack||[]).push(UI.wiki); UI.wiki=null; wikiShow(); },
  save(){save();toast('Partita salvata','ok');},
- restart(){closeModal();showStart();}
+ restart(){closeModal();showStart();},
+ options(){if($('#modal').innerHTML)return;if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);}
+   showModal(`<div class="src"><span>Opzioni</span><span>${shortDate(S.day)}</span></div><div class="win-b"><button class="btn pri" data-act="closemodal">Riprendi</button><button class="btn" data-act="quitgame">Esci dal gioco</button><p class="sm" style="margin:0">Uscendo la partita viene salvata: la ritrovi con «Continua la partita» nella schermata iniziale.</p></div>`);},
+ quitgame(){UI.evSpeed=0;if(!S.over)save();closeModal();Object.keys(UI.open).forEach(closeWin);showStart();}
 };
 function wikiShow(){
   const old=document.querySelector('#wiki-list'), ls=old?old.scrollTop:0;
@@ -2150,7 +2553,7 @@ function toast(text,kind){
 /* ====================== EVENTI DOM ====================== */
 document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a||a.tagName==='INPUT'||a.tagName==='SELECT')return;const f=ACT[a.dataset.act];if(f){e.preventDefault();f(a.dataset,a);}});
 document.addEventListener('change',e=>{const a=e.target.closest('[data-act]');if(!a)return;const f=ACT[a.dataset.act];if(f&&(a.tagName==='SELECT'||a.type==='checkbox')){a.blur();f(a.dataset,a);}});
-document.addEventListener('input',e=>{if(e.target.id==='wiki-q'){UI.wikiQ=e.target.value;$('#wiki-list').innerHTML=wikiList();return;}const a=e.target.closest('input[type=range][data-act]');if(a)ACT[a.dataset.act](a.dataset,a);});
+document.addEventListener('input',e=>{if(e.target.id==='wiki-q'){UI.wikiQ=e.target.value;$('#wiki-list').innerHTML=wikiList();$('#win-enciclopedia .wk').classList.toggle('q',!!UI.wikiQ);return;}const a=e.target.closest('input[type=range][data-act]');if(a)ACT[a.dataset.act](a.dataset,a);});
 document.addEventListener('pointerdown',e=>{if(e.target.closest('#win-gare input[type=range]'))UI.bidEditing=true;});
 document.addEventListener('pointerup',()=>{UI.bidEditing=false;});
 document.addEventListener('keydown',e=>{
@@ -2164,11 +2567,84 @@ document.addEventListener('keydown',e=>{
 });
 // tooltip
 const tip=$('#tip');
-document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-tip]');if(!t){if(!e.target.closest('svg[data-chart]'))tip.hidden=true;return;}tip.innerHTML=t.dataset.tip;tip.hidden=false;});
-document.addEventListener('mousemove',e=>{if(tip.hidden)return;const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(e.clientX+14,innerWidth-w-8)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';});
+// col dito: il primo tocco su una parola chiave (o su un elemento che spiega e basta) mostra il tooltip, il secondo apre la voce;
+// tenere premuto mostra il tooltip di qualunque pulsante. Nell'enciclopedia i collegamenti si aprono subito.
+let touchT=0, tipFor=null, lpTimer=0, lpAt=null, lpDone=false;
+function showTipAt(t){
+  tip.innerHTML=t.dataset.tip; tip.hidden=false; tipFor=t;
+  const r=t.getBoundingClientRect(), w=tip.offsetWidth, h=tip.offsetHeight; let y=r.bottom+8; if(y+h>innerHeight-8) y=Math.max(8,r.top-h-8);
+  tip.style.left=clamp(r.left+r.width/2-w/2,8,innerWidth-w-8)+'px'; tip.style.top=y+'px';
+}
+function hideTip(){tip.hidden=true;tipFor=null;}
+document.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse') return; touchT=Date.now(); clearTimeout(lpTimer); lpDone=false;
+  const t=e.target.closest('[data-tip]'); if(tipFor&&t!==tipFor) hideTip();
+  if(t){ lpAt={x:e.clientX,y:e.clientY}; lpTimer=setTimeout(()=>{lpDone=true;showTipAt(t);},450); }
+},true);
+document.addEventListener('pointermove',e=>{if(lpAt&&Math.hypot(e.clientX-lpAt.x,e.clientY-lpAt.y)>10){clearTimeout(lpTimer);lpAt=null;}},true);
+['pointerup','pointercancel'].forEach(n=>document.addEventListener(n,()=>{clearTimeout(lpTimer);lpAt=null;},true));
+document.addEventListener('contextmenu',e=>{if(Date.now()-touchT<1500)e.preventDefault();});
+document.addEventListener('click',e=>{
+  if(Date.now()-touchT>1000) return;  // clic del mouse: niente da fare
+  const stop=()=>{e.preventDefault();e.stopPropagation();};
+  if(lpDone){lpDone=false;stop();return;}
+  const t=e.target.closest('[data-tip]');
+  const info=t&&(!t.dataset.act||t.dataset.act==='wiki')&&!t.closest('#win-enciclopedia');
+  if(info&&tipFor!==t){stop();showTipAt(t);return;}
+  if(info&&!t.dataset.act){stop();hideTip();return;}
+  hideTip();
+},true);
+document.addEventListener('mouseover',e=>{if(Date.now()-touchT<1000)return;const t=e.target.closest('[data-tip]');if(!t){if(!e.target.closest('svg[data-chart]'))tip.hidden=true;return;}tip.innerHTML=t.dataset.tip;tip.hidden=false;});
+document.addEventListener('mousemove',e=>{if(tip.hidden||Date.now()-touchT<1000)return;const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(e.clientX+14,innerWidth-w-8)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';});
 
 /* ====================== AVVIO ====================== */
-let startSel={ceo:'gino',color:'#ff7a3d',name:''};
+let startSel={ceo:'gino',color:'#ff7a3d',name:'',cc:null,err:''};
+/* --- CEO creato dal giocatore: punti da distribuire tra abilità e talenti --- */
+const CC_PTS=58, CC_TRAITS=3, CC_IMGS=['cc1','cc2','cc3','cc4','cc5','cc6','cc7','cc8','cc9','cc10'];
+const ccNew=()=>({nome:'',cognome:'',eta:38,img:'cc1',base:'gino',st:{op:8,prec:8,neg:8,lead:8,amm:8,inn:8},edu:null,tal:[]});
+const ccTal=cc=>cc.edu?[cc.edu,...cc.tal]:cc.tal.slice();
+function ccMods(cc){const o={};ccTal(cc).forEach(n=>{const m=talMods(n);for(const k in m)o[k]=(o[k]||0)+m[k];});return o;}
+function ccStats(cc){const m=ccMods(cc),o={};STATS.forEach(s=>o[s.k]=clamp(cc.st[s.k]+(m[s.k]||0),0,20));return o;}
+const ccLeft=cc=>CC_PTS-STATS.reduce((a,s)=>a+cc.st[s.k],0)-ccTal(cc).reduce((a,n)=>a+talCost(n),0);
+const ccName=cc=>`${cc.nome.trim()} ${cc.cognome.trim()}`.trim();
+const ccCompany=cc=>cc.cognome.trim()?`Trasporti ${cc.cognome.trim()}`:'Nuova Logistica';
+function ccErr(cc){if(!cc.nome.trim()||!cc.cognome.trim())return 'Scrivi nome e cognome del tuo CEO.'; if(!cc.edu)return 'Scegli un titolo di studio.'; const l=ccLeft(cc); if(l<0)return `Hai speso ${-l} punti di troppo: togline qualcuno dalle abilità o cambia talenti.`; return '';}
+function ccCeo(cc){const B=CEOS.find(c=>c.id===cc.base), s=SITES[B.site];
+  return {id:'custom',img:cc.img,name:ccName(cc),age:clamp(Math.round(+cc.eta)||38,22,70),origin:cc.edu,site:B.site,cash:B.cash,motrici:B.motrici,fixed:B.fixed,rep:B.rep,company:ccCompany(cc),
+    st:ccStats(cc),tal:ccTal(cc),client:{...B.client},
+    bio:`Ha rilevato il capannone di ${s.name} con un solo cliente storico, ${B.client.name}, e un'idea fissa: arrivare fino all'ultimo pallet.`};}
+const defCo=()=>startSel.ceo==='custom'?ccCompany(startSel.cc):CEOS.find(c=>c.id===startSel.ceo).company;
+// salva quello che è scritto nei campi prima di ridisegnare la schermata
+function startKeep(){const inp=$('#coname-in'); if(inp){const t=inp.value; startSel.name=(!t||t===defCo())?'':t;}
+  const cc=startSel.cc; if(cc&&$('#cc-nome')){cc.nome=$('#cc-nome').value;cc.cognome=$('#cc-cognome').value;cc.eta=$('#cc-eta').value;}}
+function ccPanel(){
+  const cc=startSel.cc, m=ccMods(cc), fin=ccStats(cc), left=ccLeft(cc), full=cc.tal.length>=CC_TRAITS;
+  const cost=n=>{const c=talCost(n);return `<div style='margin-top:5px;font-weight:600'>${c>0?`Costa ${c} punt${c===1?'o':'i'}`:c<0?`Restituisce ${-c} punt${c===-1?'o':'i'}`:'Non costa punti'}</div>`;};
+  const tile=(n,on,act,dis)=>`<button class="tal talpick" data-act="${act}" data-n="${esc(n)}" aria-pressed="${on}" ${dis?'disabled':''} aria-label="${esc(n)}" data-tip="${talTip(n,cost(n))}" style="background:${TTYPE[TALENTS[n].t][1]}">${talentSvg(TALENTS[n].ic,30)}</button>`;
+  const edu=Object.keys(TALENTS).filter(n=>TALENTS[n].edu), tr=Object.keys(TALENTS).filter(n=>!TALENTS[n].edu);
+  const chosen=n=>`<span style="display:inline-flex;align-items:center;gap:6px;margin-right:12px">${talentIcons([n],18)}<span><b>${esc(n)}</b> <span class="sm">${esc(TALENTS[n].fx)}</span></span></span>`;
+  return `<div class="card ccbox">
+   <div class="row"><span class="h3">${kw('crea_ceo','Il tuo CEO')}</span><span class="disp" style="font-size:18px">Punti rimasti: <b class="${left<0?'bad':left===0?'ok':''}">${left}</b> <span class="sm">su ${CC_PTS}</span></span></div>
+   <div class="cc-top">
+    <div class="cc-por"><button class="btn sm2" data-act="ccimg" data-d="-1" aria-label="Ritratto precedente">◀</button><div class="portrait" style="width:96px;height:112px;overflow:hidden"><img class="px" src="${IMG[cc.img]}" alt="Ritratto scelto" width="96" height="112"></div><button class="btn sm2" data-act="ccimg" data-d="1" aria-label="Ritratto successivo">▶</button></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+     <div class="cc-fields"><label><span class="lab">Nome</span><input type="text" id="cc-nome" maxlength="20" value="${esc(cc.nome)}" placeholder="Es. Ornella"></label>
+      <label><span class="lab">Cognome</span><input type="text" id="cc-cognome" maxlength="24" value="${esc(cc.cognome)}" placeholder="Es. Bancalini"></label>
+      <label><span class="lab">Età</span><input type="number" id="cc-eta" min="22" max="70" value="${esc(cc.eta)}"></label></div>
+     <div><div class="lab" style="margin-bottom:4px">Punto di partenza</div><div class="cc-base">${CEOS.map(c=>{const st=SITES[c.site];return `<button class="btn sm2" data-act="ccbase" data-id="${c.id}" aria-pressed="${cc.base===c.id}" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,18)}<span>${esc(st.name)} · ${eur(c.cash)}</span></button>`;}).join('')}</div>
+      <div class="sm" style="margin-top:4px">Magazzino, cassa, mezzi e cliente storico di ${esc(CEOS.find(c=>c.id===cc.base).company)}: ${esc(CEOS.find(c=>c.id===cc.base).client.name)}.</div></div>
+    </div></div>
+   <div class="lab">Abilità <span class="sm">· ogni punto costa 1, da 1 a 18 prima dei talenti</span></div>
+   <div class="cc-stats">${STATS.map(s=>{const d=m[s.k]||0;return `<div class="skill cc-st" style="border-color:${s.c};background:${s.bg}">${statBadge(s.k,fin[s.k],18)}<span style="flex:1">${s.n}${d?` <span class="sm ${d>0?'ok':'bad'}">${d>0?'+':'−'}${Math.abs(d)} talenti</span>`:''}</span>
+     <button class="btn sm2" data-act="ccst" data-k="${s.k}" data-d="-1" ${cc.st[s.k]<=1?'disabled':''} aria-label="Togli un punto a ${s.n}">−</button><b class="v">${cc.st[s.k]}</b><button class="btn sm2" data-act="ccst" data-k="${s.k}" data-d="1" ${cc.st[s.k]>=18?'disabled':''} aria-label="Aggiungi un punto a ${s.n}">+</button></div>`;}).join('')}</div>
+   <div class="lab">${kw('titoli','Titolo di studio')} <span class="sm">· obbligatorio, uno solo</span></div>
+   <div class="cc-pick">${edu.map(n=>tile(n,cc.edu===n,'ccedu',false)).join('')}</div>
+   <div>${cc.edu?chosen(cc.edu):'<span class="sm">Passa il mouse sulle icone per leggere gli effetti.</span>'}</div>
+   <div class="lab">Carattere <span class="sm">· fino a ${CC_TRAITS} ${kw('talenti')}</span></div>
+   <div class="cc-pick">${tr.map(n=>{const on=cc.tal.includes(n);return tile(n,on,'cctal',full&&!on);}).join('')}</div>
+   <div>${cc.tal.length?cc.tal.map(chosen).join(''):'<span class="sm">Nessun tratto scelto.</span>'}</div>
+  </div>`;
+}
 const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['#3dd6c4','#1f9e8f','#9cefe5'],['#9b6bff','#6f43cf','#c8adff']];
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 function showStart(){
@@ -2179,45 +2655,74 @@ function showStart(){
     <span class="sm" style="color:var(--ink)">${esc(s.name)} (${s.prov}) · ${n0(s.cap)} posti · ${eur(c.cash)}</span>
     <span>${statChips(c.st,14)}</span>
     ${talentIcons(c.tal,32)}
-    <span class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,24)} Cliente storico: ${esc(c.client.name)} ${rankIcon(c.client,18)}</span></button>`;}).join('');
-  const C=CEOS.find(c=>c.id===startSel.ceo);
+    <span class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,24)} Cliente storico: ${esc(c.client.name)} ${rankIcon(c.client,18)}</span></button>`;}).join('')
+   +(()=>{const cc=startSel.cc;return `<button class="ceo" data-act="pickceo" data-id="custom" aria-pressed="${startSel.ceo==='custom'}">
+    <div class="portrait" style="height:150px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden"><img class="px" src="${IMG[cc?cc.img:'cc1']}" alt="" width="128" height="150"></div>
+    <b class="disp" style="font-size:18px">${cc&&ccName(cc)?esc(ccName(cc)):'Crea il tuo CEO'}</b><span class="sm">Nome, abilità, titolo di studio e carattere li scegli tu</span>
+    ${cc?`<span>${statChips(ccStats(cc),14)}</span>${talentIcons(ccTal(cc),32)}`:`<span class="sm" style="color:var(--ink)">${CC_PTS} punti da distribuire tra abilità e talenti</span>`}</button>`;})();
   $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP</span><span>Nord-Ovest, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
    <div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
    <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord-Ovest. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
+   ${installCard()}
    ${sv&&sv.S&&!sv.S.over?`<div class="card pend"><div class="row"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><button class="btn pri" data-act="continue">Continua la partita</button></div></div>`:''}
-   <div class="lab">1. Scegli il tuo CEO</div><div class="ceos">${st}</div>
-   <div class="split"><label style="display:flex;flex-direction:column;gap:4px"><span class="lab">2. Nome dell'azienda</span><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||C.company)}" aria-label="Nome dell'azienda"></label>
+   <div class="lab">1. Scegli il tuo CEO</div><div class="ceos five">${st}</div>
+   ${startSel.ceo==='custom'?ccPanel():''}
+   <div class="split"><label style="display:flex;flex-direction:column;gap:4px"><span class="lab">2. Nome dell'azienda</span><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||defCo())}" aria-label="Nome dell'azienda"></label>
    <div style="display:flex;flex-direction:column;gap:4px"><span class="lab">3. Colore</span><div style="display:flex;gap:8px">${COLORS.map(c=>`<button class="sw" data-act="pickcolor" data-c="${c[0]}" aria-pressed="${startSel.color===c[0]}" style="background:${c[0]}" aria-label="Colore ${c[0]}"></button>`).join('')}</div></div></div>
-   <div class="row"><span class="sm">Comandi: spazio per la pausa, 1–3 per la velocità, L per le lenti della mappa, trascina e usa la rotellina sulla mappa.</span><button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px">Inizia</button></div>
+   <div class="row" style="align-items:center">${startSel.err?`<span class="bad" role="alert" style="font-weight:600">${esc(startSel.err)}</span>`:''}<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Inizia</button></div>
   </div></div>`;
 }
+// web app: pulsante «Installa» (Chrome/Android) o istruzioni per iPhone, solo se il gioco non è già aperto come app
+let installEvt=null;
+const STANDALONE=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+function installCard(){
+  if(STANDALONE||!location.protocol.startsWith('http')) return '';
+  if(installEvt) return `<div class="card"><div class="row"><span>Gioca a schermo intero e senza connessione: aggiungi FUP alla schermata Home.</span><button class="btn" data-act="installapp">Installa come app</button></div></div>`;
+  if(IOS) return `<div class="card"><span>Per giocare a schermo intero: tocca <b>Condividi</b> in Safari, poi <b>Aggiungi alla schermata Home</b>.</span></div>`;
+  return '';
+}
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;if($('#start').innerHTML){startKeep();showStart();}});
+addEventListener('appinstalled',()=>{installEvt=null;if($('#start').innerHTML){startKeep();showStart();}});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+// sul telefono il sistema può chiudere l'app in qualunque momento: si salva ogni volta che il gioco va in secondo piano
+addEventListener('visibilitychange',()=>{if(document.hidden&&S&&!$('#start').innerHTML)save();});
+addEventListener('pagehide',()=>{if(S&&!$('#start').innerHTML)save();});
 function setSpeedSafe(v){if(S){S.speed=v;renderTop();}}
 Object.assign(ACT,{
- pickceo(d){const old=CEOS.find(c=>c.id===startSel.ceo);const inp=$('#coname-in');const typed=inp?inp.value:'';startSel.ceo=d.id;if(!typed||typed===old.company)startSel.name='';else startSel.name=typed;showStart();},
- pickcolor(d){startSel.color=d.c;applyColor(d.c);startSel.name=$('#coname-in').value;showStart();},
- startgame(){const nm=($('#coname-in').value||'').trim();uid=1;newGame(startSel.ceo,nm,startSel.color);boot();},
+ installapp(){if(!installEvt)return;startKeep();installEvt.prompt();installEvt.userChoice.finally(()=>{installEvt=null;showStart();});},
+ pickceo(d){startKeep();startSel.ceo=d.id;startSel.err='';if(d.id==='custom'&&!startSel.cc)startSel.cc=ccNew();showStart();},
+ pickcolor(d){startKeep();startSel.color=d.c;applyColor(d.c);showStart();},
+ ccst(d){startKeep();const cc=startSel.cc;cc.st[d.k]=clamp(cc.st[d.k]+(+d.d),1,18);startSel.err='';showStart();},
+ ccedu(d){startKeep();const cc=startSel.cc;cc.edu=cc.edu===d.n?null:d.n;startSel.err='';showStart();},
+ cctal(d){startKeep();const cc=startSel.cc;if(cc.tal.includes(d.n))cc.tal=cc.tal.filter(n=>n!==d.n);else if(cc.tal.length<CC_TRAITS)cc.tal.push(d.n);startSel.err='';showStart();},
+ ccimg(d){startKeep();const cc=startSel.cc,i=CC_IMGS.indexOf(cc.img);cc.img=CC_IMGS[(i+(+d.d)+CC_IMGS.length)%CC_IMGS.length];showStart();},
+ ccbase(d){startKeep();startSel.cc.base=d.id;showStart();},
+ startgame(){startKeep();const custom=startSel.ceo==='custom';
+   if(custom){const e=ccErr(startSel.cc);if(e){startSel.err=e;showStart();return;}}
+   startSel.err='';const nm=(startSel.name||defCo()).trim();uid=1;newGame(startSel.ceo,nm,startSel.color,custom?ccCeo(startSel.cc):null);boot();},
  continue(){const sv=load();if(!sv)return;S=fillSave(migrateStaff(renameClients(sv.S)));S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();}
 });
 function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;
   Object.keys(UI.open).forEach(closeWin); UI={open:{},sel:{},tab:{},z:30,pos:{},bid:{},lens:UI.lens};
   view.init=0; fitMap(); renderMap(); S.warehouses.forEach(w=>w.kpi=computeWH(w)); syncTrucks(); renderAll();
-  if(S.day===0){ modalInfo('La Gazzetta del Muletto',`Benvenuto, ${ceo().name}`,`Hai un magazzino a ${S.warehouses[0].name} e un solo cliente, ${S.clients[0].name}. Con il magazzino quasi vuoto perdi soldi ogni mese: tieni d'occhio le Gare d'appalto, assumi in anticipo quando ne vinci una e controlla Puntualità e Accuratezza nel menu Magazzini. Premi spazio per far scorrere il tempo. Le parole sottolineate a puntini si spiegano passandoci sopra; cliccale, o premi E, per aprire l'Enciclopedia.`); }
+  if(S.day===0){ modalInfo('La Gazzetta del Muletto',`Benvenuto, ${ceo().name}`,`Hai un magazzino a ${S.warehouses[0].name} e un solo cliente, ${S.clients[0].name}. Con il magazzino quasi vuoto perdi soldi ogni mese: tieni d'occhio le Gare d'appalto, assumi in anticipo quando ne vinci una e controlla Puntualità e Accuratezza nel menu Magazzini. ${TOUCH?'Tocca › in alto per far scorrere il tempo. Le parole sottolineate a puntini si spiegano con un tocco; toccale di nuovo per aprire l\'Enciclopedia.':'Premi spazio per far scorrere il tempo. Le parole sottolineate a puntini si spiegano passandoci sopra; cliccale, o premi E, per aprire l\'Enciclopedia.'}`); }
 }
 /* ciclo di gioco */
 let acc=0,lastTick=performance.now(); const STEP=[0,1000,420,140];
 function loop(now){
-  const dt=now-lastTick; lastTick=now;
+  const dt=Math.min(now-lastTick,250); lastTick=now;  // tornando da un'altra app o scheda il tempo riparte da dove era
   if(S&&!S.over&&S.speed>0&&!$('#modal').innerHTML){acc+=dt; let n=0; while(S.speed>0&&acc>=STEP[S.speed]&&n<5){acc-=STEP[S.speed];step();n++; if(S.over)break;} if(n){syncTrucksMaybe();renderAll();}}
   else acc=0;
   requestAnimationFrame(loop);
 }
 let lastSync=0; function syncTrucksMaybe(){if(S.day-lastSync>=7){lastSync=S.day;syncTrucks();}}
-initMapControls();
+setMobile(); initMapControls(); if(document.fonts) document.fonts.ready.then(layoutVars);
 const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else showStart(); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed};
+window.__FUP={get S(){return S;},step,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr};
 })();
 </script>
