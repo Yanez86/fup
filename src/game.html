@@ -338,7 +338,15 @@ const TENDER_POOL=[
  {name:'Seterie del Lario',slogan:'Il filo conduttore è sempre in ritardo',sector:'Tessile',stock:400,pal:150,sP:93,sA:98,diff:2},
  {name:'Materiali Edili Cazzuolini',slogan:'Se cade un bancale, si rompe il pavimento',sector:'Edilizia',stock:900,pal:300,sP:86,sA:null,diff:-3},
  {name:'Giocattoli Trottolino',slogan:'Natale arriva a ottobre, il bonifico a marzo',sector:'Giocattoli',stock:800,pal:400,sP:92,sA:96,diff:-1},
- {name:'Pellet Fiammella',slogan:'Paghiamo quando fa freddo. Forse',sector:'Combustibili',stock:600,pal:250,sP:85,sA:null,diff:-5}
+ {name:'Pellet Fiammella',slogan:'Paghiamo quando fa freddo. Forse',sector:'Combustibili',stock:600,pal:250,sP:85,sA:null,diff:-5},
+ {name:'Torrefazione Tazzulella',slogan:'Ristretto, come i nostri margini',sector:'Caffè',stock:350,pal:220,sP:93,sA:96,diff:0},
+ {name:'Bevande Spillatutto',slogan:'Se c\'è un bancone, c\'è un nostro fusto',sector:'Distribuzione bevande',stock:900,pal:1100,sP:94,sA:95,diff:2},
+ {name:'Surgelati Polo Sud',slogan:'Dal congelatore al ristorante, senza scongelarsi',sector:'Surgelati',stock:700,pal:500,sP:95,sA:97,diff:4,req:['freddo']},
+ {name:'Dolciaria Cornettone',slogan:'La brioche del bar, surgelata con amore',sector:'Dolciario surgelato',stock:450,pal:380,sP:94,sA:96,diff:2,req:['freddo']},
+ {name:'Acciaierie Tondino',slogan:'Il ferro si piega, le consegne no',sector:'Siderurgia',stock:1200,pal:500,sP:88,sA:null,diff:-2},
+ {name:'Scatolificio Cartonetti',slogan:'Ogni scatola ha la sua scatola',sector:'Imballaggi',stock:800,pal:600,sP:90,sA:94,diff:-1},
+ {name:'Parafarmacie Croceverde',slogan:'Sciroppi, cerotti e consigli non richiesti',sector:'Parafarmaco',stock:400,pal:300,sP:95,sA:98.5,diff:4},
+ {name:'Ortofrutta Fresco Fresco',slogan:'Raccolto ieri, venduto oggi, pagato a 90 giorni',sector:'Ortofrutta',stock:300,pal:900,sP:96,sA:95,diff:3,req:['freddo']}
 ];
 // RANK delle committenti: media di 4 voti 0-100. Il voto sui ricavi si calcola dai volumi; gli altri tre sono [desiderabilità, pubblicità, solidità]
 const RANK_F={
@@ -348,7 +356,8 @@ const RANK_F={
  'Moda Grucciani':[65,85,70],'Pneumatici Battistrada':[70,75,80],'Crema Spalmella':[70,80,75],'Riseria La Mondina':[60,35,55],
  'Scarpinando':[50,75,60],'Tuttosubito Italia':[50,98,85],'Spesa Veloce':[45,55,45],'Spedizioni Tricolore':[50,75,70],
  'Discount Prezzaccio':[15,10,25],'Mobili Truciolotto':[25,15,30],
- 'Fai-da-Te Planet':[60,85,85],'Cosmetici Belletto':[80,85,80],'Aeronautica Volavia':[85,80,95],'Salumificio Bresaolotti':[70,65,70],'Cioccolateria Sabauda':[72,70,68],'Lavatrix Elettrodomestici':[60,65,70],'Cantine Tanninello':[60,50,55],'Crocchette Codamossa':[50,45,55],'Seterie del Lario':[60,55,60],'Materiali Edili Cazzuolini':[35,25,55],'Giocattoli Trottolino':[40,40,35],'Pellet Fiammella':[20,10,25]
+ 'Fai-da-Te Planet':[60,85,85],'Cosmetici Belletto':[80,85,80],'Aeronautica Volavia':[85,80,95],'Salumificio Bresaolotti':[70,65,70],'Cioccolateria Sabauda':[72,70,68],'Lavatrix Elettrodomestici':[60,65,70],'Cantine Tanninello':[60,50,55],'Crocchette Codamossa':[50,45,55],'Seterie del Lario':[60,55,60],'Materiali Edili Cazzuolini':[35,25,55],'Giocattoli Trottolino':[40,40,35],'Pellet Fiammella':[20,10,25],
+ 'Torrefazione Tazzulella':[60,45,55],'Bevande Spillatutto':[45,40,50],'Surgelati Polo Sud':[65,60,70],'Dolciaria Cornettone':[60,55,60],'Acciaierie Tondino':[55,40,80],'Scatolificio Cartonetti':[40,20,60],'Parafarmacie Croceverde':[70,60,70],'Ortofrutta Fresco Fresco':[45,50,50]
 };
 const RANKS=[ // soglia minima della media, colori, effetti
  {r:'S',min:80,bg:'R',fg:'W',rev:1.15,comp:6,win:6,lost:10,fl:'Il nome che i commerciali scrivono in grassetto nel CV.'},
@@ -358,7 +367,30 @@ const RANKS=[ // soglia minima della media, colori, effetti
  {r:'D',min:36,bg:'B',fg:'K',rev:0.97,comp:-3,win:0,lost:2,fl:'Pagano a 120 giorni, se va bene.'},
  {r:'F',min:0,bg:'D',fg:'S',rev:0.88,comp:-6,win:-1,lost:1,fl:'Li prendi per riempire il capannone. Poi ti chiedi perché.'}
 ];
-const NAZ_REQ={tech:'accordi',wh:3,rep:65}; // requisiti per le committenti S e A
+const NAZ_REQ={tech:'accordi',wh:3,rep:65};
+const DUR_RANK={S:[24,36,36],A:[24,36],B:[12,24,36],C:[12,24],D:[12,24],F:[12,12,24]}; // durate possibili del contratto (mesi) per rank
+const minTenders=()=>R('commerciale')?3:2; // gare sempre aperte almeno
+// recesso anticipato: penale in mesi di fatturato, giorni di preavviso, reputazione persa
+function exitTerms(c){const mesi=Math.max(0,Math.round((c.end-S.day)/30)), avvio=c.status==='avvio';
+  return {mesi,avvio,pen:Math.round(clientRev(c)*(avvio?2:clamp(2+0.25*mesi,2,8))/100)*100,days:avvio?0:(isNaz(c)?90:60),rep:Math.ceil(rankOf(c).lost/2)};}
+// cosa può andare storto il giorno dell'uscita
+const EXIT_RISK=[
+ {id:'ok',w:45,t:'Uscita pulita',d:c=>`L'ultimo camion di ${c.name} è partito senza storie. I posti pallet sono di nuovo liberi.`},
+ {id:'inv',w:25,t:'Differenze inventariali',d:(c,v)=>`All'inventario di chiusura mancano dei pallet di ${c.name}. Il cliente presenta il conto: ${eur(v)}.`,cost:c=>Math.round(c.stock*rnd(4,10)/100)*100},
+ {id:'fatt',w:15,t:'Ultima fattura contestata',d:(c,v)=>`${c.name} contesta l'ultima fattura e non la paga: ${eur(v)} persi. L'ufficio legale dice che non conviene fare causa.`,cost:c=>Math.round(clientRev(c)/100)*100},
+ {id:'late',w:10,t:'Il nuovo operatore è in ritardo',d:c=>`Il nuovo logistico di ${c.name} non è pronto: la merce resta da noi altre tre settimane. Il cliente paga, ma i posti restano occupati.`},
+ {id:'legal',w:5,t:'Causa legale',d:(c,v)=>`${c.name} ci fa causa per l'uscita anticipata. Avvocati e transazione: ${eur(v)}, e la notizia gira tra i buyer.`,cost:()=>8000,rep:2}
+];
+function exitClient(c){
+  const w=whById(c.wh), A=w&&w.kpi?w.kpi.A:97;
+  const opts=EXIT_RISK.filter(r=>r.id!=='late'||!c.exit.late).map(r=>({...r,w:r.w+(r.id==='inv'?5*Math.max(0,97-A):0)}));
+  let x=Math.random()*opts.reduce((a,r)=>a+r.w,0); const r=opts.find(o=>(x-=o.w)<0)||opts[0];
+  if(r.id==='late'){c.exit.late=true; c.exit.day+=21; modalInfo('Ufficio traffico',`${c.name}: ${r.t}`,r.d(c)); return;}
+  const v=r.cost?r.cost(c):0; S.cash-=v; S.cur.pen+=v; if(r.rep) S.rep=clamp(S.rep-r.rep,0,100);
+  c.status='perso'; c.ended='recesso';
+  news('Il Sole 24 Pallet',`${c.name} esce da ${S.company.name}`,r.d(c,v));
+  modalInfo('Ufficio traffico',`Uscita di ${c.name}: ${r.t}`,r.d(c,v));
+} // requisiti per le committenti S e A
 function rankScore(c){
   const b=TENDER_POOL.find(t=>t.name===c.name)||c, f=RANK_F[c.name]||[50,40,50];
   const ric=Math.max(0,Math.min(100,Math.round(10+(2*b.pal+b.stock)/60)));
@@ -394,7 +426,7 @@ const TECH=[
  {id:'controllo',tree:'org',tier:3,row:1,req:['direzione'],name:'Controllo di gestione',year:2003,cost:40000,days:60,desc:'Budget e analisi dei costi: costi fissi −4%.'},
  {id:'academy',tree:'org',tier:4,row:0,req:['welfare2'],name:'Academy aziendale',year:2010,cost:60000,days:90,desc:'Formazione interna: morale +3 e apprendimento delle tecnologie −30% ovunque.'},
  {id:'iso',tree:'org',tier:4,row:1,req:['controllo'],name:'Certificazione ISO 9001',year:2005,cost:45000,days:120,desc:'Accuratezza +0,5 ovunque, reputazione +5, punteggio nelle gare +3.'},
- {id:'commerciale',tree:'mkt',tier:1,row:0,name:'Ufficio commerciale',year:2002,cost:15000,days:30,desc:'Più gare: ne arriva una ogni 3–5 settimane invece di 4–7.'},
+ {id:'commerciale',tree:'mkt',tier:1,row:0,name:'Ufficio commerciale',year:2002,cost:15000,days:30,desc:'Più gare: ce ne sono sempre almeno 3 aperte invece di 2.'},
  {id:'freddo',tree:'mkt',tier:1,row:1,name:'Catena del freddo',year:2002,cost:30000,days:45,desc:'Certificazione per freschi e farmaci: sblocca le gare che la richiedono.'},
  {id:'edi',tree:'mkt',tier:2,row:0,req:['commerciale'],name:'EDI con i clienti',year:2003,cost:30000,days:50,desc:'Ordini automatici: soddisfazione +1 al mese sopra soglia. Richiesto dalla grande distribuzione.'},
  {id:'marketing',tree:'mkt',tier:2,row:1,req:['commerciale'],name:'Marketing e fiere',year:2002,cost:25000,days:40,desc:'Stand alle fiere di settore: reputazione +5 subito e +0,2 al mese.'},
@@ -463,7 +495,7 @@ function techIcon(t,sz,dim){
   (TECH_IC[t.id]||[]).forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x+2}" y="${y+2}" width="1" height="1" fill="${TPAL[ch]}"/>`;}));
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="flex:none;${dim?'filter:grayscale(1) opacity(.55)':''}" aria-hidden="true">${r}</svg>`;
 }
-const LOGO={"Pastificio Mezzemaniche":{"bg":"R","ic":["....SS.S....","....SSSS....",".....SS.....","..YCYCYCYC..",".YCYCYCYCYC.","KKKKKKKKKKKK","KWWWWWWWWWWK",".KWBBBBBBWK.","..KWWWWWWK..","...KKKKKK...","............","............"]},"Mobilificio Brianzolo":{"bg":"C","ic":["............","............","..RRRRRRRR..",".RRRRRRRRRR.",".RRRRRRRRRR.","RRMRRRRRRMRR","RRMMMMMMMMRR","RRRRRRRRRRRR","RRRRRRRRRRRR",".M........M.",".M........M.","............"]},"Saponaria Italia":{"bg":"B","ic":[".....WW.....",".....WW.....","....WWWW....","....WWWW....","...WWWWWW...","..WWLWWWWW..","..WLLWWWWW..","..WLWWWWWW..","..WWWWWWWW..","...WWWWWW...","....WWWW....","............"]},"Caffè Portuale":{"bg":"N","ic":["...W..W.....","....W..W....","...W..W.....","............",".WWWWWWWW...",".WMMMMMMWWW.",".WWWWWWWWW.W",".WWWWWWWWWW.","..WWWWWWW...","...WWWWW....",".WWWWWWWWWW.","............"]},"Caseificio Stracchinelli":{"bg":"B","ic":["............","..........Y.","........YYY.","......YYYYY.","....YYYYOYY.","..YYYYYYYYY.","YYYOYYYYYYY.","YYYYYYYOYYY.","YYYYYYYYYYY.","YOYYYYYYYYY.","YYYYYYYYYYY.","............"]},"Ferramenta Bullonati":{"bg":"D","ic":["....SSSS....","...SSSSSS...","..SSSKKSSS..",".SSSKKKKSSS.",".SSKK..KKSS.",".SSKK..KKSS.",".SSSKKKKSSS.","..SSSKKSSS..","...SSSSSS...","....SSSS....","............","............"]},"Elettrofulmine":{"bg":"R","ic":["......YYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYYYYYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYY.......",".YY.........","Y...........","............"]},"FarmaSpa":{"bg":"W","ic":["....GGGG....","....GGGG....","....GGGG....","....GGGG....","GGGGGGGGGGGG","GGGGGWWGGGGG","GGGGGWWGGGGG","GGGGGGGGGGGG","....GGGG....","....GGGG....","....GGGG....","....GGGG...."]},"Supermercati Carrellone":{"bg":"R","ic":["............","WW..........",".W..........",".WWWWWWWWWW.",".W.W.W.W.WW.",".WWWWWWWWW..","..W.W.W.WW..","..WWWWWWW...","..W.........","..WWWWWWWW..","...WW...WW..","...WW...WW.."]},"Birrificio Schiumetti":{"bg":"G","ic":["............","..WWWWWW....",".WWWWWWWW...",".WYYYYYYW...",".KYYYYYYKKK.",".KYCYYYYK.K.",".KYCYYYYK.K.",".KYYYYYYKKK.",".KYYYYYYK...",".KYYYYYYK...",".KKKKKKKK...","............"]},"Acque Fonte Frizzantina":{"bg":"L","ic":[".....GG.....",".....GG.....","....GGGG....","...GGGGGG...","...GGGGGG...","...GWWWWG...","...GWRRWG...","...GRRRRG...","...GWRRWG...","...GWWWWG...","...GGGGGG...","....GGGG...."]},"Arredamenti Brugola":{"bg":"Y","ic":["........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","..DDDDDDDD..","..DDDDDDDD..","............","............"]},"Moda Grucciani":{"bg":"K","ic":[".....WW.....","....W..W....",".......W....","......W.....",".....WW.....","....W..W....","...W....W...","..W......W..",".W........W.","WWWWWWWWWWWW","............","............"]},"Pneumatici Battistrada":{"bg":"Y","ic":["...KKKKKK...","..KKKKKKKK..",".KKKSSSSKKK.","KKKS....SKKK","KKS......SKK","KKS..SS..SKK","KKS..SS..SKK","KKS......SKK","KKKS....SKKK",".KKKSSSSKKK.","..KKKKKKKK..","...KKKKKK..."]},"Crema Spalmella":{"bg":"C","ic":["...RRRRRR...","...RRRRRR...","..KKKKKKKK..","..KWWWWWWK..","..KMMMMMMK..","..KMWWMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KKKKKKKK..","............"]},"Riseria La Mondina":{"bg":"G","ic":["............","....W..W....","..W..W...W..","...WWWWWW...","..WWWWWWWW..",".WWWWWWWWWW.","KKKKKKKKKKKK","KRRRRRRRRRRK",".KRRRRRRRRK.","..KRRRRRRK..","...KKKKKK...","............"]},"Scarpinando":{"bg":"O","ic":["............","............",".KKKK.......",".KWWWK......",".KWKWWK.....",".KWWKWWKK...",".KWWWWWWWKK.",".KWWWWWWWWWK",".KRRRRRRRRRK",".KKKKKKKKKKK","............","............"]},"Tuttosubito Italia":{"bg":"K","ic":["............","............","....NNNNNNN.","....NNNYNNN.","WWW.NNNYNNN.","....NNNNNNN.",".WW.NNNNNNN.","....NNNNNNN.","WWW.NNNNNNN.","....NNNNNNN.","............","............"]},"Spesa Veloce":{"bg":"G","ic":["....KKKK....","...K....K...","..KKKKKKKK..","..KWWWWWWK..","..KWWWYWWK..","..KWWYYWWK..","..KWYYYYWK..","..KWWYYWWK..","..KWWYWWWK..","..KWWWWWWK..","..KKKKKKKK..","............"]},"Spedizioni Tricolore":{"bg":"L","ic":["............","............","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","............","............","............"]},"Discount Prezzaccio":{"bg":"Y","ic":["............",".RR......RR.",".RR.....RR..",".......RR...","......RR....",".....RR.....","....RR......","...RR.......","..RR.....RR.",".RR......RR.","............","............"]},"Mobili Truciolotto":{"bg":"F","ic":["............","..NN.NN..N..",".N..N..NN.N.","..NN..N..N..","............","NNNNNNNNNNNN","MMMMMMMMMMMM","NN........NN","N.N......N.N","N..........N","N..........N","............"]},"Fai-da-Te Planet":{"bg":"O","ic":["............","..KKKKKKKK..",".KSSSSSSSSK.",".KSWWSSSSSK.","..KKKNNKKK..",".....NN.....",".....NN.....",".....NN.....",".....NN.....",".....NN.....","....KMMK....","....KKKK...."]},"Cosmetici Belletto":{"bg":"P","ic":["............",".....RR.....","....RRR.....","....RRRR....","....RRRR....","...KKKKKK...","...KYYYYK...","...KKKKKK...","...KWWWWK...","...KWWWWK...","...KWWWWK...","...KKKKKK..."]},"Aeronautica Volavia":{"bg":"D","ic":[".....KK.....",".....WW.....",".....WW.....","....KWWK....",".KKKWWWWKKK.","KWWWWWWWWWWK",".KKKKWWKKKK.",".....WW.....",".....WW.....","....KWWK....","...KWWWWK...","....KKKK...."]},"Salumificio Bresaolotti":{"bg":"C","ic":["....KKKK....","..KKRRRRKK..",".KRRWRRRRRK.",".KRRRRRWRRK.","KRRWRRRRRRRK","KRRRRRWRRRRK","KRWRRRRRRWRK","KRRRRWRRRRRK",".KRRRRRRWRK.",".KRWRRRRRRK.","..KKRRRRKK..","....KKKK...."]},"Cioccolateria Sabauda":{"bg":"Y","ic":[".KKKKKKKKKK.",".KNNKNNKNNK.",".KMMKMMKMMK.",".KKKKKKKKKK.",".KNNKNNKNNK.",".KMMKMMKMMK.",".KKKKKKKKKK.",".KRRRRRRRRK.",".KRWWWWWWRK.",".KRRRRRRRRK.",".KRRRRRRRRK.",".KKKKKKKKKK."]},"Lavatrix Elettrodomestici":{"bg":"T","ic":[".KKKKKKKKKK.",".KWWWWWWWWK.",".KWRWGWWSWK.",".KKKKKKKKKK.",".KWWKKKKWWK.",".KWKBBBBKWK.",".KWKBLBBKWK.",".KWKBBLBKWK.",".KWKBBBBKWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KKKKKKKKKK."]},"Cantine Tanninello":{"bg":"R","ic":[".....NN.....",".....GG.....",".....GG.....","....KGGK....","...KGGGGK...","...KGGGGK...","...KCCCCK...","...KCRRCK...","...KCCCCK...","...KGGGGK...","...KGGGGK...","....KKKK...."]},"Crocchette Codamossa":{"bg":"G","ic":["............","...WW..WW...","...WW..WW...",".WW......WW.",".WW......WW.","....WWWW....","...WWWWWW...","..WWWWWWWW..","..WWWWWWWW..","...WW..WW...","............","............"]},"Seterie del Lario":{"bg":"T","ic":["..KKKKKKKK..","..KNNNNNNK..","...KPPPPK...","...KPPPPK...","...KPWPPK...","...KPPPPK...","...KPPWPK...","...KPPPPK...","...KPPPPK...","..KNNNNNNK..","..KKKKKKKK..","............"]},"Materiali Edili Cazzuolini":{"bg":"S","ic":["............","RRRRR.RRRRR.","RRRRR.RRRRR.","............","RR.RRRRR.RRR","RR.RRRRR.RRR","............","RRRRR.RRRRR.","RRRRR.RRRRR.","............","RR.RRRRR.RRR","RR.RRRRR.RRR"]},"Giocattoli Trottolino":{"bg":"Y","ic":[".....KK.....",".....KK.....","...KKKKKK...","..KRRRRRRK..",".KRRWRRRRRK.","KBBBBBBBBBBK","KBBBBBBBBBBK",".KGGGGGGGGK.","..KGGGGGGK..","...KGGGGK...","....KGGK....",".....KK....."]},"Pellet Fiammella":{"bg":"D","ic":[".....R......",".....RR.....","....RRR.....","....RRRR.R..","...RROORRR..","..RROOOORR..","..ROOYYOORR.",".RROYYYYORR.",".RROYYYYORR.","..RROYYORR..","...RRRRRR...","..NNNNNNNN.."]}};
+const LOGO={"Pastificio Mezzemaniche":{"bg":"R","ic":["....SS.S....","....SSSS....",".....SS.....","..YCYCYCYC..",".YCYCYCYCYC.","KKKKKKKKKKKK","KWWWWWWWWWWK",".KWBBBBBBWK.","..KWWWWWWK..","...KKKKKK...","............","............"]},"Mobilificio Brianzolo":{"bg":"C","ic":["............","............","..RRRRRRRR..",".RRRRRRRRRR.",".RRRRRRRRRR.","RRMRRRRRRMRR","RRMMMMMMMMRR","RRRRRRRRRRRR","RRRRRRRRRRRR",".M........M.",".M........M.","............"]},"Saponaria Italia":{"bg":"B","ic":[".....WW.....",".....WW.....","....WWWW....","....WWWW....","...WWWWWW...","..WWLWWWWW..","..WLLWWWWW..","..WLWWWWWW..","..WWWWWWWW..","...WWWWWW...","....WWWW....","............"]},"Caffè Portuale":{"bg":"N","ic":["...W..W.....","....W..W....","...W..W.....","............",".WWWWWWWW...",".WMMMMMMWWW.",".WWWWWWWWW.W",".WWWWWWWWWW.","..WWWWWWW...","...WWWWW....",".WWWWWWWWWW.","............"]},"Caseificio Stracchinelli":{"bg":"B","ic":["............","..........Y.","........YYY.","......YYYYY.","....YYYYOYY.","..YYYYYYYYY.","YYYOYYYYYYY.","YYYYYYYOYYY.","YYYYYYYYYYY.","YOYYYYYYYYY.","YYYYYYYYYYY.","............"]},"Ferramenta Bullonati":{"bg":"D","ic":["....SSSS....","...SSSSSS...","..SSSKKSSS..",".SSSKKKKSSS.",".SSKK..KKSS.",".SSKK..KKSS.",".SSSKKKKSSS.","..SSSKKSSS..","...SSSSSS...","....SSSS....","............","............"]},"Elettrofulmine":{"bg":"R","ic":["......YYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYYYYYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYY.......",".YY.........","Y...........","............"]},"FarmaSpa":{"bg":"W","ic":["....GGGG....","....GGGG....","....GGGG....","....GGGG....","GGGGGGGGGGGG","GGGGGWWGGGGG","GGGGGWWGGGGG","GGGGGGGGGGGG","....GGGG....","....GGGG....","....GGGG....","....GGGG...."]},"Supermercati Carrellone":{"bg":"R","ic":["............","WW..........",".W..........",".WWWWWWWWWW.",".W.W.W.W.WW.",".WWWWWWWWW..","..W.W.W.WW..","..WWWWWWW...","..W.........","..WWWWWWWW..","...WW...WW..","...WW...WW.."]},"Birrificio Schiumetti":{"bg":"G","ic":["............","..WWWWWW....",".WWWWWWWW...",".WYYYYYYW...",".KYYYYYYKKK.",".KYCYYYYK.K.",".KYCYYYYK.K.",".KYYYYYYKKK.",".KYYYYYYK...",".KYYYYYYK...",".KKKKKKKK...","............"]},"Acque Fonte Frizzantina":{"bg":"L","ic":[".....GG.....",".....GG.....","....GGGG....","...GGGGGG...","...GGGGGG...","...GWWWWG...","...GWRRWG...","...GRRRRG...","...GWRRWG...","...GWWWWG...","...GGGGGG...","....GGGG...."]},"Arredamenti Brugola":{"bg":"Y","ic":["........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","..DDDDDDDD..","..DDDDDDDD..","............","............"]},"Moda Grucciani":{"bg":"K","ic":[".....WW.....","....W..W....",".......W....","......W.....",".....WW.....","....W..W....","...W....W...","..W......W..",".W........W.","WWWWWWWWWWWW","............","............"]},"Pneumatici Battistrada":{"bg":"Y","ic":["...KKKKKK...","..KKKKKKKK..",".KKKSSSSKKK.","KKKS....SKKK","KKS......SKK","KKS..SS..SKK","KKS..SS..SKK","KKS......SKK","KKKS....SKKK",".KKKSSSSKKK.","..KKKKKKKK..","...KKKKKK..."]},"Crema Spalmella":{"bg":"C","ic":["...RRRRRR...","...RRRRRR...","..KKKKKKKK..","..KWWWWWWK..","..KMMMMMMK..","..KMWWMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KKKKKKKK..","............"]},"Riseria La Mondina":{"bg":"G","ic":["............","....W..W....","..W..W...W..","...WWWWWW...","..WWWWWWWW..",".WWWWWWWWWW.","KKKKKKKKKKKK","KRRRRRRRRRRK",".KRRRRRRRRK.","..KRRRRRRK..","...KKKKKK...","............"]},"Scarpinando":{"bg":"O","ic":["............","............",".KKKK.......",".KWWWK......",".KWKWWK.....",".KWWKWWKK...",".KWWWWWWWKK.",".KWWWWWWWWWK",".KRRRRRRRRRK",".KKKKKKKKKKK","............","............"]},"Tuttosubito Italia":{"bg":"K","ic":["............","............","....NNNNNNN.","....NNNYNNN.","WWW.NNNYNNN.","....NNNNNNN.",".WW.NNNNNNN.","....NNNNNNN.","WWW.NNNNNNN.","....NNNNNNN.","............","............"]},"Spesa Veloce":{"bg":"G","ic":["....KKKK....","...K....K...","..KKKKKKKK..","..KWWWWWWK..","..KWWWYWWK..","..KWWYYWWK..","..KWYYYYWK..","..KWWYYWWK..","..KWWYWWWK..","..KWWWWWWK..","..KKKKKKKK..","............"]},"Spedizioni Tricolore":{"bg":"L","ic":["............","............","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","............","............","............"]},"Discount Prezzaccio":{"bg":"Y","ic":["............",".RR......RR.",".RR.....RR..",".......RR...","......RR....",".....RR.....","....RR......","...RR.......","..RR.....RR.",".RR......RR.","............","............"]},"Mobili Truciolotto":{"bg":"F","ic":["............","..NN.NN..N..",".N..N..NN.N.","..NN..N..N..","............","NNNNNNNNNNNN","MMMMMMMMMMMM","NN........NN","N.N......N.N","N..........N","N..........N","............"]},"Fai-da-Te Planet":{"bg":"O","ic":["............","..KKKKKKKK..",".KSSSSSSSSK.",".KSWWSSSSSK.","..KKKNNKKK..",".....NN.....",".....NN.....",".....NN.....",".....NN.....",".....NN.....","....KMMK....","....KKKK...."]},"Cosmetici Belletto":{"bg":"P","ic":["............",".....RR.....","....RRR.....","....RRRR....","....RRRR....","...KKKKKK...","...KYYYYK...","...KKKKKK...","...KWWWWK...","...KWWWWK...","...KWWWWK...","...KKKKKK..."]},"Aeronautica Volavia":{"bg":"D","ic":[".....KK.....",".....WW.....",".....WW.....","....KWWK....",".KKKWWWWKKK.","KWWWWWWWWWWK",".KKKKWWKKKK.",".....WW.....",".....WW.....","....KWWK....","...KWWWWK...","....KKKK...."]},"Salumificio Bresaolotti":{"bg":"C","ic":["....KKKK....","..KKRRRRKK..",".KRRWRRRRRK.",".KRRRRRWRRK.","KRRWRRRRRRRK","KRRRRRWRRRRK","KRWRRRRRRWRK","KRRRRWRRRRRK",".KRRRRRRWRK.",".KRWRRRRRRK.","..KKRRRRKK..","....KKKK...."]},"Cioccolateria Sabauda":{"bg":"Y","ic":[".KKKKKKKKKK.",".KNNKNNKNNK.",".KMMKMMKMMK.",".KKKKKKKKKK.",".KNNKNNKNNK.",".KMMKMMKMMK.",".KKKKKKKKKK.",".KRRRRRRRRK.",".KRWWWWWWRK.",".KRRRRRRRRK.",".KRRRRRRRRK.",".KKKKKKKKKK."]},"Lavatrix Elettrodomestici":{"bg":"T","ic":[".KKKKKKKKKK.",".KWWWWWWWWK.",".KWRWGWWSWK.",".KKKKKKKKKK.",".KWWKKKKWWK.",".KWKBBBBKWK.",".KWKBLBBKWK.",".KWKBBLBKWK.",".KWKBBBBKWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KKKKKKKKKK."]},"Cantine Tanninello":{"bg":"R","ic":[".....NN.....",".....GG.....",".....GG.....","....KGGK....","...KGGGGK...","...KGGGGK...","...KCCCCK...","...KCRRCK...","...KCCCCK...","...KGGGGK...","...KGGGGK...","....KKKK...."]},"Crocchette Codamossa":{"bg":"G","ic":["............","...WW..WW...","...WW..WW...",".WW......WW.",".WW......WW.","....WWWW....","...WWWWWW...","..WWWWWWWW..","..WWWWWWWW..","...WW..WW...","............","............"]},"Seterie del Lario":{"bg":"T","ic":["..KKKKKKKK..","..KNNNNNNK..","...KPPPPK...","...KPPPPK...","...KPWPPK...","...KPPPPK...","...KPPWPK...","...KPPPPK...","...KPPPPK...","..KNNNNNNK..","..KKKKKKKK..","............"]},"Materiali Edili Cazzuolini":{"bg":"S","ic":["............","RRRRR.RRRRR.","RRRRR.RRRRR.","............","RR.RRRRR.RRR","RR.RRRRR.RRR","............","RRRRR.RRRRR.","RRRRR.RRRRR.","............","RR.RRRRR.RRR","RR.RRRRR.RRR"]},"Giocattoli Trottolino":{"bg":"Y","ic":[".....KK.....",".....KK.....","...KKKKKK...","..KRRRRRRK..",".KRRWRRRRRK.","KBBBBBBBBBBK","KBBBBBBBBBBK",".KGGGGGGGGK.","..KGGGGGGK..","...KGGGGK...","....KGGK....",".....KK....."]},"Pellet Fiammella":{"bg":"D","ic":[".....R......",".....RR.....","....RRR.....","....RRRR.R..","...RROORRR..","..RROOOORR..","..ROOYYOORR.",".RROYYYYORR.",".RROYYYYORR.","..RROYYORR..","...RRRRRR...","..NNNNNNNN.."]},"Torrefazione Tazzulella":{"bg": "C", "ic": ["............", "...N..N.....", "....N..N....", "...N..N.....", "............", ".KKKKKKKK...", ".KWWWWWWKKK.", ".KWMMMMWK.K.", ".KWWWWWWKKK.", "..KWWWWK....", ".KKKKKKKKK..", "............"]},"Bevande Spillatutto":{"bg": "B", "ic": ["............", "...WWWWW....", "..WWWWWWW...", "..KYYYYYKK..", "..KYYYYYK.K.", "..KYWYYYK.K.", "..KYWYYYK.K.", "..KYYYYYKK..", "..KYYYYYK...", "..KKKKKKK...", "............", "............"]},"Surgelati Polo Sud":{"bg": "L", "ic": ["....KKKK....", "...KKKKKK...", "...KWKKWK...", "...KKOOKK...", "..KKWWWWKK..", "..KWWWWWWK..", ".KKWWWWWWKK.", "..KWWWWWWK..", "..KWWWWWWK..", "...KWWWWK...", "...OO..OO...", "............"]},"Dolciaria Cornettone":{"bg": "R", "ic": ["............", "............", "....NNNN....", "..NFFNNFFN..", ".NFFNFFNFFN.", "NFFNFFFFNFFN", "NFNFFFFFFNFN", ".N.NFFFFN.N.", "....NNNN....", "............", "............", "............"]},"Acciaierie Tondino":{"bg": "D", "ic": ["............", ".SSSSSSSSSS.", ".SWWWWWWWWS.", "....SSSS....", "....SWSS....", "....SWSS....", "....SWSS....", "....SSSS....", ".SSSSSSSSSS.", ".SSSSSSSSSS.", "............", "............"]},"Scatolificio Cartonetti":{"bg": "G", "ic": ["............", "..NNNNNNNN..", ".NFFFFFFFFN.", "NFFFFFFFFFFN", "NNNNNNNNNNNN", "NFFFFKKFFFFN", "NFFFFKKFFFFN", "NFFFFFFFFFFN", "NFFFFFFFFFFN", "NNNNNNNNNNNN", "............", "............"]},"Parafarmacie Croceverde":{"bg": "W", "ic": ["............", "....GGGG....", "....GWWG....", "....GWWG....", ".GGGGWWGGGG.", ".GWWWWWWWWG.", ".GWWWWWWWWG.", ".GGGGWWGGGG.", "....GWWG....", "....GWWG....", "....GGGG....", "............"]},"Ortofrutta Fresco Fresco":{"bg": "C", "ic": ["......N.....", ".....N.GG...", "....N.GG....", "..RRRNRRR...", ".RRWRRRRRR..", ".RWRRRRRRR..", ".RRRRRRRRR..", ".RRRRRRRRR..", "..RRRRRRR...", "...RR.RR....", "............", "............"]}};
 const STAT_IC={"op":[".O.OO.O.","OOOOOOOO",".OO..OO.","OO....OO","OO....OO",".OO..OO.","OOOOOOOO",".O.OO.O."],"prec":["..BBBB..",".BWWWWB.","BWWBBWWB","BWBRRBWB","BWBRRBWB","BWWBBWWB",".BWWWWB.","..BBBB.."],"neg":["..YYYY..",".YYYYYY.","YYYKKKYY","YYKYYYYY","YKKKKYYY","YYKYYYYY",".YYKKKY.","..YYYY.."],"lead":["KRRRRR..","KRRRRRR.","KRRRRRRR","KRRRRRR.","KRRRRR..","K.......","K.......","KK......"],"amm":["GGGGGGGG","GWWWWWWG","GGGGGGGG","GWGWGWGG","GGGGGGGG","GWGWGWGG","GGGGGGGG","GWGWGWGG"],"inn":["..PPPP..",".PPWPPP.","PPWPPPPP","PPPPPPPP",".PPPPPP.","..PPPP..","..SSSS..","...SS..."]};
 /* --- clienti: zone di distribuzione, provenienza merce, loghi --- */
 const REG={
@@ -500,6 +532,10 @@ const ORIGINS={
  erfurt:{n:'Hub di Erfurt (Germania)',lon:11.03,lat:50.98},
  mondo:{n:'Fornitori di mezzo mondo',lon:9.19,lat:45.46},
  ortomercato:{n:'Ortomercato di Milano',lon:9.24,lat:45.44},
+ parma:{n:'Stabilimento di Parma',lon:10.33,lat:44.80},
+ sanmartino:{n:'Stabilimento di San Martino Buon Albergo (VR)',lon:11.10,lat:45.42},
+ darfo:{n:'Acciaieria di Darfo Boario (BS)',lon:10.19,lat:45.88},
+ vigevano:{n:'Cartiera di Vigevano (PV)',lon:8.86,lat:45.32},
  roma:{n:'Hub di Roma',lon:12.50,lat:41.90},
  seveso:{n:'Capannone di Seveso (MB)',lon:9.14,lat:45.65},
  castelsg:{n:'Polo logistico di Castel San Giovanni (PC)',lon:9.43,lat:45.06},
@@ -550,7 +586,15 @@ const CINFO={
  'Seterie del Lario':{zones:['nord','reg_lom'],src:'como',mode:'ritiro',ch:{ind:100}},
  'Materiali Edili Cazzuolini':{zones:['reg_lom','prov_Bergamo'],src:'calusco',mode:'ritiro',ch:{ind:100}},
  'Giocattoli Trottolino':{zones:['nordovest','nord'],src:'portoge',mode:'consegna',ch:{gdo:50,dett:35,ecom:15}},
- 'Pellet Fiammella':{zones:['reg_pie','prov_Cuneo'],src:'borgosd',mode:'ritiro',ch:{dett:60,gdo:40}}
+ 'Pellet Fiammella':{zones:['reg_pie','prov_Cuneo'],src:'borgosd',mode:'ritiro',ch:{dett:60,gdo:40}},
+ 'Torrefazione Tazzulella':{zones:['reg_lig','reg_pie','nordovest'],src:'portoge',mode:'ritiro',ch:{horeca:75,dett:15,gdo:10}},
+ 'Bevande Spillatutto':{zones:['prov_Milano','reg_lom'],src:'fornitori',mode:'consegna',ch:{horeca:90,dett:10}},
+ 'Surgelati Polo Sud':{zones:['nordovest','nord'],src:'parma',mode:'consegna',ch:{horeca:60,gdo:30,ecom:10}},
+ 'Dolciaria Cornettone':{zones:['reg_lom','nordovest'],src:'sanmartino',mode:'ritiro',ch:{horeca:50,gdo:40,dett:10}},
+ 'Acciaierie Tondino':{zones:['reg_lom','prov_Bergamo','nord'],src:'darfo',mode:'ritiro',ch:{ind:100}},
+ 'Scatolificio Cartonetti':{zones:['reg_pie','nordovest'],src:'vigevano',mode:'ritiro',ch:{ind:100}},
+ 'Parafarmacie Croceverde':{zones:['prov_Torino','reg_pie','nordovest'],src:'fornitori',mode:'consegna',ch:{dett:70,ecom:30}},
+ 'Ortofrutta Fresco Fresco':{zones:['prov_Milano','prov_Torino'],src:'ortomercato',mode:'ritiro',ch:{gdo:60,horeca:30,dett:10}}
 };
 const cinfo=c=>CINFO[c.name]||{zones:['nordovest'],src:'fornitori',mode:'consegna',ch:{gdo:50,dett:50}};
 // canali di distribuzione: veh = mezzo, sat = carico rispetto alla media, prezzo = tariffa di distribuzione, pick = lavoro di preparazione, P/A = effetto sui KPI
@@ -898,7 +942,7 @@ wk('clienti','cli','Clienti',`Le aziende che ti affidano la merce: pagano per i 
 `Ogni cliente ha un volume (posti pallet occupati e pallet consegnati al mese), delle [[soglie]] di servizio, una [[zona]] di distribuzione e un modo di farti arrivare la merce ([[ritiro]] o consegna). È servito da un solo [[magazzino]].
 
 Il primo cliente è quello storico del tuo CEO; tutti gli altri arrivano dalle [[gare]].`);
-wk('gare','cli','Gare d\'appalto',`Un cliente cerca un fornitore logistico: hai 21 giorni per fare un'offerta. Ne arriva una ogni 4-7 settimane.`,
+wk('gare','cli','Gare d\'appalto',`Un cliente cerca un fornitore logistico: hai 45 giorni per fare un'offerta. Ci sono sempre almeno due gare aperte (tre con l'Ufficio commerciale): quando una si chiude ne arriva un'altra.`,
 `Scegli il [[magazzino]] e il [[prezzo]]. Il gioco stima i KPI che avresti e la probabilità di vincere, che dipende da:
 • il prezzo: ogni 1% di sconto vale +1,2 punti;
 • i KPI previsti rispetto alle [[soglie]] del cliente;
@@ -908,9 +952,22 @@ wk('gare','cli','Gare d\'appalto',`Un cliente cerca un fornitore logistico: hai 
 
 Ogni cliente ha un [[rank]] da S a F. Alcuni clienti chiedono [[tech_richieste|tecnologie obbligatorie]]. Se vinci il [[contratto]] parte dopo 30 giorni; se non partecipi, il cliente va a un [[concorrenti|concorrente]]. Con l'[[tech_commerciale|ufficio commerciale]] le gare arrivano più spesso.`);
 wk('prezzo','cli','Prezzo rispetto al listino',`Lo sconto o il ricarico che offri in gara, da −20% a +20%. Più basso = più probabilità, meno margine.`,
-`Il listino è calcolato su stoccaggio, [[movimenti]] e trasporto (vedi [[ricavi]]). Il prezzo scelto resta per tutti i 24 mesi del [[contratto]]: uno sconto troppo aggressivo può farti lavorare in perdita.`);
-wk('contratto','cli','Contratto',`Dura 24 mesi e parte 30 giorni dopo la gara vinta. Alla scadenza il cliente rinnova se la soddisfazione è almeno 50.`,
-`Nei 30 giorni prima dell'avvio prepara il [[magazzino]]: [[assunzioni|assumi]] il [[personale]] che serve. Alla scadenza il rinnovo è automatico se la [[soddisfazione]] è almeno 50 (40 con il [[tech_kam|Key account management]]); altrimenti il cliente passa alla concorrenza.`);
+`Il listino è calcolato su stoccaggio, [[movimenti]] e trasporto (vedi [[ricavi]]). Il prezzo scelto resta per tutta la durata del [[contratto]]: uno sconto troppo aggressivo può farti lavorare in perdita.`);
+wk('contratto','cli','Contratto',`Dura 12, 24 o 36 mesi (lo dice la gara) e parte 30 giorni dopo la gara vinta. Alla scadenza il cliente rinnova se la soddisfazione è almeno 50.`,
+`Nei 30 giorni prima dell'avvio prepara il [[magazzino]]: [[assunzioni|assumi]] il [[personale]] che serve. La durata dipende dal [[rank]]: le committenti S e A firmano per 2-3 anni, quelle D e F spesso per uno solo.
+
+Due mesi prima della scadenza arriva un avviso. Alla scadenza il rinnovo, per la stessa durata, è automatico se la [[soddisfazione]] è almeno 50 (40 con il [[tech_kam|Key account management]]); altrimenti il cliente passa alla concorrenza. Se non ti conviene più, dalla scheda del cliente scegli **Non rinnovare**: alla scadenza se ne va senza penali.
+
+Uscire prima della scadenza si può, ma costa: vedi [[recesso]].`);
+wk('recesso','cli','Recesso anticipato',`Uscire da un contratto prima della scadenza: penale, preavviso e qualche rischio il giorno dell'uscita.`,
+`Dalla scheda del cliente, **Recedi dal contratto**:
+• [[penali|penale]] subito: da 2 a 8 mesi di fatturato del cliente (2 + un quarto di mese per ogni mese di contratto rimasto);
+• [[reputazione]]: metà di quella che perderesti se il cliente ti lasciasse (dipende dal [[rank]]);
+• preavviso di 60 giorni (90 per le committenti S e A): il cliente resta, paga e pretende i KPI. L'inventario di uscita toglie 1 punto di [[accuratezza]] al magazzino.
+
+Il giorno dell'uscita: 45% tutto liscio; 25% differenze inventariali (da 4 a 10 € per posto pallet, più probabili se l'accuratezza è sotto il 97%); 15% il cliente non paga l'ultima fattura; 10% il nuovo logistico è in ritardo e la merce resta altre tre settimane; 5% causa legale (8.000 € e reputazione −2).
+
+Prima dell'avvio si può **rinunciare** al contratto: 2 mesi di fatturato di penale, nessun preavviso. Il modo gratuito per uscire è non rinnovare alla [[contratto|scadenza]].`);
 wk('canali','cli','Canali di distribuzione',`Dove finisce la merce del cliente: supermercati, bar e ristoranti, negozi, case dei clienti online, stabilimenti. Ogni cliente ha il suo mix in percentuale.`,
 `Ogni cliente divide i suoi pallet tra cinque canali (la barra colorata nelle gare e nella scheda cliente):
 
@@ -1132,6 +1189,7 @@ function computeWH(wh,extra){
   if(tA) pA.push(['Tecnologie',tA]); if(mA) pA.push(['Eventi',mA]); if(Math.abs(chA)>0.05) pA.push(['Canali di distribuzione',chA]); if(R('iso')) pA.push(['Certificazione ISO',0.5]);
   if(sat>0.85) pA.push(['Saturazione oltre 85%',-25*(sat-0.85)]); if(uPick>1) pA.push(['Magazzinieri insufficienti',-8*(uPick-1)]); if(uCar>1) pA.push(['Carrellisti insufficienti',-3*(uCar-1)]);
   if(impShort) pA.push(['Impiegati insufficienti',-1*impShort]);
+  const exN=act.filter(c=>c.exit).length; if(exN) pA.push(['Inventario di uscita',-1*exN]);
   if(capoShort) pA.push(['Capiturno insufficienti',-1*capoShort]); if(wh.coop) pA.push(['Facchini in cooperativa',COOP.A]);
   const P=clamp(pP.reduce((a,x)=>a+x[1],0),50,99.9), A=clamp(pA.reduce((a,x)=>a+x[1],0),50,99.9);
   const dHr=dirStat('hr');
@@ -1183,8 +1241,11 @@ function step(){
     if(t.id==='direzione') modalInfo('La Gazzetta del Muletto','Nasce la squadra dei dirigenti','La struttura direzionale è pronta. Dal menu Direzione nomina fino a cinque direttori: ognuno guida un\'area di tutta l\'azienda con la sua abilità principale.');
     else toast(`Ricerca completata: ${t.name}${t.tree==='log'?' · installala nei magazzini':''}`,'ok'); } }
   // gare
-  if(d>=S.nextTender){ newTender(); S.nextTender=d+Math.round(R('commerciale')?rnd(20,35):rnd(28,46)); }
+  // clienti in uscita dopo il recesso
+  S.clients.filter(c=>c.exit&&c.status==='attivo'&&S.day>=c.exit.day).forEach(exitClient);
   S.tenders.filter(t=>t.deadline===d&&!t.done).forEach(resolveTender);
+  // ci sono sempre almeno due gare aperte
+  while(S.tenders.filter(t=>!t.done).length<minTenders() && newTender());
   S.tenders=S.tenders.filter(t=>!t.done||d-t.deadline<30);
   S.mods=S.mods.filter(m=>m.until>d);
   // fine mese
@@ -1218,11 +1279,17 @@ function monthEnd(){
     else {c.sat-=10; const p=0.05*clientRev(c); pen+=p;}
     c.sat=clamp(c.sat,0,100);
     if(c.sat<25){c.status='perso';S.rep-=rankOf(c).lost;toast(`${c.name} ha disdetto il contratto`,'bad');news('Il Sole 24 Pallet',`${c.name} lascia ${S.company.name}`,`"Ritardi ed errori non sono più accettabili", fa sapere il cliente.`);}
+    else if(c.exit){ /* in uscita: niente rinnovo */ }
+    else if(S.day>=c.end&&c.noRenew){c.status='perso';c.ended='scaduto';toast(`Contratto con ${c.name} concluso`,'warn');news('Il Sole 24 Pallet',`${S.company.name} non rinnova con ${c.name}`,`Il contratto è scaduto e non è stato rinnovato: nessuna penale.`);}
     else if(S.day>=c.end){
-      if(c.sat>=(R('kam')?40:50)){c.end=S.day+24*30;toast(`${c.name} rinnova per altri due anni`,'ok');news('Il Sole 24 Pallet',`${c.name} rinnova`,`Contratto prolungato di 24 mesi.`);}
+      const dur=c.dur||24;
+      if(c.sat>=(R('kam')?40:50)){c.end=S.day+dur*30;c.warned=false;toast(`${c.name} rinnova per altri ${dur} mesi`,'ok');news('Il Sole 24 Pallet',`${c.name} rinnova`,`Contratto prolungato di ${dur} mesi.`);}
       else {c.status='perso';toast(`${c.name} non rinnova`,'bad');news('Il Sole 24 Pallet',`${c.name} non rinnova`,`Il cliente passa alla concorrenza.`);}
     }
   });
+  S.clients.filter(c=>c.status==='attivo'&&!c.exit&&!c.warned&&c.end-S.day<=60).forEach(c=>{c.warned=true;
+    toast(`Il contratto con ${c.name} scade il ${shortDate(c.end)}`,'warn');
+    news('Il Sole 24 Pallet',`${c.name}: contratto in scadenza`,c.noRenew?`Scade il ${shortDate(c.end)} e non verrà rinnovato.`:`Scade il ${shortDate(c.end)}. Rinnova da solo se la soddisfazione è almeno ${R('kam')?40:50}; altrimenti il cliente va via.`);});
   if(R('marketing')) S.rep+=0.2;
   S.cash-=pen; S.cur.pen+=pen; S.rep=clamp(S.rep,0,100);
   S.warehouses.forEach(w=>w.acc={P:0,A:0,n:0});
@@ -1234,13 +1301,14 @@ function monthEnd(){
 }
 function newTender(){
   const tpl=pick(TENDER_POOL.filter(t=>cinfo(t).zones.some(z=>ZONES[z].avail)&&(!(t.req||[]).includes('ecom')||R('ecom'))&&!S.clients.some(c=>c.name===t.name&&c.status!=='perso')&&!S.tenders.some(x=>x.name===t.name&&!x.done)));
-  if(!tpl) return;
+  if(!tpl) return false;
   const k=rnd(0.75,1.25);
-  const t={id:nid('t'),...tpl,stock:Math.round(tpl.stock*k/10)*10,pal:Math.round(tpl.pal*k/10)*10,open:S.day,deadline:S.day+21,bid:null,done:false,result:null};
+  const t={id:nid('t'),...tpl,stock:Math.round(tpl.stock*k/10)*10,pal:Math.round(tpl.pal*k/10)*10,open:S.day,deadline:S.day+45,dur:pick(DUR_RANK[rankOf(tpl).r]),bid:null,done:false,result:null};
   {const ci=cinfo(tpl); t.zone=pick(ci.zones.filter(z=>ZONES[z].avail)); t.src=ci.src; t.mode=ci.mode;}
   S.tenders.push(t);
   toast(`Nuova gara: ${t.name}, scade il ${shortDate(t.deadline)}`,'warn');
-  news('Il Sole 24 Pallet',`Gara d'appalto: ${t.name}`,`${n0(t.pal)} pallet al mese, ${n0(t.stock)} posti. Offerte entro il ${shortDate(t.deadline)}.`);
+  news('Il Sole 24 Pallet',`Gara d'appalto: ${t.name}`,`${n0(t.pal)} pallet al mese, ${n0(t.stock)} posti. Offerte entro il ${shortDate(t.deadline)}. Contratto di ${t.dur} mesi.`);
+  return true;
 }
 function bidEstimate(t,whId,mult){
   const w=whById(whId); if(!w) return null;
@@ -1263,7 +1331,7 @@ function resolveTender(t){
   const e=bidEstimate(t,t.bid.wh,t.bid.mult);
   const win=e&&Math.random()<e.chance;
   if(win){
-    const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,zone:t.zone,src:t.src,mode:t.mode,wh:t.bid.wh,mult:t.bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+24*30};
+    const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,zone:t.zone,src:t.src,mode:t.mode,wh:t.bid.wh,mult:t.bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+(t.dur||24)*30,dur:t.dur||24};
     S.clients.push(c); t.result={win:true}; S.rep=clamp(S.rep+rankOf(c).win,0,100);
     toast(`Gara vinta: ${t.name}! Il contratto parte il ${shortDate(c.start)}`,'ok');
     modalInfo('Il Sole 24 Pallet',`Gara vinta: ${t.name}`,`Il contratto parte il ${shortDate(c.start)} a ${whById(c.wh).name}. In quel magazzino servono in tutto ${needTxt(e.need)}: assumi adesso, perché un autista con patente CE arriva in 3–6 settimane.`);
@@ -1753,17 +1821,19 @@ const VIEWS={
      <div class="sm">"${esc(c.slogan)}" · ${esc(c.sector)}</div></div></div>
     ${logInfoHtml(c,w)}
     <div><button class="btn sm2" data-act="mapcli" data-id="${c.id}" aria-pressed="${UI.mapCli===c.id}">${UI.mapCli===c.id?'Nascondi dalla mappa':'Mostra sulla mappa'}</button></div>
-    ${c.status==='avvio'?`<div class="sm">Il contratto parte il <b>${shortDate(c.start)}</b>.</div>`:`
+    ${c.status==='avvio'?`<div class="sm">Il contratto parte il <b>${shortDate(c.start)}</b> e dura ${c.dur||24} mesi.</div><div><button class="btn sm2" data-act="recedi" data-id="${c.id}">Rinuncia al contratto</button></div>`:`
     <table class="t num"><tr><th>KPI</th><th class="r">Oggi</th><th class="r">${kw('soglie','Richiesto')}</th></tr>
      <tr><td>${kw('puntualita')}</td><td class="r ${cP}">${f1(P)}%</td><td class="r">≥ ${f1(c.sP)}%</td></tr>
      <tr><td>${kw('accuratezza')}</td><td class="r ${cA}">${f1(A)}%</td><td class="r">${c.sA?'≥ '+f1(c.sA)+'%':'non richiesta'}</td></tr></table>
     <div class="row" style="align-items:center"><span class="lab">${kw('soddisfazione','Soddisfazione')}</span><div class="bar" style="max-width:160px"><i style="width:${c.sat}%;background:${c.sat>=60?'var(--ok)':c.sat>=40?'var(--warn)':'var(--bad)'}"></i></div><b class="num">${Math.round(c.sat)}</b></div>
-    <div class="sm">${eur(clientRev(c))}/mese · ${kw('contratto','rinnovo')} tra ${mesi} mesi${c.sat<50?' · <b class="bad">a rischio</b>':''}</div>`}
-   </div>`;}).join('')+(lost.length?`<div class="sm">Clienti persi: ${lost.map(c=>esc(c.name)).join(', ')}</div>`:'')+`<div class="sm">Ogni mese (${kw('soddisfazione','come funziona')}): sopra soglia +3 di soddisfazione; sotto di 2 punti al massimo −4; oltre −10 e penale del 5%. Sotto 25 il cliente se ne va.</div>`;
+    <div class="sm">${eur(clientRev(c))}/mese · ${kw('contratto','contratto')} di ${c.dur||24} mesi, scade il <b>${shortDate(c.end)}</b> (tra ${mesi} mesi)${c.exit?'':c.noRenew?' · <b class="warn">non verrà rinnovato</b>':c.sat<50?' · <b class="bad">rinnovo a rischio</b>':''}</div>
+    ${c.exit?`<div class="sm bad">${kw('recesso','In uscita')}: l'ultimo camion parte il <b>${shortDate(c.exit.day)}</b>. Fino ad allora il contratto vale e i KPI contano.</div>`:
+    `<div class="row"><button class="btn sm2" data-act="norenew" data-id="${c.id}" aria-pressed="${!!c.noRenew}">${c.noRenew?'Rinnova alla scadenza':'Non rinnovare'}</button><button class="btn sm2" data-act="recedi" data-id="${c.id}">Recedi dal contratto</button></div>`}`}
+   </div>`;}).join('')+(lost.length?`<div class="sm">Clienti persi: ${lost.map(c=>esc(c.name)+(c.ended==='recesso'?' (recesso)':c.ended==='scaduto'?' (non rinnovato)':c.ended==='rinuncia'?' (rinuncia)':'')).join(', ')}</div>`:'')+`<div class="sm">Ogni mese (${kw('soddisfazione','come funziona')}): sopra soglia +3 di soddisfazione; sotto di 2 punti al massimo −4; oltre −10 e penale del 5%. Sotto 25 il cliente se ne va.</div>`;
  },
  gare(){
   const open=S.tenders.filter(t=>!t.done), done=S.tenders.filter(t=>t.done).slice(-4).reverse();
-  if(!open.length&&!done.length) return `<div class="sm">Nessuna ${kw('gare','gara')} aperta. Ne arriva una ogni 4–6 settimane.</div>`;
+  if(!open.length&&!done.length) return `<div class="sm">Nessuna ${kw('gare','gara')} aperta: le committenti libere sono finite. Ne arriveranno quando qualche cliente cambia logistico.</div>`;
   const sel=open.find(t=>t.id===UI.sel.tender)||open[0];
   let detail='';
   if(sel){
@@ -1776,7 +1846,7 @@ const VIEWS={
      ${logInfoHtml(sel,whById(UI.bid.wh))}
      <table class="t num"><tr><td>Volume</td><td class="r">${n0(sel.pal)} pallet/mese · ${n0(sel.stock)} posti</td></tr>
       <tr><td>${kw('puntualita')} ${kw('soglie','richiesta')}</td><td class="r">≥ ${f1(sel.sP)}%</td></tr><tr><td>${kw('accuratezza')} ${kw('soglie','richiesta')}</td><td class="r">${sel.sA?'≥ '+f1(sel.sA)+'%':'non richiesta'}</td></tr>
-      <tr><td>${kw('contratto','Avvio')}</td><td class="r">30 giorni dopo l'aggiudicazione · 24 mesi</td></tr></table>
+      <tr><td>${kw('contratto','Avvio')}</td><td class="r">30 giorni dopo l'aggiudicazione · ${sel.dur||24} mesi</td></tr></table>
      <label class="row"><span class="lab">Magazzino</span><select data-act="bidwh" aria-label="Magazzino per la gara">${S.warehouses.map(w=>`<option value="${w.id}" ${w.id===UI.bid.wh?'selected':''}>${esc(w.name)}</option>`).join('')}</select></label>
      <label><span class="row"><span class="lab">${kw('prezzo')}</span><b class="num" id="bidmv">${UI.bid.mult>=1?'+':''}${Math.round((UI.bid.mult-1)*100)}%</b></span>
       <input type="range" min="80" max="120" step="1" value="${Math.round(UI.bid.mult*100)}" data-act="bidmult" aria-label="Prezzo rispetto al listino"></label>
@@ -1989,6 +2059,19 @@ const ACT={
    mod(w.id,{mor:-4},30);}
   S.cash-=sal; S.cur.altro+=sal; toast(`Licenziamento: ${eur(sal)} di buonuscita, morale in calo`,'warn'); renderAll();
  },
+ norenew(d){const c=S.clients.find(x=>x.id===d.id); c.noRenew=!c.noRenew; renderAll();},
+ recedi(d){const c=S.clients.find(x=>x.id===d.id), e=exitTerms(c);
+  showModal(`<div class="src"><span>Ufficio legale</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:20px">${e.avvio?'Rinuncia':'Recesso'}: ${esc(c.name)}</h3>
+   <table class="t num"><tr><td>${kw('penali','Penale')}</td><td class="r bad">${eur(e.pen)}</td></tr>
+    ${e.avvio?'':`<tr><td>Mesi di contratto rimasti</td><td class="r">${e.mesi}</td></tr><tr><td>Preavviso</td><td class="r">${e.days} giorni, fino al ${shortDate(S.day+e.days)}</td></tr>`}
+    <tr><td>${kw('reputazione')}</td><td class="r bad">−${e.rep}</td></tr></table>
+   <p class="sm" style="margin:0">${e.avvio?'Il contratto non è ancora partito: il cliente cerca subito un altro logistico.':'Durante il preavviso il cliente resta in magazzino, paga e pretende i KPI del contratto; l\'inventario di uscita toglie 1 punto di accuratezza. Il giorno dell\'uscita qualcosa può andare storto: differenze inventariali, fatture contestate, ritardi, cause legali.'}</p>
+   <div class="row"><button class="btn" data-act="closemodal">Ci ripenso</button><button class="btn pri" data-act="recedi2" data-id="${c.id}">Firma il ${e.avvio?'ritiro':'recesso'}</button></div></div>`);},
+ recedi2(d){const c=S.clients.find(x=>x.id===d.id), e=exitTerms(c);
+  S.cash-=e.pen; S.cur.pen+=e.pen; S.rep=clamp(S.rep-e.rep,0,100); closeModal();
+  if(e.avvio){c.status='perso';c.ended='rinuncia';news('Il Sole 24 Pallet',`${S.company.name} rinuncia a ${c.name}`,`Il contratto non partirà: penale di ${eur(e.pen)}.`);}
+  else {c.exit={day:S.day+e.days};news('Il Sole 24 Pallet',`${S.company.name} recede dal contratto con ${c.name}`,`Penale di ${eur(e.pen)}; l'ultimo camion partirà il ${shortDate(c.exit.day)}.`);}
+  toast(`Penale pagata: ${eur(e.pen)}`,'warn'); renderAll();},
  setsatobj(d,el){ const w=whById(d.wh); w.satObj=+el.value||0; renderAll(); },
  setmgr(d,el){
   const w=whById(d.wh); const v=el.value;
