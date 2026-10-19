@@ -2,7 +2,7 @@
 
 Gioco di strategia in pixel art sulla logistica italiana, nello stile dei grand strategy di Paradox. Sei il CEO di un'azienda di trasporti del Nord-Ovest: compri magazzini, vinci gare, assumi personale e manager, fai ricerca su tre alberi tecnologici e tieni contenti i clienti su Puntualità e Accuratezza.
 
-**Per giocare:** apri `dist/fup.html` nel browser (desktop).
+**Per giocare:** https://yanez86.github.io/fup/ (browser desktop), oppure apri `dist/fup.html` dal computer.
 
 **Per sviluppare:** leggi [`CLAUDE.md`](CLAUDE.md) e [`docs/design.md`](docs/design.md).
 
