@@ -128,6 +128,23 @@ person('cc8',skin='media',hair='#b9bec5',hairl='#dfe3e8',hairstyle='perm',cloth=
 person('cc9',skin='media',hair='#5d636b',hairl='#8a9098',hairstyle='bald',cloth='#3a4658',clothd='#2a3442',clothl='#4f5d72',beard='#5d636b',collar=tie('#ff7a3d'))
 person('cc10',skin='chiara',hair='#ffd23f',hairl='#fff3c4',hairstyle='long',cloth='#2b3550',clothd='#1b2238',clothl='#44547a',lips='#c85a62',collar=cc_col('#ffd23f'))
 
+# nuova generazione: manager e dirigenti che arrivano sul mercato negli anni, per sostituire chi va in pensione
+def polo(col):
+    def f(c):
+        m=(np.abs(xx-24)<3)&ell(24,58,24,18)&(yy<47)&(yy>40); c.fill(m,col)
+    return f
+person('giorgio',skin='media',hair='#3d2419',hairl='#5a3a28',hairstyle='short',cloth='#c8551f',clothd='#9a3f15',clothl='#ff8a4a',beard='#3d2419',collar=polo('#9a3f15'))
+person('aisha',skin='scura',hair='#1c1612',hairl='#3d2419',hairstyle='curly',cloth='#5fb4f0',clothd='#3a8ccc',clothl='#a9dcff',lips='#8f3a3a',earring='#ffd23f',collar=cc_col('#f4f5f7'))
+person('ivan',skin='chiara',hair='#d9ad6c',hairl='#f0d090',hairstyle='buzz',cloth='#26365c',clothd='#1b2238',clothl='#3a4f80',collar=polo('#f4f5f7'))
+person('sara',skin='chiara',hair='#2c2420',hairl='#4a3c34',hairstyle='long',cloth='#e0393e',clothd='#a8262b',clothl='#ff6a6e',glasses='#16202e',lips='#b8323a')
+person('nicola',skin='media',hair='#5d636b',hairl='#8a9098',hairstyle='messy',cloth='#2e9e48',clothd='#1f7a34',clothl='#5cc472',mustache='#5d636b',glasses='#8a5f36')
+person('elena',skin='media',hair='#a3482c',hairl='#c86a40',hairstyle='long',cloth='#4a5f7a',clothd='#33445a',clothl='#6b819e',lips='#c85a62',earring='#e2b84a',collar=cc_col('#ffd23f'))
+person('matteo',skin='chiara',hair='#4a3426',hairl='#6e4e38',hairstyle='messy',cloth='#9b6bff',clothd='#6f43cf',clothl='#c8adff',beard='#4a3426',glasses='#16202e')
+person('beatrice',skin='chiara',hair='#b9bec5',hairl='#dfe3e8',hairstyle='bob',cloth='#16202e',clothd='#0c131d',clothl='#2f3d52',lips='#b0505a',earring='#c3d0dc',collar=cc_col('#f4f5f7'))
+person('paolo',skin='media',hair='#9aa0a8',hairl='#c9ced4',hairstyle='short',cloth='#5a3e2b',clothd='#3e2a1c',clothl='#7a5a40',glasses='#16202e',collar=tie('#9b6bff'))
+person('federico',skin='scura',hair='#2c2420',hairl='#463830',hairstyle='short',cloth='#1f9e8f',clothd='#157366',clothl='#3dd6c4',beard='#2c2420',collar=tie('#16202e'))
+NEW=['giorgio','aisha','ivan','sara','nicola','elena','matteo','beatrice','paolo','federico']
+
 # posto vacante: sagoma anonima in ombra (p_anonimo), con un punto di domanda sul petto
 def anonimo():
     c=Canvas()
@@ -147,3 +164,7 @@ bg=Image.new('RGBA',(10*104,120),(42,58,80,255))
 for i in range(10):
     im=Image.open(OUT+f'p_cc{i+1}.png'); bg.alpha_composite(im,(4+i*104,4))
 bg.save(ROOT+'/tools/out/cc_preview.png')
+bg=Image.new('RGBA',(10*104,120),(42,58,80,255))
+for i,n in enumerate(NEW):
+    im=Image.open(OUT+f'p_{n}.png'); bg.alpha_composite(im,(4+i*104,4))
+bg.save(ROOT+'/tools/out/nuovi_preview.png')
