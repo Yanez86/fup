@@ -7,7 +7,7 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - In alternativa il giocatore **crea il proprio CEO** (quinta scheda), a passaggi: 1) identità: nome, cognome, età, ritratto (10 a scelta, `p_cc1`…`p_cc10`), soprannome e motto facoltativi; 2) abilità; 3) titolo di studio e carattere; 4) curriculum vitae da confermare. Il punto di partenza si sceglie nella scheda dell'azienda (magazzino, cassa, motrici e cliente storico di uno dei 4 CEO, senza le tecnologie iniziali di Marco).
   - 58 punti. Ogni punto di abilità costa 1 (da 1 a 18 prima dei talenti). Un **titolo di studio** obbligatorio (34 talenti con `edu`) e fino a 3 talenti di carattere.
   - Ogni talento costa la somma dei suoi effetti sulle abilità (letti dal testo `fx` con `talMods()`): Operazioni +3 e Leadership −1 = 2 punti; i talenti con soli malus restituiscono punti. Abilità finale = punti + talenti, tra 0 e 20.
-- Si parte a gennaio 2002. Le tecnologie e gli eventi hanno un anno minimo.
+- Si parte a gennaio 2002. Alcuni eventi hanno un anno minimo; le tecnologie no: contano solo quelle che le precedono nell'albero.
 - Si va in fallimento se a fine mese la cassa è sotto −50.000 €.
 
 ## KPI di magazzino (ricalcolati ogni giorno)
