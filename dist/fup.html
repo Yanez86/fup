@@ -60,6 +60,34 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .win{position:fixed;z-index:20;width:440px;max-width:calc(100vw - 32px);max-height:calc(100vh - 110px);display:flex;flex-direction:column;background:var(--panel);border:3px solid var(--ink2);box-shadow:inset 0 0 0 2px #fff, 6px 6px 0 rgba(12,19,29,.55)}
 .win.wide{width:640px}
 .win.xwide{width:960px}
+.stats{display:inline-flex;flex-wrap:wrap;gap:4px}
+.stc{display:inline-flex;align-items:center;gap:4px;padding:2px 6px 2px 3px;background:var(--sb);border:2px solid var(--sc);box-shadow:inset 0 -2px 0 rgba(22,32,46,.1);cursor:help;font-size:14px;line-height:1}
+.stc b{color:var(--ink);font-variant-numeric:tabular-nums}
+.xl{border:2px solid var(--ink);background:#fff;box-shadow:3px 3px 0 var(--ink);display:flex;flex-direction:column}
+.xl-top{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:#2e9e48;color:#fff;font-family:var(--f-disp);font-size:15px}
+.xl-top .sm{color:#e6f6e9}
+.xl-file{display:inline-flex;align-items:center;gap:6px}
+.xl-menu{display:flex;gap:2px;padding:0 6px;background:#eaf6ec;border-bottom:2px solid var(--ink);font-size:13px}
+.xl-menu span{padding:4px 9px;color:var(--muted)}
+.xl-menu .on{background:#fff;color:var(--ink);font-weight:600;box-shadow:inset 0 -3px 0 #2e9e48}
+.xl-fx{display:flex;align-items:stretch;border-bottom:2px solid var(--ink);font-size:14px}
+.xl-ref{width:64px;padding:4px 6px;border-right:2px solid var(--ink);font-family:var(--f-disp);text-align:center}
+.xl-fxl{padding:4px 8px;border-right:1px solid #c3d0dc;font-style:italic;color:var(--muted)}
+.xl-f{padding:4px 8px;font-family:ui-monospace,monospace;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xl-grid{overflow:auto;max-height:420px}
+.xl-grid table{border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums;min-width:100%}
+.xl-grid th{background:#dfe7ee;color:var(--muted);font-weight:500;border:1px solid #b5c3d1;padding:2px 6px;font-size:12px;position:sticky;top:0}
+.xl-grid tbody th,.xl-h th{width:30px;position:static}
+.xl-grid td{border:1px solid #d5dde6;padding:4px 8px;text-align:right;white-space:nowrap;cursor:cell;height:26px}
+.xl-h td{background:#f1f5f9;color:var(--ink);font-weight:700;text-align:center;border-bottom:2px solid var(--ink)}
+.xl-grid td.ok{background:#e3f4d9;color:#1f6e33}.xl-grid td.warn{background:#fff4c7;color:#7a5a00}.xl-grid td.bad{background:#fde0e0;color:#a32025}
+.xl-grid td.sel{outline:3px solid #2e9e48;outline-offset:-2px}
+.xl-grid tr.tot td{font-weight:700;border-top:2px solid var(--ink);background:#f7f9fb}
+.spark{display:inline-flex;align-items:flex-end;gap:2px;height:20px}.spark i{width:6px;display:block}
+.xl-tabs{display:flex;gap:2px;padding:0 6px;background:#dfe7ee;border-top:2px solid var(--ink)}
+.xl-tabs button{padding:4px 12px;border:0;border-right:1px solid #b5c3d1;background:transparent;font-size:13px;color:var(--muted)}
+.xl-tabs button[aria-pressed="true"]{background:#fff;color:#1f6e33;font-weight:700;box-shadow:inset 0 -3px 0 #2e9e48;margin-top:-2px}
+.xl-plus{padding:4px 10px;color:var(--muted)}
 .treebox{overflow-x:auto;padding:4px 2px 8px}
 .tnode{position:absolute;display:flex;align-items:center;gap:7px;padding:4px 6px;text-align:left;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 rgba(22,32,46,.12),2px 2px 0 var(--ink);font-size:13px;line-height:1.2}
 .tnode .tn{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -248,7 +276,8 @@ const TENDER_POOL=[
  {name:'Riso Scotto dei Navigli',slogan:'Chicchi lombardi, mai scotti',sector:'Alimentare secco',stock:650,pal:280,sP:91,sA:null,diff:-2},
  {name:'Zalandini',slogan:'Resi gratuiti, anche dei calzini',sector:'E-commerce moda',stock:900,pal:1200,sP:96,sA:98,diff:4,req:['ecom']},
  {name:'Amazzonia Italia',slogan:'Lo vuoi? È già in viaggio',sector:'E-commerce',stock:2000,pal:3000,sP:98,sA:98,diff:10,req:['ecom','edi']},
- {name:'Spesa Veloce',slogan:'La spesa a casa in un\'ora',sector:'E-commerce alimentare',stock:600,pal:900,sP:97,sA:97,diff:3,req:['ecom','freddo']}
+ {name:'Spesa Veloce',slogan:'La spesa a casa in un\'ora',sector:'E-commerce alimentare',stock:600,pal:900,sP:97,sA:97,diff:3,req:['ecom','freddo']},
+ {name:'Spedizioni Tricolore',slogan:'Da Aosta a Lampedusa in 48 ore',sector:'Pacchi',stock:1500,pal:2500,sP:95,sA:97,diff:6}
 ];
 const RIVALS=['Gruppo Bartolazzi','Logistix Global','F.lli Brambilla Autotrasporti','Cooperativa La Fatica'];
 const TECH=[
@@ -289,7 +318,7 @@ const HIRE={mag:{ann:[25,300],age:[7,1200]},aut:{ann:[35,300],age:[14,1800]},imp
 const T_ST=5.5,T_MO=3.8,T_DI=30;
 
 /* ====================== UTILITÀ ====================== */
-const TPAL={K:'#16202e',W:'#ffffff',Y:'#ffd23f',O:'#ff7a3d',R:'#e0393e',G:'#2e9e48',B:'#5fb4f0',N:'#8a5f36',S:'#c3d0dc',D:'#4a5f7a',T:'#1f9e8f',F:'#f2c79b',P:'#9b6bff'};
+const TPAL={K:'#16202e',W:'#ffffff',Y:'#ffd23f',O:'#ff7a3d',R:'#e0393e',G:'#2e9e48',B:'#5fb4f0',N:'#8a5f36',S:'#c3d0dc',D:'#4a5f7a',T:'#1f9e8f',F:'#f2c79b',P:'#9b6bff',C:'#fff3c4',L:'#bfe6ff',M:'#6b3e1f'};
 const TALENTS={
  'Un milione di km al volante':{t:'mix',fx:'Operazioni +4 · Leadership +1 · Innovazione −2 · Morale degli autisti +5',fl:'Conosce a memoria ogni Autogrill tra Rivalta e Rotterdam.',ic:['..KKKK..','.K....K.','K..KK..K','KKKKKKKK','K..KK..K','K..KK..K','.K.KK.K.','..KKKK..']},
  'Allergico al gestionale':{t:'neg',fx:'Innovazione −4 · Apprendimento delle tecnologie +50% nel suo magazzino',fl:'Ha stampato il manuale del WMS per usarlo come fermaporta.',ic:['R..S.S.R','.R.S.SR.','..RSSR..','..SRRS..','..SRRS..','..RSSR..','.R.KK.R.','R..KK..R']},
@@ -326,6 +355,110 @@ function techIcon(t,sz,dim){
   (TECH_IC[t.id]||[]).forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x+2}" y="${y+2}" width="1" height="1" fill="${TPAL[ch]}"/>`;}));
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="flex:none;${dim?'filter:grayscale(1) opacity(.55)':''}" aria-hidden="true">${r}</svg>`;
 }
+const LOGO={"Pastificio Rummolo":{"bg":"R","ic":["....SS.S....","....SSSS....",".....SS.....","..YCYCYCYC..",".YCYCYCYCYC.","KKKKKKKKKKKK","KWWWWWWWWWWK",".KWBBBBBBWK.","..KWWWWWWK..","...KKKKKK...","............","............"]},"Mobilificio Brianzolo":{"bg":"C","ic":["............","............","..RRRRRRRR..",".RRRRRRRRRR.",".RRRRRRRRRR.","RRMRRRRRRMRR","RRMMMMMMMMRR","RRRRRRRRRRRR","RRRRRRRRRRRR",".M........M.",".M........M.","............"]},"Unilevante Italia":{"bg":"B","ic":[".....WW.....",".....WW.....","....WWWW....","....WWWW....","...WWWWWW...","..WWLWWWWW..","..WLLWWWWW..","..WLWWWWWW..","..WWWWWWWW..","...WWWWWW...","....WWWW....","............"]},"Caffè Portuale":{"bg":"N","ic":["...W..W.....","....W..W....","...W..W.....","............",".WWWWWWWW...",".WMMMMMMWWW.",".WWWWWWWWW.W",".WWWWWWWWWW.","..WWWWWWW...","...WWWWW....",".WWWWWWWWWW.","............"]},"Caseificio Galbanone":{"bg":"B","ic":["............","..........Y.","........YYY.","......YYYYY.","....YYYYOYY.","..YYYYYYYYY.","YYYOYYYYYYY.","YYYYYYYOYYY.","YYYYYYYYYYY.","YOYYYYYYYYY.","YYYYYYYYYYY.","............"]},"Ferramenta Bullonati":{"bg":"D","ic":["....SSSS....","...SSSSSS...","..SSSKKSSS..",".SSSKKKKSSS.",".SSKK..KKSS.",".SSKK..KKSS.",".SSSKKKKSSS.","..SSSKKSSS..","...SSSSSS...","....SSSS....","............","............"]},"ElettroUnieuri":{"bg":"R","ic":["......YYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYYYYYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYY.......",".YY.........","Y...........","............"]},"FarmaSpa":{"bg":"W","ic":["....GGGG....","....GGGG....","....GGGG....","....GGGG....","GGGGGGGGGGGG","GGGGGWWGGGGG","GGGGGWWGGGGG","GGGGGGGGGGGG","....GGGG....","....GGGG....","....GGGG....","....GGGG...."]},"Esselonga":{"bg":"R","ic":["............","...WWWWWW...","..WWWWWWWW..","..WWW.......","..WWW.......","...WWWWWW...","....WWWWWW..",".......WWW..",".......WWW..","..WWWWWWWW..","...WWWWWW...","............"]},"Birrificio Mortetti":{"bg":"G","ic":["............","..WWWWWW....",".WWWWWWWW...",".WYYYYYYW...",".KYYYYYYKKK.",".KYCYYYYK.K.",".KYCYYYYK.K.",".KYYYYYYKKK.",".KYYYYYYK...",".KYYYYYYK...",".KKKKKKKK...","............"]},"Acque San Pellegrinetto":{"bg":"L","ic":[".....GG.....",".....GG.....","....GGGG....","...GGGGGG...","...GGGGGG...","...GWWWWG...","...GWRRWG...","...GRRRRG...","...GWRRWG...","...GWWWWG...","...GGGGGG...","....GGGG...."]},"Arredamenti Ikeo":{"bg":"B","ic":["........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","..YYYYYYYY..","..YYYYYYYY..","............","............"]},"Moda Armandi":{"bg":"K","ic":[".....WW.....","....W..W....",".......W....","......W.....",".....WW.....","....W..W....","...W....W...","..W......W..",".W........W.","WWWWWWWWWWWW","............","............"]},"Pneumatici Pirello":{"bg":"Y","ic":["...KKKKKK...","..KKKKKKKK..",".KKKSSSSKKK.","KKKS....SKKK","KKS......SKK","KKS..SS..SKK","KKS..SS..SKK","KKS......SKK","KKKS....SKKK",".KKKSSSSKKK.","..KKKKKKKK..","...KKKKKK..."]},"Crema Spalmella":{"bg":"C","ic":["...RRRRRR...","...RRRRRR...","..KKKKKKKK..","..KWWWWWWK..","..KMMMMMMK..","..KMWWMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KKKKKKKK..","............"]},"Riso Scotto dei Navigli":{"bg":"G","ic":["............","....W..W....","..W..W...W..","...WWWWWW...","..WWWWWWWW..",".WWWWWWWWWW.","KKKKKKKKKKKK","KRRRRRRRRRRK",".KRRRRRRRRK.","..KRRRRRRK..","...KKKKKK...","............"]},"Zalandini":{"bg":"O","ic":["............","..W.........","..WW........","..WWW.......","..WWWW......","..WWWWW.....","..WWWWWW....","..WWWWW.....","..WWWW......","..WWW.......","..WW........","..W........."]},"Amazzonia Italia":{"bg":"K","ic":["............",".NNNNNNNNNN.",".NNNNYYNNNN.",".NNNNYYNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.","............",".O........O.","..O......OO.","...OOOOOOO.."]},"Spesa Veloce":{"bg":"G","ic":["....KKKK....","...K....K...","..KKKKKKKK..","..KWWWWWWK..","..KWWWYWWK..","..KWWYYWWK..","..KWYYYYWK..","..KWWYYWWK..","..KWWYWWWK..","..KWWWWWWK..","..KKKKKKKK..","............"]},"Spedizioni Tricolore":{"bg":"L","ic":["............","............","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","............","............","............"]}};
+const STAT_IC={"op":[".O.OO.O.","OOOOOOOO",".OO..OO.","OO....OO","OO....OO",".OO..OO.","OOOOOOOO",".O.OO.O."],"prec":["..BBBB..",".BWWWWB.","BWWBBWWB","BWBRRBWB","BWBRRBWB","BWWBBWWB",".BWWWWB.","..BBBB.."],"neg":["..YYYY..",".YYYYYY.","YYYKKKYY","YYKYYYYY","YKKKKYYY","YYKYYYYY",".YYKKKY.","..YYYY.."],"lead":["KRRRRR..","KRRRRRR.","KRRRRRRR","KRRRRRR.","KRRRRR..","K.......","K.......","KK......"],"amm":["GGGGGGGG","GWWWWWWG","GGGGGGGG","GWGWGWGG","GGGGGGGG","GWGWGWGG","GGGGGGGG","GWGWGWGG"],"inn":["..PPPP..",".PPWPPP.","PPWPPPPP","PPPPPPPP",".PPPPPP.","..PPPP..","..SSSS..","...SS..."]};
+/* --- clienti: zone di distribuzione, provenienza merce, loghi --- */
+const REG={
+ pie:['Torino','Novara','Alessandria','Asti','Cuneo','Vercelli','Biella','Verbania'],
+ lom:['Milano','Varese','Como','Lecco','Bergamo','Brescia','Lodi','Pavia','Cremona','Mantova','Sondrio','Monza'],
+ lig:['Genova','Savona','La Spezia','Imperia'], vda:['Aosta']
+};
+const ZONES={
+ reg_pie:{n:'Piemonte',cities:REG.pie},
+ reg_lom:{n:'Lombardia',cities:REG.lom},
+ reg_lig:{n:'Liguria',cities:REG.lig},
+ nordovest:{n:'Tutto il Nord-Ovest',cities:[...REG.pie,...REG.lom,...REG.lig,...REG.vda]},
+ nord:{n:'Nord Italia',cities:[...REG.pie,...REG.lom,...REG.lig,...REG.vda,'Piacenza','Verona'],note:'consegne anche fuori dal Nord-Ovest'},
+ italia:{n:'Tutta Italia',cities:[],avail:false,note:'disponibile quando la mappa si allargherà'}
+};
+['Torino','Milano','Genova','Novara','Alessandria','Cuneo','Bergamo','Brescia','Pavia','Varese','Como'].forEach(c=>ZONES['prov_'+c]={n:'Provincia di '+c,cities:[c]});
+Object.values(ZONES).forEach(z=>{ if(z.avail===undefined) z.avail=true; z.cities=z.cities.filter(n=>CITIES.some(c=>c[0]===n)); });
+const ORIGINS={
+ gragnano:{n:'Stabilimento di Gragnano (NA)',lon:14.52,lat:40.69},
+ meda:{n:'Fabbrica di Meda (MB)',lon:9.16,lat:45.66},
+ casale:{n:'Stabilimento di Casalpusterlengo (LO)',lon:9.65,lat:45.18},
+ portoge:{n:'Porto di Genova',lon:8.91,lat:44.40},
+ melzo:{n:'Caseificio di Melzo (MI)',lon:9.42,lat:45.50},
+ lumezzane:{n:'Fonderie di Lumezzane (BS)',lon:10.26,lat:45.65},
+ latina:{n:'Stabilimento di Latina',lon:12.90,lat:41.47},
+ fornitori:{n:'Centinaia di fornitori del Nord Italia',lon:9.6,lat:45.4},
+ udine:{n:'Birrificio di Udine',lon:13.23,lat:46.06},
+ pellegrino:{n:'Fonte di San Pellegrino (BG)',lon:9.67,lat:45.84},
+ svezia:{n:'Centro distributivo in Svezia',lon:14.27,lat:56.55},
+ atelier:{n:'Atelier di via Montenapoleone',lon:9.19,lat:45.47},
+ settimo:{n:'Stabilimento di Settimo Torinese',lon:7.77,lat:45.14},
+ alba:{n:'Stabilimento di Alba (CN)',lon:8.03,lat:44.70},
+ vercelli:{n:'Riserie di Vercelli',lon:8.42,lat:45.32},
+ erfurt:{n:'Hub di Erfurt (Germania)',lon:11.03,lat:50.98},
+ mondo:{n:'Fornitori di mezzo mondo',lon:9.19,lat:45.46},
+ ortomercato:{n:'Ortomercato di Milano',lon:9.24,lat:45.44},
+ roma:{n:'Hub di Roma',lon:12.50,lat:41.90}
+};
+// zones: la prima è quella del contratto iniziale; mode: 'ritiro' = andiamo noi a prendere la merce, 'consegna' = la porta il cliente
+const CINFO={
+ 'Pastificio Rummolo':{zones:['reg_lig','reg_pie','prov_Alessandria'],src:'gragnano',mode:'consegna'},
+ 'Mobilificio Brianzolo':{zones:['reg_lom','nordovest'],src:'meda',mode:'ritiro'},
+ 'Unilevante Italia':{zones:['nordovest','reg_pie'],src:'casale',mode:'ritiro'},
+ 'Caffè Portuale':{zones:['reg_lig','reg_pie'],src:'portoge',mode:'ritiro'},
+ 'Caseificio Galbanone':{zones:['reg_lom','nordovest','prov_Milano'],src:'melzo',mode:'ritiro'},
+ 'Ferramenta Bullonati':{zones:['nordovest','reg_lom'],src:'lumezzane',mode:'ritiro'},
+ 'ElettroUnieuri':{zones:['nordovest','nord'],src:'portoge',mode:'ritiro'},
+ 'FarmaSpa':{zones:['nordovest','nord'],src:'latina',mode:'consegna'},
+ 'Esselonga':{zones:['reg_lom','nordovest'],src:'fornitori',mode:'consegna'},
+ 'Birrificio Mortetti':{zones:['nordovest','nord'],src:'udine',mode:'consegna'},
+ 'Acque San Pellegrinetto':{zones:['reg_lom','reg_pie','nordovest'],src:'pellegrino',mode:'ritiro'},
+ 'Arredamenti Ikeo':{zones:['nordovest','reg_lom'],src:'svezia',mode:'consegna'},
+ 'Moda Armandi':{zones:['nord','prov_Milano'],src:'atelier',mode:'ritiro'},
+ 'Pneumatici Pirello':{zones:['reg_pie','nordovest','nord'],src:'settimo',mode:'ritiro'},
+ 'Crema Spalmella':{zones:['nordovest','reg_pie'],src:'alba',mode:'ritiro'},
+ 'Riso Scotto dei Navigli':{zones:['reg_lom','reg_pie','prov_Milano'],src:'vercelli',mode:'ritiro'},
+ 'Zalandini':{zones:['nordovest','nord'],src:'erfurt',mode:'consegna'},
+ 'Amazzonia Italia':{zones:['nord','nordovest'],src:'mondo',mode:'consegna'},
+ 'Spesa Veloce':{zones:['prov_Milano','prov_Torino'],src:'ortomercato',mode:'ritiro'},
+ 'Spedizioni Tricolore':{zones:['italia'],src:'roma',mode:'consegna'}
+};
+const cinfo=c=>CINFO[c.name]||{zones:['nordovest'],src:'fornitori',mode:'consegna'};
+function distKm(lo1,la1,lo2,la2){const r=Math.PI/180,a=Math.sin((la2-la1)*r/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin((lo2-lo1)*r/2)**2;return 6371*2*Math.asin(Math.sqrt(a));}
+// km di un viaggio di distribuzione (andata e ritorno) e di un viaggio di ritiro
+function clientLog(c,w){
+  const s=SITES[w.site], z=ZONES[c.zone]||ZONES.nordovest;
+  const cs=z.cities.map(n=>CITIES.find(x=>x[0]===n));
+  const avg=cs.length?cs.reduce((a,x)=>a+distKm(s.lon,s.lat,x[1],x[2]),0)/cs.length:350;
+  const oKm=Math.round(2*avg*1.3+30), out=Math.ceil(c.pal/16);
+  const o=ORIGINS[c.src]||ORIGINS.fornitori, iKm=Math.round(2*distKm(s.lon,s.lat,o.lon,o.lat)*1.3+20);
+  const inn=c.mode==='ritiro'?Math.ceil(c.pal/33):0;
+  return {oKm,out,iKm,in:inn,km:out*oKm+inn*iKm};
+}
+function logoSvg(name,sz){
+  const L=LOGO[name]||{bg:'S',ic:[]}, N=16; let r='';
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){ const cx=(x===0||x===N-1), cy=(y===0||y===N-1); if(cx&&cy) continue;
+    const edge=x===0||y===0||x===N-1||y===N-1||((x===1||x===N-2)&&(y===1||y===N-2));
+    r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${edge?'#16202e':TPAL[L.bg]}"/>`; }
+  L.ic.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x+2}" y="${y+2}" width="1" height="1" fill="${TPAL[ch]}"/>`;}));
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="flex:none" role="img" aria-label="Logo ${esc(name)}">${r}</svg>`;
+}
+const zoneName=z=>(ZONES[z]||ZONES.nordovest).n;
+function logInfoHtml(c,w){
+  const t=clientLog(c,w), z=ZONES[c.zone]||ZONES.nordovest, o=ORIGINS[c.src]||ORIGINS.fornitori;
+  return `<table class="t num">
+   <tr><td>Distribuzione</td><td class="r"><b>${esc(z.n)}</b>${z.cities.length>1?` · ${z.cities.length} province`:''}</td></tr>
+   <tr><td></td><td class="r sm">${t.out} viaggi/mese da ${n0(t.oKm)} km (andata e ritorno)</td></tr>
+   <tr><td>Merce in arrivo da</td><td class="r"><b>${esc(o.n)}</b></td></tr>
+   <tr><td></td><td class="r sm">${c.mode==='ritiro'?`<span style="color:var(--accent-d,#c8551f)">la andiamo a prendere noi</span>: ${t.in} viaggi/mese da ${n0(t.iKm)} km`:'la consegna il cliente con i suoi mezzi'}</td></tr></table>`;
+}
+const STATS=[
+ {k:'op',n:'Operazioni',c:'#ff7a3d',bg:'#ffe8d9',d:'Organizzazione di magazzino e trasporti. Alza la Puntualità.'},
+ {k:'prec',n:'Precisione',c:'#2f7fd6',bg:'#dcecfc',d:'Attenzione ai dettagli. Alza l\'Accuratezza.'},
+ {k:'neg',n:'Negoziazione',c:'#e0a800',bg:'#fff4c7',d:'Trattative con clienti e fornitori. Alza le probabilità di vincere le gare.'},
+ {k:'lead',n:'Leadership',c:'#e0393e',bg:'#fde0e0',d:'Guida delle persone. Alza il morale.'},
+ {k:'amm',n:'Amministrazione',c:'#2e9e48',bg:'#dff3d6',d:'Conti, contratti e burocrazia. Evita multe e sprechi.'},
+ {k:'inn',n:'Innovazione',c:'#9b6bff',bg:'#ece3ff',d:'Tecnologia e processi nuovi. Accorcia le ricerche.'}
+];
+function statIcon(k,sz){const rows=STAT_IC[k]||[];let r='';rows.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${TPAL[ch]}"/>`;}));
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true" style="flex:none">${r}</svg>`;}
+function statTip(s,v){return `<div class='tt'>${s.n} ${v!=null?v:''}</div><div>${esc(s.d)}</div><div style='color:#c9d3dd;margin-top:4px'>Media 10 · ottimo da 15 in su</div>`;}
+function statChips(st,sz){sz=sz||16;return `<span class="stats">${STATS.map(s=>`<span class="stc" style="--sc:${s.c};--sb:${s.bg}" role="img" aria-label="${s.n} ${st[s.k]}" data-tip="${statTip(s,st[s.k])}">${statIcon(s.k,sz)}<b>${st[s.k]}</b></span>`).join('')}</span>`;}
+function statBadge(k,v,sz){const s=STATS.find(x=>x.k===k);return `<span class="stc" style="--sc:${s.c};--sb:${s.bg}" data-tip="${statTip(s,v)}">${statIcon(k,sz||14)}${v!=null?`<b>${v}</b>`:''}</span>`;}
 function talentSvg(rows,sz){let r='';rows.forEach((row,y)=>{[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${TPAL[ch]}"/>`;});});return `<svg width="${sz}" height="${sz}" viewBox="-1 -1 10 10" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
 function talentIcons(list,sz){sz=sz||36;return `<span style="display:flex;gap:6px;flex-wrap:wrap">${list.map(n=>{const t=TALENTS[n];if(!t)return '';const ty=TTYPE[t.t];
   const tip=`<div class='tt'>${esc(n)}</div><div style='color:${ty[2]};font-weight:600'>${ty[0]}</div><div>${esc(t.fx)}</div><div style='margin-top:5px;color:#c9d3dd;font-style:italic'>${esc(t.fl)}</div>`;
@@ -356,10 +489,10 @@ function newGame(ceoId,coName,color){
   S={v:1,day:0,speed:0,ceoId,company:{name:coName||C.company,color},cash:C.cash,rep:C.rep,fuel:0.86,
      warehouses:[],clients:[],tenders:[],queue:[],imp:2,managers:MANAGERS.map(m=>({...m,hired:false,wh:null})),
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextTender:12,nextEvent:25,project:null,seen:{},over:false,uid:1,
-     execs:EXECS.map(e=>({...e,hired:false})),dirs:{op:null,comm:null,hr:null,fin:null,tech:null}};
+     execs:EXECS.map(e=>({...e,hired:false})),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false};
   const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={mag:2,aut:1};
   (C.startTech||[]).forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true;});
-  S.clients.push({id:nid('c'),...C.client,wh:wh.id,mult:1,sat:60,status:'attivo',start:0,end:24*30,storico:true});
+  S.clients.push({id:nid('c'),...C.client,zone:cinfo(C.client).zones[0],src:cinfo(C.client).src,mode:cinfo(C.client).mode,wh:wh.id,mult:1,sat:60,status:'attivo',start:0,end:24*30,storico:true});
   news('La Gazzetta del Muletto',`Nasce ${S.company.name}`,`${C.name} apre l'anno con un solo cliente, ${C.client.name}. Con il magazzino quasi vuoto i conti sono in rosso: servono nuovi clienti dalle gare d'appalto.`);
   S.uid=uid;
 }
@@ -371,7 +504,7 @@ function addWarehouse(site,own,fixed,motrici){
 }
 const ceo=()=>CEOS.find(c=>c.id===S.ceoId);
 const whById=id=>S.warehouses.find(w=>w.id===id);
-const clientRev=c=>(c.stock*T_ST+2*c.pal*T_MO+c.pal*T_DI)*c.mult;
+const clientRev=c=>{const w=S&&whById(c.wh); const t=w?clientLog(c,w):{oKm:240,in:0,iKm:0}; return (c.stock*T_ST+2*c.pal*T_MO+c.pal*(18+0.05*t.oKm)+t.in*t.iKm*1.5)*c.mult;};
 function news(src,title,text){S.news.unshift({day:S.day,src,title,text}); if(S.news.length>80)S.news.pop();}
 
 /* ====================== MOTORE ====================== */
@@ -397,14 +530,15 @@ function welfarePts(k){return WELFARE.filter(w=>S.welfare[w.id]).reduce((a,w)=>a
 function modSum(wh,k){return S.mods.filter(m=>m.until>S.day&&(m.scope==='all'||m.scope===wh.id)).reduce((a,m)=>a+(m[k]||0),0);}
 function computeWH(wh,extra){
   const act=S.clients.filter(c=>c.wh===wh.id&&c.status==='attivo'); if(extra) act.push(extra);
-  const stock=act.reduce((a,c)=>a+c.stock,0), cons=act.reduce((a,c)=>a+c.pal,0), mov=2*cons, viaggi=Math.ceil(cons/16);
+  const stock=act.reduce((a,c)=>a+c.stock,0), cons=act.reduce((a,c)=>a+c.pal,0), mov=2*cons;
+  const lg=act.map(c=>clientLog(c,wh)), km=lg.reduce((a,t)=>a+t.km,0), viaggi=lg.reduce((a,t)=>a+t.out+t.in,0);
   const m=mgrStats(wh);
   let tA=0,tP=0,tMor=0,tProd=0,tCan=0; const tparts=[];
   let fuelMul=1;
   TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t); tA+=(t.A||0)*f; tP+=(t.P||0)*f; tMor+=(t.mor||0)*(f>0?1:0); tProd+=(t.prod||0)*(f>0?1:0); if(f>0&&t.fuel) fuelMul*=1-t.fuel; tCan+=t.mese; });
   const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd);
   const uMag=mov===0?0:(wh.staff.mag>0?mov/(wh.staff.mag*prod):9);
-  const uAut=viaggi===0?0:(wh.staff.aut>0?viaggi/(wh.staff.aut*20):9);
+  const uAut=km===0?0:(wh.staff.aut>0?km/(wh.staff.aut*5200):9);
   const cap=capOf(wh); const sat=stock/cap;
   const impShort=Math.max(0,impNeed()-S.imp), impPen=impShort*1.5;
   const mP=modSum(wh,'P'), mA=modSum(wh,'A'), mMor=modSum(wh,'mor');
@@ -421,10 +555,10 @@ function computeWH(wh,extra){
   const morT=clamp(58+0.6*(m.lead-10)+welfarePts('mor')+tMor+mMor+(R('academy')?3:0)+(dHr!=null?0.3*(dHr-10):0)-30*Math.max(0,uMag-1)-20*Math.max(0,uAut-1),0,100);
   const rev=act.reduce((a,c)=>a+clientRev(c),0);
   const pers=(wh.staff.mag*RAL.mag+wh.staff.aut*RAL.aut)*COEF/12;
-  const mezzi=viaggi*240*(0.25*S.fuel*fuelMul+0.08+0.05)+wh.staff.aut*1100+Math.max(0,wh.staff.aut-wh.motrici)*2100;
+  const mezzi=km*(0.25*S.fuel*fuelMul+0.08+0.05)+wh.staff.aut*1100+Math.max(0,wh.staff.aut-wh.motrici)*2100;
   const fissi=(wh.fixed+1000)*fixedMul();
-  return {act,cap,stock,cons,mov,viaggi,uMag,uAut,sat,P,A,pP,pA,morT,rev,pers,mezzi,fissi,tCan,
-    needMag:Math.max(mov?1:0,Math.ceil(mov/prod)),needAut:Math.ceil(viaggi/20),prod,m};
+  return {act,cap,stock,cons,mov,viaggi,km,uMag,uAut,sat,P,A,pP,pA,morT,rev,pers,mezzi,fissi,tCan,
+    needMag:Math.max(mov?1:0,Math.ceil(mov/prod)),needAut:Math.ceil(km/5200),prod,m};
 }
 function globalCosts(){
   const emp=S.warehouses.reduce((a,w)=>a+w.staff.mag+w.staff.aut,0)+S.imp;
@@ -448,6 +582,8 @@ function step(){
     const k=computeWH(w); w.kpi=k;
     w.morale+= (k.morT-w.morale)*0.012;
     w.acc.P+=k.P; w.acc.A+=k.A; w.acc.n++;
+    const wk=w.wk||(w.wk={n:0,P:0,A:0,sat:0,mor:0,mov:0,trips:0,rev:0,cost:0}); wk.n++; wk.P+=k.P; wk.A+=k.A; wk.sat+=k.sat; wk.mor+=w.morale;
+    wk.mov+=k.mov/30; wk.trips+=k.viaggi/30; wk.rev+=k.rev/30; wk.cost+=(k.pers+k.mezzi+k.fissi+k.tCan)/30;
     cur.ric+=k.rev/30; cur.pers+=k.pers/30; cur.mezzi+=k.mezzi/30; cur.fissi+=k.fissi/30; cur.tech+=k.tCan/30;
     dRic+=k.rev/30; dCost+=(k.pers+k.mezzi+k.fissi+k.tCan)/30;
   });
@@ -469,8 +605,18 @@ function step(){
   // fine mese
   const tomorrow=dateOf(d+1);
   S.day++;
+  if(dateOf(S.day).getUTCDay()===1) weekEnd();
   if(tomorrow.getUTCDate()===1) monthEnd();
   if(S.day>=S.nextEvent && !S.over){ S.nextEvent=S.day+Math.round(rnd(30,55)); fireEvent(); }
+}
+function weekEnd(){
+  if(!S.weeks) S.weeks=[]; const rows={}; let any=false;
+  S.warehouses.forEach(w=>{const k=w.wk; if(!k||!k.n) return; any=true;
+    const act=S.clients.filter(c=>c.wh===w.id&&c.status==='attivo'); const sA=act.filter(c=>c.sA).map(c=>c.sA);
+    rows[w.id]={P:k.P/k.n,A:k.A/k.n,sat:k.sat/k.n,mor:k.mor/k.n,mov:Math.round(k.mov),trips:Math.round(k.trips),rev:k.rev,cost:k.cost,
+      sP:act.length?Math.max(...act.map(c=>c.sP)):null,sA:sA.length?Math.max(...sA):null};
+    w.wk=null;});
+  if(!any) return; S.weeks.push({d:S.day,rows}); if(S.weeks.length>26) S.weeks.shift(); S.repNew=true;
 }
 function monthEnd(){
   S.months++;
@@ -501,10 +647,11 @@ function monthEnd(){
   save();
 }
 function newTender(){
-  const tpl=pick(TENDER_POOL.filter(t=>(!(t.req||[]).includes('ecom')||R('ecom'))&&!S.clients.some(c=>c.name===t.name&&c.status!=='perso')&&!S.tenders.some(x=>x.name===t.name&&!x.done)));
+  const tpl=pick(TENDER_POOL.filter(t=>cinfo(t).zones.some(z=>ZONES[z].avail)&&(!(t.req||[]).includes('ecom')||R('ecom'))&&!S.clients.some(c=>c.name===t.name&&c.status!=='perso')&&!S.tenders.some(x=>x.name===t.name&&!x.done)));
   if(!tpl) return;
   const k=rnd(0.75,1.25);
   const t={id:nid('t'),...tpl,stock:Math.round(tpl.stock*k/10)*10,pal:Math.round(tpl.pal*k/10)*10,open:S.day,deadline:S.day+21,bid:null,done:false,result:null};
+  {const ci=cinfo(tpl); t.zone=pick(ci.zones.filter(z=>ZONES[z].avail)); t.src=ci.src; t.mode=ci.mode;}
   S.tenders.push(t);
   toast(`Nuova gara: ${t.name}, scade il ${shortDate(t.deadline)}`,'warn');
   news('Il Sole 24 Pallet',`Gara d'appalto: ${t.name}`,`${n0(t.pal)} pallet al mese, ${n0(t.stock)} posti. Offerte entro il ${shortDate(t.deadline)}.`);
@@ -514,7 +661,7 @@ function bidEstimate(t,whId,mult){
   const extra={...t,wh:w.id,mult,status:'attivo'};
   const k=computeWH(w,extra);
   // stima con il personale che servirebbe
-  const needMag=Math.ceil(k.mov/k.prod), needAut=Math.ceil(k.viaggi/20);
+  const needMag=Math.ceil(k.mov/k.prod), needAut=Math.ceil(k.km/5200);
   const save={...w.staff}; w.staff={mag:Math.max(w.staff.mag,needMag),aut:Math.max(w.staff.aut,needAut)};
   const k2=computeWH(w,extra); w.staff=save;
   const missing=(t.req||[]).filter(r=>!R(r)).map(r=>TECH.find(x=>x.id===r).name);
@@ -531,7 +678,7 @@ function resolveTender(t){
   const e=bidEstimate(t,t.bid.wh,t.bid.mult);
   const win=e&&Math.random()<e.chance;
   if(win){
-    const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,wh:t.bid.wh,mult:t.bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+24*30};
+    const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,zone:t.zone,src:t.src,mode:t.mode,wh:t.bid.wh,mult:t.bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+24*30};
     S.clients.push(c); t.result={win:true};
     toast(`Gara vinta: ${t.name}! Il contratto parte il ${shortDate(c.start)}`,'ok');
     modalInfo('Il Sole 24 Pallet',`Gara vinta: ${t.name}`,`Il contratto parte il ${shortDate(c.start)} a ${whById(c.wh).name}. Servono circa ${e.needMag} magazzinieri e ${e.needAut} autisti in quel magazzino: assumi adesso, perché un autista arriva in 2–5 settimane.`);
@@ -733,7 +880,7 @@ function modalInfo(src,title,text){
 }
 
 /* ====================== SALVATAGGIO ====================== */
-const KEY='fup-salvataggio-v2';
+const KEY='fup-salvataggio-v3';
 function save(){try{localStorage.setItem(KEY,JSON.stringify({S,uid}));}catch(e){}}
 function load(){try{const r=localStorage.getItem(KEY);if(!r)return null;return JSON.parse(r);}catch(e){return null;}}
 
@@ -763,6 +910,16 @@ function renderMap(){
   // siti di espansione
   Object.entries(SITES).forEach(([id,s])=>{ if(S.warehouses.some(w=>w.site===id)) return; const [x,y]=pt(s.lon,s.lat);
     g.push(`<g class="mk" data-act="site" data-id="${id}" data-tip="<div class='tt'>${esc(s.name)} (${s.prov})</div>Magazzino in affitto: ${n0(s.cap)} posti pallet, ${eur(s.rent)} al mese. Clic per i dettagli."><rect class="mk-ring" x="${x-9}" y="${y-9}" width="18" height="18" fill="none" stroke="#16202e" stroke-width="2" stroke-dasharray="3 2"/><rect x="${x-5}" y="${y-5}" width="10" height="10" fill="#ffffff" fill-opacity=".6"/></g>`);});
+  // contratto evidenziato: zona di distribuzione e provenienza della merce
+  const mc=UI.mapCli&&S.clients.find(c=>c.id===UI.mapCli&&c.status!=='perso');
+  if(mc){ const w=whById(mc.wh), s=SITES[w.site], [wx,wy]=pt(s.lon,s.lat), col=TPAL[(LOGO[mc.name]||{bg:'O'}).bg], z=ZONES[mc.zone]||ZONES.nordovest;
+    z.cities.forEach(n=>{const c=CITIES.find(x=>x[0]===n); const [x,y]=pt(c[1],c[2]);
+      g.push(`<line x1="${wx}" y1="${wy}" x2="${x}" y2="${y}" stroke="#16202e" stroke-width="5" opacity=".5"/><line x1="${wx}" y1="${wy}" x2="${x}" y2="${y}" stroke="${col}" stroke-width="3" stroke-dasharray="8 5"/><rect x="${x-9}" y="${y-9}" width="18" height="18" fill="none" stroke="${col}" stroke-width="3"/>`);});
+    const o=ORIGINS[mc.src]||ORIGINS.fornitori; let [ox,oy]=pt(o.lon,o.lat); let off=false;
+    if(ox<20||ox>1260||oy<20||oy>780){off=true; const dx=ox-wx,dy=oy-wy; const t=Math.min(dx>0?(1240-wx)/dx:dx<0?(40-wx)/dx:1e9, dy>0?(740-wy)/dy:dy<0?(40-wy)/dy:1e9); ox=wx+dx*t; oy=wy+dy*t;}
+    g.push(`<line x1="${ox}" y1="${oy}" x2="${wx}" y2="${wy}" stroke="#16202e" stroke-width="7" opacity=".5"/><line x1="${ox}" y1="${oy}" x2="${wx}" y2="${wy}" stroke="${mc.mode==='ritiro'?'#ff7a3d':'#ffffff'}" stroke-width="4"/>`);
+    g.push(`<g transform="translate(${Math.round(ox-12)},${Math.round(oy-12)})">${logoSvg(mc.name,24)}</g><text class="lbl" x="${ox+(ox>700?-16:16)}" y="${oy+(oy<60?28:-16)}" font-size="14" text-anchor="${ox>700?'end':'start'}">${off?'↗ ':''}${esc(o.n)} · ${mc.mode==='ritiro'?'ritiro nostro':'consegna il cliente'}</text>`);
+  }
   // magazzini del giocatore
   S.warehouses.forEach(w=>{const s=SITES[w.site];const [x,y]=pt(s.lon,s.lat);
     g.push(`<g class="mk" data-act="openwh" data-id="${w.id}" data-tip="<div class='tt'>${esc(w.name)}</div>Clic per aprire il magazzino"><rect x="${x-15}" y="${y-13}" width="34" height="26" fill="#0c131d" opacity=".4"/><rect class="mk-ring" x="${x-17}" y="${y-16}" width="34" height="26" fill="#16202e" stroke="#16202e" stroke-width="2"/><rect x="${x-15}" y="${y-8}" width="30" height="16" style="fill:var(--accent)"/><rect x="${x-15}" y="${y-8}" width="30" height="3" style="fill:var(--accent-l)"/><rect x="${x-6}" y="${y-3}" width="12" height="11" fill="#fff"/><rect x="${x-6}" y="${y+1}" width="12" height="1" fill="#9fb0c2"/><rect x="${x-13}" y="${y-14}" width="4" height="2" fill="#ffd23f"/></g>`);
@@ -804,17 +961,18 @@ const DOCK=[
  ['gare','Gare d\'appalto','<svg width="18" height="22" viewBox="0 0 8 10" shape-rendering="crispEdges"><rect x="0" y="0" width="8" height="10" fill="#fff"/><rect x="1" y="2" width="6" height="1" fill="#16202e"/><rect x="1" y="4" width="6" height="1" fill="#16202e"/><rect x="1" y="6" width="4" height="1" fill="#16202e"/></svg>'],
  ['personale','Personale e manager','<svg width="26" height="22" viewBox="0 0 13 11" shape-rendering="crispEdges"><rect x="1" y="0" width="4" height="4" fill="#f2c79b"/><rect x="0" y="5" width="6" height="6" fill="#5fb4f0"/><rect x="8" y="0" width="4" height="4" fill="#c98762"/><rect x="7" y="5" width="6" height="6" fill="#8ed15b"/></svg>'],
  ['direzione','Direzione','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="4" y="0" width="4" height="3" fill="#ffd23f"/><rect x="5" y="3" width="2" height="2" fill="#d8e3ee"/><rect x="1" y="5" width="10" height="1" fill="#d8e3ee"/><rect x="1" y="6" width="1" height="2" fill="#d8e3ee"/><rect x="10" y="6" width="1" height="2" fill="#d8e3ee"/><rect x="5" y="6" width="2" height="2" fill="#d8e3ee"/><rect x="0" y="8" width="3" height="3" fill="#5fb4f0"/><rect x="4" y="8" width="4" height="3" fill="#ff7a3d"/><rect x="9" y="8" width="3" height="3" fill="#8ed15b"/></svg>'],
+ ['report','Report KPI','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="0" y="0" width="11" height="11" fill="#fff"/><rect x="0" y="0" width="11" height="2" fill="#2e9e48"/><rect x="0" y="0" width="2" height="11" fill="#c3d0dc"/><rect x="2" y="4" width="9" height="1" fill="#c3d0dc"/><rect x="2" y="7" width="9" height="1" fill="#c3d0dc"/><rect x="5" y="2" width="1" height="9" fill="#c3d0dc"/><rect x="8" y="2" width="1" height="9" fill="#c3d0dc"/><rect x="3" y="8" width="1" height="2" fill="#2e9e48"/><rect x="6" y="6" width="1" height="4" fill="#ff7a3d"/><rect x="9" y="5" width="1" height="5" fill="#5fb4f0"/></svg>'],
  ['tecnologia','Tecnologia','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="4" y="0" width="3" height="11" fill="#c3d0dc"/><rect x="0" y="4" width="11" height="3" fill="#c3d0dc"/><rect x="2" y="2" width="7" height="7" fill="#c3d0dc"/><rect x="4" y="4" width="3" height="3" fill="#2a3a50"/></svg>'],
  ['espansione','Espansione','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="0" y="4" width="7" height="7" fill="#d8e3ee"/><rect x="0" y="2" width="7" height="2" fill="#8a96a6"/><rect x="8" y="0" width="1" height="5" fill="#ffd23f"/><rect x="6" y="2" width="5" height="1" fill="#ffd23f"/></svg>'],
  ['giornale','Il giornale','<svg width="24" height="20" viewBox="0 0 12 10" shape-rendering="crispEdges"><rect x="0" y="0" width="12" height="10" fill="#f4f1ec"/><rect x="1" y="1" width="10" height="2" fill="#16202e"/><rect x="1" y="4" width="4" height="4" fill="#8a96a6"/><rect x="6" y="4" width="5" height="1" fill="#16202e"/><rect x="6" y="6" width="5" height="1" fill="#16202e"/></svg>']
 ];
-const TITLES={azienda:'Azienda e CEO',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',personale:'Personale e manager',tecnologia:'Tecnologia',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale'};
+const TITLES={azienda:'Azienda e CEO',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale'};
 function renderDock(){
   const openT=S.tenders.filter(t=>!t.done&&!t.bid).length;
   const short=S.warehouses.filter(w=>w.kpi&&(w.staff.mag<w.kpi.needMag||w.staff.aut<w.kpi.needAut)).length;
   const impS=S.imp<impNeed()?1:0;
   const B={gare:openT,magazzini:short,personale:impS};
-  $('#dock').innerHTML=DOCK.map(([id,t,ic])=>`<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${id==='magazzini'&&short?'Personale insufficiente in un magazzino':id==='personale'&&impS?'Servono altri impiegati in ufficio':id==='tecnologia'&&S.project?'Ricerca in corso: '+S.project.left+' giorni':id==='direzione'&&!R('direzione')?'Si sblocca con la ricerca Struttura direzionale':''}">${ic}${B[id]?`<span class="badge">${id==='gare'?B[id]:'!'}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}${id==='direzione'&&R('direzione')&&Object.values(S.dirs).some(v=>!v)?'<span class="badge">!</span>':''}</button>`).join('');
+  $('#dock').innerHTML=DOCK.map(([id,t,ic])=>`<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${id==='magazzini'&&short?'Personale insufficiente in un magazzino':id==='personale'&&impS?'Servono altri impiegati in ufficio':id==='tecnologia'&&S.project?'Ricerca in corso: '+S.project.left+' giorni':id==='direzione'&&!R('direzione')?'Si sblocca con la ricerca Struttura direzionale':''}">${ic}${B[id]?`<span class="badge">${id==='gare'?B[id]:'!'}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}${id==='report'&&S.repNew?'<span class="badge">1</span>':''}${id==='direzione'&&R('direzione')&&Object.values(S.dirs).some(v=>!v)?'<span class="badge">!</span>':''}</button>`).join('');
 }
 function renderTop(){
   $('#date').textContent=fmtDate(S.day);
@@ -834,7 +992,7 @@ function openWin(id,opts){
   UI.open[id]=true; if(opts) Object.assign(UI.sel,opts);
   let el=document.getElementById('win-'+id);
   if(!el){
-    el=document.createElement('section'); el.className='win'+(id==='tecnologia'?' xwide':['magazzini','gare','azienda','direzione'].includes(id)?' wide':''); el.id='win-'+id;
+    el=document.createElement('section'); el.className='win'+(id==='tecnologia'||id==='report'?' xwide':['magazzini','gare','azienda','direzione'].includes(id)?' wide':''); el.id='win-'+id;
     el.setAttribute('aria-label',TITLES[id]);
     const i=Object.keys(UI.pos).length; const p=UI.pos[id]||{x:Math.min(innerWidth-420,90+((i*36)%240)),y:86+((i*30)%180)};
     if(id==='magazzini'||id==='gare'){p.x=Math.max(90,innerWidth-680);} if(id==='tecnologia'){p.x=90;}
@@ -871,7 +1029,7 @@ const VIEWS={
      <div class="sm" style="color:var(--ink)">${esc(C.bio)}</div>
      ${talentIcons(C.tal,36)}
    </div></div>
-   <div class="skills">${sk.map(([n,k])=>`<div class="skill">${n}<b class="${C.st[k]>=15?'ok':C.st[k]<=5?'bad':''}">${C.st[k]}</b></div>`).join('')}</div>
+   <div class="skills">${STATS.map(s=>`<div class="skill" style="display:flex;align-items:center;gap:8px;border-color:${s.c};background:${s.bg}" data-tip="${statTip(s,C.st[s.k])}">${statIcon(s.k,24)}<span style="flex:1">${s.n}</span><b style="font-size:18px" class="${C.st[s.k]>=15?'ok':C.st[s.k]<=5?'bad':''}">${C.st[s.k]}</b></div>`).join('')}</div>
    <div class="card"><div class="row"><span class="h3">Conto economico del mese scorso</span></div>
    ${L?`<table class="t num">${pl.map(([n,v])=>`<tr><td>${n}</td><td class="r ${v<0?'bad':''}">${eur(v)}</td></tr>`).join('')}<tr><th>Utile</th><th class="r ${L.util>=0?'ok':'bad'}" style="font-size:14px">${eur(L.util)}</th></tr></table>`:'<div class="sm">Disponibile dalla fine del primo mese.</div>'}</div>
    <div class="card"><div class="row"><span class="h3">Welfare</span><span class="sm">costo per dipendente al mese</span></div>
@@ -910,8 +1068,11 @@ const VIEWS={
    const P=k.P,A=k.A;const cP=kpiCls(P,c.sP),cA=c.sA?kpiCls(A,c.sA):'ok';const bad=c.status==='attivo'&&(cP==='bad'||cA==='bad');
    const mesi=Math.max(0,Math.round((c.end-S.day)/30));
    return `<div class="card ${bad?'bad':c.status==='avvio'?'pend':''}">
-    <div class="row"><b>${esc(c.name)}</b><span class="sm">${esc(w.name)}</span></div>
-    <div class="sm">"${esc(c.slogan)}" · ${esc(c.sector)}</div>
+    <div style="display:flex;gap:10px;align-items:center">${logoSvg(c.name,48)}<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+     <div class="row"><b>${esc(c.name)}</b><span class="sm">${esc(w.name)}</span></div>
+     <div class="sm">"${esc(c.slogan)}" · ${esc(c.sector)}</div></div></div>
+    ${logInfoHtml(c,w)}
+    <div><button class="btn sm2" data-act="mapcli" data-id="${c.id}" aria-pressed="${UI.mapCli===c.id}">${UI.mapCli===c.id?'Nascondi dalla mappa':'Mostra sulla mappa'}</button></div>
     ${c.status==='avvio'?`<div class="sm">Il contratto parte il <b>${shortDate(c.start)}</b>.</div>`:`
     <table class="t num"><tr><th>KPI</th><th class="r">Oggi</th><th class="r">Richiesto</th></tr>
      <tr><td>Puntualità</td><td class="r ${cP}">${f1(P)}%</td><td class="r">≥ ${f1(c.sP)}%</td></tr>
@@ -929,8 +1090,10 @@ const VIEWS={
     if(UI.bid.t!==sel.id) UI.bid={t:sel.id,wh:sel.bid?sel.bid.wh:S.warehouses[0].id,mult:sel.bid?sel.bid.mult:1};
     const e=bidEstimate(sel,UI.bid.wh,UI.bid.mult);
     detail=`<div class="card pend">
+     <div style="display:flex;gap:10px;align-items:center">${logoSvg(sel.name,48)}<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
      <div class="row"><span class="h3">${esc(sel.name)}</span><span class="pill" style="background:var(--yellow)">scade il ${shortDate(sel.deadline)}</span></div>
-     <div class="sm">"${esc(sel.slogan)}" · ${esc(sel.sector)}</div>
+     <div class="sm">"${esc(sel.slogan)}" · ${esc(sel.sector)}</div></div></div>
+     ${logInfoHtml(sel,whById(UI.bid.wh))}
      <table class="t num"><tr><td>Volume</td><td class="r">${n0(sel.pal)} pallet/mese · ${n0(sel.stock)} posti</td></tr>
       <tr><td>Puntualità richiesta</td><td class="r">≥ ${f1(sel.sP)}%</td></tr><tr><td>Accuratezza richiesta</td><td class="r">${sel.sA?'≥ '+f1(sel.sA)+'%':'non richiesta'}</td></tr>
       <tr><td>Avvio</td><td class="r">30 giorni dopo l'aggiudicazione · 24 mesi</td></tr></table>
@@ -954,7 +1117,7 @@ const VIEWS={
    <div class="sm">Tempi più brevi con welfare e reputazione alti. Gli autisti sono i più difficili da trovare.</div></div>
    <div class="lab">Manager disponibili</div>
    ${S.managers.map(m=>`<div class="card" style="flex-direction:row;gap:12px;align-items:flex-start"><img class="px mport" src="${IMG['m_'+m.id]}" alt="Ritratto di ${esc(m.name)}" width="96" height="112"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px"><div class="row"><b>${esc(m.name)}, ${m.age}</b><span class="sm">${m.hired?(seatOf(m.id)?esc(DIR_ROLES.find(r=>r.id===seatOf(m.id)).name):m.wh?'a '+esc(whById(m.wh).name):'senza incarico'):eur(m.ral)+' l\'anno'}</span></div>
-     <div class="sm">${esc(m.role)}</div><div class="sm num">Op ${m.st.op} · Prec ${m.st.prec} · Neg ${m.st.neg} · Lead ${m.st.lead} · Amm ${m.st.amm} · Inn ${m.st.inn}</div>${talentIcons(m.tal||[],28)}
+     <div class="sm">${esc(m.role)}</div><div>${statChips(m.st,14)}</div>${talentIcons(m.tal||[],28)}
      <div>${m.hired?`<button class="btn sm2" data-act="firemgr" data-id="${m.id}">Licenzia (${eur(m.ral/12*COEF)})</button>`:`<button class="btn sm2 pri" data-act="hiremgr" data-id="${m.id}">Assumi</button>`}</div></div></div>`).join('')}`;
  },
  tecnologia(){
@@ -993,14 +1156,58 @@ const VIEWS={
   const seats=DIR_ROLES.map(r=>{const p=personById(S.dirs[r.id]);const v=p?p.st[r.stat]:null;
     const opts=pool.filter(x=>!seatOf(x.id)||S.dirs[r.id]===x.id).map(x=>`<option value="${x.id}" ${S.dirs[r.id]===x.id?'selected':''}>${esc(x.name)} (${r.statN} ${x.st[r.stat]})</option>`).join('');
     return `<div class="card" style="flex-direction:row;gap:10px;align-items:center"><img class="px mini" src="${p?IMG['m_'+p.id]:IMG.imp}" alt="" width="48" height="56" style="${p?'':'opacity:.3'}">
-      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><div class="row"><b>${r.name}</b><span class="sm">${r.statN}</span></div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><div class="row"><b>${r.name}</b>${statBadge(r.stat,v,14)}</div>
       <div class="sm ${p?(v>=10?'ok':'bad'):''}">${p?r.eff(v):'Posto vacante'}</div>
       <select data-act="setdir" data-role="${r.id}" aria-label="${r.name}"><option value="">Vacante</option>${opts}</select></div></div>`;}).join('');
   const cand=S.execs.map(e=>`<div class="card" style="flex-direction:row;gap:12px;align-items:flex-start"><img class="px mport" src="${IMG['m_'+e.id]}" alt="Ritratto di ${esc(e.name)}" width="96" height="112"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
      <div class="row"><b>${esc(e.name)}, ${e.age}</b><span class="sm">${eur(e.ral)} l'anno</span></div><div class="sm">${esc(e.role)}</div>
-     <div class="sm num">Op ${e.st.op} · Prec ${e.st.prec} · Neg ${e.st.neg} · Lead ${e.st.lead} · Amm ${e.st.amm} · Inn ${e.st.inn}</div>${talentIcons(e.tal,28)}
+     <div>${statChips(e.st,14)}</div>${talentIcons(e.tal,28)}
      <div>${e.hired?(seatOf(e.id)?`<span class="sm ok">${DIR_ROLES.find(r=>r.id===seatOf(e.id)).name}</span>`:`<button class="btn sm2" data-act="fireexec" data-id="${e.id}">Licenzia</button>`):`<button class="btn sm2 pri" data-act="hireexec" data-id="${e.id}">Assumi tramite head hunter · ${eur(15000)}</button>`}</div></div></div>`).join('');
   return `<div class="sm">I direttori guidano tutta l'azienda con la loro abilità principale. Puoi nominare manager già assunti e non assegnati a un magazzino, oppure dirigenti esterni.</div>${seats}<div class="lab">Dirigenti sul mercato</div>${cand}`;
+ },
+ report(){
+  S.repNew=false;
+  const sheets=[['sum','Riepilogo'],...S.warehouses.map(w=>[w.id,w.name])];
+  const sh=sheets.find(x=>x[0]===UI.sel.sheet)?UI.sel.sheet:'sum';
+  const W=S.weeks||[]; const COLS='ABCDEFGHIJKL';
+  const wkLabel=d=>{const a=dateOf(d-7),b=dateOf(d-1);return `${a.getUTCDate()}/${a.getUTCMonth()+1}–${b.getUTCDate()}/${b.getUTCMonth()+1}`;};
+  const cellSel=UI.sel.cell||'A1';
+  let head=[], rows=[], fx={};
+  const td=(ref,v,cls,f,al)=>{fx[ref]=f||v;return `<td data-act="cell" data-ref="${ref}" class="${cls||''}${ref===cellSel?' sel':''}" style="${al?'text-align:left':''}">${v}</td>`;};
+  const pct=v=>v==null?'':f1(v)+'%';
+  if(sh==='sum'){
+    head=['Magazzino','Puntualità','Δ','Accuratezza','Δ','Saturazione','Morale','Margine sett.','Andamento P (8 sett.)'];
+    S.warehouses.forEach((w,i)=>{const r=i+2; const hist=W.map(x=>x.rows[w.id]).filter(Boolean); const L=hist[hist.length-1], Pv=hist[hist.length-2];
+      if(!L){rows.push(`<tr><th>${r}</th>${td('A'+r,esc(w.name),'',w.name,1)}${head.slice(1).map((_,j)=>td(COLS[j+1]+r,'','')).join('')}</tr>`);return;}
+      const dP=Pv?L.P-Pv.P:0,dA=Pv?L.A-Pv.A:0, ar=v=>v>0.05?`<span class="ok">▲ ${f1(v)}</span>`:v<-0.05?`<span class="bad">▼ ${f1(-v)}</span>`:'<span class="sm">=</span>';
+      const sp=hist.slice(-8).map(h=>`<i style="height:${Math.max(2,Math.round((h.P-85)/15*18))}px;background:${kpiCls(h.P,h.sP)==='ok'?'#2e9e48':kpiCls(h.P,h.sP)==='warn'?'#e0a800':'#e0393e'}"></i>`).join('');
+      rows.push(`<tr><th>${r}</th>${td('A'+r,esc(w.name),'',w.name,1)}${td('B'+r,pct(L.P),kpiCls(L.P,L.sP),`='${w.name}'!B${hist.length+1}`)}${td('C'+r,ar(dP),'',`='${w.name}'!B${hist.length+1}-'${w.name}'!B${hist.length}`)}${td('D'+r,pct(L.A),kpiCls(L.A,L.sA),`='${w.name}'!C${hist.length+1}`)}${td('E'+r,ar(dA),'',`='${w.name}'!C${hist.length+1}-'${w.name}'!C${hist.length}`)}${td('F'+r,pct(L.sat*100),L.sat>0.95?'bad':L.sat>0.85?'warn':'',`='${w.name}'!D${hist.length+1}`)}${td('G'+r,Math.round(L.mor),L.mor<45?'bad':L.mor<55?'warn':'',`='${w.name}'!E${hist.length+1}`)}${td('H'+r,eur(L.rev-L.cost),L.rev-L.cost<0?'bad':'ok',`='${w.name}'!J${hist.length+1}`)}${td('I'+r,`<span class="spark">${sp}</span>`,'',`=SPARKLINE('${w.name}'!B2:B${hist.length+1})`)}</tr>`);});
+    const n=S.warehouses.length+2, last=W[W.length-1];
+    if(last){const ws=S.warehouses.map(w=>last.rows[w.id]).filter(Boolean); const m=k=>ws.reduce((a,x)=>a+x[k],0)/ws.length;
+      rows.push(`<tr class="tot"><th>${n}</th>${td('A'+n,'Totale azienda','','Totale azienda',1)}${td('B'+n,pct(m('P')),'',`=MEDIA(B2:B${n-1})`)}${td('C'+n,'','')}${td('D'+n,pct(m('A')),'',`=MEDIA(D2:D${n-1})`)}${td('E'+n,'','')}${td('F'+n,pct(m('sat')*100),'',`=MEDIA(F2:F${n-1})`)}${td('G'+n,Math.round(m('mor')),'',`=MEDIA(G2:G${n-1})`)}${td('H'+n,eur(ws.reduce((a,x)=>a+x.rev-x.cost,0)),'',`=SOMMA(H2:H${n-1})`)}${td('I'+n,'','')}</tr>`);}
+  } else {
+    const w=whById(sh);
+    head=['Settimana','Puntualità','Accuratezza','Saturazione','Morale','Pallet mov.','Viaggi','Ricavi','Costi','Margine'];
+    const hist=W.map(x=>({d:x.d,...x.rows[w.id]})).filter(x=>x.P!=null).slice(-12);
+    hist.forEach((h,i)=>{const r=i+2;
+      rows.push(`<tr><th>${r}</th>${td('A'+r,wkLabel(h.d),'',wkLabel(h.d),1)}${td('B'+r,pct(h.P),kpiCls(h.P,h.sP),`=MEDIA(Puntualità giornaliera; 7 giorni) → soglia più severa ${h.sP?f1(h.sP)+'%':'—'}`)}${td('C'+r,pct(h.A),kpiCls(h.A,h.sA),`=MEDIA(Accuratezza giornaliera; 7 giorni) → soglia più severa ${h.sA?f1(h.sA)+'%':'—'}`)}${td('D'+r,pct(h.sat*100),h.sat>0.95?'bad':h.sat>0.85?'warn':'','=posti occupati / posti disponibili')}${td('E'+r,Math.round(h.mor),h.mor<45?'bad':h.mor<55?'warn':'','=MEDIA(morale; 7 giorni)')}${td('F'+r,n0(h.mov),'','=pallet in entrata + in uscita')}${td('G'+r,n0(h.trips),'','=viaggi di distribuzione + viaggi di ritiro')}${td('H'+r,eur(h.rev),'','=SOMMA(ricavi giornalieri)')}${td('I'+r,eur(h.cost),'','=personale + mezzi + immobile + tecnologie')}${td('J'+r,eur(h.rev-h.cost),h.rev-h.cost<0?'bad':'ok',`=H${r}-I${r}`)}</tr>`);});
+    if(hist.length){const n=hist.length+2,m=k=>hist.reduce((a,x)=>a+x[k],0)/hist.length,s=k=>hist.reduce((a,x)=>a+x[k],0);
+      rows.push(`<tr class="tot"><th>${n}</th>${td('A'+n,'Media / Totale','','Media / Totale',1)}${td('B'+n,pct(m('P')),'',`=MEDIA(B2:B${n-1})`)}${td('C'+n,pct(m('A')),'',`=MEDIA(C2:C${n-1})`)}${td('D'+n,pct(m('sat')*100),'',`=MEDIA(D2:D${n-1})`)}${td('E'+n,Math.round(m('mor')),'',`=MEDIA(E2:E${n-1})`)}${td('F'+n,n0(s('mov')),'',`=SOMMA(F2:F${n-1})`)}${td('G'+n,n0(s('trips')),'',`=SOMMA(G2:G${n-1})`)}${td('H'+n,eur(s('rev')),'',`=SOMMA(H2:H${n-1})`)}${td('I'+n,eur(s('cost')),'',`=SOMMA(I2:I${n-1})`)}${td('J'+n,eur(s('rev')-s('cost')),s('rev')-s('cost')<0?'bad':'ok',`=SOMMA(J2:J${n-1})`)}</tr>`);}
+  }
+  const minRows=Math.max(0,8-rows.length);
+  for(let i=0;i<minRows;i++){const r=rows.length+2;rows.push(`<tr><th>${r}</th>${head.map((_,j)=>td(COLS[j]+r,'','')).join('')}</tr>`);}
+  const f=fx[cellSel]!=null?String(fx[cellSel]).replace(/<[^>]+>/g,''):'';
+  const fname=`Report_KPI_${S.company.name.replace(/\W+/g,'_')}.xlsx`;
+  return `<div class="xl">
+   <div class="xl-top"><span class="xl-file">${statIcon('amm',14)} ${esc(fname)}</span><span class="sm">${W.length?`aggiornato lunedì ${shortDate(W[W.length-1].d)}`:'il primo report arriva lunedì'}</span></div>
+   <div class="xl-menu"><span>File</span><span class="on">Home</span><span>Inserisci</span><span>Formule</span><span>Dati</span><span>Revisione</span></div>
+   <div class="xl-fx"><span class="xl-ref">${cellSel}</span><span class="xl-fxl">fx</span><span class="xl-f">${esc(f)}</span></div>
+   <div class="xl-grid"><table><thead><tr><th class="xl-corner"></th>${head.map((_,j)=>`<th>${COLS[j]}</th>`).join('')}</tr>
+    <tr class="xl-h"><th>1</th>${head.map((h,j)=>td(COLS[j]+'1',h,'',h,j===0)).join('')}</tr></thead>
+    <tbody>${rows.join('')}</tbody></table></div>
+   <div class="xl-tabs">${sheets.map(([id,n])=>`<button data-act="sheet" data-id="${id}" aria-pressed="${id===sh}">${esc(n)}</button>`).join('')}<span class="xl-plus">+</span></div>
+  </div>
+  <div class="sm">Ogni lunedì arriva il report della settimana appena chiusa. Verde: sopra la soglia più severa tra i clienti del magazzino; giallo: entro 2 punti; rosso: sotto. Clicca una cella per vedere come è calcolata.</div>`;
  },
  espansione(){
   const free=Object.entries(SITES).filter(([id])=>!S.warehouses.some(w=>w.site===id));
@@ -1058,6 +1265,9 @@ const ACT={
  },
  hiremgr(d){const m=S.managers.find(x=>x.id===d.id);m.hired=true;toast(`${m.name} entra in azienda: assegnalo a un magazzino o alla direzione`,'ok');const w=S.warehouses.find(w=>!w.mgr);if(w){w.mgr=m.id;m.wh=w.id;}renderAll();},
  firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});m.hired=false;m.wh=null;renderAll();},
+ sheet(d){UI.sel.sheet=d.id;UI.sel.cell='A1';renderWin('report');},
+ cell(d){UI.sel.cell=d.ref;renderWin('report');},
+ mapcli(d){UI.mapCli=UI.mapCli===d.id?null:d.id;renderMap();syncTrucks();renderAll();},
  seltree(d){UI.sel.tree=d.id;UI.sel.tech=null;renderWin('tecnologia');},
  seltech(d){UI.sel.tech=d.id;renderWin('tecnologia');},
  opentech(d){UI.sel.tree=d.tree;UI.sel.tech=d.id;openWin('tecnologia');},
@@ -1124,9 +1334,9 @@ function showStart(){
     <div class="portrait" style="height:150px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden"><img class="px" src="${IMG[c.id]}" alt="Ritratto di ${esc(c.name)}" width="128" height="150"></div>
     <b class="disp" style="font-size:18px">${esc(c.name)}</b><span class="sm">${c.age} anni · ${esc(c.origin)}</span>
     <span class="sm" style="color:var(--ink)">${esc(s.name)} (${s.prov}) · ${n0(s.cap)} posti · ${eur(c.cash)}</span>
-    <span class="sm num">Op ${c.st.op} · Prec ${c.st.prec} · Neg ${c.st.neg} · Lead ${c.st.lead} · Amm ${c.st.amm} · Inn ${c.st.inn}</span>
+    <span>${statChips(c.st,14)}</span>
     ${talentIcons(c.tal,32)}
-    <span class="sm">Cliente storico: ${esc(c.client.name)}</span></button>`;}).join('');
+    <span class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,24)} Cliente storico: ${esc(c.client.name)}</span></button>`;}).join('');
   const C=CEOS.find(c=>c.id===startSel.ceo);
   $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP</span><span>Nord-Ovest, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
    <div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
@@ -1165,6 +1375,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else showStart(); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon};
+window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd};
 })();
 </script>

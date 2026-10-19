@@ -15,16 +15,26 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Le abilità usate sono quelle del manager del magazzino; senza manager le prestazioni calano.
 
 ## Economia (mensile)
-- Ricavo per cliente = (posti pallet·5,5 + 2·pallet movimentati·3,8 + pallet·30) × moltiplicatore dell'offerta.
+- Ricavo per cliente = (posti pallet·5,5 + 2·pallet movimentati·3,8 + pallet·(18 + 0,05·km di un viaggio di distribuzione) + viaggi di ritiro·km del ritiro·1,5) × moltiplicatore dell'offerta.
 - Personale: RAL magazzinieri 18.500, autisti 20.000, impiegati 22.000, × 1,42 di oneri, ÷ 12.
-- Mezzi: viaggi = ceil(pallet/16), 240 km a viaggio, (0,25 l/km × gasolio × riduzione rotte + 0,13) €/km, più 1.100 € per autista e 2.100 € di leasing per ogni autista oltre le motrici di proprietà.
+- Mezzi: km del mese × (0,25 l/km × gasolio × riduzione rotte + 0,13) €/km, più 1.100 € per autista e 2.100 € di leasing per ogni autista oltre le motrici di proprietà.
+- Ogni autista copre 5.200 km al mese: autisti necessari = km del mese / 5.200. Se gli autisti sono troppo pochi, la Puntualità cala.
 - Immobile: costo fisso + 1.000, × moltiplicatore costi fissi (gestionale −3%, controllo di gestione −4%, direttore finanziario −0,5% per punto di Amministrazione sopra 10).
 - CEO 4.000 €/mese; manager e dirigenti a RAL × 1,42.
 - Gasolio: 0,86 €/l nel 2002, +0,05 l'anno, con oscillazioni.
 
-## Clienti
+## Clienti e contratti
+- Ogni cliente ha un **logo** in pixel art 16×16 (`LOGO`).
+- **Zona di distribuzione** (`ZONES`): può essere una provincia, una regione (Piemonte, Lombardia, Liguria), tutto il Nord-Ovest o il Nord Italia (che comprende anche Piacenza e Verona). "Tutta Italia" esiste già ma è bloccata finché la mappa non si allarga: i clienti che la richiedono (Spedizioni Tricolore) non partecipano alle gare. La zona viene scelta a ogni gara tra quelle possibili per quel cliente (`CINFO.zones`); il cliente iniziale usa la prima.
+- Viaggi di distribuzione = ceil(pallet/16). Km di un viaggio = 2 × distanza media tra il magazzino e i capoluoghi della zona × 1,3 + 30.
+- **Approvvigionamento** (`CINFO.src`, `ORIGINS`): da dove arriva la merce. Con `ritiro` andiamo noi a prenderla: ceil(pallet/33) viaggi a pieno carico, ciascuno di 2 × distanza × 1,3 + 20 km. Così servono più autisti e più gasolio, ma c'è anche più fatturato. Con `consegna` la merce la porta il cliente e per noi non ci sono costi.
+- Sulla mappa, "Mostra sulla mappa" dalla finestra Clienti disegna le linee verso la zona e la linea di arrivo della merce (arancione se il ritiro è nostro, bianca se consegna il cliente).
 - Soddisfazione a fine mese: se entrambi i KPI sono sopra soglia +3 (+1 con EDI, +1 con KAM); entro 2 punti sotto la soglia −4; più sotto −10 e penale del 5%. Sotto 25 il cliente se ne va.
 - Rinnovo a 24 mesi se la soddisfazione è ≥ 50 (≥ 40 con KAM).
+
+## Report KPI settimanale
+- Ogni lunedì si chiude la settimana: per ogni magazzino si salvano le medie di Puntualità, Accuratezza, saturazione e morale, insieme ai pallet movimentati, ai viaggi, ai ricavi e ai costi (vengono conservate le ultime 26 settimane in `S.weeks`).
+- La finestra "Report KPI" imita un foglio Excel: un foglio di riepilogo, un foglio per ogni magazzino, la barra della formula che spiega la cella selezionata e i colori condizionali. Verde = sopra la soglia più severa tra i clienti del magazzino, giallo = entro 2 punti, rosso = sotto.
 
 ## Gare (tender)
 - Arriva una gara ogni 28-46 giorni (20-35 con l'Ufficio commerciale). Alcune richiedono tecnologie: catena del freddo, EDI, e-commerce.
@@ -34,6 +44,9 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Giorni per assumere = base × clamp(1 + (55 − attrattività)/40; 0,6; 1,8) × (Ufficio del personale 0,8) × (1 − 0,02·(Leadership del direttore HR − 10)).
 - Attrattività = 40 + welfare + (reputazione−50)·0,5 + 5.
 - Impiegati necessari = 2 + 1 ogni 1.500 pallet movimentati (2.000 con il gestionale) + 1 per ogni magazzino oltre il primo.
+
+## Abilità dei personaggi
+Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Operazioni = ingranaggio arancione, Precisione = bersaglio blu, Negoziazione = moneta gialla, Leadership = bandiera rossa, Amministrazione = calcolatrice verde, Innovazione = lampadina viola.
 
 ## Tecnologie
 - Tre alberi: **Logistica** (barcode → WMS → radiofrequenza → pick-to-light → AMR; formazione → sicurezza muletti → magazzino verticale; GPS → pianificazione rotte), **Sviluppo aziendale** (gestionale → ufficio del personale → welfare → Academy; gestionale → struttura direzionale → controllo di gestione → ISO 9001), **Mercato** (ufficio commerciale → EDI → KAM → e-commerce; marketing; catena del freddo).

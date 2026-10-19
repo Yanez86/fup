@@ -18,7 +18,7 @@ BOT = '''(ceo)=>{
    S.tenders.filter(t=>!t.done&&!t.bid).forEach(t=>{ const e=F.bidEstimate(t,S.warehouses[0].id,0.95); if(e&&e.fits&&e.sat<0.85) t.bid={wh:S.warehouses[0].id,mult:0.95}; });
    S.warehouses.forEach(w=>{ const k=F.computeWH(w);
      const pal=S.clients.filter(c=>c.wh===w.id&&c.status==='avvio').reduce((a,c)=>a+c.pal,0);
-     const needA=Math.ceil((k.viaggi+Math.ceil(pal/16))/20), needM=Math.max(2,Math.ceil((k.mov+2*pal)/900));
+     const pkm=S.clients.filter(c=>c.wh===w.id&&c.status==='avvio').reduce((a,c)=>a+F.clientLog(c,w).km,0), needA=Math.ceil((k.km+pkm)/5200), needM=Math.max(2,Math.ceil((k.mov+2*pal)/900));
      while(w.staff.aut+S.queue.filter(q=>q.wh===w.id&&q.role==='aut').length<needA){ S.queue.push({role:'aut',wh:w.id,days:18}); S.cash-=1800; }
      while(w.staff.mag+S.queue.filter(q=>q.wh===w.id&&q.role==='mag').length<needM){ S.queue.push({role:'mag',wh:w.id,days:9}); S.cash-=1200; }
    });
@@ -33,7 +33,7 @@ async def main():
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + PAGE)
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
-        for w in ['azienda','magazzini','clienti','gare','personale','direzione','espansione','giornale','tecnologia']:
+        for w in ['azienda','magazzini','clienti','gare','report','personale','direzione','espansione','giornale','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
         for t in ['log','org','mkt']:
             await pg.click(f'#win-tecnologia [data-act=seltree][data-id={t}]')

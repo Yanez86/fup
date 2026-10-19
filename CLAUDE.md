@@ -28,9 +28,9 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 
 ### Dentro `src/game.html` (sezioni marcate con `/* ===== NOME ===== */`)
 - **DATI**: `CITIES`, `SITES` (magazzini acquistabili), `CEOS` (4 personaggi iniziali), `MANAGERS`, `EXECS` (dirigenti), `DIR_ROLES`, `TENDER_POOL` (clienti parodia, con `req` per le tecnologie richieste), `RIVALS`, `TECH` (alberi), `TREES`, `WELFARE`, `RAL`, `HIRE`.
-- **UTILITÀ**: `TPAL` (tavolozza pixel art), `TALENTS` (icona 8×8, effetto, testo di colore), `TECH_IC` (icone 12×12), `TFRAME` (cornici per albero), `techIcon()`, `talentIcons()`, formattatori (`eur`, `f1`, `esc`, date).
+- **UTILITÀ**: `TPAL` (tavolozza pixel art), `LOGO` (loghi dei clienti 12×12 su un riquadro 16×16, `logoSvg()`), `ZONES` / `ORIGINS` / `CINFO` (zona di distribuzione, provenienza della merce e ritiro/consegna per cliente; `clientLog()` calcola viaggi e km), `STATS` / `STAT_IC` (icone 8×8 delle abilità, `statChips()`, `statBadge()`), `TALENTS` (icona 8×8, effetto, testo di colore), `TECH_IC` (icone 12×12), `TFRAME` (cornici per albero), `techIcon()`, `talentIcons()`, formattatori (`eur`, `f1`, `esc`, date).
 - **STATO**: `newGame()` crea l'oggetto globale `S`, l'unico stato di gioco (serializzabile in JSON).
-- **MOTORE**: `computeWH()` calcola KPI, costi e ricavi di un magazzino; `step()` fa avanzare un giorno; `monthEnd()`; gare (`newTender`, `bidEstimate`, `resolveTender`); helper `R(id)` (tecnologia ricercata), `dirStat(ruolo)`, `fixedMul()`, `capOf()`.
+- **MOTORE**: `computeWH()` calcola KPI, costi e ricavi di un magazzino (i km arrivano da `clientLog`); `step()` fa avanzare un giorno; `weekEnd()` (report del lunedì in `S.weeks`); `monthEnd()`; gare (`newTender`, `bidEstimate`, `resolveTender`); helper `R(id)` (tecnologia ricercata), `dirStat(ruolo)`, `fixedMul()`, `capOf()`.
 - **EVENTI**: array `EVENTS` con `{id, src, title, text, cond, once?, setup?, opts:[{t, e, f, req?, reqT?}]}`. `fireEvent()` sceglie un evento tra quelli validi; ogni evento ha un'attesa di 240 giorni prima di poter tornare.
 - **SALVATAGGIO**: `localStorage` con chiave `KEY`. **Se cambi la forma di `S`, aumenta la versione della chiave** (`fup-salvataggio-vN`) oppure aggiungi una migrazione in `ACT.continue`.
 - **MAPPA**: proiezione `pt(lon,lat)`, pan/zoom, marker SVG, camion animati.
@@ -54,6 +54,9 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 - Testi del gioco in italiano, tono ironico ma da settore (gergo logistico reale: pallet, picking, WMS, soglie KPI, tender).
 - Nomi di aziende e clienti: parodie riconoscibili ma mai i marchi veri (es. "Esselonga", "Galbanone", "Amazzonia Italia").
 - Grafica: pixel art moderna e colorata, bordi scuri `#16202e`, ombre nette, font *Pixelify Sans* (titoli) e *IBM Plex Sans Condensed* (testo). Colori dalla tavolozza `TPAL`. Le icone sono SVG con `shape-rendering="crispEdges"`.
+- Ogni abilità ha un colore fisso: Operazioni arancione, Precisione blu, Negoziazione giallo, Leadership rosso, Amministrazione verde, Innovazione viola. Mostra sempre le abilità con `statChips()` / `statBadge()`, mai come semplice testo.
+- Ogni nuovo cliente deve avere un logo in `LOGO` e una voce in `CINFO`.
+- Il report KPI imita Excel (barra verde, schede dei fogli, barra della formula), ma resta nella nostra tavolozza.
 - Cornici delle tecnologie: Logistica = quadrato arancione, Sviluppo aziendale = ottagono viola, Mercato = tondo verde.
 - Interfaccia: mappa a tutto schermo con finestre mobili sopra (stile Paradox); font base grande e leggibile.
 
