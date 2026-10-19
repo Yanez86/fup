@@ -33,6 +33,8 @@ def city_boxes():  # riquadri occupati da segnaposto e nome delle città (da CIT
     for n, lo, la, big in re.findall(r"\['([^']+)',([\d.]+),([\d.]+)(?:,(\d))?", block):
         x, y = pt(float(lo), float(la)); cw = 11 if big == '1' else 8
         out.append((x - 7, y - 14, x + 10 + cw * len(n), y + 8))
+    for lo, la in re.findall(r"lon:([\d.]+),lat:([\d.]+)", src[src.index('const SITES='):src.index('const SITES=') + 3000]):
+        x, y = pt(float(lo), float(la)); out.append((x - 20, y - 18, x + 20 + 8 * 16, y + 12))  # magazzino + nome
     return out
 BOX = city_boxes()
 
