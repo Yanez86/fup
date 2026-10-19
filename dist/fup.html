@@ -60,6 +60,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   padding:6px max(16px, env(safe-area-inset-right, 0px)) 6px max(16px, env(safe-area-inset-left, 0px));padding-top:calc(6px + env(safe-area-inset-top, 0px));
   background:var(--ink);color:#fff;border-bottom:3px solid var(--accent);box-shadow:inset 0 -3px 0 var(--ink2), 0 4px 0 rgba(12,19,29,.45)}
 #top .logo{font-family:var(--f-disp);font-weight:700;font-size:22px;letter-spacing:1px;text-shadow:2px 2px 0 var(--ink2);display:flex;align-items:center;gap:8px}
+#top #cologo{display:flex}
 #top .logo small{font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--hi);letter-spacing:0;text-shadow:none}
 .chip{display:flex;flex-direction:column;justify-content:center;line-height:1.1;padding:2px 10px;background:#1d2a3b;border:2px solid #2f4057;min-width:0}
 .chip span:first-child{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--hi)}
@@ -252,6 +253,47 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .talpick{width:42px;height:42px;padding:0;cursor:pointer}
 .talpick[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:1px;box-shadow:3px 3px 0 var(--ink)}
 .talpick:disabled{opacity:.35;cursor:not-allowed}
+.talpick.lg{width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--ink)}
+.cc-f{display:flex;flex-direction:column;gap:4px}
+.cc-in{display:flex;gap:6px}.cc-in input{flex:1;min-width:0}
+.cc-az{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:10px}
+.st-nav{align-items:center;gap:10px;flex-wrap:wrap}
+/* passaggi della creazione */
+.steps{list-style:none;margin:0;padding:0;display:flex;gap:4px;flex-wrap:wrap}
+.steps button{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border:2px solid var(--ink);background:var(--panel2);font-family:var(--f-disp);font-size:14px;color:var(--muted)}
+.steps button b{display:inline-flex;width:22px;height:22px;align-items:center;justify-content:center;background:var(--ink3);color:#fff}
+.steps button.done{background:#fff;color:var(--ink);cursor:pointer}.steps button.done b{background:var(--ok,#2e9e48)}
+.steps button[aria-current="step"]{background:var(--accent);color:var(--ink);box-shadow:2px 2px 0 var(--ink)}.steps button[aria-current="step"] b{background:var(--ink)}
+/* insegna dell'azienda */
+.insegna{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--ink);border:3px solid;box-shadow:3px 3px 0 var(--ink2);color:#fff}
+.insegna > div{display:flex;flex-direction:column}
+.insegna b{font-size:24px;line-height:1.1;overflow-wrap:anywhere}.insegna i{color:var(--hi);overflow-wrap:anywhere}
+/* curriculum vitae */
+.cv{background:#fff;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink2);max-width:860px;width:100%;margin:0 auto}
+.cv-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;background:#1f3f8a;color:#fff;border-bottom:3px solid var(--ink)}
+.cv-h .sm{color:#c9d8f5}.cv-t{font-family:var(--f-disp);font-size:26px;letter-spacing:1px}
+.cv-eu{color:#ffd23f;font-size:16px;letter-spacing:2px}
+.cv-b{display:grid;grid-template-columns:170px minmax(0,1fr);gap:16px;padding:16px}
+.cv-side{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.cv-main{display:flex;flex-direction:column;gap:12px;min-width:0}
+.cv-s{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;border-top:1px solid var(--line);padding-top:8px}
+.cv-l{font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#1f3f8a;font-weight:600;text-align:right}
+.cv-r{display:flex;flex-direction:column;gap:6px;min-width:0}
+.cv-r .t td:first-child{color:var(--muted);width:100px}
+.cv-it{display:flex;gap:8px;align-items:flex-start}
+.cv-st{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.cv-st > div{display:flex;align-items:center;gap:6px}
+.cv-f{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px}
+.cv-sig{display:flex;flex-direction:column;align-items:center}.cv-sig b{font-family:var(--f-disp);font-size:22px;transform:rotate(-4deg);color:#1f3f8a;border-bottom:2px solid var(--ink);padding:0 8px}
+/* visura della Camera di Commercio */
+.visura{position:relative;background:#fffdf4;border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink2);max-width:760px;width:100%;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px;
+  background-image:repeating-linear-gradient(0deg,transparent 0 27px,#efe8cf 27px 28px)}
+.vis-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:3px double var(--ink);padding-bottom:8px;font-family:var(--f-disp)}
+.vis-ente{font-size:16px}.vis-h .sm{text-align:right}
+.vis-t td:first-child{color:var(--muted);width:170px;vertical-align:top}
+.vis-f{border-top:1px dashed var(--line);padding-top:8px}
+.timbro{position:absolute;right:24px;bottom:12px;mix-blend-mode:multiply;opacity:.88;transform:rotate(-14deg);animation:timbro .55s cubic-bezier(.2,1.5,.4,1) both;pointer-events:none}
+@keyframes timbro{0%{transform:scale(2.6) rotate(-30deg);opacity:0}70%{transform:scale(.94) rotate(-14deg);opacity:.95}100%{transform:scale(1) rotate(-14deg);opacity:.88}}
+@media (prefers-reduced-motion:reduce){.timbro{animation:none}}
 .sw[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
 @media (max-width:900px){.ceos{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){.ceos{grid-template-columns:minmax(0,1fr)}}
@@ -311,6 +353,16 @@ html,body{overscroll-behavior:none}
 .mob .cc-fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 64px}
 .mob .cc-stats{grid-template-columns:minmax(0,1fr)}
 .mob.land .cc-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mob .cc-az{grid-template-columns:minmax(0,1fr)}
+.mob .steps{flex-wrap:nowrap}.mob .steps li{flex:1}.mob .steps button{width:100%;justify-content:center;padding:4px}.mob .steps button span{display:none}
+.st-lbl{display:none}.mob .st-lbl{display:block;font-family:var(--f-disp);font-size:15px;margin-top:-6px}
+.mob .vis-h .sm{text-align:left}
+.mob .cv-b{grid-template-columns:minmax(0,1fr)}.mob .cv-side{flex-direction:row;align-items:center;flex-wrap:wrap}
+.mob .cv-s{grid-template-columns:minmax(0,1fr);gap:4px}.mob .cv-l{text-align:left}
+.mob .cv-st{grid-template-columns:minmax(0,1fr)}.mob .cv-t{font-size:20px}
+.mob .vis-t td:first-child{width:110px}.mob .visura{padding:10px}.mob .timbro{right:8px;bottom:60px}.mob .timbro svg{width:120px;height:120px}
+.mob .insegna b{font-size:20px}
+.mob .st-nav .btn.pri{font-size:16px!important;padding:8px 12px!important}
 @media (prefers-reduced-motion: reduce){ .toast{transition:none} }
 </style>
 
@@ -323,7 +375,7 @@ html,body{overscroll-behavior:none}
 <div class="vign" aria-hidden="true"></div>
 
 <header id="top">
-  <div class="logo">FUP <small id="coname"></small></div>
+  <div class="logo">FUP <span id="cologo"></span><small id="coname"></small></div>
   <div class="date num" id="date">—</div>
   <div class="spd" role="group" aria-label="Velocità del tempo">
     <button data-act="speed" data-v="0" aria-label="Pausa (spazio)">II</button>
@@ -809,13 +861,25 @@ function rankIcon(c,sz){
   RGLYPH[x.r].forEach((row,y)=>[...row].forEach((ch,X)=>{if(ch==='#'){r+=`<rect x="${X+5}" y="${y+4}" width="1" height="1" fill="#16202e" opacity=".45"/><rect x="${X+4}" y="${y+3}" width="1" height="1" fill="${TPAL[x.fg]}"/>`;}}));
   return `<span class="rank" role="img" aria-label="Rank ${x.r}" data-tip="${rankTip(c)}" style="display:inline-flex;flex:none"><svg width="${sz}" height="${sz}" viewBox="0 0 14 14" shape-rendering="crispEdges">${r}</svg></span>`;
 }
-function logoSvg(name,sz){
-  const L=LOGO[name]||{bg:'S',ic:[]}, N=16; let r='';
+function logoSvg(name,sz){const L=LOGO[name]||{bg:'S',ic:[]};return pxLogo(TPAL[L.bg],L.ic,sz,'Logo '+name);}
+// loghi tra cui il giocatore sceglie quello della propria azienda: icona bianca sul colore aziendale
+const CO_LOGOS={
+ camion:{n:'Camion',ic:['............','............','WWWWWWW.....','WWWWWWW.WW..','WWWWWWW.WLW.','WWWWWWW.WWWW','WWWWWWWWWWWW','WWWWWWWWWWWW','.KK.....KK..','KSSK...KSSK.','.KK.....KK..','............']},
+ pallet:{n:'Pallet',ic:['............','..KKKKKKKK..','..KFFFFFFK..','..KFFKKFFK..','..KFFFFFFK..','..KKKKKKKK..','............','NNNNNNNNNNNN','N..N....N..N','NNNNNNNNNNNN','N..N....N..N','............']},
+ freccia:{n:'Freccia',ic:['............','......W.....','......WW....','WW.WWWWWW...','...WWWWWWW..','WW.WWWWWWWW.','...WWWWWWW..','WW.WWWWWW...','......WW....','......W.....','............','............']},
+ muletto:{n:'Muletto',ic:['............','.KKKK....W..','.K..K....W..','.K..K....W..','.K..KYYY.W..','YYYYYYYY.W..','YYYYYYYYYW..','YYYYYYYY.W..','YYYYYYYY.WWW','.KK...KK....','KSSK.KSSK...','.KK...KK....']},
+ montagna:{n:'Alpi',ic:['............','......W.....','.....WWW....','....WWSWW...','...WSSSSSW..','..SSSSSSSSS.','.SSDSSSSDSS.','SSDDDSSDDDSS','SDDDDDDDDDDS','............','KKKKKKKKKKKK','............']},
+ stella:{n:'Stella',ic:['.....WW.....','.....WW.....','....WWWW....','WWWWWWWWWWWW','.WWWWWWWWWW.','..WWWWWWWW..','...WWWWWW...','...WWWWWW...','..WWW..WWW..','..WW....WW..','.W........W.','............']},
+ scatola:{n:'Scatola',ic:['............','...KKKKKK...','..KFFFFFFK..','.KFFFFFFFFK.','KKKKKKKKKKKK','KFFFFKKFFFFK','KFFFFKKFFFFK','KFFFFFFFFFFK','KFFFFFFFFFFK','KFFFFFFFFFFK','KKKKKKKKKKKK','............']},
+ ancora:{n:'Ancora',ic:['.....WW.....','....W..W....','.....WW.....','..WWWWWWWW..','.....WW.....','.....WW.....','W....WW....W','WW...WW...WW','.WW..WW..WW.','..WWWWWWWW..','....WWWW....','............']}};
+const coLogoSvg=(id,color,sz)=>pxLogo(color,(CO_LOGOS[id]||CO_LOGOS.camion).ic,sz,'Logo aziendale');
+function pxLogo(bg,ic,sz,label){
+  const N=16; let r='';
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){ const cx=(x===0||x===N-1), cy=(y===0||y===N-1); if(cx&&cy) continue;
     const edge=x===0||y===0||x===N-1||y===N-1||((x===1||x===N-2)&&(y===1||y===N-2));
-    r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${edge?'#16202e':TPAL[L.bg]}"/>`; }
-  L.ic.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x+2}" y="${y+2}" width="1" height="1" fill="${TPAL[ch]}"/>`;}));
-  return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="flex:none" role="img" aria-label="Logo ${esc(name)}">${r}</svg>`;
+    r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${edge?'#16202e':bg}"/>`; }
+  ic.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x+2}" y="${y+2}" width="1" height="1" fill="${TPAL[ch]}"/>`;}));
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="flex:none" role="img" aria-label="${esc(label)}">${r}</svg>`;
 }
 const zoneName=z=>(ZONES[z]||ZONES.nordovest).n;
 function logInfoHtml(c,w){
@@ -1050,15 +1114,25 @@ wk('titoli','tal','Titoli di studio',`Talenti che raccontano la scuola o l'unive
 Alcuni titoli tecnici (perito informatico, ingegnere informatico) accorciano anche l'[[apprendimento]] delle tecnologie nel magazzino guidato dal CEO.
 
 Quando [[crea_ceo|crei il tuo CEO]] il saldo dei punti del titolo (bonus meno malus) si paga con i punti da distribuire.`);
-wk('crea_ceo','basi','Creare il proprio CEO',`Nella schermata iniziale puoi creare un CEO tuo: nome, cognome, età, ritratto, abilità, titolo di studio e carattere.`,
-`Nella schermata iniziale scegli la quinta scheda, «Crea il tuo CEO».
+wk('crea_ceo','basi','Creare il proprio CEO',`Nella schermata iniziale puoi creare un CEO tuo, passo per passo: identità, abilità, studi e carattere, poi il curriculum da confermare.`,
+`Nella schermata iniziale scegli la quinta scheda, «Crea il tuo CEO». La creazione è divisa in passaggi, e puoi sempre tornare indietro:
 
-• **Punto di partenza**: il magazzino, la cassa e il cliente storico di uno dei quattro CEO già pronti.
-• **Punti**: hai 58 punti. Ogni punto in un'[[abilita|abilità]] costa 1 (minimo 1, massimo 18 prima dei talenti).
-• **[[titoli|Titolo di studio]]**: obbligatorio, uno solo.
-• **Carattere**: fino a 3 [[talenti]] a scelta.
+1. **Identità**: nome, cognome, età e ritratto; soprannome e motto sono facoltativi (il pulsante «Suggerisci» ne propone uno). Compaiono nella finestra dell'azienda.
+2. **Abilità**: hai 58 punti. Ogni punto in un'[[abilita|abilità]] costa 1 (minimo 1, massimo 18 prima dei talenti).
+3. **Studi e carattere**: il [[titoli|titolo di studio]] è obbligatorio, uno solo; poi fino a 3 [[talenti]] a scelta.
+4. **Curriculum**: il riepilogo in formato europeo. Se è tutto vero lo confermi, altrimenti torni a correggere.
 
-I talenti si pagano con gli stessi punti: un talento con Operazioni +3 e Leadership −1 costa 2 punti, un talento con soli malus te ne restituisce. Il valore finale di un'abilità va da 0 a 20.`);
+I talenti si pagano con gli stessi punti: un talento con Operazioni +3 e Leadership −1 costa 2 punti, un talento con soli malus te ne restituisce. Il valore finale di un'abilità va da 0 a 20.
+
+Dopo il curriculum si passa alla [[fondazione]] dell'azienda, dove scegli anche il **punto di partenza**: il magazzino, la cassa e il cliente storico di uno dei quattro CEO già pronti.`);
+wk('fondazione','basi','Fondare l\'azienda',`Prima di iniziare scegli nome, logo, claim e colore della tua azienda e la iscrivi alla Camera di Commercio.`,
+`Con qualunque CEO, prima della partita c'è la scheda dell'azienda:
+• **Nome**: quello che leggono clienti e giornali;
+• **Logo**: un'icona tra otto, sul colore aziendale; compare nella barra in alto e nella finestra dell'azienda;
+• **Claim**: lo slogan sull'insegna, facoltativo (il pulsante «Suggerisci» ne propone uno);
+• **Colore**: tinge i pulsanti dell'interfaccia e lo sfondo del logo.
+
+Alla fine arriva la visura della Camera di Commercio, Industria, Artigianato e Bancali del Nord-Ovest: un timbro e l'azienda è iscritta. Nome, logo e claim sono solo d'immagine: non cambiano i numeri del gioco.`);
 const TAL_ID={}; Object.keys(TALENTS).forEach((n,i)=>{TAL_ID[n]='tal_'+i; const t=TALENTS[n];
   wk('tal_'+i,'tal',n,t.fx,`${t.fx.split(' · ').join('\n• ').replace(/^/,'• ')}\n\n*${t.fl}*\n\nTipo: ${TTYPE[t.t][0].toLowerCase()}.${t.edu?' È un [[titoli|titolo di studio]].':''} Vedi [[talenti]].`,sz=>talentSvg(t.ic,sz));});
 // Personale
@@ -1288,9 +1362,9 @@ const wikiBacklinks=id=>Object.values(WIKI).filter(w=>w.id!==id&&w.t&&(w.t.inclu
 /* ====================== STATO ====================== */
 let S=null; let UI={open:{},sel:{},tab:{},z:30,pos:{},bid:{}}; let uid=1;
 const nid=p=>p+(uid++);
-function newGame(ceoId,coName,color,custom){
+function newGame(ceoId,coName,color,custom,co){
   const C=custom||CEOS.find(c=>c.id===ceoId); if(custom) ceoId='custom';
-  S={v:1,day:0,speed:0,ceoId,custom:custom||null,company:{name:coName||C.company,color},cash:C.cash,rep:C.rep,fuel:0.86,
+  S={v:1,day:0,speed:0,ceoId,custom:custom||null,company:{name:coName||C.company,color,logo:(co&&co.logo)||'camion',claim:(co&&co.claim)||''},cash:C.cash,rep:C.rep,fuel:0.86,
      warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0},managers:MANAGERS.map(m=>({...m,hired:false,wh:null})),
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextTender:12,nextEvent:25,project:null,seen:{},over:false,uid:1,
      execs:EXECS.map(e=>({...e,hired:false})),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false};
@@ -1298,7 +1372,7 @@ function newGame(ceoId,coName,color,custom){
   (C.startTech||[]).forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true;});
   S.clients.push({id:nid('c'),...C.client,zone:cinfo(C.client).zones[0],src:cinfo(C.client).src,mode:cinfo(C.client).mode,wh:wh.id,mult:1,sat:60,status:'attivo',start:0,end:24*30,storico:true});
   chMigrate(); // autisti B per la parte di merce che va con i furgoni
-  news('La Gazzetta del Muletto',`Nasce ${S.company.name}`,`${C.name} apre l'anno con un solo cliente, ${C.client.name}. Con il magazzino quasi vuoto i conti sono in rosso: servono nuovi clienti dalle gare d'appalto.`);
+  news('La Gazzetta del Muletto',`Nasce ${S.company.name}`,`${C.name} apre l'anno con un solo cliente, ${C.client.name}.${S.company.claim?` Sull'insegna c'è scritto «${S.company.claim}».`:''} Con il magazzino quasi vuoto i conti sono in rosso: servono nuovi clienti dalle gare d'appalto.`);
   S.uid=uid;
 }
 function z(){return {ric:0,pers:0,mezzi:0,fissi:0,tech:0,mgr:0,welf:0,pen:0,altro:0}}
@@ -2126,7 +2200,7 @@ function renderDock(){
 }
 function renderTop(){
   $('#date').textContent=fmtDate(S.day);
-  $('#coname').textContent=S.company.name;
+  $('#coname').textContent=S.company.name; $('#cologo').innerHTML=coLogoSvg(S.company.logo,S.company.color,24);
   document.querySelectorAll('.spd button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===S.speed)));
   $('#paused').hidden=S.speed!==0;
   const last=S.last?S.last.util:null;
@@ -2179,10 +2253,11 @@ const VIEWS={
   const C=ceo(), L=S.last;
   const sk=[['Operazioni','op'],['Precisione','prec'],['Negoziazione','neg'],['Leadership','lead'],['Amministrazione','amm'],['Innovazione','inn']];
   const pl=L?[[kw('ricavi','Ricavi'),L.ric],[kw('costi','Personale'),-L.pers],[kw('costi','Mezzi e gasolio'),-L.mezzi],[kw('costi','Immobili e fissi'),-L.fissi],[kw('costi','Tecnologie'),-L.tech],[kw('costi','Manager'),-L.mgr],[kw('welfare','Welfare'),-L.welf],[kw('penali','Penali'),-L.pen],[kw('costi','Altro'),-L.altro]].filter(x=>Math.abs(x[1])>0.5):[];
-  return `<div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+  return `<div class="insegna" style="border-color:${S.company.color}">${coLogoSvg(S.company.logo,S.company.color,48)}<div style="min-width:0"><b class="disp">${esc(S.company.name)}</b>${S.company.claim?`<i>${esc(S.company.claim)}</i>`:''}</div></div>
+   <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
    <div class="portrait" style="width:120px;height:140px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none"><img class="px" src="${ceoImg(C)}" alt="Ritratto di ${esc(C.name)}" width="120" height="140"></div>
    <div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:4px">
-     <div class="h3" style="font-size:20px">${esc(C.name)}</div><div class="sm">${C.age} anni · ${esc(C.origin)} · CEO di ${esc(S.company.name)}</div>
+     <div class="h3" style="font-size:20px">${esc(C.name)}${C.nick?` <span class="sm" style="font-family:var(--f-body)">detto «${esc(C.nick)}»</span>`:''}</div>${C.motto?`<div style="font-style:italic">«${esc(C.motto)}»</div>`:''}<div class="sm">${C.age} anni · ${esc(C.origin)} · CEO di ${esc(S.company.name)}</div>
      <div class="sm" style="color:var(--ink)">${esc(C.bio)}</div>
      ${talentIcons(C.tal,36)}
    </div></div>
@@ -2545,7 +2620,7 @@ const ACT={
  wikiback(){ if(!(UI.wikiBack||[]).length) return; UI.wiki=UI.wikiBack.pop(); wikiShow(); },
  wikihome(){ (UI.wikiBack=UI.wikiBack||[]).push(UI.wiki); UI.wiki=null; wikiShow(); },
  save(){save();toast('Partita salvata','ok');},
- restart(){closeModal();showStart();},
+ restart(){closeModal();startSel.step='scelta';startSel.stamp=false;showStart();},
  options(){if($('#modal').innerHTML)return;if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);}
    showModal(`<div class="src"><span>Opzioni</span><span>${shortDate(S.day)}</span></div><div class="win-b"><button class="btn pri" data-act="closemodal">Riprendi</button><button class="btn" data-act="quitgame">Esci dal gioco</button><p class="sm" style="margin:0">Uscendo la partita viene salvata: la ritrovi con «Continua la partita» nella schermata iniziale.</p></div>`);},
  quitgame(){UI.evSpeed=0;if(!S.over)save();closeModal();Object.keys(UI.open).forEach(closeWin);showStart();}
@@ -2571,7 +2646,7 @@ function toast(text,kind){
 /* ====================== EVENTI DOM ====================== */
 document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a||a.tagName==='INPUT'||a.tagName==='SELECT')return;const f=ACT[a.dataset.act];if(f){e.preventDefault();f(a.dataset,a);}});
 document.addEventListener('change',e=>{const a=e.target.closest('[data-act]');if(!a)return;const f=ACT[a.dataset.act];if(f&&(a.tagName==='SELECT'||a.type==='checkbox')){a.blur();f(a.dataset,a);}});
-document.addEventListener('input',e=>{if(e.target.id==='wiki-q'){UI.wikiQ=e.target.value;$('#wiki-list').innerHTML=wikiList();$('#win-enciclopedia .wk').classList.toggle('q',!!UI.wikiQ);return;}const a=e.target.closest('input[type=range][data-act]');if(a)ACT[a.dataset.act](a.dataset,a);});
+document.addEventListener('input',e=>{if(e.target.closest('#start')){const al=$('#start [role=alert]');if(al){al.remove();startSel.err='';}}const pv={'coname-in':'#co-prev-n','co-claim':'#co-prev-c'}[e.target.id];if(pv&&$(pv)){$(pv).textContent=e.target.value.trim()||(pv==='#co-prev-n'?defCo():'Il vostro claim qui');return;}if(e.target.id==='wiki-q'){UI.wikiQ=e.target.value;$('#wiki-list').innerHTML=wikiList();$('#win-enciclopedia .wk').classList.toggle('q',!!UI.wikiQ);return;}const a=e.target.closest('input[type=range][data-act]');if(a)ACT[a.dataset.act](a.dataset,a);});
 document.addEventListener('pointerdown',e=>{if(e.target.closest('#win-gare input[type=range]'))UI.bidEditing=true;});
 document.addEventListener('pointerup',()=>{UI.bidEditing=false;});
 document.addEventListener('keydown',e=>{
@@ -2616,10 +2691,10 @@ document.addEventListener('mouseover',e=>{if(Date.now()-touchT<1000)return;const
 document.addEventListener('mousemove',e=>{if(tip.hidden||Date.now()-touchT<1000)return;const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(e.clientX+14,innerWidth-w-8)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';});
 
 /* ====================== AVVIO ====================== */
-let startSel={ceo:'gino',color:'#ff7a3d',name:'',cc:null,err:''};
+let startSel={step:'scelta',ceo:'gino',color:'#ff7a3d',name:'',claim:'',logo:'camion',cc:null,err:'',stamp:false};
 /* --- CEO creato dal giocatore: punti da distribuire tra abilità e talenti --- */
 const CC_PTS=58, CC_TRAITS=3, CC_IMGS=['cc1','cc2','cc3','cc4','cc5','cc6','cc7','cc8','cc9','cc10'];
-const ccNew=()=>({nome:'',cognome:'',eta:38,img:'cc1',base:'gino',st:{op:8,prec:8,neg:8,lead:8,amm:8,inn:8},edu:null,tal:[]});
+const ccNew=()=>({nome:'',cognome:'',nick:'',motto:'',eta:38,img:'cc1',base:'gino',st:{op:8,prec:8,neg:8,lead:8,amm:8,inn:8},edu:null,tal:[]});
 const ccTal=cc=>cc.edu?[cc.edu,...cc.tal]:cc.tal.slice();
 function ccMods(cc){const o={};ccTal(cc).forEach(n=>{const m=talMods(n);for(const k in m)o[k]=(o[k]||0)+m[k];});return o;}
 function ccStats(cc){const m=ccMods(cc),o={};STATS.forEach(s=>o[s.k]=clamp(cc.st[s.k]+(m[s.k]||0),0,20));return o;}
@@ -2628,45 +2703,113 @@ const ccName=cc=>`${cc.nome.trim()} ${cc.cognome.trim()}`.trim();
 const ccCompany=cc=>cc.cognome.trim()?`Trasporti ${cc.cognome.trim()}`:'Nuova Logistica';
 function ccErr(cc){if(!cc.nome.trim()||!cc.cognome.trim())return 'Scrivi nome e cognome del tuo CEO.'; if(!cc.edu)return 'Scegli un titolo di studio.'; const l=ccLeft(cc); if(l<0)return `Hai speso ${-l} punti di troppo: togline qualcuno dalle abilità o cambia talenti.`; return '';}
 function ccCeo(cc){const B=CEOS.find(c=>c.id===cc.base), s=SITES[B.site];
-  return {id:'custom',img:cc.img,name:ccName(cc),age:clamp(Math.round(+cc.eta)||38,22,70),origin:cc.edu,site:B.site,cash:B.cash,motrici:B.motrici,fixed:B.fixed,rep:B.rep,company:ccCompany(cc),
+  return {id:'custom',img:cc.img,name:ccName(cc),nick:(cc.nick||'').trim(),motto:(cc.motto||'').trim(),age:clamp(Math.round(+cc.eta)||38,22,70),origin:cc.edu,site:B.site,cash:B.cash,motrici:B.motrici,fixed:B.fixed,rep:B.rep,company:ccCompany(cc),
     st:ccStats(cc),tal:ccTal(cc),client:{...B.client},
     bio:`Ha rilevato il capannone di ${s.name} con un solo cliente storico, ${B.client.name}, e un'idea fissa: arrivare fino all'ultimo pallet.`};}
+// suggerimenti per i campi facoltativi (pulsante «Suggerisci»)
+const SUGG={
+  nick:['il Muletto','la Bolla','Tir','il Barone del Pallet','la Zarina della Rampa','Reggiatrice','il Picking','Bancale','Doppio Turno','la Pesa'],
+  motto:['Prima si carica, poi si discute.','Se non è nel gestionale, non esiste.','Chi va piano arriva in penale.','Le soglie KPI sono suggerimenti. Severi.','Un pallet alla volta, ma in fretta.','Mai dire mai: dire «domani entro le 12».','Il muletto non dorme. E nemmeno io.','Il cliente ha sempre ragione, tranne sul codice articolo.'],
+  claim:['Arriviamo prima dei problemi.','La vostra merce, la nostra ossessione.','Ogni bancale è una promessa.','Dal muletto al cliente, senza drammi.','Logistica col cuore (e col transpallet).','Partiamo presto, arriviamo prima.','Più veloci di una bolla smarrita.','Noi la merce la troviamo sempre.']};
+const PROVN={AL:'Alessandria',BG:'Bergamo',BS:'Brescia',GE:'Genova',LO:'Lodi',MI:'Milano',NO:'Novara',PV:'Pavia',TO:'Torino'};
+const startCeo=()=>startSel.ceo==='custom'?CEOS.find(c=>c.id===startSel.cc.base):CEOS.find(c=>c.id===startSel.ceo);
 const defCo=()=>startSel.ceo==='custom'?ccCompany(startSel.cc):CEOS.find(c=>c.id===startSel.ceo).company;
+const coName=()=>(startSel.name||defCo()).trim()||defCo();
+// passaggi della schermata iniziale: per il CEO creato ci sono anche identità, abilità, talenti e curriculum
+const ST_N={scelta:'CEO',cc1:'Identità',cc2:'Abilità',cc3:'Studi e carattere',cv:'Curriculum',az:'Azienda',visura:'Iscrizione'};
+const stFlow=()=>startSel.ceo==='custom'?['scelta','cc1','cc2','cc3','cv','az','visura']:['scelta','az','visura'];
 // salva quello che è scritto nei campi prima di ridisegnare la schermata
 function startKeep(){const inp=$('#coname-in'); if(inp){const t=inp.value; startSel.name=(!t||t===defCo())?'':t;}
-  const cc=startSel.cc; if(cc&&$('#cc-nome')){cc.nome=$('#cc-nome').value;cc.cognome=$('#cc-cognome').value;cc.eta=$('#cc-eta').value;}}
-function ccPanel(){
-  const cc=startSel.cc, m=ccMods(cc), fin=ccStats(cc), left=ccLeft(cc), full=cc.tal.length>=CC_TRAITS;
-  const cost=n=>{const c=talCost(n);return `<div style='margin-top:5px;font-weight:600'>${c>0?`Costa ${c} punt${c===1?'o':'i'}`:c<0?`Restituisce ${-c} punt${c===-1?'o':'i'}`:'Non costa punti'}</div>`;};
-  const tile=(n,on,act,dis)=>`<button class="tal talpick" data-act="${act}" data-n="${esc(n)}" aria-pressed="${on}" ${dis?'disabled':''} aria-label="${esc(n)}" data-tip="${talTip(n,cost(n))}" style="background:${TTYPE[TALENTS[n].t][1]}">${talentSvg(TALENTS[n].ic,30)}</button>`;
-  const edu=Object.keys(TALENTS).filter(n=>TALENTS[n].edu), tr=Object.keys(TALENTS).filter(n=>!TALENTS[n].edu);
-  const chosen=n=>`<span style="display:inline-flex;align-items:center;gap:6px;margin-right:12px">${talentIcons([n],18)}<span><b>${esc(n)}</b> <span class="sm">${esc(TALENTS[n].fx)}</span></span></span>`;
-  return `<div class="card ccbox">
-   <div class="row"><span class="h3">${kw('crea_ceo','Il tuo CEO')}</span><span class="disp" style="font-size:18px">Punti rimasti: <b class="${left<0?'bad':left===0?'ok':''}">${left}</b> <span class="sm">su ${CC_PTS}</span></span></div>
+  if($('#co-claim')) startSel.claim=$('#co-claim').value;
+  const cc=startSel.cc; if(cc&&$('#cc-nome')){cc.nome=$('#cc-nome').value;cc.cognome=$('#cc-cognome').value;cc.eta=$('#cc-eta').value;cc.nick=$('#cc-nick').value;cc.motto=$('#cc-motto').value;}}
+function stepper(){const fl=stFlow(), i=fl.indexOf(startSel.step);
+  return `<ol class="steps" aria-label="Passaggi">${fl.map((s,j)=>`<li><button class="${j<i?'done':''}" ${j<i?`data-act="stgo" data-to="${s}"`:'disabled'} aria-current="${j===i?'step':'false'}" aria-label="${ST_N[s]}"><b>${j+1}</b><span>${ST_N[s]}</span></button></li>`).join('')}</ol><div class="st-lbl">Passo ${i+1} di ${fl.length} · ${ST_N[startSel.step]}</div>`;}
+function stNav(next,label){return `<div class="row st-nav">${startSel.step!=='scelta'?`<button class="btn" data-act="stback">‹ Indietro</button>`:'<span></span>'}
+  ${startSel.err?`<span class="bad" role="alert" style="font-weight:600;flex:1;text-align:center">${esc(startSel.err)}</span>`:''}${next}</div>`;}
+const nextBtn=t=>`<button class="btn pri" data-act="stnext" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">${t} ›</button>`;
+const suggBtn=f=>`<button class="btn sm2" data-act="sugg" data-f="${f}" aria-label="Suggerisci">Suggerisci</button>`;
+function ccPoints(){const left=ccLeft(startSel.cc);
+  return `<span class="disp" style="font-size:18px">Punti rimasti: <b class="${left<0?'bad':left===0?'ok':''}">${left}</b> <span class="sm">su ${CC_PTS}</span></span>`;}
+function stepCC1(){const cc=startSel.cc;
+  return `<div class="card ccbox"><div class="row"><span class="h3">Chi è il tuo ${kw('crea_ceo','CEO')}?</span><span class="sm">Il soprannome e il motto sono facoltativi</span></div>
    <div class="cc-top">
-    <div class="cc-por"><button class="btn sm2" data-act="ccimg" data-d="-1" aria-label="Ritratto precedente">◀</button><div class="portrait" style="width:96px;height:112px;overflow:hidden"><img class="px" src="${IMG[cc.img]}" alt="Ritratto scelto" width="96" height="112"></div><button class="btn sm2" data-act="ccimg" data-d="1" aria-label="Ritratto successivo">▶</button></div>
+    <div class="cc-por"><button class="btn sm2" data-act="ccimg" data-d="-1" aria-label="Ritratto precedente">◀</button><div class="portrait" style="width:144px;height:168px;overflow:hidden"><img class="px" src="${IMG[cc.img]}" alt="Ritratto scelto" width="144" height="168"></div><button class="btn sm2" data-act="ccimg" data-d="1" aria-label="Ritratto successivo">▶</button></div>
     <div style="display:flex;flex-direction:column;gap:10px">
      <div class="cc-fields"><label><span class="lab">Nome</span><input type="text" id="cc-nome" maxlength="20" value="${esc(cc.nome)}" placeholder="Es. Ornella"></label>
       <label><span class="lab">Cognome</span><input type="text" id="cc-cognome" maxlength="24" value="${esc(cc.cognome)}" placeholder="Es. Bancalini"></label>
       <label><span class="lab">Età</span><input type="number" id="cc-eta" min="22" max="70" value="${esc(cc.eta)}"></label></div>
-     <div><div class="lab" style="margin-bottom:4px">Punto di partenza</div><div class="cc-base">${CEOS.map(c=>{const st=SITES[c.site];return `<button class="btn sm2" data-act="ccbase" data-id="${c.id}" aria-pressed="${cc.base===c.id}" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,18)}<span>${esc(st.name)} · ${eur(c.cash)}</span></button>`;}).join('')}</div>
-      <div class="sm" style="margin-top:4px">Magazzino, cassa, mezzi e cliente storico di ${esc(CEOS.find(c=>c.id===cc.base).company)}: ${esc(CEOS.find(c=>c.id===cc.base).client.name)}.</div></div>
-    </div></div>
-   <div class="lab">Abilità <span class="sm">· ogni punto costa 1, da 1 a 18 prima dei talenti</span></div>
+     <label class="cc-f"><span class="lab">Soprannome</span><span class="cc-in"><input type="text" id="cc-nick" maxlength="24" value="${esc(cc.nick||'')}" placeholder="Es. il Muletto">${suggBtn('nick')}</span></label>
+     <label class="cc-f"><span class="lab">Motto</span><span class="cc-in"><input type="text" id="cc-motto" maxlength="70" value="${esc(cc.motto||'')}" placeholder="Es. Prima si carica, poi si discute.">${suggBtn('motto')}</span></label>
+    </div></div></div>`;}
+function stepCC2(){const cc=startSel.cc, m=ccMods(cc), fin=ccStats(cc);
+  return `<div class="card ccbox"><div class="row"><span class="h3">${kw('abilita','Abilità')}</span>${ccPoints()}</div>
+   <div class="sm">Ogni punto costa 1, da 1 a 18. I talenti del prossimo passaggio si pagano con gli stessi punti (e alcuni ne restituiscono): puoi tenerne da parte.</div>
    <div class="cc-stats">${STATS.map(s=>{const d=m[s.k]||0;return `<div class="skill cc-st" style="border-color:${s.c};background:${s.bg}">${statBadge(s.k,fin[s.k],18)}<span style="flex:1">${s.n}${d?` <span class="sm ${d>0?'ok':'bad'}">${d>0?'+':'−'}${Math.abs(d)} talenti</span>`:''}</span>
-     <button class="btn sm2" data-act="ccst" data-k="${s.k}" data-d="-1" ${cc.st[s.k]<=1?'disabled':''} aria-label="Togli un punto a ${s.n}">−</button><b class="v">${cc.st[s.k]}</b><button class="btn sm2" data-act="ccst" data-k="${s.k}" data-d="1" ${cc.st[s.k]>=18?'disabled':''} aria-label="Aggiungi un punto a ${s.n}">+</button></div>`;}).join('')}</div>
+     <button class="btn sm2" data-act="ccst" data-k="${s.k}" data-d="-1" ${cc.st[s.k]<=1?'disabled':''} aria-label="Togli un punto a ${s.n}">−</button><b class="v">${cc.st[s.k]}</b><button class="btn sm2" data-act="ccst" data-k="${s.k}" data-d="1" ${cc.st[s.k]>=18?'disabled':''} aria-label="Aggiungi un punto a ${s.n}">+</button></div>`;}).join('')}</div></div>`;}
+function stepCC3(){
+  const cc=startSel.cc, full=cc.tal.length>=CC_TRAITS;
+  const cost=n=>{const c=talCost(n);return `<div style='margin-top:5px;font-weight:600'>${c>0?`Costa ${c} punt${c===1?'o':'i'}`:c<0?`Restituisce ${-c} punt${c===-1?'o':'i'}`:'Non costa punti'}</div>`;};
+  const tile=(n,on,act,dis)=>`<button class="tal talpick" data-act="${act}" data-n="${esc(n)}" aria-pressed="${on}" ${dis?'disabled':''} aria-label="${esc(n)}" data-tip="${talTip(n,cost(n))}" style="background:${TTYPE[TALENTS[n].t][1]}">${talentSvg(TALENTS[n].ic,30)}</button>`;
+  const edu=Object.keys(TALENTS).filter(n=>TALENTS[n].edu), tr=Object.keys(TALENTS).filter(n=>!TALENTS[n].edu);
+  const chosen=n=>`<span style="display:inline-flex;align-items:center;gap:6px;margin-right:12px">${talentIcons([n],18)}<span><b>${esc(n)}</b> <span class="sm">${esc(TALENTS[n].fx)}</span></span></span>`;
+  return `<div class="card ccbox"><div class="row"><span class="h3">Studi e carattere</span>${ccPoints()}</div>
+   <div>${statChips(ccStats(cc),14)}</div>
    <div class="lab">${kw('titoli','Titolo di studio')} <span class="sm">· obbligatorio, uno solo</span></div>
    <div class="cc-pick">${edu.map(n=>tile(n,cc.edu===n,'ccedu',false)).join('')}</div>
-   <div>${cc.edu?chosen(cc.edu):'<span class="sm">Passa il mouse sulle icone per leggere gli effetti.</span>'}</div>
+   <div>${cc.edu?chosen(cc.edu):`<span class="sm">${TOUCH?'Tieni premuta un\'icona':'Passa il mouse sulle icone'} per leggere gli effetti.</span>`}</div>
    <div class="lab">Carattere <span class="sm">· fino a ${CC_TRAITS} ${kw('talenti')}</span></div>
    <div class="cc-pick">${tr.map(n=>{const on=cc.tal.includes(n);return tile(n,on,'cctal',full&&!on);}).join('')}</div>
-   <div>${cc.tal.length?cc.tal.map(chosen).join(''):'<span class="sm">Nessun tratto scelto.</span>'}</div>
-  </div>`;
-}
+   <div>${cc.tal.length?cc.tal.map(chosen).join(''):'<span class="sm">Nessun tratto scelto.</span>'}</div></div>`;}
+// curriculum vitae in formato europeo (versione 2002)
+function stepCV(){
+  const cc=startSel.cc, C=ccCeo(cc);
+  const lvl=v=>v>=16?'eccellente':v>=12?'buono':v>=8?'discreto':v>=5?'scolastico':'da migliorare';
+  const sec=(t,body)=>`<div class="cv-s"><div class="cv-l">${t}</div><div class="cv-r">${body}</div></div>`;
+  return `<div class="cv"><div class="cv-h"><div><div class="cv-t">Curriculum vitae</div><div class="sm">Formato europeo · aggiornato a gennaio 2002</div></div><div class="cv-eu" aria-hidden="true">${'★'.repeat(6)}</div></div>
+   <div class="cv-b"><div class="cv-side"><div class="portrait" style="width:120px;height:140px;overflow:hidden"><img class="px" src="${IMG[cc.img]}" alt="Ritratto di ${esc(C.name)}" width="120" height="140"></div>
+     <b class="disp" style="font-size:20px;line-height:1.1">${esc(C.name)}</b>${C.nick?`<span class="sm">detto «${esc(C.nick)}»</span>`:''}</div>
+    <div class="cv-main">
+     ${sec('Informazioni personali',`<table class="t"><tr><td>Nome</td><td><b>${esc(C.name)}</b></td></tr>${C.nick?`<tr><td>Soprannome</td><td>${esc(C.nick)}</td></tr>`:''}<tr><td>Età</td><td>${C.age} anni</td></tr><tr><td>Nazionalità</td><td>italiana</td></tr><tr><td>Patente</td><td>B, C, CE e patentino del muletto</td></tr></table>`)}
+     ${sec('Obiettivo professionale',`<i>«${esc(C.motto||'Arrivare fino all\'ultimo pallet.')}»</i>`)}
+     ${sec('Istruzione e formazione',`<div class="cv-it">${talentIcons([cc.edu],28)}<div><b>${esc(cc.edu)}</b><div class="sm">${esc(TALENTS[cc.edu].fx)}</div><div class="sm"><i>${esc(TALENTS[cc.edu].fl)}</i></div></div></div>`)}
+     ${sec('Capacità e competenze',`<div class="cv-st">${STATS.map(x=>`<div>${statBadge(x.k,C.st[x.k],16)} <span>${x.n}: <b>${lvl(C.st[x.k])}</b></span></div>`).join('')}</div>`)}
+     ${sec('Lingue','Italiano (madrelingua) · dialetto del piazzale (fluente) · inglese da bolla doganale')}
+     ${sec('Capacità personali',cc.tal.length?cc.tal.map(n=>`<div class="cv-it">${talentIcons([n],24)}<div><b>${esc(n)}</b> <span class="sm">${esc(TALENTS[n].fx)}</span></div></div>`).join(''):'<span class="sm">Nessuna degna di nota. Ma puntuale.</span>')}
+     <div class="cv-f"><span class="sm">Autorizzo il trattamento dei miei dati personali ai sensi della legge 675/96.<br>Nord-Ovest, gennaio 2002</span><span class="cv-sig"><span class="sm">Firma</span><b>${esc(C.name)}</b></span></div>
+    </div></div></div>`;}
+function stepAz(){
+  const B=startCeo(), s=SITES[B.site], cus=startSel.ceo==='custom';
+  return `<div class="card ccbox"><div class="row"><span class="h3">${kw('fondazione','La tua azienda')}</span><span class="sm">Nome, logo e claim compaiono sull'insegna e nei giornali</span></div>
+   <div class="insegna" style="border-color:${startSel.color}">${coLogoSvg(startSel.logo,startSel.color,64)}<div style="min-width:0"><b class="disp" id="co-prev-n">${esc(coName())}</b><i id="co-prev-c">${esc(startSel.claim||'Il vostro claim qui')}</i></div></div>
+   <div class="cc-az"><label class="cc-f"><span class="lab">Nome dell'azienda</span><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||defCo())}" aria-label="Nome dell'azienda"></label>
+    <label class="cc-f"><span class="lab">Claim</span><span class="cc-in"><input type="text" id="co-claim" maxlength="60" value="${esc(startSel.claim)}" placeholder="Es. Ogni bancale è una promessa.">${suggBtn('claim')}</span></label></div>
+   <div class="lab">Logo</div><div class="cc-pick">${Object.keys(CO_LOGOS).map(id=>`<button class="talpick lg" data-act="cologo" data-id="${id}" aria-pressed="${startSel.logo===id}" aria-label="Logo ${CO_LOGOS[id].n}" data-tip="<div class='tt'>${CO_LOGOS[id].n}</div>">${coLogoSvg(id,startSel.color,44)}</button>`).join('')}</div>
+   <div class="lab">Colore</div><div style="display:flex;gap:8px">${COLORS.map(c=>`<button class="sw" data-act="pickcolor" data-c="${c[0]}" aria-pressed="${startSel.color===c[0]}" style="background:${c[0]}" aria-label="Colore ${c[0]}"></button>`).join('')}</div>
+   <div class="lab">Punto di partenza</div>
+   ${cus?`<div class="cc-base">${CEOS.map(c=>{const st=SITES[c.site];return `<button class="btn sm2" data-act="ccbase" data-id="${c.id}" aria-pressed="${startSel.cc.base===c.id}" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,18)}<span>${esc(st.name)} · ${eur(c.cash)}</span></button>`;}).join('')}</div>`:''}
+   <div class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(B.client.name,20)}<span>Magazzino di ${esc(s.name)} (${s.prov}) da ${n0(s.cap)} posti, cassa di ${eur(B.cash)} e il cliente storico ${esc(B.client.name)}.</span></div></div>`;}
+// visura della Camera di Commercio (fittizia) con il timbro di iscrizione
+function stepVisura(){
+  const B=startCeo(), s=SITES[B.site], C=startSel.ceo==='custom'?ccCeo(startSel.cc):B, nm=coName();
+  const rea=s.prov+'-'+String(100000+[...nm].reduce((a,ch)=>(a*31+ch.charCodeAt(0))%900000,7)).slice(0,6);
+  const row=(k,v)=>`<tr><td>${k}</td><td>${v}</td></tr>`;
+  return `<div class="visura"><div class="vis-h"><div class="vis-ente">Camera di Commercio, Industria, Artigianato e Bancali<br><b>del Nord-Ovest</b> · sportello di ${esc(PROVN[s.prov]||s.name)}</div><div class="sm">Registro delle Imprese<br>Visura ordinaria della società</div></div>
+   <div class="insegna" style="border-color:${startSel.color}">${coLogoSvg(startSel.logo,startSel.color,56)}<div style="min-width:0"><b class="disp">${esc(nm)}</b>${startSel.claim.trim()?`<i>${esc(startSel.claim.trim())}</i>`:''}</div></div>
+   <table class="t vis-t">${row('Denominazione',`<b>${esc(nm)} S.r.l.</b>`)}${row('Forma giuridica','Società a responsabilità limitata')}${row('Sede legale',`${esc(s.name)} (${s.prov})`)}${row('Numero REA',rea)}
+    ${row('Attività prevalente','60.24 · Trasporto di merci su strada')}${row('Oggetto sociale','Trasporto, deposito e movimentazione di merci per conto terzi, fino all\'ultimo pallet.')}
+    ${row('Capitale versato',eur(B.cash))}${row('Amministratore unico',`${esc(C.name)}${C.nick?` («${esc(C.nick)}»)`:''}`)}${row('Data di iscrizione','2 gennaio 2002')}</table>
+   <div class="vis-f sm">Diritti di segreteria: 3,50 €. Il presente documento non sostituisce il certificato, né il caffè delle macchinette al piano terra.</div>
+   ${startSel.stamp?`<div class="timbro" aria-label="Timbro: iscritta">${stampSvg()}</div>`:''}</div>`;}
+function stampSvg(){const c='#c2273a';
+  return `<svg width="150" height="150" viewBox="0 0 150 150"><defs><path id="tc" d="M75,75 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1 -104,0"/></defs>
+   <circle cx="75" cy="75" r="70" fill="none" stroke="${c}" stroke-width="5"/><circle cx="75" cy="75" r="40" fill="none" stroke="${c}" stroke-width="2"/>
+   <text font-family="Pixelify Sans, monospace" font-size="13" fill="${c}" letter-spacing="1"><textPath href="#tc">CAMERA DI COMMERCIO ★ NORD-OVEST ★</textPath></text>
+   <rect x="14" y="62" width="122" height="26" fill="#fff" stroke="${c}" stroke-width="3"/>
+   <text x="75" y="82" text-anchor="middle" font-family="Pixelify Sans, monospace" font-weight="700" font-size="20" fill="${c}">ISCRITTA</text>
+   <text x="75" y="104" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="11" fill="${c}">02·01·2002</text></svg>`;}
 const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['#3dd6c4','#1f9e8f','#9cefe5'],['#9b6bff','#6f43cf','#c8adff']];
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
-function showStart(){
-  setSpeedSafe(0); WIKI_ON=false; const sv=load();
+function stepScelta(){const sv=load();
   const st=CEOS.map(c=>{const s=SITES[c.site];return `<button class="ceo" data-act="pickceo" data-id="${c.id}" aria-pressed="${startSel.ceo===c.id}">
     <div class="portrait" style="height:150px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden"><img class="px" src="${IMG[c.id]}" alt="Ritratto di ${esc(c.name)}" width="128" height="150"></div>
     <b class="disp" style="font-size:18px">${esc(c.name)}</b><span class="sm">${c.age} anni · ${esc(c.origin)}</span>
@@ -2678,18 +2821,21 @@ function showStart(){
     <div class="portrait" style="height:150px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden"><img class="px" src="${IMG[cc?cc.img:'cc1']}" alt="" width="128" height="150"></div>
     <b class="disp" style="font-size:18px">${cc&&ccName(cc)?esc(ccName(cc)):'Crea il tuo CEO'}</b><span class="sm">Nome, abilità, titolo di studio e carattere li scegli tu</span>
     ${cc?`<span>${statChips(ccStats(cc),14)}</span>${talentIcons(ccTal(cc),32)}`:`<span class="sm" style="color:var(--ink)">${CC_PTS} punti da distribuire tra abilità e talenti</span>`}</button>`;})();
-  $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP</span><span>Nord-Ovest, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
-   <div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
+  return `<div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
    <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord-Ovest. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
    ${installCard()}
    ${sv&&sv.S&&!sv.S.over?`<div class="card pend"><div class="row"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><button class="btn pri" data-act="continue">Continua la partita</button></div></div>`:''}
-   <div class="lab">1. Scegli il tuo CEO</div><div class="ceos five">${st}</div>
-   ${startSel.ceo==='custom'?ccPanel():''}
-   <div class="split"><label style="display:flex;flex-direction:column;gap:4px"><span class="lab">2. Nome dell'azienda</span><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||defCo())}" aria-label="Nome dell'azienda"></label>
-   <div style="display:flex;flex-direction:column;gap:4px"><span class="lab">3. Colore</span><div style="display:flex;gap:8px">${COLORS.map(c=>`<button class="sw" data-act="pickcolor" data-c="${c[0]}" aria-pressed="${startSel.color===c[0]}" style="background:${c[0]}" aria-label="Colore ${c[0]}"></button>`).join('')}</div></div></div>
-   <div class="row" style="align-items:center">${startSel.err?`<span class="bad" role="alert" style="font-weight:600">${esc(startSel.err)}</span>`:''}<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Inizia</button></div>
-  </div></div>`;
+   <div class="lab">Scegli il tuo CEO</div><div class="ceos five">${st}</div>`;}
+function showStart(){
+  setSpeedSafe(0); WIKI_ON=false; const k=startSel.step;
+  const body={scelta:stepScelta,cc1:stepCC1,cc2:stepCC2,cc3:stepCC3,cv:stepCV,az:stepAz,visura:stepVisura}[k]();
+  const next={scelta:nextBtn(startSel.ceo==='custom'?'Crea il CEO':'Avanti: l\'azienda'),cc1:nextBtn('Avanti: abilità'),cc2:nextBtn('Avanti: studi e carattere'),cc3:nextBtn('Vedi il curriculum'),cv:nextBtn('Confermo, è tutto vero'),az:nextBtn('Iscrivi alla Camera di Commercio'),
+    visura:startSel.stamp?`<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Inizia la partita ›</button>`:`<button class="btn pri" data-act="stamp" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Timbra la visura</button>`}[k];
+  $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP</span><span>Nord-Ovest, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
+   ${k!=='scelta'?stepper():''}${body}${stNav(next)}</div></div>`;
+  if(lastStep!==k){$('#start').scrollTop=0;lastStep=k;}
 }
+let lastStep='';
 // web app: pulsante «Installa» (Chrome/Android) o istruzioni per iPhone, solo se il gioco non è già aperto come app
 let installEvt=null;
 const STANDALONE=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
@@ -2707,10 +2853,22 @@ if('serviceWorker' in navigator&&location.protocol.startsWith('http')) navigator
 addEventListener('visibilitychange',()=>{if(document.hidden&&S&&!$('#start').innerHTML)save();});
 addEventListener('pagehide',()=>{if(S&&!$('#start').innerHTML)save();});
 function setSpeedSafe(v){if(S){S.speed=v;renderTop();}}
+function stValid(k){const cc=startSel.cc;
+  if(k==='cc1'&&(!cc.nome.trim()||!cc.cognome.trim())) return 'Scrivi nome e cognome del tuo CEO.';
+  if(k==='cc3') return ccErr(cc);
+  if(k==='az'&&!coName()) return 'Dai un nome alla tua azienda.';
+  return '';}
+function stGo(to){startSel.step=to;startSel.err='';startSel.stamp=false;showStart();}
 Object.assign(ACT,{
  installapp(){if(!installEvt)return;startKeep();installEvt.prompt();installEvt.userChoice.finally(()=>{installEvt=null;showStart();});},
- pickceo(d){startKeep();startSel.ceo=d.id;startSel.err='';if(d.id==='custom'&&!startSel.cc)startSel.cc=ccNew();showStart();},
+ pickceo(d){startKeep();startSel.ceo=d.id;startSel.err='';if(d.id==='custom'){if(!startSel.cc)startSel.cc=ccNew();stGo('cc1');return;}showStart();},
  pickcolor(d){startKeep();startSel.color=d.c;applyColor(d.c);showStart();},
+ cologo(d){startKeep();startSel.logo=d.id;showStart();},
+ sugg(d){startKeep();const t=d.f==='claim'?startSel:startSel.cc, cur=t[d.f]||'', o=SUGG[d.f].filter(x=>x!==cur);t[d.f]=o[Math.floor(Math.random()*o.length)];showStart();},
+ stnext(){startKeep();const k=startSel.step,e=stValid(k);if(e){startSel.err=e;showStart();return;}const fl=stFlow();stGo(fl[fl.indexOf(k)+1]);},
+ stback(){startKeep();const fl=stFlow();stGo(fl[Math.max(0,fl.indexOf(startSel.step)-1)]);},
+ stgo(d){startKeep();stGo(d.to);},
+ stamp(){startSel.stamp=true;showStart();},
  ccst(d){startKeep();const cc=startSel.cc;cc.st[d.k]=clamp(cc.st[d.k]+(+d.d),1,18);startSel.err='';showStart();},
  ccedu(d){startKeep();const cc=startSel.cc;cc.edu=cc.edu===d.n?null:d.n;startSel.err='';showStart();},
  cctal(d){startKeep();const cc=startSel.cc;if(cc.tal.includes(d.n))cc.tal=cc.tal.filter(n=>n!==d.n);else if(cc.tal.length<CC_TRAITS)cc.tal.push(d.n);startSel.err='';showStart();},
@@ -2718,7 +2876,7 @@ Object.assign(ACT,{
  ccbase(d){startKeep();startSel.cc.base=d.id;showStart();},
  startgame(){startKeep();const custom=startSel.ceo==='custom';
    if(custom){const e=ccErr(startSel.cc);if(e){startSel.err=e;showStart();return;}}
-   startSel.err='';const nm=(startSel.name||defCo()).trim();uid=1;newGame(startSel.ceo,nm,startSel.color,custom?ccCeo(startSel.cc):null);boot();},
+   startSel.err='';uid=1;newGame(startSel.ceo,coName(),startSel.color,custom?ccCeo(startSel.cc):null,{logo:startSel.logo,claim:startSel.claim.trim()});startSel.step='scelta';startSel.stamp=false;boot();},
  continue(){const sv=load();if(!sv)return;S=fillSave(migrateStaff(renameClients(sv.S)));S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();}
 });
 function boot(){
@@ -2741,6 +2899,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else showStart(); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr};
+window.__FUP={get S(){return S;},step,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS};
 })();
 </script>

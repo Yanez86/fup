@@ -45,6 +45,17 @@ async def phone(b, w, h, name, errs):
     await pg.goto('file://' + PAGE)
     assert await pg.evaluate("document.documentElement.classList.contains('mob')"), 'layout telefono non attivo'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_avvio.png'))
+    # creazione del CEO e dell'azienda a passaggi: ogni schermata deve stare nella larghezza del telefono
+    await pg.tap('[data-act=pickceo][data-id=custom]')
+    await pg.fill('#cc-nome', 'Ornella'); await pg.fill('#cc-cognome', 'Bancalini'); await pg.tap('[data-act=sugg][data-f=nick]')
+    for st in ['identita', 'abilita', 'studi', 'cv', 'azienda']:
+        if st == 'studi': await pg.tap('[data-act=ccedu][data-n="Diplomato geometra"]')
+        assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: {st} scorre di lato'
+        await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_{st}.png'), full_page=True)
+        await pg.tap('[data-act=stnext]')
+    await pg.tap('[data-act=stamp]'); await pg.wait_for_timeout(700)
+    assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: la visura scorre di lato'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_visura.png'), full_page=True)
     await pg.tap('[data-act=startgame]'); await pg.tap('[data-act=closemodal]')
     await pg.wait_for_timeout(100)
     for d in await pg.eval_on_selector_all('#dock button', 'e=>e.map(b=>b.dataset.id)'):
@@ -82,22 +93,43 @@ async def main():
         TIP_ON_TOP = '''(()=>{const t=document.querySelector('#tip'),r=t.getBoundingClientRect();t.style.pointerEvents='auto';const e=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);t.style.pointerEvents='';return !t.hidden&&!!e&&!!e.closest('#tip');})()'''
         await pg.hover('#start .ceo[data-id=edoardo] .tal')
         assert await pg.evaluate(TIP_ON_TOP), 'tooltip del talento coperto nella schermata iniziale'
-        # creazione del CEO: senza nome e titolo non si parte
+        # creazione del CEO a passaggi: senza nome e titolo non si va avanti
         await pg.click('[data-act=pickceo][data-id=custom]')
-        await pg.click('[data-act=startgame]')
+        await pg.click('[data-act=stnext]')
         assert 'nome e cognome' in await pg.inner_text('#start [role=alert]')
-        await pg.fill('#cc-nome', 'Ornella'); await pg.fill('#cc-cognome', 'Bancalini')
+        await pg.fill('#cc-nome', 'Ornella'); await pg.fill('#cc-cognome', 'Bancalini'); await pg.fill('#cc-nick', 'la Bolla')
+        await pg.click('[data-act=sugg][data-f=motto]')
+        assert await pg.input_value('#cc-nome') == 'Ornella' and await pg.input_value('#cc-motto')
+        await pg.click('[data-act=ccimg][data-d="1"]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_crea_1_identita.png'), full_page=True)
+        await pg.click('[data-act=stnext]')
+        for _ in range(3): await pg.click('[data-act=ccst][data-k=op][data-d="1"]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_crea_2_abilita.png'), full_page=True)
+        await pg.click('[data-act=stnext]')
+        await pg.click('[data-act=stnext]')
+        assert 'titolo di studio' in await pg.inner_text('#start [role=alert]')
         await pg.click('[data-act=ccedu][data-n="Laureato in scienze umanistiche"]')
         await pg.click('[data-act=ccedu][data-n="Ingegnere informatico"]')   # cambia titolo
         for n in ['Calma olimpica', 'Insonne', 'Cena col buyer', 'Stacanovista']:  # il quarto non entra
             await pg.click(f'[data-act=cctal][data-n="{n}"]', force=True)
-        for _ in range(3): await pg.click('[data-act=ccst][data-k=op][data-d="1"]')
-        await pg.click('[data-act=ccimg][data-d="1"]'); await pg.click('[data-act=ccbase][data-id=marco]')
-        assert await pg.input_value('#cc-nome') == 'Ornella' and await pg.input_value('#coname-in') == 'Trasporti Bancalini'
-        await pg.screenshot(path=os.path.join(OUT, 'shot_crea_ceo.png'), full_page=True)
+        await pg.screenshot(path=os.path.join(OUT, 'shot_crea_3_studi.png'), full_page=True)
+        await pg.click('[data-act=stnext]')
+        assert 'la Bolla' in await pg.inner_text('#start .cv')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_crea_4_cv.png'), full_page=True)
+        await pg.click('[data-act=stback]'); await pg.click('[data-act=stnext]')   # indietro e di nuovo avanti
+        await pg.click('[data-act=stnext]')
+        assert await pg.input_value('#coname-in') == 'Trasporti Bancalini'
+        await pg.click('[data-act=ccbase][data-id=marco]'); await pg.click('[data-act=cologo][data-id=muletto]')
+        await pg.fill('#co-claim', 'Ogni bancale è una promessa.')
+        assert await pg.inner_text('#co-prev-c') == 'Ogni bancale è una promessa.'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_crea_5_azienda.png'), full_page=True)
+        await pg.click('[data-act=stnext]'); await pg.click('[data-act=stamp]'); await pg.wait_for_timeout(700)
+        assert await pg.query_selector('#start .timbro')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_crea_6_visura.png'), full_page=True)
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
-        c = await pg.evaluate('()=>{const S=window.__FUP.S;return {id:S.ceoId,n:S.custom.name,tal:S.custom.tal,st:S.custom.st,co:S.company.name,wh:S.warehouses[0].site,cl:S.clients[0].name}}')
+        c = await pg.evaluate('()=>{const S=window.__FUP.S;return {id:S.ceoId,n:S.custom.name,tal:S.custom.tal,st:S.custom.st,co:S.company.name,logo:S.company.logo,claim:S.company.claim,nick:S.custom.nick,wh:S.warehouses[0].site,cl:S.clients[0].name}}')
         assert c['id'] == 'custom' and c['n'] == 'Ornella Bancalini' and c['co'] == 'Trasporti Bancalini', c
+        assert c['logo'] == 'muletto' and c['claim'] == 'Ogni bancale è una promessa.' and c['nick'] == 'la Bolla', c
         assert c['tal'] == ['Ingegnere informatico', 'Calma olimpica', 'Insonne', 'Cena col buyer'], c['tal']
         # 8 di base, +3 in Operazioni; Ingegnere informatico Inn +4 Lead −2; Calma +1 Lead; Insonne Op −2 Prec −2; Cena Neg +4
         assert c['st'] == {'op': 9, 'prec': 6, 'neg': 12, 'lead': 7, 'amm': 8, 'inn': 12}, c['st']
