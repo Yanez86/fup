@@ -315,6 +315,19 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .talpick{width:42px;height:42px;padding:0;cursor:pointer}
 .talpick[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:1px;box-shadow:3px 3px 0 var(--ink)}
 .talpick:disabled{opacity:.35;cursor:not-allowed}
+.tc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:8px}
+.tcard{display:flex;align-items:flex-start;gap:10px;padding:8px;background:#fff;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2);text-align:left;cursor:pointer;font:inherit;color:var(--ink);min-width:0}
+.tcard[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:1px;background:#fff9ef;box-shadow:3px 3px 0 var(--ink)}
+.tcard:disabled{opacity:.4;cursor:not-allowed}
+.tc-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.tc-n{font-size:15px}
+.tc-fx{display:flex;flex-wrap:wrap;gap:4px;font-size:13px}
+.tc-m{display:inline-flex;align-items:center;gap:3px;padding:0 4px;border:2px solid}
+.tc-x{display:inline-flex;align-items:center;padding:0 4px;border:2px solid var(--line);background:var(--panel)}
+.tc-fl{font-size:13px;color:var(--muted)}
+.pcost{flex:none;align-self:center;min-width:46px;padding:4px 4px 3px;display:flex;flex-direction:column;align-items:center;font-family:var(--f-disp);font-size:20px;line-height:1;color:#fff;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.pcost small{font-size:10px;margin-top:2px;font-family:var(--f-body);font-weight:600;letter-spacing:.5px}
+.pcost.neg{background:var(--bad)}.pcost.pos{background:var(--ok)}.pcost.zero{background:var(--ink4)}
 .talpick.lg{width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--ink)}
 .cc-f{display:flex;flex-direction:column;gap:4px}
 .cc-in{display:flex;gap:6px}.cc-in input{flex:1;min-width:0}
@@ -419,6 +432,7 @@ html,body{overscroll-behavior:none}
 .mob .cc-fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 64px}.mob .cc-sg{grid-column:1/-1}
 .mob .cc-stats{grid-template-columns:minmax(0,1fr)}
 .mob.land .cc-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mob .tc-grid{grid-template-columns:minmax(0,1fr)}.mob.land .tc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .mob .cc-az{grid-template-columns:minmax(0,1fr)}
 .mob .steps{flex-wrap:nowrap}.mob .steps li{flex:1}.mob .steps button{width:100%;justify-content:center;padding:4px}.mob .steps button span{display:none}
 .st-lbl{display:none}.mob .st-lbl{display:block;font-family:var(--f-disp);font-size:15px;margin-top:-6px}
@@ -1302,7 +1316,7 @@ wk('crea_ceo','basi','Creare il proprio CEO',`Nella schermata iniziale puoi crea
 3. **Studi e carattere**: il [[titoli|titolo di studio]] è obbligatorio, uno solo; poi fino a 3 [[talenti]] a scelta.
 4. **Curriculum**: il riepilogo in formato europeo. Se è tutto vero lo confermi, altrimenti torni a correggere.
 
-I talenti si pagano con gli stessi punti: un talento con Operazioni +3 e Leadership −1 costa 2 punti, un talento con soli malus te ne restituisce. Il valore finale di un'abilità va da 0 a 20.
+I talenti si pagano con gli stessi punti: un talento con Operazioni +3 e Leadership −1 costa 2 punti, un talento con soli malus te ne restituisce. Ogni talento è una scheda con l'icona, gli effetti, il testo di colore e, a destra, il badge del costo: rosso se costa, verde se restituisce punti, grigio se è gratis. Il piccolo badge sull'icona lo dice subito: rosso (−2) se costa, verde (+4) se restituisce punti, grigio (0) se è gratis. Il valore finale di un'abilità va da 0 a 20.
 
 Dopo il curriculum si passa alla [[fondazione]] dell'azienda, dove scegli anche il **punto di partenza**: il magazzino, la cassa e il cliente storico di uno dei quattro CEO già pronti.`);
 wk('fondazione','basi','Fondare l\'azienda',`Prima di iniziare scegli nome, logo, claim e colore della tua azienda e la iscrivi alla Camera di Commercio.`,
@@ -3188,20 +3202,25 @@ function stepCC2(){const cc=startSel.cc, m=ccMods(cc), fin=ccStats(cc);
    <div class="sm">Ogni punto costa 1, da 1 a 18. I talenti del prossimo passaggio si pagano con gli stessi punti (e alcuni ne restituiscono): puoi tenerne da parte.</div>
    <div class="cc-stats">${STATS.map(s=>{const d=m[s.k]||0;return `<div class="skill cc-st" style="border-color:${s.c};background:${s.bg}">${statBadge(s.k,fin[s.k],18)}<span style="flex:1">${s.n}${d?` <span class="sm ${d>0?'ok':'bad'}">${d>0?'+':'−'}${Math.abs(d)} talenti</span>`:''}</span>
      <button class="btn sm2" data-act="ccst" data-k="${s.k}" data-d="-1" ${cc.st[s.k]<=1?'disabled':''} aria-label="Togli un punto a ${s.n}">−</button><b class="v">${cc.st[s.k]}</b><button class="btn sm2" data-act="ccst" data-k="${s.k}" data-d="1" ${cc.st[s.k]>=18?'disabled':''} aria-label="Aggiungi un punto a ${s.n}">+</button></div>`;}).join('')}</div></div>`;}
+// piccolo badge col costo in punti di un talento: rosso se costa, verde se restituisce, grigio se è gratis
+// scheda di un talento nella creazione del CEO: icona, modificatori, testo di colore e badge col costo in punti
+function talCard(n,on,act,dis){const t=TALENTS[n], c=talCost(n);
+  const fx=t.fx.split(' · ').map(p=>{const m=p.match(/^(Operazioni|Precisione|Negoziazione|Leadership|Amministrazione|Innovazione) ([+−-]\d+)$/);
+    if(!m) return `<span class="tc-x">${esc(p)}</span>`; const s=STATS.find(x=>x.n===m[1]);
+    return `<span class="tc-m" style="border-color:${s.c};background:${s.bg}">${statIcon(s.k,12)}${esc(m[1])} <b>${esc(m[2])}</b></span>`;}).join('');
+  return `<button class="tcard" data-act="${act}" data-n="${esc(n)}" aria-pressed="${on}" ${dis?'disabled':''}>
+   <span class="tal" style="background:${TTYPE[t.t][1]};width:40px;height:40px;flex:none">${talentSvg(t.ic,30)}</span>
+   <span class="tc-b"><b class="tc-n">${esc(n)}</b><span class="tc-fx">${fx}</span><i class="tc-fl">${esc(t.fl)}</i></span>
+   <span class="pcost ${c>0?'neg':c<0?'pos':'zero'}" aria-label="${c>0?`Costa ${c} punti`:c<0?`Restituisce ${-c} punti`:'Non costa punti'}">${c>0?'−'+c:c<0?'+'+(-c):'0'}<small>${c===0?'gratis':Math.abs(c)===1?'punto':'punti'}</small></span></button>`;}
 function stepCC3(){
   const cc=startSel.cc, full=cc.tal.length>=CC_TRAITS;
-  const cost=n=>{const c=talCost(n);return `<div style='margin-top:5px;font-weight:600'>${c>0?`Costa ${c} punt${c===1?'o':'i'}`:c<0?`Restituisce ${-c} punt${c===-1?'o':'i'}`:'Non costa punti'}</div>`;};
-  const tile=(n,on,act,dis)=>`<button class="tal talpick" data-act="${act}" data-n="${esc(n)}" aria-pressed="${on}" ${dis?'disabled':''} aria-label="${esc(n)}" data-tip="${talTip(n,cost(n))}" style="background:${TTYPE[TALENTS[n].t][1]}">${talentSvg(TALENTS[n].ic,30)}</button>`;
   const edu=Object.keys(TALENTS).filter(n=>TALENTS[n].edu), tr=Object.keys(TALENTS).filter(n=>!TALENTS[n].edu);
-  const chosen=n=>`<span style="display:inline-flex;align-items:center;gap:6px;margin-right:12px">${talentIcons([n],18)}<span><b>${esc(n)}</b> <span class="sm">${esc(TALENTS[n].fx)}</span></span></span>`;
   return `<div class="card ccbox"><div class="row"><span class="h3">Studi e carattere</span>${ccPoints()}</div>
    <div>${statChips(ccStats(cc),14)}</div>
-   <div class="lab">${kw('titoli','Titolo di studio')} <span class="sm">· obbligatorio, uno solo</span></div>
-   <div class="cc-pick">${edu.map(n=>tile(n,cc.edu===n,'ccedu',false)).join('')}</div>
-   <div>${cc.edu?chosen(cc.edu):`<span class="sm">${TOUCH?'Tieni premuta un\'icona':'Passa il mouse sulle icone'} per leggere gli effetti.</span>`}</div>
-   <div class="lab">Carattere <span class="sm">· fino a ${CC_TRAITS} ${kw('talenti')}</span></div>
-   <div class="cc-pick">${tr.map(n=>{const on=cc.tal.includes(n);return tile(n,on,'cctal',full&&!on);}).join('')}</div>
-   <div>${cc.tal.length?cc.tal.map(chosen).join(''):'<span class="sm">Nessun tratto scelto.</span>'}</div></div>`;}
+   <div class="lab">${kw('titoli','Titolo di studio')} <span class="sm">· obbligatorio, uno solo${cc.edu?` · scelto: <b>${esc(cc.edu)}</b>`:''}</span></div>
+   <div class="tc-grid">${edu.map(n=>talCard(n,cc.edu===n,'ccedu',false)).join('')}</div>
+   <div class="lab">Carattere <span class="sm">· fino a ${CC_TRAITS} ${kw('talenti')} · scelti ${cc.tal.length} di ${CC_TRAITS}</span></div>
+   <div class="tc-grid">${tr.map(n=>{const on=cc.tal.includes(n);return talCard(n,on,'cctal',full&&!on);}).join('')}</div></div>`;}
 // curriculum vitae in formato europeo (versione 2002)
 function stepCV(){
   const cc=startSel.cc, C=ccCeo(cc);
@@ -3253,7 +3272,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.18',t:'Il futuro è adesso',x:['Le tecnologie non hanno più un anno minimo: si possono ricercare subito, basta avere quelle che le precedono nell\'albero.']},
+ {v:'0.18',t:'Il futuro è adesso',x:['Le tecnologie non hanno più un anno minimo: si possono ricercare subito, basta avere quelle che le precedono nell\'albero.','Creando il CEO, titoli di studio e talenti sono schede leggibili: icona, effetti, testo di colore e un badge col costo in punti.']},
  {v:'0.17',t:'Chi ripara il portone?',x:['Le novità ora stanno in fondo alla schermata iniziale.','Nuova figura in ogni magazzino: il facility manager. Senza di lui niente manutenzione, il magazzino si rovina e capitano guasti.','Lo stato del magazzino va da 0 a 100: sotto il 70% si perdono posti pallet e produttività.','Manutenzione straordinaria per tornare subito al 100%.','I magazzini si possono ampliare fino a tre volte, con un cantiere di 90 giorni.','12 nuovi servizi di welfare: caffè, sala pausa, spogliatoi, lavanderia, palestra, presidio medico, sportello d\'ascolto, corsi di italiano, raffrescatori, orto, colonnine di ricarica.']},
  {v:'0.16',t:'Tutto il Nord',x:['La mappa arriva fino a Trieste: Emilia-Romagna, Veneto, Trentino-Alto Adige e Friuli-Venezia Giulia sono giocabili, con 22 nuove città e 47 province nella lente.','10 nuovi magazzini in affitto, da Piacenza Le Mose a Trieste Fernetti.','14 nuove committenti: prosciutto, ceramica, motori, piadine, spumanti, occhiali, mele, caffè, cucine, scarponi e altro.','Gare per zona: una provincia, un gruppo di province (Romagna, Pianura Padana, Asse del Brennero…), una regione o più regioni. La stessa committente può aprire più gare per zone diverse e avere più contratti con te.','I volumi di una gara dipendono dagli abitanti della zona.']},
  {v:'0.15',t:'Acqua, frutta e asilo',x:['Nuovo albero Welfare: boccioni d\'acqua, servizio frutta, mensa, pulmini per i dipendenti, asilo aziendale e area cani.','I servizi di welfare si ricercano una volta e poi si installano magazzino per magazzino: alzano il morale e accorciano le assunzioni in quel sito.','Ogni tecnologia ha ora una breve descrizione di cosa è, oltre all\'effetto.']},
