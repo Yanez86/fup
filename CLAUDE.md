@@ -73,4 +73,5 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 2. `python3 tests/smoke_test.py` termina con `OK`.
 3. Se hai toccato l'interfaccia, guarda gli screenshot in `tools/out/`.
 4. Se hai cambiato regole o formule, aggiorna `docs/design.md`.
-5. Committa anche `dist/fup.html`: a ogni push su `main` la GitHub Action `.github/workflows/pages.yml` lo pubblica su https://yanez86.github.io/fup/.
+5. **Pubblica sempre tutto su `main`** (regola base di Davide): a fine lavoro unisci le modifiche in `main` e fai push, anche se la sessione lavora su un altro ramo.
+6. Committa anche `dist/fup.html`: a ogni push su `main` la GitHub Action `.github/workflows/pages.yml` lo pubblica su https://yanez86.github.io/fup/.

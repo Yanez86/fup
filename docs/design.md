@@ -13,6 +13,11 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Entrambi sono limitati tra 50 e 99,9.
 - **Morale**: obiettivo = 58 + 0,6·(Leadership−10) + welfare + tecnologie + Academy 3 + direttore HR·0,3·(Lead−10) − 20·(sovraccarico magazzinieri) − 20·(sovraccarico carrellisti) − 20·(sovraccarico del gruppo di autisti più carico). Ogni giorno il morale si avvicina all'obiettivo dell'1,2% della differenza.
 - Le abilità usate sono quelle del manager del magazzino; senza manager le prestazioni calano.
+- **Saturazione dei mezzi** (`satMezzi()`): quanto sono pieni in media i camion in uscita, in % della capienza (`CAPV` = 33 pallet). Base 48,5% (16 pallet a viaggio). Viaggi di distribuzione = ceil(pallet / (33 × saturazione)): più saturazione = meno viaggi, km, gasolio e autisti; il ricavo non cambia.
+  - Saturazione naturale = 48,5 + GPS 2 + pianificazione rotte 5 + **Sinergia in pianificazione** 7 × (clienti attivi nel magazzino − 1), massimo +30 (tutte valgono a metà e al contrario durante l'apprendimento).
+  - **Obiettivo minimo** (`w.satObj`, nessuno / 55-90%), scelto nella finestra del magazzino. Capacità di pianificazione = naturale + 1,2·(Operazioni del manager−10) + 0,25·(morale−60) + 8 × impiegati in più del necessario (tra −3 e +3) + eventi.
+  - Se l'obiettivo supera la naturale: con capacità ≥ obiettivo la saturazione è obiettivo + 35% dell'eccedenza; altrimenti si ferma alla capacità (mai sotto la naturale). Massimo 95%.
+  - Costi: Puntualità −0,06 per ogni punto sopra la naturale (camion che aspettano il carico); morale obiettivo −0,5 per ogni punto di obiettivo non raggiunto. Gli impiegati necessari mostrati salgono di quanti ne servono per raggiungere l'obiettivo (massimo 3).
 
 ## Economia (mensile)
 - Ricavo per cliente = (posti pallet·5,5 + 2·pallet movimentati·3,8 + pallet·(18 + 0,05·km di un viaggio di distribuzione) + viaggi di ritiro·km del ritiro·1,5) × moltiplicatore dell'offerta.
@@ -44,7 +49,7 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Ogni lunedì si chiude la settimana: per ogni magazzino si salvano le medie di Puntualità, Accuratezza, saturazione e morale, insieme ai pallet movimentati, ai viaggi, ai ricavi e ai costi (vengono conservate le ultime 26 settimane in `S.weeks`).
 - I grafici a linee del report (passando il mouse si leggono i valori di ogni settimana):
   - nel Riepilogo, Puntualità e Accuratezza per magazzino in due grafici separati, più la media dell'azienda tratteggiata;
-  - nel foglio di ogni magazzino, entrambi i KPI e la soglia più severa tra i clienti (tratteggiata);
+  - nel foglio di ogni magazzino, entrambi i KPI e la soglia più severa tra i clienti (tratteggiata); la colonna K riporta la saturazione dei mezzi della settimana (rossa se sotto l'obiettivo);
   - nel foglio Clienti, i KPI del magazzino che serve il cliente scelto e i livelli richiesti dal suo contratto. Per ogni cliente si salvano ogni settimana KPI, soglie e soddisfazione in `S.weeks[].cli`.
 - Colori fissi delle serie (controllati per chi distingue male i colori): Puntualità blu `#2f7fd6`, Accuratezza viola `#7b4fe0`; i magazzini seguono l'ordine `SERIES_C`.
 - La finestra "Report KPI" imita un foglio Excel: un foglio di riepilogo, un foglio per ogni magazzino, la barra della formula che spiega la cella selezionata e i colori condizionali. Verde = sopra la soglia più severa tra i clienti del magazzino, giallo = entro 2 punti, rosso = sotto.
@@ -73,7 +78,7 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Operazioni = ingranaggio arancione, Precisione = bersaglio blu, Negoziazione = moneta gialla, Leadership = bandiera rossa, Amministrazione = calcolatrice verde, Innovazione = lampadina viola.
 
 ## Tecnologie
-- Tre alberi: **Logistica** (barcode → WMS → radiofrequenza → pick-to-light → AMR; formazione → sicurezza muletti → magazzino verticale; GPS → pianificazione rotte), **Sviluppo aziendale** (gestionale → ufficio del personale → welfare → Academy; gestionale → struttura direzionale → controllo di gestione → ISO 9001), **Mercato** (ufficio commerciale → EDI → KAM → e-commerce / accordi quadro nazionali; marketing; catena del freddo).
+- Tre alberi: **Logistica** (barcode → WMS → radiofrequenza → pick-to-light → AMR; formazione → sicurezza muletti → magazzino verticale; GPS → pianificazione rotte → sinergia in pianificazione), **Sviluppo aziendale** (gestionale → ufficio del personale → welfare → Academy; gestionale → struttura direzionale → controllo di gestione → ISO 9001), **Mercato** (ufficio commerciale → EDI → KAM → e-commerce / accordi quadro nazionali; marketing; catena del freddo).
 - Una ricerca alla volta. Giorni = base × clamp(1 − 0,03·(Innovazione − 10); 0,6; 1,5). Si usa l'Innovazione più alta tra quella del CEO e quella del direttore tecnologia. Annullando una ricerca si recupera il 50% del costo.
 - Logistica: dopo la ricerca si paga l'installazione in ogni magazzino, più un canone mensile. Durante le settimane di apprendimento l'effetto è negativo, poi diventa positivo (Academy −30% sui tempi di apprendimento).
 
