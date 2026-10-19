@@ -18,9 +18,11 @@ BOT = '''(ceo)=>{
    S.tenders.filter(t=>!t.done&&!t.bid).forEach(t=>{ const e=F.bidEstimate(t,S.warehouses[0].id,0.95); if(e&&e.fits&&e.sat<0.85) t.bid={wh:S.warehouses[0].id,mult:0.95}; });
    S.warehouses.forEach(w=>{ const pend=S.clients.filter(c=>c.wh===w.id&&c.status==='avvio'); pend.forEach(c=>c.status='attivo');
      const k=F.computeWH(w); pend.forEach(c=>c.status='avvio');
-     const days={pick:9,car:9,imp:9,autB:9,autCE:18};
+     const days={pick:9,car:9,capo:12,imp:9,autB:9,autCE:18};
      Object.keys(days).forEach(r=>{ while(w.staff[r]+S.queue.filter(q=>q.wh===w.id&&q.role===r).length<k.need[r]){ S.queue.push({role:r,wh:w.id,days:days[r]}); S.cash-=1500; } });
    });
+   while(S.office.plan+S.queue.filter(q=>q.role==='plan').length<F.planNeed()){ S.queue.push({role:'plan',wh:null,days:12}); S.cash-=1500; }
+   if(ceo==='valeria'&&d===200) S.warehouses[0].coop=true;
    F.step();
  }
  return {ceo, day:S.day, over:S.over, cash:Math.round(S.cash), clienti:S.clients.filter(c=>c.status==='attivo').length};}'''
@@ -84,10 +86,16 @@ async def main():
         await pg.evaluate(CLEAR)
         await pg.click('#dock [data-id=personale]')
         if not await pg.query_selector('#win-personale'): await pg.click('#dock [data-id=personale]')
-        assert await pg.eval_on_selector_all('#win-personale table.t tr', 'e=>e.length') == 6
+        assert await pg.eval_on_selector_all('#win-personale table.t tr', 'e=>e.length') == 7
         await pg.screenshot(path=os.path.join(OUT, 'shot_personale.png'))
         await pg.click('#win-personale [data-act=openwh]')
-        assert await pg.eval_on_selector_all('#win-magazzini [data-act=hire]', 'e=>e.length') == 5
+        assert await pg.eval_on_selector_all('#win-magazzini [data-act=hire]', 'e=>e.length') == 6
+        await pg.click('#win-magazzini [data-act=coop]')
+        assert await pg.evaluate('()=>window.__FUP.S.warehouses[0].coop')
+        await pg.click('#win-magazzini [data-act=hire][data-role=pick]')
+        assert 'Cooperativa' in await pg.inner_text('#modal'), 'canale cooperativa mancante'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_cooperativa.png'))
+        await pg.evaluate(CLEAR)
         await pg.screenshot(path=os.path.join(OUT, 'shot_magazzino_personale.png'))
         # un salvataggio con i vecchi ruoli viene convertito
         mig = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('marco'); const S=F.S;
@@ -99,6 +107,7 @@ async def main():
         st = await pg.evaluate('''()=>{const S=window.__FUP.S;return {st:S.warehouses[0].staff,imp:S.imp,q:S.queue.map(q=>q.role+String.fromCharCode(58)+!!q.wh)}}''')
         assert st['imp'] is None and sum(st['st'].values()) == 8+3 and st['st']['autB'] > 0, st
         assert st['q'] == ['imp:true', 'autCE:true'], st
+        assert await pg.evaluate('()=>window.__FUP.S.office.plan===0 && window.__FUP.S.warehouses[0].coop===false')
         for ceo in ['gino','edoardo','valeria','marco']:
             print(await pg.evaluate(BOT, ceo))
         await b.close()

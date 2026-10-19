@@ -150,7 +150,14 @@ def cap_t(c):
     cr=ell(24,15,11.5,8)&(yy<16); c.shaded(cr,'#ff7a3d','#c85a1f','#ffb070',22,10,11,6)
     br=ell(24,16.3,13.5,2.6)&(yy>=15); c.shaded(br,'#c85a1f','#8a3e14','#ff7a3d',24,16,13,2)
 person('corriere',skin='media',hair='#4a3426',hairstyle='messy',cloth='#1f9e8f',clothd='#157366',clothl='#3dd6c4',extra=cap_t)
-names=['rosa','toto','chiara','davide','luca','franca','magazziniere','autista','impiegata','carrellista','corriere']
+def capo_x(c):
+    helmet(c); hm=ell(24,15,11.5,7.5)&(yy<17); c.shaded(hm,'#e0393e','#a8262a','#ff8a8d',22,10,11,6); c.px(line_px(12,36,17),'#a8262a')
+    c.fill(rect(33,44,41,55),'#8a5f36'); c.fill(rect(34,46,40,54),'#f4f5f7'); c.px([(35,48),(36,48),(37,48),(35,50),(36,50),(38,50),(35,52),(36,52)],'#16202e'); c.px([(36,44),(37,44),(38,44)],'#c3d0dc')
+person('capoturno',skin='scura',hair='#2c2420',hairstyle='short',cloth='#2e9e48',clothd='#1f7a34',clothl='#5cc472',mustache='#2c2420',extra=capo_x)
+def plan_col(c):
+    m=(np.abs(xx-24)<(yy-39)*0.5)&ell(24,58,24,18)&(yy<56); c.fill(m,'#f4f5f7'); c.px([(24,y) for y in range(44,55)],'#9b6bff')
+person('pianificatore',skin='chiara',hair='#7a3220',hairl='#a3482c',hairstyle='messy',cloth='#4a5f7a',clothd='#33445a',clothl='#6b819e',glasses='#16202e',beard='#7a3220',collar=plan_col)
+names=['rosa','toto','chiara','davide','luca','franca','magazziniere','autista','impiegata','carrellista','corriere','capoturno','pianificatore']
 bg=Image.new('RGBA',(5*104,3*120),(42,58,80,255))
 for i,n in enumerate(names):
     im=Image.open(OUT+f'p_{n}.png'); bg.alpha_composite(im,(4+(i%5)*104,4+(i//5)*118))

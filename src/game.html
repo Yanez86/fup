@@ -250,7 +250,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 (function(){
 'use strict';
 /* ====================== DATI ====================== */
-const IMG={car:'{{Q_carrellista}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}'};
+const IMG={car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}'};
 const LON0=4.81, LAT1=47.0, KX=78.29*2, KY=111.111*2;
 const pt=(lon,lat)=>[ (lon-LON0)*KX, (LAT1-lat)*KY ];
 const CITIES=[
@@ -406,16 +406,19 @@ const WELFARE=[
  {id:'premio',name:'Premio di produzione',cost:80,mor:6,att:6},
  {id:'navetta',name:'Navetta dalla stazione',cost:20,mor:2,att:3}
 ];
-const RAL={pick:18000,car:19500,autB:19000,autCE:23000,imp:22000}, COEF=1.42;
-const ROLES=['pick','car','autB','autCE','imp'];
-const ROLE={pick:'Magazzinieri',car:'Carrellisti',autB:'Autisti patente B',autCE:'Autisti patente CE',imp:'Impiegati di magazzino'};
-const ROLE1={pick:'magazziniere',car:'carrellista',autB:'autista con patente B',autCE:'autista con patente CE',imp:'impiegato'};
-const ROLE_WK={pick:'magazzinieri',car:'carrellisti',autB:'autisti_b',autCE:'autisti_ce',imp:'impiegati'};
-const ROLE_D={pick:'Preparano gli ordini',car:'Scaricano, stoccano e caricano',autB:'Furgoni, consegne in città',autCE:'Bilici e motrici, tratte lunghe',imp:'Bolle, inventari, traffico'};
-const HIRE={pick:{ann:[20,250],age:[6,1000]},car:{ann:[25,300],age:[8,1300]},autB:{ann:[15,250],age:[6,1000]},autCE:{ann:[40,350],age:[16,2000]},imp:{ann:[20,300],age:[7,1200]}};
+const RAL={pick:18000,car:19500,capo:25000,autB:19000,autCE:23000,imp:22000,plan:26000}, COEF=1.42;
+const ROLES=['pick','car','capo','autB','autCE','imp'];
+const ROLE={pick:'Magazzinieri',car:'Carrellisti',autB:'Autisti patente B',autCE:'Autisti patente CE',imp:'Impiegati di magazzino',capo:'Capiturno',plan:'Pianificatori del traffico'};
+const ROLE1={pick:'magazziniere',car:'carrellista',autB:'autista con patente B',autCE:'autista con patente CE',imp:'impiegato',capo:'capoturno',plan:'pianificatore del traffico'};
+const ROLE_WK={pick:'magazzinieri',car:'carrellisti',autB:'autisti_b',autCE:'autisti_ce',imp:'impiegati',capo:'capoturno',plan:'pianificatori'};
+const ROLE_D={pick:'Preparano gli ordini',car:'Scaricano, stoccano e caricano',autB:'Furgoni, consegne in città',autCE:'Bilici e motrici, tratte lunghe',imp:'Bolle, inventari, traffico',capo:'Uno ogni 10 operai',plan:'Giri dei camion, in sede'};
+const HIRE={pick:{ann:[20,250],age:[6,1000]},car:{ann:[25,300],age:[8,1300]},autB:{ann:[15,250],age:[6,1000]},autCE:{ann:[40,350],age:[16,2000]},imp:{ann:[20,300],age:[7,1200]},capo:{ann:[25,300],age:[8,1300]},plan:{ann:[25,300],age:[8,1300]}};
+// facchinaggio in cooperativa: magazzinieri e carrellisti costano il 20% in meno, arrivano in 3 giorni e si mandano via gratis, ma lavorano peggio
+const COOP={roles:['pick','car'],cost:0.8,mor:-3,A:-0.5,days:3};
 const KM_B=4000, KM_CE=5200;
-const noStaff=()=>({pick:0,car:0,autB:0,autCE:0,imp:0});
+const noStaff=()=>({pick:0,car:0,capo:0,autB:0,autCE:0,imp:0});
 const staffTot=w=>ROLES.reduce((a,r)=>a+(w.staff[r]||0),0);
+const isCoop=(w,r)=>!!w.coop&&COOP.roles.includes(r);
 const T_ST=5.5,T_MO=3.8,T_DI=30;
 
 /* ====================== UTILITÀ ====================== */
@@ -775,13 +778,16 @@ Gli effetti sulle [[abilita|abilità]] sono già sommati nei numeri. Altri effet
 const TAL_ID={}; Object.keys(TALENTS).forEach((n,i)=>{TAL_ID[n]='tal_'+i; const t=TALENTS[n];
   wk('tal_'+i,'tal',n,t.fx,`${t.fx.split(' · ').join('\n• ').replace(/^/,'• ')}\n\n*${t.fl}*\n\nTipo: ${TTYPE[t.t][0].toLowerCase()}. Vedi [[talenti]].`,sz=>talentSvg(t.ic,sz));});
 // Personale
-wk('personale','pers','Personale',`Cinque mestieri per ogni magazzino: magazzinieri, carrellisti, impiegati, autisti con patente B e con patente CE.`,
+wk('personale','pers','Personale',`Sei mestieri per ogni magazzino (magazzinieri, carrellisti, capiturno, impiegati, autisti B e CE) più i pianificatori del traffico in sede.`,
 `Ogni magazzino ha il suo organico, e ogni mestiere fa un lavoro diverso:
 • [[magazzinieri]]: preparano gli ordini, pesano sull'[[accuratezza]];
 • [[carrellisti]]: muovono i pallet col muletto, pesano sulla [[puntualita]];
+• [[capoturno|capiturno]]: uno ogni 10 operai, tengono su morale e accuratezza;
 • [[impiegati]]: bolle, inventari e traffico, un po' su entrambi i KPI;
 • [[autisti_ce|autisti con patente CE]]: bilici e motrici, tratte lunghe e ritiri;
 • [[autisti_b|autisti con patente B]]: furgoni, consegne in città e ultimo miglio.
+
+In sede lavorano i [[pianificatori]] del traffico, che servono a tutti i magazzini. Magazzinieri e carrellisti si possono anche prendere da una [[cooperativa]].
 
 Ogni cliente dice con che mezzo vuole le consegne (vedi [[zona]]), quindi vincere una [[gare|gara]] cambia chi devi [[assunzioni|assumere]]. La finestra Personale mostra l'organico di tutti i magazzini.`);
 wk('magazzinieri','pers','Magazzinieri',`Preparano gli ordini: prelevano i colli e compongono i pallet in uscita. Ognuno ne prepara circa 900 al mese.`,
@@ -796,6 +802,22 @@ wk('impiegati','pers','Impiegati di magazzino',`L'ufficio del magazzino: bolle, 
 `In ogni magazzino ne serve uno, più uno ogni 1.500 pallet al mese consegnati (2.000 con il [[tech_gestionale|gestionale]]). Ogni impiegato che manca toglie 1,5 punti di [[puntualita]] e 1 di [[accuratezza]] in quel magazzino.
 
 Costano 22.000 € lordi l'anno.`);
+wk('capoturno','pers','Capoturno',`Coordina la squadra di magazzino: ne serve uno ogni 10 tra magazzinieri e carrellisti.`,
+`Sotto i 10 operai il turno lo organizza il [[manager]]. Poi serve un capoturno ogni 10 tra [[magazzinieri]] e [[carrellisti]]. Ognuno che manca toglie 4 punti al [[morale]] obiettivo e 1 punto di [[accuratezza]].
+
+Costano 25.000 € lordi l'anno: di solito è il magazziniere più anziano, quello che sa dov'è tutto senza guardare il [[wms|WMS]].`);
+wk('pianificatori','pers','Pianificatori del traffico',`In sede organizzano i giri dei camion di tutti i magazzini. Ne serve uno ogni 80 viaggi al mese.`,
+`Finché l'azienda fa meno di 80 viaggi al mese i giri li organizza il [[ceo|CEO]]. Poi serve un pianificatore ogni 80 viaggi (distribuzione più [[ritiro|ritiri]], tutti i magazzini insieme).
+
+Ognuno che manca toglie 2 punti di [[puntualita]] in tutti i magazzini. Con la squadra al completo i giri sono ottimizzati e i km costano il 4% in meno. Costano 26.000 € lordi l'anno.`);
+wk('cooperativa','pers','Cooperativa di facchinaggio',`Magazzinieri e carrellisti forniti da una cooperativa: costano meno e arrivano subito, ma lavorano peggio e portano guai.`,
+`Si attiva per ogni magazzino con la casella nella sua finestra. Con la cooperativa:
+• [[magazzinieri]] e [[carrellisti]] costano il 20% in meno;
+• arrivano in 3 giorni, senza costi di ricerca, e si mandano via gratis, senza buonuscita né calo di [[morale]];
+• il morale obiettivo scende di 3 punti e l'[[accuratezza]] di 0,5: la squadra cambia di continuo, e con i clienti più esigenti mezzo punto pesa;
+• arrivano [[eventi]] a tema: scioperi, controlli dell'Ispettorato del lavoro, cooperative che spariscono nel nulla.
+
+Passare alla cooperativa abbassa il morale di 5 punti per un mese. Tornare ad assumere direttamente costa 600 € a persona e alza il morale di 5. [[capoturno|Capiturno]], [[impiegati]] e autisti restano sempre dipendenti.`);
 wk('autisti','pers','Autisti',`Due patenti, due mestieri: la CE per bilici e tratte lunghe, la B per i furgoni in città.`,
 `I km da fare dipendono dalla [[zona]] di distribuzione dei clienti e dai viaggi di [[ritiro]]. Le consegne con i furgoni le fanno gli [[autisti_b|autisti con patente B]]; tutto il resto, ritiri compresi, gli [[autisti_ce|autisti con patente CE]].
 
@@ -813,11 +835,11 @@ wk('manager','pers','Manager di magazzino',`Il capo di un magazzino. Le sue Oper
 
 All'inizio il manager è il [[ceo|CEO]]. Gli altri si assumono dalla finestra Personale e si assegnano dal menu a tendina del magazzino. Un manager senza magazzino può diventare un [[direzione|direttore]].`);
 wk('assunzioni','pers','Assunzioni',`Annuncio (economico ma lento) o agenzia interinale (veloce ma cara). Il nuovo arrivato si presenta dopo qualche giorno.`,
-`I tempi base con l'annuncio o con l'agenzia: [[magazzinieri]] 20 o 6 giorni, [[carrellisti]] 25 o 8, [[impiegati]] 20 o 7, [[autisti_b|autisti B]] 15 o 6, [[autisti_ce|autisti CE]] 40 o 16. Si accorciano con il [[welfare]], la [[reputazione]], l'[[tech_hr|ufficio del personale]] e il [[dir_hr|direttore HR]].
+`I tempi base con l'annuncio o con l'agenzia: [[magazzinieri]] 20 o 6 giorni, [[carrellisti]] 25 o 8, [[impiegati]] 20 o 7, [[autisti_b|autisti B]] 15 o 6, [[autisti_ce|autisti CE]] 40 o 16, [[capoturno|capiturno]] e [[pianificatori]] 25 o 8. Con la [[cooperativa]] magazzinieri e carrellisti arrivano in 3 giorni, gratis. Si accorciano con il [[welfare]], la [[reputazione]], l'[[tech_hr|ufficio del personale]] e il [[dir_hr|direttore HR]].
 
 Assumi in anticipo: quando vinci una [[gare|gara]] hai 30 giorni prima che il cliente parta.`);
 wk('licenziamenti','pers','Licenziamenti',`Costano un mese di stipendio di buonuscita e abbassano il morale del magazzino per 30 giorni.`,
-`Il pulsante − toglie una persona subito. Paghi la buonuscita e il [[morale]] del magazzino scende di 4 punti per un mese. Utile quando perdi un cliente e il personale resta senza lavoro.`);
+`Il pulsante − toglie una persona subito. Paghi la buonuscita e il [[morale]] del magazzino scende di 4 punti per un mese. Utile quando perdi un cliente e il personale resta senza lavoro. Le persone della [[cooperativa]] si mandano via gratis e senza calo di morale.`);
 wk('welfare','pers','Welfare',`Buoni pasto, assicurazione, premio, navetta: costano ogni mese per dipendente ma alzano il morale e accorciano le assunzioni.`,
 `Si attiva dalla finestra Azienda e vale per tutti i dipendenti:
 • Buoni pasto: 110 € a testa, morale +5;
@@ -878,7 +900,7 @@ Il totale si moltiplica per il [[prezzo]] offerto in gara.`);
 wk('costi','eco','Costi',`Personale, mezzi e gasolio, immobili, tecnologie, manager, welfare, penali.`,
 `Per ogni magazzino: stipendi del [[personale]], mezzi (gasolio, manutenzione, pedaggi, spese degli autisti, [[motrici]] e furgoni in leasing), affitto più 1.000 € di utenze, canoni delle [[installazione|tecnologie installate]].
 
-Per tutta l'azienda: [[manager]] e dirigenti, compenso del [[ceo|CEO]] (4.000 € al mese), [[welfare]] e [[penali]]. Le spese una tantum finiscono nella voce Altro.`);
+Per tutta l'azienda: [[pianificatori]] del traffico, [[manager]] e dirigenti, compenso del [[ceo|CEO]] (4.000 € al mese), [[welfare]] e [[penali]]. Le spese una tantum finiscono nella voce Altro.`);
 wk('conto','eco','Conto economico',`Il riepilogo del mese scorso: ricavi meno costi, voce per voce. In fondo c'è l'utile.`,
 `Si chiude a fine mese ed è nella finestra Azienda; il numero in alto "Mese scorso" è il suo risultato. Se l'utile è negativo per troppi mesi la [[cassa]] finisce. Vedi [[ricavi]] e [[costi]].`);
 wk('gasolio','eco','Gasolio',`Il prezzo al litro: parte da 0,86 € nel 2002 e sale di circa 5 centesimi l'anno.`,
@@ -962,10 +984,10 @@ const nid=p=>p+(uid++);
 function newGame(ceoId,coName,color){
   const C=CEOS.find(c=>c.id===ceoId);
   S={v:1,day:0,speed:0,ceoId,company:{name:coName||C.company,color},cash:C.cash,rep:C.rep,fuel:0.86,
-     warehouses:[],clients:[],tenders:[],queue:[],managers:MANAGERS.map(m=>({...m,hired:false,wh:null})),
+     warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0},managers:MANAGERS.map(m=>({...m,hired:false,wh:null})),
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextTender:12,nextEvent:25,project:null,seen:{},over:false,uid:1,
      execs:EXECS.map(e=>({...e,hired:false})),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false};
-  const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,autB:0,autCE:1,imp:2};
+  const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,capo:0,autB:0,autCE:1,imp:2};
   (C.startTech||[]).forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true;});
   S.clients.push({id:nid('c'),...C.client,zone:cinfo(C.client).zones[0],src:cinfo(C.client).src,mode:cinfo(C.client).mode,wh:wh.id,mult:1,sat:60,status:'attivo',start:0,end:24*30,storico:true});
   news('La Gazzetta del Muletto',`Nasce ${S.company.name}`,`${C.name} apre l'anno con un solo cliente, ${C.client.name}. Con il magazzino quasi vuoto i conti sono in rosso: servono nuovi clienti dalle gare d'appalto.`);
@@ -974,7 +996,7 @@ function newGame(ceoId,coName,color){
 function z(){return {ric:0,pers:0,mezzi:0,fissi:0,tech:0,mgr:0,welf:0,pen:0,altro:0}}
 function addWarehouse(site,own,fixed,motrici){
   const s=SITES[site];
-  const wh={id:nid('w'),site,name:s.name,prov:s.prov,cap:s.cap,own,fixed:own?fixed:s.rent,motrici:motrici||0,mgr:null,staff:noStaff(),morale:62,tech:{},acc:{P:0,A:0,n:0},kpi:null};
+  const wh={id:nid('w'),site,name:s.name,prov:s.prov,cap:s.cap,own,fixed:own?fixed:s.rent,motrici:motrici||0,mgr:null,staff:noStaff(),coop:false,morale:62,tech:{},acc:{P:0,A:0,n:0},kpi:null};
   S.warehouses.push(wh); return wh;
 }
 const ceo=()=>CEOS.find(c=>c.id===S.ceoId);
@@ -1000,6 +1022,8 @@ function techFactor(wh,t){
   if(m.ceo && ceo().allergic) weeks*=1.5; if(m.ceo && ceo().robots) weeks*=0.7; if(R('academy')) weeks*=0.7;
   return (S.day-it.day)<weeks*7 ? -0.5 : 1;
 }
+// pianificatori del traffico, in sede: il CEO regge da solo fino a 80 viaggi al mese
+function planNeed(){return Math.floor(S.clients.filter(c=>c.status==='attivo').reduce((a,c)=>{const w=whById(c.wh),t=clientLog(c,w);return a+t.out+t.in;},0)/80);}
 function impNeed(cons){return 1+Math.ceil(cons/(R('gestionale')?2000:1500));}
 function welfarePts(k){return WELFARE.filter(w=>S.welfare[w.id]).reduce((a,w)=>a+w[k],0);}
 function modSum(wh,k){return S.mods.filter(m=>m.until>S.day&&(m.scope==='all'||m.scope===wh.id)).reduce((a,m)=>a+(m[k]||0),0);}
@@ -1018,6 +1042,8 @@ function computeWH(wh,extra){
   const uCar=use(mov,st.car,2*prod), uPick=use(cons,st.pick,prod), uB=use(kmB,st.autB,KM_B), uCE=use(kmCE,st.autCE,KM_CE);
   const cap=capOf(wh); const sat=stock/cap;
   const needImp=impNeed(cons), impShort=Math.max(0,needImp-st.imp);
+  const needCapo=Math.floor((st.pick+st.car)/10), capoShort=Math.max(0,needCapo-st.capo);
+  const pNeed=planNeed(), planShort=Math.max(0,pNeed-S.office.plan), giri=pNeed>0&&!planShort?0.96:1;
   const mP=modSum(wh,'P'), mA=modSum(wh,'A'), mMor=modSum(wh,'mor');
   const pP=[['Base',92],['Operazioni di '+m.name.split(' ')[0],0.4*(m.op-10)]];
   if(tP) pP.push(['Tecnologie',tP]); if(mP) pP.push(['Eventi',mP]);
@@ -1025,24 +1051,26 @@ function computeWH(wh,extra){
   if(uCE>1) pP.push(['Autisti CE insufficienti',-20*(uCE-1)]); if(uB>1) pP.push(['Autisti B insufficienti',-20*(uB-1)]);
   if(uCar>1.05) pP.push(['Carrellisti insufficienti',-8*(uCar-1.05)]); if(uPick>1.05) pP.push(['Magazzinieri insufficienti',-3*(uPick-1.05)]);
   if(impShort) pP.push(['Impiegati insufficienti',-1.5*impShort]);
+  if(planShort) pP.push(['Pianificatori del traffico insufficienti',-2*planShort]);
   const pA=[['Base',96],['Precisione di '+m.name.split(' ')[0],0.3*(m.prec-10)],['Morale',0.04*(wh.morale-60)]];
   if(tA) pA.push(['Tecnologie',tA]); if(mA) pA.push(['Eventi',mA]); if(R('iso')) pA.push(['Certificazione ISO',0.5]);
   if(sat>0.85) pA.push(['Saturazione oltre 85%',-25*(sat-0.85)]); if(uPick>1) pA.push(['Magazzinieri insufficienti',-8*(uPick-1)]); if(uCar>1) pA.push(['Carrellisti insufficienti',-3*(uCar-1)]);
   if(impShort) pA.push(['Impiegati insufficienti',-1*impShort]);
+  if(capoShort) pA.push(['Capiturno insufficienti',-1*capoShort]); if(wh.coop) pA.push(['Facchini in cooperativa',COOP.A]);
   const P=clamp(pP.reduce((a,x)=>a+x[1],0),50,99.9), A=clamp(pA.reduce((a,x)=>a+x[1],0),50,99.9);
   const dHr=dirStat('hr');
-  const morT=clamp(58+0.6*(m.lead-10)+welfarePts('mor')+tMor+mMor+(R('academy')?3:0)+(dHr!=null?0.3*(dHr-10):0)-20*Math.max(0,uPick-1)-20*Math.max(0,uCar-1)-20*Math.max(0,Math.max(uB,uCE)-1),0,100);
+  const morT=clamp(58+0.6*(m.lead-10)+welfarePts('mor')+tMor+mMor+(R('academy')?3:0)+(dHr!=null?0.3*(dHr-10):0)-20*Math.max(0,uPick-1)-20*Math.max(0,uCar-1)-4*capoShort+(wh.coop?COOP.mor:0)-20*Math.max(0,Math.max(uB,uCE)-1),0,100);
   const rev=act.reduce((a,c)=>a+clientRev(c),0);
-  const pers=ROLES.reduce((a,r)=>a+st[r]*RAL[r],0)*COEF/12;
+  const pers=ROLES.reduce((a,r)=>a+st[r]*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12;
   // bilici: gasolio, manutenzione e pedaggi; furgoni: consumano e costano meno, sempre in leasing
-  const mezzi=kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+kmB*(0.12*S.fuel*fuelMul+0.06)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100+st.autB*900;
+  const mezzi=giri*kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+giri*kmB*(0.12*S.fuel*fuelMul+0.06)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100+st.autB*900;
   const fissi=(wh.fixed+1000)*fixedMul();
-  const need={pick:Math.max(cons?1:0,Math.ceil(cons/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp};
+  const need={pick:Math.max(cons?1:0,Math.ceil(cons/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp,capo:needCapo};
   return {act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,P,A,pP,pA,morT,rev,pers,mezzi,fissi,tCan,need,prod,m};
 }
 function globalCosts(){
-  const emp=S.warehouses.reduce((a,w)=>a+staffTot(w),0);
-  return {ceo:4000,mgr:[...S.managers,...S.execs].filter(m=>m.hired).reduce((a,m)=>a+m.ral*COEF/12,0),welf:welfarePts('cost')*emp*(R('welfare2')?0.7:1)};
+  const emp=S.warehouses.reduce((a,w)=>a+staffTot(w),0)+S.office.plan;
+  return {ceo:4000,plan:S.office.plan*RAL.plan*COEF/12,mgr:[...S.managers,...S.execs].filter(m=>m.hired).reduce((a,m)=>a+m.ral*COEF/12,0),welf:welfarePts('cost')*emp*(R('welfare2')?0.7:1)};
 }
 function step(){
   if(S.over) return;
@@ -1050,8 +1078,9 @@ function step(){
   // assunzioni in arrivo
   S.queue.forEach(q=>q.days--);
   S.queue.filter(q=>q.days<=0).forEach(q=>{
+    if(q.role==='plan'){S.office.plan++; toast('Assunto: 1 pianificatore del traffico in sede','ok'); return;}
     const w=whById(q.wh); if(!w) return; w.staff[q.role]++;
-    toast(`Assunto: 1 ${ROLE1[q.role]} a ${w.name}`,'ok');
+    toast(`${isCoop(w,q.role)?'Arrivato dalla cooperativa':'Assunto'}: 1 ${ROLE1[q.role]} a ${w.name}`,'ok');
   });
   S.queue=S.queue.filter(q=>q.days>0);
   // clienti in avvio
@@ -1068,8 +1097,8 @@ function step(){
     dRic+=k.rev/30; dCost+=(k.pers+k.mezzi+k.fissi+k.tCan)/30;
   });
   const g=globalCosts();
-  cur.fissi+=g.ceo/30; cur.mgr+=g.mgr/30; cur.welf+=g.welf/30;
-  dCost+=(g.ceo+g.mgr+g.welf)/30;
+  cur.pers+=g.plan/30; cur.fissi+=g.ceo/30; cur.mgr+=g.mgr/30; cur.welf+=g.welf/30;
+  dCost+=(g.plan+g.ceo+g.mgr+g.welf)/30;
   S.cash+=dRic-dCost;
   // ricerca in corso
   if(S.project){ S.project.left--; if(S.project.left<=0){ const t=TECH.find(x=>x.id===S.project.tech); S.project=null; S.researched[t.id]=true;
@@ -1142,7 +1171,7 @@ function bidEstimate(t,whId,mult){
   const extra={...t,wh:w.id,mult,status:'attivo'};
   const k=computeWH(w,extra);
   // stima con il personale che servirebbe
-  const need=k.need, save=w.staff; w.staff={}; ROLES.forEach(r=>w.staff[r]=Math.max(save[r],need[r]));
+  const need=k.need, save=w.staff; w.staff={}; ROLES.forEach(r=>w.staff[r]=Math.max(save[r],need[r])); w.staff.capo=Math.max(save.capo,Math.floor((w.staff.pick+w.staff.car)/10));
   const k2=computeWH(w,extra); w.staff=save;
   const missing=(t.req||[]).filter(r=>!R(r)).map(r=>TECH.find(x=>x.id===r).name), naz=nazMissing(t);
   const fits=k.stock<=k.cap&&!missing.length&&!naz.length;
@@ -1333,6 +1362,21 @@ const EVENTS=[
   text:'Quest\'anno il cesto per i dipendenti: panettone artigianale o la solita bottiglia di spumante?',
   opts:[{t:'Cesto ricco',e:'−2.500 €, morale +4',f:()=>{S.cash-=2500;mod('all',{mor:4},45);}},
         {t:'Spumante e auguri',e:'−300 €',f:()=>{S.cash-=300;}}]},
+ {id:'coop_sciopero',src:'La Gazzetta del Muletto',title:'Sciopero dei facchini',cond:()=>S.warehouses.some(w=>w.coop),
+  setup:ev=>{const w=S.warehouses.find(w=>w.coop);ev.wh=w.id;ev.text=`A ${w.name} i facchini della cooperativa bloccano il cancello: chiedono il contratto nazionale vero, non quello «multiservizi». Il sindacalista è già in diretta su una TV locale.`;},
+  text:'',
+  opts:[{t:'Paga l\'adeguamento',e:'−6.000 € una tantum, morale +4',f:function(){S.cash-=6000;S.cur.altro+=6000;mod('all',{mor:4},60);}},
+        {t:'Aspetta che passi',e:'Puntualità −10 per 10 giorni in quel magazzino',f:()=>{const w=S.warehouses.find(w=>w.coop);mod(w.id,{P:-10,mor:-5},10);}},
+        {t:'Tavolo con sindacato e cooperativa',e:'Puntualità −3 per 5 giorni, nessun costo',req:()=>ceo().st.lead>=13,reqT:'Leadership 13',f:()=>{const w=S.warehouses.find(w=>w.coop);mod(w.id,{P:-3},5);}}]},
+ {id:'coop_ispettorato',src:'Il Sole 24 Pallet',title:'L\'Ispettorato del lavoro in banchina',cond:()=>S.warehouses.some(w=>w.coop),
+  text:'Due ispettori controllano i facchini della cooperativa: buste paga, turni, straordinari. Il presidente della cooperativa non risponde al telefono da stamattina.',
+  opts:[{t:'Paga la sanzione in solido',e:'−15.000 €, reputazione −3',f:()=>{S.cash-=15000;S.cur.altro+=15000;S.rep=clamp(S.rep-3,0,100);}},
+        {t:'Assumi direttamente i facchini',e:'Fine della cooperativa in quel magazzino, 600 € a persona, morale +5',f:()=>{const w=S.warehouses.find(w=>w.coop);const c=600*(w.staff.pick+w.staff.car);w.coop=false;S.cash-=c;S.cur.altro+=c;mod(w.id,{mor:5},60);}},
+        {t:'"Abbiamo verificato tutto noi"',e:'Nessuna multa',req:()=>ceo().st.amm>=13,reqT:'Amministrazione 13',f:()=>{}}]},
+ {id:'coop_sparita',src:'La Gazzetta del Muletto',title:'La cooperativa è sparita',cond:()=>S.warehouses.some(w=>w.coop&&w.staff.pick+w.staff.car>=4),
+  text:'La cooperativa ha chiuso nella notte: partita IVA cessata, sede legale in un garage di Rozzano. Metà dei facchini non si presenta, l\'altra metà chiede chi li pagherà.',
+  opts:[{t:'Trova un\'altra cooperativa',e:'−5.000 €, perdi un quarto dei facchini, morale −5',f:()=>{const w=S.warehouses.find(w=>w.coop&&w.staff.pick+w.staff.car>=4);S.cash-=5000;S.cur.altro+=5000;w.staff.pick-=Math.floor(w.staff.pick/4);w.staff.car-=Math.floor(w.staff.car/4);mod(w.id,{mor:-5},30);}},
+        {t:'Assumili tutti tu',e:'Fine della cooperativa, 600 € a persona, morale +8',f:()=>{const w=S.warehouses.find(w=>w.coop&&w.staff.pick+w.staff.car>=4);const c=600*(w.staff.pick+w.staff.car);w.coop=false;S.cash-=c;S.cur.altro+=c;mod(w.id,{mor:8},60);}}]},
  {id:'concorrente',src:'Il Sole 24 Pallet',title:'Un concorrente ruba un autista',cond:()=>S.warehouses.some(w=>w.staff.autCE>=2),
   text:'Un rivale offre 200 € in più al mese al tuo autista migliore.',
   opts:[{t:'Pareggia l\'offerta',e:'−2.400 € e morale +2',f:()=>{S.cash-=2400;mod('all',{mor:2},30);}},
@@ -1373,6 +1417,12 @@ function migrateStaff(s){
   const first=s.warehouses[0].id;
   s.queue.forEach(q=>{q.role={mag:'car',aut:'autCE',imp:'imp'}[q.role]||q.role; if(!q.wh) q.wh=first;});
   delete s.imp; s.staffMig=true; return s;
+}
+// campi aggiunti dopo: capoturno, cooperativa, pianificatori
+function fillSave(s){
+  if(!s.office) s.office={plan:0};
+  s.warehouses.forEach(w=>{if(w.staff.capo===undefined) w.staff.capo=0; if(w.coop===undefined) w.coop=false;});
+  return s;
 }
 // dopo la conversione: gli autisti che servono sui furgoni passano alla patente B
 function rebalanceDrivers(){
@@ -1498,8 +1548,9 @@ const TITLES={azienda:'Azienda e CEO',magazzini:'Magazzini',clienti:'Clienti',ga
 function renderDock(){
   const openT=S.tenders.filter(t=>!t.done&&!t.bid).length;
   const short=S.warehouses.filter(w=>w.kpi&&ROLES.some(r=>w.staff[r]<w.kpi.need[r])).length;
-  const B={gare:openT,magazzini:short};
-  $('#dock').innerHTML=DOCK.map(([id,t,ic])=>`<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${id==='magazzini'&&short?'Personale insufficiente in un magazzino':id==='tecnologia'&&S.project?'Ricerca in corso: '+S.project.left+' giorni':id==='direzione'&&!R('direzione')?'Si sblocca con la ricerca Struttura direzionale':''}">${ic}${B[id]?`<span class="badge">${id==='gare'?B[id]:'!'}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}${id==='report'&&S.repNew?'<span class="badge">1</span>':''}${id==='direzione'&&R('direzione')&&Object.values(S.dirs).some(v=>!v)?'<span class="badge">!</span>':''}</button>`).join('');
+  const planS=S.office.plan<planNeed()?1:0;
+  const B={gare:openT,magazzini:short,personale:planS};
+  $('#dock').innerHTML=DOCK.map(([id,t,ic])=>`<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${id==='magazzini'&&short?'Personale insufficiente in un magazzino':id==='personale'&&planS?'Servono pianificatori del traffico in sede':id==='tecnologia'&&S.project?'Ricerca in corso: '+S.project.left+' giorni':id==='direzione'&&!R('direzione')?'Si sblocca con la ricerca Struttura direzionale':''}">${ic}${B[id]?`<span class="badge">${id==='gare'?B[id]:'!'}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}${id==='report'&&S.repNew?'<span class="badge">1</span>':''}${id==='direzione'&&R('direzione')&&Object.values(S.dirs).some(v=>!v)?'<span class="badge">!</span>':''}</button>`).join('');
 }
 function renderTop(){
   $('#date').textContent=fmtDate(S.day);
@@ -1580,7 +1631,8 @@ const VIEWS={
   </div>
   <div class="card"><div class="row"><span class="h3">Personale</span><span class="sm">${kw('morale','morale')} <b class="${w.morale>=60?'ok':w.morale>=45?'warn':'bad'}">${Math.round(w.morale)}</b></span></div>
    <div class="lab">Magazzino e ufficio</div>
-   <div class="staff">${['pick','car','imp'].map(r=>staffRow(r,w.staff[r],k.need[r])).join('')}</div>
+   <div class="staff">${['pick','car','capo','imp'].map(r=>staffRow(r,w.staff[r],k.need[r])).join('')}</div>
+   <label class="row" style="cursor:pointer"><span><input type="checkbox" data-act="coop" data-wh="${w.id}" ${w.coop?'checked':''}> Magazzinieri e carrellisti in ${kw('cooperativa')}</span><span class="sm">${w.coop?'−20% di costo, più errori':'assunti direttamente'}</span></label>
    <div class="lab">Trasporti</div>
    <div class="staff">${['autCE','autB'].map(r=>staffRow(r,w.staff[r],k.need[r])).join('')}</div>
    <div class="sm">${kw('motrici')}: ${w.motrici} di proprietà${Math.max(0,w.staff.autCE-w.motrici)?` + ${Math.max(0,w.staff.autCE-w.motrici)} in leasing`:''}${w.staff.autB?` · ${w.staff.autB} furgoni in leasing`:''} · ${k.viaggi} viaggi al mese</div>
@@ -1639,12 +1691,15 @@ const VIEWS={
    ${done.length?`<div class="lab">Risultati recenti</div>`+done.map(t=>`<div class="row sm"><span>${esc(t.name)}</span><span class="${t.result&&t.result.win?'ok':'bad'}">${t.result?(t.result.win?'Vinta':t.bid?`Persa contro ${esc(t.result.by)}`:`Non partecipato · ${esc(t.result.by)}`):''}</span></div>`).join(''):''}`;
  },
  personale(){
-  const ks=S.warehouses.map(w=>[w,w.kpi||computeWH(w)]);
+  const ks=S.warehouses.map(w=>[w,w.kpi||computeWH(w)]), pn=planNeed(), pq=S.queue.filter(q=>q.role==='plan').length;
   return `<div class="card"><div class="row"><span class="h3">Organico</span><span class="sm">presenti / necessari</span></div>
    <table class="t num"><tr><th></th>${ks.map(([w])=>`<th class="r"><button class="btn sm2" data-act="openwh" data-id="${w.id}">${esc(w.name)}</button></th>`).join('')}</tr>
     ${ROLES.map(r=>`<tr><td style="display:flex;align-items:center;gap:6px"><img class="px" src="${IMG[r]}" alt="" width="24" height="28">${kw(ROLE_WK[r],ROLE[r])}</td>${ks.map(([w,k])=>`<td class="r ${w.staff[r]<k.need[r]?'bad':''}">${w.staff[r]} / ${k.need[r]}</td>`).join('')}</tr>`).join('')}</table>
    <div class="sm">Si assume e si licenzia dalla finestra di ogni magazzino.</div></div>
-   <div class="card"><div class="row"><span class="h3">${kw('assunzioni')} in corso</span></div>${S.queue.length?S.queue.map(q=>`<div class="row sm"><span>${ROLE[q.role]}${q.wh?' · '+esc(whById(q.wh).name):''}</span><span>${q.days} giorni</span></div>`).join(''):'<div class="sm">Nessuna.</div>'}
+  <div class="card"><div class="row"><span class="h3">Sede</span></div>
+   <div class="staff"><img class="px mini" src="${IMG.plan}" alt="" width="48" height="56"><span>${kw('pianificatori',ROLE.plan)}<br><span class="sm">servono ${pn}${pq?` · ${pq} in arrivo`:''}</span></span><b class="num ${S.office.plan<pn?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${S.office.plan}</b><button class="btn sm2" data-act="fire" data-role="plan" ${S.office.plan<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="plan" aria-label="Assumi">+ Assumi</button></div>
+   <div class="sm">${pn?`Organizzano i giri dei camion di tutti i magazzini. Ognuno che manca toglie 2 punti di puntualità ovunque; con la squadra al completo i km costano il 4% in meno.`:`Fino a 80 viaggi al mese i giri li organizzi tu. Poi serve un pianificatore ogni 80 viaggi.`}</div></div>
+   <div class="card"><div class="row"><span class="h3">${kw('assunzioni')} in corso</span></div>${S.queue.length?S.queue.map(q=>`<div class="row sm"><span>${ROLE[q.role]}${q.wh?' · '+esc(whById(q.wh).name):' · sede'}</span><span>${q.days} giorni</span></div>`).join(''):'<div class="sm">Nessuna.</div>'}
    <div class="sm">Tempi più brevi con welfare e reputazione alti. Gli autisti con patente CE sono i più difficili da trovare.</div></div>
    <div class="lab">${kw('manager','Manager')} disponibili</div>
    ${S.managers.map(m=>`<div class="card" style="flex-direction:row;gap:12px;align-items:flex-start"><img class="px mport" src="${IMG['m_'+m.id]}" alt="Ritratto di ${esc(m.name)}" width="96" height="112"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px"><div class="row"><b>${esc(m.name)}, ${m.age}</b><span class="sm">${m.hired?(seatOf(m.id)?esc(DIR_ROLES.find(r=>r.id===seatOf(m.id)).name):m.wh?'a '+esc(whById(m.wh).name):'senza incarico'):eur(m.ral)+' l\'anno'}</span></div>
@@ -1821,14 +1876,19 @@ const ACT={
  selwh(d){UI.sel.wh=d.id;renderWin('magazzini');renderWin('tecnologia');},
  seltender(d){UI.sel.tender=d.id;renderWin('gare');},
  hire(d){
-  const r=d.role, h=HIRE[r];
+  const r=d.role, h=HIRE[r], w=whById(d.wh);
+  if(w&&isCoop(w,r)) return showChoice(`Chiedi alla cooperativa: ${ROLE1[r]}`,`Il magazzino lavora con una cooperativa di facchinaggio: manda le persone in pochi giorni, senza costi di ricerca.`,[
+   {t:`Cooperativa · ${COOP.days} giorni`,e:'0 €',f:()=>doHire(r,d.wh,COOP.days,0)}]);
   showChoice(`Assumi: ${ROLE[r].toLowerCase()}`,`Scegli il canale. Tempi stimati con welfare e reputazione attuali.`,[
    {t:`Annuncio · ${hireDays(h.ann[0])} giorni`,e:`${eur(h.ann[1])}`,f:()=>doHire(r,d.wh,hireDays(h.ann[0]),h.ann[1])},
    {t:`Agenzia interinale · ${hireDays(h.age[0])} giorni`,e:`${eur(h.age[1])}`,f:()=>doHire(r,d.wh,hireDays(h.age[0]),h.age[1])}]);
  },
  fire(d){
   const r=d.role; const sal=RAL[r]*COEF/12;
-  const w=whById(d.wh);if(w.staff[r]<=0)return;w.staff[r]--;mod(w.id,{mor:-4},30);
+  if(r==='plan'){if(S.office.plan<=0)return;S.office.plan--;}
+  else {const w=whById(d.wh);if(w.staff[r]<=0)return;w.staff[r]--;
+   if(isCoop(w,r)){toast(`La cooperativa riprende 1 ${ROLE1[r]}: nessuna buonuscita`,'ok');renderAll();return;}
+   mod(w.id,{mor:-4},30);}
   S.cash-=sal; S.cur.altro+=sal; toast(`Licenziamento: ${eur(sal)} di buonuscita, morale in calo`,'warn'); renderAll();
  },
  setmgr(d,el){
@@ -1861,6 +1921,12 @@ const ACT={
   news('Il Sole 24 Pallet',`${S.company.name} apre a ${s.name}`,`Nuovo magazzino da ${n0(s.cap)} posti pallet.`); S.rep+=3;
   toast(`Nuovo magazzino a ${s.name}: assumi personale e un manager`,'ok'); renderMap(); syncTrucks(); openWin('magazzini',{wh:w.id}); renderAll();
  },
+ coop(d,el){
+  const w=whById(d.wh), n=w.staff.pick+w.staff.car;
+  if(el.checked){w.coop=true;mod(w.id,{mor:-5},30);toast(`${w.name}: magazzinieri e carrellisti passano alla cooperativa. I sindacati non sono contenti.`,'warn');}
+  else {const c=600*n;w.coop=false;S.cash-=c;S.cur.altro+=c;mod(w.id,{mor:5},60);toast(`${w.name}: ${n} persone assunte direttamente, ${eur(c)} di pratiche`,'ok');}
+  renderAll();
+ },
  welfare(d,el){S.welfare[d.id]=el.checked;renderAll();},
  bidwh(d,el){UI.bid.wh=el.value;renderWin('gare');},
  bidmult(d,el){UI.bid.mult=(+el.value)/100;const sel=S.tenders.find(t=>t.id===UI.bid.t);$('#bidmv').textContent=(UI.bid.mult>=1?'+':'')+Math.round((UI.bid.mult-1)*100)+'%';$('#bidest').innerHTML=bidEstHtml(sel,bidEstimate(sel,UI.bid.wh,UI.bid.mult));},
@@ -1888,7 +1954,7 @@ function wikiShow(){
   const l=el.querySelector('#wiki-list'); l.scrollTop=ls; const c=l.querySelector('[aria-current="true"]');
   if(c&&(c.offsetTop<l.scrollTop||c.offsetTop>l.scrollTop+l.clientHeight-30)) l.scrollTop=c.offsetTop-l.clientHeight/3;
 }
-function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh,days});toast(`Ricerca avviata: arriva tra ${days} giorni`,'ok');}
+function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh:r==='plan'?null:wh,days});toast(`Ricerca avviata: arriva tra ${days} giorni`,'ok');}
 function setSpeed(v){S.speed=v;renderTop();}
 function showModal(html){$('#modal').innerHTML=`<div class="ovl"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;const b=$('#modal button');if(b)b.focus();}
 function closeModal(){$('#modal').innerHTML='';if(UI.evSpeed){setSpeed(UI.evSpeed);UI.evSpeed=0;}}
@@ -1948,7 +2014,7 @@ Object.assign(ACT,{
  pickceo(d){const old=CEOS.find(c=>c.id===startSel.ceo);const inp=$('#coname-in');const typed=inp?inp.value:'';startSel.ceo=d.id;if(!typed||typed===old.company)startSel.name='';else startSel.name=typed;showStart();},
  pickcolor(d){startSel.color=d.c;applyColor(d.c);startSel.name=$('#coname-in').value;showStart();},
  startgame(){const nm=($('#coname-in').value||'').trim();uid=1;newGame(startSel.ceo,nm,startSel.color);boot();},
- continue(){const sv=load();if(!sv)return;S=migrateStaff(renameClients(sv.S));S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;rebalanceDrivers();boot();}
+ continue(){const sv=load();if(!sv)return;S=fillSave(migrateStaff(renameClients(sv.S)));S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;rebalanceDrivers();boot();}
 });
 function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;
@@ -1970,6 +2036,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else showStart(); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY};
+window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed};
 })();
 </script>

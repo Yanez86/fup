@@ -8,8 +8,8 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Si va in fallimento se a fine mese la cassa è sotto −50.000 €.
 
 ## KPI di magazzino (ricalcolati ogni giorno)
-- **Puntualità** P = 92 + 0,4·(Operazioni−10) + tecnologie + eventi + direttore operativo·0,15·(Op−10) − 20·max(0, utilizzo autisti CE−1) − 20·max(0, utilizzo autisti B−1) − 8·max(0, utilizzo carrellisti−1,05) − 3·max(0, utilizzo magazzinieri−1,05) − 1,5·impiegati mancanti
-- **Accuratezza** A = 96 + 0,3·(Precisione−10) + 0,04·(morale−60) + tecnologie + eventi + ISO 0,5 − 25·max(0, saturazione−0,85) − 8·max(0, utilizzo magazzinieri−1) − 3·max(0, utilizzo carrellisti−1) − 1·impiegati mancanti
+- **Puntualità** P = 92 + 0,4·(Operazioni−10) + tecnologie + eventi + direttore operativo·0,15·(Op−10) − 20·max(0, utilizzo autisti CE−1) − 20·max(0, utilizzo autisti B−1) − 8·max(0, utilizzo carrellisti−1,05) − 3·max(0, utilizzo magazzinieri−1,05) − 1,5·impiegati mancanti − 2·pianificatori mancanti
+- **Accuratezza** A = 96 + 0,3·(Precisione−10) + 0,04·(morale−60) + tecnologie + eventi + ISO 0,5 − 25·max(0, saturazione−0,85) − 8·max(0, utilizzo magazzinieri−1) − 3·max(0, utilizzo carrellisti−1) − 1·impiegati mancanti − 1·capiturno mancanti − 0,5 se in cooperativa
 - Entrambi sono limitati tra 50 e 99,9.
 - **Morale**: obiettivo = 58 + 0,6·(Leadership−10) + welfare + tecnologie + Academy 3 + direttore HR·0,3·(Lead−10) − 20·(sovraccarico magazzinieri) − 20·(sovraccarico carrellisti) − 20·(sovraccarico del gruppo di autisti più carico). Ogni giorno il morale si avvicina all'obiettivo dell'1,2% della differenza.
 - Le abilità usate sono quelle del manager del magazzino; senza manager le prestazioni calano.
@@ -56,7 +56,7 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 ## Personale e recruiting
 - Giorni per assumere = base × clamp(1 + (55 − attrattività)/40; 0,6; 1,8) × (Ufficio del personale 0,8) × (1 − 0,02·(Leadership del direttore HR − 10)).
 - Attrattività = 40 + welfare + (reputazione−50)·0,5 + 5.
-- Ogni magazzino ha cinque mestieri (`ROLES`, `w.staff`): magazzinieri (`pick`), carrellisti (`car`), impiegati di magazzino (`imp`), autisti patente B (`autB`), autisti patente CE (`autCE`). Non ci sono più impiegati di sede.
+- Ogni magazzino ha sei mestieri (`ROLES`, `w.staff`): magazzinieri (`pick`), carrellisti (`car`), capiturno (`capo`), impiegati di magazzino (`imp`), autisti patente B (`autB`), autisti patente CE (`autCE`). Non ci sono più impiegati di sede.
 - Produttività base `prod` = 900 × (0,7 + 0,3·morale/70) × (1 + tecnologie di produttività).
 - Magazzinieri necessari = pallet consegnati al mese / prod (preparano i pallet in uscita, pesano sull'Accuratezza).
 - Carrellisti necessari = movimenti (2 × pallet) / (2·prod) (scaricano, stoccano e caricano col muletto, pesano sulla Puntualità).
@@ -64,6 +64,9 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Autisti B necessari = km di distribuzione dei clienti con `CINFO.veh='B'` / 4.000. Autisti CE = km di distribuzione degli altri clienti + km di tutti i ritiri, / 5.200.
 - Clienti con furgoni (`veh:'B'`): FarmaSpa, Moda Grucciani, Scarpinando, Tuttosubito Italia, Spesa Veloce, Spedizioni Tricolore, Cosmetici Belletto, Seterie del Lario.
 - Tempi base di assunzione (annuncio / agenzia, giorni): magazzinieri 20/6, carrellisti 25/8, impiegati 20/7, autisti B 15/6, autisti CE 40/16.
+- **Capoturno** (`capo`): ne serve uno ogni 10 tra magazzinieri e carrellisti (floor). Ognuno che manca: morale obiettivo −4, Accuratezza −1. RAL 25.000.
+- **Pianificatori del traffico** (`S.office.plan`, in sede): necessari = floor(viaggi al mese di tutti i clienti attivi / 80). Ognuno che manca: Puntualità −2 in tutti i magazzini. Con la squadra al completo (e almeno uno necessario) i costi a km dei mezzi −4%. RAL 26.000.
+- **Cooperativa di facchinaggio** (`w.coop`, `COOP`): per magazzino. Magazzinieri e carrellisti costano ×0,8, arrivano in 3 giorni gratis, si licenziano senza buonuscita né calo di morale; morale obiettivo −3, Accuratezza −0,5. Attivarla: morale −5 per 30 giorni. Disattivarla: 600 € a persona, morale +5 per 60 giorni. Eventi solo con la cooperativa: sciopero dei facchini, Ispettorato del lavoro, cooperativa sparita.
 - I salvataggi con i vecchi ruoli vengono convertiti (`migrateStaff`): metà dei magazzinieri diventano carrellisti, gli autisti diventano CE (poi quelli in più passano ai furgoni se servono), gli impiegati di sede si dividono tra i magazzini.
 
 ## Abilità dei personaggi
