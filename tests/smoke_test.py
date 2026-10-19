@@ -121,6 +121,8 @@ async def main():
         await pg.click('[data-act=pickceo][data-id=custom]')
         await pg.click('[data-act=stnext]')
         assert 'nome e cognome' in await pg.inner_text('#start [role=alert]')
+        await pg.click('[data-act=sugg][data-f=persona]')
+        assert await pg.input_value('#cc-nome') and await pg.input_value('#cc-cognome'), 'nome e cognome non suggeriti'
         await pg.fill('#cc-nome', 'Ornella'); await pg.fill('#cc-cognome', 'Bancalini'); await pg.fill('#cc-nick', 'la Bolla')
         await pg.click('[data-act=sugg][data-f=motto]')
         assert await pg.input_value('#cc-nome') == 'Ornella' and await pg.input_value('#cc-motto')
@@ -143,6 +145,9 @@ async def main():
         await pg.click('[data-act=stback]'); await pg.click('[data-act=stnext]')   # indietro e di nuovo avanti
         await pg.click('[data-act=stnext]')
         assert await pg.input_value('#coname-in') == 'Trasporti Bancalini'
+        await pg.click('[data-act=sugg][data-f=name]')
+        assert await pg.input_value('#coname-in') not in ('', 'Trasporti Bancalini'), 'nome azienda non suggerito'
+        await pg.fill('#coname-in', 'Trasporti Bancalini')
         await pg.click('[data-act=ccbase][data-id=marco]'); await pg.click('[data-act=cologo][data-id=muletto]')
         await pg.fill('#co-claim', 'Ogni bancale è una promessa.')
         assert await pg.inner_text('#co-prev-c') == 'Ogni bancale è una promessa.'
