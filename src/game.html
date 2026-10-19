@@ -266,6 +266,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .ev-res{display:block;font-size:14px;color:var(--muted)}.ev-res i{font-style:normal;font-weight:600;color:var(--ink)}
 .opt .ev-req{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:12px;font-weight:600}
 .opt .ev-req i{font-style:normal;font-weight:400;color:var(--muted)}
+.opt .ev-req .ev-rl{flex-basis:100%}
 .opt .ev-rq{display:inline-flex;align-items:center;gap:4px;padding:1px 6px 1px 1px;background:var(--yellow);border:2px solid var(--ink);line-height:1.2}
 .opt .ev-rq .tal{border-width:1px}.opt .ev-rq .stc{font-size:12px;padding:0 3px}
 .opt .ev-req.ok .ev-rq{background:#bfe8c8}
@@ -2540,7 +2541,7 @@ function evReq(reqT,ok){
     const m=x.match(/^(.+) (\d+)$/),st=m&&STATS.find(z=>z.n===m[1]);
     return st?`<span class="ev-rq">${statBadge(st.k,+m[2],11)}${esc(st.n)}</span>`:`<span class="ev-rq">${esc(x)}</span>`;
   });
-  return `<span class="ev-req${ok?' ok':''}"><i>${ok?'Grazie a':'Serve'}</i>${parts.join('<i>o</i>')}</span>`.replace(/ data-act="wiki"/g,'');
+  return `<span class="ev-req${ok?' ok':''}"><i class="ev-rl">${ok?'Grazie a:':'Serve:'}</i>${parts.join('<i>o</i>')}</span>`.replace(/ data-act="wiki"/g,'');
 }
 function showEvent(ev){
   S.seen[ev.id]=S.day; UI.ev=ev; const wasSpeed=S.speed; UI.evSpeed=wasSpeed; setSpeed(0);
