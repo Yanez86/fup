@@ -8,17 +8,17 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Si va in fallimento se a fine mese la cassa è sotto −50.000 €.
 
 ## KPI di magazzino (ricalcolati ogni giorno)
-- **Puntualità** P = 92 + 0,4·(Operazioni−10) + tecnologie + eventi + direttore operativo·0,15·(Op−10) − 20·max(0, utilizzo autisti−1) − 5·max(0, utilizzo magazzinieri−1,05) − 1,5·impiegati mancanti
-- **Accuratezza** A = 96 + 0,3·(Precisione−10) + 0,04·(morale−60) + tecnologie + eventi + ISO 0,5 − 25·max(0, saturazione−0,85) − 8·max(0, utilizzo magazzinieri−1)
+- **Puntualità** P = 92 + 0,4·(Operazioni−10) + tecnologie + eventi + direttore operativo·0,15·(Op−10) − 20·max(0, utilizzo autisti CE−1) − 20·max(0, utilizzo autisti B−1) − 8·max(0, utilizzo carrellisti−1,05) − 3·max(0, utilizzo magazzinieri−1,05) − 1,5·impiegati mancanti
+- **Accuratezza** A = 96 + 0,3·(Precisione−10) + 0,04·(morale−60) + tecnologie + eventi + ISO 0,5 − 25·max(0, saturazione−0,85) − 8·max(0, utilizzo magazzinieri−1) − 3·max(0, utilizzo carrellisti−1) − 1·impiegati mancanti
 - Entrambi sono limitati tra 50 e 99,9.
-- **Morale**: obiettivo = 58 + 0,6·(Leadership−10) + welfare + tecnologie + Academy 3 + direttore HR·0,3·(Lead−10) − sovraccarico. Ogni giorno il morale si avvicina all'obiettivo dell'1,2% della differenza.
+- **Morale**: obiettivo = 58 + 0,6·(Leadership−10) + welfare + tecnologie + Academy 3 + direttore HR·0,3·(Lead−10) − 20·(sovraccarico magazzinieri) − 20·(sovraccarico carrellisti) − 20·(sovraccarico del gruppo di autisti più carico). Ogni giorno il morale si avvicina all'obiettivo dell'1,2% della differenza.
 - Le abilità usate sono quelle del manager del magazzino; senza manager le prestazioni calano.
 
 ## Economia (mensile)
 - Ricavo per cliente = (posti pallet·5,5 + 2·pallet movimentati·3,8 + pallet·(18 + 0,05·km di un viaggio di distribuzione) + viaggi di ritiro·km del ritiro·1,5) × moltiplicatore dell'offerta.
-- Personale: RAL magazzinieri 18.500, autisti 20.000, impiegati 22.000, × 1,42 di oneri, ÷ 12.
-- Mezzi: km del mese × (0,25 l/km × gasolio × riduzione rotte + 0,13) €/km, più 1.100 € per autista e 2.100 € di leasing per ogni autista oltre le motrici di proprietà.
-- Ogni autista copre 5.200 km al mese: autisti necessari = km del mese / 5.200. Se gli autisti sono troppo pochi, la Puntualità cala.
+- Personale: RAL magazzinieri 18.000, carrellisti 19.500, impiegati di magazzino 22.000, autisti patente B 19.000, autisti patente CE 23.000, × 1,42 di oneri, ÷ 12.
+- Mezzi: km CE × (0,25 l/km × gasolio × riduzione rotte + 0,13) €/km + km B × (0,12 l/km × gasolio × riduzione rotte + 0,06) €/km, più 1.100 € per autista CE, 2.100 € di leasing per ogni autista CE oltre le motrici di proprietà e 900 € di furgone in leasing per autista B.
+- Ogni autista CE copre 5.200 km al mese, ogni autista B 4.000 (traffico e soste in città). Se gli autisti sono troppo pochi, la Puntualità cala.
 - Immobile: costo fisso + 1.000, × moltiplicatore costi fissi (gestionale −3%, controllo di gestione −4%, direttore finanziario −0,5% per punto di Amministrazione sopra 10).
 - CEO 4.000 €/mese; manager e dirigenti a RAL × 1,42.
 - Gasolio: 0,86 €/l nel 2002, +0,05 l'anno, con oscillazioni.
@@ -56,7 +56,15 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 ## Personale e recruiting
 - Giorni per assumere = base × clamp(1 + (55 − attrattività)/40; 0,6; 1,8) × (Ufficio del personale 0,8) × (1 − 0,02·(Leadership del direttore HR − 10)).
 - Attrattività = 40 + welfare + (reputazione−50)·0,5 + 5.
-- Impiegati necessari = 2 + 1 ogni 1.500 pallet movimentati (2.000 con il gestionale) + 1 per ogni magazzino oltre il primo.
+- Ogni magazzino ha cinque mestieri (`ROLES`, `w.staff`): magazzinieri (`pick`), carrellisti (`car`), impiegati di magazzino (`imp`), autisti patente B (`autB`), autisti patente CE (`autCE`). Non ci sono più impiegati di sede.
+- Produttività base `prod` = 900 × (0,7 + 0,3·morale/70) × (1 + tecnologie di produttività).
+- Magazzinieri necessari = pallet consegnati al mese / prod (preparano i pallet in uscita, pesano sull'Accuratezza).
+- Carrellisti necessari = movimenti (2 × pallet) / (2·prod) (scaricano, stoccano e caricano col muletto, pesano sulla Puntualità).
+- Impiegati necessari per magazzino = 1 + ceil(pallet consegnati / 1.500) (2.000 con il gestionale).
+- Autisti B necessari = km di distribuzione dei clienti con `CINFO.veh='B'` / 4.000. Autisti CE = km di distribuzione degli altri clienti + km di tutti i ritiri, / 5.200.
+- Clienti con furgoni (`veh:'B'`): FarmaSpa, Moda Grucciani, Scarpinando, Tuttosubito Italia, Spesa Veloce, Spedizioni Tricolore, Cosmetici Belletto, Seterie del Lario.
+- Tempi base di assunzione (annuncio / agenzia, giorni): magazzinieri 20/6, carrellisti 25/8, impiegati 20/7, autisti B 15/6, autisti CE 40/16.
+- I salvataggi con i vecchi ruoli vengono convertiti (`migrateStaff`): metà dei magazzinieri diventano carrellisti, gli autisti diventano CE (poi quelli in più passano ai furgoni se servono), gli impiegati di sede si dividono tra i magazzini.
 
 ## Abilità dei personaggi
 Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Operazioni = ingranaggio arancione, Precisione = bersaglio blu, Negoziazione = moneta gialla, Leadership = bandiera rossa, Amministrazione = calcolatrice verde, Innovazione = lampadina viola.

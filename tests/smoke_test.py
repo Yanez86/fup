@@ -16,11 +16,10 @@ BOT = '''(ceo)=>{
  for(let d=0; d<365*3 && !S.over; d++){
    S.speed=1; clr();
    S.tenders.filter(t=>!t.done&&!t.bid).forEach(t=>{ const e=F.bidEstimate(t,S.warehouses[0].id,0.95); if(e&&e.fits&&e.sat<0.85) t.bid={wh:S.warehouses[0].id,mult:0.95}; });
-   S.warehouses.forEach(w=>{ const k=F.computeWH(w);
-     const pal=S.clients.filter(c=>c.wh===w.id&&c.status==='avvio').reduce((a,c)=>a+c.pal,0);
-     const pkm=S.clients.filter(c=>c.wh===w.id&&c.status==='avvio').reduce((a,c)=>a+F.clientLog(c,w).km,0), needA=Math.ceil((k.km+pkm)/5200), needM=Math.max(2,Math.ceil((k.mov+2*pal)/900));
-     while(w.staff.aut+S.queue.filter(q=>q.wh===w.id&&q.role==='aut').length<needA){ S.queue.push({role:'aut',wh:w.id,days:18}); S.cash-=1800; }
-     while(w.staff.mag+S.queue.filter(q=>q.wh===w.id&&q.role==='mag').length<needM){ S.queue.push({role:'mag',wh:w.id,days:9}); S.cash-=1200; }
+   S.warehouses.forEach(w=>{ const pend=S.clients.filter(c=>c.wh===w.id&&c.status==='avvio'); pend.forEach(c=>c.status='attivo');
+     const k=F.computeWH(w); pend.forEach(c=>c.status='avvio');
+     const days={pick:9,car:9,imp:9,autB:9,autCE:18};
+     Object.keys(days).forEach(r=>{ while(w.staff[r]+S.queue.filter(q=>q.wh===w.id&&q.role===r).length<k.need[r]){ S.queue.push({role:r,wh:w.id,days:days[r]}); S.cash-=1500; } });
    });
    F.step();
  }
@@ -81,6 +80,25 @@ async def main():
         await pg.click('#wiki-list .wk-it'); await pg.click('#win-enciclopedia [data-act=wikihome]')
         await pg.screenshot(path=os.path.join(OUT, 'shot_enciclopedia_indice.png'))
         await pg.click('#win-enciclopedia [data-act=close]')
+        # finestre del personale con i cinque mestieri
+        await pg.evaluate(CLEAR)
+        await pg.click('#dock [data-id=personale]')
+        if not await pg.query_selector('#win-personale'): await pg.click('#dock [data-id=personale]')
+        assert await pg.eval_on_selector_all('#win-personale table.t tr', 'e=>e.length') == 6
+        await pg.screenshot(path=os.path.join(OUT, 'shot_personale.png'))
+        await pg.click('#win-personale [data-act=openwh]')
+        assert await pg.eval_on_selector_all('#win-magazzini [data-act=hire]', 'e=>e.length') == 5
+        await pg.screenshot(path=os.path.join(OUT, 'shot_magazzino_personale.png'))
+        # un salvataggio con i vecchi ruoli viene convertito
+        mig = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('marco'); const S=F.S;
+          const w=S.warehouses[0]; w.staff={mag:5,aut:3}; S.imp=3; S.queue=[{role:'imp',wh:null,days:5},{role:'aut',wh:w.id,days:9}];
+          S.clients.push({...S.clients[0],id:'cx',name:'Tuttosubito Italia',zone:'nordovest',pal:400});
+          F.save(); return true;}''')
+        await pg.evaluate('()=>location.reload()'); await pg.wait_for_selector('[data-act=continue]')
+        await pg.click('[data-act=continue]'); await pg.evaluate(CLEAR)
+        st = await pg.evaluate('''()=>{const S=window.__FUP.S;return {st:S.warehouses[0].staff,imp:S.imp,q:S.queue.map(q=>q.role+String.fromCharCode(58)+!!q.wh)}}''')
+        assert st['imp'] is None and sum(st['st'].values()) == 8+3 and st['st']['autB'] > 0, st
+        assert st['q'] == ['imp:true', 'autCE:true'], st
         for ceo in ['gino','edoardo','valeria','marco']:
             print(await pg.evaluate(BOT, ceo))
         await b.close()

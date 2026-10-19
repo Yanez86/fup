@@ -140,8 +140,18 @@ person('autista',skin='scura',hair='#2c2420',hairstyle='short',cloth='#5fb4f0',c
 def headset(c):
     c.px(line_px(14,34,9)+[(13,10),(35,10),(13,11),(35,11)],'#16202e'); c.fill(rect(11,20,15,28),'#16202e'); c.px([(14,28),(15,29),(16,30),(17,31),(18,31)],'#16202e')
 person('impiegata',skin='chiara',hair='#2c2420',hairl='#4a3c34',hairstyle='bob',cloth='#f4f5f7',clothd='#d6dbe2',clothl='#ffffff',lips='#c85a62',extra=headset)
-names=['rosa','toto','chiara','davide','luca','franca','magazziniere','autista','impiegata']
-bg=Image.new('RGBA',(5*104,2*120),(42,58,80,255))
+def helmet_w(c):
+    hm=ell(24,15,11.5,7.5)&(yy<17); c.shaded(hm,'#f4f5f7','#c3d0dc','#ffffff',22,10,11,6)
+    c.px(line_px(12,36,17),'#c3d0dc')
+def vest_y(c):
+    v=ell(24,58,24,18)&(yy<56)&((xx<19.5)|(xx>28.5)); c.fill(v,'#ffd23f'); c.px([(x,49) for x in range(6,20)]+[(x,49) for x in range(29,42)],'#c3d0dc')
+person('carrellista',skin='chiara',hair='#b98a4e',hairstyle='short',cloth='#3a6db0',clothd='#264f86',clothl='#5a8bd0',mustache='#8a5f36',extra=lambda c:(helmet_w(c),vest_y(c)))
+def cap_t(c):
+    cr=ell(24,15,11.5,8)&(yy<16); c.shaded(cr,'#ff7a3d','#c85a1f','#ffb070',22,10,11,6)
+    br=ell(24,16.3,13.5,2.6)&(yy>=15); c.shaded(br,'#c85a1f','#8a3e14','#ff7a3d',24,16,13,2)
+person('corriere',skin='media',hair='#4a3426',hairstyle='messy',cloth='#1f9e8f',clothd='#157366',clothl='#3dd6c4',extra=cap_t)
+names=['rosa','toto','chiara','davide','luca','franca','magazziniere','autista','impiegata','carrellista','corriere']
+bg=Image.new('RGBA',(5*104,3*120),(42,58,80,255))
 for i,n in enumerate(names):
     im=Image.open(OUT+f'p_{n}.png'); bg.alpha_composite(im,(4+(i%5)*104,4+(i//5)*118))
 bg.save(ROOT+'/tools/out/staff_preview.png')

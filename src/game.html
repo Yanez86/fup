@@ -250,7 +250,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 (function(){
 'use strict';
 /* ====================== DATI ====================== */
-const IMG={gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',mag:'{{Q_magazziniere}}',aut:'{{Q_autista}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}'};
+const IMG={car:'{{Q_carrellista}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}'};
 const LON0=4.81, LAT1=47.0, KX=78.29*2, KY=111.111*2;
 const pt=(lon,lat)=>[ (lon-LON0)*KX, (LAT1-lat)*KY ];
 const CITIES=[
@@ -406,9 +406,16 @@ const WELFARE=[
  {id:'premio',name:'Premio di produzione',cost:80,mor:6,att:6},
  {id:'navetta',name:'Navetta dalla stazione',cost:20,mor:2,att:3}
 ];
-const RAL={mag:18500,aut:20000,imp:22000}, COEF=1.42;
-const ROLE={mag:'Magazzinieri',aut:'Autisti',imp:'Impiegati operativi'};
-const HIRE={mag:{ann:[25,300],age:[7,1200]},aut:{ann:[35,300],age:[14,1800]},imp:{ann:[20,300],age:[7,1200]}};
+const RAL={pick:18000,car:19500,autB:19000,autCE:23000,imp:22000}, COEF=1.42;
+const ROLES=['pick','car','autB','autCE','imp'];
+const ROLE={pick:'Magazzinieri',car:'Carrellisti',autB:'Autisti patente B',autCE:'Autisti patente CE',imp:'Impiegati di magazzino'};
+const ROLE1={pick:'magazziniere',car:'carrellista',autB:'autista con patente B',autCE:'autista con patente CE',imp:'impiegato'};
+const ROLE_WK={pick:'magazzinieri',car:'carrellisti',autB:'autisti_b',autCE:'autisti_ce',imp:'impiegati'};
+const ROLE_D={pick:'Preparano gli ordini',car:'Scaricano, stoccano e caricano',autB:'Furgoni, consegne in città',autCE:'Bilici e motrici, tratte lunghe',imp:'Bolle, inventari, traffico'};
+const HIRE={pick:{ann:[20,250],age:[6,1000]},car:{ann:[25,300],age:[8,1300]},autB:{ann:[15,250],age:[6,1000]},autCE:{ann:[40,350],age:[16,2000]},imp:{ann:[20,300],age:[7,1200]}};
+const KM_B=4000, KM_CE=5200;
+const noStaff=()=>({pick:0,car:0,autB:0,autCE:0,imp:0});
+const staffTot=w=>ROLES.reduce((a,r)=>a+(w.staff[r]||0),0);
 const T_ST=5.5,T_MO=3.8,T_DI=30;
 
 /* ====================== UTILITÀ ====================== */
@@ -501,6 +508,7 @@ const ORIGINS={
  borgosd:{n:'Segherie di Borgo San Dalmazzo (CN)',lon:7.49,lat:44.33}
 };
 // zones: la prima è quella del contratto iniziale; mode: 'ritiro' = andiamo noi a prendere la merce, 'consegna' = la porta il cliente
+// veh: 'B' = distribuzione con furgoni (autisti patente B), altrimenti bilici (patente CE); i ritiri sono sempre con il bilico
 const CINFO={
  'Pastificio Mezzemaniche':{zones:['reg_lig','reg_pie','prov_Alessandria'],src:'gragnano',mode:'consegna'},
  'Mobilificio Brianzolo':{zones:['reg_lom','nordovest'],src:'meda',mode:'ritiro'},
@@ -509,30 +517,30 @@ const CINFO={
  'Caseificio Stracchinelli':{zones:['reg_lom','nordovest','prov_Milano'],src:'melzo',mode:'ritiro'},
  'Ferramenta Bullonati':{zones:['nordovest','reg_lom'],src:'lumezzane',mode:'ritiro'},
  'Elettrofulmine':{zones:['nordovest','nord'],src:'portoge',mode:'ritiro'},
- 'FarmaSpa':{zones:['nordovest','nord'],src:'latina',mode:'consegna'},
+ 'FarmaSpa':{zones:['nordovest','nord'],src:'latina',mode:'consegna',veh:'B'},
  'Supermercati Carrellone':{zones:['reg_lom','nordovest'],src:'fornitori',mode:'consegna'},
  'Birrificio Schiumetti':{zones:['nordovest','nord'],src:'udine',mode:'consegna'},
  'Acque Fonte Frizzantina':{zones:['reg_lom','reg_pie','nordovest'],src:'pellegrino',mode:'ritiro'},
  'Arredamenti Brugola':{zones:['nordovest','reg_lom'],src:'svezia',mode:'consegna'},
- 'Moda Grucciani':{zones:['nord','prov_Milano'],src:'atelier',mode:'ritiro'},
+ 'Moda Grucciani':{zones:['nord','prov_Milano'],src:'atelier',mode:'ritiro',veh:'B'},
  'Pneumatici Battistrada':{zones:['reg_pie','nordovest','nord'],src:'settimo',mode:'ritiro'},
  'Crema Spalmella':{zones:['nordovest','reg_pie'],src:'alba',mode:'ritiro'},
  'Riseria La Mondina':{zones:['reg_lom','reg_pie','prov_Milano'],src:'vercelli',mode:'ritiro'},
- 'Scarpinando':{zones:['nordovest','nord'],src:'erfurt',mode:'consegna'},
- 'Tuttosubito Italia':{zones:['nord','nordovest'],src:'mondo',mode:'consegna'},
- 'Spesa Veloce':{zones:['prov_Milano','prov_Torino'],src:'ortomercato',mode:'ritiro'},
- 'Spedizioni Tricolore':{zones:['italia'],src:'roma',mode:'consegna'},
+ 'Scarpinando':{zones:['nordovest','nord'],src:'erfurt',mode:'consegna',veh:'B'},
+ 'Tuttosubito Italia':{zones:['nord','nordovest'],src:'mondo',mode:'consegna',veh:'B'},
+ 'Spesa Veloce':{zones:['prov_Milano','prov_Torino'],src:'ortomercato',mode:'ritiro',veh:'B'},
+ 'Spedizioni Tricolore':{zones:['italia'],src:'roma',mode:'consegna',veh:'B'},
  'Discount Prezzaccio':{zones:['reg_pie','prov_Torino','prov_Cuneo'],src:'fornitori',mode:'consegna'},
  'Mobili Truciolotto':{zones:['reg_lom','prov_Milano'],src:'seveso',mode:'ritiro'},
  'Fai-da-Te Planet':{zones:['nordovest','nord'],src:'castelsg',mode:'consegna'},
- 'Cosmetici Belletto':{zones:['nordovest','nord'],src:'crema',mode:'ritiro'},
+ 'Cosmetici Belletto':{zones:['nordovest','nord'],src:'crema',mode:'ritiro',veh:'B'},
  'Aeronautica Volavia':{zones:['nord','reg_lom'],src:'samarate',mode:'ritiro'},
  'Salumificio Bresaolotti':{zones:['reg_lom','nordovest','prov_Milano'],src:'chiavenna',mode:'ritiro'},
  'Cioccolateria Sabauda':{zones:['reg_pie','nordovest'],src:'pinerolo',mode:'ritiro'},
  'Lavatrix Elettrodomestici':{zones:['nordovest','nord'],src:'comerio',mode:'ritiro'},
  'Cantine Tanninello':{zones:['reg_pie','nordovest'],src:'barolo',mode:'ritiro'},
  'Crocchette Codamossa':{zones:['nordovest','reg_lom'],src:'cremona',mode:'consegna'},
- 'Seterie del Lario':{zones:['nord','reg_lom'],src:'como',mode:'ritiro'},
+ 'Seterie del Lario':{zones:['nord','reg_lom'],src:'como',mode:'ritiro',veh:'B'},
  'Materiali Edili Cazzuolini':{zones:['reg_lom','prov_Bergamo'],src:'calusco',mode:'ritiro'},
  'Giocattoli Trottolino':{zones:['nordovest','nord'],src:'portoge',mode:'consegna'},
  'Pellet Fiammella':{zones:['reg_pie','prov_Cuneo'],src:'borgosd',mode:'ritiro'}
@@ -546,8 +554,8 @@ function clientLog(c,w){
   const avg=cs.length?cs.reduce((a,x)=>a+distKm(s.lon,s.lat,x[1],x[2]),0)/cs.length:350;
   const oKm=Math.round(2*avg*1.3+30), out=Math.ceil(c.pal/16);
   const o=ORIGINS[c.src]||ORIGINS.fornitori, iKm=Math.round(2*distKm(s.lon,s.lat,o.lon,o.lat)*1.3+20);
-  const inn=c.mode==='ritiro'?Math.ceil(c.pal/33):0;
-  return {oKm,out,iKm,in:inn,km:out*oKm+inn*iKm};
+  const inn=c.mode==='ritiro'?Math.ceil(c.pal/33):0, veh=cinfo(c).veh==='B'?'B':'CE';
+  return {oKm,out,iKm,in:inn,km:out*oKm+inn*iKm,veh,kmB:veh==='B'?out*oKm:0,kmCE:(veh==='B'?0:out*oKm)+inn*iKm};
 }
 const RGLYPH={S:['.####','#....','#....','.###.','....#','....#','####.'],A:['.###.','#...#','#...#','#####','#...#','#...#','#...#'],B:['####.','#...#','#...#','####.','#...#','#...#','####.'],
  C:['.####','#....','#....','#....','#....','#....','.####'],D:['####.','#...#','#...#','#...#','#...#','#...#','####.'],F:['#####','#....','#....','####.','#....','#....','#....']};
@@ -575,7 +583,7 @@ function logInfoHtml(c,w){
   const t=clientLog(c,w), z=ZONES[c.zone]||ZONES.nordovest, o=ORIGINS[c.src]||ORIGINS.fornitori;
   return `<table class="t num">
    <tr><td>${kw('zona','Distribuzione')}</td><td class="r"><b>${esc(z.n)}</b>${z.cities.length>1?` · ${z.cities.length} province`:''}</td></tr>
-   <tr><td></td><td class="r sm">${t.out} viaggi/mese da ${n0(t.oKm)} km (andata e ritorno)</td></tr>
+   <tr><td></td><td class="r sm">${t.out} viaggi/mese da ${n0(t.oKm)} km (andata e ritorno) con ${t.veh==='B'?kw('autisti_b','furgoni'):kw('autisti_ce','bilici')}</td></tr>
    <tr><td>${kw('ritiro','Merce in arrivo da')}</td><td class="r"><b>${esc(o.n)}</b></td></tr>
    <tr><td></td><td class="r sm">${c.mode==='ritiro'?`<span style="color:var(--accent-d,#c8551f)">la andiamo a prendere noi</span>: ${t.in} viaggi/mese da ${n0(t.iKm)} km`:'la consegna il cliente con i suoi mezzi'}</td></tr></table>`;
 }
@@ -701,7 +709,7 @@ wk('espansione','basi','Espansione',`Affittare un nuovo magazzino: due mesi di a
 
 Conviene espandersi quando il magazzino attuale supera l'85% di [[saturazione]] o quando una gara importante è in una zona lontana.`);
 wk('magazzino','basi','Magazzino',`Il capannone dove stanno i pallet dei clienti. Ognuno ha i suoi posti, il suo personale e le sue tecnologie.`,
-`Ogni magazzino ha un numero di posti pallet (la capienza), un [[manager]], [[magazzinieri]] e [[autisti]], un [[morale]] e le [[installazione|tecnologie installate]]. Da questi nascono la sua [[puntualita]] e la sua [[accuratezza]], che valgono per tutti i clienti serviti lì.
+`Ogni magazzino ha un numero di posti pallet (la capienza), un [[manager]], il suo [[personale]], un [[morale]] e le [[installazione|tecnologie installate]]. Da questi nascono la sua [[puntualita]] e la sua [[accuratezza]], che valgono per tutti i clienti serviti lì.
 
 Il magazzino del CEO è di proprietà, gli altri sono in affitto: in entrambi i casi paghi ogni mese un costo fisso più 1.000 € di utenze e manutenzione.`);
 // KPI
@@ -767,24 +775,45 @@ Gli effetti sulle [[abilita|abilità]] sono già sommati nei numeri. Altri effet
 const TAL_ID={}; Object.keys(TALENTS).forEach((n,i)=>{TAL_ID[n]='tal_'+i; const t=TALENTS[n];
   wk('tal_'+i,'tal',n,t.fx,`${t.fx.split(' · ').join('\n• ').replace(/^/,'• ')}\n\n*${t.fl}*\n\nTipo: ${TTYPE[t.t][0].toLowerCase()}. Vedi [[talenti]].`,sz=>talentSvg(t.ic,sz));});
 // Personale
-wk('magazzinieri','pers','Magazzinieri',`Scaricano, mettono a posto, prelevano e caricano i pallet. Ognuno gestisce circa 900 movimenti al mese.`,
-`Ogni pallet consegnato fa due [[movimenti]]: entrata e uscita. Un magazziniere ne regge circa 900 al mese con un [[morale]] di 70, di più con le [[tecnologie]] di produttività (radiofrequenza, pick-to-light, robot).
+wk('personale','pers','Personale',`Cinque mestieri per ogni magazzino: magazzinieri, carrellisti, impiegati, autisti con patente B e con patente CE.`,
+`Ogni magazzino ha il suo organico, e ogni mestiere fa un lavoro diverso:
+• [[magazzinieri]]: preparano gli ordini, pesano sull'[[accuratezza]];
+• [[carrellisti]]: muovono i pallet col muletto, pesano sulla [[puntualita]];
+• [[impiegati]]: bolle, inventari e traffico, un po' su entrambi i KPI;
+• [[autisti_ce|autisti con patente CE]]: bilici e motrici, tratte lunghe e ritiri;
+• [[autisti_b|autisti con patente B]]: furgoni, consegne in città e ultimo miglio.
 
-Se non bastano calano [[accuratezza]] e [[puntualita]] e il personale si stanca. Costano 18.500 € lordi l'anno, cioè circa 2.190 € al mese di [[costo_azienda|costo aziendale]].`);
-wk('autisti','pers','Autisti',`Guidano le motrici: ognuno copre circa 5.200 km al mese. Sono i più difficili da trovare.`,
-`I km da fare dipendono dalla [[zona]] di distribuzione dei clienti e dai viaggi di [[ritiro]]. Se gli autisti non bastano la [[puntualita]] crolla: −20 punti per ogni 100% di lavoro in eccesso.
+Ogni cliente dice con che mezzo vuole le consegne (vedi [[zona]]), quindi vincere una [[gare|gara]] cambia chi devi [[assunzioni|assumere]]. La finestra Personale mostra l'organico di tutti i magazzini.`);
+wk('magazzinieri','pers','Magazzinieri',`Preparano gli ordini: prelevano i colli e compongono i pallet in uscita. Ognuno ne prepara circa 900 al mese.`,
+`Un magazziniere prepara circa 900 pallet al mese con un [[morale]] di 70, di più con le [[tecnologie]] di produttività (radiofrequenza, pick-to-light, robot).
 
-Ogni autista guida una [[motrici|motrice]]. Costano 20.000 € lordi l'anno più 1.100 € al mese di spese del mezzo. Un'[[assunzioni|assunzione]] richiede 2-5 settimane: assumi appena vinci una gara.`);
-wk('impiegati','pers','Impiegati operativi',`L'ufficio: traffico, customer service, bolle e fatture. Ne servono di più con più clienti e più magazzini.`,
-`Ne servono 2, più uno ogni 1.500 pallet al mese consegnati (2.000 con il [[tech_gestionale|gestionale]]), più uno per ogni magazzino oltre il primo. Ogni impiegato che manca toglie 1,5 punti di [[puntualita]] in tutti i magazzini.
+Se non bastano crolla soprattutto l'[[accuratezza]] (−8 punti per ogni 100% di lavoro in eccesso), un po' la [[puntualita]], e il personale si stanca. Costano 18.000 € lordi l'anno, cioè circa 2.130 € al mese di [[costo_azienda|costo aziendale]].`);
+wk('carrellisti','pers','Carrellisti',`Guidano il muletto: scaricano i camion, mettono a scaffale e caricano. Ognuno fa circa 1.800 movimenti al mese.`,
+`Ogni pallet consegnato fa due [[movimenti]]: entrata e uscita. Col muletto un carrellista ne fa il doppio di un [[magazzinieri|magazziniere]], circa 1.800 al mese con un [[morale]] di 70, di più con le [[tecnologie]] di produttività.
 
-Costano 22.000 € lordi l'anno e lavorano per tutta l'azienda.`);
+Se non bastano i camion aspettano in banchina: cala la [[puntualita]] (−8 punti per ogni 100% di lavoro in eccesso) e un po' l'[[accuratezza]] (pallet urtati e messi nel posto sbagliato). Serve il patentino del muletto, per questo costano 19.500 € lordi l'anno.`);
+wk('impiegati','pers','Impiegati di magazzino',`L'ufficio del magazzino: bolle, inventari, prenotazione delle consegne, traffico. Ne servono di più con più volume.`,
+`In ogni magazzino ne serve uno, più uno ogni 1.500 pallet al mese consegnati (2.000 con il [[tech_gestionale|gestionale]]). Ogni impiegato che manca toglie 1,5 punti di [[puntualita]] e 1 di [[accuratezza]] in quel magazzino.
+
+Costano 22.000 € lordi l'anno.`);
+wk('autisti','pers','Autisti',`Due patenti, due mestieri: la CE per bilici e tratte lunghe, la B per i furgoni in città.`,
+`I km da fare dipendono dalla [[zona]] di distribuzione dei clienti e dai viaggi di [[ritiro]]. Le consegne con i furgoni le fanno gli [[autisti_b|autisti con patente B]]; tutto il resto, ritiri compresi, gli [[autisti_ce|autisti con patente CE]].
+
+Se gli autisti non bastano la [[puntualita]] crolla: −20 punti per ogni 100% di lavoro in eccesso.`);
+wk('autisti_ce','pers','Autisti patente CE',`Guidano bilici e motrici: ognuno copre circa 5.200 km al mese. Sono i più difficili da trovare.`,
+`Servono la patente CE e la carta di qualificazione (CQC). Fanno le distribuzioni dei clienti che vogliono i bilici e tutti i viaggi di [[ritiro]].
+
+Ognuno guida una [[motrici|motrice]]. Costano 23.000 € lordi l'anno più 1.100 € al mese di spese del mezzo. In Italia ne mancano davvero: un'[[assunzioni|assunzione]] richiede 3-6 settimane, quindi assumi appena vinci una gara.`);
+wk('autisti_b','pers','Autisti patente B',`Guidano i furgoni fino a 3,5 tonnellate: consegne in città, negozi, farmacie, e-commerce. Ognuno copre circa 4.000 km al mese.`,
+`Servono ai clienti con tante consegne piccole: e-commerce, farmaceutica, moda, cosmetica, spesa a domicilio. Il traffico e le soste fanno meno km al giorno di un bilico.
+
+Costano 19.000 € lordi l'anno più 900 € al mese di furgone in leasing, e il furgone consuma la metà. Si trovano in fretta (2-3 settimane con l'annuncio), ma cambiano lavoro spesso.`);
 wk('manager','pers','Manager di magazzino',`Il capo di un magazzino. Le sue Operazioni, Precisione e Leadership decidono i KPI e il morale.`,
 `Il manager usa tre [[abilita|abilità]]: [[st_op|Operazioni]] per la [[puntualita]], [[st_prec|Precisione]] per l'[[accuratezza]] e [[st_lead|Leadership]] per il [[morale]]. Senza manager il magazzino va avanti con valori scarsi (7, 7 e 6).
 
 All'inizio il manager è il [[ceo|CEO]]. Gli altri si assumono dalla finestra Personale e si assegnano dal menu a tendina del magazzino. Un manager senza magazzino può diventare un [[direzione|direttore]].`);
 wk('assunzioni','pers','Assunzioni',`Annuncio (economico ma lento) o agenzia interinale (veloce ma cara). Il nuovo arrivato si presenta dopo qualche giorno.`,
-`I tempi base: magazzinieri 25 giorni con l'annuncio o 7 con l'agenzia, autisti 35 o 14, impiegati 20 o 7. Si accorciano con il [[welfare]], la [[reputazione]], l'[[tech_hr|ufficio del personale]] e il [[dir_hr|direttore HR]].
+`I tempi base con l'annuncio o con l'agenzia: [[magazzinieri]] 20 o 6 giorni, [[carrellisti]] 25 o 8, [[impiegati]] 20 o 7, [[autisti_b|autisti B]] 15 o 6, [[autisti_ce|autisti CE]] 40 o 16. Si accorciano con il [[welfare]], la [[reputazione]], l'[[tech_hr|ufficio del personale]] e il [[dir_hr|direttore HR]].
 
 Assumi in anticipo: quando vinci una [[gare|gara]] hai 30 giorni prima che il cliente parta.`);
 wk('licenziamenti','pers','Licenziamenti',`Costano un mese di stipendio di buonuscita e abbassano il morale del magazzino per 30 giorni.`,
@@ -797,10 +826,10 @@ wk('welfare','pers','Welfare',`Buoni pasto, assicurazione, premio, navetta: cost
 • Navetta dalla stazione: 20 €, morale +2.
 
 Ogni voce rende anche l'azienda più attraente e accorcia le [[assunzioni]]. Con la ricerca [[tech_welfare2|Welfare aziendale]] costa il 30% in meno.`);
-wk('motrici','pers','Motrici',`I camion. Quelli di proprietà sono già pagati, ogni autista in più guida una motrice in leasing da 2.100 € al mese.`,
-`Il numero di motrici di proprietà dipende dal [[ceo|CEO]] scelto. Quando gli [[autisti]] sono più delle motrici, la differenza si prende in leasing e finisce nei costi dei mezzi.`);
+wk('motrici','pers','Motrici',`I camion. Quelli di proprietà sono già pagati, ogni autista CE in più guida una motrice in leasing da 2.100 € al mese.`,
+`Il numero di motrici di proprietà dipende dal [[ceo|CEO]] scelto. Quando gli [[autisti_ce|autisti con patente CE]] sono più delle motrici, la differenza si prende in leasing e finisce nei costi dei mezzi. I furgoni degli [[autisti_b|autisti B]] sono sempre in leasing (900 € al mese).`);
 wk('costo_azienda','pers','Costo aziendale',`Lo stipendio lordo annuo (RAL) moltiplicato per 1,42: contributi, TFR e tredicesima compresi.`,
-`Quando vedi una RAL, il costo vero per l'azienda è il 42% in più, diviso per 12 mesi. Vale per [[magazzinieri]], [[autisti]], [[impiegati]], [[manager]] e dirigenti.`);
+`Quando vedi una RAL, il costo vero per l'azienda è il 42% in più, diviso per 12 mesi. Vale per tutto il [[personale]], i [[manager]] e i dirigenti.`);
 // Clienti e gare
 wk('clienti','cli','Clienti',`Le aziende che ti affidano la merce: pagano per i posti occupati, i movimenti e le consegne.`,
 `Ogni cliente ha un volume (posti pallet occupati e pallet consegnati al mese), delle [[soglie]] di servizio, una [[zona]] di distribuzione e un modo di farti arrivare la merce ([[ritiro]] o consegna). È servito da un solo [[magazzino]].
@@ -818,11 +847,13 @@ Ogni cliente ha un [[rank]] da S a F. Alcuni clienti chiedono [[tech_richieste|t
 wk('prezzo','cli','Prezzo rispetto al listino',`Lo sconto o il ricarico che offri in gara, da −20% a +20%. Più basso = più probabilità, meno margine.`,
 `Il listino è calcolato su stoccaggio, [[movimenti]] e trasporto (vedi [[ricavi]]). Il prezzo scelto resta per tutti i 24 mesi del [[contratto]]: uno sconto troppo aggressivo può farti lavorare in perdita.`);
 wk('contratto','cli','Contratto',`Dura 24 mesi e parte 30 giorni dopo la gara vinta. Alla scadenza il cliente rinnova se la soddisfazione è almeno 50.`,
-`Nei 30 giorni prima dell'avvio prepara il [[magazzino]]: [[assunzioni|assumi]] [[magazzinieri]] e [[autisti]]. Alla scadenza il rinnovo è automatico se la [[soddisfazione]] è almeno 50 (40 con il [[tech_kam|Key account management]]); altrimenti il cliente passa alla concorrenza.`);
+`Nei 30 giorni prima dell'avvio prepara il [[magazzino]]: [[assunzioni|assumi]] il [[personale]] che serve. Alla scadenza il rinnovo è automatico se la [[soddisfazione]] è almeno 50 (40 con il [[tech_kam|Key account management]]); altrimenti il cliente passa alla concorrenza.`);
 wk('zona','cli','Zona di distribuzione',`Dove il cliente vuole le consegne: una provincia, una regione, tutto il Nord-Ovest o il Nord Italia.`,
-`Più è grande la zona, più km per ogni viaggio. Ogni viaggio porta 16 pallet e si conta andata e ritorno, con il 30% in più per le strade vere. I km decidono quanti [[autisti]] servono e i costi dei mezzi, ma aumentano anche il prezzo del trasporto pagato dal cliente.`);
+`Più è grande la zona, più km per ogni viaggio. Ogni viaggio porta 16 pallet e si conta andata e ritorno, con il 30% in più per le strade vere. I km decidono quanti [[autisti]] servono e i costi dei mezzi, ma aumentano anche il prezzo del trasporto pagato dal cliente.
+
+La maggior parte dei clienti vuole i bilici, guidati dagli [[autisti_ce|autisti con patente CE]]. Chi fa tante consegne piccole (e-commerce, farmacie, boutique, profumerie, spesa a domicilio) vuole i furgoni, guidati dagli [[autisti_b|autisti con patente B]].`);
 wk('ritiro','cli','Ritiro o consegna',`Da dove arriva la merce: la consegna il cliente con i suoi mezzi, oppure la vai a prendere tu.`,
-`Con "consegna" la merce arriva al magazzino gratis. Con "ritiro" mandi un bilico da 33 pallet fino allo stabilimento del cliente: servono più [[autisti]] e più gasolio, ma il cliente paga 1,5 € per ogni km di ritiro.`);
+`Con "consegna" la merce arriva al magazzino gratis. Con "ritiro" mandi un bilico da 33 pallet fino allo stabilimento del cliente: servono più [[autisti_ce|autisti CE]] e più gasolio, ma il cliente paga 1,5 € per ogni km di ritiro.`);
 wk('concorrenti','cli','Concorrenti',`Gruppo Bartolazzi, Logistix Global, F.lli Brambilla e la Cooperativa La Fatica: si prendono le gare che perdi.`,
 `Non li vedi lavorare, ma ci sono: ogni [[gare|gara]] che perdi o a cui non partecipi finisce a uno di loro, di solito con uno sconto aggressivo.`);
 wk('tech_richieste','cli','Tecnologie richieste',`Alcuni clienti partecipano solo se hai già una certa ricerca: catena del freddo, EDI, e-commerce.`,
@@ -845,9 +876,9 @@ wk('ricavi','eco','Ricavi',`Quanto paga ogni cliente al mese: posti occupati, mo
 
 Il totale si moltiplica per il [[prezzo]] offerto in gara.`);
 wk('costi','eco','Costi',`Personale, mezzi e gasolio, immobili, tecnologie, manager, welfare, penali.`,
-`Per ogni magazzino: stipendi di [[magazzinieri]] e [[autisti]], mezzi (gasolio, manutenzione, pedaggi, spese degli autisti, [[motrici]] in leasing), affitto più 1.000 € di utenze, canoni delle [[installazione|tecnologie installate]].
+`Per ogni magazzino: stipendi del [[personale]], mezzi (gasolio, manutenzione, pedaggi, spese degli autisti, [[motrici]] e furgoni in leasing), affitto più 1.000 € di utenze, canoni delle [[installazione|tecnologie installate]].
 
-Per tutta l'azienda: [[impiegati]], [[manager]] e dirigenti, compenso del [[ceo|CEO]] (4.000 € al mese), [[welfare]] e [[penali]]. Le spese una tantum finiscono nella voce Altro.`);
+Per tutta l'azienda: [[manager]] e dirigenti, compenso del [[ceo|CEO]] (4.000 € al mese), [[welfare]] e [[penali]]. Le spese una tantum finiscono nella voce Altro.`);
 wk('conto','eco','Conto economico',`Il riepilogo del mese scorso: ricavi meno costi, voce per voce. In fondo c'è l'utile.`,
 `Si chiude a fine mese ed è nella finestra Azienda; il numero in alto "Mese scorso" è il suo risultato. Se l'utile è negativo per troppi mesi la [[cassa]] finisce. Vedi [[ricavi]] e [[costi]].`);
 wk('gasolio','eco','Gasolio',`Il prezzo al litro: parte da 0,86 € nel 2002 e sale di circa 5 centesimi l'anno.`,
@@ -931,10 +962,10 @@ const nid=p=>p+(uid++);
 function newGame(ceoId,coName,color){
   const C=CEOS.find(c=>c.id===ceoId);
   S={v:1,day:0,speed:0,ceoId,company:{name:coName||C.company,color},cash:C.cash,rep:C.rep,fuel:0.86,
-     warehouses:[],clients:[],tenders:[],queue:[],imp:2,managers:MANAGERS.map(m=>({...m,hired:false,wh:null})),
+     warehouses:[],clients:[],tenders:[],queue:[],managers:MANAGERS.map(m=>({...m,hired:false,wh:null})),
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextTender:12,nextEvent:25,project:null,seen:{},over:false,uid:1,
      execs:EXECS.map(e=>({...e,hired:false})),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false};
-  const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={mag:2,aut:1};
+  const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,autB:0,autCE:1,imp:2};
   (C.startTech||[]).forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true;});
   S.clients.push({id:nid('c'),...C.client,zone:cinfo(C.client).zones[0],src:cinfo(C.client).src,mode:cinfo(C.client).mode,wh:wh.id,mult:1,sat:60,status:'attivo',start:0,end:24*30,storico:true});
   news('La Gazzetta del Muletto',`Nasce ${S.company.name}`,`${C.name} apre l'anno con un solo cliente, ${C.client.name}. Con il magazzino quasi vuoto i conti sono in rosso: servono nuovi clienti dalle gare d'appalto.`);
@@ -943,7 +974,7 @@ function newGame(ceoId,coName,color){
 function z(){return {ric:0,pers:0,mezzi:0,fissi:0,tech:0,mgr:0,welf:0,pen:0,altro:0}}
 function addWarehouse(site,own,fixed,motrici){
   const s=SITES[site];
-  const wh={id:nid('w'),site,name:s.name,prov:s.prov,cap:s.cap,own,fixed:own?fixed:s.rent,motrici:motrici||0,mgr:null,staff:{mag:0,aut:0},morale:62,tech:{},acc:{P:0,A:0,n:0},kpi:null};
+  const wh={id:nid('w'),site,name:s.name,prov:s.prov,cap:s.cap,own,fixed:own?fixed:s.rent,motrici:motrici||0,mgr:null,staff:noStaff(),morale:62,tech:{},acc:{P:0,A:0,n:0},kpi:null};
   S.warehouses.push(wh); return wh;
 }
 const ceo=()=>CEOS.find(c=>c.id===S.ceoId);
@@ -969,44 +1000,49 @@ function techFactor(wh,t){
   if(m.ceo && ceo().allergic) weeks*=1.5; if(m.ceo && ceo().robots) weeks*=0.7; if(R('academy')) weeks*=0.7;
   return (S.day-it.day)<weeks*7 ? -0.5 : 1;
 }
-function impNeed(){const cons=S.clients.filter(c=>c.status==='attivo').reduce((a,c)=>a+c.pal,0);return 2+Math.floor(cons/(R('gestionale')?2000:1500))+Math.max(0,S.warehouses.length-1);}
+function impNeed(cons){return 1+Math.ceil(cons/(R('gestionale')?2000:1500));}
 function welfarePts(k){return WELFARE.filter(w=>S.welfare[w.id]).reduce((a,w)=>a+w[k],0);}
 function modSum(wh,k){return S.mods.filter(m=>m.until>S.day&&(m.scope==='all'||m.scope===wh.id)).reduce((a,m)=>a+(m[k]||0),0);}
 function computeWH(wh,extra){
   const act=S.clients.filter(c=>c.wh===wh.id&&c.status==='attivo'); if(extra) act.push(extra);
   const stock=act.reduce((a,c)=>a+c.stock,0), cons=act.reduce((a,c)=>a+c.pal,0), mov=2*cons;
   const lg=act.map(c=>clientLog(c,wh)), km=lg.reduce((a,t)=>a+t.km,0), viaggi=lg.reduce((a,t)=>a+t.out+t.in,0);
+  const kmB=lg.reduce((a,t)=>a+t.kmB,0), kmCE=lg.reduce((a,t)=>a+t.kmCE,0), st=wh.staff;
   const m=mgrStats(wh);
   let tA=0,tP=0,tMor=0,tProd=0,tCan=0; const tparts=[];
   let fuelMul=1;
   TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t); tA+=(t.A||0)*f; tP+=(t.P||0)*f; tMor+=(t.mor||0)*(f>0?1:0); tProd+=(t.prod||0)*(f>0?1:0); if(f>0&&t.fuel) fuelMul*=1-t.fuel; tCan+=t.mese; });
   const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd);
-  const uMag=mov===0?0:(wh.staff.mag>0?mov/(wh.staff.mag*prod):9);
-  const uAut=km===0?0:(wh.staff.aut>0?km/(wh.staff.aut*5200):9);
+  // carrellisti: tutti i movimenti (doppia produttività col muletto); magazzinieri: preparano i pallet in uscita
+  const use=(load,n,per)=>load===0?0:(n>0?load/(n*per):9);
+  const uCar=use(mov,st.car,2*prod), uPick=use(cons,st.pick,prod), uB=use(kmB,st.autB,KM_B), uCE=use(kmCE,st.autCE,KM_CE);
   const cap=capOf(wh); const sat=stock/cap;
-  const impShort=Math.max(0,impNeed()-S.imp), impPen=impShort*1.5;
+  const needImp=impNeed(cons), impShort=Math.max(0,needImp-st.imp);
   const mP=modSum(wh,'P'), mA=modSum(wh,'A'), mMor=modSum(wh,'mor');
   const pP=[['Base',92],['Operazioni di '+m.name.split(' ')[0],0.4*(m.op-10)]];
   if(tP) pP.push(['Tecnologie',tP]); if(mP) pP.push(['Eventi',mP]);
   const dOp=dirStat('op'); if(dOp!=null) pP.push(['Direttore operativo',0.15*(dOp-10)]);
-  if(uAut>1) pP.push(['Autisti insufficienti',-20*(uAut-1)]); if(uMag>1.05) pP.push(['Magazzinieri insufficienti',-5*(uMag-1.05)]);
-  if(impPen) pP.push(['Ufficio sotto organico',-impPen]);
+  if(uCE>1) pP.push(['Autisti CE insufficienti',-20*(uCE-1)]); if(uB>1) pP.push(['Autisti B insufficienti',-20*(uB-1)]);
+  if(uCar>1.05) pP.push(['Carrellisti insufficienti',-8*(uCar-1.05)]); if(uPick>1.05) pP.push(['Magazzinieri insufficienti',-3*(uPick-1.05)]);
+  if(impShort) pP.push(['Impiegati insufficienti',-1.5*impShort]);
   const pA=[['Base',96],['Precisione di '+m.name.split(' ')[0],0.3*(m.prec-10)],['Morale',0.04*(wh.morale-60)]];
   if(tA) pA.push(['Tecnologie',tA]); if(mA) pA.push(['Eventi',mA]); if(R('iso')) pA.push(['Certificazione ISO',0.5]);
-  if(sat>0.85) pA.push(['Saturazione oltre 85%',-25*(sat-0.85)]); if(uMag>1) pA.push(['Magazzinieri insufficienti',-8*(uMag-1)]);
+  if(sat>0.85) pA.push(['Saturazione oltre 85%',-25*(sat-0.85)]); if(uPick>1) pA.push(['Magazzinieri insufficienti',-8*(uPick-1)]); if(uCar>1) pA.push(['Carrellisti insufficienti',-3*(uCar-1)]);
+  if(impShort) pA.push(['Impiegati insufficienti',-1*impShort]);
   const P=clamp(pP.reduce((a,x)=>a+x[1],0),50,99.9), A=clamp(pA.reduce((a,x)=>a+x[1],0),50,99.9);
   const dHr=dirStat('hr');
-  const morT=clamp(58+0.6*(m.lead-10)+welfarePts('mor')+tMor+mMor+(R('academy')?3:0)+(dHr!=null?0.3*(dHr-10):0)-30*Math.max(0,uMag-1)-20*Math.max(0,uAut-1),0,100);
+  const morT=clamp(58+0.6*(m.lead-10)+welfarePts('mor')+tMor+mMor+(R('academy')?3:0)+(dHr!=null?0.3*(dHr-10):0)-20*Math.max(0,uPick-1)-20*Math.max(0,uCar-1)-20*Math.max(0,Math.max(uB,uCE)-1),0,100);
   const rev=act.reduce((a,c)=>a+clientRev(c),0);
-  const pers=(wh.staff.mag*RAL.mag+wh.staff.aut*RAL.aut)*COEF/12;
-  const mezzi=km*(0.25*S.fuel*fuelMul+0.08+0.05)+wh.staff.aut*1100+Math.max(0,wh.staff.aut-wh.motrici)*2100;
+  const pers=ROLES.reduce((a,r)=>a+st[r]*RAL[r],0)*COEF/12;
+  // bilici: gasolio, manutenzione e pedaggi; furgoni: consumano e costano meno, sempre in leasing
+  const mezzi=kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+kmB*(0.12*S.fuel*fuelMul+0.06)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100+st.autB*900;
   const fissi=(wh.fixed+1000)*fixedMul();
-  return {act,cap,stock,cons,mov,viaggi,km,uMag,uAut,sat,P,A,pP,pA,morT,rev,pers,mezzi,fissi,tCan,
-    needMag:Math.max(mov?1:0,Math.ceil(mov/prod)),needAut:Math.ceil(km/5200),prod,m};
+  const need={pick:Math.max(cons?1:0,Math.ceil(cons/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp};
+  return {act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,P,A,pP,pA,morT,rev,pers,mezzi,fissi,tCan,need,prod,m};
 }
 function globalCosts(){
-  const emp=S.warehouses.reduce((a,w)=>a+w.staff.mag+w.staff.aut,0)+S.imp;
-  return {ceo:4000,imp:S.imp*RAL.imp*COEF/12,mgr:[...S.managers,...S.execs].filter(m=>m.hired).reduce((a,m)=>a+m.ral*COEF/12,0),welf:welfarePts('cost')*emp*(R('welfare2')?0.7:1)};
+  const emp=S.warehouses.reduce((a,w)=>a+staffTot(w),0);
+  return {ceo:4000,mgr:[...S.managers,...S.execs].filter(m=>m.hired).reduce((a,m)=>a+m.ral*COEF/12,0),welf:welfarePts('cost')*emp*(R('welfare2')?0.7:1)};
 }
 function step(){
   if(S.over) return;
@@ -1014,8 +1050,8 @@ function step(){
   // assunzioni in arrivo
   S.queue.forEach(q=>q.days--);
   S.queue.filter(q=>q.days<=0).forEach(q=>{
-    if(q.role==='imp'){S.imp++;} else {const w=whById(q.wh); if(w) w.staff[q.role]++;}
-    toast(`Assunto: 1 ${q.role==='mag'?'magazziniere':q.role==='aut'?'autista':'impiegato'}${q.role!=='imp'?' a '+whById(q.wh).name:''}`,'ok');
+    const w=whById(q.wh); if(!w) return; w.staff[q.role]++;
+    toast(`Assunto: 1 ${ROLE1[q.role]} a ${w.name}`,'ok');
   });
   S.queue=S.queue.filter(q=>q.days>0);
   // clienti in avvio
@@ -1032,8 +1068,8 @@ function step(){
     dRic+=k.rev/30; dCost+=(k.pers+k.mezzi+k.fissi+k.tCan)/30;
   });
   const g=globalCosts();
-  cur.pers+=g.imp/30; cur.fissi+=g.ceo/30; cur.mgr+=g.mgr/30; cur.welf+=g.welf/30;
-  dCost+=(g.imp+g.ceo+g.mgr+g.welf)/30;
+  cur.fissi+=g.ceo/30; cur.mgr+=g.mgr/30; cur.welf+=g.welf/30;
+  dCost+=(g.ceo+g.mgr+g.welf)/30;
   S.cash+=dRic-dCost;
   // ricerca in corso
   if(S.project){ S.project.left--; if(S.project.left<=0){ const t=TECH.find(x=>x.id===S.project.tech); S.project=null; S.researched[t.id]=true;
@@ -1106,8 +1142,7 @@ function bidEstimate(t,whId,mult){
   const extra={...t,wh:w.id,mult,status:'attivo'};
   const k=computeWH(w,extra);
   // stima con il personale che servirebbe
-  const needMag=Math.ceil(k.mov/k.prod), needAut=Math.ceil(k.km/5200);
-  const save={...w.staff}; w.staff={mag:Math.max(w.staff.mag,needMag),aut:Math.max(w.staff.aut,needAut)};
+  const need=k.need, save=w.staff; w.staff={}; ROLES.forEach(r=>w.staff[r]=Math.max(save[r],need[r]));
   const k2=computeWH(w,extra); w.staff=save;
   const missing=(t.req||[]).filter(r=>!R(r)).map(r=>TECH.find(x=>x.id===r).name), naz=nazMissing(t);
   const fits=k.stock<=k.cap&&!missing.length&&!naz.length;
@@ -1115,7 +1150,7 @@ function bidEstimate(t,whId,mult){
   const score=50+(1-mult)*120+clamp(gP*4,-20,10)+clamp(gA*4,-20,10)+(S.rep-50)*0.4+(ceo().st.neg-10)+(dC!=null?0.8*(dC-10):0)+(R('iso')?3:0);
   const comp=55+t.diff+rankOf(t).comp;
   const chance=fits?1/(1+Math.exp(-(score-comp)/6)):0;
-  return {P:k2.P,A:k2.A,sat:k.stock/k.cap,cap:k.cap,missing,naz,fits,chance,rev:clientRev(extra),needMag,needAut,staff:w.staff};
+  return {P:k2.P,A:k2.A,sat:k.stock/k.cap,cap:k.cap,missing,naz,fits,chance,rev:clientRev(extra),need,staff:w.staff};
 }
 function resolveTender(t){
   t.done=true;
@@ -1126,7 +1161,7 @@ function resolveTender(t){
     const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,zone:t.zone,src:t.src,mode:t.mode,wh:t.bid.wh,mult:t.bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+24*30};
     S.clients.push(c); t.result={win:true}; S.rep=clamp(S.rep+rankOf(c).win,0,100);
     toast(`Gara vinta: ${t.name}! Il contratto parte il ${shortDate(c.start)}`,'ok');
-    modalInfo('Il Sole 24 Pallet',`Gara vinta: ${t.name}`,`Il contratto parte il ${shortDate(c.start)} a ${whById(c.wh).name}. Servono circa ${e.needMag} magazzinieri e ${e.needAut} autisti in quel magazzino: assumi adesso, perché un autista arriva in 2–5 settimane.`);
+    modalInfo('Il Sole 24 Pallet',`Gara vinta: ${t.name}`,`Il contratto parte il ${shortDate(c.start)} a ${whById(c.wh).name}. In quel magazzino servono in tutto ${needTxt(e.need)}: assumi adesso, perché un autista con patente CE arriva in 3–6 settimane.`);
   } else {
     const by=pick(RIVALS); t.result={win:false,by,disc:Math.round(rnd(5,18))};
     toast(`Gara persa: ${t.name} va a ${by}`,'bad');
@@ -1166,10 +1201,10 @@ const EVENTS=[
   text:'Di notte qualcuno ha svuotato tre serbatoi nel piazzale.',
   opts:[{t:'Installa telecamere',e:'−8.000 €',f:()=>{S.cash-=8000;}},
         {t:'Fidati del guardiano (74 anni)',e:'−1.500 € di gasolio; può ricapitare',f:()=>{S.cash-=1500;S.seen.furto=0;}}]},
- {id:'superenalotto',src:'La Gazzetta del Muletto',title:'Vincita al Superenalotto',cond:()=>S.warehouses.some(w=>w.staff.mag>=2),
+ {id:'superenalotto',src:'La Gazzetta del Muletto',title:'Vincita al Superenalotto',cond:()=>S.warehouses.some(w=>w.staff.pick>=2),
   text:'Un magazziniere vince 2 milioni e si licenzia sul gruppo WhatsApp aziendale.',
-  opts:[{t:'Fagli gli auguri',e:'Perdi un magazziniere, morale +3',f:()=>{const w=S.warehouses.find(w=>w.staff.mag>=2);w.staff.mag--;mod('all',{mor:3},30);}},
-        {t:'Chiedigli un investimento',e:'30% di ottenere 100.000 € a tasso zero',f:()=>{const w=S.warehouses.find(w=>w.staff.mag>=2);w.staff.mag--; if(Math.random()<0.3){S.cash+=100000;toast('Ha detto sì: 100.000 € in cassa','ok');} else toast('Ha detto no e ha comprato una barca','warn');}}]},
+  opts:[{t:'Fagli gli auguri',e:'Perdi un magazziniere, morale +3',f:()=>{const w=S.warehouses.find(w=>w.staff.pick>=2);w.staff.pick--;mod('all',{mor:3},30);}},
+        {t:'Chiedigli un investimento',e:'30% di ottenere 100.000 € a tasso zero',f:()=>{const w=S.warehouses.find(w=>w.staff.pick>=2);w.staff.pick--; if(Math.random()<0.3){S.cash+=100000;toast('Ha detto sì: 100.000 € in cassa','ok');} else toast('Ha detto no e ha comprato una barca','warn');}}]},
  {id:'prete',src:'La Gazzetta del Muletto',title:'Il parroco benedice i camion',cond:()=>true,
   text:'Il parroco propone la benedizione annuale della flotta, con offerta libera.',
   opts:[{t:'Accetta e fai una donazione',e:'−500 €, morale +4',f:()=>{S.cash-=500;mod('all',{mor:4},60);}},
@@ -1298,10 +1333,10 @@ const EVENTS=[
   text:'Quest\'anno il cesto per i dipendenti: panettone artigianale o la solita bottiglia di spumante?',
   opts:[{t:'Cesto ricco',e:'−2.500 €, morale +4',f:()=>{S.cash-=2500;mod('all',{mor:4},45);}},
         {t:'Spumante e auguri',e:'−300 €',f:()=>{S.cash-=300;}}]},
- {id:'concorrente',src:'Il Sole 24 Pallet',title:'Un concorrente ruba un autista',cond:()=>S.warehouses.some(w=>w.staff.aut>=2),
+ {id:'concorrente',src:'Il Sole 24 Pallet',title:'Un concorrente ruba un autista',cond:()=>S.warehouses.some(w=>w.staff.autCE>=2),
   text:'Un rivale offre 200 € in più al mese al tuo autista migliore.',
   opts:[{t:'Pareggia l\'offerta',e:'−2.400 € e morale +2',f:()=>{S.cash-=2400;mod('all',{mor:2},30);}},
-        {t:'Lascialo andare',e:'Perdi un autista',f:()=>{const w=S.warehouses.find(w=>w.staff.aut>=2);w.staff.aut--;}}]},
+        {t:'Lascialo andare',e:'Perdi un autista con patente CE',f:()=>{const w=S.warehouses.find(w=>w.staff.autCE>=2);w.staff.autCE--;}}]},
  {id:'olimpiadi',src:'Il Sole 24 Pallet',title:'Olimpiadi invernali di Torino',cond:()=>yearOf(S.day)===2006&&monthOf(S.day)<=1,once:true,
   text:'Torino ospita le Olimpiadi: impianti, atleti e sponsor hanno bisogno di trasporti.',
   opts:[{t:'Noleggia tre camion extra per i Giochi',e:'+18.000 € di ricavi, puntualità −2 per un mese',f:()=>{S.cash+=18000;S.cur.altro-=18000;mod('all',{P:-2},30);S.rep+=3;}},
@@ -1329,6 +1364,21 @@ const KEY='fup-salvataggio-v3';
 // clienti rinominati: le partite salvate prendono i nomi nuovi (anche nei messaggi e nei report)
 const RENAMED={"Pastificio Rummolo": "Pastificio Mezzemaniche", "Unilevante Italia": "Saponaria Italia", "Caseificio Galbanone": "Caseificio Stracchinelli", "ElettroUnieuri": "Elettrofulmine", "Esselonga": "Supermercati Carrellone", "Birrificio Mortetti": "Birrificio Schiumetti", "Acque San Pellegrinetto": "Acque Fonte Frizzantina", "Arredamenti Ikeo": "Arredamenti Brugola", "Moda Armandi": "Moda Grucciani", "Pneumatici Pirello": "Pneumatici Battistrada", "Riso Scotto dei Navigli": "Riseria La Mondina", "Zalandini": "Scarpinando", "Amazzonia Italia": "Tuttosubito Italia"};
 function renameClients(s){let j=JSON.stringify(s);for(const[o,n] of Object.entries(RENAMED))j=j.split(o).join(n);return JSON.parse(j);}
+// salvataggi con i vecchi ruoli (magazzinieri, autisti, impiegati di sede)
+function migrateStaff(s){
+  if(!s.warehouses.some(w=>w.staff.mag!==undefined)) return s;
+  const oldImp=s.imp||0, n=s.warehouses.length;
+  s.warehouses.forEach((w,i)=>{const o=w.staff;
+    w.staff={pick:Math.ceil((o.mag||0)/2),car:Math.floor((o.mag||0)/2),autB:0,autCE:o.aut||0,imp:Math.floor(oldImp/n)+(i<oldImp%n?1:0)};});
+  const first=s.warehouses[0].id;
+  s.queue.forEach(q=>{q.role={mag:'car',aut:'autCE',imp:'imp'}[q.role]||q.role; if(!q.wh) q.wh=first;});
+  delete s.imp; s.staffMig=true; return s;
+}
+// dopo la conversione: gli autisti che servono sui furgoni passano alla patente B
+function rebalanceDrivers(){
+  if(!S.staffMig) return; delete S.staffMig;
+  S.warehouses.forEach(w=>{const k=computeWH(w), mv=Math.min(k.need.autB,Math.max(0,w.staff.autCE-k.need.autCE)); w.staff.autCE-=mv; w.staff.autB+=mv;});
+}
 function save(){try{localStorage.setItem(KEY,JSON.stringify({S,uid}));}catch(e){}}
 function load(){try{const r=localStorage.getItem(KEY);if(!r)return null;return JSON.parse(r);}catch(e){return null;}}
 
@@ -1408,7 +1458,7 @@ function renderLenses(){
 let trucks=[], lastT=0;
 const TRUCK=c=>`<rect x="0" y="0" width="13" height="8" fill="#16202e"/><rect x="1" y="1" width="11" height="6" fill="${c}"/><rect x="13" y="2" width="6" height="6" fill="#16202e"/><rect x="14" y="3" width="4" height="2" fill="#bfe6ff"/><rect x="2" y="8" width="3" height="3" fill="#16202e"/><rect x="13" y="8" width="3" height="3" fill="#16202e"/>`;
 function syncTrucks(){
-  const want=[]; S.warehouses.forEach(w=>{const n=Math.min(w.kpi&&w.kpi.viaggi?w.staff.aut:0,6);for(let i=0;i<n;i++)want.push(w.id+'_'+i);});
+  const want=[]; S.warehouses.forEach(w=>{const n=Math.min(w.kpi&&w.kpi.viaggi?w.staff.autB+w.staff.autCE:0,6);for(let i=0;i<n;i++)want.push(w.id+'_'+i);});
   trucks=trucks.filter(t=>want.includes(t.id));
   want.forEach(id=>{ if(trucks.find(t=>t.id===id)) return; const w=whById(id.split('_')[0]); const s=SITES[w.site];
     trucks.push({id,from:pt(s.lon,s.lat),to:null,t:Math.random(),back:false});});
@@ -1447,10 +1497,9 @@ const DOCK=[
 const TITLES={azienda:'Azienda e CEO',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP'};
 function renderDock(){
   const openT=S.tenders.filter(t=>!t.done&&!t.bid).length;
-  const short=S.warehouses.filter(w=>w.kpi&&(w.staff.mag<w.kpi.needMag||w.staff.aut<w.kpi.needAut)).length;
-  const impS=S.imp<impNeed()?1:0;
-  const B={gare:openT,magazzini:short,personale:impS};
-  $('#dock').innerHTML=DOCK.map(([id,t,ic])=>`<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${id==='magazzini'&&short?'Personale insufficiente in un magazzino':id==='personale'&&impS?'Servono altri impiegati in ufficio':id==='tecnologia'&&S.project?'Ricerca in corso: '+S.project.left+' giorni':id==='direzione'&&!R('direzione')?'Si sblocca con la ricerca Struttura direzionale':''}">${ic}${B[id]?`<span class="badge">${id==='gare'?B[id]:'!'}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}${id==='report'&&S.repNew?'<span class="badge">1</span>':''}${id==='direzione'&&R('direzione')&&Object.values(S.dirs).some(v=>!v)?'<span class="badge">!</span>':''}</button>`).join('');
+  const short=S.warehouses.filter(w=>w.kpi&&ROLES.some(r=>w.staff[r]<w.kpi.need[r])).length;
+  const B={gare:openT,magazzini:short};
+  $('#dock').innerHTML=DOCK.map(([id,t,ic])=>`<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${id==='magazzini'&&short?'Personale insufficiente in un magazzino':id==='tecnologia'&&S.project?'Ricerca in corso: '+S.project.left+' giorni':id==='direzione'&&!R('direzione')?'Si sblocca con la ricerca Struttura direzionale':''}">${ic}${B[id]?`<span class="badge">${id==='gare'?B[id]:'!'}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}${id==='report'&&S.repNew?'<span class="badge">1</span>':''}${id==='direzione'&&R('direzione')&&Object.values(S.dirs).some(v=>!v)?'<span class="badge">!</span>':''}</button>`).join('');
 }
 function renderTop(){
   $('#date').textContent=fmtDate(S.day);
@@ -1521,7 +1570,7 @@ const VIEWS={
   const q=S.queue.filter(q=>q.wh===w.id);
   const mgrOpts=[w.mgr==='ceo'||!S.warehouses.some(x=>x.mgr==='ceo')?`<option value="ceo" ${w.mgr==='ceo'?'selected':''}>${esc(ceo().name)} (CEO)</option>`:'',...S.managers.filter(m=>m.hired&&!seatOf(m.id)&&(!m.wh||m.wh===w.id)).map(m=>`<option value="${m.id}" ${w.mgr===m.id?'selected':''}>${esc(m.name)}</option>`)].join('');
   const cl=S.clients.filter(c=>c.wh===w.id&&c.status!=='perso');
-  const staffRow=(r,have,need,u)=>{const inq=q.filter(x=>x.role===r).length;return `<img class="px mini" src="${IMG[r]}" alt="" width="48" height="56"><span>${kw(r==='mag'?'magazzinieri':'autisti',ROLE[r])}<br><span class="sm">servono ${need}${inq?` · ${inq} in arrivo`:''}</span></span><b class="num ${have<need?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${have}</b><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi">+ Assumi</button>`;};
+  const staffRow=(r,have,need)=>{const inq=q.filter(x=>x.role===r).length;return `<img class="px mini" src="${IMG[r]}" alt="" width="48" height="56"><span>${kw(ROLE_WK[r],ROLE[r])}<br><span class="sm">servono ${need}${inq?` · ${inq} in arrivo`:''}</span></span><b class="num ${have<need?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${have}</b><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi">+ Assumi</button>`;};
   return `${tabs}
   <div class="row"><span class="h3" style="font-size:19px">${esc(w.name)} (${w.prov})</span><span class="sm">${w.own?'di proprietà':'in affitto'} · ${eur(w.fixed)}/mese</span></div>
   <div><div class="row"><span class="lab">${kw('saturazione')}</span><span class="num">${n0(k.stock)} / ${n0(w.cap)} posti · ${Math.round(k.sat*100)}%</span></div><div class="bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div></div>
@@ -1530,8 +1579,11 @@ const VIEWS={
    <div class="kpi" data-tip="${tipParts('Accuratezza '+f1(k.A)+'%',k.pA,'')}"><div class="lab">${kw('accuratezza')}</div><b>${f1(k.A)}%</b></div>
   </div>
   <div class="card"><div class="row"><span class="h3">Personale</span><span class="sm">${kw('morale','morale')} <b class="${w.morale>=60?'ok':w.morale>=45?'warn':'bad'}">${Math.round(w.morale)}</b></span></div>
-   <div class="staff">${staffRow('mag',w.staff.mag,k.needMag)}${staffRow('aut',w.staff.aut,k.needAut)}</div>
-   <div class="sm">${kw('motrici')}: ${w.motrici} di proprietà${Math.max(0,w.staff.aut-w.motrici)?` + ${Math.max(0,w.staff.aut-w.motrici)} in leasing`:''} · ${k.viaggi} viaggi al mese</div>
+   <div class="lab">Magazzino e ufficio</div>
+   <div class="staff">${['pick','car','imp'].map(r=>staffRow(r,w.staff[r],k.need[r])).join('')}</div>
+   <div class="lab">Trasporti</div>
+   <div class="staff">${['autCE','autB'].map(r=>staffRow(r,w.staff[r],k.need[r])).join('')}</div>
+   <div class="sm">${kw('motrici')}: ${w.motrici} di proprietà${Math.max(0,w.staff.autCE-w.motrici)?` + ${Math.max(0,w.staff.autCE-w.motrici)} in leasing`:''}${w.staff.autB?` · ${w.staff.autB} furgoni in leasing`:''} · ${k.viaggi} viaggi al mese</div>
    <label class="row" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><img class="px mini" src="${w.mgr==='ceo'?IMG[ceo().id]:w.mgr?IMG['m_'+w.mgr]:IMG.imp}" alt="" width="48" height="56" style="${w.mgr?'':'opacity:.3'}"><span class="lab">${kw('manager','Manager')}</span></span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
    ${k.m.none?'<div class="sm bad">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
   </div>
@@ -1587,12 +1639,13 @@ const VIEWS={
    ${done.length?`<div class="lab">Risultati recenti</div>`+done.map(t=>`<div class="row sm"><span>${esc(t.name)}</span><span class="${t.result&&t.result.win?'ok':'bad'}">${t.result?(t.result.win?'Vinta':t.bid?`Persa contro ${esc(t.result.by)}`:`Non partecipato · ${esc(t.result.by)}`):''}</span></div>`).join(''):''}`;
  },
  personale(){
-  const need=impNeed(); const qi=S.queue.filter(q=>q.role==='imp').length;
-  return `<div class="card"><div class="row"><span class="h3">Ufficio (${kw('impiegati','impiegati operativi')})</span></div>
-   <div class="staff"><img class="px mini" src="${IMG.imp}" alt="" width="48" height="56"><span>Traffico, customer service, amministrazione<br><span class="sm">servono ${need}${qi?` · ${qi} in arrivo`:''}</span></span><b class="num ${S.imp<need?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${S.imp}</b><button class="btn sm2" data-act="fire" data-role="imp" ${S.imp<=1?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="imp" aria-label="Assumi">+ Assumi</button></div>
-   <div class="sm">Ogni impiegato mancante toglie 1,5 punti di puntualità in tutti i magazzini.</div></div>
+  const ks=S.warehouses.map(w=>[w,w.kpi||computeWH(w)]);
+  return `<div class="card"><div class="row"><span class="h3">Organico</span><span class="sm">presenti / necessari</span></div>
+   <table class="t num"><tr><th></th>${ks.map(([w])=>`<th class="r"><button class="btn sm2" data-act="openwh" data-id="${w.id}">${esc(w.name)}</button></th>`).join('')}</tr>
+    ${ROLES.map(r=>`<tr><td style="display:flex;align-items:center;gap:6px"><img class="px" src="${IMG[r]}" alt="" width="24" height="28">${kw(ROLE_WK[r],ROLE[r])}</td>${ks.map(([w,k])=>`<td class="r ${w.staff[r]<k.need[r]?'bad':''}">${w.staff[r]} / ${k.need[r]}</td>`).join('')}</tr>`).join('')}</table>
+   <div class="sm">Si assume e si licenzia dalla finestra di ogni magazzino.</div></div>
    <div class="card"><div class="row"><span class="h3">${kw('assunzioni')} in corso</span></div>${S.queue.length?S.queue.map(q=>`<div class="row sm"><span>${ROLE[q.role]}${q.wh?' · '+esc(whById(q.wh).name):''}</span><span>${q.days} giorni</span></div>`).join(''):'<div class="sm">Nessuna.</div>'}
-   <div class="sm">Tempi più brevi con welfare e reputazione alti. Gli autisti sono i più difficili da trovare.</div></div>
+   <div class="sm">Tempi più brevi con welfare e reputazione alti. Gli autisti con patente CE sono i più difficili da trovare.</div></div>
    <div class="lab">${kw('manager','Manager')} disponibili</div>
    ${S.managers.map(m=>`<div class="card" style="flex-direction:row;gap:12px;align-items:flex-start"><img class="px mport" src="${IMG['m_'+m.id]}" alt="Ritratto di ${esc(m.name)}" width="96" height="112"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px"><div class="row"><b>${esc(m.name)}, ${m.age}</b><span class="sm">${m.hired?(seatOf(m.id)?esc(DIR_ROLES.find(r=>r.id===seatOf(m.id)).name):m.wh?'a '+esc(whById(m.wh).name):'senza incarico'):eur(m.ral)+' l\'anno'}</span></div>
      <div class="sm">${esc(m.role)}</div><div>${statChips(m.st,14)}</div>${talentIcons(m.tal||[],28)}
@@ -1738,6 +1791,7 @@ const VIEWS={
   return S.news.slice(0,30).map(n=>`<div class="card"><div class="row"><span class="lab">${esc(n.src)}</span><span class="sm">${shortDate(n.day)}</span></div><b>${esc(n.title)}</b><div class="sm" style="color:var(--ink)">${esc(n.text)}</div></div>`).join('')||'<div class="sm">Nessuna notizia.</div>';
  }
 };
+function needTxt(n){return ROLES.filter(r=>n[r]).map(r=>`${n[r]} ${ROLE[r].toLowerCase().replace('autisti ','aut. ')}`).join(', ')||'nessuno';}
 function bidEstHtml(t,e){
   if(!e) return '';
   if(e.naz.length) return `<div class="sm bad">Committente di rank ${rankOf(t).r}: lavora solo con grandi logistiche con accordi nazionali. Ti manca: ${e.naz.map(esc).join(', ')}.</div>`;
@@ -1748,7 +1802,7 @@ function bidEstHtml(t,e){
    <tr><td>${kw('saturazione')} dopo</td><td class="r ${e.sat>0.85?'bad':''}">${Math.round(e.sat*100)}%</td></tr>
    <tr><td>Puntualità prevista</td><td class="r ${kpiCls(e.P,t.sP)}">${f1(e.P)}%</td></tr>
    <tr><td>Accuratezza prevista</td><td class="r ${t.sA?kpiCls(e.A,t.sA):''}">${f1(e.A)}%</td></tr>
-   <tr><td>Personale necessario</td><td class="r">${e.needMag} magazzinieri, ${e.needAut} autisti</td></tr>
+   <tr><td>Personale necessario</td><td class="r">${needTxt(e.need)}</td></tr>
    <tr><th>${kw('gare','Probabilità di vincere')}</th><th class="r ${ch>=60?'ok':ch>=35?'warn':'bad'}" style="font-size:15px">${ch}%</th></tr></table>
    <div class="sm">KPI previsti con il personale necessario già assunto. Prezzo più basso = più probabilità, meno margine.</div>`;
 }
@@ -1774,7 +1828,7 @@ const ACT={
  },
  fire(d){
   const r=d.role; const sal=RAL[r]*COEF/12;
-  if(r==='imp'){if(S.imp<=1)return;S.imp--;} else {const w=whById(d.wh);if(w.staff[r]<=0)return;w.staff[r]--;mod(w.id,{mor:-4},30);}
+  const w=whById(d.wh);if(w.staff[r]<=0)return;w.staff[r]--;mod(w.id,{mor:-4},30);
   S.cash-=sal; S.cur.altro+=sal; toast(`Licenziamento: ${eur(sal)} di buonuscita, morale in calo`,'warn'); renderAll();
  },
  setmgr(d,el){
@@ -1834,7 +1888,7 @@ function wikiShow(){
   const l=el.querySelector('#wiki-list'); l.scrollTop=ls; const c=l.querySelector('[aria-current="true"]');
   if(c&&(c.offsetTop<l.scrollTop||c.offsetTop>l.scrollTop+l.clientHeight-30)) l.scrollTop=c.offsetTop-l.clientHeight/3;
 }
-function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh:r==='imp'?null:wh,days});toast(`Ricerca avviata: arriva tra ${days} giorni`,'ok');}
+function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh,days});toast(`Ricerca avviata: arriva tra ${days} giorni`,'ok');}
 function setSpeed(v){S.speed=v;renderTop();}
 function showModal(html){$('#modal').innerHTML=`<div class="ovl"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;const b=$('#modal button');if(b)b.focus();}
 function closeModal(){$('#modal').innerHTML='';if(UI.evSpeed){setSpeed(UI.evSpeed);UI.evSpeed=0;}}
@@ -1894,7 +1948,7 @@ Object.assign(ACT,{
  pickceo(d){const old=CEOS.find(c=>c.id===startSel.ceo);const inp=$('#coname-in');const typed=inp?inp.value:'';startSel.ceo=d.id;if(!typed||typed===old.company)startSel.name='';else startSel.name=typed;showStart();},
  pickcolor(d){startSel.color=d.c;applyColor(d.c);startSel.name=$('#coname-in').value;showStart();},
  startgame(){const nm=($('#coname-in').value||'').trim();uid=1;newGame(startSel.ceo,nm,startSel.color);boot();},
- continue(){const sv=load();if(!sv)return;S=renameClients(sv.S);S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;boot();}
+ continue(){const sv=load();if(!sv)return;S=migrateStaff(renameClients(sv.S));S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;rebalanceDrivers();boot();}
 });
 function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;
@@ -1916,6 +1970,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else showStart(); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS};
+window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY};
 })();
 </script>

@@ -43,7 +43,7 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 - **Niente punti azione o agenda**: come in Crusader Kings, il tempo scorre e i KPI salgono e scendono in base alle statistiche dell'impero.
 - **KPI separati**: Puntualità e Accuratezza (non OTIF), con soglie diverse per ogni cliente (`sP`, `sA`, `null` = non richiesta).
 - **Personaggi**: 6 abilità base (Operazioni, Precisione, Negoziazione, Leadership, Amministrazione, Innovazione) più talenti, cioè icone con tooltip, effetto e un testo di colore ironico.
-- **Personale**: magazzinieri, autisti e "impiegati operativi" (ufficio).
+- **Personale**: per ogni magazzino magazzinieri, carrellisti, impiegati di magazzino, autisti con patente B (furgoni) e con patente CE (bilici).
 - **Tecnologie**: tre alberi in stile Civ (Logistica / Sviluppo aziendale / Mercato), **una ricerca alla volta**, con tempo di ricerca ridotto dall'Innovazione. Le tecnologie di Logistica, dopo la ricerca, vanno **installate in ogni magazzino** e hanno un periodo di apprendimento; le altre valgono per tutta l'azienda.
 - **Dirigenti**: 5 posti (operativo, commerciale, HR, finanza, tecnologia), sbloccati solo dalla ricerca "Struttura direzionale".
 - **Eventi**: tanti e vari (meteo, politica, locali, clienti, personale), divertenti ma credibili, **rari**: uno ogni 30-55 giorni.
