@@ -1,0 +1,119 @@
+import os as _os
+ROOT=_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+import numpy as np
+from PIL import Image
+from scipy import ndimage
+W=48; H=56
+yy,xx=np.mgrid[0:H,0:W]+0.5
+def hexc(h): return np.array([int(h[i:i+2],16) for i in (1,3,5)],float)
+class Canvas:
+    def __init__(s):
+        s.img=np.zeros((H,W,3)); s.obj=np.zeros((H,W),bool)
+    def fill(s,m,c):
+        s.img[m]=hexc(c); s.obj|=m
+    def px(s,pts,c):
+        for x,y in pts: s.img[y,x]=hexc(c); s.obj[y,x]=True
+    def shaded(s,m,base,dark,light,cx,cy,rx,ry,td=0.35,tl=-0.5):
+        u=((xx-cx)/rx*0.8+(yy-cy)/ry*0.6)
+        s.fill(m,base)
+        s.img[m&(u>td)]=hexc(dark)
+        s.img[m&(u<tl)]=hexc(light)
+    def outline(s,c='#1b1420'):
+        edge=s.obj&~ndimage.binary_erosion(s.obj)
+        s.img[edge]=hexc(c)
+    def save(s,path,scale=4):
+        a=np.zeros((H,W,4),np.uint8); a[...,:3]=s.img.astype(np.uint8); a[...,3]=np.where(s.obj,255,0)
+        Image.fromarray(a,'RGBA').resize((W*scale,H*scale),Image.NEAREST).save(path)
+def ell(cx,cy,rx,ry): return ((xx-cx)/rx)**2+((yy-cy)/ry)**2<=1
+def rect(x0,y0,x1,y1): return (xx>=x0)&(xx<x1)&(yy>=y0)&(yy<y1)
+def line_px(x0,x1,y): return [(x,y) for x in range(x0,x1+1)]
+
+SK='#e9b48c'; SKD='#c98762'; SKL='#f6d2b0'; SKDD='#a86a4a'
+
+
+OUT=ROOT+'/assets/'
+def save2(c,name):
+    a=np.zeros((H,W,4),np.uint8); a[...,:3]=c.img.astype(np.uint8); a[...,3]=np.where(c.obj,255,0)
+    Image.fromarray(a,'RGBA').resize((W*2,H*2),Image.NEAREST).save(OUT+f'p_{name}.png')
+SKINS={'chiara':('#f1c4a0','#d29a76','#fbdcc0','#b07a58'),'media':(SK,SKD,SKL,SKDD),'scura':('#c98f62','#a26c45','#dcaa80','#83532f')}
+def person(name,skin='media',hair='#3d2419',hairl=None,hairstyle='short',cloth='#26365c',clothd=None,clothl=None,glasses=None,beard=None,mustache=None,lips=None,collar=None,extra=None,bald=False,earring=None):
+    s,sd,sl,sdd=SKINS[skin]; hl=hairl or hair
+    c=Canvas()
+    torso=ell(24,58,24,18)&(yy<56)
+    c.shaded(torso,cloth,clothd or cloth,clothl or cloth,24,50,22,10)
+    if hairstyle in ('long','bob','curly'):
+        back=ell(24,22,13.5,13)|(rect(10.5,20,37.5,(36 if hairstyle!='long' else 44))&ell(24,27,13.5,(14 if hairstyle!='long' else 19)))
+        if hairstyle=='curly': back=ell(24,21,14.5,13.5)|(rect(9.5,20,38.5,36)&ell(24,26,14.5,14))
+        c.shaded(back,hair,'#1c1612' if hair<'#5' else hair,hl,22,18,13,13)
+        if hairstyle=='curly':
+            cur=back&(((xx.astype(int)*3+yy.astype(int)*2)%5)==0); c.img[cur]=hexc(hl)
+    neck=rect(20,32,28,42); c.shaded(neck,sd,sdd,s,24,36,4,5,td=0.25,tl=-0.6)
+    c.px([(x,41) for x in range(21,27)],sdd)
+    if collar: collar(c)
+    for ex in (14,34): c.shaded(ell(ex,24,2,3),s,sd,sl,ex,24,2,3)
+    head=ell(24,23,9.8,12)|ell(24,27,9.3,8.5)
+    c.shaded(head,s,sd,sl,22,22,10,12)
+    c.px([(x,35) for x in range(20,29)],sd)
+    if hairstyle=='short':
+        h=(ell(24,15,10.8,6.5)&(yy<18.5))|(rect(14,14,16.5,22)&head)|(rect(31.5,14,34,22)&head)
+        c.shaded(h,hair,'#1c1612',hl,20,10,11,6)
+    elif hairstyle=='buzz':
+        h=(ell(24,15.5,10.5,6)&(yy<17.5))
+        c.shaded(h,hair,'#1c1612',hl,20,10,11,6); dots=h&(((xx.astype(int)+yy.astype(int))%2)==0); c.img[dots]=c.img[dots]*0.8
+    elif hairstyle=='messy':
+        h=(ell(24,14,11.5,7)&(yy<18))|(rect(14,14,16.5,23)&head)|(rect(31.5,14,34,23)&head)
+        c.shaded(h,hair,'#1c1612',hl,20,10,11,6)
+        c.px([(16,8),(19,7),(22,7),(26,7),(29,8),(31,9),(17,8),(28,7)],hair)
+    elif hairstyle=='bald':
+        h=(rect(13.5,16,17,25)&head)|(rect(31,16,34.5,25)&head)
+        c.shaded(h,hair,hair,hl,24,20,10,8)
+        c.px([(20,13),(21,13),(22,14)],sl)
+    elif hairstyle in ('bob','long','curly'):
+        fr=ell(24,13,12,7)&(yy<18)
+        jag=(yy>=15.5)&((xx.astype(int)%3)==0)
+        c.shaded(fr&~jag,hair,'#1c1612' if hair<'#5' else hair,hl,20,10,12,6)
+        side=(rect(13,15,16.5,33)|rect(31.5,15,35,33))&ell(24,24,14,14)
+        c.shaded(side,hair,'#1c1612' if hair<'#5' else hair,hl,22,18,13,13)
+    elif hairstyle=='perm':
+        h=ell(24,15,12.5,8.5)&(yy<20)|(rect(12.5,14,16.5,25)&ell(24,20,13,12))|(rect(31.5,14,35.5,25)&ell(24,20,13,12))
+        c.shaded(h,hair,'#8f949b',hl,20,10,11,7)
+        cur=h&(((xx.astype(int)*2+yy.astype(int)*3)%4)==0); c.img[cur]=hexc(hl)
+    # sopracciglia e occhi
+    bc=hair if hairstyle!='bald' else '#5d636b'
+    c.px(line_px(17,21,20),bc); c.px(line_px(27,31,20),bc)
+    c.px([(18,23),(19,23),(20,23)],'#f4f1ec'); c.px([(19,23),(20,23),(19,24)],'#2a1d1d')
+    c.px([(28,23),(29,23),(30,23)],'#f4f1ec'); c.px([(28,23),(29,23),(29,24)],'#2a1d1d')
+    c.px([(18,24),(20,24),(30,24),(28,24)],sd)
+    if glasses:
+        gl=glasses
+        c.px(line_px(16,22,22)+line_px(26,32,22)+[(23,23),(24,23),(25,23)],gl)
+        c.px([(16,23),(16,24),(22,23),(22,24),(26,23),(26,24),(32,23),(32,24)],gl)
+        c.px(line_px(17,21,25)+line_px(27,31,25),gl)
+    c.px([(24,25),(24,26),(25,27),(23,28),(25,28)],sd); c.px([(24,28)],sdd)
+    c.px([(18,27),(19,27),(29,27),(30,27)],'#e39383' if skin!='scura' else '#b9705a')
+    if beard:
+        b=head&(yy>27.5)&~(ell(24,31.5,3.5,1.6)); c.shaded(b,beard,beard,beard,24,32,9,6)
+        dots=b&(((xx.astype(int)+yy.astype(int))%2)==0); c.img[dots]=c.img[dots]*0.85
+    if mustache:
+        c.px([(x,29) for x in range(20,29)]+[(x,30) for x in range(19,30)]+[(19,31),(29,31)],mustache)
+    if lips: c.px(line_px(22,26,31),lips); c.px(line_px(23,25,32),lips)
+    else: c.px([(21,31),(22,32),(23,32),(24,32),(25,32),(26,32),(27,31)] if not mustache else line_px(21,27,32),'#8f3a32')
+    if earring: c.px([(14,30),(34,30)],earring)
+    if extra: extra(c)
+    c.outline(); save2(c,name)
+
+
+def tie(col):
+    def f(c):
+        m=(np.abs(xx-24)<(yy-39)*0.55)&ell(24,58,24,18)&(yy<56); c.fill(m,'#f4f5f7')
+        t=ell(24,58,24,18)&(yy<56)&(np.abs(xx-24)<=1.2)&(yy>41); c.fill(t,col)
+    return f
+person('ottavio',skin='chiara',hair='#9aa0a8',hairl='#c9ced4',hairstyle='bald',cloth='#2b3550',clothd='#1b2238',clothl='#44547a',glasses='#16202e',collar=tie('#2e9e48'))
+def giulia_col(c):
+    c.px([(21,41),(22,42),(23,42),(24,43),(25,42),(26,42),(27,41)],'#e2b84a')
+person('giulia',skin='media',hair='#a3482c',hairl='#c86a40',hairstyle='bob',cloth='#e8a317',clothd='#b97f0c',clothl='#ffd36b',lips='#b8323a',earring='#e2b84a',collar=giulia_col)
+person('roberto',skin='scura',hair='#c9ced4',hairl='#eef1f4',hairstyle='short',cloth='#4a2f5c',clothd='#33203f',clothl='#6b4a82',collar=tie('#e0393e'))
+bg=Image.new('RGBA',(3*104,120),(42,58,80,255))
+for i,n in enumerate(['ottavio','giulia','roberto']):
+    im=Image.open(OUT+f'p_{n}.png'); bg.alpha_composite(im,(4+i*104,4))
+bg.save(ROOT+'/tools/out/exec_preview.png')

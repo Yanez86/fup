@@ -1,0 +1,1170 @@
+<title>FUP – Fino all'ultimo pallet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap">
+<style>
+/* Layout: mappa a tutto schermo con pan e zoom, barra risorse in alto, menu a sinistra, finestre fluttuanti trascinabili sopra. Look unico (pixel art chiara su mappa), senza tema scuro alternativo. */
+:root{
+  --ink:#16202e; --ink2:#0c131d; --ink3:#2a3a50; --ink4:#4a5f7a;
+  --panel:#f4f7fa; --panel2:#e6eef3; --line:#c3d0dc; --muted:#4a5768; --hi:#a9b7c8;
+  --accent:#ff7a3d; --accent-d:#c8551f; --accent-l:#ffb07a;
+  --ok:#2e9e48; --ok-d:#217a36; --ok-t:#23803a; --warn:#e8a317; --warn-d:#b97f0c; --warn-t:#9a6a00; --bad:#e0393e; --bad-d:#a8262a; --bad-t:#c62828;
+  --yellow:#ffd23f; --sea:#1b64ad;
+  --f-disp:'Pixelify Sans', 'Courier New', monospace;
+  --f-body:'IBM Plex Sans Condensed', 'Arial Narrow', Arial, sans-serif;
+  color-scheme: light;
+}
+html,body{height:100%}
+body{margin:0;background:var(--sea);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--yellow);outline-offset:1px}
+.px{image-rendering:pixelated}
+.disp{font-family:var(--f-disp)}
+.num{font-variant-numeric:tabular-nums}
+
+/* Mappa */
+#mapwrap{position:fixed;inset:0;overflow:hidden;cursor:grab;touch-action:none}
+#mapwrap.drag{cursor:grabbing}
+#map{position:absolute;left:0;top:0;width:1280px;height:800px;transform-origin:0 0}
+#map img{position:absolute;inset:0;width:1280px;height:800px}
+#map svg{position:absolute;inset:0;overflow:visible}
+.vign{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 55%, rgba(8,20,40,0) 55%, rgba(8,20,40,.4) 100%)}
+.lbl{font-family:var(--f-disp);font-weight:600;fill:var(--ink);stroke:#f4f7fa;stroke-width:3px;paint-order:stroke}
+.mk{cursor:pointer}
+.mk:hover .mk-ring{stroke:var(--yellow)}
+
+/* Barra superiore */
+#top{position:fixed;left:0;right:0;top:0;z-index:30;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:6px max(16px, env(safe-area-inset-right, 0px)) 6px max(16px, env(safe-area-inset-left, 0px));padding-top:calc(6px + env(safe-area-inset-top, 0px));
+  background:var(--ink);color:#fff;border-bottom:3px solid var(--accent);box-shadow:inset 0 -3px 0 var(--ink2), 0 4px 0 rgba(12,19,29,.45)}
+#top .logo{font-family:var(--f-disp);font-weight:700;font-size:22px;letter-spacing:1px;text-shadow:2px 2px 0 var(--ink2);display:flex;align-items:center;gap:8px}
+#top .logo small{font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--hi);letter-spacing:0;text-shadow:none}
+.chip{display:flex;flex-direction:column;justify-content:center;line-height:1.1;padding:2px 10px;background:#1d2a3b;border:2px solid #2f4057;min-width:0}
+.chip span:first-child{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--hi)}
+.chip b{font-family:var(--f-disp);font-size:18px;font-weight:600}
+.date{font-family:var(--f-disp);font-size:17px;padding:3px 10px;background:var(--ink3);border:2px solid var(--ink4);box-shadow:inset 0 -2px 0 #1d2a3b}
+.spd{display:flex;gap:4px}
+.spd button{width:36px;height:34px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font-family:var(--f-disp);font-weight:700;box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
+.spd button[aria-pressed="true"]{background:var(--accent);color:var(--ink);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
+.spacer{flex:1}
+.stats{display:flex;gap:6px;flex-wrap:wrap}
+.paused{font-family:var(--f-disp);font-size:15px;padding:3px 8px;background:var(--bad);border:2px solid #fff}
+
+/* Menu laterale */
+#dock{position:fixed;left:max(12px, env(safe-area-inset-left, 0px));top:88px;z-index:25;display:flex;flex-direction:column;gap:6px;padding:6px;background:var(--ink);border:3px solid var(--ink2);box-shadow:inset 0 2px 0 var(--ink3), 5px 5px 0 rgba(12,19,29,.55)}
+#dock button{width:48px;height:44px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink4);background:var(--ink3);box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a;position:relative}
+#dock button.on{background:var(--accent);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
+#dock .badge{position:absolute;right:-7px;top:-7px;min-width:20px;height:20px;padding:0 4px;background:var(--bad);color:#fff;border:2px solid #fff;font:700 12px/16px var(--f-body)}
+
+/* Finestre */
+.win{position:fixed;z-index:20;width:440px;max-width:calc(100vw - 32px);max-height:calc(100vh - 110px);display:flex;flex-direction:column;background:var(--panel);border:3px solid var(--ink2);box-shadow:inset 0 0 0 2px #fff, 6px 6px 0 rgba(12,19,29,.55)}
+.win.wide{width:640px}
+.win.xwide{width:960px}
+.treebox{overflow-x:auto;padding:4px 2px 8px}
+.tnode{position:absolute;display:flex;align-items:center;gap:7px;padding:4px 6px;text-align:left;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 rgba(22,32,46,.12),2px 2px 0 var(--ink);font-size:13px;line-height:1.2}
+.tnode .tn{display:flex;flex-direction:column;gap:2px;min-width:0}
+.tnode b{font-size:13.5px;line-height:1.15}
+.tnode span{font-size:12px}
+.tnode[aria-pressed="true"]{outline:3px solid var(--yellow);outline-offset:1px}
+.win-h{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 10px;background:var(--ink);color:#fff;box-shadow:inset 0 -3px 0 var(--ink2), inset 0 2px 0 var(--ink3);cursor:move;user-select:none;touch-action:none}
+.win-h h2{flex:1;margin:0;font-family:var(--f-disp);font-size:19px;font-weight:600}
+.grip{width:10px;height:14px;background:radial-gradient(circle, #6b7a8e 1px, transparent 1.5px) 0 0/5px 5px}
+.xbtn{width:30px;height:30px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font-family:var(--f-disp);font-size:13px;line-height:1;box-shadow:inset 0 -2px 0 #1d2a3b}
+.win-b{padding:14px;overflow:auto;min-height:0;display:flex;flex-direction:column;gap:10px}
+.tabs{display:flex;border-bottom:2px solid var(--ink);background:#dfe7ee;flex-wrap:wrap}
+.tabs button{flex:1;padding:7px 9px;border:0;border-right:2px solid var(--ink);background:#dfe7ee;color:var(--muted);font-family:var(--f-disp);font-size:15px;min-width:0}
+.tabs button:last-child{border-right:0}
+.tabs button[aria-selected="true"]{background:var(--panel);color:var(--ink);font-weight:600;box-shadow:inset 0 3px 0 var(--accent)}
+.card{padding:8px 10px;background:#fff;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2);display:flex;flex-direction:column;gap:5px;min-width:0}
+.card.bad{background:#fff4f4;border-color:var(--bad-t);box-shadow:inset 0 -3px 0 #f6dede}
+.card.pend{background:#fff9e3;box-shadow:inset 0 -3px 0 #f3e3a8}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;min-width:0}
+.row > *{min-width:0}
+.lab{font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.sm{font-size:14px;color:var(--muted)}
+.h3{margin:0;font-family:var(--f-disp);font-size:18px;font-weight:600}
+.bar{height:10px;background:var(--panel2);border:1px solid var(--ink);flex:1;min-width:40px}
+.bar i{display:block;height:100%;max-width:100%}
+.btn{padding:7px 12px;border:2px solid var(--ink);background:#fff;font-family:var(--f-disp);font-size:15px;box-shadow:inset 0 -3px 0 #c9d3dd, 2px 2px 0 var(--ink)}
+.btn.pri{background:var(--accent);box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l), 2px 2px 0 var(--ink);font-weight:600}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm2{padding:4px 9px;font-size:14px;box-shadow:inset 0 -2px 0 #c9d3dd, 1px 1px 0 var(--ink)}
+.pill{display:inline-block;padding:0 6px;font-size:13px;font-weight:600;border:1px solid var(--ink)}
+.ok{color:var(--ok-t)} .warn{color:var(--warn-t)} .bad{color:var(--bad-t)}
+table.t{width:100%;border-collapse:collapse;font-size:15px}
+table.t td,table.t th{padding:3px 4px;border-bottom:1px dashed var(--line);text-align:left;vertical-align:top}
+table.t th{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);font-weight:500}
+table.t td.r,table.t th.r{text-align:right}
+.staff{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:6px 10px;align-items:center;font-size:15px}
+.mini{width:48px;height:56px;background:#3a6db0;border:2px solid var(--ink)}
+.mport{width:96px;height:112px;flex:none;background:repeating-linear-gradient(180deg,#2f5fa0 0 8px,#3a6db0 8px 16px);border:3px solid var(--ink)}
+select,input[type=text]{font:inherit;padding:5px 7px;border:2px solid var(--ink);background:#fff;min-width:0;max-width:100%}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.kpi{padding:6px 8px;background:#fff;border:2px solid var(--ink);cursor:help}
+.kpi b{font-family:var(--f-disp);font-size:26px}
+.portrait{background:repeating-linear-gradient(180deg,#2f5fa0 0 8px,#3a6db0 8px 16px);border:3px solid var(--ink);box-shadow:inset 0 0 0 3px var(--accent), inset 0 0 0 6px var(--ink)}
+.tal{display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 rgba(22,32,46,.12);cursor:help}
+.skills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.skill{padding:6px 8px;background:#fff;border:2px solid var(--ink);font-size:14px}
+.skill b{font-family:var(--f-disp);font-size:20px;float:right}
+
+/* Tooltip, notifiche, modali */
+#tip{position:fixed;z-index:60;max-width:320px;padding:9px 11px;background:var(--ink);color:#fff;border:2px solid var(--ink2);box-shadow:inset 0 2px 0 var(--ink3), 4px 4px 0 rgba(12,19,29,.5);font-size:14px;line-height:1.45;pointer-events:none}
+#tip .tt{font-family:var(--f-disp);font-size:16px;color:var(--yellow)}
+#tip .tr{display:flex;justify-content:space-between;gap:12px}
+#toasts{position:fixed;right:max(16px, env(safe-area-inset-right, 0px));top:76px;z-index:40;display:flex;flex-direction:column;gap:6px;width:340px;max-width:calc(100vw - 32px);pointer-events:none}
+.toast{padding:8px 10px;background:var(--ink);color:#fff;border:2px solid var(--ink2);border-left:6px solid var(--accent);box-shadow:4px 4px 0 rgba(12,19,29,.5);font-size:15px}
+.toast.ok{border-left-color:var(--ok)} .toast.bad{border-left-color:var(--bad)} .toast.warn{border-left-color:var(--warn)}
+.ovl{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(8,16,30,.55);padding:16px}
+.modal{width:500px;max-width:100%;max-height:calc(100vh - 32px);overflow:auto;background:var(--panel);border:3px solid var(--ink2);box-shadow:inset 0 0 0 2px #fff, 8px 8px 0 rgba(12,19,29,.6)}
+.modal .win-b{gap:10px}
+.src{display:flex;justify-content:space-between;padding:7px 12px;background:var(--ink);color:#fff;font-family:var(--f-disp);font-size:16px}
+.opt{text-align:left;padding:9px 12px;border:2px solid var(--ink);background:#fff;box-shadow:inset 0 -3px 0 #c9d3dd, 2px 2px 0 var(--ink);font-size:15px}
+.opt small{display:block;color:var(--muted);font-size:14px}
+
+/* Avvio */
+#start:empty,#modal:empty{display:none}
+#start{position:fixed;inset:0;z-index:70;overflow:auto;background:rgba(8,16,30,.7);padding:24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px))}
+#start .box{max-width:1080px;margin:0 auto;background:var(--panel);border:3px solid var(--ink2);box-shadow:inset 0 0 0 2px #fff, 8px 8px 0 rgba(12,19,29,.6)}
+#start h1{margin:0;font-family:var(--f-disp);font-size:40px;line-height:1;text-shadow:3px 3px 0 var(--accent)}
+.ceos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ceo{display:flex;flex-direction:column;gap:6px;padding:10px;background:#fff;border:3px solid var(--ink);cursor:pointer;text-align:left;box-shadow:inset 0 -3px 0 var(--panel2)}
+.ceo[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 3px var(--accent), 4px 4px 0 var(--ink)}
+.sw{width:30px;height:30px;border:3px solid var(--ink)}
+.sw[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
+@media (max-width:900px){.ceos{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){
+  .ceos{grid-template-columns:minmax(0,1fr)}
+  #top .stats .chip.opt2{display:none}
+  #dock{top:auto;bottom:calc(12px + env(safe-area-inset-bottom, 0px));flex-direction:row;left:50%;transform:translateX(-50%)}
+  .win{left:16px !important;right:16px;top:96px !important;width:auto !important}
+}
+@media (prefers-reduced-motion: reduce){ .toast{transition:none} }
+</style>
+
+<div id="mapwrap" aria-label="Mappa del Nord-Ovest">
+  <div id="map">
+    <img class="px" src="{{MAP}}" alt="Mappa in pixel art del Nord-Ovest italiano con Alpi, laghi, fiumi e autostrade">
+    <svg id="ov" width="1280" height="800" viewBox="0 0 1280 800" shape-rendering="crispEdges"></svg>
+  </div>
+</div>
+<div class="vign" aria-hidden="true"></div>
+
+<header id="top">
+  <div class="logo">FUP <small id="coname"></small></div>
+  <div class="date num" id="date">—</div>
+  <div class="spd" role="group" aria-label="Velocità del tempo">
+    <button data-act="speed" data-v="0" aria-label="Pausa (spazio)">II</button>
+    <button data-act="speed" data-v="1" aria-label="Velocità 1">›</button>
+    <button data-act="speed" data-v="2" aria-label="Velocità 2">››</button>
+    <button data-act="speed" data-v="3" aria-label="Velocità 3">›››</button>
+  </div>
+  <span class="paused" id="paused" hidden>In pausa</span>
+  <div class="spacer"></div>
+  <div class="stats num" id="stats"></div>
+</header>
+
+<nav id="dock" aria-label="Menu"></nav>
+<div id="wins"></div>
+<div id="toasts" aria-live="polite"></div>
+<div id="tip" hidden></div>
+<div id="modal"></div>
+<div id="start"></div>
+
+<script>
+(function(){
+'use strict';
+/* ====================== DATI ====================== */
+const IMG={gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',mag:'{{Q_magazziniere}}',aut:'{{Q_autista}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}'};
+const LON0=4.81, LAT1=47.0, KX=78.29*2, KY=111.111*2;
+const pt=(lon,lat)=>[ (lon-LON0)*KX, (LAT1-lat)*KY ];
+const CITIES=[
+ ['Torino',7.68,45.07,1],['Milano',9.19,45.46,1],['Genova',8.93,44.41,1],['Aosta',7.32,45.74],['Novara',8.62,45.45],['Alessandria',8.61,44.91],['Asti',8.20,44.90],['Cuneo',7.55,44.39],['Vercelli',8.42,45.32],['Biella',8.05,45.56],['Varese',8.83,45.82],['Como',9.08,45.81],['Lecco',9.39,45.85],['Bergamo',9.67,45.70],['Brescia',10.21,45.54],['Lodi',9.50,45.31],['Pavia',9.16,45.19],['Cremona',10.02,45.13],['Mantova',10.79,45.16],['Savona',8.48,44.31],['La Spezia',9.82,44.10],['Imperia',8.03,43.88],['Sondrio',9.87,46.17],
+ ['Piacenza',9.69,45.05,0,1],['Verona',10.99,45.44,0,1],['Lugano',8.95,46.0,0,1],['Nizza',7.27,43.70,0,1]];
+const SITES={
+ rivalta:{name:'Rivalta Scrivia',prov:'AL',lon:8.86,lat:44.86,cap:2500,rent:7000},
+ pioltello:{name:'Pioltello',prov:'MI',lon:9.33,lat:45.50,cap:4000,rent:12000},
+ novara:{name:'Novara CIM',prov:'NO',lon:8.66,lat:45.42,cap:3200,rent:9000},
+ voltri:{name:'Genova Voltri',prov:'GE',lon:8.75,lat:44.43,cap:1800,rent:6500},
+ orbassano:{name:'Orbassano',prov:'TO',lon:7.54,lat:45.01,cap:3500,rent:10000},
+ lodi:{name:'Lodi',prov:'LO',lon:9.47,lat:45.29,cap:2000,rent:6500},
+ orio:{name:'Bergamo Orio',prov:'BG',lon:9.70,lat:45.66,cap:2500,rent:8000},
+ mortara:{name:'Mortara',prov:'PV',lon:8.74,lat:45.25,cap:1800,rent:4500},
+ brescia:{name:'Brescia Est',prov:'BS',lon:10.27,lat:45.52,cap:3000,rent:8500}
+};
+const CEOS=[
+ {id:'gino',name:'Gino Bertolotti',age:52,origin:'Ex padroncino',site:'rivalta',cash:180000,motrici:3,fixed:3500,rep:45,company:'Trasporti Bertolotti',
+  st:{op:17,prec:9,neg:5,lead:14,amm:6,inn:2},tal:['Un milione di km al volante','Allergico al gestionale','Dialetto stretto'],allergic:true,
+  bio:'Trent\'anni sulle strade d\'Europa, poi il capannone di Rivalta comprato con la liquidazione. Diffida di tutto ciò che ha una presa elettrica.',
+  client:{name:'Pastificio Rummolo',slogan:'Al dente o rimborsati',sector:'Alimentare secco',stock:700,pal:300,sP:92,sA:null}},
+ {id:'edoardo',name:'Edoardo Ferretti',age:31,origin:'Figlio del fondatore',site:'pioltello',cash:320000,motrici:2,fixed:5500,rep:50,company:'Ferretti Logistica',
+  st:{op:6,prec:7,neg:13,lead:6,amm:12,inn:10},tal:['Laureato in Bocconi','Papà ha sempre ragione','Sempre al telefono'],
+  bio:'Ha ereditato il magazzino di Pioltello e un padre che passa "solo per un caffè" tutti i giorni alle 8.',
+  client:{name:'Mobilificio Brianzolo',slogan:'Il divano di tua nonna, da tre generazioni',sector:'Arredamento',stock:1100,pal:350,sP:88,sA:95}},
+ {id:'valeria',name:'Valeria Conti',age:44,origin:'Ex manager di multinazionale',site:'novara',cash:220000,motrici:2,fixed:4200,rep:45,company:'Conti Logistica',
+  st:{op:13,prec:10,neg:18,lead:5,amm:10,inn:9},tal:['Parla per acronimi','Stacanovista','Cena col buyer'],
+  bio:'Quindici anni di slide e KPI in una multinazionale. Dorme quattro ore a notte e lo considera un vantaggio competitivo.',
+  client:{name:'Unilevante Italia',slogan:'Detersivi per un mondo più bianco',sector:'Largo consumo',stock:900,pal:500,sP:92,sA:95}},
+ {id:'marco',name:'Marco Pellegrino',age:36,origin:'Ingegnere gestionale',site:'voltri',cash:200000,motrici:1,fixed:3000,rep:42,company:'Pellegrino Smart Logistics',
+  st:{op:9,prec:13,neg:5,lead:5,amm:11,inn:17},tal:['Excel-dipendente','Parla con i robot','Calma olimpica'],robots:true,startTech:['barcode'],
+  bio:'Ha progettato magazzini automatici per altri, ora ne vuole uno suo. Ogni pallet ha un codice, ogni codice un foglio Excel.',
+  client:{name:'Caffè Portuale',slogan:'Tostato col sale del porto',sector:'Alimentare secco',stock:600,pal:250,sP:90,sA:97}}
+];
+const MANAGERS=[
+ {id:'rosa',name:'Rosa Brambati',age:47,role:'Ha iniziato sul muletto, poi dieci anni in RSU',tal:['Ex sindacalista','Mano larga'],st:{op:12,prec:11,neg:7,lead:17,amm:5,inn:6},ral:46000},
+ {id:'toto',name:'Salvatore "Totò" Esposito',age:58,role:'Capo traffico, tre cellulari',tal:['Conosce tutti al bar','Sempre al telefono'],st:{op:14,prec:7,neg:13,lead:11,amm:6,inn:5},ral:50000},
+ {id:'chiara',name:'Chiara Ferraris',age:29,role:'Laurea al Politecnico, due stage e un master',tal:['Excel-dipendente','Ansia da prestazione'],st:{op:9,prec:18,neg:7,lead:4,amm:13,inn:11},ral:38000},
+ {id:'davide',name:'Davide Rinaldi',age:39,role:'Ha portato Orio al 99% di accuratezza',tal:['Stacanovista','Braccino corto'],st:{op:15,prec:10,neg:7,lead:6,amm:12,inn:8},ral:52000},
+ {id:'luca',name:'Luca Mazzoleni',age:33,role:'Programma di notte, installa di giorno',tal:['Parla con i robot','Insonne'],st:{op:6,prec:8,neg:5,lead:4,amm:8,inn:18},ral:44000},
+ {id:'franca',name:'Franca Gallo',age:61,role:'Controlla le fatture a mano, una per una',tal:['Calma olimpica','Braccino corto'],st:{op:7,prec:13,neg:8,lead:8,amm:17,inn:4},ral:45000}
+];
+const EXECS=[
+ {id:'ottavio',name:'Ottavio Ferri',age:58,role:'Ex direttore finanziario di una banca di provincia',tal:['Calma olimpica','Braccino corto'],st:{op:8,prec:14,neg:9,lead:8,amm:18,inn:7},ral:85000},
+ {id:'giulia',name:'Giulia Marchetti',age:45,role:'Vent\'anni di risorse umane nella grande distribuzione',tal:['Conosce tutti al bar','Mano larga'],st:{op:9,prec:10,neg:11,lead:17,amm:10,inn:8},ral:72000},
+ {id:'roberto',name:'Roberto "Bob" Colombo',age:50,role:'Ha venduto logistica a mezza Brianza',tal:['Cena col buyer','Sempre al telefono'],st:{op:9,prec:7,neg:18,lead:10,amm:8,inn:7},ral:80000}
+];
+const sgn=v=>(v>=0?'+':'−')+f1(Math.abs(v)), sgnp=v=>(v>=0?'+':'−')+Math.abs(Math.round(v))+'%';
+const DIR_ROLES=[
+ {id:'op',name:'Direttore operativo',stat:'op',statN:'Operazioni',eff:v=>`Puntualità ${sgn(0.15*(v-10))} in tutti i magazzini`},
+ {id:'comm',name:'Direttore commerciale',stat:'neg',statN:'Negoziazione',eff:v=>`Punteggio nelle gare ${sgn(0.8*(v-10))}`},
+ {id:'hr',name:'Direttore risorse umane',stat:'lead',statN:'Leadership',eff:v=>`Morale ${sgn(0.3*(v-10))} ovunque · tempi di assunzione ${sgnp(-2*(v-10))}`},
+ {id:'fin',name:'Direttore finanziario',stat:'amm',statN:'Amministrazione',eff:v=>`Costi fissi ${sgnp(-0.5*(v-10))}`},
+ {id:'tech',name:'Direttore tecnologia',stat:'inn',statN:'Innovazione',eff:v=>`Le ricerche usano Innovazione ${v} se più alta di quella del CEO`}
+];
+const TENDER_POOL=[
+ {name:'Caseificio Galbanone',slogan:'Così buono che si sente',sector:'Freschi',stock:600,pal:480,sP:93,sA:96,diff:0,req:['freddo']},
+ {name:'Ferramenta Bullonati',slogan:'Ogni vite ha il suo dado',sector:'Ferramenta',stock:500,pal:250,sP:90,sA:97,diff:-3},
+ {name:'ElettroUnieuri',slogan:'Io non sono mica scemo',sector:'Elettronica',stock:900,pal:600,sP:90,sA:99,diff:5},
+ {name:'FarmaSpa',slogan:'Lotti tracciati, sonni tranquilli',sector:'Farmaceutico',stock:400,pal:200,sP:97,sA:99.5,diff:8,req:['freddo']},
+ {name:'Esselonga',slogan:'Il buyer vuole tre copie a mano',sector:'GDO',stock:1500,pal:2400,sP:98,sA:95,diff:10,req:['edi']},
+ {name:'Birrificio Mortetti',slogan:'Baffi e luppolo dal 1859',sector:'Bevande',stock:800,pal:700,sP:92,sA:95,diff:0},
+ {name:'Acque San Pellegrinetto',slogan:'Bollicine di montagna, quasi',sector:'Bevande',stock:1200,pal:900,sP:91,sA:94,diff:2},
+ {name:'Arredamenti Ikeo',slogan:'Montalo tu, se ci riesci',sector:'Arredamento',stock:1000,pal:300,sP:90,sA:97,diff:3},
+ {name:'Moda Armandi',slogan:'Eleganza in bancale',sector:'Moda',stock:300,pal:150,sP:96,sA:98,diff:6},
+ {name:'Pneumatici Pirello',slogan:'La potenza è niente senza consegna',sector:'Automotive',stock:700,pal:400,sP:93,sA:96,diff:2},
+ {name:'Crema Spalmella',slogan:'Il cucchiaino è compreso nel prezzo',sector:'Dolciario',stock:500,pal:450,sP:95,sA:97,diff:4},
+ {name:'Riso Scotto dei Navigli',slogan:'Chicchi lombardi, mai scotti',sector:'Alimentare secco',stock:650,pal:280,sP:91,sA:null,diff:-2},
+ {name:'Zalandini',slogan:'Resi gratuiti, anche dei calzini',sector:'E-commerce moda',stock:900,pal:1200,sP:96,sA:98,diff:4,req:['ecom']},
+ {name:'Amazzonia Italia',slogan:'Lo vuoi? È già in viaggio',sector:'E-commerce',stock:2000,pal:3000,sP:98,sA:98,diff:10,req:['ecom','edi']},
+ {name:'Spesa Veloce',slogan:'La spesa a casa in un\'ora',sector:'E-commerce alimentare',stock:600,pal:900,sP:97,sA:97,diff:3,req:['ecom','freddo']}
+];
+const RIVALS=['Gruppo Bartolazzi','Logistix Global','F.lli Brambilla Autotrasporti','Cooperativa La Fatica'];
+const TECH=[
+ {id:'barcode',tree:'log',tier:1,row:0,name:'Lettori barcode',year:2002,cost:6000,days:20,inst:12000,mese:150,A:1.5,weeks:2,desc:'Meno errori di prelievo.'},
+ {id:'formazione',tree:'log',tier:1,row:1,name:'Formazione strutturata',year:2002,cost:3000,days:15,inst:4000,mese:250,A:0.5,mor:3,weeks:1,desc:'Personale più preparato: morale +3.'},
+ {id:'gps',tree:'log',tier:1,row:2,name:'Telematica GPS',year:2004,cost:15000,days:30,inst:10000,mese:500,P:2,weeks:3,desc:'Mezzi visibili in tempo reale, meno ritardi.'},
+ {id:'wms',tree:'log',tier:2,row:0,req:['barcode'],name:'WMS di base',year:2002,cost:40000,days:75,inst:25000,mese:800,A:1.5,P:0.5,weeks:6,desc:'Il magazzino sa dove sta ogni pallet.'},
+ {id:'anticoll',tree:'log',tier:2,row:1,req:['formazione'],name:'Sicurezza muletti',year:2006,cost:12000,days:30,inst:20000,mese:150,A:0.5,mor:2,weeks:2,desc:'Sensori anti-collisione: meno danni e infortuni.'},
+ {id:'rotte',tree:'log',tier:2,row:2,req:['gps'],name:'Pianificazione rotte',year:2007,cost:35000,days:50,inst:15000,mese:600,P:2,fuel:0.05,weeks:4,desc:'Percorsi ottimizzati, gasolio −5%.'},
+ {id:'rf',tree:'log',tier:3,row:0,req:['wms'],name:'Radiofrequenza',year:2004,cost:25000,days:40,inst:30000,mese:400,A:1,P:0.5,prod:0.1,weeks:4,desc:'Terminali senza carta: produttività +10%.'},
+ {id:'verticale',tree:'log',tier:3,row:1,req:['wms','anticoll'],name:'Magazzino verticale',year:2012,cost:80000,days:120,inst:400000,mese:2500,A:0.5,cap:0.2,weeks:10,desc:'Scaffalature automatiche: capacità +20%.'},
+ {id:'ptl',tree:'log',tier:4,row:0,req:['rf'],name:'Pick-to-light',year:2008,cost:40000,days:60,inst:80000,mese:600,A:2,P:0.5,prod:0.15,weeks:4,desc:'Picking guidato dalle luci: produttività +15%.'},
+ {id:'amr',tree:'log',tier:5,row:0,req:['ptl','verticale'],name:'Robot mobili (AMR)',year:2018,cost:150000,days:150,inst:600000,mese:4000,A:1,P:1,prod:0.4,weeks:12,desc:'Robot che portano gli scaffali agli operatori: produttività +40%.'},
+ {id:'gestionale',tree:'org',tier:1,row:0,name:'Gestionale amministrativo',year:2002,cost:15000,days:30,desc:'Fatture e paghe informatizzate: costi fissi −3%, ogni impiegato regge più volume.'},
+ {id:'hr',tree:'org',tier:2,row:0,req:['gestionale'],name:'Ufficio del personale',year:2002,cost:20000,days:40,desc:'Selezione più rapida: tempi di assunzione −20%.'},
+ {id:'direzione',tree:'org',tier:2,row:1,req:['gestionale'],name:'Struttura direzionale',year:2002,cost:50000,days:90,desc:'Sblocca la squadra dei dirigenti: cinque direttori che guidano tutta l\'azienda.'},
+ {id:'welfare2',tree:'org',tier:3,row:0,req:['hr'],name:'Welfare aziendale',year:2004,cost:25000,days:45,desc:'Convenzioni e piattaforma welfare: costo delle voci di welfare −30%.'},
+ {id:'controllo',tree:'org',tier:3,row:1,req:['direzione'],name:'Controllo di gestione',year:2003,cost:40000,days:60,desc:'Budget e analisi dei costi: costi fissi −4%.'},
+ {id:'academy',tree:'org',tier:4,row:0,req:['welfare2'],name:'Academy aziendale',year:2010,cost:60000,days:90,desc:'Formazione interna: morale +3 e apprendimento delle tecnologie −30% ovunque.'},
+ {id:'iso',tree:'org',tier:4,row:1,req:['controllo'],name:'Certificazione ISO 9001',year:2005,cost:45000,days:120,desc:'Accuratezza +0,5 ovunque, reputazione +5, punteggio nelle gare +3.'},
+ {id:'commerciale',tree:'mkt',tier:1,row:0,name:'Ufficio commerciale',year:2002,cost:15000,days:30,desc:'Più gare: ne arriva una ogni 3–5 settimane invece di 4–7.'},
+ {id:'freddo',tree:'mkt',tier:1,row:1,name:'Catena del freddo',year:2002,cost:30000,days:45,desc:'Certificazione per freschi e farmaci: sblocca le gare che la richiedono.'},
+ {id:'edi',tree:'mkt',tier:2,row:0,req:['commerciale'],name:'EDI con i clienti',year:2003,cost:30000,days:50,desc:'Ordini automatici: soddisfazione +1 al mese sopra soglia. Richiesto dalla grande distribuzione.'},
+ {id:'marketing',tree:'mkt',tier:2,row:1,req:['commerciale'],name:'Marketing e fiere',year:2002,cost:25000,days:40,desc:'Stand alle fiere di settore: reputazione +5 subito e +0,2 al mese.'},
+ {id:'kam',tree:'mkt',tier:3,row:0,req:['edi'],name:'Key account management',year:2005,cost:40000,days:60,desc:'Un referente per ogni grande cliente: soddisfazione +1 al mese, rinnovo da 40 invece di 50.'},
+ {id:'ecom',tree:'mkt',tier:4,row:0,req:['kam','marketing'],name:'Logistica e-commerce',year:2012,cost:70000,days:90,desc:'Sblocca le gare dei negozi online: tanti ordini, volumi alti, KPI esigenti.'}
+];
+const TREES=[['log','Logistica','Tecnologie da installare in ogni magazzino.'],['org','Sviluppo aziendale','Organizzazione, persone e controllo: valgono per tutta l\'azienda.'],['mkt','Mercato','Accesso a nuovi clienti e gare: valgono per tutta l\'azienda.']];
+const WELFARE=[
+ {id:'buoni',name:'Buoni pasto',cost:110,mor:5,att:6},
+ {id:'assic',name:'Assicurazione sanitaria',cost:35,mor:4,att:7},
+ {id:'premio',name:'Premio di produzione',cost:80,mor:6,att:6},
+ {id:'navetta',name:'Navetta dalla stazione',cost:20,mor:2,att:3}
+];
+const RAL={mag:18500,aut:20000,imp:22000}, COEF=1.42;
+const ROLE={mag:'Magazzinieri',aut:'Autisti',imp:'Impiegati operativi'};
+const HIRE={mag:{ann:[25,300],age:[7,1200]},aut:{ann:[35,300],age:[14,1800]},imp:{ann:[20,300],age:[7,1200]}};
+const T_ST=5.5,T_MO=3.8,T_DI=30;
+
+/* ====================== UTILITÀ ====================== */
+const TPAL={K:'#16202e',W:'#ffffff',Y:'#ffd23f',O:'#ff7a3d',R:'#e0393e',G:'#2e9e48',B:'#5fb4f0',N:'#8a5f36',S:'#c3d0dc',D:'#4a5f7a',T:'#1f9e8f',F:'#f2c79b',P:'#9b6bff'};
+const TALENTS={
+ 'Un milione di km al volante':{t:'mix',fx:'Operazioni +4 · Leadership +1 · Innovazione −2 · Morale degli autisti +5',fl:'Conosce a memoria ogni Autogrill tra Rivalta e Rotterdam.',ic:['..KKKK..','.K....K.','K..KK..K','KKKKKKKK','K..KK..K','K..KK..K','.K.KK.K.','..KKKK..']},
+ 'Allergico al gestionale':{t:'neg',fx:'Innovazione −4 · Apprendimento delle tecnologie +50% nel suo magazzino',fl:'Ha stampato il manuale del WMS per usarlo come fermaporta.',ic:['R..S.S.R','.R.S.SR.','..RSSR..','..SRRS..','..SRRS..','..RSSR..','.R.KK.R.','R..KK..R']},
+ 'Dialetto stretto':{t:'mix',fx:'Leadership +2 · Negoziazione −2 · Operai +10 di opinione, multinazionali −10',fl:'In magazzino lo capiscono tutti. In multinazionale nessuno.',ic:['YYYYYYYY','YWWWWWWY','YWKWKWWY','YWWWWKWY','YYYYYYYY','.YY.....','.Y......','........']},
+ 'Laureato in Bocconi':{t:'mix',fx:'Amministrazione +3 · Negoziazione +1 · Operazioni −1',fl:'Cita Porter anche quando ordina il caffè.',ic:['........','...KK...','.KKKKKK.','KKKKKKKK','.KKKKKKY','..KKKK.Y','..KKKK.Y','.......Y']},
+ 'Papà ha sempre ragione':{t:'neg',fx:'Leadership −2 · Tenuta allo stress −5 · Il fondatore interviene negli eventi',fl:'Il fondatore passa «solo per un caffè». Alle 8. Tutti i giorni.',ic:['..SSSS..','.SFFFFS.','.FKFFKF.','.FFFFFF.','.FSSSSF.','..FFFF..','..DDDD..','.DDDDDD.']},
+ 'Sempre al telefono':{t:'mix',fx:'Negoziazione +2 · Precisione −1 · Tenuta allo stress −5',fl:'Risponde ai clienti anche dall\'ombrellone a Varazze.',ic:['..KKKK.O','..KBBKO.','..KBBK.O','..KBBK..','..KKKK..','..KWKK..','..KKKK..','........']},
+ 'Parla per acronimi':{t:'mix',fx:'Negoziazione +2 · Leadership −3 · Bonus nelle gare dei clienti grandi',fl:'ASAP, KPI, ROI: le sue mail sembrano codici fiscali.',ic:['........','......G.','....G.G.','..O.G.G.','..O.G.G.','R.O.G.G.','R.O.G.G.','KKKKKKKK']},
+ 'Stacanovista':{t:'mix',fx:'Operazioni +2 · Tenuta allo stress −15',fl:'Considera il weekend un\'invenzione dei sindacati.',ic:['..KKKK..','.KWWWWK.','KWWKWWWK','KWWKWWWK','KWWKKKWK','KWWWWWWK','.KWWWWK.','..KKKK..']},
+ 'Cena col buyer':{t:'pos',fx:'Negoziazione +4 · Tenuta allo stress −10 · Scelte speciali negli eventi con i clienti',fl:'Le trattative migliori le chiude al secondo tiramisù.',ic:['.K....K.','.KRRRRK.','.KRRRRK.','..KRRK..','...KK...','...KK...','...KK...','..KKKK..']},
+ 'Excel-dipendente':{t:'mix',fx:'Precisione +3 · Amministrazione +2 · Leadership −2',fl:'Ha un foglio Excel anche per la lista della spesa.',ic:['GGGGGGGG','GWWGWWWG','GGGGGGGG','GWWGWWWG','GGGGGGGG','GWWGWWWG','GGGGGGGG','........']},
+ 'Parla con i robot':{t:'mix',fx:'Innovazione +3 · Leadership −2 · Apprendimento delle tecnologie −30%',fl:'Chiama i robot del magazzino per nome. Loro, per ora, non rispondono.',ic:['...RR...','...KK...','SSSSSSSS','SBBSSBBS','SSSSSSSS','SKKKKKKS','SSSSSSSS','.S....S.']},
+ 'Calma olimpica':{t:'pos',fx:'Leadership +1 · Tenuta allo stress +20',fl:'Durante l\'alluvione ha chiesto se c\'era ancora caffè.',ic:['........','..TTTT..','.T....T.','T..TT..T','T.T..T.T','.T....T.','..TTTT..','........']},
+ 'Ha fatto il militare':{t:'mix',fx:'Leadership +3 · Precisione +1 · Tenuta allo stress +5 · Dipendenti giovani −10 di opinione',fl:'Fa l\'appello alle 6:00. Anche quando non serve.',ic:['...YY...','...YY...','YYYYYYYY','.YYYYYY.','..YYYY..','.YY..YY.','YY....YY','........']},
+ 'Ex sindacalista':{t:'pos',fx:'Leadership +3 · Negoziazione +1 · Vertenze sindacali −50%',fl:'Conosce il contratto nazionale meglio di chi l\'ha scritto.',ic:['......R.','....RRR.','KRRRRRR.','KRRRRRR.','KRRRRRR.','....RRR.','..K...R.','..K.....']},
+ 'Conosce tutti al bar':{t:'pos',fx:'Leadership +2 · Negoziazione +1 · Scopre prima le mosse dei concorrenti',fl:'Le notizie sui concorrenti arrivano prima a lui che al Sole 24 Pallet.',ic:['.W.W....','..W.W...','KKKKKKK.','KNNNNNKK','KNNNNNKK','.KNNNK..','KKKKKKK.','........']},
+ 'Braccino corto':{t:'mix',fx:'Amministrazione +3 · Leadership −2 · Costi del magazzino −5%, morale −5',fl:'Ha ridotto la carta igienica del 30%. Il morale pure.',ic:['..YYYY..','.YKKKKY.','YYKYYYYY','YYKKKYYY','YYYYKYYY','YYKKKYYY','.YYYYYY.','..YYYY..']},
+ 'Mano larga':{t:'mix',fx:'Leadership +2 · Amministrazione −2 · Morale +5, costi del magazzino +5%',fl:'Offre la pizza a tutto il turno di notte. Il commercialista piange.',ic:['..R..R..','...RR...','OOOROOOO','OOOROOOO','YYYRYYYY','YYYRYYYY','YYYRYYYY','YYYRYYYY']},
+ 'Ansia da prestazione':{t:'mix',fx:'Precisione +2 · Tenuta allo stress −20',fl:'Rilegge ogni bolla tre volte. Poi una quarta.',ic:['...B....','...B....','..BBB...','.BBWBB..','.BBBWB..','.BBBBB..','..BBB...','........']},
+ 'Insonne':{t:'neg',fx:'Operazioni −2 · Precisione −2 · Tenuta allo stress −10',fl:'Risponde alle mail alle 3:47. E si aspetta una risposta.',ic:['..YYY...','.YY.....','YY......','YY....W.','YY......','.YY...W.','..YYY...','........']},
+ 'Tifo sfegatato':{t:'mix',fx:'Leadership +1 · Eventi speciali nei giorni del derby',fl:'Il giorno del derby il magazzino si ferma. Anche lui.',ic:['..KKKK..','.KWWWWK.','KWWKKWWK','KWKKKKWK','KWWKKWWK','KWWWWWWK','.KWWWWK.','..KKKK..']}
+};
+const TTYPE={pos:['Positivo','#eaf6ec','#6fdc8c'],neg:['Negativo','#fbecec','#ff8a8d'],mix:['Misto','#fff6dc','#ffd23f']};
+const TECH_IC={"barcode":["............",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","RRRRRRRRRRRR",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","............",".K.K.KK.K.K.","............"],"formazione":["............",".NNNNNNNNNN.",".NDDDDDDDDN.",".NDWWDDDDDN.",".NDDDWWWDDN.",".NDWWWDDDDN.",".NDDDDDWWDN.",".NDDDDDDDDN.",".NNNNNNNNNN.","....N..N....","...N....N...","............"],"gps":["....RRRR....","...RRRRRR...","..RRRWWRRR..","..RRWWWWRR..","..RRWWWWRR..","..RRRWWRRR..","...RRRRRR...","....RRRR....",".....RR.....","..GG.RR.GG..",".GGGGGGGGGG.","............"],"wms":["............",".KKKKKKKKKK.",".KBBBBBBBBK.",".KBYYBOOBBK.",".KBSSSSSSBK.",".KBGGBYYBBK.",".KBSSSSSSBK.",".KKKKKKKKKK.",".....KK.....","...KKKKKK...","............","............"],"anticoll":[".....YY.....","....YKKY....","....YKKY....","...YYKKYY...","...YYKKYY...","..YYYKKYYY..","..YYYKKYYY..",".YYYYYYYYYY.",".YYYYKKYYYY.","YYYYYYYYYYYY","KKKKKKKKKKKK","............"],"rotte":["..........R.",".........RRR","..........R.","........DD..",".....DDD....","....D.......","....D.......",".....DDD....","........D...",".G.......D..","GGG..DDDD...",".G.........."],"rf":["..........B.","........B..B","..KKKKK..B.B","..KBBBK...B.","..KBBBK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","...KKK......","............"],"verticale":["..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..DYY.OOBD..","..DDDDDDDD..","..DBB.YYOD..","..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..D......D..","..D......D..",".KKKKKKKKKK."],"ptl":["............","GGG.YYY.RRR.","GGG.YYY.RRR.","............","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","............"],"amr":[".....YY.....",".....KK.....","..KKKKKKKK..","..KSSSSSSK..","..KSBSSBSK..","..KSSSSSSK..","..KSRRRRSK..","..KKKKKKKK..",".KOOOOOOOOK.",".KOOOOOOOOK.",".KKKKKKKKKK.","..KK....KK.."],"gestionale":["..KKKKKKK...","..KWWWWWKK..","..KWKKKWWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWWWGGGK..","..KWWWGGGK..","..KWWWWWWK..","..KKKKKKKK.."],"hr":["............","...SSSS.....","..S.FF.S....",".S.FFFF.S...",".S.FFFF.S...",".S.BBBB.S...","..SBBBBS....","...SSSSN....",".......NN...","........NN..",".........NN.","............"],"direzione":["............","....YYYY....","....YYYY....",".....KK.....",".KKKKKKKKKK.",".K...KK...K.",".K...KK...K.","BBB.OOOO.GGG","BBB.OOOO.GGG","BBB.OOOO.GGG","............","............"],"welfare2":["............","..RR....RR..",".RRRR..RRRR.","RRRRRWWRRRRR","RRRRRWWRRRRR","RRRWWWWWWRRR",".RRWWWWWWRR.","..RRRWWRRR..","...RRWWRR...","....RRRR....",".....RR.....","............"],"controllo":["............","............","K.......GG..","K.......GG..","K....BB.GG..","K....BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","KKKKKKKKKKKK","............","............"],"academy":["............",".....KK.....","...KKKKKK...",".KKKKKKKKKK.","KKKKKKKKKKKK",".KKKKKKKKKKY","..KKKKKKKK.Y","..KDDDDDDK.Y","..KDDDDDDK.Y","...KKKKKK.YY","..........YY","............"],"iso":["..BB....BB..","...BB..BB...","....BBBB....","....YYYY....","..YYYYYYYY..",".YYYYWYYYYY.",".YYYWWWYYYY.",".YYYYWYYYYY.",".YYYYYYYYYY.","..YYYYYYYY..","....YYYY....","............"],"commerciale":["............","..KKKKKKKK..",".KRRRRRRRRK.","KRRKK..KKRRK","KRK......KRK",".K..KKKK..K.","...KRRRRK...","..KRWRWRRK..","..KRRWRWRK..","..KRWRWRRK..","..KKKKKKKK..","............"],"freddo":[".....BB.....","..B..BB..B..","...B.BB.B...","....BBBB....","BBBBBWWBBBBB","BBBBBWWBBBBB","....BBBB....","...B.BB.B...","..B..BB..B..",".....BB.....","............","............"],"edi":["KKKKK.......","KBBBK.......","KBBBK..O....","KKKKK.OOOOO.","..K....O....",".KKK........",".......KKKKK","....O..KBBBK","...OOOOKBBBK","....O..KKKKK",".........K..","........KKK."],"marketing":["............",".........KK.",".......KKOK.",".....KKOOOK.","..KKKOOOOOK.",".KWKOOOOOOK.",".KWKOOOOOOK.","..KKKOOOOOK.","...K.KKOOOK.","...K...KKOK.","...KK....KK.","............"],"kam":["........Y...",".......YYY..","...FF...Y...","..FFFF......","..FFFF......","...FF.......",".DDDDDD.....","DDDWWDDD....","DDDDRDDD....","DDDDRDDD....","DDDDDDDD....","............"],"ecom":["............","KK..........",".K..........",".KOOOOOOOOK.",".KOWOOWOOOK.",".KOOOOOOOK..","..KOOOOOOK..","..KKKKKKKK..","..K.........","..KKKKKKKKK.","...KK...KK..","............"]};
+const TFRAME={log:{c:'#ff7a3d',bg:'#ffe8d9',cut:[0,0,0],shape:'Quadrato arancione'},org:{c:'#9b6bff',bg:'#ece3ff',cut:[3,2,1],shape:'Ottagono viola'},mkt:{c:'#2e9e48',bg:'#dff3d6',cut:[5,3,2,1,1],shape:'Tondo verde'}};
+function techIcon(t,sz,dim){
+  const F=TFRAME[t.tree], N=16; const cut=r=>{const d=Math.min(r,N-1-r);return F.cut[d]||0;};
+  const ins=(x,y)=>y>=0&&y<N&&x>=cut(y)&&x<N-cut(y);
+  let r='';
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){ if(!ins(x,y))continue;
+    const edge=!ins(x-1,y)||!ins(x+1,y)||!ins(x,y-1)||!ins(x,y+1);
+    const ring=!edge&&(!ins(x-2,y)||!ins(x+2,y)||!ins(x,y-2)||!ins(x,y+2)||!ins(x-1,y-1)||!ins(x+1,y-1)||!ins(x-1,y+1)||!ins(x+1,y+1));
+    r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${edge?'#16202e':ring?F.c:F.bg}"/>`; }
+  (TECH_IC[t.id]||[]).forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x+2}" y="${y+2}" width="1" height="1" fill="${TPAL[ch]}"/>`;}));
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="flex:none;${dim?'filter:grayscale(1) opacity(.55)':''}" aria-hidden="true">${r}</svg>`;
+}
+function talentSvg(rows,sz){let r='';rows.forEach((row,y)=>{[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${TPAL[ch]}"/>`;});});return `<svg width="${sz}" height="${sz}" viewBox="-1 -1 10 10" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
+function talentIcons(list,sz){sz=sz||36;return `<span style="display:flex;gap:6px;flex-wrap:wrap">${list.map(n=>{const t=TALENTS[n];if(!t)return '';const ty=TTYPE[t.t];
+  const tip=`<div class='tt'>${esc(n)}</div><div style='color:${ty[2]};font-weight:600'>${ty[0]}</div><div>${esc(t.fx)}</div><div style='margin-top:5px;color:#c9d3dd;font-style:italic'>${esc(t.fl)}</div>`;
+  return `<span class="tal" role="img" aria-label="${esc(n)}: ${esc(t.fx)}" data-tip="${tip}" style="width:${sz+8}px;height:${sz+8}px;background:${ty[1]}">${talentSvg(t.ic,sz)}</span>`;}).join('')}</span>`;}
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur=v=>(v<0?'−':'')+'€ '+Math.round(Math.abs(v)).toLocaleString('it-IT');
+const n0=v=>Math.round(v).toLocaleString('it-IT');
+const f1=v=>(Math.round(v*10)/10).toLocaleString('it-IT',{minimumFractionDigits:1,maximumFractionDigits:1});
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const DAY0=Date.UTC(2002,0,1);
+const MESI=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+const GG=['dom','lun','mar','mer','gio','ven','sab'];
+const dateOf=d=>new Date(DAY0+d*86400000);
+const fmtDate=d=>{const t=dateOf(d);return `${GG[t.getUTCDay()]} ${t.getUTCDate()} ${MESI[t.getUTCMonth()]} ${t.getUTCFullYear()}`};
+const shortDate=d=>{const t=dateOf(d);return `${t.getUTCDate()} ${MESI[t.getUTCMonth()].slice(0,3)} ${t.getUTCFullYear()}`};
+const yearOf=d=>dateOf(d).getUTCFullYear();
+const monthOf=d=>dateOf(d).getUTCMonth();
+
+/* ====================== STATO ====================== */
+let S=null; let UI={open:{},sel:{},tab:{},z:30,pos:{},bid:{}}; let uid=1;
+const nid=p=>p+(uid++);
+function newGame(ceoId,coName,color){
+  const C=CEOS.find(c=>c.id===ceoId);
+  S={v:1,day:0,speed:0,ceoId,company:{name:coName||C.company,color},cash:C.cash,rep:C.rep,fuel:0.86,
+     warehouses:[],clients:[],tenders:[],queue:[],imp:2,managers:MANAGERS.map(m=>({...m,hired:false,wh:null})),
+     welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextTender:12,nextEvent:25,project:null,seen:{},over:false,uid:1,
+     execs:EXECS.map(e=>({...e,hired:false})),dirs:{op:null,comm:null,hr:null,fin:null,tech:null}};
+  const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={mag:2,aut:1};
+  (C.startTech||[]).forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true;});
+  S.clients.push({id:nid('c'),...C.client,wh:wh.id,mult:1,sat:60,status:'attivo',start:0,end:24*30,storico:true});
+  news('La Gazzetta del Muletto',`Nasce ${S.company.name}`,`${C.name} apre l'anno con un solo cliente, ${C.client.name}. Con il magazzino quasi vuoto i conti sono in rosso: servono nuovi clienti dalle gare d'appalto.`);
+  S.uid=uid;
+}
+function z(){return {ric:0,pers:0,mezzi:0,fissi:0,tech:0,mgr:0,welf:0,pen:0,altro:0}}
+function addWarehouse(site,own,fixed,motrici){
+  const s=SITES[site];
+  const wh={id:nid('w'),site,name:s.name,prov:s.prov,cap:s.cap,own,fixed:own?fixed:s.rent,motrici:motrici||0,mgr:null,staff:{mag:0,aut:0},morale:62,tech:{},acc:{P:0,A:0,n:0},kpi:null};
+  S.warehouses.push(wh); return wh;
+}
+const ceo=()=>CEOS.find(c=>c.id===S.ceoId);
+const whById=id=>S.warehouses.find(w=>w.id===id);
+const clientRev=c=>(c.stock*T_ST+2*c.pal*T_MO+c.pal*T_DI)*c.mult;
+function news(src,title,text){S.news.unshift({day:S.day,src,title,text}); if(S.news.length>80)S.news.pop();}
+
+/* ====================== MOTORE ====================== */
+function mgrStats(wh){
+  if(wh.mgr==='ceo'){const s=ceo().st;return {op:s.op,prec:s.prec,lead:s.lead,name:ceo().name,ceo:true};}
+  const m=S.managers.find(x=>x.id===wh.mgr); if(m) return {...m.st,name:m.name};
+  return {op:7,prec:7,lead:6,name:'Nessun manager',none:true};
+}
+const R=id=>!!(S&&S.researched[id]);
+function personById(id){return S.managers.find(m=>m.id===id)||S.execs.find(m=>m.id===id);}
+function dirStat(role){ if(!R('direzione')) return null; const p=personById(S.dirs[role]); if(!p) return null; const st=DIR_ROLES.find(r=>r.id===role).stat; return p.st[st]; }
+function seatOf(id){return Object.keys(S.dirs).find(k=>S.dirs[k]===id)||null;}
+function fixedMul(){let m=1; if(R('gestionale')) m*=0.97; if(R('controllo')) m*=0.96; const f=dirStat('fin'); if(f!=null) m*=1-0.005*(f-10); return m;}
+function capOf(w){const t=TECH.find(x=>x.id==='verticale'); return Math.round(w.cap*(1+(w.tech.verticale&&techFactor(w,t)>0?t.cap:0)));}
+function techFactor(wh,t){
+  const it=wh.tech[t.id]; if(!it) return 0;
+  let weeks=t.weeks; const m=mgrStats(wh);
+  if(m.ceo && ceo().allergic) weeks*=1.5; if(m.ceo && ceo().robots) weeks*=0.7; if(R('academy')) weeks*=0.7;
+  return (S.day-it.day)<weeks*7 ? -0.5 : 1;
+}
+function impNeed(){const cons=S.clients.filter(c=>c.status==='attivo').reduce((a,c)=>a+c.pal,0);return 2+Math.floor(cons/(R('gestionale')?2000:1500))+Math.max(0,S.warehouses.length-1);}
+function welfarePts(k){return WELFARE.filter(w=>S.welfare[w.id]).reduce((a,w)=>a+w[k],0);}
+function modSum(wh,k){return S.mods.filter(m=>m.until>S.day&&(m.scope==='all'||m.scope===wh.id)).reduce((a,m)=>a+(m[k]||0),0);}
+function computeWH(wh,extra){
+  const act=S.clients.filter(c=>c.wh===wh.id&&c.status==='attivo'); if(extra) act.push(extra);
+  const stock=act.reduce((a,c)=>a+c.stock,0), cons=act.reduce((a,c)=>a+c.pal,0), mov=2*cons, viaggi=Math.ceil(cons/16);
+  const m=mgrStats(wh);
+  let tA=0,tP=0,tMor=0,tProd=0,tCan=0; const tparts=[];
+  let fuelMul=1;
+  TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t); tA+=(t.A||0)*f; tP+=(t.P||0)*f; tMor+=(t.mor||0)*(f>0?1:0); tProd+=(t.prod||0)*(f>0?1:0); if(f>0&&t.fuel) fuelMul*=1-t.fuel; tCan+=t.mese; });
+  const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd);
+  const uMag=mov===0?0:(wh.staff.mag>0?mov/(wh.staff.mag*prod):9);
+  const uAut=viaggi===0?0:(wh.staff.aut>0?viaggi/(wh.staff.aut*20):9);
+  const cap=capOf(wh); const sat=stock/cap;
+  const impShort=Math.max(0,impNeed()-S.imp), impPen=impShort*1.5;
+  const mP=modSum(wh,'P'), mA=modSum(wh,'A'), mMor=modSum(wh,'mor');
+  const pP=[['Base',92],['Operazioni di '+m.name.split(' ')[0],0.4*(m.op-10)]];
+  if(tP) pP.push(['Tecnologie',tP]); if(mP) pP.push(['Eventi',mP]);
+  const dOp=dirStat('op'); if(dOp!=null) pP.push(['Direttore operativo',0.15*(dOp-10)]);
+  if(uAut>1) pP.push(['Autisti insufficienti',-20*(uAut-1)]); if(uMag>1.05) pP.push(['Magazzinieri insufficienti',-5*(uMag-1.05)]);
+  if(impPen) pP.push(['Ufficio sotto organico',-impPen]);
+  const pA=[['Base',96],['Precisione di '+m.name.split(' ')[0],0.3*(m.prec-10)],['Morale',0.04*(wh.morale-60)]];
+  if(tA) pA.push(['Tecnologie',tA]); if(mA) pA.push(['Eventi',mA]); if(R('iso')) pA.push(['Certificazione ISO',0.5]);
+  if(sat>0.85) pA.push(['Saturazione oltre 85%',-25*(sat-0.85)]); if(uMag>1) pA.push(['Magazzinieri insufficienti',-8*(uMag-1)]);
+  const P=clamp(pP.reduce((a,x)=>a+x[1],0),50,99.9), A=clamp(pA.reduce((a,x)=>a+x[1],0),50,99.9);
+  const dHr=dirStat('hr');
+  const morT=clamp(58+0.6*(m.lead-10)+welfarePts('mor')+tMor+mMor+(R('academy')?3:0)+(dHr!=null?0.3*(dHr-10):0)-30*Math.max(0,uMag-1)-20*Math.max(0,uAut-1),0,100);
+  const rev=act.reduce((a,c)=>a+clientRev(c),0);
+  const pers=(wh.staff.mag*RAL.mag+wh.staff.aut*RAL.aut)*COEF/12;
+  const mezzi=viaggi*240*(0.25*S.fuel*fuelMul+0.08+0.05)+wh.staff.aut*1100+Math.max(0,wh.staff.aut-wh.motrici)*2100;
+  const fissi=(wh.fixed+1000)*fixedMul();
+  return {act,cap,stock,cons,mov,viaggi,uMag,uAut,sat,P,A,pP,pA,morT,rev,pers,mezzi,fissi,tCan,
+    needMag:Math.max(mov?1:0,Math.ceil(mov/prod)),needAut:Math.ceil(viaggi/20),prod,m};
+}
+function globalCosts(){
+  const emp=S.warehouses.reduce((a,w)=>a+w.staff.mag+w.staff.aut,0)+S.imp;
+  return {ceo:4000,imp:S.imp*RAL.imp*COEF/12,mgr:[...S.managers,...S.execs].filter(m=>m.hired).reduce((a,m)=>a+m.ral*COEF/12,0),welf:welfarePts('cost')*emp*(R('welfare2')?0.7:1)};
+}
+function step(){
+  if(S.over) return;
+  const d=S.day;
+  // assunzioni in arrivo
+  S.queue.forEach(q=>q.days--);
+  S.queue.filter(q=>q.days<=0).forEach(q=>{
+    if(q.role==='imp'){S.imp++;} else {const w=whById(q.wh); if(w) w.staff[q.role]++;}
+    toast(`Assunto: 1 ${q.role==='mag'?'magazziniere':q.role==='aut'?'autista':'impiegato'}${q.role!=='imp'?' a '+whById(q.wh).name:''}`,'ok');
+  });
+  S.queue=S.queue.filter(q=>q.days>0);
+  // clienti in avvio
+  S.clients.filter(c=>c.status==='avvio'&&d>=c.start).forEach(c=>{c.status='attivo';toast(`${c.name} inizia oggi a ${whById(c.wh).name}`,'ok');news('Il Sole 24 Pallet',`${c.name} affida la logistica a ${S.company.name}`,`Il contratto parte oggi: ${n0(c.pal)} pallet al mese, ${n0(c.stock)} posti occupati.`);});
+  // magazzini
+  let dRic=0,dCost=0; const cur=S.cur;
+  S.warehouses.forEach(w=>{
+    const k=computeWH(w); w.kpi=k;
+    w.morale+= (k.morT-w.morale)*0.012;
+    w.acc.P+=k.P; w.acc.A+=k.A; w.acc.n++;
+    cur.ric+=k.rev/30; cur.pers+=k.pers/30; cur.mezzi+=k.mezzi/30; cur.fissi+=k.fissi/30; cur.tech+=k.tCan/30;
+    dRic+=k.rev/30; dCost+=(k.pers+k.mezzi+k.fissi+k.tCan)/30;
+  });
+  const g=globalCosts();
+  cur.pers+=g.imp/30; cur.fissi+=g.ceo/30; cur.mgr+=g.mgr/30; cur.welf+=g.welf/30;
+  dCost+=(g.imp+g.ceo+g.mgr+g.welf)/30;
+  S.cash+=dRic-dCost;
+  // ricerca in corso
+  if(S.project){ S.project.left--; if(S.project.left<=0){ const t=TECH.find(x=>x.id===S.project.tech); S.project=null; S.researched[t.id]=true;
+    if(t.id==='iso'||t.id==='marketing') S.rep=clamp(S.rep+5,0,100);
+    news('La Gazzetta del Muletto',`Ricerca completata: ${t.name}`,t.tree==='log'?'Ora si può installare nei magazzini dalla finestra Tecnologia.':t.desc);
+    if(t.id==='direzione') modalInfo('La Gazzetta del Muletto','Nasce la squadra dei dirigenti','La struttura direzionale è pronta. Dal menu Direzione nomina fino a cinque direttori: ognuno guida un\'area di tutta l\'azienda con la sua abilità principale.');
+    else toast(`Ricerca completata: ${t.name}${t.tree==='log'?' · installala nei magazzini':''}`,'ok'); } }
+  // gare
+  if(d>=S.nextTender){ newTender(); S.nextTender=d+Math.round(R('commerciale')?rnd(20,35):rnd(28,46)); }
+  S.tenders.filter(t=>t.deadline===d&&!t.done).forEach(resolveTender);
+  S.tenders=S.tenders.filter(t=>!t.done||d-t.deadline<30);
+  S.mods=S.mods.filter(m=>m.until>d);
+  // fine mese
+  const tomorrow=dateOf(d+1);
+  S.day++;
+  if(tomorrow.getUTCDate()===1) monthEnd();
+  if(S.day>=S.nextEvent && !S.over){ S.nextEvent=S.day+Math.round(rnd(30,55)); fireEvent(); }
+}
+function monthEnd(){
+  S.months++;
+  // carburante
+  const y=yearOf(S.day); S.fuel=clamp(0.86+(y-2002)*0.05+rnd(-0.03,0.03),0.8,1.9);
+  let pen=0;
+  S.clients.filter(c=>c.status==='attivo').forEach(c=>{
+    const w=whById(c.wh); const P=w.acc.n?w.acc.P/w.acc.n:w.kpi.P, A=w.acc.n?w.acc.A/w.acc.n:w.kpi.A;
+    const wP=P-c.sP, wA=c.sA?A-c.sA:9, wv=Math.min(wP,wA);
+    c.lastP=P; c.lastA=A;
+    if(wv>=0){c.sat+=3+(R('edi')?1:0)+(R('kam')?1:0); S.rep+=0.15;}
+    else if(wv>=-2){c.sat-=4;}
+    else {c.sat-=10; const p=0.05*clientRev(c); pen+=p;}
+    c.sat=clamp(c.sat,0,100);
+    if(c.sat<25){c.status='perso';S.rep-=3;toast(`${c.name} ha disdetto il contratto`,'bad');news('Il Sole 24 Pallet',`${c.name} lascia ${S.company.name}`,`"Ritardi ed errori non sono più accettabili", fa sapere il cliente.`);}
+    else if(S.day>=c.end){
+      if(c.sat>=(R('kam')?40:50)){c.end=S.day+24*30;toast(`${c.name} rinnova per altri due anni`,'ok');news('Il Sole 24 Pallet',`${c.name} rinnova`,`Contratto prolungato di 24 mesi.`);}
+      else {c.status='perso';toast(`${c.name} non rinnova`,'bad');news('Il Sole 24 Pallet',`${c.name} non rinnova`,`Il cliente passa alla concorrenza.`);}
+    }
+  });
+  if(R('marketing')) S.rep+=0.2;
+  S.cash-=pen; S.cur.pen+=pen; S.rep=clamp(S.rep,0,100);
+  S.warehouses.forEach(w=>w.acc={P:0,A:0,n:0});
+  const c=S.cur; c.util=c.ric-c.pers-c.mezzi-c.fissi-c.tech-c.mgr-c.welf-c.pen-c.altro;
+  S.last=c; S.cur=z();
+  if(S.cash<-50000){ gameOver(); return; }
+  if(S.cash<0) toast('Cassa sotto zero: sotto i −50.000 € l\'azienda fallisce','bad');
+  save();
+}
+function newTender(){
+  const tpl=pick(TENDER_POOL.filter(t=>(!(t.req||[]).includes('ecom')||R('ecom'))&&!S.clients.some(c=>c.name===t.name&&c.status!=='perso')&&!S.tenders.some(x=>x.name===t.name&&!x.done)));
+  if(!tpl) return;
+  const k=rnd(0.75,1.25);
+  const t={id:nid('t'),...tpl,stock:Math.round(tpl.stock*k/10)*10,pal:Math.round(tpl.pal*k/10)*10,open:S.day,deadline:S.day+21,bid:null,done:false,result:null};
+  S.tenders.push(t);
+  toast(`Nuova gara: ${t.name}, scade il ${shortDate(t.deadline)}`,'warn');
+  news('Il Sole 24 Pallet',`Gara d'appalto: ${t.name}`,`${n0(t.pal)} pallet al mese, ${n0(t.stock)} posti. Offerte entro il ${shortDate(t.deadline)}.`);
+}
+function bidEstimate(t,whId,mult){
+  const w=whById(whId); if(!w) return null;
+  const extra={...t,wh:w.id,mult,status:'attivo'};
+  const k=computeWH(w,extra);
+  // stima con il personale che servirebbe
+  const needMag=Math.ceil(k.mov/k.prod), needAut=Math.ceil(k.viaggi/20);
+  const save={...w.staff}; w.staff={mag:Math.max(w.staff.mag,needMag),aut:Math.max(w.staff.aut,needAut)};
+  const k2=computeWH(w,extra); w.staff=save;
+  const missing=(t.req||[]).filter(r=>!R(r)).map(r=>TECH.find(x=>x.id===r).name);
+  const fits=k.stock<=k.cap&&!missing.length;
+  const gP=k2.P-t.sP, gA=t.sA?k2.A-t.sA:3; const dC=dirStat('comm');
+  const score=50+(1-mult)*120+clamp(gP*4,-20,10)+clamp(gA*4,-20,10)+(S.rep-50)*0.4+(ceo().st.neg-10)+(dC!=null?0.8*(dC-10):0)+(R('iso')?3:0);
+  const comp=55+t.diff;
+  const chance=fits?1/(1+Math.exp(-(score-comp)/6)):0;
+  return {P:k2.P,A:k2.A,sat:k.stock/k.cap,cap:k.cap,missing,fits,chance,rev:clientRev(extra),needMag,needAut,staff:w.staff};
+}
+function resolveTender(t){
+  t.done=true;
+  if(!t.bid){t.result={win:false,by:pick(RIVALS)};return;}
+  const e=bidEstimate(t,t.bid.wh,t.bid.mult);
+  const win=e&&Math.random()<e.chance;
+  if(win){
+    const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,wh:t.bid.wh,mult:t.bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+24*30};
+    S.clients.push(c); t.result={win:true};
+    toast(`Gara vinta: ${t.name}! Il contratto parte il ${shortDate(c.start)}`,'ok');
+    modalInfo('Il Sole 24 Pallet',`Gara vinta: ${t.name}`,`Il contratto parte il ${shortDate(c.start)} a ${whById(c.wh).name}. Servono circa ${e.needMag} magazzinieri e ${e.needAut} autisti in quel magazzino: assumi adesso, perché un autista arriva in 2–5 settimane.`);
+  } else {
+    const by=pick(RIVALS); t.result={win:false,by,disc:Math.round(rnd(5,18))};
+    toast(`Gara persa: ${t.name} va a ${by}`,'bad');
+    news('Il Sole 24 Pallet',`${t.name} sceglie ${by}`,`Offerta con uno sconto del ${t.result.disc}%.`);
+  }
+}
+function gameOver(){
+  S.over=true; S.speed=0; save();
+  const yrs=(S.day/365).toFixed(1).replace('.',',');
+  showModal(`<div class="src"><span>Il Sole 24 Pallet</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:22px">${esc(S.company.name)} porta i libri in tribunale</h3><p style="margin:0">Dopo ${yrs} anni la cassa è scesa sotto i −50.000 €. ${esc(ceo().name)} commenta: "Era meglio fare il padroncino".</p><button class="btn pri" data-act="restart">Nuova partita</button></div>`);
+}
+
+/* ====================== EVENTI ====================== */
+function mod(scope,o,days){S.mods.push({scope,...o,until:S.day+days});}
+function anyWH(){return S.warehouses[0];}
+const EVENTS=[
+ {id:'nebbia',src:'Radio Traffico Nord-Ovest',title:'Nebbia in Val Padana',cond:()=>[10,11,0,1].includes(monthOf(S.day)),
+  text:'Visibilità sotto i 50 metri da Pavia a Brescia. Gli autisti chiedono di rallentare.',
+  opts:[{t:'Rallenta tutto',e:'Puntualità −6 per 7 giorni',f:()=>mod('all',{P:-6},7)},
+        {t:'Si viaggia lo stesso',e:'Puntualità −2; rischio incidente',f:()=>{mod('all',{P:-2},7); if(Math.random()<0.15){S.cash-=9000;S.rep-=4;toast('Un camion è finito fuori strada: 9.000 € di danni','bad');}}},
+        {t:'"Conosco ogni curva"',e:'Puntualità −1, nessun rischio',req:()=>ceo().tal.includes('Un milione di km al volante'),reqT:'Un milione di km al volante',f:()=>mod('all',{P:-1},7)}]},
+ {id:'sciopero',src:'Il Sole 24 Pallet',title:'Sciopero nazionale degli autotrasportatori',cond:()=>Math.random()<0.5,
+  text:'Le associazioni fermano i camion per 5 giorni contro il caro gasolio.',
+  opts:[{t:'Aderisci',e:'Puntualità −15 per 5 giorni, morale +8, reputazione +2',f:()=>{mod('all',{P:-15,mor:8},5);S.rep+=2;}},
+        {t:'Lavora lo stesso',e:'Morale −8; rischio blocchi ai caselli',f:()=>{mod('all',{mor:-8},20); if(Math.random()<0.25){mod('all',{P:-10},3);toast('Camion bloccati ai caselli','bad');}}},
+        {t:'Media tra sindacati e clienti',e:'Puntualità −6, morale +4',req:()=>ceo().st.lead>=14,reqT:'Leadership 14',f:()=>mod('all',{P:-6,mor:4},5)}]},
+ {id:'ispettorato',src:'Il Mattinale del Ministero',title:'Controllo dell\'Ispettorato del Lavoro',cond:()=>true,
+  text:'Gli ispettori si presentano alle 7:00 in magazzino e chiedono tutte le buste paga.',
+  opts:[{t:'Collabora',e:'Multa casuale tra 0 e 8.000 €',f:()=>{const m=Math.round(rnd(0,8000)/100)*100;S.cash-=m;toast(m?`Multa di ${eur(m)}`:'Nessuna irregolarità',m?'bad':'ok');}},
+        {t:'Chiedi un rinvio',e:'Reputazione −3',f:()=>{S.rep-=3;}},
+        {t:'"Abbiamo tutto in ordine"',e:'Nessuna multa, reputazione +2',req:()=>ceo().st.amm>=12,reqT:'Amministrazione 12',f:()=>{S.rep+=2;}}]},
+ {id:'natale',src:'La Gazzetta del Muletto',title:'Cena di Natale finita male',cond:()=>monthOf(S.day)===11,
+  text:'Il capo turno e l\'impiegata del traffico hanno litigato al karaoke. Non si parlano più.',
+  opts:[{t:'Organizza un chiarimento',e:'−300 €, tutto si sistema',f:()=>{S.cash-=300;}},
+        {t:'Lascia che si arrangino',e:'Puntualità −2 per 2 mesi',f:()=>mod('all',{P:-2},60)}]},
+ {id:'furto',src:'La Gazzetta del Muletto',title:'Furto di gasolio',cond:()=>true,
+  text:'Di notte qualcuno ha svuotato tre serbatoi nel piazzale.',
+  opts:[{t:'Installa telecamere',e:'−8.000 €',f:()=>{S.cash-=8000;}},
+        {t:'Fidati del guardiano (74 anni)',e:'−1.500 € di gasolio; può ricapitare',f:()=>{S.cash-=1500;S.seen.furto=0;}}]},
+ {id:'superenalotto',src:'La Gazzetta del Muletto',title:'Vincita al Superenalotto',cond:()=>S.warehouses.some(w=>w.staff.mag>=2),
+  text:'Un magazziniere vince 2 milioni e si licenzia sul gruppo WhatsApp aziendale.',
+  opts:[{t:'Fagli gli auguri',e:'Perdi un magazziniere, morale +3',f:()=>{const w=S.warehouses.find(w=>w.staff.mag>=2);w.staff.mag--;mod('all',{mor:3},30);}},
+        {t:'Chiedigli un investimento',e:'30% di ottenere 100.000 € a tasso zero',f:()=>{const w=S.warehouses.find(w=>w.staff.mag>=2);w.staff.mag--; if(Math.random()<0.3){S.cash+=100000;toast('Ha detto sì: 100.000 € in cassa','ok');} else toast('Ha detto no e ha comprato una barca','warn');}}]},
+ {id:'prete',src:'La Gazzetta del Muletto',title:'Il parroco benedice i camion',cond:()=>true,
+  text:'Il parroco propone la benedizione annuale della flotta, con offerta libera.',
+  opts:[{t:'Accetta e fai una donazione',e:'−500 €, morale +4',f:()=>{S.cash-=500;mod('all',{mor:4},60);}},
+        {t:'Rifiuta gentilmente',e:'Morale −2',f:()=>mod('all',{mor:-2},30)}]},
+ {id:'ordine',src:'La Gazzetta del Muletto',title:'Ordine alle 17:58 di venerdì',cond:()=>S.clients.some(c=>c.status==='attivo'),
+  text:'"Ci serve per lunedì alle 6, è vitale." Il cliente è al telefono e non ha intenzione di riattaccare.',
+  opts:[{t:'Accetta',e:'Straordinari −2.000 €, morale −4, soddisfazione +8',f:function(){S.cash-=2000;mod('all',{mor:-4},20);const c=this.c;c.sat=clamp(c.sat+8,0,100);}},
+        {t:'Rifiuta con cortesia',e:'Soddisfazione −6',f:function(){const c=this.c;c.sat=clamp(c.sat-6,0,100);}}],
+  setup:ev=>{ev.c=pick(S.clients.filter(c=>c.status==='attivo'));ev.title=`Ordine alle 17:58 di venerdì: ${ev.c.name}`;}},
+ {id:'afa',src:'Radio Traffico Nord-Ovest',title:'Afa record',cond:()=>[6,7].includes(monthOf(S.day)),
+  text:'40 °C nel magazzino. I muletti scaldano, le persone pure.',
+  opts:[{t:'Ventilatori e acqua per tutti',e:'−3.000 €, morale +5',f:()=>{S.cash-=3000;mod('all',{mor:5},30);}},
+        {t:'Turni all\'alba',e:'Accuratezza −1 per 15 giorni',f:()=>mod('all',{A:-1},15)}]},
+ {id:'decreto',src:'Il Mattinale del Ministero',title:'Decreto Semplificazione',cond:()=>true,
+  text:'Un decreto di 340 pagine semplifica le pratiche di trasporto. Nessuno ha capito cosa cambi.',
+  opts:[{t:'Studiatelo con calma',e:'Puntualità −2 per un mese',f:()=>mod('all',{P:-2},30)},
+        {t:'Assumi un consulente',e:'−6.000 €',f:()=>{S.cash-=6000;}},
+        {t:'"L\'ho già letto stanotte"',e:'Nessun effetto',req:()=>ceo().tal.includes('Excel-dipendente')||ceo().tal.includes('Stacanovista'),reqT:'Excel-dipendente o Stacanovista',f:()=>{}}]},
+ {id:'matrimonio',src:'La Gazzetta del Muletto',title:'Matrimonio del figlio del cliente',cond:()=>S.clients.some(c=>c.status==='attivo'&&c.sat>=70),
+  text:'Il titolare ti invita al matrimonio del figlio. Trecento invitati, tre giorni di festa.',
+  opts:[{t:'Vai con un regalo all\'altezza',e:'−2.500 €, soddisfazione +15',f:function(){S.cash-=2500;this.c.sat=clamp(this.c.sat+15,0,100);}},
+        {t:'Manda un biglietto',e:'Soddisfazione −5',f:function(){this.c.sat=clamp(this.c.sat-5,0,100);}}],
+  setup:ev=>{ev.c=pick(S.clients.filter(c=>c.status==='attivo'&&c.sat>=70));ev.text=`Il titolare di ${ev.c.name} ti invita al matrimonio del figlio. Trecento invitati, tre giorni di festa.`;}},
+ {id:'gestionale',src:'La Gazzetta del Muletto',title:'Il gestionale si aggiorna da solo',cond:()=>S.warehouses.some(w=>w.tech.wms),
+  text:'Venerdì sera il WMS ha installato un aggiornamento. Lunedì nessuno riesce a stampare le bolle.',
+  opts:[{t:'Chiama l\'assistenza',e:'−1.200 €, accuratezza −4 per 2 giorni',f:()=>{S.cash-=1200;mod('all',{A:-4},2);}},
+        {t:'Bolle a mano',e:'Accuratezza −8 per 2 giorni',f:()=>mod('all',{A:-8},2)}]},
+ {id:'neve',src:'Radio Traffico Nord-Ovest',title:'Neve al Frejus',cond:()=>[11,0,1,2].includes(monthOf(S.day)),
+  text:'Il traforo è chiuso ai mezzi pesanti e la coda arriva a Susa. I camion per la Francia sono fermi.',
+  opts:[{t:'Aspetta che riaprano',e:'Puntualità −4 per 5 giorni',f:()=>mod('all',{P:-4},5)},
+        {t:'Devia dal Monte Bianco',e:'−4.000 € di pedaggi, puntualità −1',f:()=>{S.cash-=4000;mod('all',{P:-1},5);}}]},
+ {id:'allerta',src:'Radio Traffico Nord-Ovest',title:'Allerta rossa in Liguria',cond:()=>[8,9,10].includes(monthOf(S.day)),
+  text:'Piogge torrenziali sul genovese: autostrade a singhiozzo, il porto lavora a metà.',
+  opts:[{t:'Ferma i mezzi per due giorni',e:'Puntualità −8 per 4 giorni',f:()=>mod('all',{P:-8},4)},
+        {t:'Si parte con prudenza',e:'Puntualità −3; rischio danni seri',f:()=>{mod('all',{P:-3},4); if(Math.random()<0.25){S.cash-=20000;toast('Un rimorchio allagato: 20.000 € di merce rovinata','bad');}}}]},
+ {id:'ztl',src:'Il Mattinale del Ministero',title:'Milano lancia "Zero Camion"',cond:()=>yearOf(S.day)>=2008,once:true,
+  text:'Nuova ZTL in centro: dentro solo mezzi Euro 5 e solo dalle 10 alle 12.',
+  opts:[{t:'Rinnova parte della flotta',e:'−25.000 €',f:()=>{S.cash-=25000;}},
+        {t:'Consegne all\'alba coi furgoni',e:'Puntualità −2 per 3 mesi',f:()=>mod('all',{P:-2},90)}]},
+ {id:'elezioni',src:'Il Sole 24 Pallet',title:'Elezioni anticipate',cond:()=>Math.random()<0.4,
+  text:'Tutti i partiti promettono "una grande riforma dell\'autotrasporto". Nessuno dice quale.',
+  opts:[{t:'Aspetta e guarda',e:'Nessun effetto',f:()=>{}},
+        {t:'Organizza un convegno di categoria',e:'−3.000 €, reputazione +3',f:()=>{S.cash-=3000;S.rep+=3;}}]},
+ {id:'moda',src:'La Gazzetta del Muletto',title:'Settimana della moda',cond:()=>[1,8].includes(monthOf(S.day)),
+  text:'Milano è bloccata da fotografi e monopattini. Un consegnatore è finito per sbaglio in passerella.',
+  opts:[{t:'Fai finta di niente',e:'Puntualità −2 per 7 giorni',f:()=>mod('all',{P:-2},7)},
+        {t:'Cavalca la notizia sui social',e:'Reputazione +3',f:()=>{S.rep+=3;}}]},
+ {id:'giro',src:'Radio Traffico Nord-Ovest',title:'Passa il Giro d\'Italia',cond:()=>monthOf(S.day)===4,
+  text:'La tappa attraversa le Langhe: strade chiuse dalle 11 alle 17.',
+  opts:[{t:'Anticipa le consegne',e:'Straordinari −1.500 €',f:()=>{S.cash-=1500;}},
+        {t:'Tutti a bordo strada a fare il tifo',e:'Puntualità −3 per 2 giorni, morale +4',f:()=>mod('all',{P:-3,mor:4},2)}]},
+ {id:'derby',src:'La Gazzetta del Muletto',title:'Derby della Madonnina',cond:()=>true,
+  text:'Metà magazzino è interista, metà milanista. Il lunedì dopo il derby nessuno si rivolge la parola.',
+  opts:[{t:'Vieta le sciarpe in magazzino',e:'Morale −2',f:()=>mod('all',{mor:-2},20)},
+        {t:'Organizza la partitella aziendale',e:'−800 €, morale +4',f:()=>{S.cash-=800;mod('all',{mor:4},40);}}]},
+ {id:'cane',src:'La Gazzetta del Muletto',title:'Il cane del capo turno',cond:()=>true,
+  text:'Il capo turno porta in magazzino Brutus, un cane di 60 kg "buonissimo". Mezza squadra ha paura.',
+  opts:[{t:'Brutus diventa la mascotte',e:'Morale +3, accuratezza −0,5 per 30 giorni',f:()=>mod('all',{mor:3,A:-0.5},30)},
+        {t:'Brutus resta a casa',e:'Morale −1',f:()=>mod('all',{mor:-1},20)}]},
+ {id:'tiktok',src:'La Gazzetta del Muletto',title:'Autista virale su TikTok',cond:()=>yearOf(S.day)>=2020,
+  text:'Un autista balla sul cassone in autostrada: 3 milioni di visualizzazioni e il logo dell\'azienda ben visibile.',
+  opts:[{t:'Richiamo ufficiale',e:'Reputazione −2, morale −2',f:()=>{S.rep-=2;mod('all',{mor:-2},20);}},
+        {t:'Fallo testimonial aziendale',e:'Reputazione +4, ma il rischio resta',f:()=>{S.rep+=4; if(Math.random()<0.3){S.cash-=5000;toast('Multa della Polstrada: 5.000 €','bad');}}}]},
+ {id:'buyer',src:'Il Sole 24 Pallet',title:'Cambio di buyer',cond:()=>S.clients.some(c=>c.status==='attivo'),
+  text:'Il nuovo buyer arriva da una multinazionale e vuole "rivedere tutte le condizioni".',
+  opts:[{t:'Concedi uno sconto del 3% per tre mesi',e:'Soddisfazione +6',f:function(){this.c.sat=clamp(this.c.sat+6,0,100);S.cash-=Math.round(clientRev(this.c)*0.09);}},
+        {t:'Difendi i prezzi',e:'Soddisfazione −8',f:function(){this.c.sat=clamp(this.c.sat-8,0,100);}},
+        {t:'Invitalo a pranzo',e:'Soddisfazione +4',req:()=>ceo().st.neg>=13,reqT:'Negoziazione 13',f:function(){this.c.sat=clamp(this.c.sat+4,0,100);}}],
+  setup:ev=>{ev.c=pick(S.clients.filter(c=>c.status==='attivo'));ev.title=`Cambio di buyer da ${ev.c.name}`;}},
+ {id:'blackfriday',src:'Il Sole 24 Pallet',title:'Black Friday',cond:()=>yearOf(S.day)>=2015&&monthOf(S.day)===10,
+  text:'I clienti triplicano gli ordini per una settimana. Il magazzino scricchiola.',
+  opts:[{t:'Interinali e turni extra',e:'−6.000 €, morale −2',f:()=>{S.cash-=6000;mod('all',{mor:-2},10);}},
+        {t:'Si fa quel che si può',e:'Puntualità −5, accuratezza −2 per 10 giorni',f:()=>mod('all',{P:-5,A:-2},10)}]},
+ {id:'fallimento',src:'Il Sole 24 Pallet',title:'Un cliente non paga',cond:()=>S.clients.some(c=>c.status==='attivo'),
+  text:'Un cliente è in concordato preventivo: l\'ultima fattura rischia di sparire.',
+  opts:[{t:'Accetta il 40% subito',e:'Perdi il 60% di una mensilità',f:function(){S.cash-=Math.round(clientRev(this.c)*0.6);}},
+        {t:'Fai causa',e:'50%: recuperi tutto o perdi tutto più le spese',f:function(){if(Math.random()<0.5)toast('Causa vinta: fattura recuperata','ok');else{S.cash-=Math.round(clientRev(this.c))+3000;toast('Causa persa','bad');}}}],
+  setup:ev=>{ev.c=pick(S.clients.filter(c=>c.status==='attivo'));ev.title=`${ev.c.name} non paga una fattura`;}},
+ {id:'klaus',src:'La Gazzetta del Muletto',title:'Pranzo con Klaus',cond:()=>true,
+  text:'Klaus, direttore logistico di un gruppo tedesco, è a Milano e vuole "capire come lavorano gli italiani".',
+  opts:[{t:'Ristorante stellato',e:'−1.200 €, reputazione +3',f:()=>{S.cash-=1200;S.rep+=3;}},
+        {t:'Trattoria del camionista',e:'50%: reputazione +5 o −2',f:()=>{S.rep+=Math.random()<0.5?5:-2;}}]},
+ {id:'brambilla',src:'La Gazzetta del Muletto',title:'Lite col cavalier Brambilla',cond:()=>true,
+  text:'Il vicino di capannone sostiene che i nostri camion rovinano la sua aiuola e minaccia di chiamare il sindaco.',
+  opts:[{t:'Rifai l\'aiuola',e:'−700 €',f:()=>{S.cash-=700;}},
+        {t:'Ignoralo',e:'30% di multa comunale da 4.000 €',f:()=>{if(Math.random()<0.3){S.cash-=4000;toast('Multa comunale: 4.000 €','bad');}}}]},
+ {id:'duore',src:'Il Sole 24 Pallet',title:'Consegne in 2 ore',cond:()=>yearOf(S.day)>=2014,once:true,
+  text:'I clienti hanno scoperto la consegna in giornata e ora la vogliono tutti, sempre.',
+  opts:[{t:'Investi in furgoni elettrici',e:'−30.000 €, reputazione +4',f:()=>{S.cash-=30000;S.rep+=4;}},
+        {t:'Spiega che non è il tuo mestiere',e:'Reputazione −2',f:()=>{S.rep-=2;}}]},
+ {id:'euro',src:'Il Sole 24 Pallet',title:'Arriva l\'euro',cond:()=>yearOf(S.day)===2002&&monthOf(S.day)<=3,once:true,
+  text:'Gli impiegati convertono ancora tutto in lire a mano. Due fatture sono uscite con mille volte l\'importo.',
+  opts:[{t:'Corso di formazione',e:'−1.000 €',f:()=>{S.cash-=1000;}},
+        {t:'"Si abitueranno"',e:'Accuratezza −1 per 60 giorni',f:()=>mod('all',{A:-1},60)}]},
+ {id:'expo',src:'Il Sole 24 Pallet',title:'Expo Milano 2015',cond:()=>yearOf(S.day)===2015&&monthOf(S.day)>=3&&monthOf(S.day)<=9,once:true,
+  text:'Sei mesi di padiglioni da rifornire. Gli organizzatori cercano trasportatori affidabili.',
+  opts:[{t:'Candidati come fornitore',e:'+40.000 €, puntualità −2 per 60 giorni',f:()=>{S.cash+=40000;mod('all',{P:-2},60);}},
+        {t:'Lascia perdere',e:'Nessun effetto',f:()=>{}}]},
+ {id:'pandemia',src:'Il Mattinale del Ministero',title:'Lockdown nazionale',cond:()=>yearOf(S.day)===2020&&monthOf(S.day)>=2,once:true,
+  text:'Il paese si ferma, la logistica no. Mascherine introvabili, autisti preoccupati, scaffali dei supermercati vuoti.',
+  opts:[{t:'Protocolli, DPI e premio per chi lavora',e:'−20.000 €, morale +6, reputazione +5',f:()=>{S.cash-=20000;mod('all',{mor:6},90);S.rep+=5;}},
+        {t:'Avanti con quello che c\'è',e:'Morale −8, puntualità −4 per 90 giorni',f:()=>mod('all',{mor:-8,P:-4},90)}]},
+ {id:'gasolio22',src:'Il Sole 24 Pallet',title:'Caro gasolio',cond:()=>yearOf(S.day)===2022,once:true,
+  text:'Il gasolio supera i 2 euro al litro. I clienti non vogliono sentir parlare di adeguamenti.',
+  opts:[{t:'Assorbi il costo',e:'−15.000 €',f:()=>{S.cash-=15000;}},
+        {t:'Applica la clausola gasolio',e:'Soddisfazione di tutti i clienti −5',f:()=>S.clients.forEach(c=>{if(c.status==='attivo')c.sat=clamp(c.sat-5,0,100);})}]},
+ {id:'stagista',src:'La Gazzetta del Muletto',title:'Lo stagista ha cancellato il database',cond:()=>true,
+  text:'"Volevo solo fare pulizia." L\'anagrafica articoli non c\'è più. Il backup è di tre settimane fa.',
+  opts:[{t:'Ripristina il backup e reinserisci a mano',e:'Accuratezza −2 per 15 giorni',f:()=>mod('all',{A:-2},15)},
+        {t:'Chiama il tecnico esterno',e:'−4.000 €',f:()=>{S.cash-=4000;}},
+        {t:'"Ci penso io"',e:'Tutto recuperato in una notte',req:()=>ceo().st.inn>=13,reqT:'Innovazione 13',f:()=>{}}]},
+ {id:'muletto',src:'La Gazzetta del Muletto',title:'Muletto contro scaffale',cond:()=>true,
+  text:'Una campata è venuta giù come un domino. Nessun ferito, ma 40 pallet sono a terra.',
+  opts:[{t:'Ripara subito',e:'−7.000 €',f:()=>{S.cash-=7000;}},
+        {t:'Transenna e lavora intorno',e:'Accuratezza −2, puntualità −2 per 20 giorni',f:()=>mod('all',{A:-2,P:-2},20)}],
+  setup:ev=>{if(S.warehouses.some(w=>w.tech.anticoll)){ev.text='Il sensore anti-collisione ha frenato il muletto a dieci centimetri dallo scaffale. Il carrellista vuole offrire da bere al tecnico.';ev.opts=[{t:'Brindisi!',e:'Morale +2',f:()=>mod('all',{mor:2},20)}];}}},
+ {id:'pizza',src:'La Gazzetta del Muletto',title:'Pizza per il turno di notte',cond:()=>true,
+  text:'Il turno di notte chiede una pizza il venerdì "come fanno da Brambilla".',
+  opts:[{t:'Pizza per tutti',e:'−400 € al mese, morale +3',f:()=>{S.cash-=400;mod('all',{mor:3},60);}},
+        {t:'"Non siamo da Brambilla"',e:'Morale −2',f:()=>mod('all',{mor:-2},30)}]},
+ {id:'telepass',src:'Radio Traffico Nord-Ovest',title:'Telepass in tilt',cond:()=>true,
+  text:'Un guasto blocca i caselli della tangenziale di Milano per un pomeriggio intero.',
+  opts:[{t:'Pazienza',e:'Puntualità −3 per 2 giorni',f:()=>mod('all',{P:-3},2)},
+        {t:'Strade provinciali',e:'−600 € di gasolio',f:()=>{S.cash-=600;}}]},
+ {id:'cesto',src:'La Gazzetta del Muletto',title:'Il cesto natalizio',cond:()=>monthOf(S.day)===11,
+  text:'Quest\'anno il cesto per i dipendenti: panettone artigianale o la solita bottiglia di spumante?',
+  opts:[{t:'Cesto ricco',e:'−2.500 €, morale +4',f:()=>{S.cash-=2500;mod('all',{mor:4},45);}},
+        {t:'Spumante e auguri',e:'−300 €',f:()=>{S.cash-=300;}}]},
+ {id:'concorrente',src:'Il Sole 24 Pallet',title:'Un concorrente ruba un autista',cond:()=>S.warehouses.some(w=>w.staff.aut>=2),
+  text:'Un rivale offre 200 € in più al mese al tuo autista migliore.',
+  opts:[{t:'Pareggia l\'offerta',e:'−2.400 € e morale +2',f:()=>{S.cash-=2400;mod('all',{mor:2},30);}},
+        {t:'Lascialo andare',e:'Perdi un autista',f:()=>{const w=S.warehouses.find(w=>w.staff.aut>=2);w.staff.aut--;}}]},
+ {id:'olimpiadi',src:'Il Sole 24 Pallet',title:'Olimpiadi invernali di Torino',cond:()=>yearOf(S.day)===2006&&monthOf(S.day)<=1,once:true,
+  text:'Torino ospita le Olimpiadi: impianti, atleti e sponsor hanno bisogno di trasporti.',
+  opts:[{t:'Noleggia tre camion extra per i Giochi',e:'+18.000 € di ricavi, puntualità −2 per un mese',f:()=>{S.cash+=18000;S.cur.altro-=18000;mod('all',{P:-2},30);S.rep+=3;}},
+        {t:'Resta concentrato sui clienti',e:'Nessun effetto',f:()=>{}}]},
+ {id:'crisi',src:'Il Sole 24 Pallet',title:'Crisi finanziaria',cond:()=>yearOf(S.day)===2008&&monthOf(S.day)>=8,once:true,
+  text:'Le banche chiudono i rubinetti. I clienti riducono gli ordini e pagano in ritardo.',
+  opts:[{t:'Taglia i costi',e:'Reputazione −6, cassa +15.000 €',f:()=>{S.rep-=6;S.cash+=15000;}},
+        {t:'Resisti senza licenziare',e:'Cassa −20.000 €, reputazione +5, morale +5',f:()=>{S.cash-=20000;S.rep+=5;mod('all',{mor:5},90);}}]}
+];
+function fireEvent(){
+  const el=EVENTS.filter(e=>(!e.once||!S.seen[e.id])&&(S.seen[e.id]===undefined||S.day-S.seen[e.id]>240)&&e.cond());
+  if(!el.length) return;
+  const base=pick(el); const ev={...base}; if(ev.setup) ev.setup(ev);
+  S.seen[ev.id]=S.day; UI.ev=ev; const wasSpeed=S.speed; UI.evSpeed=wasSpeed; setSpeed(0);
+  const opts=ev.opts.map((o,i)=>{const ok=!o.req||o.req();return `<button class="opt" data-act="evopt" data-i="${i}" ${ok?'':'disabled'}>${o.req?`<span class="pill" style="background:var(--yellow)">${esc(o.reqT)}</span> `:''}${esc(o.t)}<small>${esc(o.e)}</small></button>`}).join('');
+  showModal(`<div class="src"><span>${esc(ev.src)}</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:21px">${esc(ev.title)}</h3><p style="margin:0;line-height:1.45">${esc(ev.text)}</p>${opts}</div>`);
+}
+function modalInfo(src,title,text){
+  UI.evSpeed=S.speed; setSpeed(0);
+  showModal(`<div class="src"><span>${esc(src)}</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:20px">${esc(title)}</h3><p style="margin:0;line-height:1.45">${esc(text)}</p><button class="btn pri" data-act="closemodal">Ok</button></div>`);
+}
+
+/* ====================== SALVATAGGIO ====================== */
+const KEY='fup-salvataggio-v2';
+function save(){try{localStorage.setItem(KEY,JSON.stringify({S,uid}));}catch(e){}}
+function load(){try{const r=localStorage.getItem(KEY);if(!r)return null;return JSON.parse(r);}catch(e){return null;}}
+
+/* ====================== MAPPA ====================== */
+const view={s:1,x:0,y:0};
+function fitMap(){
+  const W=innerWidth,H=innerHeight; const s0=Math.max(W/1280,H/800);
+  view.min=s0; if(view.s<s0||!view.init){view.s=s0;view.x=(W-1280*s0)/2;view.y=(H-800*s0)/2;view.init=1;}
+  clampView(); applyView();
+}
+function clampView(){const W=innerWidth,H=innerHeight;view.x=clamp(view.x,W-1280*view.s,0);view.y=clamp(view.y,H-800*view.s,0);}
+function applyView(){$('#map').style.transform=`translate(${view.x}px,${view.y}px) scale(${view.s})`;}
+function initMapControls(){
+  const mw=$('#mapwrap'); let drag=null;
+  mw.addEventListener('pointerdown',e=>{ if(e.target.closest('.mk')) return; drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y};mw.classList.add('drag');mw.setPointerCapture(e.pointerId);});
+  mw.addEventListener('pointermove',e=>{if(!drag)return;view.x=drag.vx+e.clientX-drag.x;view.y=drag.vy+e.clientY-drag.y;clampView();applyView();});
+  const up=()=>{drag=null;mw.classList.remove('drag');}; mw.addEventListener('pointerup',up); mw.addEventListener('pointercancel',up);
+  mw.addEventListener('wheel',e=>{e.preventDefault();const f=e.deltaY<0?1.15:1/1.15;const ns=clamp(view.s*f,view.min,view.min*3.2);
+    const mx=e.clientX,my=e.clientY;view.x=mx-(mx-view.x)*ns/view.s;view.y=my-(my-view.y)*ns/view.s;view.s=ns;clampView();applyView();},{passive:false});
+  addEventListener('resize',fitMap);
+}
+function renderMap(){
+  const g=[];
+  CITIES.forEach(([n,lo,la,big,out])=>{const [x,y]=pt(lo,la);const s=big?10:7;
+    g.push(`<rect x="${x-s/2}" y="${y-s/2}" width="${s}" height="${s}" fill="${out?'#6b7a8e':'#16202e'}"/><rect x="${x-s/2+2}" y="${y-s/2+2}" width="${s-4}" height="${s-4}" fill="#fff"/>`);
+    g.push(`<text class="lbl" x="${x+7}" y="${y+4}" font-size="${big?16:13}" ${out?'fill-opacity=".7"':''}>${big?n.toUpperCase():n}</text>`);});
+  // siti di espansione
+  Object.entries(SITES).forEach(([id,s])=>{ if(S.warehouses.some(w=>w.site===id)) return; const [x,y]=pt(s.lon,s.lat);
+    g.push(`<g class="mk" data-act="site" data-id="${id}" data-tip="<div class='tt'>${esc(s.name)} (${s.prov})</div>Magazzino in affitto: ${n0(s.cap)} posti pallet, ${eur(s.rent)} al mese. Clic per i dettagli."><rect class="mk-ring" x="${x-9}" y="${y-9}" width="18" height="18" fill="none" stroke="#16202e" stroke-width="2" stroke-dasharray="3 2"/><rect x="${x-5}" y="${y-5}" width="10" height="10" fill="#ffffff" fill-opacity=".6"/></g>`);});
+  // magazzini del giocatore
+  S.warehouses.forEach(w=>{const s=SITES[w.site];const [x,y]=pt(s.lon,s.lat);
+    g.push(`<g class="mk" data-act="openwh" data-id="${w.id}" data-tip="<div class='tt'>${esc(w.name)}</div>Clic per aprire il magazzino"><rect x="${x-15}" y="${y-13}" width="34" height="26" fill="#0c131d" opacity=".4"/><rect class="mk-ring" x="${x-17}" y="${y-16}" width="34" height="26" fill="#16202e" stroke="#16202e" stroke-width="2"/><rect x="${x-15}" y="${y-8}" width="30" height="16" style="fill:var(--accent)"/><rect x="${x-15}" y="${y-8}" width="30" height="3" style="fill:var(--accent-l)"/><rect x="${x-6}" y="${y-3}" width="12" height="11" fill="#fff"/><rect x="${x-6}" y="${y+1}" width="12" height="1" fill="#9fb0c2"/><rect x="${x-13}" y="${y-14}" width="4" height="2" fill="#ffd23f"/></g>`);
+    g.push(`<text class="lbl" x="${x+20}" y="${y-4}" font-size="15">${esc(w.name)}</text>`);});
+  g.push('<g id="trucks"></g>');
+  $('#ov').innerHTML=g.join('');
+}
+// camion animati (solo estetica)
+let trucks=[], lastT=0;
+const TRUCK=c=>`<rect x="0" y="0" width="13" height="8" fill="#16202e"/><rect x="1" y="1" width="11" height="6" fill="${c}"/><rect x="13" y="2" width="6" height="6" fill="#16202e"/><rect x="14" y="3" width="4" height="2" fill="#bfe6ff"/><rect x="2" y="8" width="3" height="3" fill="#16202e"/><rect x="13" y="8" width="3" height="3" fill="#16202e"/>`;
+function syncTrucks(){
+  const want=[]; S.warehouses.forEach(w=>{const n=Math.min(w.kpi&&w.kpi.viaggi?w.staff.aut:0,6);for(let i=0;i<n;i++)want.push(w.id+'_'+i);});
+  trucks=trucks.filter(t=>want.includes(t.id));
+  want.forEach(id=>{ if(trucks.find(t=>t.id===id)) return; const w=whById(id.split('_')[0]); const s=SITES[w.site];
+    trucks.push({id,from:pt(s.lon,s.lat),to:null,t:Math.random(),back:false});});
+  const g=$('#trucks'); if(!g) return;
+  g.innerHTML=trucks.map(t=>`<g id="tk_${t.id}">${TRUCK(getComputedStyle(document.documentElement).getPropertyValue('--accent'))}</g>`).join('');
+}
+function animTrucks(ts){
+  const dt=Math.min(0.1,(ts-lastT)/1000||0); lastT=ts;
+  const mv=S&&!S.over&&S.speed>0 && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  trucks.forEach(t=>{
+    if(!t.to){const c=pick(CITIES);t.to=pt(c[1],c[2]);t.t=0;t.back=false;}
+    const dx=t.to[0]-t.from[0],dy=t.to[1]-t.from[1],len=Math.hypot(dx,dy)||1;
+    if(mv) t.t+=dt*(25+S.speed*20)/len;
+    if(t.t>=1){ if(!t.back){t.back=true;t.t=0;[t.from,t.to]=[t.to,t.from];} else {t.from=t.to;t.to=null;} }
+    if(!t.to) return;
+    const x=t.from[0]+(t.to[0]-t.from[0])*clamp(t.t,0,1), y=t.from[1]+(t.to[1]-t.from[1])*clamp(t.t,0,1);
+    const el=document.getElementById('tk_'+t.id); if(el) el.setAttribute('transform',`translate(${Math.round(x-9)},${Math.round(y-5)})${t.to[0]<t.from[0]?' scale(-1,1) translate(-19,0)':''}`);
+  });
+  requestAnimationFrame(animTrucks);
+}
+
+/* ====================== INTERFACCIA ====================== */
+const DOCK=[
+ ['azienda','Azienda e CEO','<svg width="22" height="24" viewBox="0 0 11 12" shape-rendering="crispEdges"><rect x="3" y="0" width="5" height="5" fill="#f2c79b"/><rect x="3" y="0" width="5" height="2" fill="#6b4a2b"/><rect x="1" y="6" width="9" height="6" fill="#ffd23f"/><rect x="5" y="6" width="1" height="4" fill="#16202e"/></svg>'],
+ ['magazzini','Magazzini','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="0" y="3" width="12" height="8" fill="#d8e3ee"/><rect x="1" y="0" width="10" height="3" fill="#8a96a6"/><rect x="4" y="6" width="4" height="5" fill="#3a4658"/></svg>'],
+ ['clienti','Clienti','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="0" y="3" width="12" height="8" fill="#16202e"/><rect x="1" y="4" width="10" height="6" fill="#8a5f36"/><rect x="4" y="0" width="4" height="1" fill="#d8e3ee"/><rect x="3" y="1" width="1" height="2" fill="#d8e3ee"/><rect x="8" y="1" width="1" height="2" fill="#d8e3ee"/><rect x="5" y="6" width="2" height="2" fill="#ffd23f"/></svg>'],
+ ['gare','Gare d\'appalto','<svg width="18" height="22" viewBox="0 0 8 10" shape-rendering="crispEdges"><rect x="0" y="0" width="8" height="10" fill="#fff"/><rect x="1" y="2" width="6" height="1" fill="#16202e"/><rect x="1" y="4" width="6" height="1" fill="#16202e"/><rect x="1" y="6" width="4" height="1" fill="#16202e"/></svg>'],
+ ['personale','Personale e manager','<svg width="26" height="22" viewBox="0 0 13 11" shape-rendering="crispEdges"><rect x="1" y="0" width="4" height="4" fill="#f2c79b"/><rect x="0" y="5" width="6" height="6" fill="#5fb4f0"/><rect x="8" y="0" width="4" height="4" fill="#c98762"/><rect x="7" y="5" width="6" height="6" fill="#8ed15b"/></svg>'],
+ ['direzione','Direzione','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="4" y="0" width="4" height="3" fill="#ffd23f"/><rect x="5" y="3" width="2" height="2" fill="#d8e3ee"/><rect x="1" y="5" width="10" height="1" fill="#d8e3ee"/><rect x="1" y="6" width="1" height="2" fill="#d8e3ee"/><rect x="10" y="6" width="1" height="2" fill="#d8e3ee"/><rect x="5" y="6" width="2" height="2" fill="#d8e3ee"/><rect x="0" y="8" width="3" height="3" fill="#5fb4f0"/><rect x="4" y="8" width="4" height="3" fill="#ff7a3d"/><rect x="9" y="8" width="3" height="3" fill="#8ed15b"/></svg>'],
+ ['tecnologia','Tecnologia','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="4" y="0" width="3" height="11" fill="#c3d0dc"/><rect x="0" y="4" width="11" height="3" fill="#c3d0dc"/><rect x="2" y="2" width="7" height="7" fill="#c3d0dc"/><rect x="4" y="4" width="3" height="3" fill="#2a3a50"/></svg>'],
+ ['espansione','Espansione','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="0" y="4" width="7" height="7" fill="#d8e3ee"/><rect x="0" y="2" width="7" height="2" fill="#8a96a6"/><rect x="8" y="0" width="1" height="5" fill="#ffd23f"/><rect x="6" y="2" width="5" height="1" fill="#ffd23f"/></svg>'],
+ ['giornale','Il giornale','<svg width="24" height="20" viewBox="0 0 12 10" shape-rendering="crispEdges"><rect x="0" y="0" width="12" height="10" fill="#f4f1ec"/><rect x="1" y="1" width="10" height="2" fill="#16202e"/><rect x="1" y="4" width="4" height="4" fill="#8a96a6"/><rect x="6" y="4" width="5" height="1" fill="#16202e"/><rect x="6" y="6" width="5" height="1" fill="#16202e"/></svg>']
+];
+const TITLES={azienda:'Azienda e CEO',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',personale:'Personale e manager',tecnologia:'Tecnologia',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale'};
+function renderDock(){
+  const openT=S.tenders.filter(t=>!t.done&&!t.bid).length;
+  const short=S.warehouses.filter(w=>w.kpi&&(w.staff.mag<w.kpi.needMag||w.staff.aut<w.kpi.needAut)).length;
+  const impS=S.imp<impNeed()?1:0;
+  const B={gare:openT,magazzini:short,personale:impS};
+  $('#dock').innerHTML=DOCK.map(([id,t,ic])=>`<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${id==='magazzini'&&short?'Personale insufficiente in un magazzino':id==='personale'&&impS?'Servono altri impiegati in ufficio':id==='tecnologia'&&S.project?'Ricerca in corso: '+S.project.left+' giorni':id==='direzione'&&!R('direzione')?'Si sblocca con la ricerca Struttura direzionale':''}">${ic}${B[id]?`<span class="badge">${id==='gare'?B[id]:'!'}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}${id==='direzione'&&R('direzione')&&Object.values(S.dirs).some(v=>!v)?'<span class="badge">!</span>':''}</button>`).join('');
+}
+function renderTop(){
+  $('#date').textContent=fmtDate(S.day);
+  $('#coname').textContent=S.company.name;
+  document.querySelectorAll('.spd button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===S.speed)));
+  $('#paused').hidden=S.speed!==0;
+  const last=S.last?S.last.util:null;
+  const mor=S.warehouses.reduce((a,w)=>a+w.morale,0)/S.warehouses.length;
+  $('#stats').innerHTML=`
+   <div class="chip" data-tip="<div class='tt'>Cassa</div>Sotto i −50.000 € l'azienda fallisce."><span>Cassa</span><b class="${S.cash<0?'bad':''}" style="${S.cash<0?'color:#ff8a8d':''}">${eur(S.cash)}</b></div>
+   <div class="chip" data-tip="<div class='tt'>Risultato del mese scorso</div>Apri Azienda per il conto economico."><span>Mese scorso</span><b style="color:${last==null?'#fff':last>=0?'#6fdc8c':'#ff8a8d'}">${last==null?'—':(last>=0?'+':'')+eur(last)}</b></div>
+   <div class="chip opt2"><span>Gasolio</span><b>${S.fuel.toFixed(2).replace('.',',')} €/l</b></div>
+   <div class="chip opt2" data-tip="<div class='tt'>Morale medio</div>Dipende da manager, carichi di lavoro, welfare ed eventi."><span>Morale</span><b style="color:${mor>=60?'#6fdc8c':mor>=45?'#ffc53d':'#ff8a8d'}">${Math.round(mor)}</b></div>
+   <div class="chip" data-tip="<div class='tt'>Reputazione</div>Pesa nelle gare e nelle assunzioni."><span>Reputazione</span><b>${Math.round(S.rep)} / 100</b></div>`;
+}
+function openWin(id,opts){
+  UI.open[id]=true; if(opts) Object.assign(UI.sel,opts);
+  let el=document.getElementById('win-'+id);
+  if(!el){
+    el=document.createElement('section'); el.className='win'+(id==='tecnologia'?' xwide':['magazzini','gare','azienda','direzione'].includes(id)?' wide':''); el.id='win-'+id;
+    el.setAttribute('aria-label',TITLES[id]);
+    const i=Object.keys(UI.pos).length; const p=UI.pos[id]||{x:Math.min(innerWidth-420,90+((i*36)%240)),y:86+((i*30)%180)};
+    if(id==='magazzini'||id==='gare'){p.x=Math.max(90,innerWidth-680);} if(id==='tecnologia'){p.x=90;}
+    UI.pos[id]=p; el.style.left=p.x+'px'; el.style.top=p.y+'px';
+    el.innerHTML=`<header class="win-h"><span class="grip"></span><h2>${TITLES[id]}</h2><button class="xbtn" data-act="close" data-id="${id}" aria-label="Chiudi">x</button></header><div class="win-b"></div>`;
+    $('#wins').appendChild(el); makeDraggable(el,id);
+    const mx=Math.max(0,innerWidth-el.offsetWidth-16); if(p.x>mx){p.x=mx;el.style.left=p.x+'px';}
+  }
+  el.style.zIndex=++UI.z; renderWin(id); renderDock();
+}
+function closeWin(id){delete UI.open[id];const el=document.getElementById('win-'+id);if(el)el.remove();renderDock();}
+function makeDraggable(el,id){
+  const h=el.querySelector('.win-h'); let d=null;
+  el.addEventListener('pointerdown',()=>{el.style.zIndex=++UI.z;});
+  h.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;d={x:e.clientX,y:e.clientY,l:el.offsetLeft,t:el.offsetTop};h.setPointerCapture(e.pointerId);});
+  h.addEventListener('pointermove',e=>{if(!d)return;const x=clamp(d.l+e.clientX-d.x,0,innerWidth-80),y=clamp(d.t+e.clientY-d.y,56,innerHeight-40);el.style.left=x+'px';el.style.top=y+'px';UI.pos[id]={x,y};});
+  h.addEventListener('pointerup',()=>d=null);
+}
+function renderWin(id){const el=document.getElementById('win-'+id);if(!el)return;const b=el.querySelector('.win-b');const st=b.scrollTop;b.innerHTML=(VIEWS[id]||(()=>''))();b.scrollTop=st;}
+function renderAll(){renderTop();const ae=document.activeElement;Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id);if(el&&ae&&el.contains(ae)&&ae.matches('select,input'))return;if(id!=='gare'||!UI.bidEditing)renderWin(id);});renderDock();}
+const kpiCls=(v,s)=>s==null?'ok':v>=s?'ok':v>=s-2?'warn':'bad';
+const barColor=v=>v>=0.85?'var(--bad)':v>=0.7?'var(--warn)':'var(--ok)';
+function tipParts(title,parts,unit){return `<div class='tt'>${esc(title)}</div>`+parts.map(([n,v])=>`<div class='tr'><span>${esc(n)}</span><span>${n==='Base'?f1(v):(v>=0?'+':'')+f1(v)}${unit||''}</span></div>`).join('');}
+
+const VIEWS={
+ azienda(){
+  const C=ceo(), L=S.last;
+  const sk=[['Operazioni','op'],['Precisione','prec'],['Negoziazione','neg'],['Leadership','lead'],['Amministrazione','amm'],['Innovazione','inn']];
+  const pl=L?[['Ricavi',L.ric],['Personale',-L.pers],['Mezzi e gasolio',-L.mezzi],['Immobili e fissi',-L.fissi],['Tecnologie',-L.tech],['Manager',-L.mgr],['Welfare',-L.welf],['Penali',-L.pen],['Altro',-L.altro]].filter(x=>Math.abs(x[1])>0.5):[];
+  return `<div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+   <div class="portrait" style="width:120px;height:140px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none"><img class="px" src="${IMG[C.id]}" alt="Ritratto di ${esc(C.name)}" width="120" height="140"></div>
+   <div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:4px">
+     <div class="h3" style="font-size:20px">${esc(C.name)}</div><div class="sm">${C.age} anni · ${esc(C.origin)} · CEO di ${esc(S.company.name)}</div>
+     <div class="sm" style="color:var(--ink)">${esc(C.bio)}</div>
+     ${talentIcons(C.tal,36)}
+   </div></div>
+   <div class="skills">${sk.map(([n,k])=>`<div class="skill">${n}<b class="${C.st[k]>=15?'ok':C.st[k]<=5?'bad':''}">${C.st[k]}</b></div>`).join('')}</div>
+   <div class="card"><div class="row"><span class="h3">Conto economico del mese scorso</span></div>
+   ${L?`<table class="t num">${pl.map(([n,v])=>`<tr><td>${n}</td><td class="r ${v<0?'bad':''}">${eur(v)}</td></tr>`).join('')}<tr><th>Utile</th><th class="r ${L.util>=0?'ok':'bad'}" style="font-size:14px">${eur(L.util)}</th></tr></table>`:'<div class="sm">Disponibile dalla fine del primo mese.</div>'}</div>
+   <div class="card"><div class="row"><span class="h3">Welfare</span><span class="sm">costo per dipendente al mese</span></div>
+   ${WELFARE.map(w=>`<label class="row" style="cursor:pointer"><span><input type="checkbox" data-act="welfare" data-id="${w.id}" ${S.welfare[w.id]?'checked':''}> ${w.name}</span><span class="sm">${eur(w.cost)} · morale +${w.mor}</span></label>`).join('')}
+   <div class="sm">Il welfare alza il morale e accorcia i tempi di assunzione.</div></div>
+   <div class="row"><button class="btn" data-act="save">Salva partita</button><button class="btn" data-act="restart">Nuova partita</button></div>`;
+ },
+ magazzini(){
+  const id=UI.sel.wh||S.warehouses[0].id; const w=whById(id)||S.warehouses[0]; UI.sel.wh=w.id; const k=w.kpi||computeWH(w);
+  const tabs=S.warehouses.length>1?`<div class="tabs" role="tablist">${S.warehouses.map(x=>`<button role="tab" aria-selected="${x.id===w.id}" data-act="selwh" data-id="${x.id}">${esc(x.name)}</button>`).join('')}</div>`:'';
+  const q=S.queue.filter(q=>q.wh===w.id);
+  const mgrOpts=[w.mgr==='ceo'||!S.warehouses.some(x=>x.mgr==='ceo')?`<option value="ceo" ${w.mgr==='ceo'?'selected':''}>${esc(ceo().name)} (CEO)</option>`:'',...S.managers.filter(m=>m.hired&&!seatOf(m.id)&&(!m.wh||m.wh===w.id)).map(m=>`<option value="${m.id}" ${w.mgr===m.id?'selected':''}>${esc(m.name)}</option>`)].join('');
+  const cl=S.clients.filter(c=>c.wh===w.id&&c.status!=='perso');
+  const staffRow=(r,have,need,u)=>{const inq=q.filter(x=>x.role===r).length;return `<img class="px mini" src="${IMG[r]}" alt="" width="48" height="56"><span>${ROLE[r]}<br><span class="sm">servono ${need}${inq?` · ${inq} in arrivo`:''}</span></span><b class="num ${have<need?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${have}</b><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi">+ Assumi</button>`;};
+  return `${tabs}
+  <div class="row"><span class="h3" style="font-size:19px">${esc(w.name)} (${w.prov})</span><span class="sm">${w.own?'di proprietà':'in affitto'} · ${eur(w.fixed)}/mese</span></div>
+  <div><div class="row"><span class="lab">Saturazione</span><span class="num">${n0(k.stock)} / ${n0(w.cap)} posti · ${Math.round(k.sat*100)}%</span></div><div class="bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div></div>
+  <div class="kpis">
+   <div class="kpi" data-tip="${tipParts('Puntualità '+f1(k.P)+'%',k.pP,'')}"><div class="lab">Puntualità</div><b>${f1(k.P)}%</b></div>
+   <div class="kpi" data-tip="${tipParts('Accuratezza '+f1(k.A)+'%',k.pA,'')}"><div class="lab">Accuratezza</div><b>${f1(k.A)}%</b></div>
+  </div>
+  <div class="card"><div class="row"><span class="h3">Personale</span><span class="sm">morale <b class="${w.morale>=60?'ok':w.morale>=45?'warn':'bad'}">${Math.round(w.morale)}</b></span></div>
+   <div class="staff">${staffRow('mag',w.staff.mag,k.needMag)}${staffRow('aut',w.staff.aut,k.needAut)}</div>
+   <div class="sm">Motrici: ${w.motrici} di proprietà${Math.max(0,w.staff.aut-w.motrici)?` + ${Math.max(0,w.staff.aut-w.motrici)} in leasing`:''} · ${k.viaggi} viaggi al mese</div>
+   <label class="row" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><img class="px mini" src="${w.mgr==='ceo'?IMG[ceo().id]:w.mgr?IMG['m_'+w.mgr]:IMG.imp}" alt="" width="48" height="56" style="${w.mgr?'':'opacity:.3'}"><span class="lab">Manager</span></span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
+   ${k.m.none?'<div class="sm bad">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
+  </div>
+  <div class="card"><div class="row"><span class="h3">Clienti</span><span class="sm">ricavi ${eur(k.rev)}/mese</span></div>
+   ${cl.length?cl.map(c=>`<div class="row"><span><b>${esc(c.name)}</b>${c.status==='avvio'?` <span class="pill" style="background:var(--yellow)">dal ${shortDate(c.start)}</span>`:''}<br><span class="sm">${n0(c.stock)} posti · ${n0(c.pal)} pallet/mese</span></span><span class="sm">${c.status==='attivo'?`soddisf. <b class="${c.sat>=60?'ok':c.sat>=40?'warn':'bad'}">${Math.round(c.sat)}</b>`:''}</span></div>`).join(''):'<div class="sm">Nessun cliente: partecipa alle gare.</div>'}</div>
+  <div class="row"><span class="sm">Costi del mese: personale ${eur(k.pers)}, mezzi ${eur(k.mezzi)}, immobile ${eur(k.fissi)}</span><button class="btn sm2" data-act="opentech" data-tree="log" data-id="">Tecnologie</button></div>
+  <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center"><span class="sm">Installate:</span>${TECH.filter(t=>w.tech[t.id]).map(t=>{const l=techFactor(w,t)<0;return `<span role="img" aria-label="${esc(t.name)}" data-tip="<div class='tt'>${esc(t.name)}</div><div>${esc(t.desc)}</div>${l?"<div style='color:#ffd23f'>In apprendimento</div>":''}" style="cursor:help;display:inline-flex">${techIcon(t,32,l)}</span>`;}).join('')||'<span class="sm">nessuna</span>'}</div>`;
+ },
+ clienti(){
+  const act=S.clients.filter(c=>c.status!=='perso'); const lost=S.clients.filter(c=>c.status==='perso');
+  return act.map(c=>{const w=whById(c.wh);const k=w.kpi||computeWH(w);
+   const P=k.P,A=k.A;const cP=kpiCls(P,c.sP),cA=c.sA?kpiCls(A,c.sA):'ok';const bad=c.status==='attivo'&&(cP==='bad'||cA==='bad');
+   const mesi=Math.max(0,Math.round((c.end-S.day)/30));
+   return `<div class="card ${bad?'bad':c.status==='avvio'?'pend':''}">
+    <div class="row"><b>${esc(c.name)}</b><span class="sm">${esc(w.name)}</span></div>
+    <div class="sm">"${esc(c.slogan)}" · ${esc(c.sector)}</div>
+    ${c.status==='avvio'?`<div class="sm">Il contratto parte il <b>${shortDate(c.start)}</b>.</div>`:`
+    <table class="t num"><tr><th>KPI</th><th class="r">Oggi</th><th class="r">Richiesto</th></tr>
+     <tr><td>Puntualità</td><td class="r ${cP}">${f1(P)}%</td><td class="r">≥ ${f1(c.sP)}%</td></tr>
+     <tr><td>Accuratezza</td><td class="r ${cA}">${f1(A)}%</td><td class="r">${c.sA?'≥ '+f1(c.sA)+'%':'non richiesta'}</td></tr></table>
+    <div class="row" style="align-items:center"><span class="lab">Soddisfazione</span><div class="bar" style="max-width:160px"><i style="width:${c.sat}%;background:${c.sat>=60?'var(--ok)':c.sat>=40?'var(--warn)':'var(--bad)'}"></i></div><b class="num">${Math.round(c.sat)}</b></div>
+    <div class="sm">${eur(clientRev(c))}/mese · rinnovo tra ${mesi} mesi${c.sat<50?' · <b class="bad">a rischio</b>':''}</div>`}
+   </div>`;}).join('')+(lost.length?`<div class="sm">Clienti persi: ${lost.map(c=>esc(c.name)).join(', ')}</div>`:'')+`<div class="sm">Ogni mese: sopra soglia +3 di soddisfazione; sotto di 2 punti al massimo −4; oltre −10 e penale del 5%. Sotto 25 il cliente se ne va.</div>`;
+ },
+ gare(){
+  const open=S.tenders.filter(t=>!t.done), done=S.tenders.filter(t=>t.done).slice(-4).reverse();
+  if(!open.length&&!done.length) return '<div class="sm">Nessuna gara aperta. Ne arriva una ogni 4–6 settimane.</div>';
+  const sel=open.find(t=>t.id===UI.sel.tender)||open[0];
+  let detail='';
+  if(sel){
+    if(UI.bid.t!==sel.id) UI.bid={t:sel.id,wh:sel.bid?sel.bid.wh:S.warehouses[0].id,mult:sel.bid?sel.bid.mult:1};
+    const e=bidEstimate(sel,UI.bid.wh,UI.bid.mult);
+    detail=`<div class="card pend">
+     <div class="row"><span class="h3">${esc(sel.name)}</span><span class="pill" style="background:var(--yellow)">scade il ${shortDate(sel.deadline)}</span></div>
+     <div class="sm">"${esc(sel.slogan)}" · ${esc(sel.sector)}</div>
+     <table class="t num"><tr><td>Volume</td><td class="r">${n0(sel.pal)} pallet/mese · ${n0(sel.stock)} posti</td></tr>
+      <tr><td>Puntualità richiesta</td><td class="r">≥ ${f1(sel.sP)}%</td></tr><tr><td>Accuratezza richiesta</td><td class="r">${sel.sA?'≥ '+f1(sel.sA)+'%':'non richiesta'}</td></tr>
+      <tr><td>Avvio</td><td class="r">30 giorni dopo l'aggiudicazione · 24 mesi</td></tr></table>
+     <label class="row"><span class="lab">Magazzino</span><select data-act="bidwh" aria-label="Magazzino per la gara">${S.warehouses.map(w=>`<option value="${w.id}" ${w.id===UI.bid.wh?'selected':''}>${esc(w.name)}</option>`).join('')}</select></label>
+     <label><span class="row"><span class="lab">Prezzo rispetto al listino</span><b class="num" id="bidmv">${UI.bid.mult>=1?'+':''}${Math.round((UI.bid.mult-1)*100)}%</b></span>
+      <input type="range" min="80" max="120" step="1" value="${Math.round(UI.bid.mult*100)}" data-act="bidmult" aria-label="Prezzo rispetto al listino"></label>
+     <div id="bidest">${bidEstHtml(sel,e)}</div>
+     <div class="row">${sel.bid?`<span class="sm ok">Offerta inviata a ${Math.round((sel.bid.mult-1)*100)}%</span><button class="btn" data-act="withdraw" data-id="${sel.id}">Ritira</button>`:''}
+      <button class="btn pri" data-act="bid" data-id="${sel.id}" ${e&&e.fits?'':'disabled'}>${sel.bid?'Aggiorna offerta':'Invia offerta'}</button></div>
+    </div>`;
+  }
+  return `${open.length>1?`<div class="tabs" role="tablist">${open.map(t=>`<button role="tab" aria-selected="${t.id===(sel&&sel.id)}" data-act="seltender" data-id="${t.id}">${esc(t.name)}${t.bid?' ✓':''}</button>`).join('')}</div>`:''}${detail}
+   ${done.length?`<div class="lab">Risultati recenti</div>`+done.map(t=>`<div class="row sm"><span>${esc(t.name)}</span><span class="${t.result&&t.result.win?'ok':'bad'}">${t.result?(t.result.win?'Vinta':t.bid?`Persa contro ${esc(t.result.by)}`:`Non partecipato · ${esc(t.result.by)}`):''}</span></div>`).join(''):''}`;
+ },
+ personale(){
+  const need=impNeed(); const qi=S.queue.filter(q=>q.role==='imp').length;
+  return `<div class="card"><div class="row"><span class="h3">Ufficio (impiegati operativi)</span></div>
+   <div class="staff"><img class="px mini" src="${IMG.imp}" alt="" width="48" height="56"><span>Traffico, customer service, amministrazione<br><span class="sm">servono ${need}${qi?` · ${qi} in arrivo`:''}</span></span><b class="num ${S.imp<need?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${S.imp}</b><button class="btn sm2" data-act="fire" data-role="imp" ${S.imp<=1?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="imp" aria-label="Assumi">+ Assumi</button></div>
+   <div class="sm">Ogni impiegato mancante toglie 1,5 punti di puntualità in tutti i magazzini.</div></div>
+   <div class="card"><div class="row"><span class="h3">Assunzioni in corso</span></div>${S.queue.length?S.queue.map(q=>`<div class="row sm"><span>${ROLE[q.role]}${q.wh?' · '+esc(whById(q.wh).name):''}</span><span>${q.days} giorni</span></div>`).join(''):'<div class="sm">Nessuna.</div>'}
+   <div class="sm">Tempi più brevi con welfare e reputazione alti. Gli autisti sono i più difficili da trovare.</div></div>
+   <div class="lab">Manager disponibili</div>
+   ${S.managers.map(m=>`<div class="card" style="flex-direction:row;gap:12px;align-items:flex-start"><img class="px mport" src="${IMG['m_'+m.id]}" alt="Ritratto di ${esc(m.name)}" width="96" height="112"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px"><div class="row"><b>${esc(m.name)}, ${m.age}</b><span class="sm">${m.hired?(seatOf(m.id)?esc(DIR_ROLES.find(r=>r.id===seatOf(m.id)).name):m.wh?'a '+esc(whById(m.wh).name):'senza incarico'):eur(m.ral)+' l\'anno'}</span></div>
+     <div class="sm">${esc(m.role)}</div><div class="sm num">Op ${m.st.op} · Prec ${m.st.prec} · Neg ${m.st.neg} · Lead ${m.st.lead} · Amm ${m.st.amm} · Inn ${m.st.inn}</div>${talentIcons(m.tal||[],28)}
+     <div>${m.hired?`<button class="btn sm2" data-act="firemgr" data-id="${m.id}">Licenzia (${eur(m.ral/12*COEF)})</button>`:`<button class="btn sm2 pri" data-act="hiremgr" data-id="${m.id}">Assumi</button>`}</div></div></div>`).join('')}`;
+ },
+ tecnologia(){
+  const tree=UI.sel.tree||'log'; const y=yearOf(S.day); const pj=S.project;
+  const tabs=`<div class="tabs" role="tablist">${TREES.map(([id,n])=>`<button role="tab" aria-selected="${id===tree}" data-act="seltree" data-id="${id}" style="display:flex;align-items:center;justify-content:center;gap:8px">${techIcon({id:'_',tree:id},22)}${n}</button>`).join('')}</div>`;
+  const pjHtml=pj?(()=>{const t=TECH.find(x=>x.id===pj.tech);const done=1-pj.left/pj.total;return `<div class="card pend"><div class="row"><span class="h3">Ricerca in corso: ${esc(t.name)}</span><b class="num">${pj.left} giorni</b></div>
+   <div class="bar"><i style="width:${Math.round(done*100)}%;background:var(--accent)"></i></div>
+   <div class="row"><span class="sm">Fine prevista: ${shortDate(S.day+pj.left)}. Una ricerca alla volta.</span><button class="btn sm2" data-act="canceltech">Annulla (rimborso 50%)</button></div></div>`;})():`<div class="sm">Nessuna ricerca in corso. Si ricerca una tecnologia alla volta; la durata dipende dall'Innovazione (${innUsed()}).</div>`;
+  const nodes=TECH.filter(t=>t.tree===tree); const maxT=Math.max(...nodes.map(t=>t.tier)), maxR=Math.max(...nodes.map(t=>t.row));
+  const NW=170,NH=64,GX=188,GY=82, W=maxT*GX-34, H=(maxR+1)*GY-18;
+  const pos=t=>({x:(t.tier-1)*GX,y:t.row*GY});
+  const st=t=>R(t.id)?'done':(pj&&pj.tech===t.id)?'run':(y<t.year||(t.req||[]).some(r=>!R(r)))?'lock':'open';
+  const lines=nodes.flatMap(t=>(t.req||[]).map(r=>{const a=TECH.find(x=>x.id===r); if(a.tree!==tree) return ''; const p1=pos(a),p2=pos(t); const x1=p1.x+NW,y1=p1.y+NH/2,x2=p2.x,y2=p2.y+NH/2,mx=x1+(x2-x1)/2;
+    return `<path d="M${x1} ${y1}H${mx}V${y2}H${x2}" fill="none" stroke="${R(r)?'#2e9e48':'#8a96a6'}" stroke-width="3"/>`;})).join('');
+  const sel=TECH.find(t=>t.id===UI.sel.tech&&t.tree===tree)||nodes.find(t=>st(t)==='open')||nodes[0];
+  const nodeHtml=nodes.map(t=>{const p=pos(t),s2=st(t);const bg={done:'#eaf6ec',run:'var(--accent)',lock:'#dfe7ee',open:'#ffffff'}[s2];
+    const sub=s2==='done'?'<span class="ok">Ricercata</span>':s2==='run'?`In corso · ${pj.left} g`:y<t.year?`Dal ${t.year}`:s2==='lock'?'Bloccata':`${eur(t.cost)} · ${techDays(t)} g`;
+    return `<button class="tnode" data-act="seltech" data-id="${t.id}" aria-pressed="${sel&&sel.id===t.id}" style="left:${p.x}px;top:${p.y}px;width:${NW}px;height:${NH}px;background:${bg};${s2==='lock'?'color:var(--muted)':''}">${techIcon(t,40,s2==='lock')}<span class="tn"><b>${esc(t.name)}</b><span>${sub}</span></span></button>`;}).join('');
+  let det='';
+  if(sel){const s2=st(sel);const reqs=(sel.req||[]).map(r=>TECH.find(x=>x.id===r));
+    const eff=[sel.A?`Accuratezza +${f1(sel.A)}`:'',sel.P?`Puntualità +${f1(sel.P)}`:'',sel.tree==='log'?`installazione ${eur(sel.inst)} per magazzino, canone ${eur(sel.mese)}/mese, apprendimento ${sel.weeks} settimane`:''].filter(Boolean).join(' · ');
+    let act='';
+    if(s2==='open') act=`<button class="btn pri" data-act="research" data-id="${sel.id}" ${!pj&&S.cash>=sel.cost?'':'disabled'}>Avvia la ricerca · ${eur(sel.cost)} · ${techDays(sel)} giorni</button>${pj?'<span class="sm">C\'è già una ricerca in corso.</span>':''}`;
+    if(s2==='done'&&sel.tree==='log') act=S.warehouses.map(w=>{const it=w.tech[sel.id];const learn=it&&techFactor(w,sel)<0;
+      return `<div class="row"><span>${esc(w.name)}</span>${it?`<span class="sm ${learn?'warn':'ok'}">${learn?'in apprendimento':'attiva'}</span>`:`<button class="btn sm2 pri" data-act="install" data-id="${sel.id}" data-wh="${w.id}" ${S.cash>=sel.inst&&(sel.req||[]).every(r=>w.tech[r])?'':'disabled'}>Installa · ${eur(sel.inst)}</button>`}</div>`;}).join('')+((sel.req||[]).length?`<div class="sm">Si installa nei magazzini che hanno già ${reqs.map(r=>esc(r.name)).join(' e ')}.</div>`:'');
+    det=`<div class="card"><div style="display:flex;gap:12px;align-items:center">${techIcon(sel,64,s2==='lock')}<div style="flex:1;display:flex;flex-direction:column;gap:3px"><div class="row"><span class="h3">${esc(sel.name)}</span><span class="sm">${s2==='done'?'Ricercata':'dal '+sel.year}</span></div><span class="sm">${TREES.find(x=>x[0]===sel.tree)[1]} · cornice: ${TFRAME[sel.tree].shape.toLowerCase()}</span></div></div>
+      <div>${esc(sel.desc)}</div>${eff?`<div class="sm">${eff}</div>`:''}
+      ${reqs.length?`<div class="sm">Richiede: ${reqs.map(r=>`<span class="${R(r.id)?'ok':'bad'}">${esc(r.name)}</span>`).join(', ')}</div>`:''}
+      ${act}</div>`;}
+  const desc=TREES.find(x=>x[0]===tree)[2];
+  return tabs+pjHtml+`<div class="sm">${desc}</div><div class="treebox"><div style="position:relative;width:${W}px;height:${H}px"><svg width="${W}" height="${H}" style="position:absolute;inset:0" aria-hidden="true">${lines}</svg>${nodeHtml}</div></div>`+det;
+ },
+ direzione(){
+  if(!R('direzione')) return `<div class="card pend"><span class="h3">Serve la Struttura direzionale</span><div>La squadra dei dirigenti arriva con la ricerca <b>Struttura direzionale</b> nell'albero Sviluppo aziendale (richiede il Gestionale amministrativo).</div><div><button class="btn sm2 pri" data-act="opentech" data-tree="org" data-id="direzione">Apri l'albero</button></div></div>`;
+  const pool=[...S.managers.filter(m=>m.hired&&!m.wh),...S.execs.filter(e=>e.hired)];
+  const seats=DIR_ROLES.map(r=>{const p=personById(S.dirs[r.id]);const v=p?p.st[r.stat]:null;
+    const opts=pool.filter(x=>!seatOf(x.id)||S.dirs[r.id]===x.id).map(x=>`<option value="${x.id}" ${S.dirs[r.id]===x.id?'selected':''}>${esc(x.name)} (${r.statN} ${x.st[r.stat]})</option>`).join('');
+    return `<div class="card" style="flex-direction:row;gap:10px;align-items:center"><img class="px mini" src="${p?IMG['m_'+p.id]:IMG.imp}" alt="" width="48" height="56" style="${p?'':'opacity:.3'}">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px"><div class="row"><b>${r.name}</b><span class="sm">${r.statN}</span></div>
+      <div class="sm ${p?(v>=10?'ok':'bad'):''}">${p?r.eff(v):'Posto vacante'}</div>
+      <select data-act="setdir" data-role="${r.id}" aria-label="${r.name}"><option value="">Vacante</option>${opts}</select></div></div>`;}).join('');
+  const cand=S.execs.map(e=>`<div class="card" style="flex-direction:row;gap:12px;align-items:flex-start"><img class="px mport" src="${IMG['m_'+e.id]}" alt="Ritratto di ${esc(e.name)}" width="96" height="112"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
+     <div class="row"><b>${esc(e.name)}, ${e.age}</b><span class="sm">${eur(e.ral)} l'anno</span></div><div class="sm">${esc(e.role)}</div>
+     <div class="sm num">Op ${e.st.op} · Prec ${e.st.prec} · Neg ${e.st.neg} · Lead ${e.st.lead} · Amm ${e.st.amm} · Inn ${e.st.inn}</div>${talentIcons(e.tal,28)}
+     <div>${e.hired?(seatOf(e.id)?`<span class="sm ok">${DIR_ROLES.find(r=>r.id===seatOf(e.id)).name}</span>`:`<button class="btn sm2" data-act="fireexec" data-id="${e.id}">Licenzia</button>`):`<button class="btn sm2 pri" data-act="hireexec" data-id="${e.id}">Assumi tramite head hunter · ${eur(15000)}</button>`}</div></div></div>`).join('');
+  return `<div class="sm">I direttori guidano tutta l'azienda con la loro abilità principale. Puoi nominare manager già assunti e non assegnati a un magazzino, oppure dirigenti esterni.</div>${seats}<div class="lab">Dirigenti sul mercato</div>${cand}`;
+ },
+ espansione(){
+  const free=Object.entries(SITES).filter(([id])=>!S.warehouses.some(w=>w.site===id));
+  return `<div class="sm">Affitta un nuovo magazzino. Costo di apertura: due mesi di affitto anticipati più 15.000 € di allestimento. Parte vuoto: servono personale, un manager e clienti.</div>`+
+   free.map(([id,s])=>{const cost=2*s.rent+15000;return `<div class="card ${UI.sel.site===id?'pend':''}"><div class="row"><b>${esc(s.name)} (${s.prov})</b><span class="sm">${n0(s.cap)} posti</span></div>
+    <div class="row sm"><span>Affitto ${eur(s.rent)}/mese · apertura ${eur(cost)}</span><button class="btn sm2 pri" data-act="rent" data-id="${id}" ${S.cash>=cost?'':'disabled'}>Affitta</button></div></div>`;}).join('');
+ },
+ giornale(){
+  return S.news.slice(0,30).map(n=>`<div class="card"><div class="row"><span class="lab">${esc(n.src)}</span><span class="sm">${shortDate(n.day)}</span></div><b>${esc(n.title)}</b><div class="sm" style="color:var(--ink)">${esc(n.text)}</div></div>`).join('')||'<div class="sm">Nessuna notizia.</div>';
+ }
+};
+function bidEstHtml(t,e){
+  if(!e) return '';
+  if(e.missing.length) return `<div class="sm bad">Serve la tecnologia: ${e.missing.map(esc).join(', ')}. Cercala nella finestra Tecnologia.</div>`;
+  if(!e.fits) return `<div class="sm bad">Non c'è spazio: servirebbero ${n0(Math.round(e.sat*e.cap))} posti su ${n0(e.cap)}.</div>`;
+  const ch=Math.round(e.chance*100);
+  return `<table class="t num"><tr><td>Ricavi stimati</td><td class="r">${eur(e.rev)}/mese</td></tr>
+   <tr><td>Saturazione dopo</td><td class="r ${e.sat>0.85?'bad':''}">${Math.round(e.sat*100)}%</td></tr>
+   <tr><td>Puntualità prevista</td><td class="r ${kpiCls(e.P,t.sP)}">${f1(e.P)}%</td></tr>
+   <tr><td>Accuratezza prevista</td><td class="r ${t.sA?kpiCls(e.A,t.sA):''}">${f1(e.A)}%</td></tr>
+   <tr><td>Personale necessario</td><td class="r">${e.needMag} magazzinieri, ${e.needAut} autisti</td></tr>
+   <tr><th>Probabilità di vincere</th><th class="r ${ch>=60?'ok':ch>=35?'warn':'bad'}" style="font-size:15px">${ch}%</th></tr></table>
+   <div class="sm">KPI previsti con il personale necessario già assunto. Prezzo più basso = più probabilità, meno margine.</div>`;
+}
+
+/* ====================== AZIONI ====================== */
+function innUsed(){const d=dirStat('tech');return Math.max(ceo().st.inn,d==null?0:d);}
+function techDays(t){return Math.max(5,Math.round(t.days*clamp(1-0.03*(innUsed()-10),0.6,1.5)));}
+function hireDays(base){const att=40+welfarePts('att')+(S.rep-50)*0.5+5;const h=dirStat('hr');return Math.max(3,Math.round(base*clamp(1+(55-att)/40,0.6,1.8)*(R('hr')?0.8:1)*(h!=null?1-0.02*(h-10):1)));}
+const ACT={
+ speed(d){setSpeed(+d.v);},
+ toggle(d){UI.open[d.id]?closeWin(d.id):openWin(d.id);},
+ open(d){openWin(d.id);},
+ close(d){closeWin(d.id);},
+ openwh(d){openWin('magazzini',{wh:d.id});},
+ site(d){UI.sel.site=d.id;openWin('espansione');},
+ selwh(d){UI.sel.wh=d.id;renderWin('magazzini');renderWin('tecnologia');},
+ seltender(d){UI.sel.tender=d.id;renderWin('gare');},
+ hire(d){
+  const r=d.role, h=HIRE[r];
+  showChoice(`Assumi: ${ROLE[r].toLowerCase()}`,`Scegli il canale. Tempi stimati con welfare e reputazione attuali.`,[
+   {t:`Annuncio · ${hireDays(h.ann[0])} giorni`,e:`${eur(h.ann[1])}`,f:()=>doHire(r,d.wh,hireDays(h.ann[0]),h.ann[1])},
+   {t:`Agenzia interinale · ${hireDays(h.age[0])} giorni`,e:`${eur(h.age[1])}`,f:()=>doHire(r,d.wh,hireDays(h.age[0]),h.age[1])}]);
+ },
+ fire(d){
+  const r=d.role; const sal=RAL[r]*COEF/12;
+  if(r==='imp'){if(S.imp<=1)return;S.imp--;} else {const w=whById(d.wh);if(w.staff[r]<=0)return;w.staff[r]--;mod(w.id,{mor:-4},30);}
+  S.cash-=sal; S.cur.altro+=sal; toast(`Licenziamento: ${eur(sal)} di buonuscita, morale in calo`,'warn'); renderAll();
+ },
+ setmgr(d,el){
+  const w=whById(d.wh); const v=el.value;
+  S.warehouses.forEach(x=>{ if(x.id!==w.id&&x.mgr===v) x.mgr=null; });
+  S.managers.forEach(m=>{ if(m.wh===w.id) m.wh=null; });
+  w.mgr=v||null; const m=S.managers.find(x=>x.id===v); if(m) m.wh=w.id; renderAll();
+ },
+ hiremgr(d){const m=S.managers.find(x=>x.id===d.id);m.hired=true;toast(`${m.name} entra in azienda: assegnalo a un magazzino o alla direzione`,'ok');const w=S.warehouses.find(w=>!w.mgr);if(w){w.mgr=m.id;m.wh=w.id;}renderAll();},
+ firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});m.hired=false;m.wh=null;renderAll();},
+ seltree(d){UI.sel.tree=d.id;UI.sel.tech=null;renderWin('tecnologia');},
+ seltech(d){UI.sel.tech=d.id;renderWin('tecnologia');},
+ opentech(d){UI.sel.tree=d.tree;UI.sel.tech=d.id;openWin('tecnologia');},
+ research(d){const t=TECH.find(x=>x.id===d.id); if(S.project||S.cash<t.cost||R(t.id))return; S.cash-=t.cost; S.cur.tech+=t.cost;
+  const days=techDays(t); S.project={tech:t.id,left:days,total:days,cost:t.cost}; toast(`Ricerca avviata: ${t.name}, pronta tra ${days} giorni`,'ok'); renderAll();},
+ install(d){const t=TECH.find(x=>x.id===d.id), w=whById(d.wh); if(!R(t.id)||w.tech[t.id]||S.cash<t.inst)return; S.cash-=t.inst; S.cur.tech+=t.inst; w.tech[t.id]={day:S.day};
+  toast(`${t.name} installato a ${w.name}: inizia l'apprendimento`,'ok'); renderAll();},
+ canceltech(){ if(!S.project)return; const r=S.project.cost*0.5; S.cash+=r; S.cur.tech-=r; toast(`Ricerca annullata: rimborsati ${eur(r)}`,'warn'); S.project=null; renderAll(); },
+ setdir(d,el){const v=el.value||null; Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===v)S.dirs[k]=null;}); S.dirs[d.role]=v; if(v){const p=personById(v); toast(`${p.name} è il nuovo ${DIR_ROLES.find(r=>r.id===d.role).name.toLowerCase()}`,'ok');} renderAll();},
+ hireexec(d){const e=S.execs.find(x=>x.id===d.id); if(S.cash<15000)return; S.cash-=15000; S.cur.altro+=15000; e.hired=true; toast(`${e.name} entra in azienda: nominalo in Direzione`,'ok'); renderAll();},
+ fireexec(d){const e=S.execs.find(x=>x.id===d.id); const c=e.ral/12*COEF; S.cash-=c; S.cur.altro+=c; e.hired=false; Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===e.id)S.dirs[k]=null;}); renderAll();},
+ rent(d){
+  const s=SITES[d.id]; const cost=2*s.rent+15000; if(S.cash<cost)return;
+  S.cash-=cost; S.cur.altro+=cost; const w=addWarehouse(d.id,false,0,0);
+  news('Il Sole 24 Pallet',`${S.company.name} apre a ${s.name}`,`Nuovo magazzino da ${n0(s.cap)} posti pallet.`); S.rep+=3;
+  toast(`Nuovo magazzino a ${s.name}: assumi personale e un manager`,'ok'); renderMap(); syncTrucks(); openWin('magazzini',{wh:w.id}); renderAll();
+ },
+ welfare(d,el){S.welfare[d.id]=el.checked;renderAll();},
+ bidwh(d,el){UI.bid.wh=el.value;renderWin('gare');},
+ bidmult(d,el){UI.bid.mult=(+el.value)/100;const sel=S.tenders.find(t=>t.id===UI.bid.t);$('#bidmv').textContent=(UI.bid.mult>=1?'+':'')+Math.round((UI.bid.mult-1)*100)+'%';$('#bidest').innerHTML=bidEstHtml(sel,bidEstimate(sel,UI.bid.wh,UI.bid.mult));},
+ bid(d){const t=S.tenders.find(x=>x.id===d.id);t.bid={wh:UI.bid.wh,mult:UI.bid.mult};toast(`Offerta inviata per ${t.name}`,'ok');renderAll();},
+ withdraw(d){const t=S.tenders.find(x=>x.id===d.id);t.bid=null;renderAll();},
+ evopt(d){const ev=UI.ev;const o=ev.opts[+d.i];o.f.call(ev);S.rep=clamp(S.rep,0,100);closeModal();news(ev.src,ev.title,`${ev.text} Scelta: ${o.t}.`);renderAll();},
+ choice(d){const f=UI.choice[+d.i];closeModal();f();renderAll();},
+ closemodal(){closeModal();},
+ save(){save();toast('Partita salvata','ok');},
+ restart(){closeModal();showStart();}
+};
+function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh:r==='imp'?null:wh,days});toast(`Ricerca avviata: arriva tra ${days} giorni`,'ok');}
+function setSpeed(v){S.speed=v;renderTop();}
+function showModal(html){$('#modal').innerHTML=`<div class="ovl"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;const b=$('#modal button');if(b)b.focus();}
+function closeModal(){$('#modal').innerHTML='';if(UI.evSpeed){setSpeed(UI.evSpeed);UI.evSpeed=0;}}
+function showChoice(title,text,opts){UI.choice=opts.map(o=>o.f);UI.evSpeed=S.speed;S.speed=0;renderTop();
+ showModal(`<div class="src"><span>${esc(title)}</span><span></span></div><div class="win-b"><p style="margin:0">${esc(text)}</p>${opts.map((o,i)=>`<button class="opt" data-act="choice" data-i="${i}">${esc(o.t)}<small>${esc(o.e)}</small></button>`).join('')}<button class="btn" data-act="closemodal">Annulla</button></div>`);}
+function toast(text,kind){
+  const el=document.createElement('div');el.className='toast '+(kind||'');el.textContent=text;$('#toasts').prepend(el);
+  setTimeout(()=>el.remove(),5200); const all=$('#toasts').children; if(all.length>5) all[all.length-1].remove();
+}
+
+/* ====================== EVENTI DOM ====================== */
+document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a||a.tagName==='INPUT'||a.tagName==='SELECT')return;const f=ACT[a.dataset.act];if(f){e.preventDefault();f(a.dataset,a);}});
+document.addEventListener('change',e=>{const a=e.target.closest('[data-act]');if(!a)return;const f=ACT[a.dataset.act];if(f&&(a.tagName==='SELECT'||a.type==='checkbox')){a.blur();f(a.dataset,a);}});
+document.addEventListener('input',e=>{const a=e.target.closest('input[type=range][data-act]');if(a)ACT[a.dataset.act](a.dataset,a);});
+document.addEventListener('pointerdown',e=>{if(e.target.closest('#win-gare input[type=range]'))UI.bidEditing=true;});
+document.addEventListener('pointerup',()=>{UI.bidEditing=false;});
+document.addEventListener('keydown',e=>{
+  if(!S||$('#start').innerHTML||e.target.matches('input[type=text]'))return;
+  if($('#modal').innerHTML) return;
+  if(e.code==='Space'){e.preventDefault();setSpeed(S.speed?0:(UI.prevSpeed||1));if(S.speed)UI.prevSpeed=S.speed;}
+  if(['Digit1','Digit2','Digit3'].includes(e.code)){setSpeed(+e.code.slice(5));UI.prevSpeed=S.speed;}
+});
+// tooltip
+const tip=$('#tip');
+document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-tip]');if(!t){tip.hidden=true;return;}tip.innerHTML=t.dataset.tip;tip.hidden=false;});
+document.addEventListener('mousemove',e=>{if(tip.hidden)return;const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(e.clientX+14,innerWidth-w-8)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';});
+
+/* ====================== AVVIO ====================== */
+let startSel={ceo:'gino',color:'#ff7a3d',name:''};
+const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['#3dd6c4','#1f9e8f','#9cefe5'],['#9b6bff','#6f43cf','#c8adff']];
+function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
+function showStart(){
+  setSpeedSafe(0); const sv=load();
+  const st=CEOS.map(c=>{const s=SITES[c.site];return `<button class="ceo" data-act="pickceo" data-id="${c.id}" aria-pressed="${startSel.ceo===c.id}">
+    <div class="portrait" style="height:150px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden"><img class="px" src="${IMG[c.id]}" alt="Ritratto di ${esc(c.name)}" width="128" height="150"></div>
+    <b class="disp" style="font-size:18px">${esc(c.name)}</b><span class="sm">${c.age} anni · ${esc(c.origin)}</span>
+    <span class="sm" style="color:var(--ink)">${esc(s.name)} (${s.prov}) · ${n0(s.cap)} posti · ${eur(c.cash)}</span>
+    <span class="sm num">Op ${c.st.op} · Prec ${c.st.prec} · Neg ${c.st.neg} · Lead ${c.st.lead} · Amm ${c.st.amm} · Inn ${c.st.inn}</span>
+    ${talentIcons(c.tal,32)}
+    <span class="sm">Cliente storico: ${esc(c.client.name)}</span></button>`;}).join('');
+  const C=CEOS.find(c=>c.id===startSel.ceo);
+  $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP</span><span>Nord-Ovest, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
+   <div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
+   <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord-Ovest. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
+   ${sv&&sv.S&&!sv.S.over?`<div class="card pend"><div class="row"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><button class="btn pri" data-act="continue">Continua la partita</button></div></div>`:''}
+   <div class="lab">1. Scegli il tuo CEO</div><div class="ceos">${st}</div>
+   <div class="split"><label style="display:flex;flex-direction:column;gap:4px"><span class="lab">2. Nome dell'azienda</span><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||C.company)}" aria-label="Nome dell'azienda"></label>
+   <div style="display:flex;flex-direction:column;gap:4px"><span class="lab">3. Colore</span><div style="display:flex;gap:8px">${COLORS.map(c=>`<button class="sw" data-act="pickcolor" data-c="${c[0]}" aria-pressed="${startSel.color===c[0]}" style="background:${c[0]}" aria-label="Colore ${c[0]}"></button>`).join('')}</div></div></div>
+   <div class="row"><span class="sm">Comandi: spazio per la pausa, 1–3 per la velocità, trascina e usa la rotellina sulla mappa.</span><button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px">Inizia</button></div>
+  </div></div>`;
+}
+function setSpeedSafe(v){if(S){S.speed=v;renderTop();}}
+Object.assign(ACT,{
+ pickceo(d){const old=CEOS.find(c=>c.id===startSel.ceo);const inp=$('#coname-in');const typed=inp?inp.value:'';startSel.ceo=d.id;if(!typed||typed===old.company)startSel.name='';else startSel.name=typed;showStart();},
+ pickcolor(d){startSel.color=d.c;applyColor(d.c);startSel.name=$('#coname-in').value;showStart();},
+ startgame(){const nm=($('#coname-in').value||'').trim();uid=1;newGame(startSel.ceo,nm,startSel.color);boot();},
+ continue(){const sv=load();if(!sv)return;S=sv.S;S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;boot();}
+});
+function boot(){
+  $('#start').innerHTML=''; applyColor(S.company.color);
+  Object.keys(UI.open).forEach(closeWin); UI={open:{},sel:{},tab:{},z:30,pos:{},bid:{}};
+  view.init=0; fitMap(); renderMap(); S.warehouses.forEach(w=>w.kpi=computeWH(w)); syncTrucks(); renderAll();
+  if(S.day===0){ modalInfo('La Gazzetta del Muletto',`Benvenuto, ${ceo().name}`,`Hai un magazzino a ${S.warehouses[0].name} e un solo cliente, ${S.clients[0].name}. Con il magazzino quasi vuoto perdi soldi ogni mese: tieni d'occhio le Gare d'appalto, assumi in anticipo quando ne vinci una e controlla Puntualità e Accuratezza nel menu Magazzini. Premi spazio per far scorrere il tempo.`); }
+}
+/* ciclo di gioco */
+let acc=0,lastTick=performance.now(); const STEP=[0,1000,420,140];
+function loop(now){
+  const dt=now-lastTick; lastTick=now;
+  if(S&&!S.over&&S.speed>0&&!$('#modal').innerHTML){acc+=dt; let n=0; while(S.speed>0&&acc>=STEP[S.speed]&&n<5){acc-=STEP[S.speed];step();n++; if(S.over)break;} if(n){syncTrucksMaybe();renderAll();}}
+  else acc=0;
+  requestAnimationFrame(loop);
+}
+let lastSync=0; function syncTrucksMaybe(){if(S.day-lastSync>=7){lastSync=S.day;syncTrucks();}}
+initMapControls();
+const hot=window.claude&&window.claude.hot;
+if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
+function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else showStart(); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
+if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
+window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon};
+})();
+</script>
