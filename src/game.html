@@ -1173,7 +1173,7 @@ const wk=(id,cat,n,s,t,ic)=>{WIKI[id]={id,cat,n,s,t,ic};};
 wk('fup','basi','Come si gioca',`Sei il CEO di un'azienda di logistica: tieni la merce dei clienti nei magazzini e la consegni con i tuoi camion.`,
 `Il tempo scorre da solo, giorno dopo giorno, e i numeri dell'azienda salgono e scendono in base a chi lavora per te, alle [[tecnologie|tecnologie]] che hai e a quanto è pieno il [[magazzino]]. Non ci sono turni né punti azione: decidi, poi guardi cosa succede.
 
-Il ciclo è sempre lo stesso: vinci una [[gare|gara d'appalto]], [[assunzioni|assumi]] in anticipo le persone che servono, tieni [[puntualita]] e [[accuratezza]] sopra le [[soglie]] del cliente e incassa. Se la [[cassa]] scende sotto i −50.000 € l'azienda fallisce.
+Il ciclo è sempre lo stesso: vinci una [[gare|gara d'appalto]], guarda il [[carico|carico di lavoro]] dei reparti e [[assunzioni|assumi]] per tempo, tieni [[puntualita]] e [[accuratezza]] sopra le [[soglie]] del cliente e incassa. Se la [[cassa]] scende sotto i −50.000 € l'azienda fallisce.
 
 Le parole sottolineate a puntini, come [[morale]], si spiegano passandoci sopra con il mouse: cliccale per aprire la voce completa. Questa enciclopedia si apre anche con il tasto E.
 
@@ -1349,7 +1349,17 @@ wk('personale','pers','Personale',`Sette figure per ogni magazzino (magazzinieri
 
 In sede lavorano i [[pianificatori]] del traffico, che servono a tutti i magazzini. Magazzinieri e carrellisti si possono anche prendere da una [[cooperativa]].
 
-Ogni cliente ha i suoi [[canali]] di distribuzione, che decidono se servono bilici o furgoni, quindi vincere una [[gare|gara]] cambia chi devi [[assunzioni|assumere]]. La finestra Personale mostra l'organico di tutti i magazzini.`);
+Ogni cliente ha i suoi [[canali]] di distribuzione, che decidono se servono bilici o furgoni, quindi vincere una [[gare|gara]] cambia chi devi [[assunzioni|assumere]]. La finestra Personale mostra l'organico di tutti i magazzini con il [[carico|carico di lavoro]] di ogni reparto.`);
+wk('carico','pers','Carico di lavoro',`Quanto è sotto sforzo un reparto: fino all'85% va tranquillo, al 100% è al limite, oltre è in affanno e i KPI scendono. Nessuno ti dice quanti assumere: lo decidi tu.`,
+`Il carico confronta il lavoro da fare con quello che le persone riescono a fare in un mese:
+• [[magazzinieri]]: pallet da preparare, circa 900 a testa;
+• [[carrellisti]]: [[movimenti]], circa 1.800 a testa;
+• [[autisti_ce|autisti CE]] e [[autisti_b|autisti B]]: km da guidare, circa 5.200 e 4.000 a testa;
+• [[impiegati]]: uno fisso più uno ogni 1.500 pallet consegnati (2.000 con il [[tech_gestionale|gestionale]]);
+• [[capoturno|capiturno]]: uno ogni 10 tra magazzinieri e carrellisti, sotto i 10 ci pensa il [[manager]].
+La produttività sale e scende con il [[morale]], le [[tecnologie]] e lo [[manutenzione|stato del magazzino]], quindi il carico cambia anche senza nuovi clienti.
+
+Verde fino all'85%, giallo fino al 100%, rosso oltre: in rosso calano [[puntualita]] e [[accuratezza]] e anche il morale. Nella scheda di una [[gare|gara]] vedi il carico che avresti con il personale di oggi se vinci: sta a te decidere se assumere prima, dopo o tenere la squadra un po' tirata per risparmiare. Il punto esclamativo sul menu Magazzini si accende quando un reparto è in affanno o manca il [[facility|facility manager]].`);
 wk('magazzinieri','pers','Magazzinieri',`Preparano gli ordini: prelevano i colli e compongono i pallet in uscita. Ognuno ne prepara circa 900 al mese.`,
 `Un magazziniere prepara circa 900 pallet al mese con un [[morale]] di 70 (meno con i [[canali]] a colli e a pezzo: dettaglio, horeca, e-commerce), di più con le [[tecnologie]] di produttività (radiofrequenza, pick-to-light, robot).
 
@@ -1731,6 +1741,23 @@ function computeWH(wh,extra){
   const need={pick:Math.max(cons?1:0,Math.ceil(cons*pickF/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp+sm.addImp,capo:needCapo,fm:1};
   return {manut,act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,mixF,pickF,P,A,pP,pA,pM,morT,rev,pers,mezzi,fissi,tCan,wCan,need,prod,m};
 }
+// carico di lavoro di ogni reparto: 1 = la squadra ce la fa giusta, oltre 1 è in affanno (9 = nessuno a fare un lavoro che c'è)
+function staffLoad(w,k){
+  const st=w.staff, r=(need,n)=>need<=0?0:(n>0?need/n:9), crew=Math.floor((st.pick+st.car)/10);
+  return {pick:k.uPick,car:k.uCar,autB:k.uB,autCE:k.uCE,imp:r(1+k.cons/(R('gestionale')?2000:1500)+k.sm.addImp,st.imp),capo:r(crew,st.capo),fm:st.fm>0?0:9};
+}
+const LOAD_ROLES=['pick','car','imp','capo','autCE','autB'];
+const overloaded=(w,k)=>{const l=staffLoad(w,k);return LOAD_ROLES.some(r=>l[r]>1.02)||l.fm>1;};
+function planLoad(){const v=S.clients.filter(c=>c.status==='attivo').reduce((a,c)=>{const t=clientLog(c,whById(c.wh));return a+t.out+t.in;},0), n=Math.floor(v/80);return n<=0?0:(S.office.plan>0?n/S.office.plan:9);}
+const loadCol=l=>l>1.02?'var(--bad)':l>0.85?'var(--warn)':'var(--ok)';
+// testo breve del carico: "carico 112%" oppure "nessuno: lavoro fermo"
+function loadTxt(r,l,have){
+  if(r==='capo'&&l===0) return 'turni organizzati dal manager';
+  if(r==='fm') return have?'in servizio':'<span class="bad">nessuno: niente manutenzione</span>';
+  if(l>=9) return `<span class="bad">nessuno: lavoro fermo</span>`;
+  return `${kw('carico','carico')} <b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>${l>1.02?' <span class="bad">in affanno</span>':''}`;
+}
+function loadBar(l){return `<div class="bar" style="height:6px;margin-top:2px"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></div>`;}
 function globalCosts(){
   const emp=S.warehouses.reduce((a,w)=>a+staffTot(w),0)+S.office.plan;
   return {ceo:4000,plan:S.office.plan*RAL.plan*COEF/12,mgr:[...S.managers,...S.execs].filter(m=>m.hired).reduce((a,m)=>a+m.ral*COEF/12,0),welf:welfarePts('cost')*emp*(R('welfare2')?0.7:1)};
@@ -1877,8 +1904,8 @@ const cname=c=>c.name+(c.zone&&[...S.clients.filter(x=>x.status!=='perso'),...S.
 function bidEstimate(t,whId,mult){
   const w=whById(whId); if(!w) return null;
   const extra={...t,wh:w.id,mult,status:'attivo'};
-  const k=computeWH(w,extra);
-  // stima con il personale che servirebbe
+  const k=computeWH(w,extra), ld=staffLoad(w,k);
+  // la committente valuta il progetto: magazzino attrezzato per reggere il carico
   const need=k.need, save=w.staff; w.staff={}; ROLES.forEach(r=>w.staff[r]=Math.max(save[r],need[r])); w.staff.capo=Math.max(save.capo,Math.floor((w.staff.pick+w.staff.car)/10));
   const k2=computeWH(w,extra); w.staff=save;
   const missing=(t.req||[]).filter(r=>!R(r)).map(r=>TECH.find(x=>x.id===r).name), naz=nazMissing(t);
@@ -1887,7 +1914,7 @@ function bidEstimate(t,whId,mult){
   const score=50+(1-mult)*120+clamp(gP*4,-20,10)+clamp(gA*4,-20,10)+(S.rep-50)*0.4+(ceo().st.neg-10)+(dC!=null?0.8*(dC-10):0)+(R('iso')?3:0)+talGara(t);
   const comp=55+t.diff+rankOf(t).comp;
   const chance=fits?1/(1+Math.exp(-(score-comp)/6)):0;
-  return {P:k2.P,A:k2.A,sat:k.stock/k.cap,cap:k.cap,missing,naz,fits,chance,rev:clientRev(extra),need,staff:w.staff};
+  return {P:k2.P,A:k2.A,sat:k.stock/k.cap,cap:k.cap,missing,naz,fits,chance,rev:clientRev(extra),need,staff:w.staff,ld,P0:k.P,A0:k.A};
 }
 function resolveTender(t){
   t.done=true;
@@ -1898,7 +1925,7 @@ function resolveTender(t){
     const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,zone:t.zone,src:t.src,mode:t.mode,wh:t.bid.wh,mult:t.bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+(t.dur||24)*30,dur:t.dur||24};
     S.clients.push(c); t.result={win:true}; S.tw.win++; S.rep=clamp(S.rep+rankOf(c).win,0,100);
     toast(`Gara vinta: ${t.name} (${zoneName(t.zone)})! Il contratto parte il ${shortDate(c.start)}`,'ok');
-    modalInfo('Il Sole 24 Pallet',`Gara vinta: ${t.name}, ${zoneName(t.zone)}`,`Il contratto parte il ${shortDate(c.start)} a ${whById(c.wh).name}. In quel magazzino servono in tutto ${needTxt(e.need)}: assumi adesso, perché un autista con patente CE arriva in 3–6 settimane.`);
+    modalInfo('Il Sole 24 Pallet',`Gara vinta: ${t.name}, ${zoneName(t.zone)}`,`Il contratto parte il ${shortDate(c.start)} a ${whById(c.wh).name}. Con il personale di oggi il carico di lavoro salirà così: ${ldSum(e.ld)}. Controlla il magazzino e assumi per tempo: un autista con patente CE arriva in 3–6 settimane.`);
   } else {
     const by=pick(RIVALS); t.result={win:false,by,disc:Math.round(rnd(5,18))}; S.tw.lose++;
     toast(`Gara persa: ${t.name} (${zoneName(t.zone)}) va a ${by}`,'bad');
@@ -2486,11 +2513,11 @@ const DOCK=[
 const TITLES={azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP'};
 function renderDock(){
   const openT=S.tenders.filter(t=>!t.done&&!t.bid).length;
-  const short=S.warehouses.filter(w=>w.kpi&&ROLES.some(r=>w.staff[r]<w.kpi.need[r])).length;
-  const planS=S.office.plan<planNeed()?1:0;
+  const short=S.warehouses.filter(w=>w.kpi&&overloaded(w,w.kpi)).length;
+  const planS=planLoad()>1.02?1:0;
   const B={gare:openT,magazzini:short,personale:planS};
   document.documentElement.classList.toggle('haswin',Object.keys(UI.open).length>0);  // sul telefono le lenti si nascondono sotto le finestre
-  $('#dock').innerHTML=DOCK.map(([id,t,ic])=>`<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${id==='magazzini'&&short?'Personale insufficiente in un magazzino':id==='personale'&&planS?'Servono pianificatori del traffico in sede':id==='tecnologia'&&S.project?'Ricerca in corso: '+S.project.left+' giorni':id==='direzione'&&!R('direzione')?'Si sblocca con la ricerca Struttura direzionale':''}">${ic}${B[id]?`<span class="badge">${id==='gare'?B[id]:'!'}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}${id==='report'&&S.repNew?'<span class="badge">1</span>':''}${id==='direzione'&&R('direzione')&&Object.values(S.dirs).some(v=>!v)?'<span class="badge">!</span>':''}</button>`).join('');
+  $('#dock').innerHTML=DOCK.map(([id,t,ic])=>`<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${id==='magazzini'&&short?'Un reparto è in affanno: controlla il carico di lavoro':id==='personale'&&planS?'Pianificatori del traffico in affanno':id==='tecnologia'&&S.project?'Ricerca in corso: '+S.project.left+' giorni':id==='direzione'&&!R('direzione')?'Si sblocca con la ricerca Struttura direzionale':''}">${ic}${B[id]?`<span class="badge">${id==='gare'?B[id]:'!'}</span>`:''}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${S.project.left}</span>`:''}${id==='report'&&S.repNew?'<span class="badge">1</span>':''}${id==='direzione'&&R('direzione')&&Object.values(S.dirs).some(v=>!v)?'<span class="badge">!</span>':''}</button>`).join('');
 }
 function renderTop(){
   $('#date').textContent=fmtDate(S.day);
@@ -2535,7 +2562,7 @@ function satObjTxt(sm){
   if(!sm.obj) return `<div class="sm">Senza obiettivo i camion partono pieni al ${Math.round(sm.nat)}%: è il carico che viene da sé.</div>`;
   const tip=tipParts('Capacità di pianificazione '+Math.round(sm.pot)+'%',[['Base',sm.nat],...sm.cP],'');
   if(sm.obj<=sm.nat) return `<div class="sm ok" data-tip="${tip}">Obiettivo già raggiunto senza sforzo: i camion partono al ${Math.round(sm.val)}%.</div>`;
-  if(sm.short>0.5) return `<div class="sm bad" data-tip="${tip}">Il personale non ci sta dietro: arriva al ${Math.round(sm.val)}% e il morale ne risente.${sm.addImp?` Servirebbero ${sm.addImp} ${kw('impiegati',sm.addImp>1?'impiegati':'impiegato')} in più.`:''}</div>`;
+  if(sm.short>0.5) return `<div class="sm bad" data-tip="${tip}">Il personale non ci sta dietro: arriva al ${Math.round(sm.val)}% e il morale ne risente.${sm.addImp?` Gli ${kw('impiegati')} non bastano per pianificare carichi così pieni.`:''}</div>`;
   return `<div class="sm ok" data-tip="${tip}">Obiettivo raggiunto: camion pieni al ${Math.round(sm.val)}%${sm.val>sm.obj+1?', il personale fa anche meglio':''}. In cambio la ${kw('puntualita','puntualità')} perde ${f1(0.06*sm.push)}.</div>`;
 }
 const kpiCls=(v,s)=>s==null?'ok':v>=s?'ok':v>=s-2?'warn':'bad';
@@ -2604,7 +2631,7 @@ const VIEWS={
   const q=S.queue.filter(q=>q.wh===w.id);
   const mgrOpts=[w.mgr==='ceo'||!S.warehouses.some(x=>x.mgr==='ceo')?`<option value="ceo" ${w.mgr==='ceo'?'selected':''}>${esc(ceo().name)} (CEO)</option>`:'',...S.managers.filter(m=>m.hired&&!seatOf(m.id)&&(!m.wh||m.wh===w.id)).map(m=>`<option value="${m.id}" ${w.mgr===m.id?'selected':''}>${esc(m.name)}</option>`)].join('');
   const cl=S.clients.filter(c=>c.wh===w.id&&c.status!=='perso');
-  const staffRow=(r,have,need)=>{const inq=q.filter(x=>x.role===r).length;return `<img class="px mini" src="${IMG[r]}" alt="" width="48" height="56"><span>${kw(ROLE_WK[r],ROLE[r])}<br><span class="sm">servono ${need}${inq?` · ${inq} in arrivo`:''}</span></span><b class="num ${have<need?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${have}</b><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi">+ Assumi</button>`;};
+  const ld=staffLoad(w,k), staffRow=(r,have)=>{const inq=q.filter(x=>x.role===r).length, l=ld[r];return `<img class="px mini" src="${IMG[r]}" alt="" width="48" height="56"><span>${kw(ROLE_WK[r],ROLE[r])}<br><span class="sm">${loadTxt(r,l,have)}${inq?` · ${inq} in arrivo`:''}</span>${r!=='fm'&&!(r==='capo'&&l===0)&&l<9?loadBar(l):''}</span><b class="num ${l>1.02?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${have}</b><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi">+ Assumi</button>`;};
   return `${tabs}
   <div class="row"><span class="h3" style="font-size:19px">${esc(w.name)} (${w.prov})</span><span class="sm">${w.own?'di proprietà':'in affitto'} · ${eur(w.fixed)}/mese</span></div>
   <div><div class="row"><span class="lab">${kw('saturazione','Occupazione')}</span><span class="num">${n0(k.stock)} / ${n0(k.cap)} posti · ${Math.round(k.sat*100)}%</span></div><div class="bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div></div>
@@ -2615,10 +2642,10 @@ const VIEWS={
   </div>
   <div class="card"><div class="row"><span class="h3">Personale</span><span class="sm">${kw('morale','morale')} <b class="${w.morale>=60?'ok':w.morale>=45?'warn':'bad'}">${Math.round(w.morale)}</b></span></div>
    <div class="lab">Magazzino e ufficio</div>
-   <div class="staff">${['pick','car','capo','imp'].map(r=>staffRow(r,w.staff[r],k.need[r])).join('')}</div>
+   <div class="staff">${['pick','car','capo','imp'].map(r=>staffRow(r,w.staff[r])).join('')}</div>
    <label class="row" style="cursor:pointer"><span><input type="checkbox" data-act="coop" data-wh="${w.id}" ${w.coop?'checked':''}> Magazzinieri e carrellisti in ${kw('cooperativa')}</span><span class="sm">${w.coop?'−20% di costo, più errori':'assunti direttamente'}</span></label>
    <div class="lab">Trasporti</div>
-   <div class="staff">${['autCE','autB'].map(r=>staffRow(r,w.staff[r],k.need[r])).join('')}</div>
+   <div class="staff">${['autCE','autB'].map(r=>staffRow(r,w.staff[r])).join('')}</div>
    <div class="sm">${kw('motrici')}: ${w.motrici} di proprietà${Math.max(0,w.staff.autCE-w.motrici)?` + ${Math.max(0,w.staff.autCE-w.motrici)} in leasing`:''}${w.staff.autB?` · ${w.staff.autB} furgoni in leasing`:''} · ${k.viaggi} viaggi al mese</div>
    <label class="row" style="align-items:center"><span class="lab">${kw('obiettivo_sat','Obiettivo minimo di saturazione')}</span><select data-act="setsatobj" data-wh="${w.id}" aria-label="Obiettivo minimo di saturazione dei mezzi">${SAT_OBJ.map(v=>`<option value="${v}" ${(w.satObj||0)===v?'selected':''}>${v?'almeno '+v+'%':'nessuno'}</option>`).join('')}</select></label>
    ${satObjTxt(k.sm)}
@@ -2683,13 +2710,13 @@ const VIEWS={
    ${done.length?`<div class="lab">Risultati recenti</div>`+done.map(t=>`<div class="row sm"><span>${esc(t.name)} · ${esc(zoneName(t.zone))}</span><span class="${t.result&&t.result.win?'ok':'bad'}">${t.result?(t.result.win?'Vinta':t.bid?`Persa contro ${esc(t.result.by)}`:`Non partecipato · ${esc(t.result.by)}`):''}</span></div>`).join(''):''}`;
  },
  personale(){
-  const ks=S.warehouses.map(w=>[w,w.kpi||computeWH(w)]), pn=planNeed(), pq=S.queue.filter(q=>q.role==='plan').length;
-  return `<div class="card"><div class="row"><span class="h3">Organico</span><span class="sm">presenti / necessari</span></div>
+  const ks=S.warehouses.map(w=>[w,w.kpi||computeWH(w)]), pn=planNeed(), pl=planLoad(), pq=S.queue.filter(q=>q.role==='plan').length;
+  return `<div class="card"><div class="row"><span class="h3">Organico</span><span class="sm">persone · ${kw('carico','carico di lavoro')}</span></div>
    <table class="t num"><tr><th></th>${ks.map(([w])=>`<th class="r"><button class="btn sm2" data-act="openwh" data-id="${w.id}">${esc(w.name)}</button></th>`).join('')}</tr>
-    ${ROLES.map(r=>`<tr><td style="display:flex;align-items:center;gap:6px"><img class="px" src="${IMG[r]}" alt="" width="24" height="28">${kw(ROLE_WK[r],ROLE[r])}</td>${ks.map(([w,k])=>`<td class="r ${w.staff[r]<k.need[r]?'bad':''}">${w.staff[r]} / ${k.need[r]}</td>`).join('')}</tr>`).join('')}</table>
+    ${ROLES.map(r=>`<tr><td style="display:flex;align-items:center;gap:6px"><img class="px" src="${IMG[r]}" alt="" width="24" height="28">${kw(ROLE_WK[r],ROLE[r])}</td>${ks.map(([w,k])=>{const l=staffLoad(w,k)[r];return `<td class="r">${w.staff[r]} · ${r==='fm'?(l?'<span class="bad">manca</span>':'ok'):r==='capo'&&l===0?'–':l>=9?'<span class="bad">fermo</span>':`<b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>`}</td>`;}).join('')}</tr>`).join('')}</table>
    <div class="sm">Si assume e si licenzia dalla finestra di ogni magazzino.</div></div>
   <div class="card"><div class="row"><span class="h3">Sede</span></div>
-   <div class="staff"><img class="px mini" src="${IMG.plan}" alt="" width="48" height="56"><span>${kw('pianificatori',ROLE.plan)}<br><span class="sm">servono ${pn}${pq?` · ${pq} in arrivo`:''}</span></span><b class="num ${S.office.plan<pn?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${S.office.plan}</b><button class="btn sm2" data-act="fire" data-role="plan" ${S.office.plan<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="plan" aria-label="Assumi">+ Assumi</button></div>
+   <div class="staff"><img class="px mini" src="${IMG.plan}" alt="" width="48" height="56"><span>${kw('pianificatori',ROLE.plan)}<br><span class="sm">${pn?(pl>=9?'<span class="bad">nessuno: giri non organizzati</span>':`${kw('carico','carico')} <b style="color:${loadCol(pl)}">${Math.round(pl*100)}%</b>${pl>1.02?' <span class="bad">in affanno</span>':''}`):'i giri li organizzi tu'}${pq?` · ${pq} in arrivo`:''}</span>${pn&&pl<9?loadBar(pl):''}</span><b class="num ${pl>1.02?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${S.office.plan}</b><button class="btn sm2" data-act="fire" data-role="plan" ${S.office.plan<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="plan" aria-label="Assumi">+ Assumi</button></div>
    <div class="sm">${pn?`Organizzano i giri dei camion di tutti i magazzini. Ognuno che manca toglie 2 punti di puntualità ovunque; con la squadra al completo i km costano il 4% in meno.`:`Fino a 80 viaggi al mese i giri li organizzi tu. Poi serve un pianificatore ogni 80 viaggi.`}</div></div>
    <div class="card"><div class="row"><span class="h3">${kw('assunzioni')} in corso</span></div>${S.queue.length?S.queue.map(q=>`<div class="row sm"><span>${ROLE[q.role]}${q.wh?' · '+esc(whById(q.wh).name):' · sede'}</span><span>${q.days} giorni</span></div>`).join(''):'<div class="sm">Nessuna.</div>'}
    <div class="sm">Tempi più brevi con benefit, servizi di welfare del magazzino e reputazione alti. Gli autisti con patente CE sono i più difficili da trovare.</div></div>
@@ -2967,13 +2994,15 @@ function strutturaCard(w,k,staffRow){
   return `<div class="card"><div class="row"><span class="h3">${kw('manutenzione','Immobile')}</span><span class="sm">${n0(w.cap)} posti di base${w.exp?` · ${w.exp} ${w.exp>1?'ampliamenti':'ampliamento'}`:''}</span></div>
    <div><div class="row"><span class="lab">${kw('manutenzione','Stato del magazzino')}</span><b class="num" style="color:${col}">${c}%</b></div><div class="bar"><i style="width:${c}%;background:${col}"></i></div></div>
    <div class="sm">${pen?`<span class="bad">Sotto il ${MAINT.soglia}%: posti pallet e produttività −${f1(pen*100)}%.</span>`:`Sopra il ${MAINT.soglia}% il magazzino rende al massimo.`} ${fm?`Il facility manager lo tiene in ordine: manutenzione ${eur(manutMese(w))}/mese.`:'<b>Senza facility manager nessuno fa manutenzione</b>: lo stato scende ogni giorno e capitano guasti.'}</div>
-   <div class="staff">${staffRow('fm',w.staff.fm,1)}</div>
+   <div class="staff">${staffRow('fm',w.staff.fm)}</div>
    <div class="row" style="flex-wrap:wrap"><span class="sm">Riporta subito lo stato al 100%</span><button class="btn sm2" data-act="straord" data-wh="${w.id}" ${fm&&c<95&&S.cash>=sc?'':'disabled'}>Manutenzione straordinaria · ${eur(sc)}</button></div>
    ${b?`<div><div class="row"><span class="lab">${kw('ampliamento','Ampliamento')} in corso: +${n0(b.add)} posti</span><b class="num">${b.left} giorni</b></div><div class="bar"><i style="width:${Math.round((1-b.left/b.total)*100)}%;background:var(--accent)"></i></div><div class="sm">Durante il cantiere la produttività cala del 5%.</div></div>`
      :`<div class="row" style="flex-wrap:wrap"><span class="sm">${full?`Già ampliato ${MAINT.expMax} volte: non c'è più terreno.`:`${kw('ampliamento','Ampliamento')}: +${n0(expAdd(w))} posti in ${MAINT.expGg} giorni, ${w.own?'costi fissi':'affitto'} +${eur(expRent(w))}/mese`}</span>${full?'':`<button class="btn sm2 pri" data-act="amplia" data-wh="${w.id}" ${fm&&S.cash>=ec?'':'disabled'}>Amplia · ${eur(ec)}</button>`}</div>`}
    ${fm?'':'<div class="sm">Manutenzione straordinaria e ampliamento richiedono un facility manager.</div>'}</div>`;
 }
-function needTxt(n){return ROLES.filter(r=>n[r]).map(r=>`${n[r]} ${ROLE[r].toLowerCase().replace('autisti ','aut. ')}`).join(', ')||'nessuno';}
+// carico dei reparti dopo un nuovo contratto, per le gare
+function ldSum(ld){const rs=LOAD_ROLES.filter(r=>ld[r]>0);if(!rs.length) return 'nessun reparto coinvolto';
+  return rs.map(r=>`${ROLE[r].toLowerCase()} ${ld[r]>=9?'(nessuno in squadra)':Math.round(ld[r]*100)+'%'}`).join(', ');}
 function bidEstHtml(t,e){
   if(!e) return '';
   if(e.naz.length) return `<div class="sm bad">Committente di rank ${rankOf(t).r}: lavora solo con grandi logistiche con accordi nazionali. Ti manca: ${e.naz.map(esc).join(', ')}.</div>`;
@@ -2982,11 +3011,12 @@ function bidEstHtml(t,e){
   const ch=Math.round(e.chance*100);
   return `<table class="t num"><tr><td>${kw('ricavi','Ricavi stimati')}</td><td class="r">${eur(e.rev)}/mese</td></tr>
    <tr><td>${kw('saturazione','Occupazione')} dopo</td><td class="r ${e.sat>0.85?'bad':''}">${Math.round(e.sat*100)}%</td></tr>
-   <tr><td>Puntualità prevista</td><td class="r ${kpiCls(e.P,t.sP)}">${f1(e.P)}%</td></tr>
-   <tr><td>Accuratezza prevista</td><td class="r ${t.sA?kpiCls(e.A,t.sA):''}">${f1(e.A)}%</td></tr>
-   <tr><td>Personale necessario</td><td class="r">${needTxt(e.need)}</td></tr>
+   <tr><td>Puntualità prevista</td><td class="r ${kpiCls(e.P0,t.sP)}">${f1(e.P0)}%</td></tr>
+   <tr><td>Accuratezza prevista</td><td class="r ${t.sA?kpiCls(e.A0,t.sA):''}">${f1(e.A0)}%</td></tr>
+   <tr><th colspan="2" style="text-align:left">${kw('carico','Carico di lavoro')} dopo, con il personale di oggi</th></tr>
+   ${LOAD_ROLES.filter(r=>e.ld[r]>0).map(r=>`<tr><td>&nbsp;&nbsp;${ROLE[r]}</td><td class="r"><b style="color:${loadCol(e.ld[r])}">${e.ld[r]>=9?'nessuno':Math.round(e.ld[r]*100)+'%'}</b>${e.ld[r]>1.02?' <span class="bad">in affanno</span>':''}</td></tr>`).join('')}
    <tr><th>${kw('gare','Probabilità di vincere')}</th><th class="r ${ch>=60?'ok':ch>=35?'warn':'bad'}" style="font-size:15px">${ch}%</th></tr></table>
-   <div class="sm">KPI previsti con il personale necessario già assunto. Prezzo più basso = più probabilità, meno margine.</div>`;
+   <div class="sm">KPI previsti con il personale che hai oggi: se un reparto va oltre il 100% è in affanno, e tocca a te decidere quanti assumere. La committente valuta il tuo progetto come se il magazzino fosse pronto a reggere il carico. Prezzo più basso = più probabilità, meno margine.</div>`;
 }
 
 /* ====================== AZIONI ====================== */
@@ -3294,6 +3324,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.20',t:'Chi è in affanno?',x:['Le committenti non dicono più quante persone assumere: nelle gare e nei magazzini ogni reparto mostra il suo carico di lavoro, con una barra verde, gialla o rossa.','Oltre il 100% un reparto è in affanno e i KPI scendono: sei tu a decidere quanti magazzinieri, carrellisti e autisti assumere, e quando.','Nella scheda della gara puntualità e accuratezza previste sono quelle con il personale che hai oggi, insieme al carico che avresti vincendo.','Nuova voce dell\'enciclopedia: Carico di lavoro.']},
  {v:'0.19',t:'Ognuno al suo posto',x:['Niente più tre cose diverse chiamate «Welfare»: i buoni pasto, l\'assicurazione e il premio ora sono i benefit aziendali; la ricerca che li fa costare meno è la Piattaforma welfare; l\'albero Welfare resta quello dei servizi nei magazzini.','Tolta la Navetta dalla stazione tra i benefit: faceva lo stesso lavoro dei Pulmini per i dipendenti dell\'albero Welfare.','Quanto è pieno un magazzino ora si chiama occupazione, per non confonderla con la saturazione dei mezzi (quanto sono pieni i camion).','I talenti fanno davvero quello che dicono: per esempio Braccino corto e Mano larga cambiano costi e morale del magazzino che il personaggio guida, Parla per acronimi aiuta nelle gare delle committenti S e A, Un milione di km al volante fa trovare prima gli autisti. Tolti gli effetti che non esistevano, come la «tenuta allo stress».','Anche i manager, non solo il CEO, accorciano o allungano l\'apprendimento delle tecnologie con i loro talenti.','Formazione strutturata e Academy aziendale non fanno più la stessa cosa: la Formazione si installa nel magazzino e dà accuratezza +1 e produttività +3%; l\'Academy vale per tutta l\'azienda, accorcia l\'apprendimento delle tecnologie e rende più facile assumere. Nessuna delle due dà più morale.','I soldi spesi o incassati negli eventi compaiono nel conto economico, alla voce Altro; canone e installazione dei servizi di welfare stanno nella voce Welfare e benefit, non più in Tecnologie.','Niente eventi doppi: il derby e la pizza del turno di notte non tornano due volte se il CEO ha il talento con il suo evento; il controllo generico ora è della Guardia di Finanza.','I camion sulla mappa vanno nelle città dei clienti del loro magazzino.','Enciclopedia aggiornata alle regole di oggi, e qualche correzione: i km dei viaggi sono al mese, il «rinnovo a rischio» tiene conto del Key account, la Camera di Commercio è del Nord.','Nuovo carattere per i testi (Rubik): più largo e arrotondato, si legge meglio, soprattutto sul telefono.']},
  {v:'0.18',t:'Il futuro è adesso',x:['Le tecnologie non hanno più un anno minimo: si possono ricercare subito, basta avere quelle che le precedono nell\'albero.','Creando il CEO, titoli di studio e talenti sono schede leggibili: icona, effetti, testo di colore e un badge col costo in punti.']},
  {v:'0.17',t:'Chi ripara il portone?',x:['Le novità ora stanno in fondo alla schermata iniziale.','Nuova figura in ogni magazzino: il facility manager. Senza di lui niente manutenzione, il magazzino si rovina e capitano guasti.','Lo stato del magazzino va da 0 a 100: sotto il 70% si perdono posti pallet e produttività.','Manutenzione straordinaria per tornare subito al 100%.','I magazzini si possono ampliare fino a tre volte, con un cantiere di 90 giorni.','11 nuovi servizi di welfare: caffè, sala pausa, spogliatoi, lavanderia, palestra, presidio medico, sportello d\'ascolto, corsi di italiano, raffrescatori, orto, colonnine di ricarica.']},
@@ -3434,6 +3465,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,mod,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW};
+window.__FUP={get S(){return S;},step,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW};
 })();
 </script>

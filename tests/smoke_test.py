@@ -19,9 +19,13 @@ BOT = '''(ceo)=>{
    S.speed=1; clr();
    S.tenders.filter(t=>!t.done&&!t.bid).forEach(t=>{ const e=F.bidEstimate(t,S.warehouses[0].id,0.95); if(e&&e.fits&&e.sat<0.85) t.bid={wh:S.warehouses[0].id,mult:0.95}; });
    S.warehouses.forEach(w=>{ const pend=S.clients.filter(c=>c.wh===w.id&&c.status==='avvio'); pend.forEach(c=>c.status='attivo');
-     const k=F.computeWH(w); pend.forEach(c=>c.status='avvio');
-     const days={pick:9,car:9,capo:12,imp:9,autB:9,autCE:18,fm:15};
-     Object.keys(days).forEach(r=>{ while(w.staff[r]+S.queue.filter(q=>q.wh===w.id&&q.role===r).length<k.need[r]){ S.queue.push({role:r,wh:w.id,days:days[r]}); S.cash-=1500; } });
+     // il bot assume guardando il carico di lavoro dei reparti, come il giocatore
+     const days={pick:9,car:9,capo:12,imp:9,autB:9,autCE:18,fm:15}, real=w.staff, tmp={...real};
+     Object.keys(days).forEach(r=>tmp[r]+=S.queue.filter(q=>q.wh===w.id&&q.role===r).length);
+     w.staff=tmp;
+     for(let i=0;i<60;i++){ const l=F.staffLoad(w,F.computeWH(w)); const r=Object.keys(days).find(r=>l[r]>1);
+       if(!r) break; tmp[r]++; S.queue.push({role:r,wh:w.id,days:days[r]}); S.cash-=1500; }
+     w.staff=real; pend.forEach(c=>c.status='avvio');
    });
    while(S.office.plan+S.queue.filter(q=>q.role==='plan').length<F.planNeed()){ S.queue.push({role:'plan',wh:null,days:12}); S.cash-=1500; }
    if(ceo==='valeria'&&d===200) S.warehouses[0].coop=true;
