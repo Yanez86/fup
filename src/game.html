@@ -384,7 +384,6 @@ input.sw:disabled{opacity:.45;cursor:not-allowed}
 .trow .tal{flex:none}
 .trow b{font-size:15px}
 .trow i.sm{font-size:13px}
-.tty{font:600 11px var(--f-body);padding:0 4px;border:1px solid var(--ink);background:#fff;vertical-align:2px}
 .mob .sbn{width:auto;flex:0 1 90px}
 @media (max-width:400px){.mob .pf-st{flex-direction:column;align-items:stretch}.mob .pf-st .radar{align-self:center;width:156px;height:156px}}
 .mob .wh-kpis,.mob .wh-money{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1430,7 +1429,7 @@ function statBars(st){const top=Math.max(...STATS.map(s=>st[s.k]));
   return `<div class="sbars">${STATS.map(s=>{const v=st[s.k];return `<div class="sbar" style="--sc:${s.c};--sb:${s.bg}" data-act="wiki" data-id="st_${s.k}" data-tip="${statTip(s,v)}" role="img" aria-label="${s.n} ${v}">${statIcon(s.k,14)}<span class="sbn">${s.n}</span><span class="sbt"><i style="width:${Math.min(100,v*5)}%"></i></span><b class="${v>=15?'ok':v<=5?'bad':''}">${v}${v===top?'★':''}</b></div>`;}).join('')}</div>`;}
 // talenti come righe: icona, nome, tipo, effetto e la battuta
 function talentRows(list){return list.map(n=>{const t=TALENTS[n];if(!t)return '';const ty=TTYPE[t.t];
-  return `<div class="trow" style="--tb:${ty[1]};--tc:${ty[2]}" data-act="wiki" data-id="${TAL_ID[n]}" data-tip="${talTip(n)}"><span class="tal" style="width:36px;height:36px;background:${ty[1]}">${talentSvg(t.ic,28)}</span><span class="wh-sm"><b>${esc(n)} <span class="tty">${ty[0]}</span></b><span class="sm">${esc(t.fx)}</span><i class="sm">${esc(t.fl)}</i></span></div>`;}).join('');}
+  return `<div class="trow" style="--tb:${ty[1]};--tc:${ty[2]}" data-act="wiki" data-id="${TAL_ID[n]}" data-tip="${talTip(n)}"><span class="tal" style="width:36px;height:36px;background:${ty[1]}">${talentSvg(t.ic,28)}</span><span class="wh-sm"><b>${esc(n)}</b><span class="sm">${esc(t.fx)}</span><i class="sm">${esc(t.fl)}</i></span></div>`;}).join('');}
 function statTip(s,v){return `<div class='tt'>${s.n} ${v!=null?v:''}</div><div>${esc(s.d)}</div><div style='color:#c9d3dd;margin-top:4px'>Media 10 · ottimo da 15 in su</div>${wikiHint()}`;}
 function statChips(st,sz){sz=sz||16;return `<span class="stats">${STATS.map(s=>`<span class="stc" style="--sc:${s.c};--sb:${s.bg}" role="img" aria-label="${s.n} ${st[s.k]}" data-act="wiki" data-id="st_${s.k}" data-tip="${statTip(s,st[s.k])}">${statIcon(s.k,sz)}<b>${st[s.k]}</b></span>`).join('')}</span>`;}
 function statBadge(k,v,sz){const s=STATS.find(x=>x.k===k);return `<span class="stc" style="--sc:${s.c};--sb:${s.bg}" data-act="wiki" data-id="st_${k}" data-tip="${statTip(s,v)}">${statIcon(k,sz||14)}${v!=null?`<b>${v}</b>`:''}</span>`;}
