@@ -60,6 +60,13 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Colori fissi delle serie (controllati per chi distingue male i colori): Puntualità blu `#2f7fd6`, Accuratezza viola `#7b4fe0`; i magazzini seguono l'ordine `SERIES_C`.
 - La finestra "Report KPI" imita un foglio Excel: un foglio di riepilogo, un foglio per ogni magazzino, la barra della formula che spiega la cella selezionata e i colori condizionali. Verde = sopra la soglia più severa tra i clienti del magazzino, giallo = entro 2 punti, rosso = sotto.
 
+## Riepilogo dell'azienda
+- Finestra dal menu a sinistra con cinque schede: Panoramica, Conti, Operazioni, Clienti, Persone. Solo lettura: non cambia nessuna regola del gioco.
+- A fine mese `histPush()` aggiunge una riga a `S.hist` (fino a 240 mesi): voci del conto economico, utile, cassa, reputazione, medie dei magazzini di Puntualità e Accuratezza del mese, saturazione e morale, pallet movimentati e viaggi (somma dei report settimanali del mese), dipendenti per mestiere, clienti attivi, magazzini, pallet a stock e capienza.
+- `S.tw` conta le gare vinte, perse e lasciate senza offerta. I salvataggi vecchi partono con storico vuoto (`fillSave`).
+- Puntualità e Accuratezza "medie" sono la media semplice dei magazzini, non pesata sui volumi. Il margine per magazzino è ricavi meno personale, mezzi e immobile (senza tecnologie, manager e sede).
+- Grafici: `lineChart()` con `nice` (scala libera con passi 1-2-5, per euro e pallet), `fmt`/`ax` per i formati e `maxLab` per le etichette dei mesi; l'utile mensile è un grafico a colonne verdi/rosse (`rpCols()`).
+
 ## Gare (tender)
 - Ci sono sempre almeno 2 gare aperte, 3 con l'Ufficio commerciale (`minTenders()`): quando una si chiude ne arriva subito un'altra, se ci sono committenti libere. Si hanno 45 giorni per l'offerta (circa 16 gare l'anno, 24 con l'Ufficio commerciale). Alcune richiedono tecnologie: catena del freddo, EDI, e-commerce.
 - Punteggio = 50 + (1−moltiplicatore)·120 + margine P·4 + margine A·4 (ciascuno tra −20 e +10) + (reputazione−50)·0,4 + (Negoziazione CEO−10) + direttore commerciale·0,8·(Neg−10) + ISO 3. Si confronta con 55 + difficoltà della gara + modificatore del rank, con probabilità logistica (scala 6).

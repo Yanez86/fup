@@ -128,6 +128,26 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .xl-cli{display:flex;gap:4px;flex-wrap:wrap;padding:6px;border-bottom:2px solid var(--ink);background:#f1f5f9}
 .xl-cli button{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border:2px solid #b5c3d1;background:#fff;font-size:13px}
 .xl-cli button[aria-pressed="true"]{border-color:#2e9e48;box-shadow:inset 0 -3px 0 #2e9e48;font-weight:700}
+.rp-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.rp-tiles.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.rp-t{display:flex;flex-direction:column;gap:1px;padding:7px 10px;background:#fff;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2),2px 2px 0 var(--ink);min-width:0}
+.rp-t[data-act]{cursor:pointer}.rp-t[data-act]:hover{background:#fff8dc}
+.rp-t b{font-family:var(--f-disp);font-size:24px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-t.ok b{color:var(--ok-t)}.rp-t.bad b{color:var(--bad-t)}
+.rp-sub{font-size:13px;color:var(--muted);line-height:1.25}
+.rp-head{display:flex;gap:10px;align-items:center}
+.rp-sw{width:28px;height:28px;flex:none;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.rp-hb{display:flex;flex-direction:column;gap:5px}
+.rp-hr{display:grid;grid-template-columns:minmax(0,190px) minmax(40px,1fr) auto;gap:8px;align-items:center;font-size:14px}
+.rp-hr b{font-variant-numeric:tabular-nums;min-width:56px;text-align:right}
+.rp-hn{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rp-hr .bar{height:14px}
+.rp-stack{display:flex;height:22px;border:2px solid var(--ink)}.rp-stack i{display:block;height:100%}.rp-stack i+i{border-left:1px solid var(--ink)}
+.rp-scroll{overflow-x:auto}
+.lnk{border:0;background:none;padding:0;font:inherit;color:#2f5fa0;text-decoration:underline;cursor:pointer;text-align:left}
+.mob .rp-tiles,.mob .rp-tiles.c4{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mob .rp-hr{grid-template-columns:minmax(0,120px) minmax(30px,1fr) auto}
+.mob .rp-t b{font-size:21px}
+.mob .rp-tabs button{flex:1 0 auto;font-size:14px;padding:10px 8px}
 .treebox{overflow-x:auto;padding:4px 2px 8px}
 .tnode{position:absolute;display:flex;align-items:center;gap:7px;padding:4px 6px;text-align:left;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 rgba(22,32,46,.12),2px 2px 0 var(--ink);font-size:13px;line-height:1.2}
 .tnode .tn{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -847,29 +867,33 @@ const KPI_C={P:'#2f7fd6',A:'#7b4fe0'};
 let CHARTS={};
 function lineChart(id,o){
   const L=o.labels, n=L.length;
-  if(n<2) return `<div class="lc lc-empty"><b>${esc(o.title)}</b><span class="sm">Il grafico compare dalla seconda settimana di dati.</span></div>`;
-  const W=o.w||860,H=o.h||250, ml=46,mr=o.labels2===false?14:(o.mr||136),mt=40,mb=34, pw=W-ml-mr, ph=H-mt-mb;
+  if(n<2) return `<div class="lc lc-empty"><b>${esc(o.title)}</b><span class="sm">${esc(o.empty||'Il grafico compare dalla seconda settimana di dati.')}</span></div>`;
+  const fm=o.fmt||(v=>f1(v)+(o.unit||''));
+  const W=o.w||860,H=o.h||250, ml=o.ml||46,mr=o.labels2===false?14:(o.mr||136),mt=40,mb=34, pw=W-ml-mr, ph=H-mt-mb;
   const all=o.series.flatMap(s=>s.v.filter(v=>v!=null));
   let lo=Math.floor(Math.min(...all)-0.6), hi=Math.ceil(Math.max(...all)+0.4); if(hi-lo<4){const m=(hi+lo)/2;lo=Math.floor(m-2);hi=Math.ceil(m+2);}
   lo=Math.max(o.min!=null?o.min:0,lo); hi=Math.min(o.max!=null?o.max:100,hi);
-  const step=hi-lo>12?4:hi-lo>6?2:1;
+  let step=hi-lo>12?4:hi-lo>6?2:1;
+  // o.nice: scala libera (euro, pallet...) con passi tondi 1-2-5
+  if(o.nice){ const r=(hi-lo)/4||1, m=Math.pow(10,Math.floor(Math.log10(r))); step=[1,2,5,10].find(x=>x*m>=r)*m; lo=Math.floor(lo/step)*step; hi=Math.ceil(hi/step)*step; if(hi===lo) hi=lo+step; }
   const X=i=>ml+(n===1?pw/2:i*pw/(n-1)), Y=v=>mt+ph-(v-lo)/(hi-lo)*ph;
   let g='';
-  for(let v=Math.ceil(lo/step)*step;v<=hi;v+=step) g+=`<line x1="${ml}" x2="${ml+pw}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e3e9ef" stroke-width="1"/><text x="${ml-6}" y="${Y(v)+4}" text-anchor="end" class="lc-ax">${v}${o.unit||''}</text>`;
+  for(let v=Math.ceil(lo/step)*step;v<=hi;v+=step) g+=`<line x1="${ml}" x2="${ml+pw}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e3e9ef" stroke-width="1"/><text x="${ml-6}" y="${Y(v)+4}" text-anchor="end" class="lc-ax">${o.ax?o.ax(v):v+(o.unit||'')}</text>`;
   g+=`<line x1="${ml}" x2="${ml+pw}" y1="${mt+ph}" y2="${mt+ph}" stroke="#8a96a6" stroke-width="1"/>`;
-  const every=Math.ceil(n/8); L.forEach((l,i)=>{ if(i%every===0||(i===n-1&&(n-1)%every>=every/2)) g+=`<text x="${X(i)}" y="${H-12}" text-anchor="middle" class="lc-ax">${esc(l)}</text>`; });
+  if(lo<0&&hi>0) g+=`<line x1="${ml}" x2="${ml+pw}" y1="${Y(0)}" y2="${Y(0)}" stroke="#16202e" stroke-width="1"/>`;
+  const every=Math.ceil(n/(o.maxLab||8)); L.forEach((l,i)=>{ if((n-1-i)%every===0) g+=`<text x="${X(i)}" y="${H-12}" text-anchor="${i===n-1&&o.labels2===false?'end':'middle'}" class="lc-ax">${esc(l)}</text>`; });  // contate dall'ultima: la settimana (o il mese) più recente ha sempre l'etichetta
   // linee: prima le soglie (tratteggiate), poi i dati
   const ends=[];
   [...o.series].sort((a,b)=>(b.dash?1:0)-(a.dash?1:0)).forEach(s=>{
     let d='',pen=false; s.v.forEach((v,i)=>{ if(v==null){pen=false;return;} d+=(pen?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1); pen=true; });
     g+=`<path d="${d}" fill="none" stroke="${s.c}" stroke-width="${s.dash?1.5:2}" ${s.dash?'stroke-dasharray="6 4"':''} stroke-linejoin="round" stroke-linecap="round"/>`;
-    if(!s.dash){ const i=s.v.map((v,i)=>v==null?-1:i).filter(i=>i>=0).pop(); if(i!=null&&i>=0){ g+=`<circle cx="${X(i)}" cy="${Y(s.v[i])}" r="4" fill="${s.c}" stroke="#fff" stroke-width="2"/>`; ends.push({y:Y(s.v[i]),t:`${s.short||s.n} ${f1(s.v[i])}${o.unit||''}`,c:s.c}); } }
+    if(!s.dash){ const i=s.v.map((v,i)=>v==null?-1:i).filter(i=>i>=0).pop(); if(i!=null&&i>=0){ g+=`<circle cx="${X(i)}" cy="${Y(s.v[i])}" r="4" fill="${s.c}" stroke="#fff" stroke-width="2"/>`; ends.push({y:Y(s.v[i]),t:`${s.short||s.n} ${fm(s.v[i])}`,c:s.c}); } }
   });
   // etichette dirette (al massimo 4 serie), distanziate per non sovrapporsi
   if(o.labels2!==false&&ends.length<=4){ ends.sort((a,b)=>a.y-b.y); for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<15) ends[i].y=ends[i-1].y+15;
     ends.forEach(e=>{ g+=`<line x1="${ml+pw+4}" x2="${ml+pw+12}" y1="${e.y}" y2="${e.y}" stroke="${e.c}" stroke-width="2"/><text x="${ml+pw+15}" y="${e.y+4}" class="lc-dl">${esc(e.t)}</text>`; }); }
   const leg=o.series.map(s=>`<span class="lc-key"><svg width="18" height="8" aria-hidden="true"><line x1="0" x2="18" y1="4" y2="4" stroke="${s.c}" stroke-width="${s.dash?1.5:2.5}" ${s.dash?'stroke-dasharray="4 3"':''}/></svg>${esc(s.n)}</span>`).join('');
-  CHARTS[id]={L,series:o.series,unit:o.unit||'',ml,pw,n,W,mt,ph};
+  CHARTS[id]={L,series:o.series,unit:o.unit||'',fmt:fm,xl:o.xl,ml,pw,n,W,mt,ph};
   return `<figure class="lc"><figcaption><b>${esc(o.title)}</b><span class="lc-leg">${leg}</span></figcaption>
    <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(o.title)}" data-chart="${id}">${g}
     <line class="lc-x" x1="0" x2="0" y1="${mt}" y2="${mt+ph}" stroke="#16202e" stroke-width="1" visibility="hidden"/>
@@ -882,7 +906,7 @@ function chartHover(e){
   const C=CHARTS[svg.dataset.chart]; if(!C) return;
   const r=svg.getBoundingClientRect(), x=(e.clientX-r.left)/r.width*C.W, i=clamp(Math.round((x-C.ml)/C.pw*(C.n-1)),0,C.n-1), cx=C.ml+i*C.pw/(C.n-1);
   const ln=svg.querySelector('.lc-x'); ln.setAttribute('x1',cx); ln.setAttribute('x2',cx); ln.setAttribute('visibility','visible');
-  tip.innerHTML=`<div class='tt'>Settimana ${esc(C.L[i])}</div>`+C.series.map(s=>`<div class='tr'><span style='display:flex;align-items:center;gap:6px'><svg width='14' height='6'><line x1='0' x2='14' y1='3' y2='3' stroke='${s.c}' stroke-width='2.5' ${s.dash?"stroke-dasharray='3 2'":''}/></svg>${esc(s.n)}</span><b>${s.v[i]==null?'—':f1(s.v[i])+C.unit}</b></div>`).join('');
+  tip.innerHTML=`<div class='tt'>${C.xl!=null?C.xl:'Settimana '}${esc(C.L[i])}</div>`+C.series.map(s=>`<div class='tr'><span style='display:flex;align-items:center;gap:6px'><svg width='14' height='6'><line x1='0' x2='14' y1='3' y2='3' stroke='${s.c}' stroke-width='2.5' ${s.dash?"stroke-dasharray='3 2'":''}/></svg>${esc(s.n)}</span><b>${s.v[i]==null?'—':C.fmt(s.v[i])}</b></div>`).join('');
   tip.hidden=false; chartHover.on=true;
   const w=tip.offsetWidth,h=tip.offsetHeight; tip.style.left=Math.min(e.clientX+14,innerWidth-w-8)+'px'; tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';
 }
@@ -925,6 +949,12 @@ Il ciclo è sempre lo stesso: vinci una [[gare|gara d'appalto]], [[assunzioni|as
 Le parole sottolineate a puntini, come [[saturazione]], si spiegano passandoci sopra con il mouse: cliccale per aprire la voce completa. Questa enciclopedia si apre anche con il tasto E.
 
 Sul telefono: il primo tocco su una parola sottolineata mostra la spiegazione, il secondo apre la voce; tenendo premuto un pulsante si scopre a cosa serve. FUP si può installare come app dalla schermata iniziale.`);
+wk('riepilogo','basi','Riepilogo dell\'azienda',`La finestra con tutti i numeri dell'azienda in un colpo d'occhio: conti, operazioni, clienti, persone e ricerca.`,
+`Si apre dal menu a sinistra. È divisa in cinque schede:
+
+Panoramica: [[cassa]], utile e [[ricavi]] del mese scorso, [[reputazione]], clienti, magazzini, dipendenti e gare vinte, con l'andamento della cassa e l'utile di ogni mese. Conti: ricavi e [[costi]] mese per mese, dove vanno i soldi, [[penali]] pagate e il [[conto|conto economico]] anno per anno. Operazioni: [[puntualita]], [[accuratezza]], [[saturazione]] e [[morale]] medi, i pallet movimentati e una tabella magazzino per magazzino. Clienti: quanto rende ogni cliente, la sua [[soddisfazione]], le soglie dei contratti e le [[gare]] vinte e perse. Persone: chi lavora per te, [[manager]], [[direzione|dirigenti]], [[welfare]] e [[alberi|alberi delle tecnologie]].
+
+I grafici si aggiornano alla fine di ogni mese, quando si chiudono i conti: ne servono almeno due per vedere una linea. I numeri di puntualità e accuratezza sono la media dei magazzini, non pesata sui volumi. Ogni riquadro si apre nell'enciclopedia.`);
 wk('tempo','basi','Tempo e velocità',`Il gioco avanza un giorno alla volta. Spazio mette in pausa, i tasti 1, 2 e 3 cambiano velocità.`,
 `Ogni giorno il gioco ricalcola tutti i magazzini: [[puntualita]], [[accuratezza]], [[morale]], costi e ricavi. Ogni lunedì arriva il [[report]] della settimana, alla fine di ogni mese si chiudono i conti: [[soddisfazione]] dei clienti, [[penali]], [[conto|conto economico]] e prezzo del [[gasolio]].
 
@@ -1293,7 +1323,7 @@ function newGame(ceoId,coName,color,custom){
   S={v:1,day:0,speed:0,ceoId,custom:custom||null,company:{name:coName||C.company,color},cash:C.cash,rep:C.rep,fuel:0.86,
      warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0},managers:MANAGERS.map(m=>({...m,hired:false,wh:null})),
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextTender:12,nextEvent:25,project:null,seen:{},over:false,uid:1,
-     execs:EXECS.map(e=>({...e,hired:false})),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false};
+     execs:EXECS.map(e=>({...e,hired:false})),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false,hist:[],tw:{win:0,lose:0,skip:0}};
   const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,capo:0,autB:0,autCE:1,imp:2};
   (C.startTech||[]).forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true;});
   S.clients.push({id:nid('c'),...C.client,zone:cinfo(C.client).zones[0],src:cinfo(C.client).src,mode:cinfo(C.client).mode,wh:wh.id,mult:1,sat:60,status:'attivo',start:0,end:24*30,storico:true});
@@ -1465,6 +1495,17 @@ function weekEnd(){
   const cli={}; S.clients.filter(c=>c.status==='attivo').forEach(c=>{const r=rows[c.wh]; if(r) cli[c.id]={P:r.P,A:r.A,sP:c.sP,sA:c.sA,sat:c.sat,wh:whById(c.wh).name};});
   if(!any) return; S.weeks.push({d:S.day,rows,cli}); if(S.weeks.length>26) S.weeks.shift(); S.repNew=true;
 }
+// una riga al mese per il Riepilogo: conti, cassa e numeri dell'azienda in quel momento
+function histPush(c){
+  if(!S.hist) S.hist=[]; const H=S.hist, from=H.length?H[H.length-1].d:-1, ws=S.warehouses, wk=(S.weeks||[]).filter(x=>x.d>from);
+  const avg=f=>ws.length?ws.reduce((a,w)=>a+f(w),0)/ws.length:0, kp=(w,k)=>w.acc.n?w.acc[k]/w.acc.n:w.kpi?w.kpi[k]:null;
+  const staff={plan:S.office.plan}; ROLES.forEach(r=>staff[r]=ws.reduce((a,w)=>a+w.staff[r],0));
+  H.push({d:S.day,ric:c.ric,pers:c.pers,mezzi:c.mezzi,fissi:c.fissi,tech:c.tech,mgr:c.mgr,welf:c.welf,pen:c.pen,altro:c.altro,util:c.util,cash:S.cash,rep:S.rep,
+    P:avg(w=>kp(w,'P')||0),A:avg(w=>kp(w,'A')||0),sat:avg(w=>w.kpi?w.kpi.sat*100:0),mor:avg(w=>w.morale),
+    mov:wk.reduce((a,x)=>a+Object.values(x.rows).reduce((b,r)=>b+r.mov,0),0),trips:wk.reduce((a,x)=>a+Object.values(x.rows).reduce((b,r)=>b+r.trips,0),0),
+    staff,cli:S.clients.filter(x=>x.status==='attivo').length,wh:ws.length,stock:ws.reduce((a,w)=>a+(w.kpi?w.kpi.stock:0),0),cap:ws.reduce((a,w)=>a+capOf(w),0)});
+  if(H.length>240) H.shift();
+}
 function monthEnd(){
   S.months++;
   // carburante
@@ -1495,8 +1536,9 @@ function monthEnd(){
     news('Il Sole 24 Pallet',`${c.name}: contratto in scadenza`,c.noRenew?`Scade il ${shortDate(c.end)} e non verrà rinnovato.`:`Scade il ${shortDate(c.end)}. Rinnova da solo se la soddisfazione è almeno ${R('kam')?40:50}; altrimenti il cliente va via.`);});
   if(R('marketing')) S.rep+=0.2;
   S.cash-=pen; S.cur.pen+=pen; S.rep=clamp(S.rep,0,100);
-  S.warehouses.forEach(w=>w.acc={P:0,A:0,n:0});
   const c=S.cur; c.util=c.ric-c.pers-c.mezzi-c.fissi-c.tech-c.mgr-c.welf-c.pen-c.altro;
+  histPush(c);
+  S.warehouses.forEach(w=>w.acc={P:0,A:0,n:0});
   S.last=c; S.cur=z();
   if(S.cash<-50000){ gameOver(); return; }
   if(S.cash<0) toast('Cassa sotto zero: sotto i −50.000 € l\'azienda fallisce','bad');
@@ -1530,16 +1572,16 @@ function bidEstimate(t,whId,mult){
 }
 function resolveTender(t){
   t.done=true;
-  if(!t.bid){t.result={win:false,by:pick(RIVALS)};return;}
+  if(!t.bid){t.result={win:false,by:pick(RIVALS)};S.tw.skip++;return;}
   const e=bidEstimate(t,t.bid.wh,t.bid.mult);
   const win=e&&Math.random()<e.chance;
   if(win){
     const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,zone:t.zone,src:t.src,mode:t.mode,wh:t.bid.wh,mult:t.bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+(t.dur||24)*30,dur:t.dur||24};
-    S.clients.push(c); t.result={win:true}; S.rep=clamp(S.rep+rankOf(c).win,0,100);
+    S.clients.push(c); t.result={win:true}; S.tw.win++; S.rep=clamp(S.rep+rankOf(c).win,0,100);
     toast(`Gara vinta: ${t.name}! Il contratto parte il ${shortDate(c.start)}`,'ok');
     modalInfo('Il Sole 24 Pallet',`Gara vinta: ${t.name}`,`Il contratto parte il ${shortDate(c.start)} a ${whById(c.wh).name}. In quel magazzino servono in tutto ${needTxt(e.need)}: assumi adesso, perché un autista con patente CE arriva in 3–6 settimane.`);
   } else {
-    const by=pick(RIVALS); t.result={win:false,by,disc:Math.round(rnd(5,18))};
+    const by=pick(RIVALS); t.result={win:false,by,disc:Math.round(rnd(5,18))}; S.tw.lose++;
     toast(`Gara persa: ${t.name} va a ${by}`,'bad');
     news('Il Sole 24 Pallet',`${t.name} sceglie ${by}`,`Offerta con uno sconto del ${t.result.disc}%.`);
   }
@@ -1958,6 +2000,7 @@ function migrateStaff(s){
 // campi aggiunti dopo: capoturno, cooperativa, pianificatori
 function fillSave(s){
   if(!s.office) s.office={plan:0};
+  if(!s.hist) s.hist=[]; if(!s.tw) s.tw={win:0,lose:0,skip:0};
   s.warehouses.forEach(w=>{if(w.staff.capo===undefined) w.staff.capo=0; if(w.coop===undefined) w.coop=false;});
   return s;
 }
@@ -2110,12 +2153,13 @@ const DOCK=[
  ['personale','Personale e manager','<svg width="26" height="22" viewBox="0 0 13 11" shape-rendering="crispEdges"><rect x="1" y="0" width="4" height="4" fill="#f2c79b"/><rect x="0" y="5" width="6" height="6" fill="#5fb4f0"/><rect x="8" y="0" width="4" height="4" fill="#c98762"/><rect x="7" y="5" width="6" height="6" fill="#8ed15b"/></svg>'],
  ['direzione','Direzione','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="4" y="0" width="4" height="3" fill="#ffd23f"/><rect x="5" y="3" width="2" height="2" fill="#d8e3ee"/><rect x="1" y="5" width="10" height="1" fill="#d8e3ee"/><rect x="1" y="6" width="1" height="2" fill="#d8e3ee"/><rect x="10" y="6" width="1" height="2" fill="#d8e3ee"/><rect x="5" y="6" width="2" height="2" fill="#d8e3ee"/><rect x="0" y="8" width="3" height="3" fill="#5fb4f0"/><rect x="4" y="8" width="4" height="3" fill="#ff7a3d"/><rect x="9" y="8" width="3" height="3" fill="#8ed15b"/></svg>'],
  ['report','Report KPI','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="0" y="0" width="11" height="11" fill="#fff"/><rect x="0" y="0" width="11" height="2" fill="#2e9e48"/><rect x="0" y="0" width="2" height="11" fill="#c3d0dc"/><rect x="2" y="4" width="9" height="1" fill="#c3d0dc"/><rect x="2" y="7" width="9" height="1" fill="#c3d0dc"/><rect x="5" y="2" width="1" height="9" fill="#c3d0dc"/><rect x="8" y="2" width="1" height="9" fill="#c3d0dc"/><rect x="3" y="8" width="1" height="2" fill="#2e9e48"/><rect x="6" y="6" width="1" height="4" fill="#ff7a3d"/><rect x="9" y="5" width="1" height="5" fill="#5fb4f0"/></svg>'],
+ ['riepilogo','Riepilogo dell\'azienda','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="0" y="0" width="11" height="11" fill="#2a3a50"/><rect x="1" y="1" width="4" height="3" fill="#ffd23f"/><rect x="6" y="1" width="4" height="3" fill="#8ed15b"/><rect x="1" y="8" width="2" height="2" fill="#5fb4f0"/><rect x="4" y="6" width="2" height="4" fill="#5fb4f0"/><rect x="7" y="5" width="2" height="5" fill="#ff7a3d"/><rect x="1" y="5" width="2" height="1" fill="#d8e3ee"/></svg>'],
  ['tecnologia','Tecnologia','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="4" y="0" width="3" height="11" fill="#c3d0dc"/><rect x="0" y="4" width="11" height="3" fill="#c3d0dc"/><rect x="2" y="2" width="7" height="7" fill="#c3d0dc"/><rect x="4" y="4" width="3" height="3" fill="#2a3a50"/></svg>'],
  ['espansione','Espansione','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="0" y="4" width="7" height="7" fill="#d8e3ee"/><rect x="0" y="2" width="7" height="2" fill="#8a96a6"/><rect x="8" y="0" width="1" height="5" fill="#ffd23f"/><rect x="6" y="2" width="5" height="1" fill="#ffd23f"/></svg>'],
  ['enciclopedia','Enciclopedia (tasto E)','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="1" y="0" width="9" height="10" fill="#9b6bff"/><rect x="1" y="0" width="2" height="10" fill="#6f43cf"/><rect x="3" y="9" width="7" height="2" fill="#fff"/><rect x="5" y="2" width="3" height="1" fill="#ffd23f"/><rect x="7" y="3" width="1" height="2" fill="#ffd23f"/><rect x="6" y="5" width="1" height="1" fill="#ffd23f"/><rect x="6" y="7" width="1" height="1" fill="#ffd23f"/></svg>'],
  ['giornale','Il giornale','<svg width="24" height="20" viewBox="0 0 12 10" shape-rendering="crispEdges"><rect x="0" y="0" width="12" height="10" fill="#f4f1ec"/><rect x="1" y="1" width="10" height="2" fill="#16202e"/><rect x="1" y="4" width="4" height="4" fill="#8a96a6"/><rect x="6" y="4" width="5" height="1" fill="#16202e"/><rect x="6" y="6" width="5" height="1" fill="#16202e"/></svg>']
 ];
-const TITLES={azienda:'Azienda e CEO',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP'};
+const TITLES={azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP'};
 function renderDock(){
   const openT=S.tenders.filter(t=>!t.done&&!t.bid).length;
   const short=S.warehouses.filter(w=>w.kpi&&ROLES.some(r=>w.staff[r]<w.kpi.need[r])).length;
@@ -2142,7 +2186,7 @@ function openWin(id,opts){
   UI.open[id]=true; if(opts) Object.assign(UI.sel,opts);
   let el=document.getElementById('win-'+id);
   if(!el){
-    el=document.createElement('section'); el.className='win'+(id==='enciclopedia'?' wkw':id==='tecnologia'||id==='report'?' xwide':['magazzini','gare','azienda','direzione'].includes(id)?' wide':''); el.id='win-'+id;
+    el=document.createElement('section'); el.className='win'+(id==='enciclopedia'?' wkw':id==='tecnologia'||id==='report'||id==='riepilogo'?' xwide':['magazzini','gare','azienda','direzione'].includes(id)?' wide':''); el.id='win-'+id;
     el.setAttribute('aria-label',TITLES[id]);
     const i=Object.keys(UI.pos).length; const p=UI.pos[id]||{x:Math.min(innerWidth-420,90+((i*36)%240)),y:86+((i*30)%180)};
     if(id==='magazzini'||id==='gare'){p.x=Math.max(90,innerWidth-680);} if(id==='enciclopedia'){p.x=Math.max(90,innerWidth-900);p.y=86;} if(id==='tecnologia'){p.x=90;}
@@ -2173,6 +2217,32 @@ function satObjTxt(sm){
 const kpiCls=(v,s)=>s==null?'ok':v>=s?'ok':v>=s-2?'warn':'bad';
 const barColor=v=>v>=0.85?'var(--bad)':v>=0.7?'var(--warn)':'var(--ok)';
 function tipParts(title,parts,unit){return `<div class='tt'>${esc(title)}</div>`+parts.map(([n,v])=>`<div class='tr'><span>${esc(n)}</span><span>${n==='Base'?f1(v):(v>=0?'+':'')+f1(v)}${unit||''}</span></div>`).join('');}
+
+// ---- Riepilogo: tessere con i numeri, barre orizzontali e colonne dell'utile ----
+const euK=v=>{const a=Math.abs(v),sg=v<0?'−':'';return sg+(a>=1e6?f1(a/1e6)+' M':a>=1e4?n0(a/1000)+'k':n0(a))+' €';};
+const monLab=d=>{const t=dateOf(d-1);return `${MESI[t.getUTCMonth()].slice(0,3)} ${t.getUTCFullYear()}`;};
+function rpDelta(v,prev,fmt,good){ if(prev==null||v==null) return ''; const d=v-prev; if(Math.abs(d)<0.05) return '<span class="sm">= stabile sul mese prima</span>';
+  const up=d>0, ok=good==null?null:(up===good); return `<span class="${ok==null?'sm':ok?'ok':'bad'}">${up?'▲':'▼'} ${fmt(Math.abs(d))}</span> sul mese prima`; }
+function rpTile(lab,val,sub,wiki,cls){
+  return `<div class="rp-t${cls?' '+cls:''}"${wiki?` data-act="wiki" data-id="${wiki}" data-tip="${wikiTip(wiki)}"`:''}><span class="lab">${lab}</span><b>${val}</b><span class="rp-sub">${sub||'&nbsp;'}</span></div>`;}
+function rpBars(items,fmt,max){
+  if(!items.length) return '<div class="sm">Ancora niente da mostrare.</div>';
+  const mx=max||Math.max(1,...items.map(x=>x.v));
+  return `<div class="rp-hb">${items.map(x=>`<div class="rp-hr"${x.tip?` data-tip="${x.tip}"`:''}><span class="rp-hn">${x.ic||''}${esc(x.n)}</span><span class="bar"><i style="width:${clamp(x.v/mx*100,0,100).toFixed(1)}%;background:${x.c||'var(--accent)'}"></i></span><b>${fmt(x.v)}</b></div>`).join('')}</div>`;}
+function rpCols(title,labels,vals,emptyTxt){
+  const n=vals.length; if(n<1) return `<div class="lc lc-empty"><b>${esc(title)}</b><span class="sm">${esc(emptyTxt)}</span></div>`;
+  const W=440,H=220,ml=58,mr=10,mt=24,mb=30,pw=W-ml-mr,ph=H-mt-mb;
+  let lo=Math.min(0,...vals),hi=Math.max(0,...vals); const r=(hi-lo)/4||1,m=Math.pow(10,Math.floor(Math.log10(r))),st=[1,2,5,10].find(x=>x*m>=r)*m; lo=Math.floor(lo/st)*st; hi=Math.ceil(hi/st)*st; if(hi===lo)hi=lo+st;
+  const Y=v=>mt+ph-(v-lo)/(hi-lo)*ph, bw=pw/n; let g='';
+  for(let v=lo;v<=hi+1e-9;v+=st) g+=`<line x1="${ml}" x2="${ml+pw}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e3e9ef"/><text x="${ml-6}" y="${Y(v)+4}" text-anchor="end" class="lc-ax">${euK(v)}</text>`;
+  vals.forEach((v,i)=>{const y0=Y(Math.max(0,v)),h=Math.max(1,Math.abs(Y(v)-Y(0)));
+    g+=`<rect x="${(ml+i*bw+bw*0.15).toFixed(1)}" y="${y0.toFixed(1)}" width="${Math.max(1,bw*0.7).toFixed(1)}" height="${h.toFixed(1)}" fill="${v>=0?'#2e9e48':'#e0393e'}" data-tip="<div class='tt'>${esc(labels[i])}</div>Utile: ${eur(v)}"/>`;});
+  g+=`<line x1="${ml}" x2="${ml+pw}" y1="${Y(0)}" y2="${Y(0)}" stroke="#16202e"/>`;
+  const every=Math.ceil(n/6); labels.forEach((l,i)=>{if(i%every===0) g+=`<text x="${ml+i*bw+bw/2}" y="${H-10}" text-anchor="middle" class="lc-ax">${esc(l)}</text>`;});
+  return `<figure class="lc"><figcaption><b>${esc(title)}</b><span class="lc-leg"><span class="lc-key"><svg width="10" height="10" aria-hidden="true"><rect width="10" height="10" fill="#2e9e48"/></svg>Utile</span><span class="lc-key"><svg width="10" height="10" aria-hidden="true"><rect width="10" height="10" fill="#e0393e"/></svg>Perdita</span></span></figcaption><svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(title)}" shape-rendering="crispEdges">${g}</svg></figure>`;}
+const RP_TABS=[['gen','Panoramica'],['soldi','Conti'],['op','Operazioni'],['cli','Clienti'],['pers','Persone']];
+const RP_COST=[['pers','Personale','#2f7fd6'],['mezzi','Mezzi e gasolio','#ff7a3d'],['fissi','Immobili e fissi','#7b4fe0'],['tech','Tecnologie','#1f9e8f'],['mgr','Manager','#c98a00'],['welf','Welfare','#c2185b'],['pen','Penali','#e0393e'],['altro','Altro','#8a96a6']];
+const costOf=h=>RP_COST.reduce((a,[k])=>a+(h[k]||0),0);
 
 const VIEWS={
  azienda(){
@@ -2337,8 +2407,105 @@ const VIEWS={
      <div>${e.hired?(seatOf(e.id)?`<span class="sm ok">${DIR_ROLES.find(r=>r.id===seatOf(e.id)).name}</span>`:`<button class="btn sm2" data-act="fireexec" data-id="${e.id}">Licenzia</button>`):`<button class="btn sm2 pri" data-act="hireexec" data-id="${e.id}">Assumi tramite head hunter · ${eur(15000)}</button>`}</div></div></div>`).join('');
   return `<div class="sm">I ${kw('direzione','direttori')} guidano tutta l'azienda con la loro abilità principale. Puoi nominare manager già assunti e non assegnati a un magazzino, oppure dirigenti esterni.</div>${seats}<div class="lab">Dirigenti sul mercato</div>${cand}`;
  },
+ riepilogo(){
+  const tab=RP_TABS.some(t=>t[0]===UI.tab.rp)?UI.tab.rp:'gen'; UI.tab.rp=tab;
+  const H=S.hist||[], L=H[H.length-1], P2=H[H.length-2], lab=H.map(h=>monLab(h.d)), ws=S.warehouses;
+  const act=S.clients.filter(c=>c.status==='attivo'), start=S.clients.filter(c=>c.status==='avvio'), lost=S.clients.filter(c=>c.status==='perso');
+  const staffNow=ROLES.reduce((a,r)=>a+ws.reduce((b,w)=>b+w.staff[r],0),0)+S.office.plan;
+  const kAvg=k=>ws.length?ws.reduce((a,w)=>a+(w.kpi?w.kpi[k]:0),0)/ws.length:0;
+  const tw=S.tw||{win:0,lose:0,skip:0}, bids=tw.win+tw.lose;
+  const yrs=Math.floor(S.day/365), mos=Math.floor((S.day%365)/30.4);
+  const empty='Il grafico compare dalla fine del secondo mese.';
+  const fE=v=>eur(v), fP=v=>f1(v)+'%';
+  const tabs=`<div class="tabs rp-tabs" role="tablist">${RP_TABS.map(([id,n])=>`<button role="tab" aria-selected="${id===tab}" data-act="rptab" data-id="${id}">${n}</button>`).join('')}</div>`;
+  let body='';
+  if(tab==='gen'){
+    const stock=ws.reduce((a,w)=>a+(w.kpi?w.kpi.stock:0),0), cap=ws.reduce((a,w)=>a+capOf(w),0);
+    body=`<div class="rp-head"><span class="rp-sw" style="background:${S.company.color}"></span><div><div class="h3">${esc(S.company.name)}</div><div class="sm">CEO ${esc(ceo().name)} · in attività da ${yrs?yrs+(yrs>1?' anni':' anno')+' e ':''}${mos} ${mos===1?'mese':'mesi'} · oggi è il ${shortDate(S.day)}</div></div></div>
+    <div class="rp-tiles c4">
+     ${rpTile('Cassa',eur(S.cash),L&&P2?rpDelta(L.cash,P2.cash,euK,true):'',`cassa`,S.cash<0?'bad':'')}
+     ${rpTile('Utile mese scorso',L?eur(L.util):'—',L&&P2?rpDelta(L.util,P2.util,euK,true):'',`conto`,L?(L.util>=0?'ok':'bad'):'')}
+     ${rpTile('Ricavi mese scorso',L?eur(L.ric):'—',L&&P2?rpDelta(L.ric,P2.ric,euK,true):'',`ricavi`)}
+     ${rpTile('Reputazione',Math.round(S.rep)+' / 100',L&&P2?rpDelta(S.rep,P2.rep,f1,true):'',`reputazione`)}
+     ${rpTile('Clienti attivi',act.length,start.length?`+${start.length} in partenza`:`${lost.length} persi finora`,`clienti`)}
+     ${rpTile('Magazzini',ws.length,`${n0(stock)} / ${n0(cap)} posti pallet`,`magazzino`)}
+     ${rpTile('Dipendenti',n0(staffNow),L&&P2?rpDelta(staffNow,P2.staff?Object.values(P2.staff).reduce((a,v)=>a+v,0):null,n0,null):'',`personale`)}
+     ${rpTile('Gare vinte',`${tw.win} su ${bids}`,bids?`${Math.round(tw.win/bids*100)}% delle offerte`:'nessuna offerta ancora',`gare`)}
+    </div>
+    <div class="lc-row">${lineChart('rp_cash',{title:'Cassa a fine mese',labels:lab,xl:'',nice:1,min:-1e12,max:1e12,ml:62,mr:14,labels2:false,fmt:fE,ax:euK,empty,series:[{n:'Cassa',c:SERIES_C[0],v:H.map(h=>h.cash)}],w:440,h:220,maxLab:5})}
+    ${rpCols('Utile di ogni mese',lab.slice(-24),H.slice(-24).map(h=>h.util),empty)}</div>
+    <div class="sm">Ogni numero si apre nell'enciclopedia. I grafici si aggiornano alla fine di ogni mese, quando si chiudono i conti.</div>`;
+  } else if(tab==='soldi'){
+    const y12=H.slice(-12), sR=y12.reduce((a,h)=>a+h.ric,0), sC=y12.reduce((a,h)=>a+costOf(h),0), tot=H.reduce((a,h)=>a+h.util,0), pen=H.reduce((a,h)=>a+(h.pen||0),0);
+    const years={}; H.forEach(h=>{const y=yearOf(h.d-1); const o=years[y]||(years[y]={r:0,c:0,n:0}); o.r+=h.ric; o.c+=costOf(h); o.n++;});
+    const cl=L?RP_COST.map(([k,n,c])=>({n,c,v:L[k]||0})).filter(x=>x.v>0.5):[], cT=cl.reduce((a,x)=>a+x.v,0);
+    body=`<div class="rp-tiles">
+     ${rpTile(`Ricavi ${y12.length<12?'da inizio':'ultimi 12 mesi'}`,euK(sR),y12.length?`${euK(sR/y12.length)} al mese`:'','ricavi')}
+     ${rpTile(`Costi ${y12.length<12?'da inizio':'ultimi 12 mesi'}`,euK(sC),y12.length?`${euK(sC/y12.length)} al mese`:'','costi')}
+     ${rpTile('Margine',sR?f1((sR-sC)/sR*100)+'%':'—',`utile ${euK(sR-sC)}`,'conto',sR-sC>=0?'ok':'bad')}
+     ${rpTile('Utile da inizio partita',euK(tot),`${H.filter(h=>h.util>=0).length} mesi in utile su ${H.length}`,'conto',tot>=0?'ok':'bad')}
+     ${rpTile('Penali pagate',euK(pen),pen?'per KPI sotto soglia':'nessuna, finora','penali',pen?'bad':'')}
+     ${rpTile('Gasolio',S.fuel.toFixed(2).replace('.',',')+' €/l',L?`mezzi: ${euK(L.mezzi)} al mese`:'','gasolio')}
+    </div>
+    <div class="lc-row">${lineChart('rp_rc',{title:'Ricavi e costi per mese',labels:lab,xl:'',nice:1,min:0,max:1e12,ml:62,mr:118,maxLab:4,fmt:fE,ax:euK,empty,series:[{n:'Ricavi',c:SERIES_C[0],v:H.map(h=>h.ric)},{n:'Costi',c:SERIES_C[1],v:H.map(costOf)}],w:440,h:230,maxLab:5})}
+    ${rpCols('Utile di ogni mese',lab.slice(-24),H.slice(-24).map(h=>h.util),empty)}</div>
+    <div class="card"><div class="row"><span class="h3">Dove vanno i soldi</span><span class="sm">${L?'costi del mese scorso: '+eur(cT):''}</span></div>
+     ${cl.length?`<div class="rp-stack">${cl.map(x=>`<i style="width:${(x.v/cT*100).toFixed(2)}%;background:${x.c}" data-tip="<div class='tt'>${x.n}</div>${eur(x.v)} · ${Math.round(x.v/cT*100)}%"></i>`).join('')}</div>
+     ${rpBars(cl.sort((a,b)=>b.v-a.v).map(x=>({...x,tip:`<div class='tt'>${x.n}</div>${Math.round(x.v/cT*100)}% dei costi`})),fE)}`:'<div class="sm">Disponibile dalla fine del primo mese.</div>'}</div>
+    <div class="card"><span class="h3">Anno per anno</span><div class="rp-scroll"><table class="t num"><tr><th>Anno</th><th class="r">Ricavi</th><th class="r">Costi</th><th class="r">Utile</th><th class="r">Margine</th></tr>
+     ${Object.entries(years).reverse().map(([y,o])=>`<tr><td>${y}${o.n<12?` <span class="sm">(${o.n} mesi)</span>`:''}</td><td class="r">${eur(o.r)}</td><td class="r">${eur(o.c)}</td><td class="r ${o.r-o.c>=0?'ok':'bad'}">${eur(o.r-o.c)}</td><td class="r">${o.r?f1((o.r-o.c)/o.r*100)+'%':'—'}</td></tr>`).join('')||'<tr><td colspan="5" class="sm">Il primo anno si chiude a fine mese.</td></tr>'}</table></div></div>`;
+  } else if(tab==='op'){
+    const km=ws.reduce((a,w)=>a+(w.kpi?w.kpi.km:0),0);
+    body=`<div class="rp-tiles">
+     ${rpTile('Puntualità media',fP(kAvg('P')),L&&P2?rpDelta(L.P,P2.P,f1,true):'','puntualita')}
+     ${rpTile('Accuratezza media',fP(kAvg('A')),L&&P2?rpDelta(L.A,P2.A,f1,true):'','accuratezza')}
+     ${rpTile('Saturazione media',fP(kAvg('sat')*100),kAvg('sat')>0.85?'oltre l\'85%: errori in aumento':'spazio a sufficienza','saturazione',kAvg('sat')>0.85?'bad':'')}
+     ${rpTile('Morale medio',Math.round(ws.reduce((a,w)=>a+w.morale,0)/ws.length),L&&P2?rpDelta(L.mor,P2.mor,f1,true):'','morale')}
+     ${rpTile('Pallet movimentati',L?n0(L.mov):'—',L?'il mese scorso':'','movimenti')}
+     ${rpTile('Viaggi',L?n0(L.trips):'—',`${n0(km)} km al giorno`,null)}
+    </div>
+    <div class="lc-row">${lineChart('rp_pa',{title:'Puntualità e accuratezza (media dei magazzini)',labels:lab,xl:'',unit:'%',empty,series:[{n:'Puntualità',c:KPI_C.P,v:H.map(h=>h.P)},{n:'Accuratezza',c:KPI_C.A,v:H.map(h=>h.A)}],w:440,h:230,mr:118,maxLab:4})}
+    ${lineChart('rp_sm',{title:'Saturazione e morale',labels:lab,xl:'',nice:1,min:0,max:100,empty,series:[{n:'Saturazione %',short:'Saturazione',c:SERIES_C[3],v:H.map(h=>h.sat)},{n:'Morale (0–100)',short:'Morale',c:SERIES_C[5],v:H.map(h=>h.mor)}],w:440,h:230,mr:118,maxLab:4})}</div>
+    ${lineChart('rp_mov',{title:'Pallet movimentati al mese',labels:lab,xl:'',nice:1,min:0,max:1e12,ml:56,mr:14,labels2:false,fmt:n0,ax:n0,empty,series:[{n:'Pallet movimentati',c:SERIES_C[1],v:H.map(h=>h.mov)}],w:880,h:200,maxLab:10})}
+    <div class="card"><span class="h3">Magazzino per magazzino</span><div class="rp-scroll"><table class="t num"><tr><th>Magazzino</th><th class="r">${kw('puntualita','Punt.')}</th><th class="r">${kw('accuratezza','Accur.')}</th><th>${kw('saturazione')}</th><th class="r">${kw('morale','Morale')}</th><th class="r">Clienti</th><th class="r">Persone</th><th class="r">Margine al mese</th></tr>
+     ${ws.map(w=>{const k=w.kpi||computeWH(w), sP=Math.max(0,...k.act.map(c=>c.sP)), aA=k.act.filter(c=>c.sA).map(c=>c.sA), sA=aA.length?Math.max(...aA):null, mg=k.rev-k.pers-k.mezzi-k.fissi;
+       return `<tr><td><button class="lnk" data-act="openwh" data-id="${w.id}">${esc(w.name)}</button></td><td class="r ${kpiCls(k.P,sP||null)}">${fP(k.P)}</td><td class="r ${kpiCls(k.A,sA)}">${fP(k.A)}</td><td><span class="row" style="justify-content:flex-start;gap:6px"><span class="bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></span>${Math.round(k.sat*100)}%</span></td><td class="r ${w.morale<45?'bad':w.morale<55?'warn':''}">${Math.round(w.morale)}</td><td class="r">${k.act.length}</td><td class="r">${ROLES.reduce((a,r)=>a+w.staff[r],0)}</td><td class="r ${mg>=0?'ok':'bad'}">${eur(mg)}</td></tr>`;}).join('')}</table></div>
+     <div class="sm">Margine stimato al mese: ricavi dei clienti meno personale, mezzi e immobile del magazzino (senza tecnologie, manager e sede).</div></div>`;
+  } else if(tab==='cli'){
+    const rev=act.map(c=>({c,v:clientRev(c)})).sort((a,b)=>b.v-a.v), rT=rev.reduce((a,x)=>a+x.v,0), sat=act.length?act.reduce((a,c)=>a+c.sat,0)/act.length:0;
+    body=`<div class="rp-tiles">
+     ${rpTile('Clienti attivi',act.length,start.length?`+${start.length} in partenza`:'nessuno in partenza','clienti')}
+     ${rpTile('Soddisfazione media',act.length?Math.round(sat):'—',sat<40?'qualcuno rischia di andarsene':'su 100','soddisfazione',act.length&&sat<40?'bad':'')}
+     ${rpTile('Primo cliente',rev.length?Math.round(rev[0].v/rT*100)+'%':'—',rev.length?'dei ricavi da '+esc(rev[0].c.name):'','ricavi',rev.length&&rev[0].v/rT>0.5?'bad':'')}
+     ${rpTile('Gare vinte',tw.win,`${tw.lose} perse · ${tw.skip} senza offerta`,'gare')}
+     ${rpTile('Tasso di vittoria',bids?Math.round(tw.win/bids*100)+'%':'—','delle gare con offerta','gare')}
+     ${rpTile('Clienti persi',lost.length,'disdette e contratti non rinnovati','contratto',lost.length?'bad':'')}
+    </div>
+    <div class="lc-row"><div class="card"><span class="h3">Ricavi al mese per cliente</span>${rpBars(rev.map(x=>({n:x.c.name,ic:logoSvg(x.c.name,18),v:x.v,c:'#2f7fd6',tip:`<div class='tt'>${esc(x.c.name)}</div>${eur(x.v)} al mese · ${Math.round(x.v/rT*100)}% dei ricavi`})),euK)}</div>
+    <div class="card"><span class="h3">${kw('soddisfazione','Soddisfazione')} dei clienti</span>${rpBars(act.slice().sort((a,b)=>b.sat-a.sat).map(c=>({n:c.name,ic:logoSvg(c.name,18),v:c.sat,c:c.sat<40?'#e0393e':c.sat<60?'#e0a800':'#2e9e48',tip:`<div class='tt'>${esc(c.name)}</div>Sotto 25 disdice; per rinnovare serve almeno ${R('kam')?40:50}.`})),v=>Math.round(v),100)}</div></div>
+    <div class="card"><span class="h3">Contratti</span><div class="rp-scroll"><table class="t num"><tr><th>Cliente</th><th>Magazzino</th><th class="r">${kw('puntualita','Punt.')} / soglia</th><th class="r">${kw('accuratezza','Accur.')} / soglia</th><th class="r">Scadenza</th></tr>
+     ${[...act,...start].map(c=>{const w=whById(c.wh),k=w&&w.kpi; return `<tr><td><span style="display:inline-flex;gap:6px;align-items:center">${logoSvg(c.name,18)}${esc(c.name)}</span>${c.status==='avvio'?' <span class="pill">in partenza</span>':''}</td><td>${w?esc(w.name):''}</td><td class="r ${k?kpiCls(k.P,c.sP):''}">${k?f1(k.P):'—'} / ${f1(c.sP)}</td><td class="r ${k&&c.sA?kpiCls(k.A,c.sA):''}">${k?f1(k.A):'—'} / ${c.sA?f1(c.sA):'—'}</td><td class="r ${c.end-S.day<=60?'warn':''}">${shortDate(c.end)}</td></tr>`;}).join('')||'<tr><td colspan="5" class="sm">Nessun contratto.</td></tr>'}</table></div></div>`;
+  } else {
+    const rolesAll=[...ROLES,'plan'].map(r=>({n:ROLE[r],v:r==='plan'?S.office.plan:ws.reduce((a,w)=>a+w.staff[r],0),c:'#ff7a3d',tip:`<div class='tt'>${ROLE[r]}</div>${ROLE_D[r]}`}));
+    const mg=S.managers.filter(m=>m.hired).length, dr=Object.values(S.dirs).filter(Boolean).length, wf=WELFARE.filter(w=>S.welfare[w.id]).length;
+    const pr=S.project&&TECH.find(t=>t.id===S.project.tech), totR=Object.keys(S.researched).filter(k=>S.researched[k]).length;
+    body=`<div class="rp-tiles">
+     ${rpTile('Dipendenti',n0(staffNow),`in ${ws.length} ${ws.length>1?'magazzini':'magazzino'} e in sede`,'personale')}
+     ${rpTile('Costo del personale',L?euK(L.pers):'—',L&&staffNow?euK(L.pers/staffNow)+' a testa al mese':'','costo_azienda')}
+     ${rpTile('Manager assunti',mg,(n=>n?`il CEO guida ${n} ${n>1?'magazzini':'magazzino'}`:`${ws.filter(w=>w.mgr).length} magazzini su ${ws.length} con un manager`)(ws.filter(w=>w.mgr==='ceo').length),'manager')}
+     ${rpTile('Dirigenti',R('direzione')?dr+' / 5':'—',R('direzione')?'posti della direzione occupati':'serve la Struttura direzionale','direzione')}
+     ${rpTile('Welfare',wf+' / '+WELFARE.length,'iniziative attive','welfare')}
+     ${rpTile('Tecnologie',totR+' / '+TECH.length,pr?`in corso: ${esc(pr.name)} (${S.project.left} g)`:'nessuna ricerca in corso','tecnologie')}
+    </div>
+    <div class="lc-row"><div class="card"><span class="h3">Chi lavora per te</span>${rpBars(rolesAll,n0)}</div>
+    ${lineChart('rp_st',{title:'Dipendenti a fine mese',labels:lab,xl:'',nice:1,min:0,max:1e12,ml:46,mr:14,labels2:false,fmt:n0,ax:n0,empty,series:[{n:'Dipendenti',c:SERIES_C[2],v:H.map(h=>h.staff?Object.values(h.staff).reduce((a,v)=>a+v,0):null)}],w:440,h:230,maxLab:5})}</div>
+    <div class="card"><span class="h3">${kw('alberi','Alberi delle tecnologie')}</span>${TREES.map(([id,n])=>{const all=TECH.filter(t=>t.tree===id), done=all.filter(t=>S.researched[t.id]).length;
+      return `<div class="rp-hr"><span class="rp-hn">${techIcon({id:'_',tree:id},20)}${n}</span><span class="bar"><i style="width:${(done/all.length*100).toFixed(1)}%;background:${TFRAME[id].c}"></i></span><b>${done} / ${all.length}</b></div>`;}).join('')}</div>`;
+  }
+  return tabs+body;
+ },
  report(){
-  S.repNew=false; CHARTS={};
+  S.repNew=false;
   const sheets=[['sum','Riepilogo'],...S.warehouses.map(w=>[w.id,w.name]),['cli','Clienti']];
   const sh=sheets.find(x=>x[0]===UI.sel.sheet)?UI.sel.sheet:'sum';
   const W=S.weeks||[]; const COLS='ABCDEFGHIJKL';
@@ -2500,6 +2667,7 @@ const ACT={
  hiremgr(d){const m=S.managers.find(x=>x.id===d.id);m.hired=true;toast(`${m.name} entra in azienda: assegnalo a un magazzino o alla direzione`,'ok');const w=S.warehouses.find(w=>!w.mgr);if(w){w.mgr=m.id;m.wh=w.id;}renderAll();},
  firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});m.hired=false;m.wh=null;renderAll();},
  selcli(d){UI.sel.cli=d.id;UI.sel.cell='A1';renderWin('report');},
+ rptab(d){UI.tab.rp=d.id;renderWin('riepilogo');},
  sheet(d){UI.sel.sheet=d.id;UI.sel.cell='A1';renderWin('report');},
  cell(d){UI.sel.cell=d.ref;renderWin('report');},
  lens(d){UI.lens=d.id;renderMap();syncTrucks();},
