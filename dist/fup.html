@@ -291,7 +291,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .ccbox{gap:10px}
 .cc-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
 .cc-por{display:flex;align-items:center;gap:6px}
-.cc-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 90px;gap:8px}
+.cc-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 90px auto;gap:8px}
+.cc-sg{display:flex;align-items:flex-end}
 .cc-fields label{display:flex;flex-direction:column;gap:4px}
 .cc-base{display:flex;gap:8px;flex-wrap:wrap}
 .btn[aria-pressed="true"]{background:var(--accent-l);border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--accent), 2px 2px 0 var(--ink)}
@@ -399,7 +400,7 @@ html,body{overscroll-behavior:none}
 .mob .cc-top{grid-template-columns:minmax(0,1fr);justify-items:center}
 .mob .cc-top > *{width:100%}
 .mob .cc-por{justify-content:center}
-.mob .cc-fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 64px}
+.mob .cc-fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 64px}.mob .cc-sg{grid-column:1/-1}
 .mob .cc-stats{grid-template-columns:minmax(0,1fr)}
 .mob.land .cc-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 .mob .cc-az{grid-template-columns:minmax(0,1fr)}
@@ -1177,7 +1178,7 @@ Quando [[crea_ceo|crei il tuo CEO]] il saldo dei punti del titolo (bonus meno ma
 wk('crea_ceo','basi','Creare il proprio CEO',`Nella schermata iniziale puoi creare un CEO tuo, passo per passo: identità, abilità, studi e carattere, poi il curriculum da confermare.`,
 `Nella schermata iniziale scegli la quinta scheda, «Crea il tuo CEO». La creazione è divisa in passaggi, e puoi sempre tornare indietro:
 
-1. **Identità**: nome, cognome, età e ritratto; soprannome e motto sono facoltativi (il pulsante «Suggerisci» ne propone uno). Compaiono nella finestra dell'azienda.
+1. **Identità**: nome, cognome, età e ritratto; soprannome e motto sono facoltativi. Il pulsante «Suggerisci» propone nome e cognome, un soprannome o un motto. Soprannome e motto compaiono nella finestra dell'azienda.
 2. **Abilità**: hai 58 punti. Ogni punto in un'[[abilita|abilità]] costa 1 (minimo 1, massimo 18 prima dei talenti).
 3. **Studi e carattere**: il [[titoli|titolo di studio]] è obbligatorio, uno solo; poi fino a 3 [[talenti]] a scelta.
 4. **Curriculum**: il riepilogo in formato europeo. Se è tutto vero lo confermi, altrimenti torni a correggere.
@@ -1187,7 +1188,7 @@ I talenti si pagano con gli stessi punti: un talento con Operazioni +3 e Leaders
 Dopo il curriculum si passa alla [[fondazione]] dell'azienda, dove scegli anche il **punto di partenza**: il magazzino, la cassa e il cliente storico di uno dei quattro CEO già pronti.`);
 wk('fondazione','basi','Fondare l\'azienda',`Prima di iniziare scegli nome, logo, claim e colore della tua azienda e la iscrivi alla Camera di Commercio.`,
 `Con qualunque CEO, prima della partita c'è la scheda dell'azienda:
-• **Nome**: quello che leggono clienti e giornali;
+• **Nome**: quello che leggono clienti e giornali («Suggerisci» ne propone uno, spesso col cognome del CEO);
 • **Logo**: un'icona tra otto, sul colore aziendale; compare nella barra in alto e nella finestra dell'azienda;
 • **Claim**: lo slogan sull'insegna, facoltativo (il pulsante «Suggerisci» ne propone uno);
 • **Colore**: tinge i pulsanti dell'interfaccia e lo sfondo del logo.
@@ -2904,11 +2905,17 @@ function ccCeo(cc){const B=CEOS.find(c=>c.id===cc.base), s=SITES[B.site];
   return {id:'custom',img:cc.img,name:ccName(cc),nick:(cc.nick||'').trim(),motto:(cc.motto||'').trim(),age:clamp(Math.round(+cc.eta)||38,22,70),origin:cc.edu,site:B.site,cash:B.cash,motrici:B.motrici,fixed:B.fixed,rep:B.rep,company:ccCompany(cc),
     st:ccStats(cc),tal:ccTal(cc),client:{...B.client},
     bio:`Ha rilevato il capannone di ${s.name} con un solo cliente storico, ${B.client.name}, e un'idea fissa: arrivare fino all'ultimo pallet.`};}
-// suggerimenti per i campi facoltativi (pulsante «Suggerisci»)
+// suggerimenti per i campi (pulsante «Suggerisci»)
 const SUGG={
+  nome:['Ornella','Gianfranco','Loredana','Ivano','Graziella','Walter','Simona','Claudio','Rossella','Massimo','Tiziana','Ezio','Patrizia','Roberto','Manuela','Silvano','Daniela','Franco','Cinzia','Mirko'],
+  cognome:['Bancalini','Muletti','Rampini','Colombo','Pallettoni','Ferrero','Carrà','Bollati','Reggiani','Gattinara','Piazzali','Scaffaroli','Brambilla','Caricati','Gerbino','Moletti','Rondinelli','Banfi','Trasporti','Viaggi'],
   nick:['il Muletto','la Bolla','Tir','il Barone del Pallet','la Zarina della Rampa','Reggiatrice','il Picking','Bancale','Doppio Turno','la Pesa'],
   motto:['Prima si carica, poi si discute.','Se non è nel gestionale, non esiste.','Chi va piano arriva in penale.','Le soglie KPI sono suggerimenti. Severi.','Un pallet alla volta, ma in fretta.','Mai dire mai: dire «domani entro le 12».','Il muletto non dorme. E nemmeno io.','Il cliente ha sempre ragione, tranne sul codice articolo.'],
   claim:['Arriviamo prima dei problemi.','La vostra merce, la nostra ossessione.','Ogni bancale è una promessa.','Dal muletto al cliente, senza drammi.','Logistica col cuore (e col transpallet).','Partiamo presto, arriviamo prima.','Più veloci di una bolla smarrita.','Noi la merce la troviamo sempre.']};
+// nomi d'azienda: dal cognome del CEO o di pura fantasia
+function coNames(){const cog=startSel.ceo==='custom'?startSel.cc.cognome.trim():CEOS.find(c=>c.id===startSel.ceo).name.split(' ').pop();
+  return [...(cog?[`Trasporti ${cog}`,`${cog} Logistica`,`Autotrasporti ${cog} & Figli`,`${cog} Express`,`F.lli ${cog} Spedizioni`]:[]),
+    'Bancali Veloci','Rampa Nord Logistica','Transpallet Riuniti','Colli Sicuri','Ultimo Miglio & C.','Logistica Padana del Bancale','Interporto delle Langhe','Gommato Trasporti','Sponda Idraulica','Carica e Scarica'];}
 const PROVN={AL:'Alessandria',BG:'Bergamo',BS:'Brescia',GE:'Genova',LO:'Lodi',MI:'Milano',NO:'Novara',PV:'Pavia',TO:'Torino'};
 const startCeo=()=>startSel.ceo==='custom'?CEOS.find(c=>c.id===startSel.cc.base):CEOS.find(c=>c.id===startSel.ceo);
 const defCo=()=>startSel.ceo==='custom'?ccCompany(startSel.cc):CEOS.find(c=>c.id===startSel.ceo).company;
@@ -2935,7 +2942,7 @@ function stepCC1(){const cc=startSel.cc;
     <div style="display:flex;flex-direction:column;gap:10px">
      <div class="cc-fields"><label><span class="lab">Nome</span><input type="text" id="cc-nome" maxlength="20" value="${esc(cc.nome)}" placeholder="Es. Ornella"></label>
       <label><span class="lab">Cognome</span><input type="text" id="cc-cognome" maxlength="24" value="${esc(cc.cognome)}" placeholder="Es. Bancalini"></label>
-      <label><span class="lab">Età</span><input type="number" id="cc-eta" min="22" max="70" value="${esc(cc.eta)}"></label></div>
+      <label><span class="lab">Età</span><input type="number" id="cc-eta" min="22" max="70" value="${esc(cc.eta)}"></label><span class="cc-sg">${suggBtn('persona')}</span></div>
      <label class="cc-f"><span class="lab">Soprannome</span><span class="cc-in"><input type="text" id="cc-nick" maxlength="24" value="${esc(cc.nick||'')}" placeholder="Es. il Muletto">${suggBtn('nick')}</span></label>
      <label class="cc-f"><span class="lab">Motto</span><span class="cc-in"><input type="text" id="cc-motto" maxlength="70" value="${esc(cc.motto||'')}" placeholder="Es. Prima si carica, poi si discute.">${suggBtn('motto')}</span></label>
     </div></div></div>`;}
@@ -2979,7 +2986,7 @@ function stepAz(){
   const B=startCeo(), s=SITES[B.site], cus=startSel.ceo==='custom';
   return `<div class="card ccbox"><div class="row"><span class="h3">${kw('fondazione','La tua azienda')}</span><span class="sm">Nome, logo e claim compaiono sull'insegna e nei giornali</span></div>
    <div class="insegna" style="border-color:${startSel.color}">${coLogoSvg(startSel.logo,startSel.color,64)}<div style="min-width:0"><b class="disp" id="co-prev-n">${esc(coName())}</b><i id="co-prev-c">${esc(startSel.claim||'Il vostro claim qui')}</i></div></div>
-   <div class="cc-az"><label class="cc-f"><span class="lab">Nome dell'azienda</span><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||defCo())}" aria-label="Nome dell'azienda"></label>
+   <div class="cc-az"><label class="cc-f"><span class="lab">Nome dell'azienda</span><span class="cc-in"><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||defCo())}" aria-label="Nome dell'azienda">${suggBtn('name')}</span></label>
     <label class="cc-f"><span class="lab">Claim</span><span class="cc-in"><input type="text" id="co-claim" maxlength="60" value="${esc(startSel.claim)}" placeholder="Es. Ogni bancale è una promessa.">${suggBtn('claim')}</span></label></div>
    <div class="lab">Logo</div><div class="cc-pick">${Object.keys(CO_LOGOS).map(id=>`<button class="talpick lg" data-act="cologo" data-id="${id}" aria-pressed="${startSel.logo===id}" aria-label="Logo ${CO_LOGOS[id].n}" data-tip="<div class='tt'>${CO_LOGOS[id].n}</div>">${coLogoSvg(id,startSel.color,44)}</button>`).join('')}</div>
    <div class="lab">Colore</div><div style="display:flex;gap:8px">${COLORS.map(c=>`<button class="sw" data-act="pickcolor" data-c="${c[0]}" aria-pressed="${startSel.color===c[0]}" style="background:${c[0]}" aria-label="Colore ${c[0]}"></button>`).join('')}</div>
@@ -3009,7 +3016,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.13',t:'Curriculum e visura',x:['La creazione del CEO va a passaggi: identità (con soprannome e motto), abilità, studi e carattere.','Alla fine il CEO firma il suo curriculum vitae in formato europeo.','Ogni azienda ha logo, claim e colore, e si iscrive alla Camera di Commercio con tanto di timbro.']},
+ {v:'0.13',t:'Curriculum e visura',x:['Pulsanti «Suggerisci» per nome e cognome del CEO e per il nome dell\'azienda.','La creazione del CEO va a passaggi: identità (con soprannome e motto), abilità, studi e carattere.','Alla fine il CEO firma il suo curriculum vitae in formato europeo.','Ogni azienda ha logo, claim e colore, e si iscrive alla Camera di Commercio con tanto di timbro.']},
  {v:'0.12',t:'Tutti i numeri',x:['Nuova finestra Riepilogo dell\'azienda con cinque schede: panoramica, conti, operazioni, clienti e persone.','Grafici della cassa, dei ricavi e dei costi, dell\'utile di ogni mese, dei KPI e dei dipendenti.']},
  {v:'0.11',t:'Si parte col camioncino',x:['Schermata introduttiva: un camioncino entra in scena con il pallet dell\'icona.','Elenco delle novità nella schermata iniziale.']},
  {v:'0.10',t:'Contratti e penali',x:['8 nuovi clienti e gare sempre aperte.','Contratti con una durata: alla scadenza il cliente può non rinnovare, e può anche recedere prima.','Penali da contratto solo per alcuni clienti, in percentuale per ogni punto sotto soglia.']},
@@ -3105,7 +3112,11 @@ Object.assign(ACT,{
  pickceo(d){startKeep();startSel.ceo=d.id;startSel.err='';if(d.id==='custom'){if(!startSel.cc)startSel.cc=ccNew();stGo('cc1');return;}showStart();},
  pickcolor(d){startKeep();startSel.color=d.c;applyColor(d.c);showStart();},
  cologo(d){startKeep();startSel.logo=d.id;showStart();},
- sugg(d){startKeep();const t=d.f==='claim'?startSel:startSel.cc, cur=t[d.f]||'', o=SUGG[d.f].filter(x=>x!==cur);t[d.f]=o[Math.floor(Math.random()*o.length)];showStart();},
+ sugg(d){startKeep();const pick=(a,cur)=>{const o=a.filter(x=>x!==cur);return o[Math.floor(Math.random()*o.length)];}, cc=startSel.cc;
+   if(d.f==='persona'){cc.nome=pick(SUGG.nome,cc.nome);cc.cognome=pick(SUGG.cognome,cc.cognome);startSel.err='';}
+   else if(d.f==='name') startSel.name=pick(coNames(),coName());
+   else {const t=d.f==='claim'?startSel:cc;t[d.f]=pick(SUGG[d.f],t[d.f]||'');}
+   showStart();},
  stnext(){startKeep();const k=startSel.step,e=stValid(k);if(e){startSel.err=e;showStart();return;}const fl=stFlow();stGo(fl[fl.indexOf(k)+1]);},
  stback(){startKeep();const fl=stFlow();stGo(fl[Math.max(0,fl.indexOf(startSel.step)-1)]);},
  stgo(d){startKeep();stGo(d.to);},
