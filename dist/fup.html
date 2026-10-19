@@ -2360,7 +2360,7 @@ function showStart(){
    ${startSel.ceo==='custom'?ccPanel():''}
    <div class="split"><label style="display:flex;flex-direction:column;gap:4px"><span class="lab">2. Nome dell'azienda</span><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||defCo())}" aria-label="Nome dell'azienda"></label>
    <div style="display:flex;flex-direction:column;gap:4px"><span class="lab">3. Colore</span><div style="display:flex;gap:8px">${COLORS.map(c=>`<button class="sw" data-act="pickcolor" data-c="${c[0]}" aria-pressed="${startSel.color===c[0]}" style="background:${c[0]}" aria-label="Colore ${c[0]}"></button>`).join('')}</div></div></div>
-   <div class="row"><span class="sm">${TOUCH?'Comandi: trascina la mappa con un dito, allarga e stringi con due dita per lo zoom. Tocca una parola sottolineata per la spiegazione, tieni premuto un pulsante per sapere cosa fa.':'Comandi: spazio per la pausa, 1–3 per la velocità, L per le lenti della mappa, trascina e usa la rotellina sulla mappa.'}</span>${startSel.err?`<span class="bad" role="alert" style="font-weight:600">${esc(startSel.err)}</span>`:''}<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px">Inizia</button></div>
+   <div class="row" style="align-items:center">${startSel.err?`<span class="bad" role="alert" style="font-weight:600">${esc(startSel.err)}</span>`:''}<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Inizia</button></div>
   </div></div>`;
 }
 // web app: pulsante «Installa» (Chrome/Android) o istruzioni per iPhone, solo se il gioco non è già aperto come app
