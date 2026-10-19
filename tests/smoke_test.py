@@ -36,6 +36,10 @@ async def main():
         pg = await b.new_page(viewport={'width': 1440, 'height': 860})
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + PAGE)
+        # i tooltip devono stare sopra a tutto: schermata iniziale (talenti dei CEO) e finestre aperte
+        TIP_ON_TOP = '''(()=>{const t=document.querySelector('#tip'),r=t.getBoundingClientRect();t.style.pointerEvents='auto';const e=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);t.style.pointerEvents='';return !t.hidden&&!!e&&!!e.closest('#tip');})()'''
+        await pg.hover('#start .ceo[data-id=edoardo] .tal')
+        assert await pg.evaluate(TIP_ON_TOP), 'tooltip del talento coperto nella schermata iniziale'
         # creazione del CEO: senza nome e titolo non si parte
         await pg.click('[data-act=pickceo][data-id=custom]')
         await pg.click('[data-act=startgame]')
@@ -96,6 +100,9 @@ async def main():
         if not await pg.query_selector('#win-magazzini'): await pg.click('#dock [data-id=magazzini]')
         await pg.hover('#win-magazzini .kw[data-id=saturazione]')
         assert await pg.is_visible('#tip'), 'tooltip parola chiave non visibile'
+        assert await pg.evaluate(TIP_ON_TOP), 'tooltip coperto da una finestra'
+        await pg.hover('#top .chip[data-id=cassa]')
+        assert await pg.evaluate(TIP_ON_TOP), 'tooltip della barra in alto coperto dalle finestre'
         await pg.click('#win-magazzini .kw[data-id=saturazione]')
         assert await pg.query_selector('#win-enciclopedia .wk-it[aria-current=true][data-id=saturazione]')
         await pg.click('#win-enciclopedia .wk-txt .kw[data-id=accuratezza]')
