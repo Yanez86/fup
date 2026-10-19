@@ -1,13 +1,12 @@
 """Test automatico: apre il gioco in Chromium headless, clicca tutti i menu, prova alberi tecnologici e direzione,
-poi fa giocare un bot semplice 3 anni con ognuno dei 4 CEO. Fallisce se ci sono errori JavaScript.
+poi prova il gioco su un telefono (verticale e orizzontale: finestre, tocchi, zoom con due dita)
+e fa giocare un bot semplice 3 anni con ognuno dei 4 CEO. Fallisce se ci sono errori JavaScript.
 Uso: python3 tools/build.py && python3 tests/smoke_test.py   (richiede: pip install playwright && playwright install chromium)"""
 import asyncio, os, sys
 from playwright.async_api import async_playwright
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'tools', 'out'); os.makedirs(OUT, exist_ok=True)
-HTML = open(os.path.join(ROOT, 'dist', 'fup.html'), encoding='utf-8').read()
-PAGE = os.path.join(OUT, 'test_page.html')
-open(PAGE, 'w', encoding='utf-8').write('<!doctype html><html><head><meta charset="utf-8"></head><body>' + HTML + '</body></html>')
+PAGE = os.path.join(ROOT, 'dist', 'fup.html')
 
 CLEAR = '''()=>{const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}}'''
 BOT = '''(ceo)=>{
@@ -27,11 +26,54 @@ BOT = '''(ceo)=>{
  }
  return {ceo, day:S.day, over:S.over, cash:Math.round(S.cash), clienti:S.clients.filter(c=>c.status==='attivo').length};}'''
 
+# telefono: ogni finestra resta dentro lo schermo, la pagina non scorre di lato, tooltip al tocco, pinch sulla mappa
+PINCH = r'''()=>{const mw=document.querySelector('#mapwrap'), m=document.querySelector('#map'), s0=m.style.transform;
+  const ev=(t,id,x,y)=>mw.dispatchEvent(new PointerEvent(t,{pointerId:id,clientX:x,clientY:y,pointerType:'touch',bubbles:true,isPrimary:id===1}));
+  ev('pointerdown',1,150,400); ev('pointerdown',2,250,400);
+  for(let i=1;i<=5;i++){ev('pointermove',1,150-i*15,400);ev('pointermove',2,250+i*15,400);}
+  ev('pointerup',1,75,400); ev('pointerup',2,325,400);
+  const sc=t=>+((t.match(/scale\(([\d.]+)\)/)||[])[1]||0); return [sc(s0),sc(m.style.transform)];}'''
+FITS = '''(sel)=>{const r=document.querySelector(sel).getBoundingClientRect();
+  return r.left>=-1&&r.top>=-1&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1&&document.documentElement.scrollWidth<=innerWidth;}'''
+
+async def phone(b, w, h, name, errs):
+    ctx = await b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    pg = await ctx.new_page(); pg.on('pageerror', lambda e: errs.append(f'{name}: {e}'))
+    await pg.goto('file://' + PAGE)
+    assert await pg.evaluate("document.documentElement.classList.contains('mob')"), 'layout telefono non attivo'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_avvio.png'))
+    await pg.tap('[data-act=startgame]'); await pg.tap('[data-act=closemodal]')
+    await pg.wait_for_timeout(100)
+    for d in await pg.eval_on_selector_all('#dock button', 'e=>e.map(b=>b.dataset.id)'):
+        assert await pg.evaluate(FITS, f'#dock [data-id={d}]'), f'{name}: pulsante {d} fuori schermo'
+    zoom = await pg.evaluate(PINCH)
+    assert zoom[1] > zoom[0] * 1.5, f'{name}: pinch non ha zoomato {zoom}'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_mappa.png'))
+    for wn in ['azienda','magazzini','clienti','gare','report','personale','direzione','espansione','giornale','tecnologia','enciclopedia']:
+        await pg.tap(f'#dock [data-id={wn}]')
+        assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
+        await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{wn}.png'))
+        await pg.tap(f'#win-{wn} [data-act=close]')
+    # parola chiave: primo tocco = tooltip, secondo tocco = enciclopedia
+    await pg.tap('#dock [data-id=magazzini]')
+    await pg.tap('#win-magazzini .kw[data-id=saturazione]')
+    assert await pg.is_visible('#tip') and not await pg.query_selector('#win-enciclopedia'), f'{name}: il primo tocco deve mostrare il tooltip'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_tooltip.png'))
+    await pg.tap('#win-magazzini .kw[data-id=saturazione]')
+    assert await pg.query_selector('#win-enciclopedia .wk-it[aria-current=true][data-id=saturazione]'), f'{name}: il secondo tocco deve aprire la voce'
+    # il menu riporta davanti una finestra coperta invece di chiuderla
+    await pg.tap('#dock [data-id=magazzini]')
+    assert await pg.query_selector('#win-magazzini'), f'{name}: la finestra coperta è stata chiusa'
+    await ctx.close()
+
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch()
+        errs = []
+        await phone(b, 390, 844, 'verticale', errs)
+        await phone(b, 844, 390, 'orizzontale', errs)
         pg = await b.new_page(viewport={'width': 1440, 'height': 860})
-        errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + PAGE)
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
         # lente delle province

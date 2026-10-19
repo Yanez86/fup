@@ -1,5 +1,18 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>FUP – Fino all'ultimo pallet</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<!-- web app: si installa sulla schermata Home del telefono (manifest, icone e sw.js sono accanto a index.html) -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#16202e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FUP">
+<link rel="apple-touch-icon" href="icona_180.png">
+<link rel="icon" type="image/png" href="{{ICON}}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap">
 <style>
 /* Layout: mappa a tutto schermo con pan e zoom, barra risorse in alto, menu a sinistra, finestre fluttuanti trascinabili sopra. Look unico (pixel art chiara su mappa), senza tema scuro alternativo. */
@@ -209,12 +222,56 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .sw{width:30px;height:30px;border:3px solid var(--ink)}
 .sw[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
 @media (max-width:900px){.ceos{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:640px){
-  .ceos{grid-template-columns:minmax(0,1fr)}
-  #top .stats .chip.opt2{display:none}
-  #dock{top:auto;bottom:calc(12px + env(safe-area-inset-bottom, 0px));flex-direction:row;left:50%;transform:translateX(-50%)}
-  .win{left:16px !important;right:16px;top:96px !important;width:auto !important}
-}
+@media (max-width:640px){.ceos{grid-template-columns:minmax(0,1fr)}}
+
+/* Telefono (classe .mob su <html>, vedi setMobile): finestre a tutto schermo tra la barra in alto e il menu,
+   menu in basso (in verticale) o a sinistra su due colonne (in orizzontale), pulsanti grandi per il dito.
+   --top-h, --win-l e --win-b sono misurati in JS. */
+html,body{overscroll-behavior:none}
+.mob body{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.mob input[type=text]{-webkit-user-select:text;user-select:text;font-size:16px}
+.mob #top{gap:6px 8px;padding:4px max(8px, env(safe-area-inset-right, 0px)) 5px max(8px, env(safe-area-inset-left, 0px));padding-top:calc(4px + env(safe-area-inset-top, 0px))}
+.mob #top .logo{font-size:19px}
+.mob #top .logo small,.mob #top .spacer{display:none}
+.mob .date{font-size:14px;padding:3px 6px}
+.mob .spd button{width:38px;height:36px}
+.mob .paused{display:none}
+.mob #top .stats{gap:4px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.mob #top .stats .chip.opt2{display:none}
+.mob .chip{padding:1px 7px;flex:none}
+.mob .chip span:first-child{font-size:10px}
+.mob .chip b{font-size:15px}
+.mob #dock{top:auto;left:0;right:0;bottom:0;flex-direction:row;flex-wrap:wrap;justify-content:center;gap:5px;padding:5px max(8px, env(safe-area-inset-right, 0px)) calc(5px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));border-width:3px 0 0;box-shadow:inset 0 2px 0 var(--ink3)}
+.mob #dock button{width:50px;height:44px}
+.mob.land #dock{top:var(--top-h);bottom:0;right:auto;display:grid;grid-template-columns:repeat(2,46px);grid-auto-rows:40px;align-content:start;gap:4px;padding:5px 5px calc(5px + env(safe-area-inset-bottom, 0px)) max(5px, env(safe-area-inset-left, 0px));border-width:0 3px 0 0;overflow-y:auto}
+.mob.land #dock button{width:46px;height:40px}
+.mob #lenses{right:8px;bottom:calc(var(--win-b) + 8px);padding:4px}
+.mob #lenses .lab{display:none}
+.mob .win{left:var(--win-l) !important;right:0;top:var(--top-h) !important;bottom:var(--win-b);width:auto !important;max-width:none;max-height:none;border-width:0 0 0 3px;box-shadow:none}
+.mob .win-h{cursor:default;padding:4px 6px 4px 12px}
+.mob .win-h h2{font-size:20px}
+.mob .grip{display:none}
+.mob .xbtn{width:44px;height:40px;font-size:16px}
+.mob .win-b{padding:10px max(10px, env(safe-area-inset-right, 0px)) 16px 10px;overscroll-behavior:contain}
+.mob .tabs button{padding:10px 6px}
+.mob .win-b > *{flex-shrink:0}
+.mob .skills{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mob .btn{min-height:40px}
+.mob .btn.sm2{min-height:36px}
+.mob .xl-grid{max-height:none}
+.mob .lc-row,.mob .wk{grid-template-columns:minmax(0,1fr)}
+.mob .wk-list{max-height:32vh}
+.mob .wk:not(.q) .wk-list{display:none}
+.mob .xl-top{flex-wrap:wrap;gap:2px 8px}
+.mob .wk-home{grid-template-columns:minmax(0,1fr)}
+.mob #toasts{top:calc(var(--top-h) + 6px);left:max(8px, env(safe-area-inset-left, 0px));right:max(8px, env(safe-area-inset-right, 0px));width:auto;max-width:none}
+.mob #tip{max-width:min(340px, calc(100vw - 16px))}
+.mob .ovl{padding:8px}
+.mob .modal{max-height:calc(100dvh - 16px)}
+.mob #start{padding:10px max(8px, env(safe-area-inset-right, 0px)) 16px max(8px, env(safe-area-inset-left, 0px))}
+.mob #start h1{font-size:34px}
+.mob .ceos{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mob .ceo{padding:6px}
 @media (prefers-reduced-motion: reduce){ .toast{transition:none} }
 </style>
 
@@ -704,7 +761,9 @@ wk('fup','basi','Come si gioca',`Sei il CEO di un'azienda di logistica: tieni la
 
 Il ciclo è sempre lo stesso: vinci una [[gare|gara d'appalto]], [[assunzioni|assumi]] in anticipo le persone che servono, tieni [[puntualita]] e [[accuratezza]] sopra le [[soglie]] del cliente e incassa. Se la [[cassa]] scende sotto i −50.000 € l'azienda fallisce.
 
-Le parole sottolineate a puntini, come [[saturazione]], si spiegano passandoci sopra con il mouse: cliccale per aprire la voce completa. Questa enciclopedia si apre anche con il tasto E.`);
+Le parole sottolineate a puntini, come [[saturazione]], si spiegano passandoci sopra con il mouse: cliccale per aprire la voce completa. Questa enciclopedia si apre anche con il tasto E.
+
+Sul telefono: il primo tocco su una parola sottolineata mostra la spiegazione, il secondo apre la voce; tenendo premuto un pulsante si scopre a cosa serve. FUP si può installare come app dalla schermata iniziale.`);
 wk('tempo','basi','Tempo e velocità',`Il gioco avanza un giorno alla volta. Spazio mette in pausa, i tasti 1, 2 e 3 cambiano velocità.`,
 `Ogni giorno il gioco ricalcola tutti i magazzini: [[puntualita]], [[accuratezza]], [[morale]], costi e ricavi. Ogni lunedì arriva il [[report]] della settimana, alla fine di ogni mese si chiudono i conti: [[soddisfazione]] dei clienti, [[penali]], [[conto|conto economico]] e prezzo del [[gasolio]].
 
@@ -728,7 +787,7 @@ Gli effetti possono essere immediati (soldi, [[reputazione]], [[soddisfazione]])
 wk('giornale','basi','Il giornale',`L'archivio delle notizie: gare, contratti, ricerche concluse, scelte fatte negli eventi.`,
 `La Gazzetta del Muletto e Il Sole 24 Pallet raccontano cosa succede alla tua azienda e al mercato. Utile per ricordare chi ha vinto una [[gare|gara]] che hai perso e cosa hai deciso negli [[eventi]].`);
 wk('mappa','basi','Mappa',`Il Nord-Ovest in pixel art: magazzini, città servite e camion in viaggio.`,
-`Trascina per spostarti e usa la rotellina per lo zoom. Solo Piemonte, Lombardia, Liguria e Valle d'Aosta sono giocabili: il resto d'Italia è grigio.
+`Trascina per spostarti e usa la rotellina per lo zoom (sul telefono: un dito per spostarti, due dita per lo zoom). Solo Piemonte, Lombardia, Liguria e Valle d'Aosta sono giocabili: il resto d'Italia è grigio.
 
 Clicca un [[magazzino]] per aprirlo. Dalla finestra Clienti puoi mostrare sulla mappa la [[zona]] di distribuzione di un cliente e il percorso del [[ritiro]].`);
 wk('espansione','basi','Espansione',`Affittare un nuovo magazzino: due mesi di affitto anticipati più 15.000 € di allestimento.`,
@@ -1001,7 +1060,7 @@ wk('otif','gergo','OTIF',`On Time In Full: il KPI che unisce puntualità e compl
 wk('tender','gergo','Tender',`Il nome inglese (e da riunione) della gara d'appalto.`,`Vedi [[gare]]. Se il buyer dice "tender", di solito è già tardi per il listino pieno.`);
 const wikiIds=()=>Object.keys(WIKI);
 let WIKI_ON=false;  // false nella schermata iniziale: lì i clic sulle parole chiave non aprono l'enciclopedia
-const wikiHint=()=>WIKI_ON?`<div style='color:#c9d3dd;margin-top:4px;font-size:13px'>Clic: apri l'enciclopedia</div>`:'';
+const wikiHint=()=>WIKI_ON?`<div style='color:#c9d3dd;margin-top:4px;font-size:13px'>${TOUCH?'Tocca di nuovo':'Clic'}: apri l'enciclopedia</div>`:'';
 function wikiTip(id){const w=WIKI[id];if(!w)return '';return `<div class='tt'>${esc(w.n)}</div><div>${esc(w.s)}</div>${wikiHint()}`;}
 // parola chiave: testo sottolineato a puntini, tooltip con la spiegazione breve, clic = voce completa
 function kw(id,label){const w=WIKI[id];if(!w)return label==null?id:label;return `<span class="kw" data-act="wiki" data-id="${id}" tabindex="0" role="button" data-tip="${wikiTip(id)}">${label==null?esc(w.n):label}</span>`;}
@@ -1529,14 +1588,26 @@ function fitMap(){
 }
 function clampView(){const W=innerWidth,H=innerHeight;view.x=clamp(view.x,W-1280*view.s,0);view.y=clamp(view.y,H-800*view.s,0);}
 function applyView(){$('#map').style.transform=`translate(${view.x}px,${view.y}px) scale(${view.s})`;}
+// zoom tenendo fermo il punto (mx,my) dello schermo
+function zoomAt(mx,my,ns){ns=clamp(ns,view.min,view.min*3.2);view.x=mx-(mx-view.x)*ns/view.s;view.y=my-(my-view.y)*ns/view.s;view.s=ns;clampView();applyView();}
 function initMapControls(){
-  const mw=$('#mapwrap'); let drag=null;
-  mw.addEventListener('pointerdown',e=>{ if(e.target.closest('.mk')) return; drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y};mw.classList.add('drag');mw.setPointerCapture(e.pointerId);});
-  mw.addEventListener('pointermove',e=>{if(!drag)return;view.x=drag.vx+e.clientX-drag.x;view.y=drag.vy+e.clientY-drag.y;clampView();applyView();});
-  const up=()=>{drag=null;mw.classList.remove('drag');}; mw.addEventListener('pointerup',up); mw.addEventListener('pointercancel',up);
-  mw.addEventListener('wheel',e=>{e.preventDefault();const f=e.deltaY<0?1.15:1/1.15;const ns=clamp(view.s*f,view.min,view.min*3.2);
-    const mx=e.clientX,my=e.clientY;view.x=mx-(mx-view.x)*ns/view.s;view.y=my-(my-view.y)*ns/view.s;view.s=ns;clampView();applyView();},{passive:false});
-  addEventListener('resize',fitMap);
+  // un dito (o il mouse) trascina, due dita allargano e stringono; il trascinamento parte solo dopo qualche pixel, così i tocchi restano clic
+  const mw=$('#mapwrap'), pts=new Map(); let drag=null, pinch=null;
+  const mid=()=>{const [a,b]=[...pts.values()];return {x:(a.x+b.x)/2,y:(a.y+b.y)/2,d:Math.hypot(a.x-b.x,a.y-b.y)||1};};
+  const begin=()=>{ drag=null; pinch=null;
+    if(pts.size===1){const [p]=pts.values(); drag={x:p.x,y:p.y,vx:view.x,vy:view.y,on:false};}
+    else if(pts.size===2){const m=mid(); pinch={...m,s:view.s,vx:view.x,vy:view.y}; mw.classList.add('drag');} };
+  mw.addEventListener('pointerdown',e=>{ if(e.target.closest('.mk')||pts.size>=2) return; pts.set(e.pointerId,{x:e.clientX,y:e.clientY}); begin(); });
+  mw.addEventListener('pointermove',e=>{ const p=pts.get(e.pointerId); if(!p) return; p.x=e.clientX; p.y=e.clientY;
+    if(pinch){const m=mid(), ns=clamp(pinch.s*m.d/pinch.d,view.min,view.min*3.2); view.s=ns;
+      view.x=m.x-(pinch.x-pinch.vx)*ns/pinch.s; view.y=m.y-(pinch.y-pinch.vy)*ns/pinch.s; clampView(); applyView(); return;}
+    if(!drag) return;
+    if(!drag.on){ if(Math.hypot(p.x-drag.x,p.y-drag.y)<6) return; drag.on=true; mw.classList.add('drag'); try{mw.setPointerCapture(e.pointerId);}catch(_){} }
+    view.x=drag.vx+p.x-drag.x; view.y=drag.vy+p.y-drag.y; clampView(); applyView(); });
+  const up=e=>{ if(!pts.delete(e.pointerId)) return; mw.classList.remove('drag'); begin(); };
+  mw.addEventListener('pointerup',up); mw.addEventListener('pointercancel',up);
+  mw.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,view.s*(e.deltaY<0?1.15:1/1.15));},{passive:false});
+  addEventListener('resize',()=>{setMobile();fitMap();});
 }
 function renderMap(){
   const g=[];
@@ -1590,7 +1661,7 @@ const LENSES=[
   ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="5" height="5" fill="#ff7a3d"/><rect x="5" y="0" width="6" height="4" fill="#5fb4f0"/><rect x="0" y="5" width="4" height="5" fill="#ffd23f"/><rect x="4" y="5" width="7" height="5" fill="#2e9e48"/><rect x="5" y="4" width="6" height="1" fill="#2e9e48"/><rect x="4" y="0" width="1" height="10" fill="#16202e"/><rect x="0" y="4" width="11" height="1" fill="#16202e"/></svg>'}
 ];
 function renderLenses(){
-  $('#lenses').innerHTML='<span class="lab">Lenti</span>'+LENSES.map(l=>`<button data-act="lens" data-id="${l.id}" aria-pressed="${(UI.lens||'base')===l.id}" aria-label="Lente: ${esc(l.n)}" data-tip="<div class='tt'>${esc(l.n)}</div>${esc(l.d)}<br><span class='sm'>Tasto L per cambiare lente</span>">${l.ic}</button>`).join('');
+  $('#lenses').innerHTML='<span class="lab">Lenti</span>'+LENSES.map(l=>`<button data-act="lens" data-id="${l.id}" aria-pressed="${(UI.lens||'base')===l.id}" aria-label="Lente: ${esc(l.n)}" data-tip="<div class='tt'>${esc(l.n)}</div>${esc(l.d)}${TOUCH?'':"<br><span class='sm'>Tasto L per cambiare lente</span>"}">${l.ic}</button>`).join('');
 }
 // camion animati (solo estetica)
 let trucks=[], lastT=0;
@@ -1619,6 +1690,23 @@ function animTrucks(ts){
 }
 
 /* ====================== INTERFACCIA ====================== */
+// telefono: .mob su <html> mette le finestre a tutto schermo e il menu in basso (a sinistra se il telefono è in orizzontale).
+// TOUCH (schermo senza mouse) sceglie i testi dei comandi: «tocca» invece di «clic», niente tasti.
+const TOUCH=matchMedia('(hover: none)').matches;
+let MOB=false;
+function setMobile(){
+  MOB=matchMedia('(max-width: 760px), (max-height: 500px)').matches;
+  const h=document.documentElement; h.classList.toggle('mob',MOB); h.classList.toggle('land',MOB&&innerWidth>innerHeight);
+  layoutVars();
+}
+function layoutVars(){
+  if(!MOB) return;
+  const r=document.documentElement.style, land=innerWidth>innerHeight;
+  r.setProperty('--top-h',Math.round($('#top').getBoundingClientRect().bottom)+'px');
+  const d=$('#dock').getBoundingClientRect(), on=d.width>0;
+  r.setProperty('--win-l',on&&land?Math.round(d.right)+'px':'0px');
+  r.setProperty('--win-b',on&&!land?Math.round(innerHeight-d.top)+'px':'0px');
+}
 const DOCK=[
  ['azienda','Azienda e CEO','<svg width="22" height="24" viewBox="0 0 11 12" shape-rendering="crispEdges"><rect x="3" y="0" width="5" height="5" fill="#f2c79b"/><rect x="3" y="0" width="5" height="2" fill="#6b4a2b"/><rect x="1" y="6" width="9" height="6" fill="#ffd23f"/><rect x="5" y="6" width="1" height="4" fill="#16202e"/></svg>'],
  ['magazzini','Magazzini','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="0" y="3" width="12" height="8" fill="#d8e3ee"/><rect x="1" y="0" width="10" height="3" fill="#8a96a6"/><rect x="4" y="6" width="4" height="5" fill="#3a4658"/></svg>'],
@@ -1673,12 +1761,12 @@ function closeWin(id){delete UI.open[id];const el=document.getElementById('win-'
 function makeDraggable(el,id){
   const h=el.querySelector('.win-h'); let d=null;
   el.addEventListener('pointerdown',()=>{el.style.zIndex=++UI.z;});
-  h.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;d={x:e.clientX,y:e.clientY,l:el.offsetLeft,t:el.offsetTop};h.setPointerCapture(e.pointerId);});
+  h.addEventListener('pointerdown',e=>{if(MOB||e.target.closest('button'))return;d={x:e.clientX,y:e.clientY,l:el.offsetLeft,t:el.offsetTop};h.setPointerCapture(e.pointerId);});
   h.addEventListener('pointermove',e=>{if(!d)return;const x=clamp(d.l+e.clientX-d.x,0,innerWidth-80),y=clamp(d.t+e.clientY-d.y,56,innerHeight-40);el.style.left=x+'px';el.style.top=y+'px';UI.pos[id]={x,y};});
   h.addEventListener('pointerup',()=>d=null);
 }
 function renderWin(id){const el=document.getElementById('win-'+id);if(!el)return;const b=el.querySelector('.win-b');const st=b.scrollTop;b.innerHTML=(VIEWS[id]||(()=>''))();b.scrollTop=st;}
-function renderAll(){renderTop();const ae=document.activeElement;Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id);if(el&&ae&&el.contains(ae)&&ae.matches('select,input'))return;if(id==='enciclopedia')return;if(id!=='gare'||!UI.bidEditing)renderWin(id);});renderDock();}
+function renderAll(){renderTop();const ae=document.activeElement;Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id);if(el&&ae&&el.contains(ae)&&ae.matches('select,input'))return;if(id==='enciclopedia')return;if(id!=='gare'||!UI.bidEditing)renderWin(id);});renderDock();layoutVars();}
 function satObjTxt(sm){
   if(!sm.obj) return `<div class="sm">Senza obiettivo i camion partono pieni al ${Math.round(sm.nat)}%: è il carico che viene da sé.</div>`;
   const tip=tipParts('Capacità di pianificazione '+Math.round(sm.pot)+'%',[['Base',sm.nat],...sm.cP],'');
@@ -1935,10 +2023,10 @@ const VIEWS={
      ${bl.length?`<div class="lab">Se ne parla anche in</div><div class="wk-see">${bl.map(id=>kw(id)).join('')}</div>`:''}`;
   } else {
     art=`<div class="wk-head">${catIcon('basi',40)}<div style="flex:1;min-width:0"><div class="lab">Indice</div><h3 class="h3" style="font-size:23px">Enciclopedia di FUP</h3></div>${nav}</div>
-     <div class="wk-txt"><p>Tutto quello che serve sapere per non finire sotto un bancale. Le <span class="kw" style="cursor:default">parole sottolineate a puntini</span> sparse nel gioco si spiegano passandoci sopra con il mouse; con un clic si apre qui la voce completa. Si comincia da ${kw('fup')}.</p></div>
+     <div class="wk-txt"><p>Tutto quello che serve sapere per non finire sotto un bancale. Le <span class="kw" style="cursor:default">parole sottolineate a puntini</span> sparse nel gioco si spiegano ${TOUCH?'con un tocco; toccandole di nuovo':'passandoci sopra con il mouse; con un clic'} si apre qui la voce completa. Si comincia da ${kw('fup')}.</p></div>
      <div class="wk-home">${WIKI_CAT.map(([c,cn])=>`<div class="card"><div class="row">${catIcon(c,20)}<b>${esc(cn)}</b></div><div class="kws">${Object.values(WIKI).filter(w=>w.cat===c).map(w=>kw(w.id)).join('')}</div></div>`).join('')}</div>`;
   }
-  return `<div class="wk">${side}<article class="wk-art">${art}</article></div>`;
+  return `<div class="wk${UI.wikiQ?' q':''}">${side}<article class="wk-art">${art}</article></div>`;
  },
  giornale(){
   return S.news.slice(0,30).map(n=>`<div class="card"><div class="row"><span class="lab">${esc(n.src)}</span><span class="sm">${shortDate(n.day)}</span></div><b>${esc(n.title)}</b><div class="sm" style="color:var(--ink)">${esc(n.text)}</div></div>`).join('')||'<div class="sm">Nessuna notizia.</div>';
@@ -1966,7 +2054,7 @@ function techDays(t){return Math.max(5,Math.round(t.days*clamp(1-0.03*(innUsed()
 function hireDays(base){const att=40+welfarePts('att')+(S.rep-50)*0.5+5;const h=dirStat('hr');return Math.max(3,Math.round(base*clamp(1+(55-att)/40,0.6,1.8)*(R('hr')?0.8:1)*(h!=null?1-0.02*(h-10):1)));}
 const ACT={
  speed(d){setSpeed(+d.v);},
- toggle(d){UI.open[d.id]?closeWin(d.id):openWin(d.id);},
+ toggle(d){const el=document.getElementById('win-'+d.id); if(MOB&&el&&+el.style.zIndex<UI.z) return openWin(d.id); UI.open[d.id]?closeWin(d.id):openWin(d.id);},
  open(d){openWin(d.id);},
  close(d){closeWin(d.id);},
  openwh(d){openWin('magazzini',{wh:d.id});},
@@ -2067,7 +2155,7 @@ function toast(text,kind){
 /* ====================== EVENTI DOM ====================== */
 document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a||a.tagName==='INPUT'||a.tagName==='SELECT')return;const f=ACT[a.dataset.act];if(f){e.preventDefault();f(a.dataset,a);}});
 document.addEventListener('change',e=>{const a=e.target.closest('[data-act]');if(!a)return;const f=ACT[a.dataset.act];if(f&&(a.tagName==='SELECT'||a.type==='checkbox')){a.blur();f(a.dataset,a);}});
-document.addEventListener('input',e=>{if(e.target.id==='wiki-q'){UI.wikiQ=e.target.value;$('#wiki-list').innerHTML=wikiList();return;}const a=e.target.closest('input[type=range][data-act]');if(a)ACT[a.dataset.act](a.dataset,a);});
+document.addEventListener('input',e=>{if(e.target.id==='wiki-q'){UI.wikiQ=e.target.value;$('#wiki-list').innerHTML=wikiList();$('#win-enciclopedia .wk').classList.toggle('q',!!UI.wikiQ);return;}const a=e.target.closest('input[type=range][data-act]');if(a)ACT[a.dataset.act](a.dataset,a);});
 document.addEventListener('pointerdown',e=>{if(e.target.closest('#win-gare input[type=range]'))UI.bidEditing=true;});
 document.addEventListener('pointerup',()=>{UI.bidEditing=false;});
 document.addEventListener('keydown',e=>{
@@ -2081,8 +2169,35 @@ document.addEventListener('keydown',e=>{
 });
 // tooltip
 const tip=$('#tip');
-document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-tip]');if(!t){if(!e.target.closest('svg[data-chart]'))tip.hidden=true;return;}tip.innerHTML=t.dataset.tip;tip.hidden=false;});
-document.addEventListener('mousemove',e=>{if(tip.hidden)return;const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(e.clientX+14,innerWidth-w-8)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';});
+// col dito: il primo tocco su una parola chiave (o su un elemento che spiega e basta) mostra il tooltip, il secondo apre la voce;
+// tenere premuto mostra il tooltip di qualunque pulsante. Nell'enciclopedia i collegamenti si aprono subito.
+let touchT=0, tipFor=null, lpTimer=0, lpAt=null, lpDone=false;
+function showTipAt(t){
+  tip.innerHTML=t.dataset.tip; tip.hidden=false; tipFor=t;
+  const r=t.getBoundingClientRect(), w=tip.offsetWidth, h=tip.offsetHeight; let y=r.bottom+8; if(y+h>innerHeight-8) y=Math.max(8,r.top-h-8);
+  tip.style.left=clamp(r.left+r.width/2-w/2,8,innerWidth-w-8)+'px'; tip.style.top=y+'px';
+}
+function hideTip(){tip.hidden=true;tipFor=null;}
+document.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse') return; touchT=Date.now(); clearTimeout(lpTimer); lpDone=false;
+  const t=e.target.closest('[data-tip]'); if(tipFor&&t!==tipFor) hideTip();
+  if(t){ lpAt={x:e.clientX,y:e.clientY}; lpTimer=setTimeout(()=>{lpDone=true;showTipAt(t);},450); }
+},true);
+document.addEventListener('pointermove',e=>{if(lpAt&&Math.hypot(e.clientX-lpAt.x,e.clientY-lpAt.y)>10){clearTimeout(lpTimer);lpAt=null;}},true);
+['pointerup','pointercancel'].forEach(n=>document.addEventListener(n,()=>{clearTimeout(lpTimer);lpAt=null;},true));
+document.addEventListener('contextmenu',e=>{if(Date.now()-touchT<1500)e.preventDefault();});
+document.addEventListener('click',e=>{
+  if(Date.now()-touchT>1000) return;  // clic del mouse: niente da fare
+  const stop=()=>{e.preventDefault();e.stopPropagation();};
+  if(lpDone){lpDone=false;stop();return;}
+  const t=e.target.closest('[data-tip]');
+  const info=t&&(!t.dataset.act||t.dataset.act==='wiki')&&!t.closest('#win-enciclopedia');
+  if(info&&tipFor!==t){stop();showTipAt(t);return;}
+  if(info&&!t.dataset.act){stop();hideTip();return;}
+  hideTip();
+},true);
+document.addEventListener('mouseover',e=>{if(Date.now()-touchT<1000)return;const t=e.target.closest('[data-tip]');if(!t){if(!e.target.closest('svg[data-chart]'))tip.hidden=true;return;}tip.innerHTML=t.dataset.tip;tip.hidden=false;});
+document.addEventListener('mousemove',e=>{if(tip.hidden||Date.now()-touchT<1000)return;const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(e.clientX+14,innerWidth-w-8)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';});
 
 /* ====================== AVVIO ====================== */
 let startSel={ceo:'gino',color:'#ff7a3d',name:''};
@@ -2101,15 +2216,33 @@ function showStart(){
   $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP</span><span>Nord-Ovest, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
    <div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
    <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord-Ovest. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
+   ${installCard()}
    ${sv&&sv.S&&!sv.S.over?`<div class="card pend"><div class="row"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><button class="btn pri" data-act="continue">Continua la partita</button></div></div>`:''}
    <div class="lab">1. Scegli il tuo CEO</div><div class="ceos">${st}</div>
    <div class="split"><label style="display:flex;flex-direction:column;gap:4px"><span class="lab">2. Nome dell'azienda</span><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||C.company)}" aria-label="Nome dell'azienda"></label>
    <div style="display:flex;flex-direction:column;gap:4px"><span class="lab">3. Colore</span><div style="display:flex;gap:8px">${COLORS.map(c=>`<button class="sw" data-act="pickcolor" data-c="${c[0]}" aria-pressed="${startSel.color===c[0]}" style="background:${c[0]}" aria-label="Colore ${c[0]}"></button>`).join('')}</div></div></div>
-   <div class="row"><span class="sm">Comandi: spazio per la pausa, 1–3 per la velocità, L per le lenti della mappa, trascina e usa la rotellina sulla mappa.</span><button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px">Inizia</button></div>
+   <div class="row"><span class="sm">${TOUCH?'Comandi: trascina la mappa con un dito, allarga e stringi con due dita per lo zoom. Tocca una parola sottolineata per la spiegazione, tieni premuto un pulsante per sapere cosa fa.':'Comandi: spazio per la pausa, 1–3 per la velocità, L per le lenti della mappa, trascina e usa la rotellina sulla mappa.'}</span><button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px">Inizia</button></div>
   </div></div>`;
 }
+// web app: pulsante «Installa» (Chrome/Android) o istruzioni per iPhone, solo se il gioco non è già aperto come app
+let installEvt=null;
+const STANDALONE=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+function installCard(){
+  if(STANDALONE||!location.protocol.startsWith('http')) return '';
+  if(installEvt) return `<div class="card"><div class="row"><span>Gioca a schermo intero e senza connessione: aggiungi FUP alla schermata Home.</span><button class="btn" data-act="installapp">Installa come app</button></div></div>`;
+  if(IOS) return `<div class="card"><span>Per giocare a schermo intero: tocca <b>Condividi</b> in Safari, poi <b>Aggiungi alla schermata Home</b>.</span></div>`;
+  return '';
+}
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;if($('#start').innerHTML){const i=$('#coname-in');if(i)startSel.name=i.value;showStart();}});
+addEventListener('appinstalled',()=>{installEvt=null;if($('#start').innerHTML)showStart();});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+// sul telefono il sistema può chiudere l'app in qualunque momento: si salva ogni volta che il gioco va in secondo piano
+addEventListener('visibilitychange',()=>{if(document.hidden&&S&&!$('#start').innerHTML)save();});
+addEventListener('pagehide',()=>{if(S&&!$('#start').innerHTML)save();});
 function setSpeedSafe(v){if(S){S.speed=v;renderTop();}}
 Object.assign(ACT,{
+ installapp(){if(!installEvt)return;installEvt.prompt();installEvt.userChoice.finally(()=>{installEvt=null;const i=$('#coname-in');if(i)startSel.name=i.value;showStart();});},
  pickceo(d){const old=CEOS.find(c=>c.id===startSel.ceo);const inp=$('#coname-in');const typed=inp?inp.value:'';startSel.ceo=d.id;if(!typed||typed===old.company)startSel.name='';else startSel.name=typed;showStart();},
  pickcolor(d){startSel.color=d.c;applyColor(d.c);startSel.name=$('#coname-in').value;showStart();},
  startgame(){const nm=($('#coname-in').value||'').trim();uid=1;newGame(startSel.ceo,nm,startSel.color);boot();},
@@ -2119,18 +2252,18 @@ function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;
   Object.keys(UI.open).forEach(closeWin); UI={open:{},sel:{},tab:{},z:30,pos:{},bid:{},lens:UI.lens};
   view.init=0; fitMap(); renderMap(); S.warehouses.forEach(w=>w.kpi=computeWH(w)); syncTrucks(); renderAll();
-  if(S.day===0){ modalInfo('La Gazzetta del Muletto',`Benvenuto, ${ceo().name}`,`Hai un magazzino a ${S.warehouses[0].name} e un solo cliente, ${S.clients[0].name}. Con il magazzino quasi vuoto perdi soldi ogni mese: tieni d'occhio le Gare d'appalto, assumi in anticipo quando ne vinci una e controlla Puntualità e Accuratezza nel menu Magazzini. Premi spazio per far scorrere il tempo. Le parole sottolineate a puntini si spiegano passandoci sopra; cliccale, o premi E, per aprire l'Enciclopedia.`); }
+  if(S.day===0){ modalInfo('La Gazzetta del Muletto',`Benvenuto, ${ceo().name}`,`Hai un magazzino a ${S.warehouses[0].name} e un solo cliente, ${S.clients[0].name}. Con il magazzino quasi vuoto perdi soldi ogni mese: tieni d'occhio le Gare d'appalto, assumi in anticipo quando ne vinci una e controlla Puntualità e Accuratezza nel menu Magazzini. ${TOUCH?'Tocca › in alto per far scorrere il tempo. Le parole sottolineate a puntini si spiegano con un tocco; toccale di nuovo per aprire l\'Enciclopedia.':'Premi spazio per far scorrere il tempo. Le parole sottolineate a puntini si spiegano passandoci sopra; cliccale, o premi E, per aprire l\'Enciclopedia.'}`); }
 }
 /* ciclo di gioco */
 let acc=0,lastTick=performance.now(); const STEP=[0,1000,420,140];
 function loop(now){
-  const dt=now-lastTick; lastTick=now;
+  const dt=Math.min(now-lastTick,250); lastTick=now;  // tornando da un'altra app o scheda il tempo riparte da dove era
   if(S&&!S.over&&S.speed>0&&!$('#modal').innerHTML){acc+=dt; let n=0; while(S.speed>0&&acc>=STEP[S.speed]&&n<5){acc-=STEP[S.speed];step();n++; if(S.over)break;} if(n){syncTrucksMaybe();renderAll();}}
   else acc=0;
   requestAnimationFrame(loop);
 }
 let lastSync=0; function syncTrucksMaybe(){if(S.day-lastSync>=7){lastSync=S.day;syncTrucks();}}
-initMapControls();
+setMobile(); initMapControls(); if(document.fonts) document.fonts.ready.then(layoutVars);
 const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else showStart(); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }

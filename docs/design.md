@@ -94,8 +94,14 @@ Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Opera
 
 ## Enciclopedia e parole chiave
 - Finestra "Enciclopedia di FUP" (icona del libro nel menu, tasto E): indice per categorie (basi, KPI, abilità, talenti, personale, clienti e gare, soldi e costi, tecnologie, direzione, gergo), ricerca, voci collegate tra loro, pulsanti Indietro e Indice.
-- Nell'interfaccia le parole chiave sono sottolineate a puntini: al passaggio del mouse un tooltip dà la spiegazione breve, al clic si apre la voce completa. Anche abilità, talenti, tecnologie installate e i riquadri della barra in alto aprono la loro voce.
+- Nell'interfaccia le parole chiave sono sottolineate a puntini: al passaggio del mouse (o al primo tocco sul telefono) un tooltip dà la spiegazione breve, al clic (o al secondo tocco) si apre la voce completa. Anche abilità, talenti, tecnologie installate e i riquadri della barra in alto aprono la loro voce.
 - Le voci di abilità, talenti, tecnologie e direttori sono generate dai dati del gioco; le altre sono scritte a mano in `WIKI` e i numeri vanno tenuti allineati alle formule di questo documento.
+
+## Telefono e web app
+- Il gioco funziona su computer e su telefono. Sotto i 760 px di larghezza (o 500 di altezza) si attiva il layout da telefono: finestre a tutto schermo, una sopra l'altra; menu in basso su due righe in verticale, a sinistra su due colonne in orizzontale; barra in alto compatta (cassa, mese scorso, reputazione).
+- Comandi al tocco: un dito sposta la mappa, due dita fanno lo zoom. Primo tocco su una parola chiave = tooltip, secondo tocco = voce dell'enciclopedia (dentro l'enciclopedia i collegamenti si aprono subito). Tenere premuto un pulsante mostra il suo tooltip. Il menu riporta davanti una finestra coperta invece di chiuderla.
+- Web app: da GitHub Pages si installa sulla schermata Home (manifest, icone da `tools/icone.py`, service worker `sw.js` che tiene una copia per giocare senza rete; la pagina si scarica fresca quando c'è connessione).
+- Salvataggio automatico ogni volta che il gioco va in secondo piano. Tornando nel gioco il tempo riparte da dove era: i giorni non scorrono mentre l'app è chiusa.
 
 ## Idee aperte
 - Espansione oltre il Nord-Ovest, concorrenti più attivi sulla mappa, flotta con tipi di mezzi diversi (motrici, bilici, frigo), contratti con i fornitori, uffici.

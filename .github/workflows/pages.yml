@@ -1,5 +1,5 @@
 # Pubblica il gioco su GitHub Pages a ogni push su main.
-# Il sito mostra dist/fup.html come pagina principale.
+# Il sito mostra dist/fup.html come pagina principale, con accanto i file della web app.
 name: Pubblica su GitHub Pages
 on:
   push:
@@ -24,6 +24,8 @@ jobs:
         run: |
           mkdir -p _site
           cp dist/fup.html _site/index.html
+          # web app installabile sul telefono: manifest, service worker e icone
+          cp dist/manifest.webmanifest dist/sw.js dist/icona_*.png _site/
           touch _site/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
