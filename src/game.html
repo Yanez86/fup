@@ -31,6 +31,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .vign{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 55%, rgba(8,20,40,0) 55%, rgba(8,20,40,.4) 100%)}
 .lbl{font-family:var(--f-disp);font-weight:600;fill:var(--ink);stroke:#f4f7fa;stroke-width:3px;paint-order:stroke}
 .mk{cursor:pointer}
+.plbl{font-family:var(--f-disp);font-weight:600;fill:#fff;stroke:var(--ink);stroke-width:3px;paint-order:stroke;pointer-events:none;letter-spacing:1px}
+.prov{transition:fill-opacity .12s}
+.prov:hover{fill-opacity:.62}
+#lenses{position:fixed;right:max(16px, env(safe-area-inset-right, 0px));bottom:max(16px, env(safe-area-inset-bottom, 0px));z-index:25;display:flex;align-items:center;gap:6px;padding:6px;background:var(--ink);border:3px solid var(--ink2);box-shadow:inset 0 2px 0 var(--ink3), 5px 5px 0 rgba(12,19,29,.55)}
+#lenses .lab{color:var(--hi);font-family:var(--f-disp);font-size:14px;padding:0 4px}
+#lenses button{width:44px;height:40px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink4);background:var(--ink3);box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
+#lenses button[aria-pressed="true"]{background:var(--accent);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
 .mk:hover .mk-ring{stroke:var(--yellow)}
 
 /* Barra superiore */
@@ -195,6 +202,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 </header>
 
 <nav id="dock" aria-label="Menu"></nav>
+<nav id="lenses" aria-label="Lenti della mappa"></nav>
 <div id="wins"></div>
 <div id="toasts" aria-live="polite"></div>
 <div id="tip" hidden></div>
@@ -925,7 +933,36 @@ function renderMap(){
     g.push(`<g class="mk" data-act="openwh" data-id="${w.id}" data-tip="<div class='tt'>${esc(w.name)}</div>Clic per aprire il magazzino"><rect x="${x-15}" y="${y-13}" width="34" height="26" fill="#0c131d" opacity=".4"/><rect class="mk-ring" x="${x-17}" y="${y-16}" width="34" height="26" fill="#16202e" stroke="#16202e" stroke-width="2"/><rect x="${x-15}" y="${y-8}" width="30" height="16" style="fill:var(--accent)"/><rect x="${x-15}" y="${y-8}" width="30" height="3" style="fill:var(--accent-l)"/><rect x="${x-6}" y="${y-3}" width="12" height="11" fill="#fff"/><rect x="${x-6}" y="${y+1}" width="12" height="1" fill="#9fb0c2"/><rect x="${x-13}" y="${y-14}" width="4" height="2" fill="#ffd23f"/></g>`);
     g.push(`<text class="lbl" x="${x+20}" y="${y-4}" font-size="15">${esc(w.name)}</text>`);});
   g.push('<g id="trucks"></g>');
-  $('#ov').innerHTML=g.join('');
+  const L=LENSES.find(l=>l.id===UI.lens), lg=L&&L.draw?L.draw():[];
+  $('#ov').innerHTML=lg.join('')+g.join('');
+  renderLenses();
+}
+/* lenti della mappa: ogni lente aggiunge uno strato sotto città e magazzini. Per una nuova lente basta una voce in LENSES con draw() */
+const PROV={{PROV}};
+const PROV_CAP={TO:'Torino',VC:'Vercelli',NO:'Novara',CN:'Cuneo',AT:'Asti',AL:'Alessandria',AO:'Aosta',IM:'Imperia',SV:'Savona',GE:'Genova',SP:'La Spezia',VA:'Varese',CO:'Como',SO:'Sondrio',MI:'Milano',BG:'Bergamo',BS:'Brescia',PV:'Pavia',CR:'Cremona',MN:'Mantova',BI:'Biella',LC:'Lecco',LO:'Lodi',VB:'Verbania',MB:'Monza'};
+function lensProv(){
+  const fill=[],line=[],lab=[];
+  PROV.forEach(p=>{
+    const d=p.rings.map(r=>'M'+r.map(q=>q.join(' ')).join('L')+'Z').join('');
+    const mine=S.warehouses.filter(w=>w.prov===p.id), free=Object.values(SITES).filter(s=>s.prov===p.id&&!S.warehouses.some(w=>SITES[w.site]===s));
+    const tip=`<div class='tt'>${esc(p.n)} (${p.id})</div>${esc(p.reg)} · capoluogo ${esc(PROV_CAP[p.id])}`
+      +(mine.length?`<br>I tuoi magazzini: <b>${mine.map(w=>esc(w.name)).join(', ')}</b>`:'')
+      +(free.length?`<br>Siti in affitto: ${free.map(s=>esc(s.name)).join(', ')}`:'')
+      +(p.id==='MB'&&S.day<2737?`<br><i>Sulla carta esiste dal 2004, ma fino al 2009 gli uffici dicono «chieda a Milano».</i>`:'');
+    fill.push(`<path class="prov" d="${d}" fill="${TPAL[p.c]}" fill-opacity="${mine.length?.5:.32}" data-tip="${tip}"/>`);
+    line.push(`<path d="${d}" fill="none" stroke="#16202e" stroke-width="${mine.length?3:1.5}" stroke-opacity=".75" stroke-linejoin="round"/>`);
+    lab.push(`<text class="plbl" x="${p.lp[0]}" y="${p.lp[1]+p.lp[2]*.36}" font-size="${p.lp[2]}" text-anchor="middle">${p.id}</text>`);
+  });
+  return [`<g aria-label="Province">`,...fill,`<g shape-rendering="auto" pointer-events="none">`,...line,'</g>',...lab,'</g>'];
+}
+const LENSES=[
+ {id:'base',n:'Mappa normale',d:'Città, magazzini e siti in affitto.',
+  ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="11" height="10" fill="#5fb4f0"/><rect x="0" y="3" width="7" height="7" fill="#8ed15b"/><rect x="2" y="1" width="6" height="3" fill="#8ed15b"/><rect x="5" y="4" width="2" height="2" fill="#16202e"/><rect x="2" y="7" width="2" height="2" fill="#fff"/></svg>'},
+ {id:'prov',n:'Province',d:'Le 25 province di Piemonte, Valle d\'Aosta, Lombardia e Liguria. Passa sopra a una provincia per i dettagli.',draw:lensProv,
+  ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="5" height="5" fill="#ff7a3d"/><rect x="5" y="0" width="6" height="4" fill="#5fb4f0"/><rect x="0" y="5" width="4" height="5" fill="#ffd23f"/><rect x="4" y="5" width="7" height="5" fill="#2e9e48"/><rect x="5" y="4" width="6" height="1" fill="#2e9e48"/><rect x="4" y="0" width="1" height="10" fill="#16202e"/><rect x="0" y="4" width="11" height="1" fill="#16202e"/></svg>'}
+];
+function renderLenses(){
+  $('#lenses').innerHTML='<span class="lab">Lenti</span>'+LENSES.map(l=>`<button data-act="lens" data-id="${l.id}" aria-pressed="${(UI.lens||'base')===l.id}" aria-label="Lente: ${esc(l.n)}" data-tip="<div class='tt'>${esc(l.n)}</div>${esc(l.d)}<br><span class='sm'>Tasto L per cambiare lente</span>">${l.ic}</button>`).join('');
 }
 // camion animati (solo estetica)
 let trucks=[], lastT=0;
@@ -1267,6 +1304,7 @@ const ACT={
  firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});m.hired=false;m.wh=null;renderAll();},
  sheet(d){UI.sel.sheet=d.id;UI.sel.cell='A1';renderWin('report');},
  cell(d){UI.sel.cell=d.ref;renderWin('report');},
+ lens(d){UI.lens=d.id;renderMap();syncTrucks();},
  mapcli(d){UI.mapCli=UI.mapCli===d.id?null:d.id;renderMap();syncTrucks();renderAll();},
  seltree(d){UI.sel.tree=d.id;UI.sel.tech=null;renderWin('tecnologia');},
  seltech(d){UI.sel.tech=d.id;renderWin('tecnologia');},
@@ -1318,6 +1356,7 @@ document.addEventListener('keydown',e=>{
   if($('#modal').innerHTML) return;
   if(e.code==='Space'){e.preventDefault();setSpeed(S.speed?0:(UI.prevSpeed||1));if(S.speed)UI.prevSpeed=S.speed;}
   if(['Digit1','Digit2','Digit3'].includes(e.code)){setSpeed(+e.code.slice(5));UI.prevSpeed=S.speed;}
+  if(e.code==='KeyL'){const i=LENSES.findIndex(l=>l.id===(UI.lens||'base'));ACT.lens({id:LENSES[(i+1)%LENSES.length].id});}
 });
 // tooltip
 const tip=$('#tip');
@@ -1345,7 +1384,7 @@ function showStart(){
    <div class="lab">1. Scegli il tuo CEO</div><div class="ceos">${st}</div>
    <div class="split"><label style="display:flex;flex-direction:column;gap:4px"><span class="lab">2. Nome dell'azienda</span><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||C.company)}" aria-label="Nome dell'azienda"></label>
    <div style="display:flex;flex-direction:column;gap:4px"><span class="lab">3. Colore</span><div style="display:flex;gap:8px">${COLORS.map(c=>`<button class="sw" data-act="pickcolor" data-c="${c[0]}" aria-pressed="${startSel.color===c[0]}" style="background:${c[0]}" aria-label="Colore ${c[0]}"></button>`).join('')}</div></div></div>
-   <div class="row"><span class="sm">Comandi: spazio per la pausa, 1–3 per la velocità, trascina e usa la rotellina sulla mappa.</span><button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px">Inizia</button></div>
+   <div class="row"><span class="sm">Comandi: spazio per la pausa, 1–3 per la velocità, L per le lenti della mappa, trascina e usa la rotellina sulla mappa.</span><button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px">Inizia</button></div>
   </div></div>`;
 }
 function setSpeedSafe(v){if(S){S.speed=v;renderTop();}}
@@ -1357,7 +1396,7 @@ Object.assign(ACT,{
 });
 function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color);
-  Object.keys(UI.open).forEach(closeWin); UI={open:{},sel:{},tab:{},z:30,pos:{},bid:{}};
+  Object.keys(UI.open).forEach(closeWin); UI={open:{},sel:{},tab:{},z:30,pos:{},bid:{},lens:UI.lens};
   view.init=0; fitMap(); renderMap(); S.warehouses.forEach(w=>w.kpi=computeWH(w)); syncTrucks(); renderAll();
   if(S.day===0){ modalInfo('La Gazzetta del Muletto',`Benvenuto, ${ceo().name}`,`Hai un magazzino a ${S.warehouses[0].name} e un solo cliente, ${S.clients[0].name}. Con il magazzino quasi vuoto perdi soldi ogni mese: tieni d'occhio le Gare d'appalto, assumi in anticipo quando ne vinci una e controlla Puntualità e Accuratezza nel menu Magazzini. Premi spazio per far scorrere il tempo.`); }
 }
