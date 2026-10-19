@@ -264,9 +264,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .opt b{display:block;font-size:16px}
 .opt .ev-d{display:block;margin:2px 0 4px;line-height:1.4}
 .ev-res{display:block;font-size:14px;color:var(--muted)}.ev-res i{font-style:normal;font-weight:600;color:var(--ink)}
-.opt .ev-req{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:14px;font-weight:600}
+.opt .ev-req{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:12px;font-weight:600}
 .opt .ev-req i{font-style:normal;font-weight:400;color:var(--muted)}
-.opt .ev-rq{display:inline-flex;align-items:center;gap:5px;padding:2px 8px 2px 2px;background:var(--yellow);border:2px solid var(--ink)}
+.opt .ev-rq{display:inline-flex;align-items:center;gap:4px;padding:1px 6px 1px 1px;background:var(--yellow);border:2px solid var(--ink);line-height:1.2}
+.opt .ev-rq .tal{border-width:1px}.opt .ev-rq .stc{font-size:12px;padding:0 3px}
 .opt .ev-req.ok .ev-rq{background:#bfe8c8}
 .opt .ev-rq .tal{cursor:inherit}
 
@@ -2535,9 +2536,9 @@ function fireEvent(){
 // requisito di una risposta, in fondo al riquadro: badge del talento o dell'abilità («A o B» = basta uno dei due)
 function evReq(reqT,ok){
   const parts=reqT.split(' o ').map(x=>{
-    if(TALENTS[x]) return `<span class="ev-rq">${talentIcons([x],16)}${esc(x)}</span>`;
+    if(TALENTS[x]) return `<span class="ev-rq">${talentIcons([x],11)}${esc(x)}</span>`;
     const m=x.match(/^(.+) (\d+)$/),st=m&&STATS.find(z=>z.n===m[1]);
-    return st?`<span class="ev-rq">${statBadge(st.k,+m[2])}${esc(st.n)}</span>`:`<span class="ev-rq">${esc(x)}</span>`;
+    return st?`<span class="ev-rq">${statBadge(st.k,+m[2],11)}${esc(st.n)}</span>`:`<span class="ev-rq">${esc(x)}</span>`;
   });
   return `<span class="ev-req${ok?' ok':''}"><i>${ok?'Grazie a':'Serve'}</i>${parts.join('<i>o</i>')}</span>`.replace(/ data-act="wiki"/g,'');
 }
