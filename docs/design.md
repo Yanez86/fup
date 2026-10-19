@@ -95,11 +95,18 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Operazioni = ingranaggio arancione, Precisione = bersaglio blu, Negoziazione = moneta gialla, Leadership = bandiera rossa, Amministrazione = calcolatrice verde, Innovazione = lampadina viola.
 
 ## Tecnologie
-- Quattro alberi: **Logistica** (barcode → WMS → radiofrequenza → pick-to-light → AMR; formazione → sicurezza muletti → magazzino verticale; GPS → pianificazione rotte → sinergia in pianificazione), **Sviluppo aziendale** (gestionale → ufficio del personale → welfare → Academy; gestionale → struttura direzionale → controllo di gestione → ISO 9001), **Mercato** (ufficio commerciale → EDI → KAM → e-commerce / accordi quadro nazionali; marketing; catena del freddo), **Welfare** (boccioni d'acqua → servizio frutta → mensa → asilo; pulmini per i dipendenti → asilo; boccioni d'acqua → area cani).
+- Quattro alberi: **Logistica** (barcode → WMS → radiofrequenza → pick-to-light → AMR; formazione → sicurezza muletti → magazzino verticale; GPS → pianificazione rotte → sinergia in pianificazione), **Sviluppo aziendale** (gestionale → ufficio del personale → welfare → Academy; gestionale → struttura direzionale → controllo di gestione → ISO 9001), **Mercato** (ufficio commerciale → EDI → KAM → e-commerce / accordi quadro nazionali; marketing; catena del freddo), **Welfare** (18 servizi: acqua → frutta → mensa → orto / asilo; caffè → sala pausa; pulmini → asilo / colonnine; spogliatoi → lavanderia → palestra; presidio medico → sportello d'ascolto; corsi di italiano; raffrescatori; area cani).
 - Una ricerca alla volta. Giorni = base × clamp(1 − 0,03·(Innovazione − 10); 0,6; 1,5). Si usa l'Innovazione più alta tra quella del CEO e quella del direttore tecnologia. Annullando una ricerca si recupera il 50% del costo.
 - Logistica: dopo la ricerca si paga l'installazione in ogni magazzino, più un canone mensile. Durante le settimane di apprendimento l'effetto è negativo, poi diventa positivo (moltiplicatori sui tempi di apprendimento: Academy ×0,7; nel magazzino guidato dal CEO i talenti con `learn`: Allergico al gestionale ×1,5, Parla con i robot ×0,7, Ingegnere informatico ×0,8, Diplomato perito informatico ×0,85).
 - Welfare: come la Logistica si installa magazzino per magazzino (costo + canone, canone −30% con Welfare aziendale), ma senza apprendimento. Ogni servizio dà morale e attrattività al solo magazzino; la mensa +3% di produttività, i pulmini +0,5 di puntualità. Attrattività per le assunzioni = 40 + welfare aziendale + (reputazione−50)·0,5 + 5 + servizi di welfare del magazzino.
 - Ogni tecnologia ha `desc` (effetto) e `txt` (una o due frasi semplici su cos'è).
+
+## Immobile, manutenzione e ampliamento
+- Ogni magazzino ha uno **stato** da 0 a 100 (parte da 100) e richiede **1 facility manager** (RAL 30.000 €).
+- Con il facility manager: stato +0,12 al giorno fino a 100, manutenzione ordinaria 0,25 € per posto pallet al mese (nei costi dell'immobile). Senza: stato −0,06 al giorno × (1 + saturazione oltre 0,6) e a fine mese 18% di probabilità di un guasto (−8).
+- Sotto 70: posti pallet e produttività −0,6% per ogni punto mancante.
+- Manutenzione straordinaria (serve il facility manager): stato subito a 100, costo = punti mancanti × posti × 0,12 €.
+- Ampliamento (serve il facility manager, max 3): +25% dei posti iniziali del sito, 120 € per posto, 90 giorni di cantiere con produttività −5%; a fine lavori affitto/costo fisso +25% di quello iniziale.
 
 ## Dirigenti
 - Sbloccati dalla "Struttura direzionale". Posti disponibili: operativo (Operazioni), commerciale (Negoziazione), risorse umane (Leadership), finanziario (Amministrazione), tecnologia (Innovazione).

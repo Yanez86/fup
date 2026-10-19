@@ -20,7 +20,7 @@ BOT = '''(ceo)=>{
    S.tenders.filter(t=>!t.done&&!t.bid).forEach(t=>{ const e=F.bidEstimate(t,S.warehouses[0].id,0.95); if(e&&e.fits&&e.sat<0.85) t.bid={wh:S.warehouses[0].id,mult:0.95}; });
    S.warehouses.forEach(w=>{ const pend=S.clients.filter(c=>c.wh===w.id&&c.status==='avvio'); pend.forEach(c=>c.status='attivo');
      const k=F.computeWH(w); pend.forEach(c=>c.status='avvio');
-     const days={pick:9,car:9,capo:12,imp:9,autB:9,autCE:18};
+     const days={pick:9,car:9,capo:12,imp:9,autB:9,autCE:18,fm:15};
      Object.keys(days).forEach(r=>{ while(w.staff[r]+S.queue.filter(q=>q.wh===w.id&&q.role===r).length<k.need[r]){ S.queue.push({role:r,wh:w.id,days:days[r]}); S.cash-=1500; } });
    });
    while(S.office.plan+S.queue.filter(q=>q.role==='plan').length<F.planNeed()){ S.queue.push({role:'plan',wh:null,days:12}); S.cash-=1500; }
@@ -192,7 +192,7 @@ async def main():
         await pg.evaluate("()=>{window.__FUP.S.researched.acqua=true;}")
         await pg.click('#win-tecnologia [data-act=seltree][data-id=wel]')
         await pg.click('#win-tecnologia [data-act=seltech][data-id=acqua]')
-        await pg.click('#win-tecnologia [data-act=install]')
+        await pg.eval_on_selector('#win-tecnologia [data-act=install]', 'e=>e.click()')
         ok = await pg.evaluate("()=>{const F=window.__FUP,w=F.S.warehouses[0];return !!w.tech.acqua;}")
         assert ok, 'boccioni d\'acqua non installati'
         await pg.screenshot(path=os.path.join(OUT, 'shot_tree_wel_inst.png'))
@@ -229,10 +229,24 @@ async def main():
         await pg.evaluate(CLEAR)
         await pg.click('#dock [data-id=personale]')
         if not await pg.query_selector('#win-personale'): await pg.click('#dock [data-id=personale]')
-        assert await pg.eval_on_selector_all('#win-personale table.t tr', 'e=>e.length') == 7
+        assert await pg.eval_on_selector_all('#win-personale table.t tr', 'e=>e.length') == 8
         await pg.screenshot(path=os.path.join(OUT, 'shot_personale.png'))
         await pg.click('#win-personale [data-act=openwh]')
-        assert await pg.eval_on_selector_all('#win-magazzini [data-act=hire]', 'e=>e.length') == 6
+        assert await pg.eval_on_selector_all('#win-magazzini [data-act=hire]', 'e=>e.length') == 7
+        # facility manager, manutenzione e ampliamento
+        await pg.evaluate("()=>{const S=window.__FUP.S,w=S.warehouses[0]; w.staff.fm=1; w.cond=45; S.cash+=900000;}")
+        await pg.click('#dock [data-id=personale]'); await pg.click('#dock [data-id=personale]')
+        await pg.click('#win-personale [data-act=openwh]')
+        await pg.eval_on_selector('#win-magazzini [data-act=straord]', 'e=>e.click()')
+        await pg.eval_on_selector('#win-magazzini [data-act=amplia]', 'e=>e.click()')
+        st = await pg.evaluate("()=>{const w=window.__FUP.S.warehouses[0];return [w.cond,!!w.build];}")
+        assert st[0] == 100 and st[1], f'manutenzione/ampliamento: {st}'
+        await pg.evaluate("()=>{const F=window.__FUP;F.S.warehouses[0].cond=52;}")
+        await pg.click('#dock [data-id=magazzini]'); 
+        if not await pg.query_selector('#win-magazzini'): await pg.click('#dock [data-id=magazzini]')
+        card = await pg.evaluate_handle("()=>document.querySelector('#win-magazzini [data-act=straord]').closest('.card')")
+        await card.as_element().scroll_into_view_if_needed()
+        await card.as_element().screenshot(path=os.path.join(OUT, 'shot_magazzino_immobile.png'))
         await pg.click('#win-magazzini [data-act=coop]')
         assert await pg.evaluate('()=>window.__FUP.S.warehouses[0].coop')
         await pg.click('#win-magazzini [data-act=hire][data-role=pick]')

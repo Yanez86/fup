@@ -157,7 +157,13 @@ person('capoturno',skin='scura',hair='#2c2420',hairstyle='short',cloth='#2e9e48'
 def plan_col(c):
     m=(np.abs(xx-24)<(yy-39)*0.5)&ell(24,58,24,18)&(yy<56); c.fill(m,'#f4f5f7'); c.px([(24,y) for y in range(44,55)],'#9b6bff')
 person('pianificatore',skin='chiara',hair='#7a3220',hairl='#a3482c',hairstyle='messy',cloth='#4a5f7a',clothd='#33445a',clothl='#6b819e',glasses='#16202e',beard='#7a3220',collar=plan_col)
-names=['rosa','toto','chiara','davide','luca','franca','magazziniere','autista','impiegata','carrellista','corriere','capoturno','pianificatore']
+def fm_x(c):
+    helmet_w(c)
+    # chiave inglese sul petto
+    c.px([(33,45),(34,45),(36,45),(37,45),(33,46),(37,46),(34,47),(35,47),(36,47),(35,48),(35,49),(35,50),(35,51),(35,52),(34,53),(35,53),(36,53)],'#c3d0dc')
+    c.px([(34,46),(36,46)],'#16202e')
+person('facility',skin='media',hair='#5a4a40',hairstyle='buzz',cloth='#1f9e8f',clothd='#157366',clothl='#3dd6c4',glasses='#16202e',beard='#5a4a40',extra=fm_x)
+names=['rosa','toto','chiara','davide','luca','franca','magazziniere','autista','impiegata','carrellista','corriere','capoturno','pianificatore','facility']
 bg=Image.new('RGBA',(5*104,3*120),(42,58,80,255))
 for i,n in enumerate(names):
     im=Image.open(OUT+f'p_{n}.png'); bg.alpha_composite(im,(4+(i%5)*104,4+(i//5)*118))

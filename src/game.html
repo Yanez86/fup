@@ -468,7 +468,7 @@ html,body{overscroll-behavior:none}
 (function(){
 'use strict';
 /* ====================== DATI ====================== */
-const IMG={car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}'};
+const IMG={fm:'{{Q_facility}}',car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}'};
 const LON0=4.81, LAT1=47.0, KX=78.29*2, KY=111.111*2;
 const pt=(lon,lat)=>[ (lon-LON0)*KX, (LAT1-lat)*KY ];
 const CITIES=[
@@ -689,9 +689,20 @@ const TECH=[
  {id:'acqua',tree:'wel',tier:1,row:0,name:'Boccioni d\'acqua',year:2002,cost:2000,days:10,inst:600,mese:90,mor:1,att:1,weeks:0,desc:'Morale +1 e il magazzino attira un po\' di più chi cerca lavoro.',txt:'Erogatori di acqua fresca in reparto e in banchina. D\'estate, sotto il tetto del capannone, fanno la differenza.'},
  {id:'frutta',tree:'wel',tier:2,row:0,req:['acqua'],name:'Servizio frutta',year:2003,cost:5000,days:20,inst:300,mese:250,mor:2,att:2,weeks:0,desc:'Morale +2, attrattività +2.',txt:'Una cassetta di frutta fresca ogni mattina in sala pausa. Mele, banane e qualche mandarino molto conteso.'},
  {id:'mensa',tree:'wel',tier:3,row:0,req:['frutta'],name:'Mensa aziendale',year:2004,cost:15000,days:40,inst:60000,mese:2500,mor:4,att:4,prod:0.03,weeks:0,desc:'Morale +4, attrattività +4, produttività +3%.',txt:'Un pasto caldo a metà turno, cucinato sul posto. Si mangia insieme e si torna in reparto con più energia.'},
- {id:'pulmino',tree:'wel',tier:1,row:1,name:'Pulmini per i dipendenti',year:2002,cost:8000,days:20,inst:35000,mese:1200,mor:2,att:5,P:0.5,weeks:0,desc:'Morale +2, attrattività +5, puntualità +0,5.',txt:'Navette che passano dai paesi vicini e dalla stazione a ogni cambio turno. Chi non ha l\'auto arriva lo stesso, e in orario.'},
+ {id:'pulmino',tree:'wel',tier:1,row:2,name:'Pulmini per i dipendenti',year:2002,cost:8000,days:20,inst:35000,mese:1200,mor:2,att:5,P:0.5,weeks:0,desc:'Morale +2, attrattività +5, puntualità +0,5.',txt:'Navette che passano dai paesi vicini e dalla stazione a ogni cambio turno. Chi non ha l\'auto arriva lo stesso, e in orario.'},
  {id:'asilo',tree:'wel',tier:4,row:1,req:['mensa','pulmino'],name:'Asilo aziendale',year:2008,cost:40000,days:75,inst:150000,mese:4000,mor:5,att:8,weeks:0,desc:'Morale +5, attrattività +8.',txt:'Un asilo nido accanto al magazzino, con orari pensati per i turni. Per molti genitori è il motivo per restare.'},
- {id:'cani',tree:'wel',tier:2,row:2,req:['acqua'],name:'Area cani',year:2010,cost:6000,days:20,inst:8000,mese:150,mor:2,att:3,weeks:0,desc:'Morale +2, attrattività +3.',txt:'Un recinto all\'ombra dove il cane aspetta la fine del turno, con ciotole e un po\' di prato. Il buonumore è contagioso.'}
+ {id:'cani',tree:'wel',tier:2,row:5,name:'Area cani',year:2010,cost:6000,days:20,inst:8000,mese:150,mor:2,att:3,weeks:0,desc:'Morale +2, attrattività +3.',txt:'Un recinto all\'ombra dove il cane aspetta la fine del turno, con ciotole e un po\' di prato. Il buonumore è contagioso.'},
+ {id:'orto',tree:'wel',tier:4,row:0,req:['mensa'],name:'Orto aziendale',year:2014,cost:6000,days:25,inst:5000,mese:200,mor:2,att:1,weeks:0,desc:'Morale +2, attrattività +1.',txt:'Qualche aiuola dietro al capannone, curata a turno da chi ha il pollice verde. Le zucchine finiscono in mensa.'},
+ {id:'caffe',tree:'wel',tier:1,row:1,name:'Macchinette del caffè',year:2002,cost:1500,days:8,inst:800,mese:120,mor:1,att:1,weeks:0,desc:'Morale +1, attrattività +1.',txt:'Caffè e snack a prezzo politico vicino alle baie. Il vero carburante del turno di notte.'},
+ {id:'relax',tree:'wel',tier:2,row:1,req:['caffe'],name:'Sala pausa arredata',year:2003,cost:4000,days:15,inst:15000,mese:150,mor:2,att:2,weeks:0,desc:'Morale +2, attrattività +2.',txt:'Divanetti, tavoli e un microonde che funziona. Dieci minuti seduti davvero, lontano dai muletti.'},
+ {id:'colonnine',tree:'wel',tier:3,row:2,req:['pulmino'],name:'Colonnine di ricarica',year:2018,cost:10000,days:30,inst:25000,mese:300,mor:1,att:3,weeks:0,desc:'Morale +1, attrattività +3.',txt:'Prese per auto e scooter elettrici nel parcheggio dei dipendenti. Si ricarica mentre si lavora.'},
+ {id:'spogliatoi',tree:'wel',tier:1,row:3,name:'Spogliatoi e docce',year:2002,cost:3000,days:15,inst:20000,mese:200,mor:2,att:2,weeks:0,desc:'Morale +2, attrattività +2.',txt:'Armadietti, docce calde e panche. A fine turno si torna a casa puliti.'},
+ {id:'lavanderia',tree:'wel',tier:2,row:3,req:['spogliatoi'],name:'Lavanderia delle divise',year:2004,cost:4000,days:15,inst:3000,mese:400,mor:1,att:1,A:0.2,weeks:0,desc:'Morale +1, attrattività +1, accuratezza +0,2.',txt:'Le divise si lasciano sporche e si ritrovano pulite e stirate. Si lavora in ordine e si riconosce chi è di turno.'},
+ {id:'palestra',tree:'wel',tier:3,row:3,req:['lavanderia'],name:'Palestra aziendale',year:2009,cost:20000,days:45,inst:40000,mese:900,mor:3,att:4,weeks:0,desc:'Morale +3, attrattività +4.',txt:'Pesi, tapis roulant e un corso di ginnastica per la schiena. Chi solleva colli tutto il giorno ringrazia.'},
+ {id:'presidio',tree:'wel',tier:1,row:4,name:'Presidio medico',year:2006,cost:10000,days:30,inst:15000,mese:1500,mor:2,att:3,A:0.2,weeks:0,desc:'Morale +2, attrattività +3, accuratezza +0,2.',txt:'Un\'infermeria con un infermiere qualche ora al giorno. Visite rapide e meno giorni di malattia.'},
+ {id:'ascolto',tree:'wel',tier:2,row:4,req:['presidio'],name:'Sportello d\'ascolto',year:2016,cost:12000,days:30,inst:2000,mese:600,mor:3,att:2,weeks:0,desc:'Morale +3, attrattività +2.',txt:'Uno psicologo a disposizione una mattina a settimana. Si parla di stress, turni e problemi di casa.'},
+ {id:'italiano',tree:'wel',tier:3,row:4,name:'Corsi di italiano',year:2005,cost:5000,days:20,inst:1000,mese:300,mor:2,att:3,A:0.3,weeks:0,desc:'Morale +2, attrattività +3, accuratezza +0,3.',txt:'Lezioni in sala pausa per chi arriva da lontano. Si capiscono meglio le istruzioni e le etichette.'},
+ {id:'clima',tree:'wel',tier:1,row:5,name:'Raffrescatori in reparto',year:2005,cost:8000,days:25,inst:45000,mese:700,mor:3,att:2,prod:0.02,weeks:0,desc:'Morale +3, attrattività +2, produttività +2%.',txt:'Grandi ventilatori ad acqua sopra le corsie. A luglio sotto il tetto di lamiera fa la differenza.'}
 ];
 const TREES=[['log','Logistica','Tecnologie da installare in ogni magazzino.'],['org','Sviluppo aziendale','Organizzazione, persone e controllo: valgono per tutta l\'azienda.'],['mkt','Mercato','Accesso a nuovi clienti e gare: valgono per tutta l\'azienda.'],['wel','Welfare','Servizi per chi lavora: si ricercano una volta e poi si installano magazzino per magazzino. Alzano il morale e aiutano ad assumere.']];
 const WELFARE=[
@@ -700,18 +711,18 @@ const WELFARE=[
  {id:'premio',name:'Premio di produzione',cost:80,mor:6,att:6},
  {id:'navetta',name:'Navetta dalla stazione',cost:20,mor:2,att:3}
 ];
-const RAL={pick:18000,car:19500,capo:25000,autB:19000,autCE:23000,imp:22000,plan:26000}, COEF=1.42;
-const ROLES=['pick','car','capo','autB','autCE','imp'];
-const ROLE={pick:'Magazzinieri',car:'Carrellisti',autB:'Autisti patente B',autCE:'Autisti patente CE',imp:'Impiegati di magazzino',capo:'Capiturno',plan:'Pianificatori del traffico'};
-const ROLE1={pick:'magazziniere',car:'carrellista',autB:'autista con patente B',autCE:'autista con patente CE',imp:'impiegato',capo:'capoturno',plan:'pianificatore del traffico'};
-const ROLE_WK={pick:'magazzinieri',car:'carrellisti',autB:'autisti_b',autCE:'autisti_ce',imp:'impiegati',capo:'capoturno',plan:'pianificatori'};
-const ROLE_D={pick:'Preparano gli ordini',car:'Scaricano, stoccano e caricano',autB:'Furgoni, consegne in città',autCE:'Bilici e motrici, tratte lunghe',imp:'Bolle, inventari, traffico',capo:'Uno ogni 10 operai',plan:'Giri dei camion, in sede'};
-const HIRE={pick:{ann:[20,250],age:[6,1000]},car:{ann:[25,300],age:[8,1300]},autB:{ann:[15,250],age:[6,1000]},autCE:{ann:[40,350],age:[16,2000]},imp:{ann:[20,300],age:[7,1200]},capo:{ann:[25,300],age:[8,1300]},plan:{ann:[25,300],age:[8,1300]}};
+const RAL={pick:18000,car:19500,capo:25000,autB:19000,autCE:23000,imp:22000,plan:26000,fm:30000}, COEF=1.42;
+const ROLES=['pick','car','capo','autB','autCE','imp','fm'];
+const ROLE={pick:'Magazzinieri',car:'Carrellisti',autB:'Autisti patente B',autCE:'Autisti patente CE',imp:'Impiegati di magazzino',capo:'Capiturno',plan:'Pianificatori del traffico',fm:'Facility manager'};
+const ROLE1={pick:'magazziniere',car:'carrellista',autB:'autista con patente B',autCE:'autista con patente CE',imp:'impiegato',capo:'capoturno',plan:'pianificatore del traffico',fm:'facility manager'};
+const ROLE_WK={pick:'magazzinieri',car:'carrellisti',autB:'autisti_b',autCE:'autisti_ce',imp:'impiegati',capo:'capoturno',plan:'pianificatori',fm:'facility'};
+const ROLE_D={pick:'Preparano gli ordini',car:'Scaricano, stoccano e caricano',autB:'Furgoni, consegne in città',autCE:'Bilici e motrici, tratte lunghe',imp:'Bolle, inventari, traffico',capo:'Uno ogni 10 operai',plan:'Giri dei camion, in sede',fm:'Manutenzione e cantieri'};
+const HIRE={pick:{ann:[20,250],age:[6,1000]},car:{ann:[25,300],age:[8,1300]},autB:{ann:[15,250],age:[6,1000]},autCE:{ann:[40,350],age:[16,2000]},imp:{ann:[20,300],age:[7,1200]},capo:{ann:[25,300],age:[8,1300]},plan:{ann:[25,300],age:[8,1300]},fm:{ann:[30,350],age:[10,1500]}};
 // facchinaggio in cooperativa: magazzinieri e carrellisti costano il 20% in meno, arrivano in 3 giorni e si mandano via gratis, ma lavorano peggio
 const COOP={roles:['pick','car'],cost:0.8,mor:-3,A:-0.5,days:3};
 const KM_B=4000, KM_CE=5200;
 const CAPV=33, SAT0=16/33*100, SAT_OBJ=[0,55,60,65,70,75,80,85,90]; // capienza di un viaggio in pallet, saturazione dei mezzi di partenza (%), obiettivi minimi
-const noStaff=()=>({pick:0,car:0,capo:0,autB:0,autCE:0,imp:0});
+const noStaff=()=>({pick:0,car:0,capo:0,autB:0,autCE:0,imp:0,fm:0});
 const staffTot=w=>ROLES.reduce((a,r)=>a+(w.staff[r]||0),0);
 const isCoop=(w,r)=>!!w.coop&&COOP.roles.includes(r);
 const T_ST=5.5,T_MO=3.8,T_DI=30;
@@ -807,7 +818,7 @@ const TALENTS={
  'Cuore d\'oro':{t:'pos',fx:'Leadership +2 · Amministrazione −1',fl:'Conosce i nomi dei figli di tutti i carrellisti. E i loro problemi con la caldaia.',ic:['.YY.YY..','YYYYYYY.','YYWYYYY.','YYYYYYY.','.YYYYY..','..YYY...','...Y....','........']}
 };
 const TTYPE={pos:['Positivo','#eaf6ec','#6fdc8c'],neg:['Negativo','#fbecec','#ff8a8d'],mix:['Misto','#fff6dc','#ffd23f']};
-const TECH_IC={"acqua":["....LLLL....", "...LBBBBL...", "...LBBBBL...", "...LBBBBL...", "....LLLL....", "...DDDDDD...", "...DKKKKD...", "...DWWWWD...", "...DDRBDD...", "...DDDDDD...", "...D....D...", "...DD..DD..."],"frutta":["......GN....", ".....GGN....", "...RRRNRR...", "..RWRRRRRR..", "..RWRRRRRR.Y", "..RRRRRRRRYY", "..RRRRRRRYY.", "...RRRRRYY..", "...RRRRYY...", "....RR.YY...", "......YY....", "............"],"mensa":["..S..S..S...", "...S..S..S..", "..S..S..S...", "............", "KKKKKKKKKKKK", "KOOOOYOOOGOK", "KWWWWWWWWWWK", ".KWWWWWWWWK.", "..KWWWWWWK..", "...KKKKKK...", "....KKKK....", "............"],"pulmino":["............", "............", "KKKKKKKKKK..", "KYLLYLLYLLK.", "KYLLYLLYLLYK", "KYYYYYYYYYYK", "KYYYYYYYYYYK", "KKKKKKKKKKKK", ".KDK....KDK.", "..K......K..", "............", "............"],"asilo":[".....KK.....", "....KRRK....", "...KRRRRK...", "..KRRRRRRK..", ".KRRRRRRRRK.", "KKKKKKKKKKKK", ".KCCCCCCCCK.", ".KCRRCRRCCK.", ".KCRRRRRCCK.", ".KCCRRRCCCK.", ".KCCCRCCCCK.", ".KKKKKKKKKK."],"cani":["..NN....NN..", "..NN....NN..", "............", "NN........NN", "NN..NNNN..NN", "...NNNNNN...", "..NNNNNNNN..", "..NNNNNNNN..", "...NNNNNN...", "............", "............", "............"],"barcode":["............",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","RRRRRRRRRRRR",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","............",".K.K.KK.K.K.","............"],"formazione":["............",".NNNNNNNNNN.",".NDDDDDDDDN.",".NDWWDDDDDN.",".NDDDWWWDDN.",".NDWWWDDDDN.",".NDDDDDWWDN.",".NDDDDDDDDN.",".NNNNNNNNNN.","....N..N....","...N....N...","............"],"gps":["....RRRR....","...RRRRRR...","..RRRWWRRR..","..RRWWWWRR..","..RRWWWWRR..","..RRRWWRRR..","...RRRRRR...","....RRRR....",".....RR.....","..GG.RR.GG..",".GGGGGGGGGG.","............"],"wms":["............",".KKKKKKKKKK.",".KBBBBBBBBK.",".KBYYBOOBBK.",".KBSSSSSSBK.",".KBGGBYYBBK.",".KBSSSSSSBK.",".KKKKKKKKKK.",".....KK.....","...KKKKKK...","............","............"],"anticoll":[".....YY.....","....YKKY....","....YKKY....","...YYKKYY...","...YYKKYY...","..YYYKKYYY..","..YYYKKYYY..",".YYYYYYYYYY.",".YYYYKKYYYY.","YYYYYYYYYYYY","KKKKKKKKKKKK","............"],"rotte":["..........R.",".........RRR","..........R.","........DD..",".....DDD....","....D.......","....D.......",".....DDD....","........D...",".G.......D..","GGG..DDDD...",".G.........."],"rf":["..........B.","........B..B","..KKKKK..B.B","..KBBBK...B.","..KBBBK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","...KKK......","............"],"verticale":["..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..DYY.OOBD..","..DDDDDDDD..","..DBB.YYOD..","..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..D......D..","..D......D..",".KKKKKKKKKK."],"sinergia":["............","............",".KKKKKKK....",".KRRYYBK....",".KRRYYBKKKK.",".KGGOOBKWBK.",".KGGOOBKBBKK",".KKKKKKKKKKK","..KK....KK..","..KK....KK..","............","............"],"ptl":["............","GGG.YYY.RRR.","GGG.YYY.RRR.","............","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","............"],"amr":[".....YY.....",".....KK.....","..KKKKKKKK..","..KSSSSSSK..","..KSBSSBSK..","..KSSSSSSK..","..KSRRRRSK..","..KKKKKKKK..",".KOOOOOOOOK.",".KOOOOOOOOK.",".KKKKKKKKKK.","..KK....KK.."],"gestionale":["..KKKKKKK...","..KWWWWWKK..","..KWKKKWWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWWWGGGK..","..KWWWGGGK..","..KWWWWWWK..","..KKKKKKKK.."],"hr":["............","...SSSS.....","..S.FF.S....",".S.FFFF.S...",".S.FFFF.S...",".S.BBBB.S...","..SBBBBS....","...SSSSN....",".......NN...","........NN..",".........NN.","............"],"direzione":["............","....YYYY....","....YYYY....",".....KK.....",".KKKKKKKKKK.",".K...KK...K.",".K...KK...K.","BBB.OOOO.GGG","BBB.OOOO.GGG","BBB.OOOO.GGG","............","............"],"welfare2":["............","..RR....RR..",".RRRR..RRRR.","RRRRRWWRRRRR","RRRRRWWRRRRR","RRRWWWWWWRRR",".RRWWWWWWRR.","..RRRWWRRR..","...RRWWRR...","....RRRR....",".....RR.....","............"],"controllo":["............","............","K.......GG..","K.......GG..","K....BB.GG..","K....BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","KKKKKKKKKKKK","............","............"],"academy":["............",".....KK.....","...KKKKKK...",".KKKKKKKKKK.","KKKKKKKKKKKK",".KKKKKKKKKKY","..KKKKKKKK.Y","..KDDDDDDK.Y","..KDDDDDDK.Y","...KKKKKK.YY","..........YY","............"],"iso":["..BB....BB..","...BB..BB...","....BBBB....","....YYYY....","..YYYYYYYY..",".YYYYWYYYYY.",".YYYWWWYYYY.",".YYYYWYYYYY.",".YYYYYYYYYY.","..YYYYYYYY..","....YYYY....","............"],"commerciale":["............","..KKKKKKKK..",".KRRRRRRRRK.","KRRKK..KKRRK","KRK......KRK",".K..KKKK..K.","...KRRRRK...","..KRWRWRRK..","..KRRWRWRK..","..KRWRWRRK..","..KKKKKKKK..","............"],"freddo":[".....BB.....","..B..BB..B..","...B.BB.B...","....BBBB....","BBBBBWWBBBBB","BBBBBWWBBBBB","....BBBB....","...B.BB.B...","..B..BB..B..",".....BB.....","............","............"],"edi":["KKKKK.......","KBBBK.......","KBBBK..O....","KKKKK.OOOOO.","..K....O....",".KKK........",".......KKKKK","....O..KBBBK","...OOOOKBBBK","....O..KKKKK",".........K..","........KKK."],"marketing":["............",".........KK.",".......KKOK.",".....KKOOOK.","..KKKOOOOOK.",".KWKOOOOOOK.",".KWKOOOOOOK.","..KKKOOOOOK.","...K.KKOOOK.","...K...KKOK.","...KK....KK.","............"],"accordi":["............",".KKKKKKKK...",".KGGWWRRK...",".KWWWWWWK...",".KWKKKKWK...",".KWWWWWWK...",".KWKKKWWK...",".KWWWWWYYY..",".KWKKWYRRY..",".KWWWWYRRY..",".KKKKKKYY...","........Y.."],"kam":["........Y...",".......YYY..","...FF...Y...","..FFFF......","..FFFF......","...FF.......",".DDDDDD.....","DDDWWDDD....","DDDDRDDD....","DDDDRDDD....","DDDDDDDD....","............"],"ecom":["............","KK..........",".K..........",".KOOOOOOOOK.",".KOWOOWOOOK.",".KOOOOOOOK..","..KOOOOOOK..","..KKKKKKKK..","..K.........","..KKKKKKKKK.","...KK...KK..","............"]};
+const TECH_IC={"orto":["............", "..G..G..G...", ".GGG.GGG.GGG", "..G..G..G...", "..O..G..O...", "..O.....O...", "NNNNNNNNNNNN", "NMNNMNNMNNMN", "NNNNNNNNNNNN", "MNNMNNMNNMNN", "NNNNNNNNNNNN", "............"],"caffe":["...S..S.....", "....S..S....", "...S..S.....", "............", "KKKKKKKKK...", "KWWWWWWWKKK.", "KWNNNNNWK.K.", "KWWWWWWWK.K.", "KWWWWWWWKKK.", ".KWWWWWK....", "..KKKKK.....", "KKKKKKKKKK.."],"relax":["............", "............", "..BBBBBBBB..", ".BBBBBBBBBB.", ".BLBBBBBBLB.", "BBBBBBBBBBBB", "BLLLLLLLLLLB", "BBBBBBBBBBBB", "BBBBBBBBBBBB", ".K........K.", ".K........K.", "............"],"colonnine":["..KKKKKK....", "..KGGGGK....", "..KGWWGK....", "..KGWGGK..K.", "..KGGWGK..K.", "..KGWGGK.KK.", "..KGGGGK.K..", "..KGGGGKKK..", "..KGGGGK....", "..KGGGGK....", "..KKKKKK....", ".KKKKKKKK..."],"spogliatoi":["............", "KKKKKKKKKKKK", "KBBBKBBBKBBK", "KBBBKBBBKBBK", "KBWBKBWBKBWK", "KBBBKBBBKBBK", "KBBBKBBBKBBK", "KBBBKBBBKBBK", "KBBBKBBBKBBK", "KKKKKKKKKKKK", "..K......K..", "............"],"lavanderia":["............", ".....KK.....", "....K..K....", "......K.....", ".....K......", "...KK.KK....", "..K......K..", ".KTTTTTTTTK.", ".KTTTTTTTTK.", ".KTTWTTWTTK.", ".KTTTTTTTTK.", ".KKKKKKKKKK."],"palestra":["............", "............", "KK........KK", "KK........KK", "KKKKKKKKKKKK", "KKDDDDDDDDKK", "KKKKKKKKKKKK", "KK........KK", "KK........KK", "............", "............", "............"],"presidio":["............", "....RRRR....", "....RRRR....", "....RRRR....", "RRRRRRRRRRRR", "RRRRRRRRRRRR", "RRRRRRRRRRRR", "RRRRRRRRRRRR", "....RRRR....", "....RRRR....", "....RRRR....", "............"],"ascolto":["............", ".KKKKKKKKK..", ".KWWWWWWWK..", ".KWRRWRRWK..", ".KWRRRRRWK..", ".KWWRRRWWK..", ".KWWWRWWWK..", ".KKKKKKKKK..", "...KK.......", "..KK........", ".K..........", "............"],"italiano":["............", "GGGGWWWWRRRR", "GGGGWWWWRRRR", "GGGGWWWWRRRR", "GGGGWWWWRRRR", "GGGGWWWWRRRR", "GGGGWWWWRRRR", "............", "..K.K.KK.K..", "..K.K.K..K..", "..K.K.K..K..", "............"],"clima":["............", "..KKKKKKKK..", ".K.L....L.K.", "K..LL..LL..K", "K....KK....K", "K..LLKKLL..K", "K..L.KK.L..K", "K....KK....K", ".K..L..L..K.", "..KKKKKKKK..", ".....KK.....", "....KKKK...."],"acqua":["....LLLL....", "...LBBBBL...", "...LBBBBL...", "...LBBBBL...", "....LLLL....", "...DDDDDD...", "...DKKKKD...", "...DWWWWD...", "...DDRBDD...", "...DDDDDD...", "...D....D...", "...DD..DD..."],"frutta":["......GN....", ".....GGN....", "...RRRNRR...", "..RWRRRRRR..", "..RWRRRRRR.Y", "..RRRRRRRRYY", "..RRRRRRRYY.", "...RRRRRYY..", "...RRRRYY...", "....RR.YY...", "......YY....", "............"],"mensa":["..S..S..S...", "...S..S..S..", "..S..S..S...", "............", "KKKKKKKKKKKK", "KOOOOYOOOGOK", "KWWWWWWWWWWK", ".KWWWWWWWWK.", "..KWWWWWWK..", "...KKKKKK...", "....KKKK....", "............"],"pulmino":["............", "............", "KKKKKKKKKK..", "KYLLYLLYLLK.", "KYLLYLLYLLYK", "KYYYYYYYYYYK", "KYYYYYYYYYYK", "KKKKKKKKKKKK", ".KDK....KDK.", "..K......K..", "............", "............"],"asilo":[".....KK.....", "....KRRK....", "...KRRRRK...", "..KRRRRRRK..", ".KRRRRRRRRK.", "KKKKKKKKKKKK", ".KCCCCCCCCK.", ".KCRRCRRCCK.", ".KCRRRRRCCK.", ".KCCRRRCCCK.", ".KCCCRCCCCK.", ".KKKKKKKKKK."],"cani":["..NN....NN..", "..NN....NN..", "............", "NN........NN", "NN..NNNN..NN", "...NNNNNN...", "..NNNNNNNN..", "..NNNNNNNN..", "...NNNNNN...", "............", "............", "............"],"barcode":["............",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","RRRRRRRRRRRR",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","............",".K.K.KK.K.K.","............"],"formazione":["............",".NNNNNNNNNN.",".NDDDDDDDDN.",".NDWWDDDDDN.",".NDDDWWWDDN.",".NDWWWDDDDN.",".NDDDDDWWDN.",".NDDDDDDDDN.",".NNNNNNNNNN.","....N..N....","...N....N...","............"],"gps":["....RRRR....","...RRRRRR...","..RRRWWRRR..","..RRWWWWRR..","..RRWWWWRR..","..RRRWWRRR..","...RRRRRR...","....RRRR....",".....RR.....","..GG.RR.GG..",".GGGGGGGGGG.","............"],"wms":["............",".KKKKKKKKKK.",".KBBBBBBBBK.",".KBYYBOOBBK.",".KBSSSSSSBK.",".KBGGBYYBBK.",".KBSSSSSSBK.",".KKKKKKKKKK.",".....KK.....","...KKKKKK...","............","............"],"anticoll":[".....YY.....","....YKKY....","....YKKY....","...YYKKYY...","...YYKKYY...","..YYYKKYYY..","..YYYKKYYY..",".YYYYYYYYYY.",".YYYYKKYYYY.","YYYYYYYYYYYY","KKKKKKKKKKKK","............"],"rotte":["..........R.",".........RRR","..........R.","........DD..",".....DDD....","....D.......","....D.......",".....DDD....","........D...",".G.......D..","GGG..DDDD...",".G.........."],"rf":["..........B.","........B..B","..KKKKK..B.B","..KBBBK...B.","..KBBBK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","...KKK......","............"],"verticale":["..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..DYY.OOBD..","..DDDDDDDD..","..DBB.YYOD..","..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..D......D..","..D......D..",".KKKKKKKKKK."],"sinergia":["............","............",".KKKKKKK....",".KRRYYBK....",".KRRYYBKKKK.",".KGGOOBKWBK.",".KGGOOBKBBKK",".KKKKKKKKKKK","..KK....KK..","..KK....KK..","............","............"],"ptl":["............","GGG.YYY.RRR.","GGG.YYY.RRR.","............","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","............"],"amr":[".....YY.....",".....KK.....","..KKKKKKKK..","..KSSSSSSK..","..KSBSSBSK..","..KSSSSSSK..","..KSRRRRSK..","..KKKKKKKK..",".KOOOOOOOOK.",".KOOOOOOOOK.",".KKKKKKKKKK.","..KK....KK.."],"gestionale":["..KKKKKKK...","..KWWWWWKK..","..KWKKKWWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWWWGGGK..","..KWWWGGGK..","..KWWWWWWK..","..KKKKKKKK.."],"hr":["............","...SSSS.....","..S.FF.S....",".S.FFFF.S...",".S.FFFF.S...",".S.BBBB.S...","..SBBBBS....","...SSSSN....",".......NN...","........NN..",".........NN.","............"],"direzione":["............","....YYYY....","....YYYY....",".....KK.....",".KKKKKKKKKK.",".K...KK...K.",".K...KK...K.","BBB.OOOO.GGG","BBB.OOOO.GGG","BBB.OOOO.GGG","............","............"],"welfare2":["............","..RR....RR..",".RRRR..RRRR.","RRRRRWWRRRRR","RRRRRWWRRRRR","RRRWWWWWWRRR",".RRWWWWWWRR.","..RRRWWRRR..","...RRWWRR...","....RRRR....",".....RR.....","............"],"controllo":["............","............","K.......GG..","K.......GG..","K....BB.GG..","K....BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","KKKKKKKKKKKK","............","............"],"academy":["............",".....KK.....","...KKKKKK...",".KKKKKKKKKK.","KKKKKKKKKKKK",".KKKKKKKKKKY","..KKKKKKKK.Y","..KDDDDDDK.Y","..KDDDDDDK.Y","...KKKKKK.YY","..........YY","............"],"iso":["..BB....BB..","...BB..BB...","....BBBB....","....YYYY....","..YYYYYYYY..",".YYYYWYYYYY.",".YYYWWWYYYY.",".YYYYWYYYYY.",".YYYYYYYYYY.","..YYYYYYYY..","....YYYY....","............"],"commerciale":["............","..KKKKKKKK..",".KRRRRRRRRK.","KRRKK..KKRRK","KRK......KRK",".K..KKKK..K.","...KRRRRK...","..KRWRWRRK..","..KRRWRWRK..","..KRWRWRRK..","..KKKKKKKK..","............"],"freddo":[".....BB.....","..B..BB..B..","...B.BB.B...","....BBBB....","BBBBBWWBBBBB","BBBBBWWBBBBB","....BBBB....","...B.BB.B...","..B..BB..B..",".....BB.....","............","............"],"edi":["KKKKK.......","KBBBK.......","KBBBK..O....","KKKKK.OOOOO.","..K....O....",".KKK........",".......KKKKK","....O..KBBBK","...OOOOKBBBK","....O..KKKKK",".........K..","........KKK."],"marketing":["............",".........KK.",".......KKOK.",".....KKOOOK.","..KKKOOOOOK.",".KWKOOOOOOK.",".KWKOOOOOOK.","..KKKOOOOOK.","...K.KKOOOK.","...K...KKOK.","...KK....KK.","............"],"accordi":["............",".KKKKKKKK...",".KGGWWRRK...",".KWWWWWWK...",".KWKKKKWK...",".KWWWWWWK...",".KWKKKWWK...",".KWWWWWYYY..",".KWKKWYRRY..",".KWWWWYRRY..",".KKKKKKYY...","........Y.."],"kam":["........Y...",".......YYY..","...FF...Y...","..FFFF......","..FFFF......","...FF.......",".DDDDDD.....","DDDWWDDD....","DDDDRDDD....","DDDDRDDD....","DDDDDDDD....","............"],"ecom":["............","KK..........",".K..........",".KOOOOOOOOK.",".KOWOOWOOOK.",".KOOOOOOOK..","..KOOOOOOK..","..KKKKKKKK..","..K.........","..KKKKKKKKK.","...KK...KK..","............"]};
 const TFRAME={log:{c:'#ff7a3d',bg:'#ffe8d9',cut:[0,0,0],shape:'Quadrato arancione'},org:{c:'#9b6bff',bg:'#ece3ff',cut:[3,2,1],shape:'Ottagono viola'},mkt:{c:'#2e9e48',bg:'#dff3d6',cut:[5,3,2,1,1],shape:'Tondo verde'},wel:{c:'#e0393e',bg:'#ffe1e1',cut:[2,1],shape:'Quadrato smussato rosso'}};
 function techIcon(t,sz,dim){
   const F=TFRAME[t.tree], N=16; const cut=r=>{const d=Math.min(r,N-1-r);return F.cut[d]||0;};
@@ -1329,6 +1340,18 @@ wk('impiegati','pers','Impiegati di magazzino',`L'ufficio del magazzino: bolle, 
 `In ogni magazzino ne serve uno, più uno ogni 1.500 pallet al mese consegnati (2.000 con il [[tech_gestionale|gestionale]]). Ogni impiegato che manca toglie 1,5 punti di [[puntualita]] e 1 di [[accuratezza]] in quel magazzino.
 
 Costano 22.000 € lordi l'anno.`);
+wk('facility','pers','Facility manager',`Si occupa dell'immobile: manutenzione, guasti e cantieri. Ne serve uno per magazzino.`,
+`Con un facility manager lo [[manutenzione|stato del magazzino]] risale di circa 3,6 punti al mese fino al 100%, e si paga la manutenzione ordinaria (0,25 € per posto pallet al mese). Senza, lo stato scende ogni giorno e a fine mese c'è il 18% di probabilità di un guasto (−8 punti).
+
+Serve anche per la manutenzione straordinaria e per l'[[ampliamento]]. Stipendio: 30.000 € lordi l'anno.`);
+wk('manutenzione','basi','Stato del magazzino',`Da 0 a 100. Sotto il 70% il magazzino perde posti pallet e produttività. Lo tiene alto il facility manager.`,
+`Ogni magazzino parte al 100%. Senza [[facility|facility manager]] scende di circa 1,8 punti al mese, di più quando è molto pieno ([[saturazione]] oltre il 60%), e capitano guasti. Con il facility manager risale di 3,6 punti al mese.
+
+Sotto il 70% perdi lo 0,6% di posti pallet e di produttività per ogni punto mancante: a 40% sono −18%. Se i posti scendono sotto la merce dei clienti, la saturazione supera il 100% e l'[[accuratezza]] crolla.
+
+La manutenzione straordinaria riporta subito lo stato al 100%: costa 12 € per posto pallet ogni 100 punti mancanti, e serve il facility manager.`);
+wk('ampliamento','basi','Ampliamento',`Il magazzino può crescere di un quarto dei posti iniziali, fino a 3 volte. Serve il facility manager.`,
+`Ogni ampliamento aggiunge il 25% dei posti pallet iniziali del sito, costa 120 € per posto nuovo e dura 90 giorni. Durante il cantiere la produttività cala del 5%. Finiti i lavori l'affitto (o il costo fisso, se il magazzino è tuo) sale di un quarto di quello iniziale. Si può ampliare al massimo 3 volte.`);
 wk('capoturno','pers','Capoturno',`Coordina la squadra di magazzino: ne serve uno ogni 10 tra magazzinieri e carrellisti.`,
 `Sotto i 10 operai il turno lo organizza il [[manager]]. Poi serve un capoturno ogni 10 tra [[magazzinieri]] e [[carrellisti]]. Ognuno che manca toglie 4 punti al [[morale]] obiettivo e 1 punto di [[accuratezza]].
 
@@ -1361,10 +1384,10 @@ wk('manager','pers','Manager di magazzino',`Il capo di un magazzino. Le sue Oper
 `Il manager usa tre [[abilita|abilità]]: [[st_op|Operazioni]] per la [[puntualita]], [[st_prec|Precisione]] per l'[[accuratezza]] e [[st_lead|Leadership]] per il [[morale]]. Senza manager il magazzino va avanti con valori scarsi (7, 7 e 6).
 
 All'inizio il manager è il [[ceo|CEO]]. Gli altri si assumono dalla finestra Personale e si assegnano dal menu a tendina del magazzino. Un manager senza magazzino può diventare un [[direzione|direttore]].`);
-wk('welfare_mag','pers','Welfare nei magazzini',`Servizi per chi lavora in un magazzino: boccioni d'acqua, frutta, mensa, pulmini, asilo e area cani. Si ricercano nell'albero Welfare e si installano sito per sito.`,
+wk('welfare_mag','pers','Welfare nei magazzini',`Servizi per chi lavora in un magazzino: dai boccioni d'acqua alla mensa, dalla palestra all'asilo, fino all'area cani. Si ricercano nell'albero Welfare e si installano sito per sito.`,
 `Ogni servizio si ricerca una volta nell'albero Welfare della finestra Tecnologia, poi si [[installazione|installa]] nei magazzini che vuoi, con un costo iniziale e un canone al mese. Funziona da subito, senza [[apprendimento]].
 
-Alza il [[morale]] di quel magazzino e la sua [[attrattivita|attrattività]]: le [[assunzioni]] per quel magazzino sono più veloci. La mensa aumenta anche la produttività del 3%, i pulmini la [[puntualita|puntualità]] di 0,5. Con il [[tech_welfare2|Welfare aziendale]] il canone costa il 30% in meno.
+Alza il [[morale]] di quel magazzino e la sua [[attrattivita|attrattività]]: le [[assunzioni]] per quel magazzino sono più veloci. Alcuni danno qualcosa in più: mensa e raffrescatori la produttività, i pulmini la [[puntualita|puntualità]], lavanderia, presidio medico e corsi di italiano l'[[accuratezza]]. Con il [[tech_welfare2|Welfare aziendale]] il canone costa il 30% in meno.
 
 È diverso dal [[welfare]] aziendale (buoni pasto, assicurazione…), che vale per tutti i dipendenti e si paga a testa.`);
 wk('attrattivita','pers','Attrattività',`Quanto l'azienda piace a chi cerca lavoro. Più è alta, più le assunzioni sono rapide.`,
@@ -1476,7 +1499,7 @@ wk('alberi','tech','Alberi tecnologici',`Logistica (quadrato arancione), Svilupp
 `• Logistica: macchine e software di magazzino, migliorano [[puntualita]], [[accuratezza]] e produttività; vanno [[installazione|installate]].
 • Sviluppo aziendale: organizzazione e persone, valgono per tutta l'azienda; contiene la [[direzione|Struttura direzionale]].
 • Mercato: nuovi clienti e [[tech_richieste|tecnologie richieste]] dalle gare.
-• Welfare: [[welfare_mag|servizi per chi lavora]] (acqua, frutta, mensa, pulmini, asilo, area cani); vanno installati magazzino per magazzino.
+• Welfare: [[welfare_mag|servizi per chi lavora]] (acqua, frutta, mensa, caffè, spogliatoi, palestra, presidio medico, pulmini, asilo, area cani e altri); vanno installati magazzino per magazzino.
 
 La forma della cornice dell'icona ti dice sempre a quale albero appartiene.`);
 wk('ricerca','tech','Ricerca',`Si paga all'avvio e dura un certo numero di giorni. Una sola alla volta; l'Innovazione la accorcia.`,
@@ -1552,7 +1575,7 @@ function newGame(ceoId,coName,color,custom,co){
      warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0},managers:MANAGERS.map(m=>({...m,hired:false,wh:null})),
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextTender:12,nextEvent:25,project:null,seen:{},over:false,uid:1,
      execs:EXECS.map(e=>({...e,hired:false})),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false,hist:[],tw:{win:0,lose:0,skip:0}};
-  const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,capo:0,autB:0,autCE:1,imp:2};
+  const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,capo:0,autB:0,autCE:1,imp:2,fm:0};
   (C.startTech||[]).forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true;});
   S.clients.push({id:nid('c'),...C.client,zone:cinfo(C.client).zones[0],src:cinfo(C.client).src,mode:cinfo(C.client).mode,wh:wh.id,mult:1,sat:60,status:'attivo',start:0,end:24*30,storico:true});
   chMigrate(); // autisti B per la parte di merce che va con i furgoni
@@ -1562,7 +1585,7 @@ function newGame(ceoId,coName,color,custom,co){
 function z(){return {ric:0,pers:0,mezzi:0,fissi:0,tech:0,mgr:0,welf:0,pen:0,altro:0}}
 function addWarehouse(site,own,fixed,motrici){
   const s=SITES[site];
-  const wh={id:nid('w'),site,name:s.name,prov:s.prov,cap:s.cap,own,fixed:own?fixed:s.rent,motrici:motrici||0,mgr:null,staff:noStaff(),coop:false,morale:62,tech:{},acc:{P:0,A:0,n:0},kpi:null};
+  const wh={id:nid('w'),site,name:s.name,prov:s.prov,cap:s.cap,own,fixed:own?fixed:s.rent,motrici:motrici||0,mgr:null,staff:noStaff(),coop:false,morale:62,tech:{},acc:{P:0,A:0,n:0},kpi:null,cond:100,exp:0,build:null};
   S.warehouses.push(wh); return wh;
 }
 const ceo=()=>S.custom||CEOS.find(c=>c.id===S.ceoId);
@@ -1582,7 +1605,15 @@ function personById(id){return S.managers.find(m=>m.id===id)||S.execs.find(m=>m.
 function dirStat(role){ if(!R('direzione')) return null; const p=personById(S.dirs[role]); if(!p) return null; const st=DIR_ROLES.find(r=>r.id===role).stat; return p.st[st]; }
 function seatOf(id){return Object.keys(S.dirs).find(k=>S.dirs[k]===id)||null;}
 function fixedMul(){let m=1; if(R('gestionale')) m*=0.97; if(R('controllo')) m*=0.96; const f=dirStat('fin'); if(f!=null) m*=1-0.005*(f-10); return m;}
-function capOf(w){const t=TECH.find(x=>x.id==='verticale'); return Math.round(w.cap*(1+(w.tech.verticale&&techFactor(w,t)>0?t.cap:0)));}
+// stato del magazzino (0-100): sotto 70 si perdono posti pallet e produttività
+const MAINT={up:0.12,down:0.06,soglia:70,pen:0.006,costo:0.25,straord:0.12,expPct:0.25,expEur:120,expGg:90,expMax:3};
+function condPen(w){return Math.max(0,MAINT.soglia-(w.cond==null?100:w.cond))*MAINT.pen;}
+function manutMese(w){return w.staff.fm?MAINT.costo*w.cap:0;}
+function straordCost(w){return Math.round((100-(w.cond==null?100:w.cond))*w.cap*MAINT.straord/100)*100;}
+function expAdd(w){const b=SITES[w.site]?SITES[w.site].cap:w.cap; return Math.round(b*MAINT.expPct/50)*50;}
+function expCost(w){return expAdd(w)*MAINT.expEur;}
+function expRent(w){const b=SITES[w.site]?SITES[w.site].rent:w.fixed; return Math.round(b*MAINT.expPct/100)*100;}
+function capOf(w){const t=TECH.find(x=>x.id==='verticale'); return Math.round(w.cap*(1+(w.tech.verticale&&techFactor(w,t)>0?t.cap:0))*(1-condPen(w)));}
 function perWh(t){return t.tree==='log'||t.tree==='wel';}
 // servizi di welfare installati in un magazzino: canone scontato dal Welfare aziendale
 function welMese(t){return t.tree==='wel'&&R('welfare2')?t.mese*0.7:t.mese;}
@@ -1631,8 +1662,8 @@ function computeWH(wh,extra){
   let fuelMul=1;
   TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t); tA+=(t.A||0)*f; tP+=(t.P||0)*f; tMor+=(t.mor||0)*(f>0?1:0); tProd+=(t.prod||0)*(f>0?1:0); if(f>0&&t.fuel) fuelMul*=1-t.fuel; tCan+=t.mese; });
   // servizi di welfare del magazzino: niente apprendimento, valgono da subito
-  let wMor=0,wP=0; TECH.forEach(t=>{ if(t.tree!=='wel'||!wh.tech[t.id]) return; wMor+=t.mor||0; wP+=t.P||0; tProd+=t.prod||0; tCan+=welMese(t); });
-  const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd);
+  let wMor=0,wP=0,wA=0; TECH.forEach(t=>{ if(t.tree!=='wel'||!wh.tech[t.id]) return; wMor+=t.mor||0; wP+=t.P||0; wA+=t.A||0; tProd+=t.prod||0; tCan+=welMese(t); });
+  const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd)*(1-condPen(wh))*(wh.build?0.95:1);
   // carrellisti: tutti i movimenti (doppia produttività col muletto); magazzinieri: preparano i pallet in uscita
   const use=(load,n,per)=>load===0?0:(n>0?load/(n*per):9);
   const uCar=use(mov,st.car,2*prod), uPick=use(cons*pickF,st.pick,prod), uB=use(kmB,st.autB,KM_B), uCE=use(kmCE,st.autCE,KM_CE);
@@ -1650,7 +1681,7 @@ function computeWH(wh,extra){
   if(planShort) pP.push(['Pianificatori del traffico insufficienti',-2*planShort]);
   if(sm.push>0.5) pP.push(['Camion che aspettano il carico completo',-0.06*sm.push]);
   const pA=[['Base',96],['Precisione di '+m.name.split(' ')[0],0.3*(m.prec-10)],['Morale',0.04*(wh.morale-60)]];
-  if(tA) pA.push(['Tecnologie',tA]); if(mA) pA.push(['Eventi',mA]); if(Math.abs(chA)>0.05) pA.push(['Canali di distribuzione',chA]); if(R('iso')) pA.push(['Certificazione ISO',0.5]);
+  if(tA) pA.push(['Tecnologie',tA]); if(wA) pA.push(['Servizi di welfare',wA]); if(mA) pA.push(['Eventi',mA]); if(Math.abs(chA)>0.05) pA.push(['Canali di distribuzione',chA]); if(R('iso')) pA.push(['Certificazione ISO',0.5]);
   if(sat>0.85) pA.push(['Saturazione oltre 85%',-25*(sat-0.85)]); if(uPick>1) pA.push(['Magazzinieri insufficienti',-8*(uPick-1)]); if(uCar>1) pA.push(['Carrellisti insufficienti',-3*(uCar-1)]);
   if(impShort) pA.push(['Impiegati insufficienti',-1*impShort]);
   const exN=act.filter(c=>c.exit).length; if(exN) pA.push(['Inventario di uscita',-1*exN]);
@@ -1663,12 +1694,12 @@ function computeWH(wh,extra){
     ['Autisti insufficienti',-20*Math.max(0,Math.max(uB,uCE)-1)],['Personale che non sta dietro all\'obiettivo di carico',-0.5*sm.short]].filter((x,i)=>i===0||Math.abs(x[1])>0.05);
   const morT=clamp(pM.reduce((a,x)=>a+x[1],0),0,100);
   const rev=act.reduce((a,c)=>a+clientRev(c),0);
-  const pers=ROLES.reduce((a,r)=>a+st[r]*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12;
+  const pers=ROLES.reduce((a,r)=>a+(st[r]||0)*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12;
   // bilici: gasolio, manutenzione e pedaggi; furgoni: consumano e costano meno, sempre in leasing
   const mezzi=giri*kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+giri*kmB*(0.12*S.fuel*fuelMul+0.06)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100+st.autB*900;
-  const fissi=(wh.fixed+1000)*fixedMul();
-  const need={pick:Math.max(cons?1:0,Math.ceil(cons*pickF/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp+sm.addImp,capo:needCapo};
-  return {act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,mixF,pickF,P,A,pP,pA,pM,morT,rev,pers,mezzi,fissi,tCan,need,prod,m};
+  const manut=manutMese(wh), fissi=(wh.fixed+1000)*fixedMul()+manut;
+  const need={pick:Math.max(cons?1:0,Math.ceil(cons*pickF/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp+sm.addImp,capo:needCapo,fm:1};
+  return {manut,act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,mixF,pickF,P,A,pP,pA,pM,morT,rev,pers,mezzi,fissi,tCan,need,prod,m};
 }
 function globalCosts(){
   const emp=S.warehouses.reduce((a,w)=>a+staffTot(w),0)+S.office.plan;
@@ -1692,6 +1723,11 @@ function step(){
   S.warehouses.forEach(w=>{
     const k=computeWH(w); w.kpi=k;
     w.morale+= (k.morT-w.morale)*0.012;
+    // manutenzione: con il facility manager lo stato risale, senza si rovina (più in fretta se il magazzino è pieno)
+    if(w.cond==null) w.cond=100;
+    w.cond=clamp(w.cond+(w.staff.fm?MAINT.up:-MAINT.down*(1+Math.max(0,k.sat-0.6))),0,100);
+    if(w.build){ w.build.left--; if(w.build.left<=0){ w.cap+=w.build.add; w.fixed+=w.build.rent; w.exp=(w.exp||0)+1; const a=w.build.add; w.build=null;
+      toast(`Ampliamento finito a ${w.name}: +${n0(a)} posti pallet`,'ok'); news('Il Sole 24 Pallet',`${S.company.name} amplia ${w.name}`,`Il cantiere è chiuso: il magazzino sale a ${n0(w.cap)} posti pallet.`);} }
     w.acc.P+=k.P; w.acc.A+=k.A; w.acc.n++;
     const wk=w.wk||(w.wk={n:0,P:0,A:0,sat:0,mor:0,mov:0,trips:0,rev:0,cost:0}); wk.n++; wk.P+=k.P; wk.A+=k.A; wk.sat+=k.sat; wk.satM=(wk.satM||0)+k.satM; wk.mor+=w.morale;
     wk.mov+=k.mov/30; wk.trips+=k.viaggi/30; wk.rev+=k.rev/30; wk.cost+=(k.pers+k.mezzi+k.fissi+k.tCan)/30;
@@ -1746,6 +1782,10 @@ function histPush(c){
 }
 function monthEnd(){
   S.months++;
+  // guasti nei magazzini senza facility manager
+  const GUASTI=['si è bloccato un portone sezionale','una scaffalatura è stata urtata e va scaricata','piove dal tetto sulla baia 4','si è rotta la rampa di carico','il quadro elettrico ha preso fuoco (poco, per fortuna)','il pavimento si è crepato davanti alle baie'];
+  S.warehouses.forEach(w=>{ if(!w.staff.fm&&Math.random()<0.18){ w.cond=Math.max(0,(w.cond==null?100:w.cond)-8); const g=GUASTI[Math.floor(Math.random()*GUASTI.length)];
+    toast(`${w.name}: ${g}. Senza facility manager nessuno ripara`,'warn'); news('La Gazzetta del Muletto',`Guasto a ${w.name}`,`Nel magazzino ${g}. Manca un facility manager che segua la manutenzione: lo stato dell'immobile scende a ${Math.round(w.cond)}%.`);} });
   // carburante
   const y=yearOf(S.day); S.fuel=clamp(0.86+(y-2002)*0.05+rnd(-0.03,0.03),0.8,1.9);
   let pen=0;
@@ -2249,7 +2289,7 @@ function migrateStaff(s){
 function fillSave(s){
   if(!s.office) s.office={plan:0};
   if(!s.hist) s.hist=[]; if(!s.tw) s.tw={win:0,lose:0,skip:0};
-  s.warehouses.forEach(w=>{if(w.staff.capo===undefined) w.staff.capo=0; if(w.coop===undefined) w.coop=false;});
+  s.warehouses.forEach(w=>{if(w.staff.capo===undefined) w.staff.capo=0; if(w.staff.fm===undefined) w.staff.fm=0; if(w.coop===undefined) w.coop=false; if(w.cond===undefined) w.cond=100; if(w.exp===undefined) w.exp=0; if(w.build===undefined) w.build=null;});
   return s;
 }
 // dopo la conversione: gli autisti che servono sui furgoni passano alla patente B
@@ -2520,7 +2560,7 @@ const VIEWS={
    ${L?`<table class="t num">${pl.map(([n,v])=>`<tr><td>${n}</td><td class="r ${v<0?'bad':''}">${eur(v)}</td></tr>`).join('')}<tr><th>Utile</th><th class="r ${L.util>=0?'ok':'bad'}" style="font-size:14px">${eur(L.util)}</th></tr></table>`:'<div class="sm">Disponibile dalla fine del primo mese.</div>'}</div>
    <div class="card"><div class="row"><span class="h3">${kw('welfare')}</span><span class="sm">costo per dipendente al mese</span></div>
    ${WELFARE.map(w=>`<label class="row" style="cursor:pointer"><span><input type="checkbox" data-act="welfare" data-id="${w.id}" ${S.welfare[w.id]?'checked':''}> ${w.name}</span><span class="sm">${eur(w.cost)} · morale +${w.mor}</span></label>`).join('')}
-   <div class="sm">Il welfare alza il morale e accorcia i tempi di assunzione.</div><div class="row"><span class="sm">Acqua, frutta, mensa, pulmini, asilo e area cani si installano nei singoli magazzini: ${kw('welfare_mag','albero Welfare')}.</span><button class="btn sm2" data-act="opentech" data-tree="wel" data-id="acqua">Apri</button></div></div>
+   <div class="sm">Il welfare alza il morale e accorcia i tempi di assunzione.</div><div class="row"><span class="sm">Mensa, palestra, pulmini, asilo e gli altri servizi si installano nei singoli magazzini: ${kw('welfare_mag','albero Welfare')}.</span><button class="btn sm2" data-act="opentech" data-tree="wel" data-id="acqua">Apri</button></div></div>
    <div class="row"><button class="btn" data-act="save">Salva partita</button><button class="btn" data-act="restart">Nuova partita</button></div>`;
  },
  magazzini(){
@@ -2532,7 +2572,7 @@ const VIEWS={
   const staffRow=(r,have,need)=>{const inq=q.filter(x=>x.role===r).length;return `<img class="px mini" src="${IMG[r]}" alt="" width="48" height="56"><span>${kw(ROLE_WK[r],ROLE[r])}<br><span class="sm">servono ${need}${inq?` · ${inq} in arrivo`:''}</span></span><b class="num ${have<need?'bad':''}" style="font-family:var(--f-disp);font-size:18px">${have}</b><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia">−</button><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi">+ Assumi</button>`;};
   return `${tabs}
   <div class="row"><span class="h3" style="font-size:19px">${esc(w.name)} (${w.prov})</span><span class="sm">${w.own?'di proprietà':'in affitto'} · ${eur(w.fixed)}/mese</span></div>
-  <div><div class="row"><span class="lab">${kw('saturazione')}</span><span class="num">${n0(k.stock)} / ${n0(w.cap)} posti · ${Math.round(k.sat*100)}%</span></div><div class="bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div></div>
+  <div><div class="row"><span class="lab">${kw('saturazione')}</span><span class="num">${n0(k.stock)} / ${n0(k.cap)} posti · ${Math.round(k.sat*100)}%</span></div><div class="bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div></div>
   <div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">
    <div class="kpi" data-tip="${tipParts('Puntualità '+f1(k.P)+'%',k.pP,'')}"><div class="lab">${kw('puntualita')}</div><b>${f1(k.P)}%</b></div>
    <div class="kpi" data-tip="${tipParts('Accuratezza '+f1(k.A)+'%',k.pA,'')}"><div class="lab">${kw('accuratezza')}</div><b>${f1(k.A)}%</b></div>
@@ -2550,9 +2590,10 @@ const VIEWS={
    <label class="row" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><img class="px mini" src="${w.mgr==='ceo'?ceoImg(ceo()):w.mgr?IMG['m_'+w.mgr]:IMG.imp}" alt="" width="48" height="56" style="${w.mgr?'':'opacity:.3'}"><span class="lab">${kw('manager','Manager')}</span></span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
    ${k.m.none?'<div class="sm bad">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
   </div>
+  ${strutturaCard(w,k,staffRow)}
   <div class="card"><div class="row"><span class="h3">${kw('clienti')}</span><span class="sm">${kw('ricavi','ricavi')} ${eur(k.rev)}/mese</span></div>
    ${cl.length?cl.map(c=>`<div class="row"><span><b>${esc(c.name)}</b>${c.status==='avvio'?` <span class="pill" style="background:var(--yellow)">dal ${shortDate(c.start)}</span>`:''}<br><span class="sm">${n0(c.stock)} posti · ${n0(c.pal)} pallet/mese</span></span><span class="sm">${c.status==='attivo'?`soddisf. <b class="${c.sat>=60?'ok':c.sat>=40?'warn':'bad'}">${Math.round(c.sat)}</b>`:''}</span></div>`).join(''):'<div class="sm">Nessun cliente: partecipa alle gare.</div>'}</div>
-  <div class="row"><span class="sm">${kw('costi','Costi del mese')}: personale ${eur(k.pers)}, mezzi ${eur(k.mezzi)}, immobile ${eur(k.fissi)}</span><button class="btn sm2" data-act="opentech" data-tree="log" data-id="">Tecnologie</button></div>
+  <div class="row"><span class="sm">${kw('costi','Costi del mese')}: personale ${eur(k.pers)}, mezzi ${eur(k.mezzi)}, immobile ${eur(k.fissi)}${k.manut?` (di cui manutenzione ${eur(k.manut)})`:''}</span><button class="btn sm2" data-act="opentech" data-tree="log" data-id="">Tecnologie</button></div>
   <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center"><span class="sm">${kw('installazione','Installate')}:</span>${TECH.filter(t=>w.tech[t.id]).map(t=>{const l=techFactor(w,t)<0;return `<span role="img" aria-label="${esc(t.name)}" data-act="wiki" data-id="tech_${t.id}" data-tip="<div class='tt'>${esc(t.name)}</div><div>${esc(t.desc)}</div>${l?"<div style='color:#ffd23f'>In apprendimento: per qualche settimana peggiora i KPI</div>":''}${wikiHint()}" style="cursor:help;display:inline-flex">${techIcon(t,32,l)}</span>`;}).join('')||'<span class="sm">nessuna</span>'}</div>`;
  },
  clienti(){
@@ -2884,6 +2925,19 @@ const VIEWS={
   return S.news.slice(0,30).map(n=>`<div class="card"><div class="row"><span class="lab">${esc(n.src)}</span><span class="sm">${shortDate(n.day)}</span></div><b>${esc(n.title)}</b><div class="sm" style="color:var(--ink)">${esc(n.text)}</div></div>`).join('')||'<div class="sm">Nessuna notizia.</div>';
  }
 };
+function strutturaCard(w,k,staffRow){
+  const c=Math.round(w.cond==null?100:w.cond), pen=condPen(w), fm=w.staff.fm>0, sc=straordCost(w), ec=expCost(w), full=(w.exp||0)>=MAINT.expMax;
+  const col=c>=MAINT.soglia?'var(--ok)':c>=40?'var(--warn)':'var(--bad)';
+  const b=w.build;
+  return `<div class="card"><div class="row"><span class="h3">${kw('manutenzione','Immobile')}</span><span class="sm">${n0(w.cap)} posti di base${w.exp?` · ${w.exp} ${w.exp>1?'ampliamenti':'ampliamento'}`:''}</span></div>
+   <div><div class="row"><span class="lab">${kw('manutenzione','Stato del magazzino')}</span><b class="num" style="color:${col}">${c}%</b></div><div class="bar"><i style="width:${c}%;background:${col}"></i></div></div>
+   <div class="sm">${pen?`<span class="bad">Sotto il ${MAINT.soglia}%: posti pallet e produttività −${f1(pen*100)}%.</span>`:`Sopra il ${MAINT.soglia}% il magazzino rende al massimo.`} ${fm?`Il facility manager lo tiene in ordine: manutenzione ${eur(manutMese(w))}/mese.`:'<b>Senza facility manager nessuno fa manutenzione</b>: lo stato scende ogni giorno e capitano guasti.'}</div>
+   <div class="staff">${staffRow('fm',w.staff.fm,1)}</div>
+   <div class="row" style="flex-wrap:wrap"><span class="sm">Riporta subito lo stato al 100%</span><button class="btn sm2" data-act="straord" data-wh="${w.id}" ${fm&&c<95&&S.cash>=sc?'':'disabled'}>Manutenzione straordinaria · ${eur(sc)}</button></div>
+   ${b?`<div><div class="row"><span class="lab">${kw('ampliamento','Ampliamento')} in corso: +${n0(b.add)} posti</span><b class="num">${b.left} giorni</b></div><div class="bar"><i style="width:${Math.round((1-b.left/b.total)*100)}%;background:var(--accent)"></i></div><div class="sm">Durante il cantiere la produttività cala del 5%.</div></div>`
+     :`<div class="row" style="flex-wrap:wrap"><span class="sm">${full?`Già ampliato ${MAINT.expMax} volte: non c'è più terreno.`:`${kw('ampliamento','Ampliamento')}: +${n0(expAdd(w))} posti in ${MAINT.expGg} giorni, ${w.own?'costi fissi':'affitto'} +${eur(expRent(w))}/mese`}</span>${full?'':`<button class="btn sm2 pri" data-act="amplia" data-wh="${w.id}" ${fm&&S.cash>=ec?'':'disabled'}>Amplia · ${eur(ec)}</button>`}</div>`}
+   ${fm?'':'<div class="sm">Manutenzione straordinaria e ampliamento richiedono un facility manager.</div>'}</div>`;
+}
 function needTxt(n){return ROLES.filter(r=>n[r]).map(r=>`${n[r]} ${ROLE[r].toLowerCase().replace('autisti ','aut. ')}`).join(', ')||'nessuno';}
 function bidEstHtml(t,e){
   if(!e) return '';
@@ -2982,6 +3036,9 @@ const ACT={
   renderAll();
  },
  welfare(d,el){S.welfare[d.id]=el.checked;renderAll();},
+ straord(d){const w=whById(d.wh), c=straordCost(w); if(!w.staff.fm||S.cash<c||w.cond>=95)return; S.cash-=c; S.cur.altro+=c; w.cond=100; toast(`${w.name}: manutenzione straordinaria fatta, stato al 100%`,'ok'); renderAll();},
+ amplia(d){const w=whById(d.wh), c=expCost(w); if(!w.staff.fm||w.build||(w.exp||0)>=MAINT.expMax||S.cash<c)return; S.cash-=c; S.cur.altro+=c;
+  w.build={left:MAINT.expGg,total:MAINT.expGg,add:expAdd(w),rent:expRent(w)}; toast(`Cantiere aperto a ${w.name}: +${n0(expAdd(w))} posti tra ${MAINT.expGg} giorni`,'ok'); renderAll();},
  bidwh(d,el){UI.bid.wh=el.value;renderWin('gare');},
  bidmult(d,el){UI.bid.mult=(+el.value)/100;const sel=S.tenders.find(t=>t.id===UI.bid.t);$('#bidmv').textContent=(UI.bid.mult>=1?'+':'')+Math.round((UI.bid.mult-1)*100)+'%';$('#bidest').innerHTML=bidEstHtml(sel,bidEstimate(sel,UI.bid.wh,UI.bid.mult));},
  bid(d){const t=S.tenders.find(x=>x.id===d.id);t.bid={wh:UI.bid.wh,mult:UI.bid.mult};toast(`Offerta inviata per ${t.name}`,'ok');renderAll();},
@@ -3196,6 +3253,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.16',t:'Chi ripara il portone?',x:['Nuova figura in ogni magazzino: il facility manager. Senza di lui niente manutenzione, il magazzino si rovina e capitano guasti.','Lo stato del magazzino va da 0 a 100: sotto il 70% si perdono posti pallet e produttività.','Manutenzione straordinaria per tornare subito al 100%.','I magazzini si possono ampliare fino a tre volte, con un cantiere di 90 giorni.','12 nuovi servizi di welfare: caffè, sala pausa, spogliatoi, lavanderia, palestra, presidio medico, sportello d\'ascolto, corsi di italiano, raffrescatori, orto, colonnine di ricarica.']},
  {v:'0.16',t:'Tutto il Nord',x:['La mappa arriva fino a Trieste: Emilia-Romagna, Veneto, Trentino-Alto Adige e Friuli-Venezia Giulia sono giocabili, con 22 nuove città e 47 province nella lente.','10 nuovi magazzini in affitto, da Piacenza Le Mose a Trieste Fernetti.','14 nuove committenti: prosciutto, ceramica, motori, piadine, spumanti, occhiali, mele, caffè, cucine, scarponi e altro.','Gare per zona: una provincia, un gruppo di province (Romagna, Pianura Padana, Asse del Brennero…), una regione o più regioni. La stessa committente può aprire più gare per zone diverse e avere più contratti con te.','I volumi di una gara dipendono dagli abitanti della zona.']},
  {v:'0.15',t:'Acqua, frutta e asilo',x:['Nuovo albero Welfare: boccioni d\'acqua, servizio frutta, mensa, pulmini per i dipendenti, asilo aziendale e area cani.','I servizi di welfare si ricercano una volta e poi si installano magazzino per magazzino: alzano il morale e accorciano le assunzioni in quel sito.','Ogni tecnologia ha ora una breve descrizione di cosa è, oltre all\'effetto.']},
  {v:'0.14',t:'Sotto il cofano',x:['Nel Riepilogo la scheda Modificatori: da cosa dipendono puntualità, accuratezza e morale di ogni magazzino, voce per voce.','Talenti di CEO, manager e dirigenti con i loro effetti, tecnologie e dove sono installate, effetti degli eventi in corso con la scadenza.']},
