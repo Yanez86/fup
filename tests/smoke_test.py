@@ -140,6 +140,15 @@ async def main():
         assert st['imp'] is None and sum(st['st'].values()) == 8+3 and st['st']['autB'] > 0, st
         assert st['q'] == ['imp:true', 'autCE:true'], st
         assert await pg.evaluate('()=>window.__FUP.S.office.plan===0 && window.__FUP.S.warehouses[0].coop===false')
+        # eventi dei talenti: ognuno compare con il suo talento e tutte le scelte funzionano
+        r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame(null,F.ccCeo(Object.assign(F.ccNew(),{nome:'Prova',cognome:'Eventi',edu:'Autodidatta'})));
+          const S=F.S,evs=F.EVENTS.filter(e=>e.id.startsWith('t_')),bad=[];S.custom.tal=[];
+          evs.forEach(e=>{const nm=(e.cond.toString().match(/hasTal[(]'(.+?)'[)]/)||[])[1];if(!nm||!F.TALENTS[nm.replace(/\\\\/g,'')])bad.push(e.id+': talento?');});
+          if(evs.some(e=>{try{return e.cond();}catch(x){return true;}}))bad.push('evento senza talento');
+          S.custom.tal=Object.keys(F.TALENTS);
+          evs.forEach(e=>e.opts.forEach((o,i)=>{const ev={...e};try{if(ev.setup)ev.setup(ev);if(!ev.text)bad.push(e.id+': testo');o.f.call(ev);}catch(x){bad.push(e.id+'/'+i+': '+x);}}));
+          return {n:evs.length,bad};}''')
+        assert r['n'] >= 30 and not r['bad'], r
         for ceo in ['gino','edoardo','valeria','marco','custom']:
             print(await pg.evaluate(BOT, ceo))
         await b.close()
