@@ -295,6 +295,7 @@ async def main():
         mig = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('marco'); const S=F.S;
           const w=S.warehouses[0]; w.staff={mag:5,aut:3}; S.imp=3; S.queue=[{role:'imp',wh:null,days:5},{role:'aut',wh:w.id,days:9}];
           S.clients.push({...S.clients[0],id:'cx',name:'Tuttosubito Italia',zone:'nordovest',pal:400});
+          delete S.boss; delete S.alumni; S.managers=S.managers.filter(m=>!m.from).map(m=>{const x={...m}; delete x.bd; delete x.log; delete x.ann; return x;}); S.execs.forEach(e=>{delete e.bd; delete e.log;});
           F.save(); return true;}''')
         await pg.evaluate('()=>location.reload()'); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached'); await pg.wait_for_selector('[data-act=continue]')
         await pg.click('[data-act=continue]'); await pg.evaluate(CLEAR)
@@ -302,12 +303,14 @@ async def main():
         assert st['imp'] is None and sum(st['st'].values()) == 8+3 and st['st']['autB'] > 0, st
         assert st['q'] == ['imp:true', 'autCE:true'], st
         assert await pg.evaluate('()=>window.__FUP.S.office.plan===0 && window.__FUP.S.warehouses[0].coop===false')
+        st = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S;return {boss:S.boss.name,age:F.ageOf(S.boss),m:S.managers.length,bd:F.people().every(p=>p.bd!=null&&Array.isArray(p.log))}}''')
+        assert st['boss'] == 'Marco Pellegrino' and st['age'] == 36 and st['m'] >= 13 and st['bd'], st
         # eventi dei talenti: ognuno compare con il suo talento e tutte le scelte funzionano
         r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame(null,F.ccCeo(Object.assign(F.ccNew(),{nome:'Prova',cognome:'Eventi',edu:'Autodidatta'})));
-          const S=F.S,evs=F.EVENTS.filter(e=>e.id.startsWith('t_')),bad=[];S.custom.tal=[];
+          const S=F.S,evs=F.EVENTS.filter(e=>e.id.startsWith('t_')),bad=[];S.boss.tal=[];
           evs.forEach(e=>{const nm=(e.cond.toString().match(/hasTal[(]'(.+?)'[)]/)||[])[1];if(!nm||!F.TALENTS[nm.replace(/\\\\/g,'')])bad.push(e.id+': talento?');});
           if(evs.some(e=>{try{return e.cond();}catch(x){return true;}}))bad.push('evento senza talento');
-          S.custom.tal=Object.keys(F.TALENTS);
+          S.boss.tal=Object.keys(F.TALENTS);
           evs.forEach(e=>e.opts.forEach((o,i)=>{const ev={...e};try{if(ev.setup)ev.setup(ev);if(!ev.text)bad.push(e.id+': testo');o.f.call(ev);}catch(x){bad.push(e.id+'/'+i+': '+x);}}));
           return {n:evs.length,bad};}''')
         assert r['n'] >= 30 and not r['bad'], r
@@ -333,6 +336,49 @@ async def main():
         r = await pg.evaluate('()=>{const S=window.__FUP.S;return {altro:S.cur.altro,pend:S.evPend.length}}')
         assert r['altro'] - altro0 == 2500 and r['pend'] == 0, r
         await pg.click('#modal [data-act=closemodal]')
+        # eventi personali: CEO, manager e dirigenti; tutte le scelte funzionano e cambiano abilità e talenti
+        r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame('gino');const S=F.S,bad=[],w=S.warehouses[0];
+          document.querySelector('#modal').innerHTML=''; S.researched.direzione=true; ['chiara','davide','rosa'].forEach(id=>F.ACT.hiremgr({id}));
+          const c=S.managers.find(m=>m.id==='chiara'); w.mgr='chiara'; c.wh=w.id; S.execs.forEach(e=>{e.hired=true;}); S.dirs.fin=S.execs[0].id;
+          S.boss.tal.push('Fumatore incallito','Stacanovista');
+          const evs=F.EVENTS.filter(e=>/^(p|m|d|x)_/.test(e.id));
+          evs.forEach(e=>{try{e.cond();}catch(x){bad.push(e.id+': cond '+x);} e.opts.forEach((o,i)=>{const ev={...e}, T=F.people().map(p=>[p,[...p.tal],{...p.st},p.quit]);try{if(ev.setup)ev.setup(ev);if(!ev.text)bad.push(e.id+': testo');if(!ev.p)bad.push(e.id+': persona');o.f.call(ev);}catch(x){bad.push(e.id+'/'+i+': '+x);}
+            T.forEach(([p,t,st,q])=>{p.tal=t;p.st=st;p.quit=q;});});});
+          const p=S.managers.find(m=>m.id==='rosa'), st0={...p.st}; F.gainTal(p,'Mentore'); const up=p.st.lead-st0.lead; F.loseTal(p,'Mentore'); const back=p.st.lead===st0.lead;
+          ['Esaurito','Golfista','Maratoneta','Cuoco provetto'].forEach(n=>F.gainTal(p,n));
+          return {n:evs.length,bad,up,back,max:p.tal.length};}''')
+        assert r['n'] >= 20 and not r['bad'] and r['up'] == 2 and r['back'] and r['max'] == 5, r
+        # il risultato di un evento personale mostra cosa è cambiato
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S;document.querySelector('#modal').innerHTML='';S.nextEvent=1e9;S.seen={};S.day=Math.max(S.day,800);const e=F.EVENTS.find(x=>x.id==='p_dogane');F.EVENTS.forEach(x=>{if(x!==e)S.seen[x.id]=S.day;});S.boss.tal=S.boss.tal.filter(t=>t!=='Esperto di dogane');F.fireEvent();}")
+        await pg.click('#modal [data-act=evopt][data-i="0"]')
+        await pg.evaluate("()=>{window.__FUP.step();}")
+        assert await pg.query_selector('#modal .ev-chg .chg'), await pg.inner_text('#modal')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_evento_personale.png'))
+        await pg.click('#modal [data-act=closemodal]')
+        # pensione di un manager: al compleanno dei 66 anni annuncia la pensione, dopo il preavviso esce dalle liste
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; F.ACT.hiremgr({id:'toto'}); const t=S.managers.find(m=>m.id==='toto');
+          t.bd=S.day+1-66*365; S.nextEvent=1e9; F.step(); return {age:F.ageOf(t),modal:document.querySelector('#modal').innerText};}''')
+        assert r['age'] == 66 and 'pensione' in r['modal'], r
+        await pg.screenshot(path=os.path.join(OUT, 'shot_pensione.png'))
+        await pg.click('#modal [data-act=evopt][data-i="2"]')
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,t=S.managers.find(m=>m.id==='toto'); const q=!!(t.quit&&t.quit.ret); t.quit.day=S.day; F.step(); return {q,ret:t.retired,hired:t.hired};}''')
+        assert r['q'] and r['ret'] and not r['hired'], r
+        # il CEO compie 65 anni, lascia, e si sceglie il successore
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S;document.querySelector('#modal').innerHTML='';S.boss.bd=S.day+1-65*365;F.step();}")
+        assert 'pensione' in (await pg.inner_text('#modal')).lower()
+        await pg.click('#modal [data-act=evopt][data-i="2"]')
+        await pg.evaluate("()=>{window.__FUP.step();}")
+        assert await pg.query_selector('#modal [data-act=succ]'), 'scelta del successore non mostrata'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_successione.png'))
+        old = await pg.evaluate('()=>window.__FUP.S.boss.name')
+        await pg.click('#modal [data-act=succ]:not([disabled])')
+        r = await pg.evaluate('()=>{const S=window.__FUP.S;return {n:S.boss.name,al:S.alumni.length}}')
+        assert r['n'] != old and r['al'] == 1, r
+        await pg.click('#modal [data-act=closemodal]')
+        await pg.click('#dock [data-id=azienda]')
+        if not await pg.query_selector('#win-azienda'): await pg.click('#dock [data-id=azienda]')
+        assert 'CEO precedenti' in await pg.inner_text('#win-azienda')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_nuovo_ceo.png'))
         for ceo in ['gino','edoardo','valeria','marco','custom']:
             print(await pg.evaluate(BOT, ceo))
         # riepilogo dell'azienda dopo tre anni: storico mensile e tutte le schede
