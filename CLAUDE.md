@@ -56,6 +56,7 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 - Grafica: pixel art moderna e colorata, bordi scuri `#16202e`, ombre nette, font *Pixelify Sans* (titoli) e *IBM Plex Sans Condensed* (testo). Colori dalla tavolozza `TPAL`. Le icone sono SVG con `shape-rendering="crispEdges"`.
 - Ogni abilità ha un colore fisso: Operazioni arancione, Precisione blu, Negoziazione giallo, Leadership rosso, Amministrazione verde, Innovazione viola. Mostra sempre le abilità con `statChips()` / `statBadge()`, mai come semplice testo.
 - Ogni nuovo cliente deve avere un logo in `LOGO` e una voce in `CINFO`.
+- I grafici sono SVG fatti a mano (`lineChart()`, con crosshair e tooltip in `chartHover`): niente librerie; linee da 2px, le soglie tratteggiate, la legenda sempre presente e le etichette dirette al massimo per 4 serie; una sola scala per grafico.
 - Il report KPI imita Excel (barra verde, schede dei fogli, barra della formula), ma resta nella nostra tavolozza.
 - Cornici delle tecnologie: Logistica = quadrato arancione, Sviluppo aziendale = ottagono viola, Mercato = tondo verde.
 - Interfaccia: mappa a tutto schermo con finestre mobili sopra (stile Paradox); font base grande e leggibile.

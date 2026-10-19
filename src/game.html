@@ -75,6 +75,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .xl-fxl{padding:4px 8px;border-right:1px solid #c3d0dc;font-style:italic;color:var(--muted)}
 .xl-f{padding:4px 8px;font-family:ui-monospace,monospace;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .xl-grid{overflow:auto;max-height:420px}
+.xl.has-ch .xl-grid{max-height:236px}
 .xl-grid table{border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums;min-width:100%}
 .xl-grid th{background:#dfe7ee;color:var(--muted);font-weight:500;border:1px solid #b5c3d1;padding:2px 6px;font-size:12px;position:sticky;top:0}
 .xl-grid tbody th,.xl-h th{width:30px;position:static}
@@ -88,6 +89,19 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .xl-tabs button{padding:4px 12px;border:0;border-right:1px solid #b5c3d1;background:transparent;font-size:13px;color:var(--muted)}
 .xl-tabs button[aria-pressed="true"]{background:#fff;color:#1f6e33;font-weight:700;box-shadow:inset 0 -3px 0 #2e9e48;margin-top:-2px}
 .xl-plus{padding:4px 10px;color:var(--muted)}
+.xl-charts{padding:12px;background:#f7f9fb;border-top:2px solid var(--ink);display:flex;flex-direction:column;gap:12px}
+.lc-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lc{margin:0;background:#fff;border:1px solid #b5c3d1;box-shadow:2px 2px 0 rgba(22,32,46,.18);padding:8px 10px 4px}
+.lc figcaption{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:14px}
+.lc-leg{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.lc-key{display:inline-flex;align-items:center;gap:4px}
+.lc-ax{font:12px var(--f-body,sans-serif);fill:#5b6b7f}
+.lc-dl{font:600 12px var(--f-body,sans-serif);fill:#16202e}
+.lc-empty{display:flex;flex-direction:column;gap:4px;padding:14px}
+.lc svg{display:block;cursor:crosshair}
+.xl-cli{display:flex;gap:4px;flex-wrap:wrap;padding:6px;border-bottom:2px solid var(--ink);background:#f1f5f9}
+.xl-cli button{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border:2px solid #b5c3d1;background:#fff;font-size:13px}
+.xl-cli button[aria-pressed="true"]{border-color:#2e9e48;box-shadow:inset 0 -3px 0 #2e9e48;font-weight:700}
 .treebox{overflow-x:auto;padding:4px 2px 8px}
 .tnode{position:absolute;display:flex;align-items:center;gap:7px;padding:4px 6px;text-align:left;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 rgba(22,32,46,.12),2px 2px 0 var(--ink);font-size:13px;line-height:1.2}
 .tnode .tn{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -459,6 +473,52 @@ function statIcon(k,sz){const rows=STAT_IC[k]||[];let r='';rows.forEach((row,y)=
 function statTip(s,v){return `<div class='tt'>${s.n} ${v!=null?v:''}</div><div>${esc(s.d)}</div><div style='color:#c9d3dd;margin-top:4px'>Media 10 · ottimo da 15 in su</div>`;}
 function statChips(st,sz){sz=sz||16;return `<span class="stats">${STATS.map(s=>`<span class="stc" style="--sc:${s.c};--sb:${s.bg}" role="img" aria-label="${s.n} ${st[s.k]}" data-tip="${statTip(s,st[s.k])}">${statIcon(s.k,sz)}<b>${st[s.k]}</b></span>`).join('')}</span>`;}
 function statBadge(k,v,sz){const s=STATS.find(x=>x.k===k);return `<span class="stc" style="--sc:${s.c};--sb:${s.bg}" data-tip="${statTip(s,v)}">${statIcon(k,sz||14)}${v!=null?`<b>${v}</b>`:''}</span>`;}
+/* --- grafici a linee del report (stile "grafico Excel", pixel-friendly) --- */
+const SERIES_C=['#2f7fd6','#ff7a3d','#7b4fe0','#1f9e8f','#c98a00','#c2185b'];  // ordine fisso, validato (CVD ok)
+const KPI_C={P:'#2f7fd6',A:'#7b4fe0'};
+let CHARTS={};
+function lineChart(id,o){
+  const L=o.labels, n=L.length;
+  if(n<2) return `<div class="lc lc-empty"><b>${esc(o.title)}</b><span class="sm">Il grafico compare dalla seconda settimana di dati.</span></div>`;
+  const W=o.w||860,H=o.h||250, ml=46,mr=o.labels2===false?14:(o.mr||136),mt=40,mb=34, pw=W-ml-mr, ph=H-mt-mb;
+  const all=o.series.flatMap(s=>s.v.filter(v=>v!=null));
+  let lo=Math.floor(Math.min(...all)-0.6), hi=Math.ceil(Math.max(...all)+0.4); if(hi-lo<4){const m=(hi+lo)/2;lo=Math.floor(m-2);hi=Math.ceil(m+2);}
+  lo=Math.max(o.min!=null?o.min:0,lo); hi=Math.min(o.max!=null?o.max:100,hi);
+  const step=hi-lo>12?4:hi-lo>6?2:1;
+  const X=i=>ml+(n===1?pw/2:i*pw/(n-1)), Y=v=>mt+ph-(v-lo)/(hi-lo)*ph;
+  let g='';
+  for(let v=Math.ceil(lo/step)*step;v<=hi;v+=step) g+=`<line x1="${ml}" x2="${ml+pw}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e3e9ef" stroke-width="1"/><text x="${ml-6}" y="${Y(v)+4}" text-anchor="end" class="lc-ax">${v}${o.unit||''}</text>`;
+  g+=`<line x1="${ml}" x2="${ml+pw}" y1="${mt+ph}" y2="${mt+ph}" stroke="#8a96a6" stroke-width="1"/>`;
+  const every=Math.ceil(n/8); L.forEach((l,i)=>{ if(i%every===0||(i===n-1&&(n-1)%every>=every/2)) g+=`<text x="${X(i)}" y="${H-12}" text-anchor="middle" class="lc-ax">${esc(l)}</text>`; });
+  // linee: prima le soglie (tratteggiate), poi i dati
+  const ends=[];
+  [...o.series].sort((a,b)=>(b.dash?1:0)-(a.dash?1:0)).forEach(s=>{
+    let d='',pen=false; s.v.forEach((v,i)=>{ if(v==null){pen=false;return;} d+=(pen?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1); pen=true; });
+    g+=`<path d="${d}" fill="none" stroke="${s.c}" stroke-width="${s.dash?1.5:2}" ${s.dash?'stroke-dasharray="6 4"':''} stroke-linejoin="round" stroke-linecap="round"/>`;
+    if(!s.dash){ const i=s.v.map((v,i)=>v==null?-1:i).filter(i=>i>=0).pop(); if(i!=null&&i>=0){ g+=`<circle cx="${X(i)}" cy="${Y(s.v[i])}" r="4" fill="${s.c}" stroke="#fff" stroke-width="2"/>`; ends.push({y:Y(s.v[i]),t:`${s.short||s.n} ${f1(s.v[i])}${o.unit||''}`,c:s.c}); } }
+  });
+  // etichette dirette (al massimo 4 serie), distanziate per non sovrapporsi
+  if(o.labels2!==false&&ends.length<=4){ ends.sort((a,b)=>a.y-b.y); for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<15) ends[i].y=ends[i-1].y+15;
+    ends.forEach(e=>{ g+=`<line x1="${ml+pw+4}" x2="${ml+pw+12}" y1="${e.y}" y2="${e.y}" stroke="${e.c}" stroke-width="2"/><text x="${ml+pw+15}" y="${e.y+4}" class="lc-dl">${esc(e.t)}</text>`; }); }
+  const leg=o.series.map(s=>`<span class="lc-key"><svg width="18" height="8" aria-hidden="true"><line x1="0" x2="18" y1="4" y2="4" stroke="${s.c}" stroke-width="${s.dash?1.5:2.5}" ${s.dash?'stroke-dasharray="4 3"':''}/></svg>${esc(s.n)}</span>`).join('');
+  CHARTS[id]={L,series:o.series,unit:o.unit||'',ml,pw,n,W,mt,ph};
+  return `<figure class="lc"><figcaption><b>${esc(o.title)}</b><span class="lc-leg">${leg}</span></figcaption>
+   <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(o.title)}" data-chart="${id}">${g}
+    <line class="lc-x" x1="0" x2="0" y1="${mt}" y2="${mt+ph}" stroke="#16202e" stroke-width="1" visibility="hidden"/>
+    <rect class="lc-hit" x="${ml-10}" y="${mt-10}" width="${pw+20}" height="${ph+20}" fill="transparent"/></svg></figure>`;
+}
+function chartHover(e){
+  const svg=e.target.closest&&e.target.closest('svg[data-chart]'); const tip=$('#tip');
+  document.querySelectorAll('svg[data-chart] .lc-x').forEach(l=>{ if(!svg||!svg.contains(l)) l.setAttribute('visibility','hidden'); });
+  if(!svg){ if(chartHover.on){tip.hidden=true;chartHover.on=false;} return; }
+  const C=CHARTS[svg.dataset.chart]; if(!C) return;
+  const r=svg.getBoundingClientRect(), x=(e.clientX-r.left)/r.width*C.W, i=clamp(Math.round((x-C.ml)/C.pw*(C.n-1)),0,C.n-1), cx=C.ml+i*C.pw/(C.n-1);
+  const ln=svg.querySelector('.lc-x'); ln.setAttribute('x1',cx); ln.setAttribute('x2',cx); ln.setAttribute('visibility','visible');
+  tip.innerHTML=`<div class='tt'>Settimana ${esc(C.L[i])}</div>`+C.series.map(s=>`<div class='tr'><span style='display:flex;align-items:center;gap:6px'><svg width='14' height='6'><line x1='0' x2='14' y1='3' y2='3' stroke='${s.c}' stroke-width='2.5' ${s.dash?"stroke-dasharray='3 2'":''}/></svg>${esc(s.n)}</span><b>${s.v[i]==null?'—':f1(s.v[i])+C.unit}</b></div>`).join('');
+  tip.hidden=false; chartHover.on=true;
+  const w=tip.offsetWidth,h=tip.offsetHeight; tip.style.left=Math.min(e.clientX+14,innerWidth-w-8)+'px'; tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';
+}
+document.addEventListener('pointermove',chartHover);
 function talentSvg(rows,sz){let r='';rows.forEach((row,y)=>{[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${TPAL[ch]}"/>`;});});return `<svg width="${sz}" height="${sz}" viewBox="-1 -1 10 10" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
 function talentIcons(list,sz){sz=sz||36;return `<span style="display:flex;gap:6px;flex-wrap:wrap">${list.map(n=>{const t=TALENTS[n];if(!t)return '';const ty=TTYPE[t.t];
   const tip=`<div class='tt'>${esc(n)}</div><div style='color:${ty[2]};font-weight:600'>${ty[0]}</div><div>${esc(t.fx)}</div><div style='margin-top:5px;color:#c9d3dd;font-style:italic'>${esc(t.fl)}</div>`;
@@ -616,7 +676,8 @@ function weekEnd(){
     rows[w.id]={P:k.P/k.n,A:k.A/k.n,sat:k.sat/k.n,mor:k.mor/k.n,mov:Math.round(k.mov),trips:Math.round(k.trips),rev:k.rev,cost:k.cost,
       sP:act.length?Math.max(...act.map(c=>c.sP)):null,sA:sA.length?Math.max(...sA):null};
     w.wk=null;});
-  if(!any) return; S.weeks.push({d:S.day,rows}); if(S.weeks.length>26) S.weeks.shift(); S.repNew=true;
+  const cli={}; S.clients.filter(c=>c.status==='attivo').forEach(c=>{const r=rows[c.wh]; if(r) cli[c.id]={P:r.P,A:r.A,sP:c.sP,sA:c.sA,sat:c.sat,wh:whById(c.wh).name};});
+  if(!any) return; S.weeks.push({d:S.day,rows,cli}); if(S.weeks.length>26) S.weeks.shift(); S.repNew=true;
 }
 function monthEnd(){
   S.months++;
@@ -1166,13 +1227,14 @@ const VIEWS={
   return `<div class="sm">I direttori guidano tutta l'azienda con la loro abilità principale. Puoi nominare manager già assunti e non assegnati a un magazzino, oppure dirigenti esterni.</div>${seats}<div class="lab">Dirigenti sul mercato</div>${cand}`;
  },
  report(){
-  S.repNew=false;
-  const sheets=[['sum','Riepilogo'],...S.warehouses.map(w=>[w.id,w.name])];
+  S.repNew=false; CHARTS={};
+  const sheets=[['sum','Riepilogo'],...S.warehouses.map(w=>[w.id,w.name]),['cli','Clienti']];
   const sh=sheets.find(x=>x[0]===UI.sel.sheet)?UI.sel.sheet:'sum';
   const W=S.weeks||[]; const COLS='ABCDEFGHIJKL';
   const wkLabel=d=>{const a=dateOf(d-7),b=dateOf(d-1);return `${a.getUTCDate()}/${a.getUTCMonth()+1}–${b.getUTCDate()}/${b.getUTCMonth()+1}`;};
   const cellSel=UI.sel.cell||'A1';
-  let head=[], rows=[], fx={};
+  let head=[], rows=[], fx={}, charts='', pre='';
+  const short=d=>{const a=dateOf(d-7);return `${a.getUTCDate()}/${a.getUTCMonth()+1}`;};
   const td=(ref,v,cls,f,al)=>{fx[ref]=f||v;return `<td data-act="cell" data-ref="${ref}" class="${cls||''}${ref===cellSel?' sel':''}" style="${al?'text-align:left':''}">${v}</td>`;};
   const pct=v=>v==null?'':f1(v)+'%';
   if(sh==='sum'){
@@ -1184,7 +1246,21 @@ const VIEWS={
       rows.push(`<tr><th>${r}</th>${td('A'+r,esc(w.name),'',w.name,1)}${td('B'+r,pct(L.P),kpiCls(L.P,L.sP),`='${w.name}'!B${hist.length+1}`)}${td('C'+r,ar(dP),'',`='${w.name}'!B${hist.length+1}-'${w.name}'!B${hist.length}`)}${td('D'+r,pct(L.A),kpiCls(L.A,L.sA),`='${w.name}'!C${hist.length+1}`)}${td('E'+r,ar(dA),'',`='${w.name}'!C${hist.length+1}-'${w.name}'!C${hist.length}`)}${td('F'+r,pct(L.sat*100),L.sat>0.95?'bad':L.sat>0.85?'warn':'',`='${w.name}'!D${hist.length+1}`)}${td('G'+r,Math.round(L.mor),L.mor<45?'bad':L.mor<55?'warn':'',`='${w.name}'!E${hist.length+1}`)}${td('H'+r,eur(L.rev-L.cost),L.rev-L.cost<0?'bad':'ok',`='${w.name}'!J${hist.length+1}`)}${td('I'+r,`<span class="spark">${sp}</span>`,'',`=SPARKLINE('${w.name}'!B2:B${hist.length+1})`)}</tr>`);});
     const n=S.warehouses.length+2, last=W[W.length-1];
     if(last){const ws=S.warehouses.map(w=>last.rows[w.id]).filter(Boolean); const m=k=>ws.reduce((a,x)=>a+x[k],0)/ws.length;
+      const lab=W.map(x=>short(x.d)), avg=(x,k)=>{const v=S.warehouses.map(w=>x.rows[w.id]).filter(Boolean);return v.length?v.reduce((a,r)=>a+r[k],0)/v.length:null;};
+      const ser=k=>[...S.warehouses.map((w,i)=>({n:w.name,short:w.name.split(' ')[0],c:SERIES_C[i%SERIES_C.length],v:W.map(x=>x.rows[w.id]?x.rows[w.id][k]:null)})),...(S.warehouses.length>1?[{n:'Media azienda',short:'Media',c:'#16202e',dash:true,v:W.map(x=>avg(x,k))}]:[])];
+      charts=`<div class="lc-row">${lineChart('sumP',{title:'Puntualità per magazzino',labels:lab,series:ser('P'),unit:'%',w:440,h:250,mr:118})}${lineChart('sumA',{title:'Accuratezza per magazzino',labels:lab,series:ser('A'),unit:'%',w:440,h:250,mr:118})}</div>`;
       rows.push(`<tr class="tot"><th>${n}</th>${td('A'+n,'Totale azienda','','Totale azienda',1)}${td('B'+n,pct(m('P')),'',`=MEDIA(B2:B${n-1})`)}${td('C'+n,'','')}${td('D'+n,pct(m('A')),'',`=MEDIA(D2:D${n-1})`)}${td('E'+n,'','')}${td('F'+n,pct(m('sat')*100),'',`=MEDIA(F2:F${n-1})`)}${td('G'+n,Math.round(m('mor')),'',`=MEDIA(G2:G${n-1})`)}${td('H'+n,eur(ws.reduce((a,x)=>a+x.rev-x.cost,0)),'',`=SOMMA(H2:H${n-1})`)}${td('I'+n,'','')}</tr>`);}
+  } else if(sh==='cli'){
+    const cl=S.clients.filter(c=>c.status!=='perso'&&c.status!=='avvio'); const c=cl.find(x=>x.id===UI.sel.cli)||cl[0];
+    pre=`<div class="xl-cli">${cl.map(x=>`<button data-act="selcli" data-id="${x.id}" aria-pressed="${c&&x.id===c.id}">${logoSvg(x.name,20)}${esc(x.name)}</button>`).join('')||'<span class="sm">Nessun cliente attivo.</span>'}</div>`;
+    head=['Settimana','Puntualità','Richiesta','Accuratezza','Richiesta','Soddisfazione','Magazzino'];
+    if(c){ const hs=W.map(x=>({d:x.d,...((x.cli||{})[c.id]||{})})).filter(x=>x.P!=null);
+      hs.slice(-12).forEach((h,i)=>{const r=i+2;
+        rows.push(`<tr><th>${r}</th>${td('A'+r,wkLabel(h.d),'',wkLabel(h.d),1)}${td('B'+r,pct(h.P),kpiCls(h.P,h.sP),`='${h.wh}'!Puntualità della settimana`)}${td('C'+r,'≥ '+pct(h.sP),'',`=Contratto ${c.name}: puntualità minima`)}${td('D'+r,pct(h.A),h.sA?kpiCls(h.A,h.sA):'',`='${h.wh}'!Accuratezza della settimana`)}${td('E'+r,h.sA?'≥ '+pct(h.sA):'non richiesta','',`=Contratto ${c.name}: accuratezza minima`)}${td('F'+r,Math.round(h.sat),h.sat<40?'bad':h.sat<60?'warn':'ok','=soddisfazione del cliente a fine settimana (0–100)')}${td('G'+r,esc(h.wh),'',h.wh,1)}</tr>`);});
+      charts=lineChart('cli',{h:230,title:`${c.name}: KPI e livelli richiesti dal contratto`,labels:hs.map(h=>short(h.d)),unit:'%',series:[
+        {n:'Puntualità',c:KPI_C.P,v:hs.map(h=>h.P)},{n:'Accuratezza',c:KPI_C.A,v:hs.map(h=>h.A)},
+        {n:'Puntualità richiesta',short:'Richiesta P',c:KPI_C.P,dash:true,v:hs.map(h=>h.sP)},
+        ...(c.sA?[{n:'Accuratezza richiesta',short:'Richiesta A',c:KPI_C.A,dash:true,v:hs.map(h=>h.sA)}]:[])]}); }
   } else {
     const w=whById(sh);
     head=['Settimana','Puntualità','Accuratezza','Saturazione','Morale','Pallet mov.','Viaggi','Ricavi','Costi','Margine'];
@@ -1194,20 +1270,26 @@ const VIEWS={
     if(hist.length){const n=hist.length+2,m=k=>hist.reduce((a,x)=>a+x[k],0)/hist.length,s=k=>hist.reduce((a,x)=>a+x[k],0);
       rows.push(`<tr class="tot"><th>${n}</th>${td('A'+n,'Media / Totale','','Media / Totale',1)}${td('B'+n,pct(m('P')),'',`=MEDIA(B2:B${n-1})`)}${td('C'+n,pct(m('A')),'',`=MEDIA(C2:C${n-1})`)}${td('D'+n,pct(m('sat')*100),'',`=MEDIA(D2:D${n-1})`)}${td('E'+n,Math.round(m('mor')),'',`=MEDIA(E2:E${n-1})`)}${td('F'+n,n0(s('mov')),'',`=SOMMA(F2:F${n-1})`)}${td('G'+n,n0(s('trips')),'',`=SOMMA(G2:G${n-1})`)}${td('H'+n,eur(s('rev')),'',`=SOMMA(H2:H${n-1})`)}${td('I'+n,eur(s('cost')),'',`=SOMMA(I2:I${n-1})`)}${td('J'+n,eur(s('rev')-s('cost')),s('rev')-s('cost')<0?'bad':'ok',`=SOMMA(J2:J${n-1})`)}</tr>`);}
   }
-  const minRows=Math.max(0,8-rows.length);
+  if(sh!=='sum'&&sh!=='cli'){ const w=whById(sh); const hs=W.map(x=>({d:x.d,...x.rows[w.id]})).filter(x=>x.P!=null);
+    charts=lineChart('wh',{h:230,title:`${w.name}: andamento dei KPI`,labels:hs.map(h=>short(h.d)),unit:'%',series:[
+      {n:'Puntualità',c:KPI_C.P,v:hs.map(h=>h.P)},{n:'Accuratezza',c:KPI_C.A,v:hs.map(h=>h.A)},
+      {n:'Soglia puntualità (cliente più severo)',short:'Soglia P',c:KPI_C.P,dash:true,v:hs.map(h=>h.sP)},
+      {n:'Soglia accuratezza (cliente più severo)',short:'Soglia A',c:KPI_C.A,dash:true,v:hs.map(h=>h.sA)}].filter(s=>s.v.some(v=>v!=null))}); }
+  const minRows=Math.max(0,(sh==='cli'?4:8)-rows.length);
   for(let i=0;i<minRows;i++){const r=rows.length+2;rows.push(`<tr><th>${r}</th>${head.map((_,j)=>td(COLS[j]+r,'','')).join('')}</tr>`);}
   const f=fx[cellSel]!=null?String(fx[cellSel]).replace(/<[^>]+>/g,''):'';
   const fname=`Report_KPI_${S.company.name.replace(/\W+/g,'_')}.xlsx`;
-  return `<div class="xl">
+  return `<div class="xl${charts?' has-ch':''}">
    <div class="xl-top"><span class="xl-file">${statIcon('amm',14)} ${esc(fname)}</span><span class="sm">${W.length?`aggiornato lunedì ${shortDate(W[W.length-1].d)}`:'il primo report arriva lunedì'}</span></div>
    <div class="xl-menu"><span>File</span><span class="on">Home</span><span>Inserisci</span><span>Formule</span><span>Dati</span><span>Revisione</span></div>
    <div class="xl-fx"><span class="xl-ref">${cellSel}</span><span class="xl-fxl">fx</span><span class="xl-f">${esc(f)}</span></div>
-   <div class="xl-grid"><table><thead><tr><th class="xl-corner"></th>${head.map((_,j)=>`<th>${COLS[j]}</th>`).join('')}</tr>
+   ${pre}<div class="xl-grid"><table><thead><tr><th class="xl-corner"></th>${head.map((_,j)=>`<th>${COLS[j]}</th>`).join('')}</tr>
     <tr class="xl-h"><th>1</th>${head.map((h,j)=>td(COLS[j]+'1',h,'',h,j===0)).join('')}</tr></thead>
     <tbody>${rows.join('')}</tbody></table></div>
+   ${charts?`<div class="xl-charts">${charts}</div>`:''}
    <div class="xl-tabs">${sheets.map(([id,n])=>`<button data-act="sheet" data-id="${id}" aria-pressed="${id===sh}">${esc(n)}</button>`).join('')}<span class="xl-plus">+</span></div>
   </div>
-  <div class="sm">Ogni lunedì arriva il report della settimana appena chiusa. Verde: sopra la soglia più severa tra i clienti del magazzino; giallo: entro 2 punti; rosso: sotto. Clicca una cella per vedere come è calcolata.</div>`;
+  <div class="sm">Ogni lunedì arriva il report della settimana appena chiusa. Verde: sopra la soglia più severa tra i clienti del magazzino; giallo: entro 2 punti; rosso: sotto. Clicca una cella per vedere come è calcolata; passa sopra i grafici per leggere i valori di ogni settimana. Le linee tratteggiate sono i livelli richiesti dai clienti.</div>`;
  },
  espansione(){
   const free=Object.entries(SITES).filter(([id])=>!S.warehouses.some(w=>w.site===id));
@@ -1265,6 +1347,7 @@ const ACT={
  },
  hiremgr(d){const m=S.managers.find(x=>x.id===d.id);m.hired=true;toast(`${m.name} entra in azienda: assegnalo a un magazzino o alla direzione`,'ok');const w=S.warehouses.find(w=>!w.mgr);if(w){w.mgr=m.id;m.wh=w.id;}renderAll();},
  firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});m.hired=false;m.wh=null;renderAll();},
+ selcli(d){UI.sel.cli=d.id;UI.sel.cell='A1';renderWin('report');},
  sheet(d){UI.sel.sheet=d.id;UI.sel.cell='A1';renderWin('report');},
  cell(d){UI.sel.cell=d.ref;renderWin('report');},
  mapcli(d){UI.mapCli=UI.mapCli===d.id?null:d.id;renderMap();syncTrucks();renderAll();},
@@ -1321,7 +1404,7 @@ document.addEventListener('keydown',e=>{
 });
 // tooltip
 const tip=$('#tip');
-document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-tip]');if(!t){tip.hidden=true;return;}tip.innerHTML=t.dataset.tip;tip.hidden=false;});
+document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-tip]');if(!t){if(!e.target.closest('svg[data-chart]'))tip.hidden=true;return;}tip.innerHTML=t.dataset.tip;tip.hidden=false;});
 document.addEventListener('mousemove',e=>{if(tip.hidden)return;const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(e.clientX+14,innerWidth-w-8)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';});
 
 /* ====================== AVVIO ====================== */
@@ -1375,6 +1458,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else showStart(); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd};
+window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT};
 })();
 </script>

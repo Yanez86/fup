@@ -34,6 +34,11 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 
 ## Report KPI settimanale
 - Ogni lunedì si chiude la settimana: per ogni magazzino si salvano le medie di Puntualità, Accuratezza, saturazione e morale, insieme ai pallet movimentati, ai viaggi, ai ricavi e ai costi (vengono conservate le ultime 26 settimane in `S.weeks`).
+- I grafici a linee del report (passando il mouse si leggono i valori di ogni settimana):
+  - nel Riepilogo, Puntualità e Accuratezza per magazzino in due grafici separati, più la media dell'azienda tratteggiata;
+  - nel foglio di ogni magazzino, entrambi i KPI e la soglia più severa tra i clienti (tratteggiata);
+  - nel foglio Clienti, i KPI del magazzino che serve il cliente scelto e i livelli richiesti dal suo contratto. Per ogni cliente si salvano ogni settimana KPI, soglie e soddisfazione in `S.weeks[].cli`.
+- Colori fissi delle serie (controllati per chi distingue male i colori): Puntualità blu `#2f7fd6`, Accuratezza viola `#7b4fe0`; i magazzini seguono l'ordine `SERIES_C`.
 - La finestra "Report KPI" imita un foglio Excel: un foglio di riepilogo, un foglio per ogni magazzino, la barra della formula che spiega la cella selezionata e i colori condizionali. Verde = sopra la soglia più severa tra i clienti del magazzino, giallo = entro 2 punti, rosso = sotto.
 
 ## Gare (tender)
