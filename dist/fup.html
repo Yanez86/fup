@@ -283,6 +283,24 @@ input.sw:disabled{opacity:.45;cursor:not-allowed}
 .pr-ma{display:flex;justify-content:flex-end}
 .pr-ma .btn.pri{min-width:140px}
 .wh-kpis.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* finestra Clienti */
+.cl{gap:8px}
+.cl-h{display:flex;align-items:center;gap:10px}
+.cl-h svg{flex:none}
+.cl-n{display:flex;align-items:center;gap:6px;font-size:17px;min-width:0}
+.cl-slo{font-style:italic}
+.cl-st{flex:none;align-self:flex-start;white-space:nowrap}
+.cl-st.ok{background:#dff3e3}.cl-st.warn{background:var(--yellow)}.cl-st.bad{background:var(--bad);color:#fff}
+.cl-k{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.cl-k .wh-k b{font-size:21px}
+.cl-k .bar{height:6px;margin-top:4px;flex:none}
+.cl-a{display:flex;gap:6px;flex-wrap:wrap}
+.cl-log{display:flex;flex-direction:column;gap:8px;padding:8px 10px;background:var(--panel);border:2px solid var(--line)}
+.cl-log>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cl-log b{font-size:15px}
+.card.cl-bad{background:#fff4f4;border-color:var(--bad-t);box-shadow:inset 0 -3px 0 #f6dede}
+.card.cl-bad .wh-chips>span{background:#fff}
+.cl-k .lab{letter-spacing:0}
 .mob .wh-kpis,.mob .wh-money{grid-template-columns:repeat(2,minmax(0,1fr))}
 .staff{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:6px 10px;align-items:center;font-size:15px}
 .mini{width:48px;height:56px;background:#3a6db0;border:2px solid var(--ink)}
@@ -1241,7 +1259,7 @@ const chAvg=(c,k)=>chMix(c).reduce((a,x)=>a+x.s*x[k],0);
 const chOverlap=(a,b)=>{const ma=cinfo(a).ch,mb=cinfo(b).ch,ta=Object.values(ma).reduce((x,v)=>x+v,0),tb=Object.values(mb).reduce((x,v)=>x+v,0);return CHANNELS.reduce((x,ch)=>x+Math.min((ma[ch.id]||0)/ta,(mb[ch.id]||0)/tb),0);};
 function chBar(c,w){const mx=chMix(c);
   const tip=`<div class='tt'>Canali di distribuzione</div>`+mx.map(x=>`<div class='tr'><span><b style='color:${TPAL[x.c]}'>■</b> ${x.n}</span><span>${Math.round(x.s*100)}%</span></div>`).join('')+wikiHint();
-  return `<span class="chbar" role="img" aria-label="Canali: ${mx.map(x=>x.n+' '+Math.round(x.s*100)+'%').join(', ')}" data-act="wiki" data-id="canali" data-tip="${tip}" style="display:inline-flex;width:${w||120}px;height:12px;border:2px solid #16202e;cursor:help;vertical-align:middle">${mx.map(x=>`<i style="width:${x.s*100}%;background:${TPAL[x.c]}"></i>`).join('')}</span>`;}
+  return `<span class="chbar" role="img" aria-label="Canali: ${mx.map(x=>x.n+' '+Math.round(x.s*100)+'%').join(', ')}" data-act="wiki" data-id="canali" data-tip="${tip}" style="display:inline-flex;width:${typeof w==='string'?w:(w||120)+'px'};height:12px;border:2px solid #16202e;cursor:help;vertical-align:middle">${mx.map(x=>`<i style="width:${x.s*100}%;background:${TPAL[x.c]}"></i>`).join('')}</span>`;}
 function distKm(lo1,la1,lo2,la2){const r=Math.PI/180,a=Math.sin((la2-la1)*r/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin((lo2-lo1)*r/2)**2;return 6371*2*Math.asin(Math.sqrt(a));}
 // km di un viaggio di distribuzione (andata e ritorno) e di un viaggio di ritiro
 function clientLog(c,w,sm){
@@ -1290,6 +1308,14 @@ function pxLogo(bg,ic,sz,label){
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="flex:none" role="img" aria-label="${esc(label)}">${r}</svg>`;
 }
 const zoneName=z=>(ZONES[z]||ZONES.nordovest).n;
+function logInfoList(c,w){
+  const t=clientLog(c,w), z=ZONES[c.zone]||ZONES.nordovest, o=ORIGINS[c.src]||ORIGINS.fornitori;
+  const veh=t.veh==='B'?kw('autisti_b','furgoni'):t.veh==='CE'?kw('autisti_ce','bilici'):kw('autisti_ce','bilici')+' e '+kw('autisti_b','furgoni');
+  return `<div class="cl-log">
+   <div><span class="lab">${kw('zona','Distribuzione')}</span><b>${esc(z.n)}${z.cities.length>1?` · ${z.cities.length} province`:''}</b><span class="sm">${t.out} viaggi/mese · ${n0(t.oKm)} km andata e ritorno · ${veh}</span></div>
+   <div><span class="lab">${kw('canali','Canali')}</span>${chBar(c,'100%')}<span class="sm">${t.chs.map(x=>`${x.n}: ${x.trips} ${x.veh==='B'?'furgoni':'bilici'} al ${Math.round(x.ld)}%`).join(' · ')}</span></div>
+   <div><span class="lab">${kw('ritiro','Merce in arrivo da')}</span><b>${esc(o.n)}</b><span class="sm">${c.mode==='ritiro'?`<span style="color:var(--accent-d)">la andiamo a prendere noi</span>: ${t.in} viaggi/mese da ${n0(t.iKm)} km`:'la consegna il cliente con i suoi mezzi'}</span></div></div>`;
+}
 function logInfoHtml(c,w){
   const t=clientLog(c,w), z=ZONES[c.zone]||ZONES.nordovest, o=ORIGINS[c.src]||ORIGINS.fornitori;
   return `<table class="t num">
@@ -3061,25 +3087,36 @@ const VIEWS={
  },
  clienti(){
   const act=S.clients.filter(c=>c.status!=='perso'); const lost=S.clients.filter(c=>c.status==='perso');
-  return act.map(c=>{const w=whById(c.wh);const k=w.kpi||computeWH(w);
-   const P=k.P,A=k.A;const cP=kpiCls(P,c.sP),cA=c.sA?kpiCls(A,c.sA):'ok';const bad=c.status==='attivo'&&(cP==='bad'||cA==='bad');
+  const on=act.filter(c=>c.status==='attivo');
+  const kp=c=>{const k=whById(c.wh).kpi||computeWH(whById(c.wh));return {P:k.P,A:k.A,cP:kpiCls(k.P,c.sP),cA:c.sA?kpiCls(k.A,c.sA):'ok'};};
+  const risk=on.filter(c=>{const x=kp(c);return x.cP==='bad'||x.cA==='bad'||c.sat<(R('kam')?40:50);}).length;
+  const rev=on.reduce((a,c)=>a+clientRev(c),0), sat=on.length?Math.round(on.reduce((a,c)=>a+c.sat,0)/on.length):0;
+  const satC=v=>v>=60?'ok':v>=40?'warn':'bad';
+  const tile=(cls,lab,val,sub)=>`<div class="kpi wh-k ${cls}"><div class="lab">${lab}</div><b>${val}</b><div class="sm">${sub}</div></div>`;
+  UI.cliOpen=UI.cliOpen||{};
+  return (act.length?`<div class="wh-kpis c2">
+   ${tile('','Clienti',on.length,act.length>on.length?`+${act.length-on.length} in avvio`:'attivi')}
+   ${tile('',kw('ricavi','Ricavi'),eur(rev),'al mese')}
+   ${tile(on.length?satC(sat):'',kw('soddisfazione','Soddisfazione'),on.length?sat:'–','media')}
+   ${tile(risk?'bad':on.length?'ok':'',kw('soglie','A rischio'),risk,risk===1?'cliente':'clienti')}
+  </div>`:'<div class="sm">Nessun cliente: partecipa alle gare d\'appalto.</div>')+act.map(c=>{const w=whById(c.wh), x=kp(c), open=!!UI.cliOpen[c.id];
+   const bad=c.status==='attivo'&&(x.cP==='bad'||x.cA==='bad');
    const mesi=Math.max(0,Math.round((c.end-S.day)/30));
-   return `<div class="card ${bad?'bad':c.status==='avvio'?'pend':''}">
-    <div style="display:flex;gap:10px;align-items:center">${logoSvg(c.name,48)}<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-     <div class="row"><b style="display:flex;align-items:center;gap:6px">${rankIcon(c,22)}${esc(cname(c))}</b><span class="sm">${esc(w.name)}</span></div>
-     <div class="sm">"${esc(c.slogan)}" · ${esc(c.sector)}</div></div></div>
-    ${logInfoHtml(c,w)}
-    <div><button class="btn sm2" data-act="mapcli" data-id="${c.id}" aria-pressed="${UI.mapCli===c.id}">${UI.mapCli===c.id?'Nascondi dalla mappa':'Mostra sulla mappa'}</button></div>
-    ${c.status==='avvio'?`<div class="sm">Il contratto parte il <b>${shortDate(c.start)}</b> e dura ${c.dur||24} mesi.</div><div><button class="btn sm2" data-act="recedi" data-id="${c.id}">Rinuncia al contratto</button></div>`:`
-    <table class="t num"><tr><th>KPI</th><th class="r">Oggi</th><th class="r">${kw('soglie','Richiesto')}</th></tr>
-     <tr><td>${kw('puntualita')}</td><td class="r ${cP}">${f1(P)}%</td><td class="r">≥ ${f1(c.sP)}%</td></tr>
-     <tr><td>${kw('accuratezza')}</td><td class="r ${cA}">${f1(A)}%</td><td class="r">${c.sA?'≥ '+f1(c.sA)+'%':'non richiesta'}</td></tr></table>
-    <div class="row" style="align-items:center"><span class="lab">${kw('soddisfazione','Soddisfazione')}</span><div class="bar" style="max-width:160px"><i style="width:${c.sat}%;background:${c.sat>=60?'var(--ok)':c.sat>=40?'var(--warn)':'var(--bad)'}"></i></div><b class="num">${Math.round(c.sat)}</b></div>
-    <div class="sm">${kw('penali')}: ${penTxt(c)}${c.lastPen>=1?` · <b class="bad">ultimo mese ${eur(c.lastPen)}</b>`:''}</div>
-    <div class="sm">${eur(clientRev(c))}/mese · ${kw('contratto','contratto')} di ${c.dur||24} mesi, scade il <b>${shortDate(c.end)}</b> (tra ${mesi} mesi)${c.exit?'':c.noRenew?' · <b class="warn">non verrà rinnovato</b>':c.sat<(R('kam')?40:50)?' · <b class="bad">rinnovo a rischio</b>':''}</div>
-    ${c.exit?`<div class="sm bad">${kw('recesso','In uscita')}: l'ultimo camion parte il <b>${shortDate(c.exit.day)}</b>. Fino ad allora il contratto vale e i KPI contano.</div>`:
-    `<div class="row"><button class="btn sm2" data-act="norenew" data-id="${c.id}" aria-pressed="${!!c.noRenew}">${c.noRenew?'Rinnova alla scadenza':'Non rinnovare'}</button><button class="btn sm2" data-act="recedi" data-id="${c.id}">Recedi dal contratto</button></div>`}`}
-   </div>`;}).join('')+(lost.length?`<div class="sm">Clienti persi: ${lost.map(c=>esc(c.name)+(c.ended==='recesso'?' (recesso)':c.ended==='scaduto'?' (non rinnovato)':c.ended==='rinuncia'?' (rinuncia)':'')).join(', ')}</div>`:'')+`<div class="sm">Ogni mese (${kw('soddisfazione','come funziona')}): sopra soglia +3 di soddisfazione; sotto di 2 punti al massimo −4; oltre −10. Sotto 25 il cliente se ne va. Le ${kw('penali')} dipendono dal contratto.</div>`;
+   const st=c.exit?['bad','in uscita']:c.status==='avvio'?['warn','dal '+shortDate(c.start)]:c.noRenew?['warn','non rinnova']:c.sat<(R('kam')?40:50)?['bad','rinnovo a rischio']:['ok','attivo'];
+   return `<div class="card cl ${bad?'cl-bad':c.status==='avvio'?'pend':''}">
+    <div class="cl-h">${logoSvg(c.name,44)}<div class="wh-sm"><b class="cl-n">${rankIcon(c,20)}<span class="wh-nm">${esc(cname(c))}</span></b><span class="sm wh-nm">${esc(c.sector)} · ${esc(w.name)}</span><span class="sm wh-nm cl-slo">"${esc(c.slogan)}"</span></div><span class="pill cl-st ${st[0]}">${st[1]}</span></div>
+    ${c.status==='avvio'?`<div class="sm">Il contratto parte il <b>${shortDate(c.start)}</b> e dura ${c.dur||24} mesi.</div>`:`
+    <div class="cl-k">
+     <div class="kpi wh-k ${x.cP}"><div class="lab">${kw('puntualita')}</div><b>${f1(x.P)}%</b><div class="sm">${kw('soglie','soglia')} ${f1(c.sP)}%</div></div>
+     <div class="kpi wh-k ${c.sA?x.cA:''}"><div class="lab">${kw('accuratezza')}</div><b>${f1(x.A)}%</b><div class="sm">${c.sA?'soglia '+f1(c.sA)+'%':'non richiesta'}</div></div>
+     <div class="kpi wh-k ${satC(c.sat)}"><div class="lab">${kw('soddisfazione','Soddisf.')}</div><b>${Math.round(c.sat)}</b><div class="bar"><i style="width:${c.sat}%;background:var(--${satC(c.sat)})"></i></div></div>
+    </div>
+    <div class="wh-chips"><span><b>${eur(clientRev(c))}</b>/mese</span><span>${kw('contratto','scade')} <b>${shortDate(c.end)}</b> · ${mesi} mesi</span><span class="${c.lastPen>=1?'bad':''}">${kw('penali')}: ${c.lastPen>=1?`<b>${eur(c.lastPen)}</b> il mese scorso`:penTxt(c)}</span></div>`}
+    ${c.exit?`<div class="sm bad">${kw('recesso','In uscita')}: l'ultimo camion parte il <b>${shortDate(c.exit.day)}</b>. Fino ad allora i KPI contano.</div>`:''}
+    <div class="cl-a"><button class="btn sm2" data-act="clidet" data-id="${c.id}" aria-expanded="${open}">${open?'▴ Meno dettagli':'▾ Trasporti e contratto'}</button><button class="btn sm2" data-act="mapcli" data-id="${c.id}" aria-pressed="${UI.mapCli===c.id}">${UI.mapCli===c.id?'Nascondi dalla mappa':'Sulla mappa'}</button></div>
+    ${open?`${logInfoList(c,w)}<div class="sm">${kw('contratto','Contratto')} di ${c.dur||24} mesi, scade il <b>${shortDate(c.end)}</b>. ${kw('penali')}: ${penTxt(c)}.</div>
+     ${c.status==='avvio'?`<div class="cl-a"><button class="btn sm2" data-act="recedi" data-id="${c.id}">Rinuncia al contratto</button></div>`:c.exit?'':`<div class="cl-a"><button class="btn sm2" data-act="norenew" data-id="${c.id}" aria-pressed="${!!c.noRenew}">${c.noRenew?'Rinnova alla scadenza':'Non rinnovare'}</button><button class="btn sm2" data-act="recedi" data-id="${c.id}">Recedi dal contratto</button></div>`}`:''}
+   </div>`;}).join('')+(lost.length?`<div class="sm">Clienti persi: ${lost.map(c=>esc(c.name)+(c.ended==='recesso'?' (recesso)':c.ended==='scaduto'?' (non rinnovato)':c.ended==='rinuncia'?' (rinuncia)':'')).join(', ')}</div>`:'')+`<div class="sm">Ogni mese (${kw('soddisfazione','come funziona')}): sopra soglia +3 di soddisfazione; sotto di 2 punti al massimo −4; oltre −10. Sotto 25 il cliente se ne va.</div>`;
  },
  gare(){
   const open=S.tenders.filter(t=>!t.done), done=S.tenders.filter(t=>t.done).slice(-4).reverse();
@@ -3526,6 +3563,7 @@ const ACT={
  sheet(d){UI.sel.sheet=d.id;UI.sel.cell='A1';renderWin('report');},
  cell(d){UI.sel.cell=d.ref;renderWin('report');},
  lens(d){UI.lens=d.id;renderMap();syncTrucks();},
+ clidet(d){UI.cliOpen=UI.cliOpen||{}; UI.cliOpen[d.id]=!UI.cliOpen[d.id]; renderWin('clienti');},
  mapcli(d){UI.mapCli=UI.mapCli===d.id?null:d.id;renderMap();syncTrucks();renderAll();},
  seltree(d){UI.sel.tree=d.id;UI.sel.tech=null;renderWin('tecnologia');},
  seltech(d){UI.sel.tech=d.id;renderWin('tecnologia');},
@@ -3779,7 +3817,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.24',t:'Il menu in tasca',x:['Sul telefono i tasti in basso diventano un solo pulsante «Menu»: si apre un elenco da sinistra, diviso in Operazioni, Azienda e Informazioni, e ogni voce dice in una riga come sta il suo reparto (gare aperte, reparto in affanno, ricerca in corso).','La mappa e le finestre usano tutto lo schermo del telefono.','La casella della data ha sempre la stessa larghezza: i pulsanti accanto non si spostano più ogni giorno. Sul telefono il mese è abbreviato.','Anche la finestra Personale è più ordinata: quattro riquadri in cima (persone, reparti in affanno, assunzioni in arrivo, manager), per ogni magazzino l\'elenco dei reparti con una barra del carico, i manager divisi tra «in squadra» e «disponibili».','La scheda del magazzino è più chiara: in cima nome, occupazione e manager; quattro riquadri colorati per puntualità, accuratezza, mezzi pieni e morale (verde, giallo o rosso rispetto alle soglie dei clienti); per ogni reparto una barra del carico e i pulsanti − e +; un interruttore per la cooperativa e il conto del mese in quattro caselle.','Restano due velocità più la pausa: la terza, troppo veloce per seguire il gioco, è stata tolta.']},
+ {v:'0.24',t:'Il menu in tasca',x:['Sul telefono i tasti in basso diventano un solo pulsante «Menu»: si apre un elenco da sinistra, diviso in Operazioni, Azienda e Informazioni, e ogni voce dice in una riga come sta il suo reparto (gare aperte, reparto in affanno, ricerca in corso).','La mappa e le finestre usano tutto lo schermo del telefono.','La casella della data ha sempre la stessa larghezza: i pulsanti accanto non si spostano più ogni giorno. Sul telefono il mese è abbreviato.','Nuova finestra Clienti: in cima ricavi, soddisfazione media e clienti a rischio; ogni cliente ha i suoi KPI a confronto con la soglia, un\'etichetta di stato (attivo, rinnovo a rischio, in uscita) e i dettagli su trasporti e contratto che si aprono con un tocco.','Anche la finestra Personale è più ordinata: quattro riquadri in cima (persone, reparti in affanno, assunzioni in arrivo, manager), per ogni magazzino l\'elenco dei reparti con una barra del carico, i manager divisi tra «in squadra» e «disponibili».','La scheda del magazzino è più chiara: in cima nome, occupazione e manager; quattro riquadri colorati per puntualità, accuratezza, mezzi pieni e morale (verde, giallo o rosso rispetto alle soglie dei clienti); per ogni reparto una barra del carico e i pulsanti − e +; un interruttore per la cooperativa e il conto del mese in quattro caselle.','Restano due velocità più la pausa: la terza, troppo veloce per seguire il gioco, è stata tolta.']},
  {v:'0.23',t:'Tutto a portata di dito',x:['Sul telefono il report KPI di un magazzino non si sovrappone più al testo sotto il foglio: le schede delle righe restano dentro il riquadro, sopra i grafici.','Sul computer le finestre non escono più dal fondo dello schermo: si accorciano e il contenuto scorre dentro con la rotellina, senza doverle trascinare in alto.','Sul telefono niente scorre più di lato: l\'albero delle tecnologie diventa un elenco per livelli e il report KPI mostra ogni riga del foglio come una scheda.','Sistemati i pulsanti con il testo più largo del pulsante (Tecnologie, Apri, schede delle gare).','I posti vuoti (dirigenti vacanti, magazzino senza manager, reparti senza personale) mostrano una sagoma anonima in ombra.']},
  {v:'0.22',t:'Dormici sopra',x:['15 nuovi clienti piccoli e locali: una panetteria di Orbassano, una distilleria di Bassano, le sedie di Manzano, i ricambi nautici di Lerici e altri.','Ci sono sempre almeno tre gare aperte (quattro con l\'Ufficio commerciale), ed escono più spesso i clienti piccoli e le zone di una sola provincia.','Negli eventi la scelta non ha effetto subito: il giorno dopo arriva una finestra che racconta com\'è andata, con gli effetti.']},
  {v:'0.21',t:'Il regolamento in bacheca',x:['Nuova finestra Policy aziendali: regole da accendere o spegnere per tutta l\'azienda, ognuna con un vantaggio e un prezzo. Dopo un cambio servono 90 giorni per cambiarla di nuovo.','12 policy: Zero straordinario, Sabato obbligatorio, Telefoni nell\'armadietto, Doppia spunta in uscita, Niente cooperative, Spending review, Il cliente ha sempre ragione, Limite 80 all\'ora, Smart working, Rotazione delle mansioni, Settimana corta e Corso sicurezza.','Si sbloccano con la nuova ricerca Regolamento aziendale e con altre tecnologie, comprese due nuove del Welfare: Lavoro agile e Settimana corta.','I manager hanno delle pretese: alcuni vogliono una policy, altri non la sopportano. Dopo un mese arriva l\'ultimatum: li accontenti, alzi lo stipendio perché la sopportino, oppure se ne vanno.','Nuovo evento: un concorrente prova a portarti via un manager. Pareggi l\'offerta, rilanci meno o lo lasci andare.']},
