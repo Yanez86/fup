@@ -1,5 +1,5 @@
 """Test automatico: apre il gioco in Chromium headless, clicca tutti i menu, prova alberi tecnologici e direzione,
-poi fa giocare un bot semplice 3 anni con ognuno dei 4 CEO. Fallisce se ci sono errori JavaScript.
+crea un CEO personalizzato, poi fa giocare un bot semplice 3 anni con ognuno dei 4 CEO e con uno creato. Fallisce se ci sono errori JavaScript.
 Uso: python3 tools/build.py && python3 tests/smoke_test.py   (richiede: pip install playwright && playwright install chromium)"""
 import asyncio, os, sys
 from playwright.async_api import async_playwright
@@ -11,7 +11,10 @@ open(PAGE, 'w', encoding='utf-8').write('<!doctype html><html><head><meta charse
 
 CLEAR = '''()=>{const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}}'''
 BOT = '''(ceo)=>{
- const F=window.__FUP; F.newGame(ceo); const S=F.S; const out=[];
+ const F=window.__FUP; const out=[];
+ if(ceo==='custom') F.newGame(null,F.ccCeo(Object.assign(F.ccNew(),{nome:'Ornella',cognome:'Bancalini',base:'valeria',edu:'Ingegnere dei trasporti',tal:['Calma olimpica','Parla con i robot']})));
+ else F.newGame(ceo);
+ const S=F.S;
  const clr=()=>{const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}};
  for(let d=0; d<365*3 && !S.over; d++){
    S.speed=1; clr();
@@ -33,7 +36,29 @@ async def main():
         pg = await b.new_page(viewport={'width': 1440, 'height': 860})
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + PAGE)
+        # creazione del CEO: senza nome e titolo non si parte
+        await pg.click('[data-act=pickceo][data-id=custom]')
+        await pg.click('[data-act=startgame]')
+        assert 'nome e cognome' in await pg.inner_text('#start [role=alert]')
+        await pg.fill('#cc-nome', 'Ornella'); await pg.fill('#cc-cognome', 'Bancalini')
+        await pg.click('[data-act=ccedu][data-n="Laureato in scienze umanistiche"]')
+        await pg.click('[data-act=ccedu][data-n="Ingegnere informatico"]')   # cambia titolo
+        for n in ['Calma olimpica', 'Insonne', 'Cena col buyer', 'Stacanovista']:  # il quarto non entra
+            await pg.click(f'[data-act=cctal][data-n="{n}"]', force=True)
+        for _ in range(3): await pg.click('[data-act=ccst][data-k=op][data-d="1"]')
+        await pg.click('[data-act=ccimg][data-d="1"]'); await pg.click('[data-act=ccbase][data-id=marco]')
+        assert await pg.input_value('#cc-nome') == 'Ornella' and await pg.input_value('#coname-in') == 'Trasporti Bancalini'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_crea_ceo.png'), full_page=True)
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
+        c = await pg.evaluate('()=>{const S=window.__FUP.S;return {id:S.ceoId,n:S.custom.name,tal:S.custom.tal,st:S.custom.st,co:S.company.name,wh:S.warehouses[0].site,cl:S.clients[0].name}}')
+        assert c['id'] == 'custom' and c['n'] == 'Ornella Bancalini' and c['co'] == 'Trasporti Bancalini', c
+        assert c['tal'] == ['Ingegnere informatico', 'Calma olimpica', 'Insonne', 'Cena col buyer'], c['tal']
+        # 8 di base, +3 in Operazioni; Ingegnere informatico Inn +4 Lead −2; Calma +1 Lead; Insonne Op −2 Prec −2; Cena Neg +4
+        assert c['st'] == {'op': 9, 'prec': 6, 'neg': 12, 'lead': 7, 'amm': 8, 'inn': 12}, c['st']
+        assert c['wh'] == 'voltri' and c['cl'] == 'Caffè Portuale', c
+        await pg.click('#dock [data-id=azienda]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_azienda_ceo_creato.png'))
+        await pg.click('#dock [data-id=azienda]')
         # lente delle province
         await pg.click('#lenses [data-act=lens][data-id=prov]')
         n = await pg.evaluate("document.querySelectorAll('#ov path.prov').length")
@@ -108,7 +133,7 @@ async def main():
         assert st['imp'] is None and sum(st['st'].values()) == 8+3 and st['st']['autB'] > 0, st
         assert st['q'] == ['imp:true', 'autCE:true'], st
         assert await pg.evaluate('()=>window.__FUP.S.office.plan===0 && window.__FUP.S.warehouses[0].coop===false')
-        for ceo in ['gino','edoardo','valeria','marco']:
+        for ceo in ['gino','edoardo','valeria','marco','custom']:
             print(await pg.evaluate(BOT, ceo))
         await b.close()
     if errs:

@@ -147,7 +147,7 @@ table.t td.r,table.t th.r{text-align:right}
 .staff{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:6px 10px;align-items:center;font-size:15px}
 .mini{width:48px;height:56px;background:#3a6db0;border:2px solid var(--ink)}
 .mport{width:96px;height:112px;flex:none;background:repeating-linear-gradient(180deg,#2f5fa0 0 8px,#3a6db0 8px 16px);border:3px solid var(--ink)}
-select,input[type=text]{font:inherit;padding:5px 7px;border:2px solid var(--ink);background:#fff;min-width:0;max-width:100%}
+select,input[type=text],input[type=number]{font:inherit;padding:5px 7px;border:2px solid var(--ink);background:#fff;min-width:0;max-width:100%}
 input[type=range]{width:100%;accent-color:var(--accent)}
 .split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .chbar i{display:block;height:100%}
@@ -207,6 +207,21 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .ceo{display:flex;flex-direction:column;gap:6px;padding:10px;background:#fff;border:3px solid var(--ink);cursor:pointer;text-align:left;box-shadow:inset 0 -3px 0 var(--panel2)}
 .ceo[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 3px var(--accent), 4px 4px 0 var(--ink)}
 .sw{width:30px;height:30px;border:3px solid var(--ink)}
+.ceos.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.ccbox{gap:10px}
+.cc-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.cc-por{display:flex;align-items:center;gap:6px}
+.cc-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 90px;gap:8px}
+.cc-fields label{display:flex;flex-direction:column;gap:4px}
+.cc-base{display:flex;gap:8px;flex-wrap:wrap}
+.btn[aria-pressed="true"]{background:var(--accent-l);border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--accent), 2px 2px 0 var(--ink)}
+.cc-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cc-st{display:flex;align-items:center;gap:6px}
+.cc-st b.v{min-width:22px;text-align:center;font-size:17px}
+.cc-pick{display:flex;gap:6px;flex-wrap:wrap}
+.talpick{width:42px;height:42px;padding:0;cursor:pointer}
+.talpick[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:1px;box-shadow:3px 3px 0 var(--ink)}
+.talpick:disabled{opacity:.35;cursor:not-allowed}
 .sw[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
 @media (max-width:900px){.ceos{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){
@@ -252,7 +267,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 (function(){
 'use strict';
 /* ====================== DATI ====================== */
-const IMG={car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}'};
+const IMG={car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}'};
 const LON0=4.81, LAT1=47.0, KX=78.29*2, KY=111.111*2;
 const pt=(lon,lat)=>[ (lon-LON0)*KX, (LAT1-lat)*KY ];
 const CITIES=[
@@ -271,7 +286,7 @@ const SITES={
 };
 const CEOS=[
  {id:'gino',name:'Gino Bertolotti',age:52,origin:'Ex padroncino',site:'rivalta',cash:180000,motrici:3,fixed:3500,rep:45,company:'Trasporti Bertolotti',
-  st:{op:17,prec:9,neg:5,lead:14,amm:6,inn:2},tal:['Un milione di km al volante','Allergico al gestionale','Dialetto stretto'],allergic:true,
+  st:{op:17,prec:9,neg:5,lead:14,amm:6,inn:2},tal:['Un milione di km al volante','Allergico al gestionale','Dialetto stretto'],
   bio:'Trent\'anni sulle strade d\'Europa, poi il capannone di Rivalta comprato con la liquidazione. Diffida di tutto ciò che ha una presa elettrica.',
   client:{name:'Pastificio Mezzemaniche',slogan:'Al dente o rimborsati',sector:'Alimentare secco',stock:700,pal:300,sP:92,sA:null}},
  {id:'edoardo',name:'Edoardo Ferretti',age:31,origin:'Figlio del fondatore',site:'pioltello',cash:320000,motrici:2,fixed:5500,rep:50,company:'Ferretti Logistica',
@@ -283,7 +298,7 @@ const CEOS=[
   bio:'Quindici anni di slide e KPI in una multinazionale. Dorme quattro ore a notte e lo considera un vantaggio competitivo.',
   client:{name:'Saponaria Italia',slogan:'Detersivi per un mondo più bianco',sector:'Largo consumo',stock:900,pal:500,sP:92,sA:95}},
  {id:'marco',name:'Marco Pellegrino',age:36,origin:'Ingegnere gestionale',site:'voltri',cash:200000,motrici:1,fixed:3000,rep:42,company:'Pellegrino Smart Logistics',
-  st:{op:9,prec:13,neg:5,lead:5,amm:11,inn:17},tal:['Excel-dipendente','Parla con i robot','Calma olimpica'],robots:true,startTech:['barcode'],
+  st:{op:9,prec:13,neg:5,lead:5,amm:11,inn:17},tal:['Excel-dipendente','Parla con i robot','Calma olimpica'],startTech:['barcode'],
   bio:'Ha progettato magazzini automatici per altri, ora ne vuole uno suo. Ogni pallet ha un codice, ogni codice un foglio Excel.',
   client:{name:'Caffè Portuale',slogan:'Tostato col sale del porto',sector:'Alimentare secco',stock:600,pal:250,sP:90,sA:97}}
 ];
@@ -429,16 +444,16 @@ const T_ST=5.5,T_MO=3.8,T_DI=30;
 const TPAL={K:'#16202e',W:'#ffffff',Y:'#ffd23f',O:'#ff7a3d',R:'#e0393e',G:'#2e9e48',B:'#5fb4f0',N:'#8a5f36',S:'#c3d0dc',D:'#4a5f7a',T:'#1f9e8f',F:'#f2c79b',P:'#9b6bff',C:'#fff3c4',L:'#bfe6ff',M:'#6b3e1f'};
 const TALENTS={
  'Un milione di km al volante':{t:'mix',fx:'Operazioni +4 · Leadership +1 · Innovazione −2 · Morale degli autisti +5',fl:'Conosce a memoria ogni Autogrill tra Rivalta e Rotterdam.',ic:['..KKKK..','.K....K.','K..KK..K','KKKKKKKK','K..KK..K','K..KK..K','.K.KK.K.','..KKKK..']},
- 'Allergico al gestionale':{t:'neg',fx:'Innovazione −4 · Apprendimento delle tecnologie +50% nel suo magazzino',fl:'Ha stampato il manuale del WMS per usarlo come fermaporta.',ic:['R..S.S.R','.R.S.SR.','..RSSR..','..SRRS..','..SRRS..','..RSSR..','.R.KK.R.','R..KK..R']},
+ 'Allergico al gestionale':{t:'neg',learn:1.5,fx:'Innovazione −4 · Apprendimento delle tecnologie +50% nel suo magazzino',fl:'Ha stampato il manuale del WMS per usarlo come fermaporta.',ic:['R..S.S.R','.R.S.SR.','..RSSR..','..SRRS..','..SRRS..','..RSSR..','.R.KK.R.','R..KK..R']},
  'Dialetto stretto':{t:'mix',fx:'Leadership +2 · Negoziazione −2 · Operai +10 di opinione, multinazionali −10',fl:'In magazzino lo capiscono tutti. In multinazionale nessuno.',ic:['YYYYYYYY','YWWWWWWY','YWKWKWWY','YWWWWKWY','YYYYYYYY','.YY.....','.Y......','........']},
- 'Laureato in Bocconi':{t:'mix',fx:'Amministrazione +3 · Negoziazione +1 · Operazioni −1',fl:'Cita Porter anche quando ordina il caffè.',ic:['........','...KK...','.KKKKKK.','KKKKKKKK','.KKKKKKY','..KKKK.Y','..KKKK.Y','.......Y']},
+ 'Laureato in Bocconi':{t:'mix',edu:1,fx:'Amministrazione +3 · Negoziazione +1 · Operazioni −1',fl:'Cita Porter anche quando ordina il caffè.',ic:['........','...KK...','.KKKKKK.','KKKKKKKK','.KKKKKKY','..KKKK.Y','..KKKK.Y','.......Y']},
  'Papà ha sempre ragione':{t:'neg',fx:'Leadership −2 · Tenuta allo stress −5 · Il fondatore interviene negli eventi',fl:'Il fondatore passa «solo per un caffè». Alle 8. Tutti i giorni.',ic:['..SSSS..','.SFFFFS.','.FKFFKF.','.FFFFFF.','.FSSSSF.','..FFFF..','..DDDD..','.DDDDDD.']},
  'Sempre al telefono':{t:'mix',fx:'Negoziazione +2 · Precisione −1 · Tenuta allo stress −5',fl:'Risponde ai clienti anche dall\'ombrellone a Varazze.',ic:['..KKKK.O','..KBBKO.','..KBBK.O','..KBBK..','..KKKK..','..KWKK..','..KKKK..','........']},
  'Parla per acronimi':{t:'mix',fx:'Negoziazione +2 · Leadership −3 · Bonus nelle gare dei clienti grandi',fl:'ASAP, KPI, ROI: le sue mail sembrano codici fiscali.',ic:['........','......G.','....G.G.','..O.G.G.','..O.G.G.','R.O.G.G.','R.O.G.G.','KKKKKKKK']},
  'Stacanovista':{t:'mix',fx:'Operazioni +2 · Tenuta allo stress −15',fl:'Considera il weekend un\'invenzione dei sindacati.',ic:['..KKKK..','.KWWWWK.','KWWKWWWK','KWWKWWWK','KWWKKKWK','KWWWWWWK','.KWWWWK.','..KKKK..']},
  'Cena col buyer':{t:'pos',fx:'Negoziazione +4 · Tenuta allo stress −10 · Scelte speciali negli eventi con i clienti',fl:'Le trattative migliori le chiude al secondo tiramisù.',ic:['.K....K.','.KRRRRK.','.KRRRRK.','..KRRK..','...KK...','...KK...','...KK...','..KKKK..']},
  'Excel-dipendente':{t:'mix',fx:'Precisione +3 · Amministrazione +2 · Leadership −2',fl:'Ha un foglio Excel anche per la lista della spesa.',ic:['GGGGGGGG','GWWGWWWG','GGGGGGGG','GWWGWWWG','GGGGGGGG','GWWGWWWG','GGGGGGGG','........']},
- 'Parla con i robot':{t:'mix',fx:'Innovazione +3 · Leadership −2 · Apprendimento delle tecnologie −30%',fl:'Chiama i robot del magazzino per nome. Loro, per ora, non rispondono.',ic:['...RR...','...KK...','SSSSSSSS','SBBSSBBS','SSSSSSSS','SKKKKKKS','SSSSSSSS','.S....S.']},
+ 'Parla con i robot':{t:'mix',learn:0.7,fx:'Innovazione +3 · Leadership −2 · Apprendimento delle tecnologie −30%',fl:'Chiama i robot del magazzino per nome. Loro, per ora, non rispondono.',ic:['...RR...','...KK...','SSSSSSSS','SBBSSBBS','SSSSSSSS','SKKKKKKS','SSSSSSSS','.S....S.']},
  'Calma olimpica':{t:'pos',fx:'Leadership +1 · Tenuta allo stress +20',fl:'Durante l\'alluvione ha chiesto se c\'era ancora caffè.',ic:['........','..TTTT..','.T....T.','T..TT..T','T.T..T.T','.T....T.','..TTTT..','........']},
  'Ha fatto il militare':{t:'mix',fx:'Leadership +3 · Precisione +1 · Tenuta allo stress +5 · Dipendenti giovani −10 di opinione',fl:'Fa l\'appello alle 6:00. Anche quando non serve.',ic:['...YY...','...YY...','YYYYYYYY','.YYYYYY.','..YYYY..','.YY..YY.','YY....YY','........']},
  'Ex sindacalista':{t:'pos',fx:'Leadership +3 · Negoziazione +1 · Vertenze sindacali −50%',fl:'Conosce il contratto nazionale meglio di chi l\'ha scritto.',ic:['......R.','....RRR.','KRRRRRR.','KRRRRRR.','KRRRRRR.','....RRR.','..K...R.','..K.....']},
@@ -447,7 +462,41 @@ const TALENTS={
  'Mano larga':{t:'mix',fx:'Leadership +2 · Amministrazione −2 · Morale +5, costi del magazzino +5%',fl:'Offre la pizza a tutto il turno di notte. Il commercialista piange.',ic:['..R..R..','...RR...','OOOROOOO','OOOROOOO','YYYRYYYY','YYYRYYYY','YYYRYYYY','YYYRYYYY']},
  'Ansia da prestazione':{t:'mix',fx:'Precisione +2 · Tenuta allo stress −20',fl:'Rilegge ogni bolla tre volte. Poi una quarta.',ic:['...B....','...B....','..BBB...','.BBWBB..','.BBBWB..','.BBBBB..','..BBB...','........']},
  'Insonne':{t:'neg',fx:'Operazioni −2 · Precisione −2 · Tenuta allo stress −10',fl:'Risponde alle mail alle 3:47. E si aspetta una risposta.',ic:['..YYY...','.YY.....','YY......','YY....W.','YY......','.YY...W.','..YYY...','........']},
- 'Tifo sfegatato':{t:'mix',fx:'Leadership +1 · Eventi speciali nei giorni del derby',fl:'Il giorno del derby il magazzino si ferma. Anche lui.',ic:['..KKKK..','.KWWWWK.','KWWKKWWK','KWKKKKWK','KWWKKWWK','KWWWWWWK','.KWWWWK.','..KKKK..']}
+ 'Tifo sfegatato':{t:'mix',fx:'Leadership +1 · Eventi speciali nei giorni del derby',fl:'Il giorno del derby il magazzino si ferma. Anche lui.',ic:['..KKKK..','.KWWWWK.','KWWKKWWK','KWKKKKWK','KWWKKWWK','KWWWWWWK','.KWWWWK.','..KKKK..']},
+ /* titoli di studio (edu:true): uno a testa per i personaggi creati dal giocatore */
+ 'Licenza media':{t:'mix',edu:1,fx:'Operazioni +2 · Amministrazione −1',fl:'A quattordici anni ha scelto il muletto. Il muletto non l\'ha mai deluso.',ic:['......KK','.....KYK','....KYK.','...KYK..','..KYK...','.KFK....','.KK.....','K.......']},
+ 'Diplomato ragioniere':{t:'pos',edu:1,fx:'Amministrazione +3 · Innovazione −1',fl:'Fa le somme a mente più in fretta del gestionale. E lo dice.',ic:['.KKKKKK.','.KGGGGK.','.KKKKKK.','.KWKWKK.','.KKKKKK.','.KWKWKK.','.KKKKKK.','........']},
+ 'Diplomato perito industriale':{t:'pos',edu:1,fx:'Operazioni +2 · Innovazione +1',fl:'Ripara la reggiatrice con una forcina. Funziona meglio di prima.',ic:['...DD...','.D.DD.D.','..DDDD..','DDD..DDD','DDD..DDD','..DDDD..','.D.DD.D.','...DD...']},
+ 'Diplomato perito informatico':{t:'mix',edu:1,fx:'Innovazione +3 · Leadership −1 · Apprendimento delle tecnologie −15% nel suo magazzino',fl:'Ha installato Linux sul terminale della pesa. Nessuno ha più il coraggio di toccarlo.',learn:0.85,ic:['KKKKKKKK','KBBBBBBK','KBGBBBBK','KBBBGBBK','KBBBBBBK','KKKKKKKK','...KK...','..KKKK..']},
+ 'Diplomato geometra':{t:'pos',edu:1,fx:'Precisione +2 · Operazioni +1',fl:'Misura le corsie col metro rigido. Due volte.',ic:['K.......','KK......','KYK.....','KYYK....','KY.YK...','KY..YK..','KYYYYYK.','KKKKKKKK']},
+ 'Maturità classica':{t:'mix',edu:1,fx:'Negoziazione +2 · Leadership +1 · Operazioni −1',fl:'Traduce Cicerone a vista. Le bolle doganali, meno.',ic:['KKKKKKKK','.KSSSSK.','.KSKSKK.','.KSKSKK.','.KSKSKK.','.KSKSKK.','.KSSSSK.','KKKKKKKK']},
+ 'Maturità scientifica':{t:'pos',edu:1,fx:'Precisione +1 · Innovazione +2',fl:'Per lui un bancale è un parallelepipedo con delle pretese.',ic:['........','BBBBBBBB','.B...B..','.B...B..','.B...B..','.B...B..','.B...BB.','........']},
+ 'Diplomato all\'alberghiero':{t:'mix',edu:1,fx:'Negoziazione +2 · Leadership +1 · Precisione −1',fl:'Le riunioni con i clienti finiscono sempre con un risotto.',ic:['.WW..WW.','WWWWWWWW','WWWWWWWW','.WWWWWW.','.WWWWWW.','.KKKKKK.','.WWWWWW.','........']},
+ 'Diplomato al nautico':{t:'mix',edu:1,fx:'Operazioni +2 · Leadership +1 · Amministrazione −1',fl:'Chiama il piazzale «la banchina» e i bilici «le navi».',ic:['...DD...','..D..D..','...DD...','DDDDDDDD','...DD...','D..DD..D','DD.DD.DD','.DDDDDD.']},
+ 'Qualifica professionale':{t:'pos',edu:1,fx:'Operazioni +2 · Precisione +1 · Negoziazione −1',fl:'Tre anni di centro di formazione e mani d\'oro. Il resto l\'ha imparato in turno di notte.',ic:['.D...D..','.DD.DD..','..DDD...','...D....','...DD...','....DD..','.....DD.','......DD']},
+ 'Ingegnere gestionale':{t:'mix',edu:1,fx:'Precisione +2 · Amministrazione +2 · Leadership −1',fl:'Ha un diagramma di Gantt anche per le ferie.',ic:['KKKKKKKK','KOOOOWWK','KWWBBBWK','KWWWGGGK','KYYWWWWK','KWWWWRRK','KKKKKKKK','........']},
+ 'Ingegnere meccanico':{t:'mix',edu:1,fx:'Operazioni +2 · Innovazione +2 · Negoziazione −1',fl:'Sa perché il carrello fa quel rumore. Purtroppo te lo spiega.',ic:['...OO...','.O.OO.O.','..OOOO..','OOOKKOOO','OOOKKOOO','..OOOO..','.O.OO.O.','...OO...']},
+ 'Ingegnere informatico':{t:'mix',edu:1,fx:'Innovazione +4 · Leadership −2 · Apprendimento delle tecnologie −20% nel suo magazzino',fl:'Ha scritto lui il WMS. Solo lui sa come funziona, e ci tiene che resti così.',learn:0.8,ic:['........','.P....P.','P....P.P','P...P..P','P..P...P','P.P....P','.P....P.','........']},
+ 'Ingegnere dei trasporti':{t:'pos',edu:1,fx:'Operazioni +3 · Precisione +1 · Negoziazione −1',fl:'Ha calcolato il percorso ottimo per andare al bar. Ci mette di più, ma ottimo.',ic:['........','OOOOO...','OOOOOBB.','OOOOOBBB','OOOOOOOO','.KK..KK.','.KK..KK.','........']},
+ 'Laureato in economia':{t:'pos',edu:1,fx:'Amministrazione +2 · Negoziazione +2 · Operazioni −1',fl:'Sa leggere un bilancio. Un transpallet, ancora no.',ic:['...KK...','..K..K..','...KK...','.NNNNNN.','NNNYNNNN','NNYYYNNN','NNNYNNNN','.NNNNNN.']},
+ 'Laureato in giurisprudenza':{t:'mix',edu:1,fx:'Negoziazione +3 · Amministrazione +1 · Innovazione −1',fl:'Legge le clausole penali dei contratti come fossero gialli. E trova sempre l\'assassino.',ic:['...KK...','KKKKKKKK','.K....K.','K.K..K.K','YYY..YYY','...KK...','...KK...','..KKKK..']},
+ 'Laureato in lettere':{t:'mix',edu:1,fx:'Negoziazione +2 · Leadership +1 · Operazioni −2',fl:'Le sue mail di sollecito sono così belle che i clienti le incorniciano. Poi non pagano.',ic:['WWWKKWWW','WKWKKWKW','WWWKKWWW','WKWKKWKW','WWWKKWWW','WKWKKWKW','KKKKKKKK','........']},
+ 'Laureato in scienze umanistiche':{t:'mix',edu:1,fx:'Leadership +2 · Negoziazione +1 · Operazioni −1 · Amministrazione −1',fl:'Ha una tesi sull\'antropologia del capoturno. I capiturno non l\'hanno letta.',ic:['......PP','.....PPP','....PPP.','...PPP..','..PPP...','..PP....','.K......','K.......']},
+ 'Laureato in filosofia':{t:'mix',edu:1,fx:'Leadership +2 · Innovazione +1 · Operazioni −2',fl:'In inventario si chiede se il pallet mancante sia mai esistito davvero.',ic:['..WWWW..','.WWKKWW.','WWWWWKWW','WWWWKWWW','WWWKWWWW','.WWWWWW.','...KW...','..W.....']},
+ 'Laureato in psicologia':{t:'mix',edu:1,fx:'Leadership +3 · Precisione −1',fl:'Ai colloqui chiede ai carrellisti com\'era il rapporto con il loro primo muletto.',ic:['R..R..R.','R..R..R.','R..R..R.','.R.R.R..','..RRR...','...R....','...R....','..RRR...']},
+ 'Laureato in scienze politiche':{t:'mix',edu:1,fx:'Negoziazione +2 · Leadership +1 · Precisione −1',fl:'Ha fondato una corrente interna al magazzino 3. Ha già due scissioni.',ic:['...WW...','...WK...','..KWWK..','KKKKKKKK','KBBBBBBK','KBBKKBBK','KBBBBBBK','KKKKKKKK']},
+ 'Laureato in lingue':{t:'pos',edu:1,fx:'Negoziazione +3 · Operazioni −1',fl:'Litiga con gli autisti stranieri in cinque lingue. Con quelli di Bergamo serve l\'interprete.',ic:['RRRRR...','RWWWR...','RRRRR...','.R.BBBBB','...BWWWB','...BBBBB','.....B..','........']},
+ 'Laureato in matematica':{t:'mix',edu:1,fx:'Precisione +3 · Innovazione +1 · Negoziazione −2',fl:'Ha dimostrato che la saturazione al 100% esiste solo in teoria. Poi è andato in magazzino a controllare.',ic:['BBBBBBB.','.B......','..B.....','...B....','..B.....','.B......','BBBBBBB.','........']},
+ 'Laureato in chimica':{t:'pos',edu:1,fx:'Precisione +2 · Innovazione +1',fl:'Sa a memoria tutte le classi ADR. Le canticchia sotto la doccia.',ic:['..KKKK..','...KK...','...KK...','..KGGK..','.KGGGGK.','KGGWGGGK','KGGGGWGK','KKKKKKKK']},
+ 'Laureato in architettura':{t:'mix',edu:1,fx:'Innovazione +2 · Precisione +1 · Amministrazione −1',fl:'Vuole un capannone «che dialoghi con il territorio». Il territorio è la tangenziale.',ic:['...KK...','..KRRK..','.KRRRRK.','KRRRRRRK','.KWWWWK.','.KWKKWK.','.KWKKWK.','.KKKKKK.']},
+ 'Laureato in agraria':{t:'pos',edu:1,fx:'Operazioni +1 · Precisione +1',fl:'Riconosce una pesca matura dall\'odore della cella frigo. A dieci metri.',ic:['...Y....','..YYY...','...Y.Y..','..YYYY..','.Y.Y....','..YYY...','...G....','...G....']},
+ 'Laureato in scienze della comunicazione':{t:'mix',edu:1,fx:'Negoziazione +2 · Innovazione +1 · Precisione −2',fl:'Ha rifatto il logo aziendale tre volte. I camion sono ancora del colore vecchio.',ic:['.K...K..','..K.K...','...K....','KKKKKKKK','KOOOOOKK','KOWOOOKK','KOOOOOKK','KKKKKKKK']},
+ 'Medicina, mai finita':{t:'mix',edu:1,fx:'Precisione +2 · Leadership +1 · Amministrazione −1',fl:'Gli manca l\'ultimo esame dal 1994. In magazzino lo chiamano comunque «dottore».',ic:['........','...RR...','...RR...','.RRRRRR.','.RRRRRR.','...RR...','...RR...','........']},
+ 'Master in supply chain':{t:'pos',edu:1,fx:'Operazioni +2 · Precisione +1 · Amministrazione +1 · Leadership −1',fl:'Dice «lead time» anche al ristorante, aspettando la pizza.',ic:['........','.NNNNNN.','.NMNNMN.','.NNNNNN.','.NMNNMN.','.NNNNNN.','KKKKKKKK','K.K..K.K']},
+ 'MBA all\'estero':{t:'mix',edu:1,fx:'Negoziazione +3 · Amministrazione +2 · Operazioni −2',fl:'Due anni a Londra e un mutuo da 80.000 sterline. Rimpiange solo il mutuo.',ic:['..KKKK..','..K..K..','KKKKKKKK','KNNNNNNK','KNNYYNNK','KNNNNNNK','KNNNNNNK','KKKKKKKK']},
+ 'Dottorato di ricerca':{t:'mix',edu:1,fx:'Innovazione +4 · Precisione +1 · Operazioni −2 · Negoziazione −1',fl:'Ha pubblicato tre articoli sul pallet ottimo. Il pallet ottimo non è mai arrivato.',ic:['........','...KK...','.KKKKKK.','KKKKKKKK','.KKKKKKP','..KKKK.P','..KKKK.P','.......P']},
+ 'Fuoricorso eterno':{t:'neg',edu:1,fx:'Leadership +1 · Amministrazione −2 · Precisione −1',fl:'Iscritto a Ingegneria dal 1989. Conosce il bar della facoltà meglio del preside.',ic:['KKKKKKKK','.KYYYYK.','..KYYK..','...KK...','...KK...','..K..K..','.KYYYYK.','KKKKKKKK']},
+ 'Autodidatta':{t:'mix',edu:1,fx:'Innovazione +2 · Operazioni +1 · Amministrazione −1',fl:'Ha imparato tutto dai manuali dei muletti e dai forum di notte.',ic:['........','RRRRRR..','.BBBBBB.','GGGGGG..','..YYYYYY','OOOOOO..','.PPPPPP.','KKKKKKKK']}
 };
 const TTYPE={pos:['Positivo','#eaf6ec','#6fdc8c'],neg:['Negativo','#fbecec','#ff8a8d'],mix:['Misto','#fff6dc','#ffd23f']};
 const TECH_IC={"barcode":["............",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","RRRRRRRRRRRR",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","............",".K.K.KK.K.K.","............"],"formazione":["............",".NNNNNNNNNN.",".NDDDDDDDDN.",".NDWWDDDDDN.",".NDDDWWWDDN.",".NDWWWDDDDN.",".NDDDDDWWDN.",".NDDDDDDDDN.",".NNNNNNNNNN.","....N..N....","...N....N...","............"],"gps":["....RRRR....","...RRRRRR...","..RRRWWRRR..","..RRWWWWRR..","..RRWWWWRR..","..RRRWWRRR..","...RRRRRR...","....RRRR....",".....RR.....","..GG.RR.GG..",".GGGGGGGGGG.","............"],"wms":["............",".KKKKKKKKKK.",".KBBBBBBBBK.",".KBYYBOOBBK.",".KBSSSSSSBK.",".KBGGBYYBBK.",".KBSSSSSSBK.",".KKKKKKKKKK.",".....KK.....","...KKKKKK...","............","............"],"anticoll":[".....YY.....","....YKKY....","....YKKY....","...YYKKYY...","...YYKKYY...","..YYYKKYYY..","..YYYKKYYY..",".YYYYYYYYYY.",".YYYYKKYYYY.","YYYYYYYYYYYY","KKKKKKKKKKKK","............"],"rotte":["..........R.",".........RRR","..........R.","........DD..",".....DDD....","....D.......","....D.......",".....DDD....","........D...",".G.......D..","GGG..DDDD...",".G.........."],"rf":["..........B.","........B..B","..KKKKK..B.B","..KBBBK...B.","..KBBBK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","...KKK......","............"],"verticale":["..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..DYY.OOBD..","..DDDDDDDD..","..DBB.YYOD..","..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..D......D..","..D......D..",".KKKKKKKKKK."],"sinergia":["............","............",".KKKKKKK....",".KRRYYBK....",".KRRYYBKKKK.",".KGGOOBKWBK.",".KGGOOBKBBKK",".KKKKKKKKKKK","..KK....KK..","..KK....KK..","............","............"],"ptl":["............","GGG.YYY.RRR.","GGG.YYY.RRR.","............","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","............"],"amr":[".....YY.....",".....KK.....","..KKKKKKKK..","..KSSSSSSK..","..KSBSSBSK..","..KSSSSSSK..","..KSRRRRSK..","..KKKKKKKK..",".KOOOOOOOOK.",".KOOOOOOOOK.",".KKKKKKKKKK.","..KK....KK.."],"gestionale":["..KKKKKKK...","..KWWWWWKK..","..KWKKKWWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWWWGGGK..","..KWWWGGGK..","..KWWWWWWK..","..KKKKKKKK.."],"hr":["............","...SSSS.....","..S.FF.S....",".S.FFFF.S...",".S.FFFF.S...",".S.BBBB.S...","..SBBBBS....","...SSSSN....",".......NN...","........NN..",".........NN.","............"],"direzione":["............","....YYYY....","....YYYY....",".....KK.....",".KKKKKKKKKK.",".K...KK...K.",".K...KK...K.","BBB.OOOO.GGG","BBB.OOOO.GGG","BBB.OOOO.GGG","............","............"],"welfare2":["............","..RR....RR..",".RRRR..RRRR.","RRRRRWWRRRRR","RRRRRWWRRRRR","RRRWWWWWWRRR",".RRWWWWWWRR.","..RRRWWRRR..","...RRWWRR...","....RRRR....",".....RR.....","............"],"controllo":["............","............","K.......GG..","K.......GG..","K....BB.GG..","K....BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","KKKKKKKKKKKK","............","............"],"academy":["............",".....KK.....","...KKKKKK...",".KKKKKKKKKK.","KKKKKKKKKKKK",".KKKKKKKKKKY","..KKKKKKKK.Y","..KDDDDDDK.Y","..KDDDDDDK.Y","...KKKKKK.YY","..........YY","............"],"iso":["..BB....BB..","...BB..BB...","....BBBB....","....YYYY....","..YYYYYYYY..",".YYYYWYYYYY.",".YYYWWWYYYY.",".YYYYWYYYYY.",".YYYYYYYYYY.","..YYYYYYYY..","....YYYY....","............"],"commerciale":["............","..KKKKKKKK..",".KRRRRRRRRK.","KRRKK..KKRRK","KRK......KRK",".K..KKKK..K.","...KRRRRK...","..KRWRWRRK..","..KRRWRWRK..","..KRWRWRRK..","..KKKKKKKK..","............"],"freddo":[".....BB.....","..B..BB..B..","...B.BB.B...","....BBBB....","BBBBBWWBBBBB","BBBBBWWBBBBB","....BBBB....","...B.BB.B...","..B..BB..B..",".....BB.....","............","............"],"edi":["KKKKK.......","KBBBK.......","KBBBK..O....","KKKKK.OOOOO.","..K....O....",".KKK........",".......KKKKK","....O..KBBBK","...OOOOKBBBK","....O..KKKKK",".........K..","........KKK."],"marketing":["............",".........KK.",".......KKOK.",".....KKOOOK.","..KKKOOOOOK.",".KWKOOOOOOK.",".KWKOOOOOOK.","..KKKOOOOOK.","...K.KKOOOK.","...K...KKOK.","...KK....KK.","............"],"accordi":["............",".KKKKKKKK...",".KGGWWRRK...",".KWWWWWWK...",".KWKKKKWK...",".KWWWWWWK...",".KWKKKWWK...",".KWWWWWYYY..",".KWKKWYRRY..",".KWWWWYRRY..",".KKKKKKYY...","........Y.."],"kam":["........Y...",".......YYY..","...FF...Y...","..FFFF......","..FFFF......","...FF.......",".DDDDDD.....","DDDWWDDD....","DDDDRDDD....","DDDDRDDD....","DDDDDDDD....","............"],"ecom":["............","KK..........",".K..........",".KOOOOOOOOK.",".KOWOOWOOOK.",".KOOOOOOOK..","..KOOOOOOK..","..KKKKKKKK..","..K.........","..KKKKKKKKK.","...KK...KK..","............"]};
@@ -674,8 +723,12 @@ function chartHover(e){
 }
 document.addEventListener('pointermove',chartHover);
 function talentSvg(rows,sz){let r='';rows.forEach((row,y)=>{[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${TPAL[ch]}"/>`;});});return `<svg width="${sz}" height="${sz}" viewBox="-1 -1 10 10" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
+// effetti sulle abilità letti dal testo fx ("Operazioni +2 · Leadership −1"): il testo resta l'unica fonte
+function talMods(n){const o={};((TALENTS[n]||{}).fx||'').replace(/(Operazioni|Precisione|Negoziazione|Leadership|Amministrazione|Innovazione) ([+−-]\d+)/g,(m,a,v)=>{const k=STATS.find(x=>x.n===a).k;o[k]=(o[k]||0)+parseInt(v.replace('−','-'),10);});return o;}
+const talCost=n=>Object.values(talMods(n)).reduce((a,v)=>a+v,0);
+function talTip(n,extra){const t=TALENTS[n],ty=TTYPE[t.t];return `<div class='tt'>${esc(n)}</div><div style='color:${ty[2]};font-weight:600'>${ty[0]}${t.edu?' · titolo di studio':''}</div><div>${esc(t.fx)}</div><div style='margin-top:5px;color:#c9d3dd;font-style:italic'>${esc(t.fl)}</div>${extra||''}${wikiHint()}`;}
 function talentIcons(list,sz){sz=sz||36;return `<span style="display:flex;gap:6px;flex-wrap:wrap">${list.map(n=>{const t=TALENTS[n];if(!t)return '';const ty=TTYPE[t.t];
-  const tip=`<div class='tt'>${esc(n)}</div><div style='color:${ty[2]};font-weight:600'>${ty[0]}</div><div>${esc(t.fx)}</div><div style='margin-top:5px;color:#c9d3dd;font-style:italic'>${esc(t.fl)}</div>${wikiHint()}`;
+  const tip=talTip(n);
   return `<span class="tal" role="img" aria-label="${esc(n)}: ${esc(t.fx)}" data-act="wiki" data-id="${TAL_ID[n]}" data-tip="${tip}" style="width:${sz+8}px;height:${sz+8}px;background:${ty[1]}">${talentSvg(t.ic,sz)}</span>`;}).join('')}</span>`;}
 
 const $=s=>document.querySelector(s);
@@ -815,9 +868,26 @@ STATS.forEach(s=>wk('st_'+s.k,'abil',s.n,s.d,STAT_TXT[s.k],sz=>statIcon(s.k,sz))
 wk('talenti','tal','Talenti',`Tratti di carattere, mostrati come icone. Cambiano le abilità e a volte aprono scelte speciali.`,
 `Ogni personaggio ha uno o più talenti. Il colore del riquadro dice se è positivo (verde), negativo (rosso) o misto (giallo). Passa il mouse su un'icona per leggere l'effetto e la sua piccola storia.
 
-Gli effetti sulle [[abilita|abilità]] sono già sommati nei numeri. Altri effetti valgono solo in certe situazioni: tempi di [[apprendimento]], [[morale]], scelte negli [[eventi]].`);
+Gli effetti sulle [[abilita|abilità]] sono già sommati nei numeri. Altri effetti valgono solo in certe situazioni: tempi di [[apprendimento]], [[morale]], scelte negli [[eventi]].
+
+Un tipo speciale di talento è il [[titoli|titolo di studio]]: chi [[crea_ceo|crea il proprio CEO]] ne sceglie uno.`);
+wk('titoli','tal','Titoli di studio',`Talenti che raccontano la scuola o l'università del personaggio. Il CEO creato dal giocatore ne ha esattamente uno.`,
+`Dalla licenza media al dottorato di ricerca, passando per il ragioniere, il perito, l'ingegnere e le lauree umanistiche. Ogni titolo sposta qualche punto tra le [[abilita|abilità]]: chi ha studiato ingegneria guadagna in Innovazione ma perde in Leadership, chi ha fatto lettere tratta meglio ma conosce poco il magazzino.
+
+Alcuni titoli tecnici (perito informatico, ingegnere informatico) accorciano anche l'[[apprendimento]] delle tecnologie nel magazzino guidato dal CEO.
+
+Quando [[crea_ceo|crei il tuo CEO]] il saldo dei punti del titolo (bonus meno malus) si paga con i punti da distribuire.`);
+wk('crea_ceo','basi','Creare il proprio CEO',`Nella schermata iniziale puoi creare un CEO tuo: nome, cognome, età, ritratto, abilità, titolo di studio e carattere.`,
+`Nella schermata iniziale scegli la quinta scheda, «Crea il tuo CEO».
+
+• **Punto di partenza**: il magazzino, la cassa e il cliente storico di uno dei quattro CEO già pronti.
+• **Punti**: hai 58 punti. Ogni punto in un'[[abilita|abilità]] costa 1 (minimo 1, massimo 18 prima dei talenti).
+• **[[titoli|Titolo di studio]]**: obbligatorio, uno solo.
+• **Carattere**: fino a 3 [[talenti]] a scelta.
+
+I talenti si pagano con gli stessi punti: un talento con Operazioni +3 e Leadership −1 costa 2 punti, un talento con soli malus te ne restituisce. Il valore finale di un'abilità va da 0 a 20.`);
 const TAL_ID={}; Object.keys(TALENTS).forEach((n,i)=>{TAL_ID[n]='tal_'+i; const t=TALENTS[n];
-  wk('tal_'+i,'tal',n,t.fx,`${t.fx.split(' · ').join('\n• ').replace(/^/,'• ')}\n\n*${t.fl}*\n\nTipo: ${TTYPE[t.t][0].toLowerCase()}. Vedi [[talenti]].`,sz=>talentSvg(t.ic,sz));});
+  wk('tal_'+i,'tal',n,t.fx,`${t.fx.split(' · ').join('\n• ').replace(/^/,'• ')}\n\n*${t.fl}*\n\nTipo: ${TTYPE[t.t][0].toLowerCase()}.${t.edu?' È un [[titoli|titolo di studio]].':''} Vedi [[talenti]].`,sz=>talentSvg(t.ic,sz));});
 // Personale
 wk('personale','pers','Personale',`Sei mestieri per ogni magazzino (magazzinieri, carrellisti, capiturno, impiegati, autisti B e CE) più i pianificatori del traffico in sede.`,
 `Ogni magazzino ha il suo organico, e ogni mestiere fa un lavoro diverso:
@@ -972,7 +1042,7 @@ wk('installazione','tech','Installazione',`Le tecnologie di Logistica, una volta
 wk('apprendimento','tech','Apprendimento',`Le prime settimane dopo un'installazione il personale si abitua: i KPI peggiorano invece di migliorare.`,
 `Durante l'apprendimento la tecnologia dà metà del suo effetto, ma al contrario: se promette +2 di [[accuratezza]] ne toglie 1. Finito il periodo vale per intero.
 
-È più lungo con un CEO allergico ai gestionali e più corto con chi parla con i robot o con l'[[tech_academy|Academy aziendale]]. Non installare tutto insieme prima di una scadenza importante!`);
+È più lungo con un CEO allergico ai gestionali e più corto con chi parla con i robot, con un CEO perito o ingegnere informatico ([[titoli|titoli di studio]]) o con l'[[tech_academy|Academy aziendale]]. Non installare tutto insieme prima di una scadenza importante!`);
 TECH.forEach(t=>{const tr=TREES.find(x=>x[0]===t.tree);const reqs=(t.req||[]).map(r=>{const a=TECH.find(x=>x.id===r);return `[[tech_${a.id}|${a.name}]]`;});
   const eff=[t.A?`Accuratezza +${f1(t.A)}`:'',t.P?`Puntualità +${f1(t.P)}`:'',t.prod?`produttività +${Math.round(t.prod*100)}%`:'',t.mor?`morale +${t.mor}`:'',t.sm?`[[saturazione_mezzi|saturazione dei mezzi]] +${t.sm}`:'',t.smC?`[[saturazione_mezzi|saturazione dei mezzi]] +${t.smC} per ogni cliente oltre il primo, fino a +${t.smMax}`:''].filter(Boolean).join(', ');
   wk('tech_'+t.id,'tech',t.name,t.desc,`${t.desc}\n\nAlbero: [[alberi|${tr[1]}]]. Disponibile dal ${t.year}. Ricerca: ${eur(t.cost)}, ${t.days} giorni di base.${reqs.length?` Richiede ${reqs.join(' e ')}.`:''}`+
@@ -1032,9 +1102,9 @@ const wikiBacklinks=id=>Object.values(WIKI).filter(w=>w.id!==id&&w.t&&(w.t.inclu
 /* ====================== STATO ====================== */
 let S=null; let UI={open:{},sel:{},tab:{},z:30,pos:{},bid:{}}; let uid=1;
 const nid=p=>p+(uid++);
-function newGame(ceoId,coName,color){
-  const C=CEOS.find(c=>c.id===ceoId);
-  S={v:1,day:0,speed:0,ceoId,company:{name:coName||C.company,color},cash:C.cash,rep:C.rep,fuel:0.86,
+function newGame(ceoId,coName,color,custom){
+  const C=custom||CEOS.find(c=>c.id===ceoId); if(custom) ceoId='custom';
+  S={v:1,day:0,speed:0,ceoId,custom:custom||null,company:{name:coName||C.company,color},cash:C.cash,rep:C.rep,fuel:0.86,
      warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0},managers:MANAGERS.map(m=>({...m,hired:false,wh:null})),
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextTender:12,nextEvent:25,project:null,seen:{},over:false,uid:1,
      execs:EXECS.map(e=>({...e,hired:false})),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false};
@@ -1051,7 +1121,8 @@ function addWarehouse(site,own,fixed,motrici){
   const wh={id:nid('w'),site,name:s.name,prov:s.prov,cap:s.cap,own,fixed:own?fixed:s.rent,motrici:motrici||0,mgr:null,staff:noStaff(),coop:false,morale:62,tech:{},acc:{P:0,A:0,n:0},kpi:null};
   S.warehouses.push(wh); return wh;
 }
-const ceo=()=>CEOS.find(c=>c.id===S.ceoId);
+const ceo=()=>S.custom||CEOS.find(c=>c.id===S.ceoId);
+const ceoImg=C=>IMG[C.img||C.id];
 const whById=id=>S.warehouses.find(w=>w.id===id);
 const clientRev=c=>{const w=S&&whById(c.wh); const t=w?clientLog(c,w):{oKm:240,in:0,iKm:0}; return (c.stock*T_ST+2*c.pal*T_MO+c.pal*(18+0.05*t.oKm)*chAvg(c,'price')+t.in*t.iKm*1.5)*c.mult*rankOf(c).rev;};
 function news(src,title,text){S.news.unshift({day:S.day,src,title,text}); if(S.news.length>80)S.news.pop();}
@@ -1071,7 +1142,7 @@ function capOf(w){const t=TECH.find(x=>x.id==='verticale'); return Math.round(w.
 function techFactor(wh,t){
   const it=wh.tech[t.id]; if(!it) return 0;
   let weeks=t.weeks; const m=mgrStats(wh);
-  if(m.ceo && ceo().allergic) weeks*=1.5; if(m.ceo && ceo().robots) weeks*=0.7; if(R('academy')) weeks*=0.7;
+  if(m.ceo) ceo().tal.forEach(n=>{const l=TALENTS[n]&&TALENTS[n].learn; if(l) weeks*=l;}); if(R('academy')) weeks*=0.7;
   return (S.day-it.day)<weeks*7 ? -0.5 : 1;
 }
 // pianificatori del traffico, in sede: il CEO regge da solo fino a 80 viaggi al mese
@@ -1696,7 +1767,7 @@ const VIEWS={
   const sk=[['Operazioni','op'],['Precisione','prec'],['Negoziazione','neg'],['Leadership','lead'],['Amministrazione','amm'],['Innovazione','inn']];
   const pl=L?[[kw('ricavi','Ricavi'),L.ric],[kw('costi','Personale'),-L.pers],[kw('costi','Mezzi e gasolio'),-L.mezzi],[kw('costi','Immobili e fissi'),-L.fissi],[kw('costi','Tecnologie'),-L.tech],[kw('costi','Manager'),-L.mgr],[kw('welfare','Welfare'),-L.welf],[kw('penali','Penali'),-L.pen],[kw('costi','Altro'),-L.altro]].filter(x=>Math.abs(x[1])>0.5):[];
   return `<div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
-   <div class="portrait" style="width:120px;height:140px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none"><img class="px" src="${IMG[C.id]}" alt="Ritratto di ${esc(C.name)}" width="120" height="140"></div>
+   <div class="portrait" style="width:120px;height:140px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none"><img class="px" src="${ceoImg(C)}" alt="Ritratto di ${esc(C.name)}" width="120" height="140"></div>
    <div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:4px">
      <div class="h3" style="font-size:20px">${esc(C.name)}</div><div class="sm">${C.age} anni · ${esc(C.origin)} · CEO di ${esc(S.company.name)}</div>
      <div class="sm" style="color:var(--ink)">${esc(C.bio)}</div>
@@ -1734,7 +1805,7 @@ const VIEWS={
    <div class="sm">${kw('motrici')}: ${w.motrici} di proprietà${Math.max(0,w.staff.autCE-w.motrici)?` + ${Math.max(0,w.staff.autCE-w.motrici)} in leasing`:''}${w.staff.autB?` · ${w.staff.autB} furgoni in leasing`:''} · ${k.viaggi} viaggi al mese</div>
    <label class="row" style="align-items:center"><span class="lab">${kw('obiettivo_sat','Obiettivo minimo di saturazione')}</span><select data-act="setsatobj" data-wh="${w.id}" aria-label="Obiettivo minimo di saturazione dei mezzi">${SAT_OBJ.map(v=>`<option value="${v}" ${(w.satObj||0)===v?'selected':''}>${v?'almeno '+v+'%':'nessuno'}</option>`).join('')}</select></label>
    ${satObjTxt(k.sm)}
-   <label class="row" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><img class="px mini" src="${w.mgr==='ceo'?IMG[ceo().id]:w.mgr?IMG['m_'+w.mgr]:IMG.imp}" alt="" width="48" height="56" style="${w.mgr?'':'opacity:.3'}"><span class="lab">${kw('manager','Manager')}</span></span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
+   <label class="row" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><img class="px mini" src="${w.mgr==='ceo'?ceoImg(ceo()):w.mgr?IMG['m_'+w.mgr]:IMG.imp}" alt="" width="48" height="56" style="${w.mgr?'':'opacity:.3'}"><span class="lab">${kw('manager','Manager')}</span></span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
    ${k.m.none?'<div class="sm bad">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
   </div>
   <div class="card"><div class="row"><span class="h3">${kw('clienti')}</span><span class="sm">${kw('ricavi','ricavi')} ${eur(k.rev)}/mese</span></div>
@@ -2085,7 +2156,53 @@ document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-tip]')
 document.addEventListener('mousemove',e=>{if(tip.hidden)return;const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(e.clientX+14,innerWidth-w-8)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';});
 
 /* ====================== AVVIO ====================== */
-let startSel={ceo:'gino',color:'#ff7a3d',name:''};
+let startSel={ceo:'gino',color:'#ff7a3d',name:'',cc:null,err:''};
+/* --- CEO creato dal giocatore: punti da distribuire tra abilità e talenti --- */
+const CC_PTS=58, CC_TRAITS=3, CC_IMGS=['cc1','cc2','cc3','cc4','cc5','cc6','cc7','cc8','cc9','cc10'];
+const ccNew=()=>({nome:'',cognome:'',eta:38,img:'cc1',base:'gino',st:{op:8,prec:8,neg:8,lead:8,amm:8,inn:8},edu:null,tal:[]});
+const ccTal=cc=>cc.edu?[cc.edu,...cc.tal]:cc.tal.slice();
+function ccMods(cc){const o={};ccTal(cc).forEach(n=>{const m=talMods(n);for(const k in m)o[k]=(o[k]||0)+m[k];});return o;}
+function ccStats(cc){const m=ccMods(cc),o={};STATS.forEach(s=>o[s.k]=clamp(cc.st[s.k]+(m[s.k]||0),0,20));return o;}
+const ccLeft=cc=>CC_PTS-STATS.reduce((a,s)=>a+cc.st[s.k],0)-ccTal(cc).reduce((a,n)=>a+talCost(n),0);
+const ccName=cc=>`${cc.nome.trim()} ${cc.cognome.trim()}`.trim();
+const ccCompany=cc=>cc.cognome.trim()?`Trasporti ${cc.cognome.trim()}`:'Nuova Logistica';
+function ccErr(cc){if(!cc.nome.trim()||!cc.cognome.trim())return 'Scrivi nome e cognome del tuo CEO.'; if(!cc.edu)return 'Scegli un titolo di studio.'; const l=ccLeft(cc); if(l<0)return `Hai speso ${-l} punti di troppo: togline qualcuno dalle abilità o cambia talenti.`; return '';}
+function ccCeo(cc){const B=CEOS.find(c=>c.id===cc.base), s=SITES[B.site];
+  return {id:'custom',img:cc.img,name:ccName(cc),age:clamp(Math.round(+cc.eta)||38,22,70),origin:cc.edu,site:B.site,cash:B.cash,motrici:B.motrici,fixed:B.fixed,rep:B.rep,company:ccCompany(cc),
+    st:ccStats(cc),tal:ccTal(cc),client:{...B.client},
+    bio:`Ha rilevato il capannone di ${s.name} con un solo cliente storico, ${B.client.name}, e un'idea fissa: arrivare fino all'ultimo pallet.`};}
+const defCo=()=>startSel.ceo==='custom'?ccCompany(startSel.cc):CEOS.find(c=>c.id===startSel.ceo).company;
+// salva quello che è scritto nei campi prima di ridisegnare la schermata
+function startKeep(){const inp=$('#coname-in'); if(inp){const t=inp.value; startSel.name=(!t||t===defCo())?'':t;}
+  const cc=startSel.cc; if(cc&&$('#cc-nome')){cc.nome=$('#cc-nome').value;cc.cognome=$('#cc-cognome').value;cc.eta=$('#cc-eta').value;}}
+function ccPanel(){
+  const cc=startSel.cc, m=ccMods(cc), fin=ccStats(cc), left=ccLeft(cc), full=cc.tal.length>=CC_TRAITS;
+  const cost=n=>{const c=talCost(n);return `<div style='margin-top:5px;font-weight:600'>${c>0?`Costa ${c} punt${c===1?'o':'i'}`:c<0?`Restituisce ${-c} punt${c===-1?'o':'i'}`:'Non costa punti'}</div>`;};
+  const tile=(n,on,act,dis)=>`<button class="tal talpick" data-act="${act}" data-n="${esc(n)}" aria-pressed="${on}" ${dis?'disabled':''} aria-label="${esc(n)}" data-tip="${talTip(n,cost(n))}" style="background:${TTYPE[TALENTS[n].t][1]}">${talentSvg(TALENTS[n].ic,30)}</button>`;
+  const edu=Object.keys(TALENTS).filter(n=>TALENTS[n].edu), tr=Object.keys(TALENTS).filter(n=>!TALENTS[n].edu);
+  const chosen=n=>`<span style="display:inline-flex;align-items:center;gap:6px;margin-right:12px">${talentIcons([n],18)}<span><b>${esc(n)}</b> <span class="sm">${esc(TALENTS[n].fx)}</span></span></span>`;
+  return `<div class="card ccbox">
+   <div class="row"><span class="h3">${kw('crea_ceo','Il tuo CEO')}</span><span class="disp" style="font-size:18px">Punti rimasti: <b class="${left<0?'bad':left===0?'ok':''}">${left}</b> <span class="sm">su ${CC_PTS}</span></span></div>
+   <div class="cc-top">
+    <div class="cc-por"><button class="btn sm2" data-act="ccimg" data-d="-1" aria-label="Ritratto precedente">◀</button><div class="portrait" style="width:96px;height:112px;overflow:hidden"><img class="px" src="${IMG[cc.img]}" alt="Ritratto scelto" width="96" height="112"></div><button class="btn sm2" data-act="ccimg" data-d="1" aria-label="Ritratto successivo">▶</button></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+     <div class="cc-fields"><label><span class="lab">Nome</span><input type="text" id="cc-nome" maxlength="20" value="${esc(cc.nome)}" placeholder="Es. Ornella"></label>
+      <label><span class="lab">Cognome</span><input type="text" id="cc-cognome" maxlength="24" value="${esc(cc.cognome)}" placeholder="Es. Bancalini"></label>
+      <label><span class="lab">Età</span><input type="number" id="cc-eta" min="22" max="70" value="${esc(cc.eta)}"></label></div>
+     <div><div class="lab" style="margin-bottom:4px">Punto di partenza</div><div class="cc-base">${CEOS.map(c=>{const st=SITES[c.site];return `<button class="btn sm2" data-act="ccbase" data-id="${c.id}" aria-pressed="${cc.base===c.id}" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,18)}<span>${esc(st.name)} · ${eur(c.cash)}</span></button>`;}).join('')}</div>
+      <div class="sm" style="margin-top:4px">Magazzino, cassa, mezzi e cliente storico di ${esc(CEOS.find(c=>c.id===cc.base).company)}: ${esc(CEOS.find(c=>c.id===cc.base).client.name)}.</div></div>
+    </div></div>
+   <div class="lab">Abilità <span class="sm">· ogni punto costa 1, da 1 a 18 prima dei talenti</span></div>
+   <div class="cc-stats">${STATS.map(s=>{const d=m[s.k]||0;return `<div class="skill cc-st" style="border-color:${s.c};background:${s.bg}">${statBadge(s.k,fin[s.k],18)}<span style="flex:1">${s.n}${d?` <span class="sm ${d>0?'ok':'bad'}">${d>0?'+':'−'}${Math.abs(d)} talenti</span>`:''}</span>
+     <button class="btn sm2" data-act="ccst" data-k="${s.k}" data-d="-1" ${cc.st[s.k]<=1?'disabled':''} aria-label="Togli un punto a ${s.n}">−</button><b class="v">${cc.st[s.k]}</b><button class="btn sm2" data-act="ccst" data-k="${s.k}" data-d="1" ${cc.st[s.k]>=18?'disabled':''} aria-label="Aggiungi un punto a ${s.n}">+</button></div>`;}).join('')}</div>
+   <div class="lab">${kw('titoli','Titolo di studio')} <span class="sm">· obbligatorio, uno solo</span></div>
+   <div class="cc-pick">${edu.map(n=>tile(n,cc.edu===n,'ccedu',false)).join('')}</div>
+   <div>${cc.edu?chosen(cc.edu):'<span class="sm">Passa il mouse sulle icone per leggere gli effetti.</span>'}</div>
+   <div class="lab">Carattere <span class="sm">· fino a ${CC_TRAITS} ${kw('talenti')}</span></div>
+   <div class="cc-pick">${tr.map(n=>{const on=cc.tal.includes(n);return tile(n,on,'cctal',full&&!on);}).join('')}</div>
+   <div>${cc.tal.length?cc.tal.map(chosen).join(''):'<span class="sm">Nessun tratto scelto.</span>'}</div>
+  </div>`;
+}
 const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['#3dd6c4','#1f9e8f','#9cefe5'],['#9b6bff','#6f43cf','#c8adff']];
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 function showStart(){
@@ -2096,23 +2213,34 @@ function showStart(){
     <span class="sm" style="color:var(--ink)">${esc(s.name)} (${s.prov}) · ${n0(s.cap)} posti · ${eur(c.cash)}</span>
     <span>${statChips(c.st,14)}</span>
     ${talentIcons(c.tal,32)}
-    <span class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,24)} Cliente storico: ${esc(c.client.name)} ${rankIcon(c.client,18)}</span></button>`;}).join('');
-  const C=CEOS.find(c=>c.id===startSel.ceo);
+    <span class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,24)} Cliente storico: ${esc(c.client.name)} ${rankIcon(c.client,18)}</span></button>`;}).join('')
+   +(()=>{const cc=startSel.cc;return `<button class="ceo" data-act="pickceo" data-id="custom" aria-pressed="${startSel.ceo==='custom'}">
+    <div class="portrait" style="height:150px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden"><img class="px" src="${IMG[cc?cc.img:'cc1']}" alt="" width="128" height="150"></div>
+    <b class="disp" style="font-size:18px">${cc&&ccName(cc)?esc(ccName(cc)):'Crea il tuo CEO'}</b><span class="sm">Nome, abilità, titolo di studio e carattere li scegli tu</span>
+    ${cc?`<span>${statChips(ccStats(cc),14)}</span>${talentIcons(ccTal(cc),32)}`:`<span class="sm" style="color:var(--ink)">${CC_PTS} punti da distribuire tra abilità e talenti</span>`}</button>`;})();
   $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP</span><span>Nord-Ovest, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
    <div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
    <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord-Ovest. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
    ${sv&&sv.S&&!sv.S.over?`<div class="card pend"><div class="row"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><button class="btn pri" data-act="continue">Continua la partita</button></div></div>`:''}
-   <div class="lab">1. Scegli il tuo CEO</div><div class="ceos">${st}</div>
-   <div class="split"><label style="display:flex;flex-direction:column;gap:4px"><span class="lab">2. Nome dell'azienda</span><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||C.company)}" aria-label="Nome dell'azienda"></label>
+   <div class="lab">1. Scegli il tuo CEO</div><div class="ceos five">${st}</div>
+   ${startSel.ceo==='custom'?ccPanel():''}
+   <div class="split"><label style="display:flex;flex-direction:column;gap:4px"><span class="lab">2. Nome dell'azienda</span><input type="text" id="coname-in" maxlength="40" value="${esc(startSel.name||defCo())}" aria-label="Nome dell'azienda"></label>
    <div style="display:flex;flex-direction:column;gap:4px"><span class="lab">3. Colore</span><div style="display:flex;gap:8px">${COLORS.map(c=>`<button class="sw" data-act="pickcolor" data-c="${c[0]}" aria-pressed="${startSel.color===c[0]}" style="background:${c[0]}" aria-label="Colore ${c[0]}"></button>`).join('')}</div></div></div>
-   <div class="row"><span class="sm">Comandi: spazio per la pausa, 1–3 per la velocità, L per le lenti della mappa, trascina e usa la rotellina sulla mappa.</span><button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px">Inizia</button></div>
+   <div class="row"><span class="sm">Comandi: spazio per la pausa, 1–3 per la velocità, L per le lenti della mappa, trascina e usa la rotellina sulla mappa.</span>${startSel.err?`<span class="bad" role="alert" style="font-weight:600">${esc(startSel.err)}</span>`:''}<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px">Inizia</button></div>
   </div></div>`;
 }
 function setSpeedSafe(v){if(S){S.speed=v;renderTop();}}
 Object.assign(ACT,{
- pickceo(d){const old=CEOS.find(c=>c.id===startSel.ceo);const inp=$('#coname-in');const typed=inp?inp.value:'';startSel.ceo=d.id;if(!typed||typed===old.company)startSel.name='';else startSel.name=typed;showStart();},
- pickcolor(d){startSel.color=d.c;applyColor(d.c);startSel.name=$('#coname-in').value;showStart();},
- startgame(){const nm=($('#coname-in').value||'').trim();uid=1;newGame(startSel.ceo,nm,startSel.color);boot();},
+ pickceo(d){startKeep();startSel.ceo=d.id;startSel.err='';if(d.id==='custom'&&!startSel.cc)startSel.cc=ccNew();showStart();},
+ pickcolor(d){startKeep();startSel.color=d.c;applyColor(d.c);showStart();},
+ ccst(d){startKeep();const cc=startSel.cc;cc.st[d.k]=clamp(cc.st[d.k]+(+d.d),1,18);startSel.err='';showStart();},
+ ccedu(d){startKeep();const cc=startSel.cc;cc.edu=cc.edu===d.n?null:d.n;startSel.err='';showStart();},
+ cctal(d){startKeep();const cc=startSel.cc;if(cc.tal.includes(d.n))cc.tal=cc.tal.filter(n=>n!==d.n);else if(cc.tal.length<CC_TRAITS)cc.tal.push(d.n);startSel.err='';showStart();},
+ ccimg(d){startKeep();const cc=startSel.cc,i=CC_IMGS.indexOf(cc.img);cc.img=CC_IMGS[(i+(+d.d)+CC_IMGS.length)%CC_IMGS.length];showStart();},
+ ccbase(d){startKeep();startSel.cc.base=d.id;showStart();},
+ startgame(){startKeep();const custom=startSel.ceo==='custom';
+   if(custom){const e=ccErr(startSel.cc);if(e){startSel.err=e;showStart();return;}}
+   startSel.err='';const nm=(startSel.name||defCo()).trim();uid=1;newGame(startSel.ceo,nm,startSel.color,custom?ccCeo(startSel.cc):null);boot();},
  continue(){const sv=load();if(!sv)return;S=fillSave(migrateStaff(renameClients(sv.S)));S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();}
 });
 function boot(){
@@ -2135,6 +2263,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else showStart(); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,newGame:(c)=>{uid=1;newGame(c,'',COLORS[0][0]);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed};
+window.__FUP={get S(){return S;},step,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr};
 })();
 </script>
