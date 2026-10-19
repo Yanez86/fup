@@ -82,7 +82,7 @@ async def phone(b, w, h, name, errs):
     await pg.evaluate("()=>{window.__FUP.S.speed=0;document.querySelector('#modal').innerHTML='';document.querySelector('#toasts').innerHTML='';}")
     if await pg.query_selector('#win-magazzini'): await pg.tap('#win-magazzini [data-act=close]')
     await pg.tap('#dock [data-id=riepilogo]')
-    for t in ['gen','soldi','op','cli','pers']:
+    for t in ['gen','soldi','op','cli','pers','mod']:
         await pg.tap(f'#win-riepilogo [data-act=rptab][data-id={t}]')
         assert await pg.evaluate(FITS, '#win-riepilogo'), f'{name}: riepilogo {t} esce dallo schermo'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_riepilogo_{t}.png'))
@@ -224,13 +224,27 @@ async def main():
         assert h['n'] >= 6 and h['g'] > 0, h
         await pg.click('#dock [data-id=riepilogo]')
         if not await pg.query_selector('#win-riepilogo'): await pg.click('#dock [data-id=riepilogo]')
-        for t in ['gen','soldi','op','cli','pers']:
+        for t in ['gen','soldi','op','cli','pers','mod']:
             await pg.click(f'#win-riepilogo [data-act=rptab][data-id={t}]')
-            assert await pg.eval_on_selector_all('#win-riepilogo .rp-t', 'e=>e.length') >= 6, t
+            assert await pg.eval_on_selector_all('#win-riepilogo '+('.rp-mod' if t=='mod' else '.rp-t'), 'e=>e.length') >= (3 if t=='mod' else 6), t
             await pg.screenshot(path=os.path.join(OUT, f'shot_riepilogo_{t}.png'))
         await pg.click('#win-riepilogo [data-act=rptab][data-id=gen]')
         await pg.hover('#win-riepilogo svg[data-chart=rp_cash]')
         assert 'Cassa' in await pg.inner_text('#tip'), 'tooltip del grafico della cassa'
+        # modificatori: le voci della puntualità sommano al valore del KPI; gli effetti degli eventi ricordano da dove vengono
+        chk = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0],k=F.computeWH(w);
+          const r=k.pP.reduce((a,x)=>a+x[1],0), m=k.pM.reduce((a,x)=>a+x[1],0);
+          F.mod('all',{P:-2},5); const src=S.mods[S.mods.length-1].src; S.mods.pop();
+          return {p:Math.abs(Math.max(50,Math.min(99.9,r))-k.P)<1e-9, m:Math.abs(Math.max(0,Math.min(100,m))-k.morT)<1e-9, src};}''')
+        assert chk['p'] and chk['m'] and chk['src'] is None, chk
+        # un'azienda più ricca: tecnologie, manager, un dirigente, welfare e un evento in corso
+        await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0];
+          ['barcode','formazione','gestionale','direzione','iso'].forEach(t=>S.researched[t]=true); w.tech.barcode={day:S.day-200}; w.tech.formazione={day:S.day-2};
+          const m=S.managers[0]; m.hired=true; w.mgr=m.id; const e=S.execs[0]; e.hired=true; S.dirs.op=e.id; S.welfare.buoni=true;
+          S.mods.push({scope:'all',P:-6,mor:3,until:S.day+7,src:'Nebbia in Val Padana'}); F.ACT.rptab({id:'mod'});}''')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_riepilogo_mod_pieno.png'))
+        await pg.evaluate("()=>{const b=document.querySelector('#win-riepilogo .win-b');b.scrollTop=b.scrollHeight;}")
+        await pg.screenshot(path=os.path.join(OUT, 'shot_riepilogo_mod_pieno_sotto.png'))
         await b.close()
     if errs:
         print('ERRORI JS:', *errs, sep='\n  '); sys.exit(1)

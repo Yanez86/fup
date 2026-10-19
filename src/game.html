@@ -142,12 +142,23 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .rp-hn{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rp-hr .bar{height:14px}
 .rp-stack{display:flex;height:22px;border:2px solid var(--ink)}.rp-stack i{display:block;height:100%}.rp-stack i+i{border-left:1px solid var(--ink)}
+.rp-mod3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rp-mod{font-size:14px;gap:3px}.rp-mod b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.rp-tot{border-top:2px solid var(--ink);padding-top:3px;margin-top:2px;font-weight:600}
+.rp-whs{border:0;background:none;padding:0}
+.rp-pp{display:flex;flex-direction:column;gap:4px;padding:6px 0;border-bottom:1px dashed var(--line)}.rp-pp:last-child{border-bottom:0}
+.rp-ppn{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.rp-ppn b{font-size:16px}
+.rp-fx{line-height:1.35}
+.rp-tr{display:flex;gap:8px;align-items:flex-start;padding:4px 0;border-bottom:1px dashed var(--line);font-size:14px}.rp-tr:last-child{border-bottom:0}
+.rp-inst{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}.rp-inst .pill.ok{background:#e3f4d9}.rp-inst .pill.warn{background:#fff4c7}
+.rp-ev{display:flex;flex-direction:column;gap:1px;padding:4px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.mob .rp-mod3{grid-template-columns:minmax(0,1fr)}
 .rp-scroll{overflow-x:auto}
 .lnk{border:0;background:none;padding:0;font:inherit;color:#2f5fa0;text-decoration:underline;cursor:pointer;text-align:left}
 .mob .rp-tiles,.mob .rp-tiles.c4{grid-template-columns:repeat(2,minmax(0,1fr))}
 .mob .rp-hr{grid-template-columns:minmax(0,120px) minmax(30px,1fr) auto}
 .mob .rp-t b{font-size:21px}
-.mob .rp-tabs button{flex:1 0 auto;font-size:14px;padding:10px 8px}
+.mob .rp-tabs button{flex:1 0 30%;font-size:14px;padding:10px 6px;border-bottom:2px solid var(--ink)}
 .treebox{overflow-x:auto;padding:4px 2px 8px}
 .tnode{position:absolute;display:flex;align-items:center;gap:7px;padding:4px 6px;text-align:left;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 rgba(22,32,46,.12),2px 2px 0 var(--ink);font-size:13px;line-height:1.2}
 .tnode .tn{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -980,9 +991,9 @@ Le parole sottolineate a puntini, come [[saturazione]], si spiegano passandoci s
 
 Sul telefono: il primo tocco su una parola sottolineata mostra la spiegazione, il secondo apre la voce; tenendo premuto un pulsante si scopre a cosa serve. FUP si può installare come app dalla schermata iniziale.`);
 wk('riepilogo','basi','Riepilogo dell\'azienda',`La finestra con tutti i numeri dell'azienda in un colpo d'occhio: conti, operazioni, clienti, persone e ricerca.`,
-`Si apre dal menu a sinistra. È divisa in cinque schede:
+`Si apre dal menu a sinistra. È divisa in sei schede:
 
-Panoramica: [[cassa]], utile e [[ricavi]] del mese scorso, [[reputazione]], clienti, magazzini, dipendenti e gare vinte, con l'andamento della cassa e l'utile di ogni mese. Conti: ricavi e [[costi]] mese per mese, dove vanno i soldi, [[penali]] pagate e il [[conto|conto economico]] anno per anno. Operazioni: [[puntualita]], [[accuratezza]], [[saturazione]] e [[morale]] medi, i pallet movimentati e una tabella magazzino per magazzino. Clienti: quanto rende ogni cliente, la sua [[soddisfazione]], le soglie dei contratti e le [[gare]] vinte e perse. Persone: chi lavora per te, [[manager]], [[direzione|dirigenti]], [[welfare]] e [[alberi|alberi delle tecnologie]].
+Panoramica: [[cassa]], utile e [[ricavi]] del mese scorso, [[reputazione]], clienti, magazzini, dipendenti e gare vinte, con l'andamento della cassa e l'utile di ogni mese. Conti: ricavi e [[costi]] mese per mese, dove vanno i soldi, [[penali]] pagate e il [[conto|conto economico]] anno per anno. Operazioni: [[puntualita]], [[accuratezza]], [[saturazione]] e [[morale]] medi, i pallet movimentati e una tabella magazzino per magazzino. Clienti: quanto rende ogni cliente, la sua [[soddisfazione]], le soglie dei contratti e le [[gare]] vinte e perse. Persone: chi lavora per te, [[manager]], [[direzione|dirigenti]], [[welfare]] e [[alberi|alberi delle tecnologie]]. Modificatori: da cosa dipendono oggi [[puntualita]], [[accuratezza]] e [[morale]] di ogni magazzino, voce per voce; i [[talenti]] del CEO, dei manager e dei dirigenti con i loro effetti; le [[tecnologie]] ricercate e dove sono installate; gli effetti degli [[eventi]] ancora in corso, con la data di scadenza.
 
 I grafici si aggiornano alla fine di ogni mese, quando si chiudono i conti: ne servono almeno due per vedere una linea. I numeri di puntualità e accuratezza sono la media dei magazzini, non pesata sui volumi. Ogni riquadro si apre nell'enciclopedia.`);
 wk('tempo','basi','Tempo e velocità',`Il gioco avanza un giorno alla volta. Spazio mette in pausa, i tasti 1, 2 e 3 cambiano velocità.`,
@@ -1453,14 +1464,18 @@ function computeWH(wh,extra){
   if(capoShort) pA.push(['Capiturno insufficienti',-1*capoShort]); if(wh.coop) pA.push(['Facchini in cooperativa',COOP.A]);
   const P=clamp(pP.reduce((a,x)=>a+x[1],0),50,99.9), A=clamp(pA.reduce((a,x)=>a+x[1],0),50,99.9);
   const dHr=dirStat('hr');
-  const morT=clamp(58+0.6*(m.lead-10)+welfarePts('mor')+tMor+mMor+(R('academy')?3:0)+(dHr!=null?0.3*(dHr-10):0)-20*Math.max(0,uPick-1)-20*Math.max(0,uCar-1)-4*capoShort+(wh.coop?COOP.mor:0)-20*Math.max(0,Math.max(uB,uCE)-1)-0.5*sm.short,0,100);
+  // morale verso cui tende il magazzino: le voci servono anche al Riepilogo (scheda Modificatori)
+  const pM=[['Base',58],['Leadership di '+m.name.split(' ')[0],0.6*(m.lead-10)],['Welfare',welfarePts('mor')],['Tecnologie',tMor],['Eventi',mMor],['Academy aziendale',R('academy')?3:0],['Direttore risorse umane',dHr!=null?0.3*(dHr-10):0],
+    ['Magazzinieri insufficienti',-20*Math.max(0,uPick-1)],['Carrellisti insufficienti',-20*Math.max(0,uCar-1)],['Capiturno insufficienti',-4*capoShort],['Facchini in cooperativa',wh.coop?COOP.mor:0],
+    ['Autisti insufficienti',-20*Math.max(0,Math.max(uB,uCE)-1)],['Personale che non sta dietro all\'obiettivo di carico',-0.5*sm.short]].filter((x,i)=>i===0||Math.abs(x[1])>0.05);
+  const morT=clamp(pM.reduce((a,x)=>a+x[1],0),0,100);
   const rev=act.reduce((a,c)=>a+clientRev(c),0);
   const pers=ROLES.reduce((a,r)=>a+st[r]*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12;
   // bilici: gasolio, manutenzione e pedaggi; furgoni: consumano e costano meno, sempre in leasing
   const mezzi=giri*kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+giri*kmB*(0.12*S.fuel*fuelMul+0.06)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100+st.autB*900;
   const fissi=(wh.fixed+1000)*fixedMul();
   const need={pick:Math.max(cons?1:0,Math.ceil(cons*pickF/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp+sm.addImp,capo:needCapo};
-  return {act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,mixF,pickF,P,A,pP,pA,morT,rev,pers,mezzi,fissi,tCan,need,prod,m};
+  return {act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,mixF,pickF,P,A,pP,pA,pM,morT,rev,pers,mezzi,fissi,tCan,need,prod,m};
 }
 function globalCosts(){
   const emp=S.warehouses.reduce((a,w)=>a+staffTot(w),0)+S.office.plan;
@@ -1623,7 +1638,7 @@ function gameOver(){
 }
 
 /* ====================== EVENTI ====================== */
-function mod(scope,o,days){S.mods.push({scope,...o,until:S.day+days});}
+function mod(scope,o,days){S.mods.push({scope,...o,until:S.day+days,src:UI.modSrc||null});}  // src: titolo dell'evento, per il Riepilogo
 function anyWH(){return S.warehouses[0];}
 const hasTal=n=>ceo().tal.includes(n);
 const actC=()=>{const l=S.clients.filter(c=>c.status==='attivo');return l.length?pick(l):null;};
@@ -2270,7 +2285,17 @@ function rpCols(title,labels,vals,emptyTxt){
   g+=`<line x1="${ml}" x2="${ml+pw}" y1="${Y(0)}" y2="${Y(0)}" stroke="#16202e"/>`;
   const every=Math.ceil(n/6); labels.forEach((l,i)=>{if(i%every===0) g+=`<text x="${ml+i*bw+bw/2}" y="${H-10}" text-anchor="middle" class="lc-ax">${esc(l)}</text>`;});
   return `<figure class="lc"><figcaption><b>${esc(title)}</b><span class="lc-leg"><span class="lc-key"><svg width="10" height="10" aria-hidden="true"><rect width="10" height="10" fill="#2e9e48"/></svg>Utile</span><span class="lc-key"><svg width="10" height="10" aria-hidden="true"><rect width="10" height="10" fill="#e0393e"/></svg>Perdita</span></span></figcaption><svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(title)}" shape-rendering="crispEdges">${g}</svg></figure>`;}
-const RP_TABS=[['gen','Panoramica'],['soldi','Conti'],['op','Operazioni'],['cli','Clienti'],['pers','Persone']];
+// scheda Modificatori: una colonna di voci con il loro peso, come i tooltip dei KPI
+function rpParts(title,wiki,parts,tot,unit,lo,hi){
+  const raw=parts.reduce((a,x)=>a+x[1],0), cut=raw>hi+0.05?`tetto ${hi}${unit}`:raw<lo-0.05?`minimo ${lo}${unit}`:'';
+  return `<div class="card rp-mod"><span class="h3">${kw(wiki,title)}</span>${parts.filter((x,i)=>i===0||Math.abs(x[1])>=0.05).map(([n,v],i)=>`<div class="row"><span>${esc(n)}</span><b class="${i===0?'':v>0?'ok':'bad'}">${i===0?f1(v):(v>0?'+':'−')+f1(Math.abs(v))}${unit}</b></div>`).join('')}
+   <div class="row rp-tot"><span>Totale${cut?` <span class="sm">(${cut})</span>`:''}</span><b>${f1(tot)}${unit}</b></div></div>`;}
+const MOD_N={P:'Puntualità',A:'Accuratezza',mor:'Morale',sm:'Saturazione dei mezzi'};
+const modTxt=m=>Object.keys(MOD_N).filter(k=>m[k]).map(k=>`<span class="${m[k]>0?'ok':'bad'}">${MOD_N[k]} ${m[k]>0?'+':'−'}${f1(Math.abs(m[k])).replace(',0','')}</span>`).join(' · ');
+function rpPerson(p,role,extra){
+  return `<div class="rp-pp"><div class="rp-ppn"><b>${esc(p.name)}</b><span class="sm">${role}</span></div>${statChips(p.st,14)}${(p.tal||[]).length?talentIcons(p.tal,22):''}
+   ${(p.tal||[]).filter(n=>TALENTS[n]).map(n=>`<div class="sm rp-fx"><b>${esc(n)}</b>: ${esc(TALENTS[n].fx)}</div>`).join('')}${extra||''}</div>`;}
+const RP_TABS=[['gen','Panoramica'],['soldi','Conti'],['op','Operazioni'],['cli','Clienti'],['pers','Persone'],['mod','Modificatori']];
 const RP_COST=[['pers','Personale','#2f7fd6'],['mezzi','Mezzi e gasolio','#ff7a3d'],['fissi','Immobili e fissi','#7b4fe0'],['tech','Tecnologie','#1f9e8f'],['mgr','Manager','#c98a00'],['welf','Welfare','#c2185b'],['pen','Penali','#e0393e'],['altro','Altro','#8a96a6']];
 const costOf=h=>RP_COST.reduce((a,[k])=>a+(h[k]||0),0);
 
@@ -2515,6 +2540,31 @@ const VIEWS={
     <div class="card"><span class="h3">${kw('soddisfazione','Soddisfazione')} dei clienti</span>${rpBars(act.slice().sort((a,b)=>b.sat-a.sat).map(c=>({n:c.name,ic:logoSvg(c.name,18),v:c.sat,c:c.sat<40?'#e0393e':c.sat<60?'#e0a800':'#2e9e48',tip:`<div class='tt'>${esc(c.name)}</div>Sotto 25 disdice; per rinnovare serve almeno ${R('kam')?40:50}.`})),v=>Math.round(v),100)}</div></div>
     <div class="card"><span class="h3">Contratti</span><div class="rp-scroll"><table class="t num"><tr><th>Cliente</th><th>Magazzino</th><th class="r">${kw('puntualita','Punt.')} / soglia</th><th class="r">${kw('accuratezza','Accur.')} / soglia</th><th class="r">Scadenza</th></tr>
      ${[...act,...start].map(c=>{const w=whById(c.wh),k=w&&w.kpi; return `<tr><td><span style="display:inline-flex;gap:6px;align-items:center">${logoSvg(c.name,18)}${esc(c.name)}</span>${c.status==='avvio'?' <span class="pill">in partenza</span>':''}</td><td>${w?esc(w.name):''}</td><td class="r ${k?kpiCls(k.P,c.sP):''}">${k?f1(k.P):'—'} / ${f1(c.sP)}</td><td class="r ${k&&c.sA?kpiCls(k.A,c.sA):''}">${k?f1(k.A):'—'} / ${c.sA?f1(c.sA):'—'}</td><td class="r ${c.end-S.day<=60?'warn':''}">${shortDate(c.end)}</td></tr>`;}).join('')||'<tr><td colspan="5" class="sm">Nessun contratto.</td></tr>'}</table></div></div>`;
+  } else if(tab==='mod'){
+    const w=whById(UI.sel.rpwh)||ws[0]; UI.sel.rpwh=w.id; const k=computeWH(w), C=ceo();
+    const chips=ws.length>1?`<div class="xl-cli rp-whs">${ws.map(x=>`<button data-act="rpwh" data-id="${x.id}" aria-pressed="${x.id===w.id}">${esc(x.name)}</button>`).join('')}</div>`:'';
+    const mods=S.mods.filter(m=>m.until>S.day);
+    const logT=TECH.filter(t=>S.researched[t.id]&&t.tree==='log'), othT=TECH.filter(t=>S.researched[t.id]&&t.tree!=='log');
+    const mgrs=S.managers.filter(m=>m.hired), dirs=R('direzione')?DIR_ROLES.filter(r=>S.dirs[r.id]):[];
+    const fm=fixedMul(), wf=WELFARE.filter(x=>S.welfare[x.id]);
+    body=`<div class="card"><div class="row"><span class="h3">Da cosa dipendono i KPI</span><span class="sm">valori di oggi</span></div>${chips}
+     <div class="rp-mod3">${rpParts('Puntualità','puntualita',k.pP,k.P,'%',50,99.9)}${rpParts('Accuratezza','accuratezza',k.pA,k.A,'%',50,99.9)}${rpParts('Morale (obiettivo)','morale',k.pM,k.morT,'',0,100)}</div>
+     <div class="sm">Il morale non salta subito al valore obiettivo: ci si avvicina un po' ogni giorno (oggi a ${esc(w.name)} è ${Math.round(w.morale)}).</div></div>
+    <div class="card"><span class="h3">Personaggi e ${kw('talenti')}</span>
+     ${rpPerson(C,'CEO di '+esc(S.company.name)+(ws.some(x=>x.mgr==='ceo')?' · guida anche '+ws.filter(x=>x.mgr==='ceo').map(x=>esc(x.name)).join(', '):''),`<div class="sm rp-fx">In tutta l'azienda contano la sua Negoziazione nelle gare e la sua Innovazione nelle ricerche.</div>`)}
+     ${mgrs.map(m=>{const x=ws.find(y=>y.mgr===m.id); return rpPerson(m,x?`${kw('manager','Manager')} di ${esc(x.name)}`:'Manager senza magazzino');}).join('')}
+     ${dirs.map(r=>{const p=personById(S.dirs[r.id]), v=p.st[r.stat]; return rpPerson(p,kw('direzione',r.name),`<div class="rp-fx">${statBadge(r.stat,v,14)} <span class="${r.id==='tech'?'':v>10?'ok':v<10?'bad':''}">${esc(r.eff(v))}</span></div>`);}).join('')}
+     ${!mgrs.length&&!dirs.length?'<div class="sm">Per ora ci sei solo tu: i manager si assumono dal menu Personale, i dirigenti arrivano con la Struttura direzionale.</div>':''}</div>
+    <div class="card"><span class="h3">${kw('tecnologie','Tecnologie')} ricercate</span>
+     ${logT.length||othT.length?'':'<div class="sm">Nessuna tecnologia ancora: si ricercano dalla finestra Tecnologia.</div>'}
+     ${logT.map(t=>`<div class="rp-tr">${techIcon(t,24)}<div><b>${esc(t.name)}</b> <span class="sm">${esc(t.desc)}</span><div class="rp-inst">${ws.map(x=>{const f=x.tech[t.id]?techFactor(x,t):null; return `<span class="pill ${f==null?'':f>0?'ok':'warn'}">${esc(x.name)}: ${f==null?'da installare':f>0?'attiva':'in apprendimento, effetto −50%'}</span>`;}).join('')}</div></div></div>`).join('')}
+     ${othT.map(t=>`<div class="rp-tr">${techIcon(t,24)}<div><b>${esc(t.name)}</b> <span class="sm">${esc(t.desc)}</span><div class="rp-inst"><span class="pill ok">tutta l'azienda</span></div></div></div>`).join('')}</div>
+    <div class="lc-row"><div class="card"><span class="h3">Effetti degli ${kw('eventi')}</span>
+      ${mods.length?mods.map(m=>`<div class="rp-ev"><b>${esc(m.src||'Evento')}</b><span>${modTxt(m)}</span><span class="sm">${m.scope==='all'?'tutti i magazzini':esc((whById(m.scope)||{name:'magazzino chiuso'}).name)} · fino al ${shortDate(m.until)}</span></div>`).join(''):'<div class="sm">Nessun effetto in corso.</div>'}</div>
+     <div class="card"><span class="h3">${kw('welfare')} e organizzazione</span>
+      ${wf.map(x=>`<div class="row"><span>${esc(x.name)}</span><b class="ok">morale +${x.mor}</b></div>`).join('')||'<div class="sm">Nessuna iniziativa di welfare.</div>'}
+      ${ws.filter(x=>x.coop).map(x=>`<div class="row"><span>${kw('cooperativa','Cooperativa')} a ${esc(x.name)}</span><b class="bad">accuratezza ${f1(COOP.A)} · morale ${COOP.mor}</b></div>`).join('')}
+      <div class="row"><span>Costi fissi degli immobili</span><b class="${fm<1?'ok':fm>1?'bad':''}">${fm===1?'nessuno sconto':(fm<1?'−':'+')+f1(Math.abs(1-fm)*100)+'%'}</b></div></div></div>`;
   } else {
     const rolesAll=[...ROLES,'plan'].map(r=>({n:ROLE[r],v:r==='plan'?S.office.plan:ws.reduce((a,w)=>a+w.staff[r],0),c:'#ff7a3d',tip:`<div class='tt'>${ROLE[r]}</div>${ROLE_D[r]}`}));
     const mg=S.managers.filter(m=>m.hired).length, dr=Object.values(S.dirs).filter(Boolean).length, wf=WELFARE.filter(w=>S.welfare[w.id]).length;
@@ -2697,6 +2747,7 @@ const ACT={
  hiremgr(d){const m=S.managers.find(x=>x.id===d.id);m.hired=true;toast(`${m.name} entra in azienda: assegnalo a un magazzino o alla direzione`,'ok');const w=S.warehouses.find(w=>!w.mgr);if(w){w.mgr=m.id;m.wh=w.id;}renderAll();},
  firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});m.hired=false;m.wh=null;renderAll();},
  selcli(d){UI.sel.cli=d.id;UI.sel.cell='A1';renderWin('report');},
+ rpwh(d){UI.sel.rpwh=d.id;renderWin('riepilogo');},
  rptab(d){UI.tab.rp=d.id;renderWin('riepilogo');},
  sheet(d){UI.sel.sheet=d.id;UI.sel.cell='A1';renderWin('report');},
  cell(d){UI.sel.cell=d.ref;renderWin('report');},
@@ -2730,7 +2781,7 @@ const ACT={
  bidmult(d,el){UI.bid.mult=(+el.value)/100;const sel=S.tenders.find(t=>t.id===UI.bid.t);$('#bidmv').textContent=(UI.bid.mult>=1?'+':'')+Math.round((UI.bid.mult-1)*100)+'%';$('#bidest').innerHTML=bidEstHtml(sel,bidEstimate(sel,UI.bid.wh,UI.bid.mult));},
  bid(d){const t=S.tenders.find(x=>x.id===d.id);t.bid={wh:UI.bid.wh,mult:UI.bid.mult};toast(`Offerta inviata per ${t.name}`,'ok');renderAll();},
  withdraw(d){const t=S.tenders.find(x=>x.id===d.id);t.bid=null;renderAll();},
- evopt(d){const ev=UI.ev;const o=ev.opts[+d.i];o.f.call(ev);S.rep=clamp(S.rep,0,100);closeModal();news(ev.src,ev.title,`${ev.text} Scelta: «${o.t}». ${o.d||''}`.trim());renderAll();},
+ evopt(d){const ev=UI.ev;const o=ev.opts[+d.i];UI.modSrc=ev.title;try{o.f.call(ev);}finally{UI.modSrc=null;}S.rep=clamp(S.rep,0,100);closeModal();news(ev.src,ev.title,`${ev.text} Scelta: «${o.t}». ${o.d||''}`.trim());renderAll();},
  choice(d){const f=UI.choice[+d.i];closeModal();f();renderAll();},
  closemodal(){closeModal();},
  wiki(d,el){
@@ -2865,6 +2916,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.13',t:'Sotto il cofano',x:['Nel Riepilogo la scheda Modificatori: da cosa dipendono puntualità, accuratezza e morale di ogni magazzino, voce per voce.','Talenti di CEO, manager e dirigenti con i loro effetti, tecnologie e dove sono installate, effetti degli eventi in corso con la scadenza.']},
  {v:'0.12',t:'Tutti i numeri',x:['Nuova finestra Riepilogo dell\'azienda con cinque schede: panoramica, conti, operazioni, clienti e persone.','Grafici della cassa, dei ricavi e dei costi, dell\'utile di ogni mese, dei KPI e dei dipendenti.']},
  {v:'0.11',t:'Si parte col camioncino',x:['Schermata introduttiva: un camioncino entra in scena con il pallet dell\'icona.','Elenco delle novità nella schermata iniziale.']},
  {v:'0.10',t:'Contratti e penali',x:['8 nuovi clienti e gare sempre aperte.','Contratti con una durata: alla scadenza il cliente può non rinnovare, e può anche recedere prima.','Penali da contratto solo per alcuni clienti, in percentuale per ogni punto sotto soglia.']},
@@ -2981,6 +3033,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr};
+window.__FUP={get S(){return S;},step,mod,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr};
 })();
 </script>

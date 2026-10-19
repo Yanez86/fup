@@ -61,8 +61,9 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - La finestra "Report KPI" imita un foglio Excel: un foglio di riepilogo, un foglio per ogni magazzino, la barra della formula che spiega la cella selezionata e i colori condizionali. Verde = sopra la soglia più severa tra i clienti del magazzino, giallo = entro 2 punti, rosso = sotto.
 
 ## Riepilogo dell'azienda
-- Finestra dal menu a sinistra con cinque schede: Panoramica, Conti, Operazioni, Clienti, Persone. Solo lettura: non cambia nessuna regola del gioco.
+- Finestra dal menu a sinistra con sei schede: Panoramica, Conti, Operazioni, Clienti, Persone, Modificatori. Solo lettura: non cambia nessuna regola del gioco.
 - A fine mese `histPush()` aggiunge una riga a `S.hist` (fino a 240 mesi): voci del conto economico, utile, cassa, reputazione, medie dei magazzini di Puntualità e Accuratezza del mese, saturazione e morale, pallet movimentati e viaggi (somma dei report settimanali del mese), dipendenti per mestiere, clienti attivi, magazzini, pallet a stock e capienza.
+- Scheda Modificatori: le voci di Puntualità, Accuratezza e morale obiettivo vengono da `computeWH()` (`pP`, `pA`, `pM`: il morale obiettivo è la somma di `pM`, limitata tra 0 e 100). Gli effetti degli eventi (`S.mods`) ricordano il titolo dell'evento in `src`.
 - `S.tw` conta le gare vinte, perse e lasciate senza offerta. I salvataggi vecchi partono con storico vuoto (`fillSave`).
 - Puntualità e Accuratezza "medie" sono la media semplice dei magazzini, non pesata sui volumi. Il margine per magazzino è ricavi meno personale, mezzi e immobile (senza tecnologie, manager e sede).
 - Grafici: `lineChart()` con `nice` (scala libera con passi 1-2-5, per euro e pallet), `fmt`/`ax` per i formati e `maxLab` per le etichette dei mesi; l'utile mensile è un grafico a colonne verdi/rosse (`rpCols()`).
