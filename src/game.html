@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="FUP">
 <link rel="apple-touch-icon" href="icona_180.png">
 <link rel="icon" type="image/png" href="{{ICON}}">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Rubik:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: mappa a tutto schermo con pan e zoom, barra risorse in alto, menu a sinistra, finestre fluttuanti trascinabili sopra. Look unico (pixel art chiara su mappa), senza tema scuro alternativo. */
 :root{
@@ -23,7 +23,7 @@
   --ok:#2e9e48; --ok-d:#217a36; --ok-t:#23803a; --warn:#e8a317; --warn-d:#b97f0c; --warn-t:#9a6a00; --bad:#e0393e; --bad-d:#a8262a; --bad-t:#c62828;
   --yellow:#ffd23f; --sea:#1b64ad;
   --f-disp:'Pixelify Sans', 'Courier New', monospace;
-  --f-body:'IBM Plex Sans Condensed', 'Arial Narrow', Arial, sans-serif;
+  --f-body:'Rubik', 'Trebuchet MS', Arial, sans-serif;
   color-scheme: light;
 }
 /* sfondo scuro come la barra e il menu: su iPhone si vede sotto la barra di stato e sotto il menu, dove la mappa non arriva */
@@ -3273,7 +3273,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.18',t:'Il futuro è adesso',x:['Le tecnologie non hanno più un anno minimo: si possono ricercare subito, basta avere quelle che le precedono nell\'albero.','Creando il CEO, titoli di studio e talenti sono schede leggibili: icona, effetti, testo di colore e un badge col costo in punti.']},
+ {v:'0.18',t:'Il futuro è adesso',x:['Le tecnologie non hanno più un anno minimo: si possono ricercare subito, basta avere quelle che le precedono nell\'albero.','Creando il CEO, titoli di studio e talenti sono schede leggibili: icona, effetti, testo di colore e un badge col costo in punti.','Nuovo carattere per i testi (Rubik): più largo e arrotondato, si legge meglio, soprattutto sul telefono.']},
  {v:'0.17',t:'Chi ripara il portone?',x:['Le novità ora stanno in fondo alla schermata iniziale.','Nuova figura in ogni magazzino: il facility manager. Senza di lui niente manutenzione, il magazzino si rovina e capitano guasti.','Lo stato del magazzino va da 0 a 100: sotto il 70% si perdono posti pallet e produttività.','Manutenzione straordinaria per tornare subito al 100%.','I magazzini si possono ampliare fino a tre volte, con un cantiere di 90 giorni.','12 nuovi servizi di welfare: caffè, sala pausa, spogliatoi, lavanderia, palestra, presidio medico, sportello d\'ascolto, corsi di italiano, raffrescatori, orto, colonnine di ricarica.']},
  {v:'0.16',t:'Tutto il Nord',x:['La mappa arriva fino a Trieste: Emilia-Romagna, Veneto, Trentino-Alto Adige e Friuli-Venezia Giulia sono giocabili, con 22 nuove città e 47 province nella lente.','10 nuovi magazzini in affitto, da Piacenza Le Mose a Trieste Fernetti.','14 nuove committenti: prosciutto, ceramica, motori, piadine, spumanti, occhiali, mele, caffè, cucine, scarponi e altro.','Gare per zona: una provincia, un gruppo di province (Romagna, Pianura Padana, Asse del Brennero…), una regione o più regioni. La stessa committente può aprire più gare per zone diverse e avere più contratti con te.','I volumi di una gara dipendono dagli abitanti della zona.']},
  {v:'0.15',t:'Acqua, frutta e asilo',x:['Nuovo albero Welfare: boccioni d\'acqua, servizio frutta, mensa, pulmini per i dipendenti, asilo aziendale e area cani.','I servizi di welfare si ricercano una volta e poi si installano magazzino per magazzino: alzano il morale e accorciano le assunzioni in quel sito.','Ogni tecnologia ha ora una breve descrizione di cosa è, oltre all\'effetto.']},
