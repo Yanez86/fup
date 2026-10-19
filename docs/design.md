@@ -39,8 +39,10 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - **Approvvigionamento** (`CINFO.src`, `ORIGINS`): da dove arriva la merce. Con `ritiro` andiamo noi a prenderla: ceil(pallet/33) viaggi a pieno carico, ciascuno di 2 × distanza × 1,3 + 20 km. Così servono più autisti e più gasolio, ma c'è anche più fatturato. Con `consegna` la merce la porta il cliente e per noi non ci sono costi.
 - Sulla mappa, "Mostra sulla mappa" dalla finestra Clienti disegna le linee verso la zona e la linea di arrivo della merce (arancione se il ritiro è nostro, bianca se consegna il cliente).
 - **Lenti della mappa** (`LENSES`, pulsanti in basso a destra o tasto L): cambiano cosa mostra la mappa, come le modalità mappa dei giochi Paradox. Per ora: *Mappa normale* e *Province* (le 25 province di Piemonte, Valle d'Aosta, Lombardia e Liguria con sigla, colori diversi tra province confinanti e bordo più spesso dove hai un magazzino; il tooltip mostra regione, capoluogo, tuoi magazzini e siti in affitto). Sono solo visualizzazione, non cambiano le regole.
-- Soddisfazione a fine mese: se entrambi i KPI sono sopra soglia +3 (+1 con EDI, +1 con KAM); entro 2 punti sotto la soglia −4; più sotto −10 e penale del 5%. Sotto 25 il cliente se ne va.
-- Rinnovo a 24 mesi se la soddisfazione è ≥ 50 (≥ 40 con KAM).
+- Soddisfazione a fine mese: se entrambi i KPI sono sopra soglia +3 (+1 con EDI, +1 con KAM); entro 2 punti sotto la soglia −4; più sotto −10. Sotto 25 il cliente se ne va.
+- **Penali da contratto** (`PEN_PCT`, solo alcuni clienti): fatturato mensile × min(20%; % del contratto × punti sotto soglia), dove i punti sono la somma di quelli mancanti in Puntualità e Accuratezza della media del mese. Dall'1% al 5% per punto; chi non è in `PEN_PCT` non ha penali.
+- **Durata del contratto** (`DUR_RANK`, scelta a caso nella gara): S 24/36/36 mesi, A 24/36, B 12/24/36, C 12/24, D 12/24, F 12/12/24. Due mesi prima della scadenza arriva un avviso. Alla scadenza rinnovo per la stessa durata se la soddisfazione è ≥ 50 (≥ 40 con KAM). Con **Non rinnovare** (`c.noRenew`) il cliente se ne va alla scadenza senza penali.
+- **Recesso anticipato** (`exitTerms`, `exitClient`): penale = fatturato mensile × clamp(2 + 0,25 × mesi rimasti; 2; 8), reputazione −ceil(perdita del rank / 2), preavviso 60 giorni (90 per S e A) in cui il cliente resta attivo e il magazzino ha Accuratezza −1 per ogni cliente in uscita. Il giorno dell'uscita (`EXIT_RISK`): 45% tutto liscio, 25% differenze inventariali (posti × 4-10 €, peso +5 per ogni punto di Accuratezza sotto 97), 15% ultima fattura non pagata (1 mese), 10% nuovo operatore in ritardo (+21 giorni, una volta sola), 5% causa legale (8.000 € e reputazione −2). Prima dell'avvio si può rinunciare: 2 mesi di penale, subito.
 
 ## Rank delle committenti
 - Ogni committente ha un **rank** da S (le migliori) a F (le peggiori), mostrato come medaglia in pixel art (`rankIcon()`) nelle gare, nella lista clienti e nella scelta del CEO; il tooltip mostra i quattro voti.
@@ -59,7 +61,7 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - La finestra "Report KPI" imita un foglio Excel: un foglio di riepilogo, un foglio per ogni magazzino, la barra della formula che spiega la cella selezionata e i colori condizionali. Verde = sopra la soglia più severa tra i clienti del magazzino, giallo = entro 2 punti, rosso = sotto.
 
 ## Gare (tender)
-- Arriva una gara ogni 28-46 giorni (20-35 con l'Ufficio commerciale). Alcune richiedono tecnologie: catena del freddo, EDI, e-commerce.
+- Ci sono sempre almeno 2 gare aperte, 3 con l'Ufficio commerciale (`minTenders()`): quando una si chiude ne arriva subito un'altra, se ci sono committenti libere. Si hanno 45 giorni per l'offerta (circa 16 gare l'anno, 24 con l'Ufficio commerciale). Alcune richiedono tecnologie: catena del freddo, EDI, e-commerce.
 - Punteggio = 50 + (1−moltiplicatore)·120 + margine P·4 + margine A·4 (ciascuno tra −20 e +10) + (reputazione−50)·0,4 + (Negoziazione CEO−10) + direttore commerciale·0,8·(Neg−10) + ISO 3. Si confronta con 55 + difficoltà della gara + modificatore del rank, con probabilità logistica (scala 6).
 
 ## Personale e recruiting
