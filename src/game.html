@@ -239,6 +239,35 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .ceo[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 3px var(--accent), 4px 4px 0 var(--ink)}
 .sw{width:30px;height:30px;border:3px solid var(--ink)}
 .ceos.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+
+/* Schermata introduttiva: il camioncino porta il pallet dell'icona */
+#intro:empty{display:none}
+#intro{position:fixed;inset:0;z-index:90;overflow:hidden;cursor:pointer;color:#fff3c4;display:flex;flex-direction:column;align-items:stretch;transition:opacity .5s;background:linear-gradient(#141d2b 0 25%,#1d2a3b 25% 55%,#24344a 55%)}
+#intro.out{opacity:0}
+#intro .road{position:relative;flex:1 0 30%;background:#2a3a50;border-top:6px solid #16202e;box-shadow:inset 0 6px 0 #4a5f7a;padding:min(26px,4vh) 16px 12px}
+#intro .road::after{content:'';position:absolute;left:0;right:0;bottom:22%;height:6px;background:repeating-linear-gradient(90deg,#ffd23f 0 36px,transparent 36px 72px);animation:introRoad .4s linear 6}
+#intro .lane::before{content:'';position:absolute;left:0;right:0;bottom:0;height:45%;background:#2a3a50;opacity:.7;clip-path:polygon(0 100%,0 60%,8% 20%,16% 55%,27% 10%,38% 50%,50% 0,61% 45%,72% 15%,84% 55%,93% 25%,100% 50%,100% 100%)}
+#intro .ttl{position:relative;flex:1 1 auto;display:flex;flex-direction:column;justify-content:flex-end;padding:16px 16px 18px;text-align:center;opacity:0;animation:introPop .5s 2s forwards}
+#intro h1{margin:0;font-family:var(--f-disp);font-size:min(clamp(56px,12vw,110px),14vh);line-height:.9;color:#ffd23f;text-shadow:6px 6px 0 #0c131d;letter-spacing:4px}
+#intro .sub{font-family:var(--f-disp);font-size:min(clamp(20px,4vw,30px),6vh);margin-top:6px}
+#intro .lane{position:relative;flex:none;width:100%;height:min(clamp(130px,24vw,230px),30vh);margin-bottom:-2px}
+#intro .truck{position:absolute;left:50%;bottom:0;height:100%;transform:translateX(-50%);animation:introIn 2.2s cubic-bezier(.2,.7,.3,1) forwards}
+#intro .truck svg{height:100%;width:auto;display:block;animation:introBump .18s steps(2) 12;filter:drop-shadow(6px 6px 0 rgba(12,19,29,.55))}
+#intro .puff{position:absolute;left:-2%;bottom:14%;width:5%;aspect-ratio:1;background:#c3d0dc;opacity:0;animation:introPuff .5s steps(3) 4}
+#intro.go .truck{animation:introOut .7s cubic-bezier(.6,0,.9,.4) forwards}
+#intro .bot{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:introPop .4s 2.4s forwards}
+#intro .bot .btn{font-size:20px;padding:12px 26px}
+#intro .ver{font-size:14px;color:#c3d0dc}
+.land #intro .bot .btn{padding:8px 22px} .land #intro .ttl{padding-bottom:8px}
+@keyframes introIn{from{transform:translateX(calc(-50vw - 110%))}to{transform:translateX(-50%)}}
+@keyframes introOut{from{transform:translateX(-50%)}to{transform:translateX(60vw)}}
+@keyframes introBump{50%{transform:translateY(-3%)}}
+@keyframes introPuff{0%{opacity:.8;transform:translate(0,0)}100%{opacity:0;transform:translate(-120%,-60%) scale(1.6)}}
+@keyframes introRoad{to{background-position:-72px 0}}
+@keyframes introPop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){#intro *,#intro .truck svg{animation:none!important;opacity:1!important} #intro .truck{transform:translateX(-50%)!important}}
+.news summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.news ul{margin:6px 0 0;padding-left:20px;line-height:1.45} .news h4{margin:10px 0 0;font-family:var(--f-disp);font-size:16px}
 .ccbox{gap:10px}
 .cc-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
 .cc-por{display:flex;align-items:center;gap:6px}
@@ -396,6 +425,7 @@ html,body{overscroll-behavior:none}
 <div id="tip" hidden></div>
 <div id="modal"></div>
 <div id="start"></div>
+<div id="intro"></div>
 
 <script>
 (function(){
@@ -2803,12 +2833,52 @@ function stepVisura(){
 function stampSvg(){const c='#c2273a';
   return `<svg width="150" height="150" viewBox="0 0 150 150"><defs><path id="tc" d="M75,75 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1 -104,0"/></defs>
    <circle cx="75" cy="75" r="70" fill="none" stroke="${c}" stroke-width="5"/><circle cx="75" cy="75" r="40" fill="none" stroke="${c}" stroke-width="2"/>
-   <text font-family="Pixelify Sans, monospace" font-size="13" fill="${c}" letter-spacing="1"><textPath href="#tc">CAMERA DI COMMERCIO ★ NORD-OVEST ★</textPath></text>
-   <rect x="14" y="62" width="122" height="26" fill="#fff" stroke="${c}" stroke-width="3"/>
-   <text x="75" y="82" text-anchor="middle" font-family="Pixelify Sans, monospace" font-weight="700" font-size="20" fill="${c}">ISCRITTA</text>
+   <text font-family="Pixelify Sans, monospace" font-size="13" fill="${c}"><textPath href="#tc" textLength="318" lengthAdjust="spacing">CAMERA DI COMMERCIO ★ NORD-OVEST ★</textPath></text>
+   <rect x="31" y="63" width="88" height="24" fill="#fff" stroke="${c}" stroke-width="3"/>
+   <text x="75" y="81" text-anchor="middle" font-family="Pixelify Sans, monospace" font-weight="700" font-size="17" fill="${c}">ISCRITTA</text>
    <text x="75" y="104" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="11" fill="${c}">02·01·2002</text></svg>`;}
 const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['#3dd6c4','#1f9e8f','#9cefe5'],['#9b6bff','#6f43cf','#c8adff']];
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
+/* --- Novità: un minimo di changelog, la versione più recente in cima --- */
+const CHANGELOG=[
+ {v:'0.12',t:'Curriculum e visura',x:['La creazione del CEO va a passaggi: identità (con soprannome e motto), abilità, studi e carattere.','Alla fine il CEO firma il suo curriculum vitae in formato europeo.','Ogni azienda ha logo, claim e colore, e si iscrive alla Camera di Commercio con tanto di timbro.']},
+ {v:'0.11',t:'Si parte col camioncino',x:['Schermata introduttiva: un camioncino entra in scena con il pallet dell\'icona.','Elenco delle novità nella schermata iniziale.']},
+ {v:'0.10',t:'Contratti e penali',x:['8 nuovi clienti e gare sempre aperte.','Contratti con una durata: alla scadenza il cliente può non rinnovare, e può anche recedere prima.','Penali da contratto solo per alcuni clienti, in percentuale per ogni punto sotto soglia.']},
+ {v:'0.9',t:'Carattere e racconti',x:['31 nuovi talenti di carattere e 40 eventi legati ai talenti del CEO.','Eventi raccontati meglio, con risposte che spiegano cosa succede.']},
+ {v:'0.8',t:'In tasca',x:['Si gioca anche sul telefono, in verticale e in orizzontale.','FUP si installa come app e funziona senza rete.','Pulsante Opzioni con «Esci dal gioco».']},
+ {v:'0.7',t:'Crea il tuo CEO',x:['Nome, ritratto, abilità, titolo di studio (33 a scelta) e carattere.','Tooltip sempre in primo piano.']},
+ {v:'0.6',t:'Canali e mezzi',x:['Canali di distribuzione dei clienti: GDO, Horeca, Dettaglio, E-commerce, Industria.','Sinergia in pianificazione e saturazione dei mezzi con obiettivo minimo.']},
+ {v:'0.5',t:'Il personale',x:['Cinque mestieri: magazzinieri, carrellisti, impiegati, autisti B e CE.','Capiturno, pianificatori del traffico e cooperativa di facchinaggio.']},
+ {v:'0.4',t:'Nuove committenti',x:['12 nuovi clienti e nomi senza rimandi a marchi veri.','Rank dei clienti da S a F e accordi quadro nazionali.']},
+ {v:'0.3',t:'Enciclopedia e lenti',x:['Enciclopedia di gioco e parole chiave con tooltip.','Lenti della mappa, a partire dalle province.']},
+ {v:'0.2',t:'Report KPI',x:['Report settimanale in stile foglio di calcolo con grafici di Puntualità e Accuratezza.','Loghi dei clienti, zone di distribuzione e provenienza della merce.']},
+ {v:'0.1',t:'Primo pallet',x:['Prototipo giocabile: mappa del Nord-Ovest, gare, magazzini, tecnologie ed eventi.']},
+];
+const VER=CHANGELOG[0].v;
+function newsCard(){const L=CHANGELOG[0];
+  return `<details class="card news"><summary>Novità della versione ${VER}: ${esc(L.t)} <span class="sm">· ${TOUCH?'tocca':'clicca'} per l'elenco completo</span></summary>
+   ${CHANGELOG.map(c=>`<h4>${c.v} · ${esc(c.t)}</h4><ul>${c.x.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`).join('')}</details>`;}
+/* --- schermata introduttiva: camioncino in pixel art (56x48) con il collo e il pallet dell'icona --- */
+function introTruck(){let r='';const R=(x0,y0,x1,y1,c)=>{r+=`<rect x="${x0}" y="${y0}" width="${x1-x0+1}" height="${y1-y0+1}" fill="${c}"/>`;};
+  const K=TPAL.K,cab='#3d8fd6',cabD='#2a6aa8';
+  // collo e pallet, disegnati come in tools/icone.py
+  R(7,18,24,29,K);R(8,19,23,28,TPAL.O);R(8,19,23,19,'#ffb07a');R(23,19,23,28,'#c8551f');R(8,28,23,28,'#c8551f');R(15,19,16,28,TPAL.C);R(11,22,13,23,'#c8551f');
+  R(5,29,26,33,K);R(6,30,25,31,TPAL.N);R(6,32,25,33,'#1d2a3b');[6,14,22].forEach(x=>R(x,32,x+3,33,TPAL.M));R(5,34,26,34,K);
+  // pianale, sponda e telaio
+  R(1,35,35,38,K);R(2,35,34,36,TPAL.D);R(2,35,34,35,TPAL.S);R(31,22,34,35,K);R(32,23,33,34,TPAL.D);
+  // cabina
+  R(35,19,50,41,K);R(51,23,53,41,K);R(36,20,49,40,cab);R(50,24,52,40,cab);R(36,20,48,20,'#8fc6f2');
+  R(43,22,51,30,K);R(44,23,50,29,TPAL.L);R(45,23,46,24,TPAL.W);R(41,22,41,39,cabD);R(38,31,39,31,K);
+  R(36,35,52,36,TPAL.O);R(52,33,53,34,TPAL.Y);R(50,39,54,41,K);R(51,40,53,40,TPAL.S);R(36,40,49,40,cabD);
+  // ruote
+  [10,44].forEach(x=>{R(x-2,40,x+2,47,K);R(x-3,41,x+3,46,K);R(x-1,42,x+1,45,TPAL.S);R(x,43,x,44,TPAL.D);});
+  return `<svg viewBox="0 0 56 48" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
+function showIntro(){
+  $('#intro').innerHTML=`<div class="ttl"><h1>FUP</h1><div class="sub">Fino all'ultimo pallet</div></div>
+   <div class="lane"><div class="truck"><div class="puff"></div>${introTruck()}</div></div>
+   <div class="road"><div class="bot"><button class="btn pri" data-act="introgo">${TOUCH?'Tocca':'Clicca'} per entrare</button><span class="ver">Versione ${VER} · ${esc(CHANGELOG[0].t)}</span></div></div>`;
+  $('#intro').dataset.act='introgo';
+}
 function stepScelta(){const sv=load();
   const st=CEOS.map(c=>{const s=SITES[c.site];return `<button class="ceo" data-act="pickceo" data-id="${c.id}" aria-pressed="${startSel.ceo===c.id}">
     <div class="portrait" style="height:150px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden"><img class="px" src="${IMG[c.id]}" alt="Ritratto di ${esc(c.name)}" width="128" height="150"></div>
@@ -2823,6 +2893,7 @@ function stepScelta(){const sv=load();
     ${cc?`<span>${statChips(ccStats(cc),14)}</span>${talentIcons(ccTal(cc),32)}`:`<span class="sm" style="color:var(--ink)">${CC_PTS} punti da distribuire tra abilità e talenti</span>`}</button>`;})();
   return `<div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
    <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord-Ovest. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
+   ${newsCard()}
    ${installCard()}
    ${sv&&sv.S&&!sv.S.over?`<div class="card pend"><div class="row"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><button class="btn pri" data-act="continue">Continua la partita</button></div></div>`:''}
    <div class="lab">Scegli il tuo CEO</div><div class="ceos five">${st}</div>`;}
@@ -2831,7 +2902,7 @@ function showStart(){
   const body={scelta:stepScelta,cc1:stepCC1,cc2:stepCC2,cc3:stepCC3,cv:stepCV,az:stepAz,visura:stepVisura}[k]();
   const next={scelta:nextBtn(startSel.ceo==='custom'?'Crea il CEO':'Avanti: l\'azienda'),cc1:nextBtn('Avanti: abilità'),cc2:nextBtn('Avanti: studi e carattere'),cc3:nextBtn('Vedi il curriculum'),cv:nextBtn('Confermo, è tutto vero'),az:nextBtn('Iscrivi alla Camera di Commercio'),
     visura:startSel.stamp?`<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Inizia la partita ›</button>`:`<button class="btn pri" data-act="stamp" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Timbra la visura</button>`}[k];
-  $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP</span><span>Nord-Ovest, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
+  $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP · versione ${VER}</span><span>Nord-Ovest, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
    ${k!=='scelta'?stepper():''}${body}${stNav(next)}</div></div>`;
   if(lastStep!==k){$('#start').scrollTop=0;lastStep=k;}
 }
@@ -2860,6 +2931,7 @@ function stValid(k){const cc=startSel.cc;
   return '';}
 function stGo(to){startSel.step=to;startSel.err='';startSel.stamp=false;showStart();}
 Object.assign(ACT,{
+ introgo(){const el=$('#intro');if(!el.innerHTML||el.classList.contains('go'))return;el.classList.add('go','out');setTimeout(()=>{el.innerHTML='';el.className='';delete el.dataset.act;const b=$('#start [data-act=startgame]');if(b)b.focus({preventScroll:true});},matchMedia('(prefers-reduced-motion: reduce)').matches?0:600);},
  installapp(){if(!installEvt)return;startKeep();installEvt.prompt();installEvt.userChoice.finally(()=>{installEvt=null;showStart();});},
  pickceo(d){startKeep();startSel.ceo=d.id;startSel.err='';if(d.id==='custom'){if(!startSel.cc)startSel.cc=ccNew();stGo('cc1');return;}showStart();},
  pickcolor(d){startKeep();startSel.color=d.c;applyColor(d.c);showStart();},
@@ -2897,7 +2969,7 @@ let lastSync=0; function syncTrucksMaybe(){if(S.day-lastSync>=7){lastSync=S.day;
 setMobile(); initMapControls(); if(document.fonts) document.fonts.ready.then(layoutVars);
 const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
-function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else showStart(); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
+function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
 window.__FUP={get S(){return S;},step,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS};
 })();

@@ -39,11 +39,20 @@ PINCH = r'''()=>{const mw=document.querySelector('#mapwrap'), m=document.querySe
 FITS = '''(sel)=>{const r=document.querySelector(sel).getBoundingClientRect();
   return r.left>=-1&&r.top>=-1&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1&&document.documentElement.scrollWidth<=innerWidth;}'''
 
+async def intro(pg, shot):
+    # schermata introduttiva: il camioncino arriva, poi un tocco la chiude e resta la schermata iniziale
+    await pg.wait_for_timeout(2900)
+    await pg.screenshot(path=os.path.join(OUT, shot))
+    assert await pg.evaluate(FITS, '#intro [data-act=introgo]'), f'{shot}: pulsante della schermata introduttiva fuori schermo'
+    await pg.tap('#intro') if await pg.evaluate("navigator.maxTouchPoints>0") else await pg.click('#intro')
+    await pg.wait_for_selector('#intro:empty', state='attached')
+
 async def phone(b, w, h, name, errs):
     ctx = await b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, is_mobile=True, has_touch=True)
     pg = await ctx.new_page(); pg.on('pageerror', lambda e: errs.append(f'{name}: {e}'))
     await pg.goto('file://' + PAGE)
     assert await pg.evaluate("document.documentElement.classList.contains('mob')"), 'layout telefono non attivo'
+    await intro(pg, f'shot_tel_{name}_intro.png')
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_avvio.png'))
     # creazione del CEO e dell'azienda a passaggi: ogni schermata deve stare nella larghezza del telefono
     await pg.tap('[data-act=pickceo][data-id=custom]')
@@ -89,6 +98,11 @@ async def main():
         pg = await b.new_page(viewport={'width': 1440, 'height': 860})
         pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + PAGE)
+        await intro(pg, 'shot_intro.png')
+        await pg.click('#start .news summary')
+        assert await pg.evaluate("document.querySelector('#start .news').open"), 'elenco delle novità non si apre'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_novita.png'))
+        await pg.click('#start .news summary')
         # i tooltip devono stare sopra a tutto: schermata iniziale (talenti dei CEO) e finestre aperte
         TIP_ON_TOP = '''(()=>{const t=document.querySelector('#tip'),r=t.getBoundingClientRect();t.style.pointerEvents='auto';const e=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);t.style.pointerEvents='';return !t.hidden&&!!e&&!!e.closest('#tip');})()'''
         await pg.hover('#start .ceo[data-id=edoardo] .tal')
@@ -208,7 +222,7 @@ async def main():
           const w=S.warehouses[0]; w.staff={mag:5,aut:3}; S.imp=3; S.queue=[{role:'imp',wh:null,days:5},{role:'aut',wh:w.id,days:9}];
           S.clients.push({...S.clients[0],id:'cx',name:'Tuttosubito Italia',zone:'nordovest',pal:400});
           F.save(); return true;}''')
-        await pg.evaluate('()=>location.reload()'); await pg.wait_for_selector('[data-act=continue]')
+        await pg.evaluate('()=>location.reload()'); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached'); await pg.wait_for_selector('[data-act=continue]')
         await pg.click('[data-act=continue]'); await pg.evaluate(CLEAR)
         st = await pg.evaluate('''()=>{const S=window.__FUP.S;return {st:S.warehouses[0].staff,imp:S.imp,q:S.queue.map(q=>q.role+String.fromCharCode(58)+!!q.wh)}}''')
         assert st['imp'] is None and sum(st['st'].values()) == 8+3 and st['st']['autB'] > 0, st
