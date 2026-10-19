@@ -52,7 +52,7 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 
 ## Stile
 - Testi del gioco in italiano, tono ironico ma da settore (gergo logistico reale: pallet, picking, WMS, soglie KPI, tender).
-- Nomi di aziende e clienti: parodie riconoscibili ma mai i marchi veri (es. "Esselonga", "Galbanone", "Amazzonia Italia").
+- Nomi di aziende e clienti: parodie ironiche e parlanti, **mai rimandi diretti a marchi esistenti** (niente nomi storpiati di una lettera, slogan pubblicitari veri o loghi copiati). Es. "Supermercati Carrellone", "Caseificio Stracchinelli", "Tuttosubito Italia". I vecchi nomi rinominati stanno in `RENAMED`, che converte i salvataggi.
 - Grafica: pixel art moderna e colorata, bordi scuri `#16202e`, ombre nette, font *Pixelify Sans* (titoli) e *IBM Plex Sans Condensed* (testo). Colori dalla tavolozza `TPAL`. Le icone sono SVG con `shape-rendering="crispEdges"`.
 - Ogni abilità ha un colore fisso: Operazioni arancione, Precisione blu, Negoziazione giallo, Leadership rosso, Amministrazione verde, Innovazione viola. Mostra sempre le abilità con `statChips()` / `statBadge()`, mai come semplice testo.
 - Ogni nuovo cliente deve avere un logo in `LOGO` e una voce in `CINFO`.

@@ -74,9 +74,9 @@ def show(name,log,cols=('m','clienti','stock','mag','aut','imp','ric','costi','u
 RUM=dict(nome='Rummolo',inizio=1,stock=700,pallet=300,soglia_P=92,soglia_A=None)
 GAL=dict(nome='Galbanone',inizio=4,stock=600,pallet=480,soglia_P=93,soglia_A=96)
 FER=dict(nome='Ferramenta',inizio=9,stock=500,pallet=250,soglia_P=90,soglia_A=97)
-ESS=dict(nome='Esselonga',inizio=4,stock=1500,pallet=2400,soglia_P=98,soglia_A=95)
+ESS=dict(nome='Supermercati Carrellone',inizio=4,stock=1500,pallet=2400,soglia_P=98,soglia_A=95)
 if __name__=='__main__':
     show('A passivo: solo Rummolo',sim([RUM]))
     show('B crescita: +Galbanone m4, +Ferramenta m9',sim([RUM,GAL,FER]))
-    show('C troppo grande: +Esselonga m4',sim([RUM,ESS]))
+    show('C troppo grande: +Supermercati Carrellone m4',sim([RUM,ESS]))
     show('D crescita + WMS/barcode m6',sim([RUM,GAL,FER],tech_A=4,tech_P=1,tech_from=6,extra_fixed=0))

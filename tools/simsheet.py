@@ -63,11 +63,11 @@ hdrs=['Cliente','Mese di inizio','Stock medio (posti)','Pallet consegnati/mese',
 for j,h in enumerate(hdrs,4):
     x=ws.cell(row=16,column=j,value=h); x.font=hdr_font; x.fill=hdr_fill; x.alignment=Alignment(wrap_text=True)
 ws.row_dimensions[16].height=30
-CL=[('Pastificio Rummolo',1,700,300,92,None),('Caseificio Galbanone',4,600,480,93,96),('Ferramenta Bullonati',9,500,250,90,97),('Esselonga',0,1500,2400,98,95)]
+CL=[('Pastificio Mezzemaniche',1,700,300,92,None),('Caseificio Stracchinelli',4,600,480,93,96),('Ferramenta Bullonati',9,500,250,90,97),('Supermercati Carrellone',0,1500,2400,98,95)]
 CR=[]
 for i,(n,ini,st,pal,sp,sa) in enumerate(CL,17):
     lab(i,4,n,True); inv(i,5,ini,'0'); inv(i,6,st,'#,##0'); inv(i,7,pal,'#,##0'); inv(i,8,sp,'0.0'); inv(i,9,sa,'0.0'); CR.append(i)
-lab(21,4,'Soglia accuratezza vuota = KPI non richiesto. Esselonga è esclusa (mese 0): metti 4 per provare un contratto troppo grande.',color='4A5768')
+lab(21,4,'Soglia accuratezza vuota = KPI non richiesto. Supermercati Carrellone è esclusa (mese 0): metti 4 per provare un contratto troppo grande.',color='4A5768')
 lab(22,4,'Soddisfazione: parte da 60; +3 al mese sopra soglia, −4 se sotto di 2 punti al massimo, −10 e penale del 5% se oltre. Sotto 25 il cliente se ne va.',color='4A5768')
 
 # ---- riepilogo (D24..) ----

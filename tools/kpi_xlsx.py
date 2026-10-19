@@ -78,9 +78,9 @@ wc['A1']='Requisiti dei clienti'; wc['A1'].font=title_font
 wc['A2']='Celle in blu su sfondo giallo: da modificare. Soglia vuota = KPI non richiesto. I valori "attuali" sono esempi per provare gli esiti.'; wc['A2'].font=F(color='4A5768')
 cols=['Cliente','Settore','Soglia puntualità','Soglia accuratezza','Perché','Puntualità attuale (esempio)','Accuratezza attuale (esempio)','Esito puntualità','Esito accuratezza','Stato complessivo']
 header(wc,4,cols)
-clients=[('Esselonga','GDO freschi',0.98,0.95,'Gli scaffali vuoti al mattino sono un disastro',0.975,0.96),
-('ElettroUnieuri','Elettronica di consumo',0.90,0.99,'Un frigo sbagliato o rotto costa caro',0.93,0.955),
-('Pastificio Rummolo','Alimentare secco',0.92,None,'Pasta secca: conta solo che arrivi',0.95,0.97),
+clients=[('Supermercati Carrellone','GDO freschi',0.98,0.95,'Gli scaffali vuoti al mattino sono un disastro',0.975,0.96),
+('Elettrofulmine','Elettronica di consumo',0.90,0.99,'Un frigo sbagliato o rotto costa caro',0.93,0.955),
+('Pastificio Mezzemaniche','Alimentare secco',0.92,None,'Pasta secca: conta solo che arrivi',0.95,0.97),
 ('FarmaSpa','Farmaceutico',0.97,0.995,'Lotti e scadenze tracciati: cliente difficilissimo',0.97,0.99)]
 for i,(n,s,p,a,why,pa,aa) in enumerate(clients,5):
     vals=[n,s,p,a,why,pa,aa]

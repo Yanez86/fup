@@ -56,10 +56,10 @@ def show(name,log,months=(1,3,4,5,6,8,9,10,12,15,18,24)):
 RUM=dict(nome='Rummolo',inizio=1,stock=700,pallet=300,sP=92,sA=None)
 GAL=dict(nome='Galbanone',inizio=4,stock=600,pallet=480,sP=93,sA=96)
 FER=dict(nome='Ferramenta',inizio=9,stock=500,pallet=250,sP=90,sA=97)
-ESS=dict(nome='Esselonga',inizio=4,stock=1500,pallet=2400,sP=98,sA=95)
+ESS=dict(nome='Supermercati Carrellone',inizio=4,stock=1500,pallet=2400,sP=98,sA=95)
 if __name__=='__main__':
     show('A passivo',sim([RUM]))
     show('B crescita, assunzioni in anticipo',sim([RUM,GAL,FER]))
     show('C crescita, assunzioni in ritardo di un mese',sim([RUM,GAL,FER],ritardo=1))
     show('D crescita + barcode m3 + WMS m7',sim([RUM,GAL,FER],tech=(('barcode',3),('wms',7))))
-    show('E Esselonga dal mese 4',sim([RUM,ESS]))
+    show('E Supermercati Carrellone dal mese 4',sim([RUM,ESS]))

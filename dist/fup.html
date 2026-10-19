@@ -271,7 +271,7 @@ const CEOS=[
  {id:'gino',name:'Gino Bertolotti',age:52,origin:'Ex padroncino',site:'rivalta',cash:180000,motrici:3,fixed:3500,rep:45,company:'Trasporti Bertolotti',
   st:{op:17,prec:9,neg:5,lead:14,amm:6,inn:2},tal:['Un milione di km al volante','Allergico al gestionale','Dialetto stretto'],allergic:true,
   bio:'Trent\'anni sulle strade d\'Europa, poi il capannone di Rivalta comprato con la liquidazione. Diffida di tutto ciò che ha una presa elettrica.',
-  client:{name:'Pastificio Rummolo',slogan:'Al dente o rimborsati',sector:'Alimentare secco',stock:700,pal:300,sP:92,sA:null}},
+  client:{name:'Pastificio Mezzemaniche',slogan:'Al dente o rimborsati',sector:'Alimentare secco',stock:700,pal:300,sP:92,sA:null}},
  {id:'edoardo',name:'Edoardo Ferretti',age:31,origin:'Figlio del fondatore',site:'pioltello',cash:320000,motrici:2,fixed:5500,rep:50,company:'Ferretti Logistica',
   st:{op:6,prec:7,neg:13,lead:6,amm:12,inn:10},tal:['Laureato in Bocconi','Papà ha sempre ragione','Sempre al telefono'],
   bio:'Ha ereditato il magazzino di Pioltello e un padre che passa "solo per un caffè" tutti i giorni alle 8.',
@@ -279,7 +279,7 @@ const CEOS=[
  {id:'valeria',name:'Valeria Conti',age:44,origin:'Ex manager di multinazionale',site:'novara',cash:220000,motrici:2,fixed:4200,rep:45,company:'Conti Logistica',
   st:{op:13,prec:10,neg:18,lead:5,amm:10,inn:9},tal:['Parla per acronimi','Stacanovista','Cena col buyer'],
   bio:'Quindici anni di slide e KPI in una multinazionale. Dorme quattro ore a notte e lo considera un vantaggio competitivo.',
-  client:{name:'Unilevante Italia',slogan:'Detersivi per un mondo più bianco',sector:'Largo consumo',stock:900,pal:500,sP:92,sA:95}},
+  client:{name:'Saponaria Italia',slogan:'Detersivi per un mondo più bianco',sector:'Largo consumo',stock:900,pal:500,sP:92,sA:95}},
  {id:'marco',name:'Marco Pellegrino',age:36,origin:'Ingegnere gestionale',site:'voltri',cash:200000,motrici:1,fixed:3000,rep:42,company:'Pellegrino Smart Logistics',
   st:{op:9,prec:13,neg:5,lead:5,amm:11,inn:17},tal:['Excel-dipendente','Parla con i robot','Calma olimpica'],robots:true,startTech:['barcode'],
   bio:'Ha progettato magazzini automatici per altri, ora ne vuole uno suo. Ogni pallet ha un codice, ogni codice un foglio Excel.',
@@ -307,33 +307,46 @@ const DIR_ROLES=[
  {id:'tech',name:'Direttore tecnologia',stat:'inn',statN:'Innovazione',eff:v=>`Le ricerche usano Innovazione ${v} se più alta di quella del CEO`}
 ];
 const TENDER_POOL=[
- {name:'Caseificio Galbanone',slogan:'Così buono che si sente',sector:'Freschi',stock:600,pal:480,sP:93,sA:96,diff:0,req:['freddo']},
+ {name:'Caseificio Stracchinelli',slogan:'Così buono che si sente',sector:'Freschi',stock:600,pal:480,sP:93,sA:96,diff:0,req:['freddo']},
  {name:'Ferramenta Bullonati',slogan:'Ogni vite ha il suo dado',sector:'Ferramenta',stock:500,pal:250,sP:90,sA:97,diff:-3},
- {name:'ElettroUnieuri',slogan:'Io non sono mica scemo',sector:'Elettronica',stock:900,pal:600,sP:94,sA:99,diff:5},
+ {name:'Elettrofulmine',slogan:'Tasso zero, pazienza pure',sector:'Elettronica',stock:900,pal:600,sP:94,sA:99,diff:5},
  {name:'FarmaSpa',slogan:'Lotti tracciati, sonni tranquilli',sector:'Farmaceutico',stock:400,pal:200,sP:97,sA:99.5,diff:8,req:['freddo']},
- {name:'Esselonga',slogan:'Il buyer vuole tre copie a mano',sector:'GDO',stock:1500,pal:2400,sP:98,sA:97,diff:10,req:['edi']},
- {name:'Birrificio Mortetti',slogan:'Baffi e luppolo dal 1859',sector:'Bevande',stock:800,pal:700,sP:92,sA:95,diff:0},
- {name:'Acque San Pellegrinetto',slogan:'Bollicine di montagna, quasi',sector:'Bevande',stock:1200,pal:900,sP:91,sA:94,diff:2},
- {name:'Arredamenti Ikeo',slogan:'Montalo tu, se ci riesci',sector:'Arredamento',stock:1000,pal:300,sP:90,sA:97,diff:3},
- {name:'Moda Armandi',slogan:'Eleganza in bancale',sector:'Moda',stock:300,pal:150,sP:96,sA:98,diff:6},
- {name:'Pneumatici Pirello',slogan:'La potenza è niente senza consegna',sector:'Automotive',stock:700,pal:400,sP:93,sA:96,diff:2},
+ {name:'Supermercati Carrellone',slogan:'Il buyer vuole tre copie a mano',sector:'GDO',stock:1500,pal:2400,sP:98,sA:97,diff:10,req:['edi']},
+ {name:'Birrificio Schiumetti',slogan:'Luppolo, malto e niente fretta',sector:'Bevande',stock:800,pal:700,sP:92,sA:95,diff:0},
+ {name:'Acque Fonte Frizzantina',slogan:'Bollicine di montagna, quasi',sector:'Bevande',stock:1200,pal:900,sP:91,sA:94,diff:2},
+ {name:'Arredamenti Brugola',slogan:'Montalo tu, se ci riesci',sector:'Arredamento',stock:1000,pal:300,sP:90,sA:97,diff:3},
+ {name:'Moda Grucciani',slogan:'Eleganza in bancale',sector:'Moda',stock:300,pal:150,sP:96,sA:98,diff:6},
+ {name:'Pneumatici Battistrada',slogan:'Aderenza garantita, anche sulla rampa',sector:'Automotive',stock:700,pal:400,sP:93,sA:96,diff:2},
  {name:'Crema Spalmella',slogan:'Il cucchiaino è compreso nel prezzo',sector:'Dolciario',stock:500,pal:450,sP:95,sA:97,diff:4},
- {name:'Riso Scotto dei Navigli',slogan:'Chicchi lombardi, mai scotti',sector:'Alimentare secco',stock:650,pal:280,sP:91,sA:null,diff:-2},
- {name:'Zalandini',slogan:'Resi gratuiti, anche dei calzini',sector:'E-commerce moda',stock:900,pal:1200,sP:96,sA:98,diff:4,req:['ecom']},
- {name:'Amazzonia Italia',slogan:'Lo vuoi? È già in viaggio',sector:'E-commerce',stock:2000,pal:3000,sP:98,sA:99,diff:10,req:['ecom','edi']},
+ {name:'Riseria La Mondina',slogan:'Chicchi vercellesi, mai scotti',sector:'Alimentare secco',stock:650,pal:280,sP:91,sA:null,diff:-2},
+ {name:'Scarpinando',slogan:'Resi gratuiti, anche dei calzini',sector:'E-commerce moda',stock:900,pal:1200,sP:96,sA:98,diff:4,req:['ecom']},
+ {name:'Tuttosubito Italia',slogan:'Lo vuoi? È già in viaggio',sector:'E-commerce',stock:2000,pal:3000,sP:98,sA:99,diff:10,req:['ecom','edi']},
  {name:'Spesa Veloce',slogan:'La spesa a casa in un\'ora',sector:'E-commerce alimentare',stock:600,pal:900,sP:97,sA:97,diff:3,req:['ecom','freddo']},
  {name:'Spedizioni Tricolore',slogan:'Da Aosta a Lampedusa in 48 ore',sector:'Pacchi',stock:1500,pal:2500,sP:97,sA:98,diff:6},
  {name:'Discount Prezzaccio',slogan:'Sottocosto, anche il trasportatore',sector:'GDO discount',stock:500,pal:700,sP:88,sA:null,diff:-6},
- {name:'Mobili Truciolotto',slogan:'Si monta da solo. E si smonta da solo',sector:'Arredamento low cost',stock:400,pal:150,sP:85,sA:92,diff:-6}
+ {name:'Mobili Truciolotto',slogan:'Si monta da solo. E si smonta da solo',sector:'Arredamento low cost',stock:400,pal:150,sP:85,sA:92,diff:-6},
+ {name:'Fai-da-Te Planet',slogan:'Se non lo trovi, l\'hai già montato storto',sector:'Bricolage',stock:1800,pal:2000,sP:96,sA:98,diff:9,req:['edi']},
+ {name:'Cosmetici Belletto',slogan:'Il rossetto arriva prima del rossore',sector:'Cosmetica',stock:500,pal:400,sP:96,sA:99.5,diff:7},
+ {name:'Aeronautica Volavia',slogan:'Pezzi che non possono cadere. Letteralmente',sector:'Aerospaziale',stock:300,pal:120,sP:97,sA:99.5,diff:8},
+ {name:'Salumificio Bresaolotti',slogan:'Stagionato in valle, affettato in tangenziale',sector:'Freschi',stock:450,pal:380,sP:94,sA:96,diff:2,req:['freddo']},
+ {name:'Cioccolateria Sabauda',slogan:'Si scioglie in bocca, non nel camion',sector:'Dolciario',stock:500,pal:350,sP:94,sA:97,diff:3,req:['freddo']},
+ {name:'Lavatrix Elettrodomestici',slogan:'Centrifuga a 1400 giri, consegna in 14 giorni',sector:'Elettrodomestici',stock:1100,pal:500,sP:93,sA:97,diff:3},
+ {name:'Cantine Tanninello',slogan:'Invecchiato in botte, non in banchina',sector:'Vini',stock:700,pal:300,sP:91,sA:96,diff:1},
+ {name:'Crocchette Codamossa',slogan:'Il cliente finale ha quattro zampe e zero pazienza',sector:'Petfood',stock:800,pal:600,sP:92,sA:95,diff:0},
+ {name:'Seterie del Lario',slogan:'Il filo conduttore è sempre in ritardo',sector:'Tessile',stock:400,pal:150,sP:93,sA:98,diff:2},
+ {name:'Materiali Edili Cazzuolini',slogan:'Se cade un bancale, si rompe il pavimento',sector:'Edilizia',stock:900,pal:300,sP:86,sA:null,diff:-3},
+ {name:'Giocattoli Trottolino',slogan:'Natale arriva a ottobre, il bonifico a marzo',sector:'Giocattoli',stock:800,pal:400,sP:92,sA:96,diff:-1},
+ {name:'Pellet Fiammella',slogan:'Paghiamo quando fa freddo. Forse',sector:'Combustibili',stock:600,pal:250,sP:85,sA:null,diff:-5}
 ];
 // RANK delle committenti: media di 4 voti 0-100. Il voto sui ricavi si calcola dai volumi; gli altri tre sono [desiderabilità, pubblicità, solidità]
 const RANK_F={
- 'Pastificio Rummolo':[55,40,60],'Mobilificio Brianzolo':[50,35,50],'Unilevante Italia':[60,60,65],'Caffè Portuale':[55,35,55],
- 'Caseificio Galbanone':[70,70,75],'Ferramenta Bullonati':[40,15,45],'ElettroUnieuri':[70,80,85],'FarmaSpa':[85,85,95],
- 'Esselonga':[55,95,90],'Birrificio Mortetti':[55,50,55],'Acque San Pellegrinetto':[45,50,55],'Arredamenti Ikeo':[55,65,60],
- 'Moda Armandi':[65,85,70],'Pneumatici Pirello':[70,75,80],'Crema Spalmella':[70,80,75],'Riso Scotto dei Navigli':[60,35,55],
- 'Zalandini':[50,75,60],'Amazzonia Italia':[50,98,85],'Spesa Veloce':[45,55,45],'Spedizioni Tricolore':[50,75,70],
- 'Discount Prezzaccio':[15,10,25],'Mobili Truciolotto':[25,15,30]
+ 'Pastificio Mezzemaniche':[55,40,60],'Mobilificio Brianzolo':[50,35,50],'Saponaria Italia':[60,60,65],'Caffè Portuale':[55,35,55],
+ 'Caseificio Stracchinelli':[70,70,75],'Ferramenta Bullonati':[40,15,45],'Elettrofulmine':[70,80,85],'FarmaSpa':[85,85,95],
+ 'Supermercati Carrellone':[55,95,90],'Birrificio Schiumetti':[55,50,55],'Acque Fonte Frizzantina':[45,50,55],'Arredamenti Brugola':[55,65,60],
+ 'Moda Grucciani':[65,85,70],'Pneumatici Battistrada':[70,75,80],'Crema Spalmella':[70,80,75],'Riseria La Mondina':[60,35,55],
+ 'Scarpinando':[50,75,60],'Tuttosubito Italia':[50,98,85],'Spesa Veloce':[45,55,45],'Spedizioni Tricolore':[50,75,70],
+ 'Discount Prezzaccio':[15,10,25],'Mobili Truciolotto':[25,15,30],
+ 'Fai-da-Te Planet':[60,85,85],'Cosmetici Belletto':[80,85,80],'Aeronautica Volavia':[85,80,95],'Salumificio Bresaolotti':[70,65,70],'Cioccolateria Sabauda':[72,70,68],'Lavatrix Elettrodomestici':[60,65,70],'Cantine Tanninello':[60,50,55],'Crocchette Codamossa':[50,45,55],'Seterie del Lario':[60,55,60],'Materiali Edili Cazzuolini':[35,25,55],'Giocattoli Trottolino':[40,40,35],'Pellet Fiammella':[20,10,25]
 };
 const RANKS=[ // soglia minima della media, colori, effetti
  {r:'S',min:80,bg:'R',fg:'W',rev:1.15,comp:6,win:6,lost:10,fl:'Il nome che i commerciali scrivono in grassetto nel CV.'},
@@ -436,7 +449,7 @@ function techIcon(t,sz,dim){
   (TECH_IC[t.id]||[]).forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch!=='.')r+=`<rect x="${x+2}" y="${y+2}" width="1" height="1" fill="${TPAL[ch]}"/>`;}));
   return `<svg width="${sz}" height="${sz}" viewBox="0 0 16 16" shape-rendering="crispEdges" style="flex:none;${dim?'filter:grayscale(1) opacity(.55)':''}" aria-hidden="true">${r}</svg>`;
 }
-const LOGO={"Pastificio Rummolo":{"bg":"R","ic":["....SS.S....","....SSSS....",".....SS.....","..YCYCYCYC..",".YCYCYCYCYC.","KKKKKKKKKKKK","KWWWWWWWWWWK",".KWBBBBBBWK.","..KWWWWWWK..","...KKKKKK...","............","............"]},"Mobilificio Brianzolo":{"bg":"C","ic":["............","............","..RRRRRRRR..",".RRRRRRRRRR.",".RRRRRRRRRR.","RRMRRRRRRMRR","RRMMMMMMMMRR","RRRRRRRRRRRR","RRRRRRRRRRRR",".M........M.",".M........M.","............"]},"Unilevante Italia":{"bg":"B","ic":[".....WW.....",".....WW.....","....WWWW....","....WWWW....","...WWWWWW...","..WWLWWWWW..","..WLLWWWWW..","..WLWWWWWW..","..WWWWWWWW..","...WWWWWW...","....WWWW....","............"]},"Caffè Portuale":{"bg":"N","ic":["...W..W.....","....W..W....","...W..W.....","............",".WWWWWWWW...",".WMMMMMMWWW.",".WWWWWWWWW.W",".WWWWWWWWWW.","..WWWWWWW...","...WWWWW....",".WWWWWWWWWW.","............"]},"Caseificio Galbanone":{"bg":"B","ic":["............","..........Y.","........YYY.","......YYYYY.","....YYYYOYY.","..YYYYYYYYY.","YYYOYYYYYYY.","YYYYYYYOYYY.","YYYYYYYYYYY.","YOYYYYYYYYY.","YYYYYYYYYYY.","............"]},"Ferramenta Bullonati":{"bg":"D","ic":["....SSSS....","...SSSSSS...","..SSSKKSSS..",".SSSKKKKSSS.",".SSKK..KKSS.",".SSKK..KKSS.",".SSSKKKKSSS.","..SSSKKSSS..","...SSSSSS...","....SSSS....","............","............"]},"ElettroUnieuri":{"bg":"R","ic":["......YYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYYYYYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYY.......",".YY.........","Y...........","............"]},"FarmaSpa":{"bg":"W","ic":["....GGGG....","....GGGG....","....GGGG....","....GGGG....","GGGGGGGGGGGG","GGGGGWWGGGGG","GGGGGWWGGGGG","GGGGGGGGGGGG","....GGGG....","....GGGG....","....GGGG....","....GGGG...."]},"Esselonga":{"bg":"R","ic":["............","...WWWWWW...","..WWWWWWWW..","..WWW.......","..WWW.......","...WWWWWW...","....WWWWWW..",".......WWW..",".......WWW..","..WWWWWWWW..","...WWWWWW...","............"]},"Birrificio Mortetti":{"bg":"G","ic":["............","..WWWWWW....",".WWWWWWWW...",".WYYYYYYW...",".KYYYYYYKKK.",".KYCYYYYK.K.",".KYCYYYYK.K.",".KYYYYYYKKK.",".KYYYYYYK...",".KYYYYYYK...",".KKKKKKKK...","............"]},"Acque San Pellegrinetto":{"bg":"L","ic":[".....GG.....",".....GG.....","....GGGG....","...GGGGGG...","...GGGGGG...","...GWWWWG...","...GWRRWG...","...GRRRRG...","...GWRRWG...","...GWWWWG...","...GGGGGG...","....GGGG...."]},"Arredamenti Ikeo":{"bg":"B","ic":["........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","........YY..","..YYYYYYYY..","..YYYYYYYY..","............","............"]},"Moda Armandi":{"bg":"K","ic":[".....WW.....","....W..W....",".......W....","......W.....",".....WW.....","....W..W....","...W....W...","..W......W..",".W........W.","WWWWWWWWWWWW","............","............"]},"Pneumatici Pirello":{"bg":"Y","ic":["...KKKKKK...","..KKKKKKKK..",".KKKSSSSKKK.","KKKS....SKKK","KKS......SKK","KKS..SS..SKK","KKS..SS..SKK","KKS......SKK","KKKS....SKKK",".KKKSSSSKKK.","..KKKKKKKK..","...KKKKKK..."]},"Crema Spalmella":{"bg":"C","ic":["...RRRRRR...","...RRRRRR...","..KKKKKKKK..","..KWWWWWWK..","..KMMMMMMK..","..KMWWMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KKKKKKKK..","............"]},"Riso Scotto dei Navigli":{"bg":"G","ic":["............","....W..W....","..W..W...W..","...WWWWWW...","..WWWWWWWW..",".WWWWWWWWWW.","KKKKKKKKKKKK","KRRRRRRRRRRK",".KRRRRRRRRK.","..KRRRRRRK..","...KKKKKK...","............"]},"Zalandini":{"bg":"O","ic":["............","..W.........","..WW........","..WWW.......","..WWWW......","..WWWWW.....","..WWWWWW....","..WWWWW.....","..WWWW......","..WWW.......","..WW........","..W........."]},"Amazzonia Italia":{"bg":"K","ic":["............",".NNNNNNNNNN.",".NNNNYYNNNN.",".NNNNYYNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.",".NNNNNNNNNN.","............",".O........O.","..O......OO.","...OOOOOOO.."]},"Spesa Veloce":{"bg":"G","ic":["....KKKK....","...K....K...","..KKKKKKKK..","..KWWWWWWK..","..KWWWYWWK..","..KWWYYWWK..","..KWYYYYWK..","..KWWYYWWK..","..KWWYWWWK..","..KWWWWWWK..","..KKKKKKKK..","............"]},"Spedizioni Tricolore":{"bg":"L","ic":["............","............","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","............","............","............"]},"Discount Prezzaccio":{"bg":"Y","ic":["............",".RR......RR.",".RR.....RR..",".......RR...","......RR....",".....RR.....","....RR......","...RR.......","..RR.....RR.",".RR......RR.","............","............"]},"Mobili Truciolotto":{"bg":"F","ic":["............","..NN.NN..N..",".N..N..NN.N.","..NN..N..N..","............","NNNNNNNNNNNN","MMMMMMMMMMMM","NN........NN","N.N......N.N","N..........N","N..........N","............"]}};
+const LOGO={"Pastificio Mezzemaniche":{"bg":"R","ic":["....SS.S....","....SSSS....",".....SS.....","..YCYCYCYC..",".YCYCYCYCYC.","KKKKKKKKKKKK","KWWWWWWWWWWK",".KWBBBBBBWK.","..KWWWWWWK..","...KKKKKK...","............","............"]},"Mobilificio Brianzolo":{"bg":"C","ic":["............","............","..RRRRRRRR..",".RRRRRRRRRR.",".RRRRRRRRRR.","RRMRRRRRRMRR","RRMMMMMMMMRR","RRRRRRRRRRRR","RRRRRRRRRRRR",".M........M.",".M........M.","............"]},"Saponaria Italia":{"bg":"B","ic":[".....WW.....",".....WW.....","....WWWW....","....WWWW....","...WWWWWW...","..WWLWWWWW..","..WLLWWWWW..","..WLWWWWWW..","..WWWWWWWW..","...WWWWWW...","....WWWW....","............"]},"Caffè Portuale":{"bg":"N","ic":["...W..W.....","....W..W....","...W..W.....","............",".WWWWWWWW...",".WMMMMMMWWW.",".WWWWWWWWW.W",".WWWWWWWWWW.","..WWWWWWW...","...WWWWW....",".WWWWWWWWWW.","............"]},"Caseificio Stracchinelli":{"bg":"B","ic":["............","..........Y.","........YYY.","......YYYYY.","....YYYYOYY.","..YYYYYYYYY.","YYYOYYYYYYY.","YYYYYYYOYYY.","YYYYYYYYYYY.","YOYYYYYYYYY.","YYYYYYYYYYY.","............"]},"Ferramenta Bullonati":{"bg":"D","ic":["....SSSS....","...SSSSSS...","..SSSKKSSS..",".SSSKKKKSSS.",".SSKK..KKSS.",".SSKK..KKSS.",".SSSKKKKSSS.","..SSSKKSSS..","...SSSSSS...","....SSSS....","............","............"]},"Elettrofulmine":{"bg":"R","ic":["......YYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYYYYYYY..",".....YYYY...","....YYYY....","...YYYY.....","..YYY.......",".YY.........","Y...........","............"]},"FarmaSpa":{"bg":"W","ic":["....GGGG....","....GGGG....","....GGGG....","....GGGG....","GGGGGGGGGGGG","GGGGGWWGGGGG","GGGGGWWGGGGG","GGGGGGGGGGGG","....GGGG....","....GGGG....","....GGGG....","....GGGG...."]},"Supermercati Carrellone":{"bg":"R","ic":["............","WW..........",".W..........",".WWWWWWWWWW.",".W.W.W.W.WW.",".WWWWWWWWW..","..W.W.W.WW..","..WWWWWWW...","..W.........","..WWWWWWWW..","...WW...WW..","...WW...WW.."]},"Birrificio Schiumetti":{"bg":"G","ic":["............","..WWWWWW....",".WWWWWWWW...",".WYYYYYYW...",".KYYYYYYKKK.",".KYCYYYYK.K.",".KYCYYYYK.K.",".KYYYYYYKKK.",".KYYYYYYK...",".KYYYYYYK...",".KKKKKKKK...","............"]},"Acque Fonte Frizzantina":{"bg":"L","ic":[".....GG.....",".....GG.....","....GGGG....","...GGGGGG...","...GGGGGG...","...GWWWWG...","...GWRRWG...","...GRRRRG...","...GWRRWG...","...GWWWWG...","...GGGGGG...","....GGGG...."]},"Arredamenti Brugola":{"bg":"Y","ic":["........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","........DD..","..DDDDDDDD..","..DDDDDDDD..","............","............"]},"Moda Grucciani":{"bg":"K","ic":[".....WW.....","....W..W....",".......W....","......W.....",".....WW.....","....W..W....","...W....W...","..W......W..",".W........W.","WWWWWWWWWWWW","............","............"]},"Pneumatici Battistrada":{"bg":"Y","ic":["...KKKKKK...","..KKKKKKKK..",".KKKSSSSKKK.","KKKS....SKKK","KKS......SKK","KKS..SS..SKK","KKS..SS..SKK","KKS......SKK","KKKS....SKKK",".KKKSSSSKKK.","..KKKKKKKK..","...KKKKKK..."]},"Crema Spalmella":{"bg":"C","ic":["...RRRRRR...","...RRRRRR...","..KKKKKKKK..","..KWWWWWWK..","..KMMMMMMK..","..KMWWMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KKKKKKKK..","............"]},"Riseria La Mondina":{"bg":"G","ic":["............","....W..W....","..W..W...W..","...WWWWWW...","..WWWWWWWW..",".WWWWWWWWWW.","KKKKKKKKKKKK","KRRRRRRRRRRK",".KRRRRRRRRK.","..KRRRRRRK..","...KKKKKK...","............"]},"Scarpinando":{"bg":"O","ic":["............","............",".KKKK.......",".KWWWK......",".KWKWWK.....",".KWWKWWKK...",".KWWWWWWWKK.",".KWWWWWWWWWK",".KRRRRRRRRRK",".KKKKKKKKKKK","............","............"]},"Tuttosubito Italia":{"bg":"K","ic":["............","............","....NNNNNNN.","....NNNYNNN.","WWW.NNNYNNN.","....NNNNNNN.",".WW.NNNNNNN.","....NNNNNNN.","WWW.NNNNNNN.","....NNNNNNN.","............","............"]},"Spesa Veloce":{"bg":"G","ic":["....KKKK....","...K....K...","..KKKKKKKK..","..KWWWWWWK..","..KWWWYWWK..","..KWWYYWWK..","..KWYYYYWK..","..KWWYYWWK..","..KWWYWWWK..","..KWWWWWWK..","..KKKKKKKK..","............"]},"Spedizioni Tricolore":{"bg":"L","ic":["............","............","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","GGGGWWWWRRRR","............","............","............"]},"Discount Prezzaccio":{"bg":"Y","ic":["............",".RR......RR.",".RR.....RR..",".......RR...","......RR....",".....RR.....","....RR......","...RR.......","..RR.....RR.",".RR......RR.","............","............"]},"Mobili Truciolotto":{"bg":"F","ic":["............","..NN.NN..N..",".N..N..NN.N.","..NN..N..N..","............","NNNNNNNNNNNN","MMMMMMMMMMMM","NN........NN","N.N......N.N","N..........N","N..........N","............"]},"Fai-da-Te Planet":{"bg":"O","ic":["............","..KKKKKKKK..",".KSSSSSSSSK.",".KSWWSSSSSK.","..KKKNNKKK..",".....NN.....",".....NN.....",".....NN.....",".....NN.....",".....NN.....","....KMMK....","....KKKK...."]},"Cosmetici Belletto":{"bg":"P","ic":["............",".....RR.....","....RRR.....","....RRRR....","....RRRR....","...KKKKKK...","...KYYYYK...","...KKKKKK...","...KWWWWK...","...KWWWWK...","...KWWWWK...","...KKKKKK..."]},"Aeronautica Volavia":{"bg":"D","ic":[".....KK.....",".....WW.....",".....WW.....","....KWWK....",".KKKWWWWKKK.","KWWWWWWWWWWK",".KKKKWWKKKK.",".....WW.....",".....WW.....","....KWWK....","...KWWWWK...","....KKKK...."]},"Salumificio Bresaolotti":{"bg":"C","ic":["....KKKK....","..KKRRRRKK..",".KRRWRRRRRK.",".KRRRRRWRRK.","KRRWRRRRRRRK","KRRRRRWRRRRK","KRWRRRRRRWRK","KRRRRWRRRRRK",".KRRRRRRWRK.",".KRWRRRRRRK.","..KKRRRRKK..","....KKKK...."]},"Cioccolateria Sabauda":{"bg":"Y","ic":[".KKKKKKKKKK.",".KNNKNNKNNK.",".KMMKMMKMMK.",".KKKKKKKKKK.",".KNNKNNKNNK.",".KMMKMMKMMK.",".KKKKKKKKKK.",".KRRRRRRRRK.",".KRWWWWWWRK.",".KRRRRRRRRK.",".KRRRRRRRRK.",".KKKKKKKKKK."]},"Lavatrix Elettrodomestici":{"bg":"T","ic":[".KKKKKKKKKK.",".KWWWWWWWWK.",".KWRWGWWSWK.",".KKKKKKKKKK.",".KWWKKKKWWK.",".KWKBBBBKWK.",".KWKBLBBKWK.",".KWKBBLBKWK.",".KWKBBBBKWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KKKKKKKKKK."]},"Cantine Tanninello":{"bg":"R","ic":[".....NN.....",".....GG.....",".....GG.....","....KGGK....","...KGGGGK...","...KGGGGK...","...KCCCCK...","...KCRRCK...","...KCCCCK...","...KGGGGK...","...KGGGGK...","....KKKK...."]},"Crocchette Codamossa":{"bg":"G","ic":["............","...WW..WW...","...WW..WW...",".WW......WW.",".WW......WW.","....WWWW....","...WWWWWW...","..WWWWWWWW..","..WWWWWWWW..","...WW..WW...","............","............"]},"Seterie del Lario":{"bg":"T","ic":["..KKKKKKKK..","..KNNNNNNK..","...KPPPPK...","...KPPPPK...","...KPWPPK...","...KPPPPK...","...KPPWPK...","...KPPPPK...","...KPPPPK...","..KNNNNNNK..","..KKKKKKKK..","............"]},"Materiali Edili Cazzuolini":{"bg":"S","ic":["............","RRRRR.RRRRR.","RRRRR.RRRRR.","............","RR.RRRRR.RRR","RR.RRRRR.RRR","............","RRRRR.RRRRR.","RRRRR.RRRRR.","............","RR.RRRRR.RRR","RR.RRRRR.RRR"]},"Giocattoli Trottolino":{"bg":"Y","ic":[".....KK.....",".....KK.....","...KKKKKK...","..KRRRRRRK..",".KRRWRRRRRK.","KBBBBBBBBBBK","KBBBBBBBBBBK",".KGGGGGGGGK.","..KGGGGGGK..","...KGGGGK...","....KGGK....",".....KK....."]},"Pellet Fiammella":{"bg":"D","ic":[".....R......",".....RR.....","....RRR.....","....RRRR.R..","...RROORRR..","..RROOOORR..","..ROOYYOORR.",".RROYYYYORR.",".RROYYYYORR.","..RROYYORR..","...RRRRRR...","..NNNNNNNN.."]}};
 const STAT_IC={"op":[".O.OO.O.","OOOOOOOO",".OO..OO.","OO....OO","OO....OO",".OO..OO.","OOOOOOOO",".O.OO.O."],"prec":["..BBBB..",".BWWWWB.","BWWBBWWB","BWBRRBWB","BWBRRBWB","BWWBBWWB",".BWWWWB.","..BBBB.."],"neg":["..YYYY..",".YYYYYY.","YYYKKKYY","YYKYYYYY","YKKKKYYY","YYKYYYYY",".YYKKKY.","..YYYY.."],"lead":["KRRRRR..","KRRRRRR.","KRRRRRRR","KRRRRRR.","KRRRRR..","K.......","K.......","KK......"],"amm":["GGGGGGGG","GWWWWWWG","GGGGGGGG","GWGWGWGG","GGGGGGGG","GWGWGWGG","GGGGGGGG","GWGWGWGG"],"inn":["..PPPP..",".PPWPPP.","PPWPPPPP","PPPPPPPP",".PPPPPP.","..PPPP..","..SSSS..","...SS..."]};
 /* --- clienti: zone di distribuzione, provenienza merce, loghi --- */
 const REG={
@@ -474,32 +487,55 @@ const ORIGINS={
  mondo:{n:'Fornitori di mezzo mondo',lon:9.19,lat:45.46},
  ortomercato:{n:'Ortomercato di Milano',lon:9.24,lat:45.44},
  roma:{n:'Hub di Roma',lon:12.50,lat:41.90},
- seveso:{n:'Capannone di Seveso (MB)',lon:9.14,lat:45.65}
+ seveso:{n:'Capannone di Seveso (MB)',lon:9.14,lat:45.65},
+ castelsg:{n:'Polo logistico di Castel San Giovanni (PC)',lon:9.43,lat:45.06},
+ crema:{n:'Polo cosmetico di Crema (CR)',lon:9.69,lat:45.36},
+ samarate:{n:'Stabilimenti di Samarate (VA)',lon:8.78,lat:45.62},
+ chiavenna:{n:'Salumificio di Chiavenna (SO)',lon:9.40,lat:46.32},
+ pinerolo:{n:'Laboratorio di Pinerolo (TO)',lon:7.34,lat:44.88},
+ comerio:{n:'Stabilimento di Comerio (VA)',lon:8.75,lat:45.84},
+ barolo:{n:'Cantine di Barolo (CN)',lon:7.94,lat:44.61},
+ cremona:{n:'Stabilimento di Cremona',lon:10.02,lat:45.13},
+ como:{n:'Seterie di Como',lon:9.08,lat:45.81},
+ calusco:{n:'Cave di Calusco d\'Adda (BG)',lon:9.47,lat:45.69},
+ borgosd:{n:'Segherie di Borgo San Dalmazzo (CN)',lon:7.49,lat:44.33}
 };
 // zones: la prima è quella del contratto iniziale; mode: 'ritiro' = andiamo noi a prendere la merce, 'consegna' = la porta il cliente
 const CINFO={
- 'Pastificio Rummolo':{zones:['reg_lig','reg_pie','prov_Alessandria'],src:'gragnano',mode:'consegna'},
+ 'Pastificio Mezzemaniche':{zones:['reg_lig','reg_pie','prov_Alessandria'],src:'gragnano',mode:'consegna'},
  'Mobilificio Brianzolo':{zones:['reg_lom','nordovest'],src:'meda',mode:'ritiro'},
- 'Unilevante Italia':{zones:['nordovest','reg_pie'],src:'casale',mode:'ritiro'},
+ 'Saponaria Italia':{zones:['nordovest','reg_pie'],src:'casale',mode:'ritiro'},
  'Caffè Portuale':{zones:['reg_lig','reg_pie'],src:'portoge',mode:'ritiro'},
- 'Caseificio Galbanone':{zones:['reg_lom','nordovest','prov_Milano'],src:'melzo',mode:'ritiro'},
+ 'Caseificio Stracchinelli':{zones:['reg_lom','nordovest','prov_Milano'],src:'melzo',mode:'ritiro'},
  'Ferramenta Bullonati':{zones:['nordovest','reg_lom'],src:'lumezzane',mode:'ritiro'},
- 'ElettroUnieuri':{zones:['nordovest','nord'],src:'portoge',mode:'ritiro'},
+ 'Elettrofulmine':{zones:['nordovest','nord'],src:'portoge',mode:'ritiro'},
  'FarmaSpa':{zones:['nordovest','nord'],src:'latina',mode:'consegna'},
- 'Esselonga':{zones:['reg_lom','nordovest'],src:'fornitori',mode:'consegna'},
- 'Birrificio Mortetti':{zones:['nordovest','nord'],src:'udine',mode:'consegna'},
- 'Acque San Pellegrinetto':{zones:['reg_lom','reg_pie','nordovest'],src:'pellegrino',mode:'ritiro'},
- 'Arredamenti Ikeo':{zones:['nordovest','reg_lom'],src:'svezia',mode:'consegna'},
- 'Moda Armandi':{zones:['nord','prov_Milano'],src:'atelier',mode:'ritiro'},
- 'Pneumatici Pirello':{zones:['reg_pie','nordovest','nord'],src:'settimo',mode:'ritiro'},
+ 'Supermercati Carrellone':{zones:['reg_lom','nordovest'],src:'fornitori',mode:'consegna'},
+ 'Birrificio Schiumetti':{zones:['nordovest','nord'],src:'udine',mode:'consegna'},
+ 'Acque Fonte Frizzantina':{zones:['reg_lom','reg_pie','nordovest'],src:'pellegrino',mode:'ritiro'},
+ 'Arredamenti Brugola':{zones:['nordovest','reg_lom'],src:'svezia',mode:'consegna'},
+ 'Moda Grucciani':{zones:['nord','prov_Milano'],src:'atelier',mode:'ritiro'},
+ 'Pneumatici Battistrada':{zones:['reg_pie','nordovest','nord'],src:'settimo',mode:'ritiro'},
  'Crema Spalmella':{zones:['nordovest','reg_pie'],src:'alba',mode:'ritiro'},
- 'Riso Scotto dei Navigli':{zones:['reg_lom','reg_pie','prov_Milano'],src:'vercelli',mode:'ritiro'},
- 'Zalandini':{zones:['nordovest','nord'],src:'erfurt',mode:'consegna'},
- 'Amazzonia Italia':{zones:['nord','nordovest'],src:'mondo',mode:'consegna'},
+ 'Riseria La Mondina':{zones:['reg_lom','reg_pie','prov_Milano'],src:'vercelli',mode:'ritiro'},
+ 'Scarpinando':{zones:['nordovest','nord'],src:'erfurt',mode:'consegna'},
+ 'Tuttosubito Italia':{zones:['nord','nordovest'],src:'mondo',mode:'consegna'},
  'Spesa Veloce':{zones:['prov_Milano','prov_Torino'],src:'ortomercato',mode:'ritiro'},
  'Spedizioni Tricolore':{zones:['italia'],src:'roma',mode:'consegna'},
  'Discount Prezzaccio':{zones:['reg_pie','prov_Torino','prov_Cuneo'],src:'fornitori',mode:'consegna'},
- 'Mobili Truciolotto':{zones:['reg_lom','prov_Milano'],src:'seveso',mode:'ritiro'}
+ 'Mobili Truciolotto':{zones:['reg_lom','prov_Milano'],src:'seveso',mode:'ritiro'},
+ 'Fai-da-Te Planet':{zones:['nordovest','nord'],src:'castelsg',mode:'consegna'},
+ 'Cosmetici Belletto':{zones:['nordovest','nord'],src:'crema',mode:'ritiro'},
+ 'Aeronautica Volavia':{zones:['nord','reg_lom'],src:'samarate',mode:'ritiro'},
+ 'Salumificio Bresaolotti':{zones:['reg_lom','nordovest','prov_Milano'],src:'chiavenna',mode:'ritiro'},
+ 'Cioccolateria Sabauda':{zones:['reg_pie','nordovest'],src:'pinerolo',mode:'ritiro'},
+ 'Lavatrix Elettrodomestici':{zones:['nordovest','nord'],src:'comerio',mode:'ritiro'},
+ 'Cantine Tanninello':{zones:['reg_pie','nordovest'],src:'barolo',mode:'ritiro'},
+ 'Crocchette Codamossa':{zones:['nordovest','reg_lom'],src:'cremona',mode:'consegna'},
+ 'Seterie del Lario':{zones:['nord','reg_lom'],src:'como',mode:'ritiro'},
+ 'Materiali Edili Cazzuolini':{zones:['reg_lom','prov_Bergamo'],src:'calusco',mode:'ritiro'},
+ 'Giocattoli Trottolino':{zones:['nordovest','nord'],src:'portoge',mode:'consegna'},
+ 'Pellet Fiammella':{zones:['reg_pie','prov_Cuneo'],src:'borgosd',mode:'ritiro'}
 };
 const cinfo=c=>CINFO[c.name]||{zones:['nordovest'],src:'fornitori',mode:'consegna'};
 function distKm(lo1,la1,lo2,la2){const r=Math.PI/180,a=Math.sin((la2-la1)*r/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin((lo2-lo1)*r/2)**2;return 6371*2*Math.asin(Math.sqrt(a));}
@@ -1290,6 +1326,9 @@ function modalInfo(src,title,text){
 
 /* ====================== SALVATAGGIO ====================== */
 const KEY='fup-salvataggio-v3';
+// clienti rinominati: le partite salvate prendono i nomi nuovi (anche nei messaggi e nei report)
+const RENAMED={"Pastificio Rummolo": "Pastificio Mezzemaniche", "Unilevante Italia": "Saponaria Italia", "Caseificio Galbanone": "Caseificio Stracchinelli", "ElettroUnieuri": "Elettrofulmine", "Esselonga": "Supermercati Carrellone", "Birrificio Mortetti": "Birrificio Schiumetti", "Acque San Pellegrinetto": "Acque Fonte Frizzantina", "Arredamenti Ikeo": "Arredamenti Brugola", "Moda Armandi": "Moda Grucciani", "Pneumatici Pirello": "Pneumatici Battistrada", "Riso Scotto dei Navigli": "Riseria La Mondina", "Zalandini": "Scarpinando", "Amazzonia Italia": "Tuttosubito Italia"};
+function renameClients(s){let j=JSON.stringify(s);for(const[o,n] of Object.entries(RENAMED))j=j.split(o).join(n);return JSON.parse(j);}
 function save(){try{localStorage.setItem(KEY,JSON.stringify({S,uid}));}catch(e){}}
 function load(){try{const r=localStorage.getItem(KEY);if(!r)return null;return JSON.parse(r);}catch(e){return null;}}
 
@@ -1855,7 +1894,7 @@ Object.assign(ACT,{
  pickceo(d){const old=CEOS.find(c=>c.id===startSel.ceo);const inp=$('#coname-in');const typed=inp?inp.value:'';startSel.ceo=d.id;if(!typed||typed===old.company)startSel.name='';else startSel.name=typed;showStart();},
  pickcolor(d){startSel.color=d.c;applyColor(d.c);startSel.name=$('#coname-in').value;showStart();},
  startgame(){const nm=($('#coname-in').value||'').trim();uid=1;newGame(startSel.ceo,nm,startSel.color);boot();},
- continue(){const sv=load();if(!sv)return;S=sv.S;S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;boot();}
+ continue(){const sv=load();if(!sv)return;S=renameClients(sv.S);S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;boot();}
 });
 function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;
