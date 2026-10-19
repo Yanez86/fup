@@ -376,12 +376,13 @@ const RIVALS=['Gruppo Bartolazzi','Logistix Global','F.lli Brambilla Autotraspor
 const TECH=[
  {id:'barcode',tree:'log',tier:1,row:0,name:'Lettori barcode',year:2002,cost:6000,days:20,inst:12000,mese:150,A:1.5,weeks:2,desc:'Meno errori di prelievo.'},
  {id:'formazione',tree:'log',tier:1,row:1,name:'Formazione strutturata',year:2002,cost:3000,days:15,inst:4000,mese:250,A:0.5,mor:3,weeks:1,desc:'Personale più preparato: morale +3.'},
- {id:'gps',tree:'log',tier:1,row:2,name:'Telematica GPS',year:2004,cost:15000,days:30,inst:10000,mese:500,P:2,weeks:3,desc:'Mezzi visibili in tempo reale, meno ritardi.'},
+ {id:'gps',tree:'log',tier:1,row:2,name:'Telematica GPS',year:2004,cost:15000,days:30,inst:10000,mese:500,P:2,sm:2,weeks:3,desc:'Mezzi visibili in tempo reale: meno ritardi, saturazione dei mezzi +2.'},
  {id:'wms',tree:'log',tier:2,row:0,req:['barcode'],name:'WMS di base',year:2002,cost:40000,days:75,inst:25000,mese:800,A:1.5,P:0.5,weeks:6,desc:'Il magazzino sa dove sta ogni pallet.'},
  {id:'anticoll',tree:'log',tier:2,row:1,req:['formazione'],name:'Sicurezza muletti',year:2006,cost:12000,days:30,inst:20000,mese:150,A:0.5,mor:2,weeks:2,desc:'Sensori anti-collisione: meno danni e infortuni.'},
- {id:'rotte',tree:'log',tier:2,row:2,req:['gps'],name:'Pianificazione rotte',year:2007,cost:35000,days:50,inst:15000,mese:600,P:2,fuel:0.05,weeks:4,desc:'Percorsi ottimizzati, gasolio −5%.'},
+ {id:'rotte',tree:'log',tier:2,row:2,req:['gps'],name:'Pianificazione rotte',year:2007,cost:35000,days:50,inst:15000,mese:600,P:2,fuel:0.05,sm:5,weeks:4,desc:'Percorsi ottimizzati: gasolio −5%, saturazione dei mezzi +5.'},
  {id:'rf',tree:'log',tier:3,row:0,req:['wms'],name:'Radiofrequenza',year:2004,cost:25000,days:40,inst:30000,mese:400,A:1,P:0.5,prod:0.1,weeks:4,desc:'Terminali senza carta: produttività +10%.'},
  {id:'verticale',tree:'log',tier:3,row:1,req:['wms','anticoll'],name:'Magazzino verticale',year:2012,cost:80000,days:120,inst:400000,mese:2500,A:0.5,cap:0.2,weeks:10,desc:'Scaffalature automatiche: capacità +20%.'},
+ {id:'sinergia',tree:'log',tier:3,row:2,req:['rotte'],name:'Sinergia in pianificazione',year:2008,cost:45000,days:60,inst:15000,mese:500,smC:7,smMax:30,weeks:6,desc:'Merce di clienti diversi sullo stesso camion: saturazione dei mezzi +7 per ogni cliente oltre il primo (massimo +30).'},
  {id:'ptl',tree:'log',tier:4,row:0,req:['rf'],name:'Pick-to-light',year:2008,cost:40000,days:60,inst:80000,mese:600,A:2,P:0.5,prod:0.15,weeks:4,desc:'Picking guidato dalle luci: produttività +15%.'},
  {id:'amr',tree:'log',tier:5,row:0,req:['ptl','verticale'],name:'Robot mobili (AMR)',year:2018,cost:150000,days:150,inst:600000,mese:4000,A:1,P:1,prod:0.4,weeks:12,desc:'Robot che portano gli scaffali agli operatori: produttività +40%.'},
  {id:'gestionale',tree:'org',tier:1,row:0,name:'Gestionale amministrativo',year:2002,cost:15000,days:30,desc:'Fatture e paghe informatizzate: costi fissi −3%, ogni impiegato regge più volume.'},
@@ -414,6 +415,7 @@ const ROLE_WK={pick:'magazzinieri',car:'carrellisti',autB:'autisti_b',autCE:'aut
 const ROLE_D={pick:'Preparano gli ordini',car:'Scaricano, stoccano e caricano',autB:'Furgoni, consegne in città',autCE:'Bilici e motrici, tratte lunghe',imp:'Bolle, inventari, traffico'};
 const HIRE={pick:{ann:[20,250],age:[6,1000]},car:{ann:[25,300],age:[8,1300]},autB:{ann:[15,250],age:[6,1000]},autCE:{ann:[40,350],age:[16,2000]},imp:{ann:[20,300],age:[7,1200]}};
 const KM_B=4000, KM_CE=5200;
+const CAPV=33, SAT0=16/33*100, SAT_OBJ=[0,55,60,65,70,75,80,85,90]; // capienza di un viaggio in pallet, saturazione dei mezzi di partenza (%), obiettivi minimi
 const noStaff=()=>({pick:0,car:0,autB:0,autCE:0,imp:0});
 const staffTot=w=>ROLES.reduce((a,r)=>a+(w.staff[r]||0),0);
 const T_ST=5.5,T_MO=3.8,T_DI=30;
@@ -443,7 +445,7 @@ const TALENTS={
  'Tifo sfegatato':{t:'mix',fx:'Leadership +1 · Eventi speciali nei giorni del derby',fl:'Il giorno del derby il magazzino si ferma. Anche lui.',ic:['..KKKK..','.KWWWWK.','KWWKKWWK','KWKKKKWK','KWWKKWWK','KWWWWWWK','.KWWWWK.','..KKKK..']}
 };
 const TTYPE={pos:['Positivo','#eaf6ec','#6fdc8c'],neg:['Negativo','#fbecec','#ff8a8d'],mix:['Misto','#fff6dc','#ffd23f']};
-const TECH_IC={"barcode":["............",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","RRRRRRRRRRRR",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","............",".K.K.KK.K.K.","............"],"formazione":["............",".NNNNNNNNNN.",".NDDDDDDDDN.",".NDWWDDDDDN.",".NDDDWWWDDN.",".NDWWWDDDDN.",".NDDDDDWWDN.",".NDDDDDDDDN.",".NNNNNNNNNN.","....N..N....","...N....N...","............"],"gps":["....RRRR....","...RRRRRR...","..RRRWWRRR..","..RRWWWWRR..","..RRWWWWRR..","..RRRWWRRR..","...RRRRRR...","....RRRR....",".....RR.....","..GG.RR.GG..",".GGGGGGGGGG.","............"],"wms":["............",".KKKKKKKKKK.",".KBBBBBBBBK.",".KBYYBOOBBK.",".KBSSSSSSBK.",".KBGGBYYBBK.",".KBSSSSSSBK.",".KKKKKKKKKK.",".....KK.....","...KKKKKK...","............","............"],"anticoll":[".....YY.....","....YKKY....","....YKKY....","...YYKKYY...","...YYKKYY...","..YYYKKYYY..","..YYYKKYYY..",".YYYYYYYYYY.",".YYYYKKYYYY.","YYYYYYYYYYYY","KKKKKKKKKKKK","............"],"rotte":["..........R.",".........RRR","..........R.","........DD..",".....DDD....","....D.......","....D.......",".....DDD....","........D...",".G.......D..","GGG..DDDD...",".G.........."],"rf":["..........B.","........B..B","..KKKKK..B.B","..KBBBK...B.","..KBBBK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","...KKK......","............"],"verticale":["..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..DYY.OOBD..","..DDDDDDDD..","..DBB.YYOD..","..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..D......D..","..D......D..",".KKKKKKKKKK."],"ptl":["............","GGG.YYY.RRR.","GGG.YYY.RRR.","............","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","............"],"amr":[".....YY.....",".....KK.....","..KKKKKKKK..","..KSSSSSSK..","..KSBSSBSK..","..KSSSSSSK..","..KSRRRRSK..","..KKKKKKKK..",".KOOOOOOOOK.",".KOOOOOOOOK.",".KKKKKKKKKK.","..KK....KK.."],"gestionale":["..KKKKKKK...","..KWWWWWKK..","..KWKKKWWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWWWGGGK..","..KWWWGGGK..","..KWWWWWWK..","..KKKKKKKK.."],"hr":["............","...SSSS.....","..S.FF.S....",".S.FFFF.S...",".S.FFFF.S...",".S.BBBB.S...","..SBBBBS....","...SSSSN....",".......NN...","........NN..",".........NN.","............"],"direzione":["............","....YYYY....","....YYYY....",".....KK.....",".KKKKKKKKKK.",".K...KK...K.",".K...KK...K.","BBB.OOOO.GGG","BBB.OOOO.GGG","BBB.OOOO.GGG","............","............"],"welfare2":["............","..RR....RR..",".RRRR..RRRR.","RRRRRWWRRRRR","RRRRRWWRRRRR","RRRWWWWWWRRR",".RRWWWWWWRR.","..RRRWWRRR..","...RRWWRR...","....RRRR....",".....RR.....","............"],"controllo":["............","............","K.......GG..","K.......GG..","K....BB.GG..","K....BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","KKKKKKKKKKKK","............","............"],"academy":["............",".....KK.....","...KKKKKK...",".KKKKKKKKKK.","KKKKKKKKKKKK",".KKKKKKKKKKY","..KKKKKKKK.Y","..KDDDDDDK.Y","..KDDDDDDK.Y","...KKKKKK.YY","..........YY","............"],"iso":["..BB....BB..","...BB..BB...","....BBBB....","....YYYY....","..YYYYYYYY..",".YYYYWYYYYY.",".YYYWWWYYYY.",".YYYYWYYYYY.",".YYYYYYYYYY.","..YYYYYYYY..","....YYYY....","............"],"commerciale":["............","..KKKKKKKK..",".KRRRRRRRRK.","KRRKK..KKRRK","KRK......KRK",".K..KKKK..K.","...KRRRRK...","..KRWRWRRK..","..KRRWRWRK..","..KRWRWRRK..","..KKKKKKKK..","............"],"freddo":[".....BB.....","..B..BB..B..","...B.BB.B...","....BBBB....","BBBBBWWBBBBB","BBBBBWWBBBBB","....BBBB....","...B.BB.B...","..B..BB..B..",".....BB.....","............","............"],"edi":["KKKKK.......","KBBBK.......","KBBBK..O....","KKKKK.OOOOO.","..K....O....",".KKK........",".......KKKKK","....O..KBBBK","...OOOOKBBBK","....O..KKKKK",".........K..","........KKK."],"marketing":["............",".........KK.",".......KKOK.",".....KKOOOK.","..KKKOOOOOK.",".KWKOOOOOOK.",".KWKOOOOOOK.","..KKKOOOOOK.","...K.KKOOOK.","...K...KKOK.","...KK....KK.","............"],"accordi":["............",".KKKKKKKK...",".KGGWWRRK...",".KWWWWWWK...",".KWKKKKWK...",".KWWWWWWK...",".KWKKKWWK...",".KWWWWWYYY..",".KWKKWYRRY..",".KWWWWYRRY..",".KKKKKKYY...","........Y.."],"kam":["........Y...",".......YYY..","...FF...Y...","..FFFF......","..FFFF......","...FF.......",".DDDDDD.....","DDDWWDDD....","DDDDRDDD....","DDDDRDDD....","DDDDDDDD....","............"],"ecom":["............","KK..........",".K..........",".KOOOOOOOOK.",".KOWOOWOOOK.",".KOOOOOOOK..","..KOOOOOOK..","..KKKKKKKK..","..K.........","..KKKKKKKKK.","...KK...KK..","............"]};
+const TECH_IC={"barcode":["............",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","RRRRRRRRRRRR",".K.KK.K.KKK.",".K.KK.K.KKK.",".K.KK.K.KKK.","............",".K.K.KK.K.K.","............"],"formazione":["............",".NNNNNNNNNN.",".NDDDDDDDDN.",".NDWWDDDDDN.",".NDDDWWWDDN.",".NDWWWDDDDN.",".NDDDDDWWDN.",".NDDDDDDDDN.",".NNNNNNNNNN.","....N..N....","...N....N...","............"],"gps":["....RRRR....","...RRRRRR...","..RRRWWRRR..","..RRWWWWRR..","..RRWWWWRR..","..RRRWWRRR..","...RRRRRR...","....RRRR....",".....RR.....","..GG.RR.GG..",".GGGGGGGGGG.","............"],"wms":["............",".KKKKKKKKKK.",".KBBBBBBBBK.",".KBYYBOOBBK.",".KBSSSSSSBK.",".KBGGBYYBBK.",".KBSSSSSSBK.",".KKKKKKKKKK.",".....KK.....","...KKKKKK...","............","............"],"anticoll":[".....YY.....","....YKKY....","....YKKY....","...YYKKYY...","...YYKKYY...","..YYYKKYYY..","..YYYKKYYY..",".YYYYYYYYYY.",".YYYYKKYYYY.","YYYYYYYYYYYY","KKKKKKKKKKKK","............"],"rotte":["..........R.",".........RRR","..........R.","........DD..",".....DDD....","....D.......","....D.......",".....DDD....","........D...",".G.......D..","GGG..DDDD...",".G.........."],"rf":["..........B.","........B..B","..KKKKK..B.B","..KBBBK...B.","..KBBBK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","..KWKWK.....","..KKKKK.....","...KKK......","............"],"verticale":["..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..DYY.OOBD..","..DDDDDDDD..","..DBB.YYOD..","..DDDDDDDD..","..DOO.BBYD..","..DDDDDDDD..","..D......D..","..D......D..",".KKKKKKKKKK."],"sinergia":["............","............",".KKKKKKK....",".KRRYYBK....",".KRRYYBKKKK.",".KGGOOBKWBK.",".KGGOOBKBBKK",".KKKKKKKKKKK","..KK....KK..","..KK....KK..","............","............"],"ptl":["............","GGG.YYY.RRR.","GGG.YYY.RRR.","............","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","SSSKSSSKSSSK","SSSKSSSKSSSK","KKKKKKKKKKKK","............"],"amr":[".....YY.....",".....KK.....","..KKKKKKKK..","..KSSSSSSK..","..KSBSSBSK..","..KSSSSSSK..","..KSRRRRSK..","..KKKKKKKK..",".KOOOOOOOOK.",".KOOOOOOOOK.",".KKKKKKKKKK.","..KK....KK.."],"gestionale":["..KKKKKKK...","..KWWWWWKK..","..KWKKKWWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWKKKKWK..","..KWWWWWWK..","..KWWWGGGK..","..KWWWGGGK..","..KWWWWWWK..","..KKKKKKKK.."],"hr":["............","...SSSS.....","..S.FF.S....",".S.FFFF.S...",".S.FFFF.S...",".S.BBBB.S...","..SBBBBS....","...SSSSN....",".......NN...","........NN..",".........NN.","............"],"direzione":["............","....YYYY....","....YYYY....",".....KK.....",".KKKKKKKKKK.",".K...KK...K.",".K...KK...K.","BBB.OOOO.GGG","BBB.OOOO.GGG","BBB.OOOO.GGG","............","............"],"welfare2":["............","..RR....RR..",".RRRR..RRRR.","RRRRRWWRRRRR","RRRRRWWRRRRR","RRRWWWWWWRRR",".RRWWWWWWRR.","..RRRWWRRR..","...RRWWRR...","....RRRR....",".....RR.....","............"],"controllo":["............","............","K.......GG..","K.......GG..","K....BB.GG..","K....BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","K.OO.BB.GG..","KKKKKKKKKKKK","............","............"],"academy":["............",".....KK.....","...KKKKKK...",".KKKKKKKKKK.","KKKKKKKKKKKK",".KKKKKKKKKKY","..KKKKKKKK.Y","..KDDDDDDK.Y","..KDDDDDDK.Y","...KKKKKK.YY","..........YY","............"],"iso":["..BB....BB..","...BB..BB...","....BBBB....","....YYYY....","..YYYYYYYY..",".YYYYWYYYYY.",".YYYWWWYYYY.",".YYYYWYYYYY.",".YYYYYYYYYY.","..YYYYYYYY..","....YYYY....","............"],"commerciale":["............","..KKKKKKKK..",".KRRRRRRRRK.","KRRKK..KKRRK","KRK......KRK",".K..KKKK..K.","...KRRRRK...","..KRWRWRRK..","..KRRWRWRK..","..KRWRWRRK..","..KKKKKKKK..","............"],"freddo":[".....BB.....","..B..BB..B..","...B.BB.B...","....BBBB....","BBBBBWWBBBBB","BBBBBWWBBBBB","....BBBB....","...B.BB.B...","..B..BB..B..",".....BB.....","............","............"],"edi":["KKKKK.......","KBBBK.......","KBBBK..O....","KKKKK.OOOOO.","..K....O....",".KKK........",".......KKKKK","....O..KBBBK","...OOOOKBBBK","....O..KKKKK",".........K..","........KKK."],"marketing":["............",".........KK.",".......KKOK.",".....KKOOOK.","..KKKOOOOOK.",".KWKOOOOOOK.",".KWKOOOOOOK.","..KKKOOOOOK.","...K.KKOOOK.","...K...KKOK.","...KK....KK.","............"],"accordi":["............",".KKKKKKKK...",".KGGWWRRK...",".KWWWWWWK...",".KWKKKKWK...",".KWWWWWWK...",".KWKKKWWK...",".KWWWWWYYY..",".KWKKWYRRY..",".KWWWWYRRY..",".KKKKKKYY...","........Y.."],"kam":["........Y...",".......YYY..","...FF...Y...","..FFFF......","..FFFF......","...FF.......",".DDDDDD.....","DDDWWDDD....","DDDDRDDD....","DDDDRDDD....","DDDDDDDD....","............"],"ecom":["............","KK..........",".K..........",".KOOOOOOOOK.",".KOWOOWOOOK.",".KOOOOOOOK..","..KOOOOOOK..","..KKKKKKKK..","..K.........","..KKKKKKKKK.","...KK...KK..","............"]};
 const TFRAME={log:{c:'#ff7a3d',bg:'#ffe8d9',cut:[0,0,0],shape:'Quadrato arancione'},org:{c:'#9b6bff',bg:'#ece3ff',cut:[3,2,1],shape:'Ottagono viola'},mkt:{c:'#2e9e48',bg:'#dff3d6',cut:[5,3,2,1,1],shape:'Tondo verde'}};
 function techIcon(t,sz,dim){
   const F=TFRAME[t.tree], N=16; const cut=r=>{const d=Math.min(r,N-1-r);return F.cut[d]||0;};
@@ -548,11 +550,12 @@ const CINFO={
 const cinfo=c=>CINFO[c.name]||{zones:['nordovest'],src:'fornitori',mode:'consegna'};
 function distKm(lo1,la1,lo2,la2){const r=Math.PI/180,a=Math.sin((la2-la1)*r/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin((lo2-lo1)*r/2)**2;return 6371*2*Math.asin(Math.sqrt(a));}
 // km di un viaggio di distribuzione (andata e ritorno) e di un viaggio di ritiro
-function clientLog(c,w){
+function clientLog(c,w,sm){
   const s=SITES[w.site], z=ZONES[c.zone]||ZONES.nordovest;
   const cs=z.cities.map(n=>CITIES.find(x=>x[0]===n));
   const avg=cs.length?cs.reduce((a,x)=>a+distKm(s.lon,s.lat,x[1],x[2]),0)/cs.length:350;
-  const oKm=Math.round(2*avg*1.3+30), out=Math.ceil(c.pal/16);
+  sm=sm||(w.kpi&&w.kpi.satM)||SAT0;
+  const oKm=Math.round(2*avg*1.3+30), out=Math.ceil(c.pal/(Math.round(CAPV*sm)/100));
   const o=ORIGINS[c.src]||ORIGINS.fornitori, iKm=Math.round(2*distKm(s.lon,s.lat,o.lon,o.lat)*1.3+20);
   const inn=c.mode==='ritiro'?Math.ceil(c.pal/33):0, veh=cinfo(c).veh==='B'?'B':'CE';
   return {oKm,out,iKm,in:inn,km:out*oKm+inn*iKm,veh,kmB:veh==='B'?out*oKm:0,kmCE:(veh==='B'?0:out*oKm)+inn*iKm};
@@ -746,7 +749,24 @@ wk('penali','kpi','Penali',`Multa del 5% del fatturato mensile del cliente quand
 wk('saturazione','kpi','Saturazione',`Quanto è pieno il magazzino: posti pallet occupati diviso posti disponibili.`,
 `Un magazzino pieno rende, ma oltre l'85% di saturazione l'[[accuratezza]] cala in fretta: −2,5 punti ogni 10% in più. Le barre diventano gialle dal 70% e rosse dall'85%.
 
+Da non confondere con la [[saturazione_mezzi|saturazione dei mezzi]], che misura quanto sono pieni i camion.
+
 Non puoi fare un'offerta in una [[gare|gara]] se la merce del nuovo cliente non ci sta. Il [[tech_verticale|magazzino verticale]] aggiunge il 20% di posti.`);
+wk('saturazione_mezzi','kpi','Saturazione dei mezzi',`Quanto sono pieni in media i camion che escono dal magazzino: pallet caricati diviso capienza (33 pallet).`,
+`Si parte dal 48%: ogni cliente ha i suoi camion e spesso partono mezzi vuoti. Più alta è la saturazione, meno viaggi servono per gli stessi pallet: meno km, meno gasolio e meno [[autisti]]. Il ricavo invece non cambia, perché il cliente paga a pallet: tutto il risparmio è margine.
+
+Senza sforzo la saturazione sale con il [[tech_gps|GPS]] (+2), la [[tech_rotte|pianificazione rotte]] (+5) e soprattutto con la [[tech_sinergia|sinergia in pianificazione]], che mette sullo stesso camion la merce di clienti diversi: +7 per ogni cliente oltre il primo, fino a +30. Più clienti hai nel magazzino, più conviene.
+
+Per andare oltre serve un [[obiettivo_sat|obiettivo minimo]] imposto dalla direzione. Massimo 95%. Per i furgoni la capienza si conta in colli, ma il conto è lo stesso.`);
+wk('obiettivo_sat','kpi','Obiettivo minimo di saturazione',`Il livello minimo di saturazione dei mezzi che la direzione impone a un magazzino. Raggiungerlo costa sempre qualcosa.`,
+`Lo scegli nella finestra del [[magazzino]], nella parte dei trasporti. Se l'obiettivo è sopra il carico che viene da sé, il personale deve aspettare i carichi completi e incastrare le consegne:
+
+• la [[puntualita]] perde 0,06 punti per ogni punto di saturazione in più (camion che aspettano il carico);
+• il personale arriva fin dove glielo permette la **capacità di pianificazione** = saturazione naturale + 1,2·([[st_op|Operazioni]] del [[manager]] − 10) + 0,25·([[morale]] − 60) + 8 per ogni [[impiegati|impiegato]] in più del necessario (fino a 3; tolti 8 per ognuno che manca);
+• se la capacità supera l'obiettivo, va anche meglio: si prende il 35% della differenza in più;
+• se non basta, la saturazione si ferma alla capacità e il morale obiettivo cala di 0,5 per ogni punto che manca. La finestra ti dice quanti impiegati in più servirebbero.
+
+Un buon manager, un ufficio ben fornito e un morale alto possono portare i camion all'80-90%. Una squadra stanca e sotto organico no, e la direzione lo scopre a fine mese.`);
 wk('morale','kpi','Morale',`L'umore del personale di un magazzino, da 0 a 100. Cambia lentamente.`,
 `Ogni magazzino ha un morale che si avvicina piano piano a un valore obiettivo. L'obiettivo parte da 58 e sale con la [[st_lead|Leadership]] del [[manager]] (+0,6 per punto sopra 10), il [[welfare]], alcune [[tecnologie]], l'Academy e il [[dir_hr|direttore HR]]. Scende se il personale è sovraccarico e dopo i [[licenziamenti]].
 
@@ -901,7 +921,7 @@ wk('apprendimento','tech','Apprendimento',`Le prime settimane dopo un'installazi
 
 È più lungo con un CEO allergico ai gestionali e più corto con chi parla con i robot o con l'[[tech_academy|Academy aziendale]]. Non installare tutto insieme prima di una scadenza importante!`);
 TECH.forEach(t=>{const tr=TREES.find(x=>x[0]===t.tree);const reqs=(t.req||[]).map(r=>{const a=TECH.find(x=>x.id===r);return `[[tech_${a.id}|${a.name}]]`;});
-  const eff=[t.A?`Accuratezza +${f1(t.A)}`:'',t.P?`Puntualità +${f1(t.P)}`:'',t.prod?`produttività +${Math.round(t.prod*100)}%`:'',t.mor?`morale +${t.mor}`:''].filter(Boolean).join(', ');
+  const eff=[t.A?`Accuratezza +${f1(t.A)}`:'',t.P?`Puntualità +${f1(t.P)}`:'',t.prod?`produttività +${Math.round(t.prod*100)}%`:'',t.mor?`morale +${t.mor}`:'',t.sm?`[[saturazione_mezzi|saturazione dei mezzi]] +${t.sm}`:'',t.smC?`[[saturazione_mezzi|saturazione dei mezzi]] +${t.smC} per ogni cliente oltre il primo, fino a +${t.smMax}`:''].filter(Boolean).join(', ');
   wk('tech_'+t.id,'tech',t.name,t.desc,`${t.desc}\n\nAlbero: [[alberi|${tr[1]}]]. Disponibile dal ${t.year}. Ricerca: ${eur(t.cost)}, ${t.days} giorni di base.${reqs.length?` Richiede ${reqs.join(' e ')}.`:''}`+
    (t.tree==='log'?`\n\n[[installazione|Installazione]]: ${eur(t.inst)} per magazzino, canone ${eur(t.mese)} al mese, [[apprendimento]] di ${t.weeks} settimane.${eff?` Effetto a regime: ${eff}.`:''}`:''),sz=>techIcon(t,sz));});
 // Direzione
@@ -1003,12 +1023,30 @@ function techFactor(wh,t){
 function impNeed(cons){return 1+Math.ceil(cons/(R('gestionale')?2000:1500));}
 function welfarePts(k){return WELFARE.filter(w=>S.welfare[w.id]).reduce((a,w)=>a+w[k],0);}
 function modSum(wh,k){return S.mods.filter(m=>m.until>S.day&&(m.scope==='all'||m.scope===wh.id)).reduce((a,m)=>a+(m[k]||0),0);}
+// saturazione dei mezzi: quanto sono pieni in media i camion in uscita (% della capienza)
+function satMezzi(wh,n,m,needImp){
+  let nat=SAT0; const pS=[['Base',SAT0]];
+  TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t);
+    if(t.sm){pS.push([t.name,t.sm*f]); nat+=t.sm*f;}
+    if(t.smC&&n>1){const v=Math.min(t.smMax,t.smC*(n-1))*f; pS.push([`Sinergia tra ${n} clienti`,v]); nat+=v;} });
+  // capacità di pianificazione: fin dove il personale riesce a spingere i carichi se la direzione impone un obiettivo
+  const obj=wh.satObj||0, extra=clamp((wh.staff.imp||0)-needImp,-3,3);
+  const cP=[['Operazioni di '+m.name.split(' ')[0],1.2*(m.op-10)],['Morale',0.25*(wh.morale-60)]];
+  if(extra) cP.push([extra>0?'Impiegati in più':'Impiegati mancanti',8*extra]);
+  const mS=modSum(wh,'sm'); if(mS) cP.push(['Eventi',mS]);
+  const pot=nat+cP.reduce((a,x)=>a+x[1],0);
+  let val=nat;
+  if(obj>nat){ val=pot>=obj?obj+0.35*(pot-obj):Math.max(nat,pot); pS.push([`Obiettivo ${obj}%: lavoro del personale`,Math.min(95,val)-nat]); }
+  val=Math.min(95,val);
+  const short=obj>nat?Math.max(0,obj-pot):0, addImp=obj>nat?clamp(Math.ceil((obj-(pot-8*extra))/8),0,3):0;
+  return {val,nat,pot,obj,push:Math.max(0,val-nat),short,addImp,pS,cP};
+}
 function computeWH(wh,extra){
   const act=S.clients.filter(c=>c.wh===wh.id&&c.status==='attivo'); if(extra) act.push(extra);
   const stock=act.reduce((a,c)=>a+c.stock,0), cons=act.reduce((a,c)=>a+c.pal,0), mov=2*cons;
-  const lg=act.map(c=>clientLog(c,wh)), km=lg.reduce((a,t)=>a+t.km,0), viaggi=lg.reduce((a,t)=>a+t.out+t.in,0);
+  const m=mgrStats(wh), needImp=impNeed(cons), sm=satMezzi(wh,act.length,m,needImp);
+  const lg=act.map(c=>clientLog(c,wh,sm.val)), km=lg.reduce((a,t)=>a+t.km,0), viaggi=lg.reduce((a,t)=>a+t.out+t.in,0);
   const kmB=lg.reduce((a,t)=>a+t.kmB,0), kmCE=lg.reduce((a,t)=>a+t.kmCE,0), st=wh.staff;
-  const m=mgrStats(wh);
   let tA=0,tP=0,tMor=0,tProd=0,tCan=0; const tparts=[];
   let fuelMul=1;
   TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t); tA+=(t.A||0)*f; tP+=(t.P||0)*f; tMor+=(t.mor||0)*(f>0?1:0); tProd+=(t.prod||0)*(f>0?1:0); if(f>0&&t.fuel) fuelMul*=1-t.fuel; tCan+=t.mese; });
@@ -1017,7 +1055,7 @@ function computeWH(wh,extra){
   const use=(load,n,per)=>load===0?0:(n>0?load/(n*per):9);
   const uCar=use(mov,st.car,2*prod), uPick=use(cons,st.pick,prod), uB=use(kmB,st.autB,KM_B), uCE=use(kmCE,st.autCE,KM_CE);
   const cap=capOf(wh); const sat=stock/cap;
-  const needImp=impNeed(cons), impShort=Math.max(0,needImp-st.imp);
+  const impShort=Math.max(0,needImp-st.imp);
   const mP=modSum(wh,'P'), mA=modSum(wh,'A'), mMor=modSum(wh,'mor');
   const pP=[['Base',92],['Operazioni di '+m.name.split(' ')[0],0.4*(m.op-10)]];
   if(tP) pP.push(['Tecnologie',tP]); if(mP) pP.push(['Eventi',mP]);
@@ -1025,20 +1063,21 @@ function computeWH(wh,extra){
   if(uCE>1) pP.push(['Autisti CE insufficienti',-20*(uCE-1)]); if(uB>1) pP.push(['Autisti B insufficienti',-20*(uB-1)]);
   if(uCar>1.05) pP.push(['Carrellisti insufficienti',-8*(uCar-1.05)]); if(uPick>1.05) pP.push(['Magazzinieri insufficienti',-3*(uPick-1.05)]);
   if(impShort) pP.push(['Impiegati insufficienti',-1.5*impShort]);
+  if(sm.push>0.5) pP.push(['Camion che aspettano il carico completo',-0.06*sm.push]);
   const pA=[['Base',96],['Precisione di '+m.name.split(' ')[0],0.3*(m.prec-10)],['Morale',0.04*(wh.morale-60)]];
   if(tA) pA.push(['Tecnologie',tA]); if(mA) pA.push(['Eventi',mA]); if(R('iso')) pA.push(['Certificazione ISO',0.5]);
   if(sat>0.85) pA.push(['Saturazione oltre 85%',-25*(sat-0.85)]); if(uPick>1) pA.push(['Magazzinieri insufficienti',-8*(uPick-1)]); if(uCar>1) pA.push(['Carrellisti insufficienti',-3*(uCar-1)]);
   if(impShort) pA.push(['Impiegati insufficienti',-1*impShort]);
   const P=clamp(pP.reduce((a,x)=>a+x[1],0),50,99.9), A=clamp(pA.reduce((a,x)=>a+x[1],0),50,99.9);
   const dHr=dirStat('hr');
-  const morT=clamp(58+0.6*(m.lead-10)+welfarePts('mor')+tMor+mMor+(R('academy')?3:0)+(dHr!=null?0.3*(dHr-10):0)-20*Math.max(0,uPick-1)-20*Math.max(0,uCar-1)-20*Math.max(0,Math.max(uB,uCE)-1),0,100);
+  const morT=clamp(58+0.6*(m.lead-10)+welfarePts('mor')+tMor+mMor+(R('academy')?3:0)+(dHr!=null?0.3*(dHr-10):0)-20*Math.max(0,uPick-1)-20*Math.max(0,uCar-1)-20*Math.max(0,Math.max(uB,uCE)-1)-0.5*sm.short,0,100);
   const rev=act.reduce((a,c)=>a+clientRev(c),0);
   const pers=ROLES.reduce((a,r)=>a+st[r]*RAL[r],0)*COEF/12;
   // bilici: gasolio, manutenzione e pedaggi; furgoni: consumano e costano meno, sempre in leasing
   const mezzi=kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+kmB*(0.12*S.fuel*fuelMul+0.06)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100+st.autB*900;
   const fissi=(wh.fixed+1000)*fixedMul();
-  const need={pick:Math.max(cons?1:0,Math.ceil(cons/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp};
-  return {act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,P,A,pP,pA,morT,rev,pers,mezzi,fissi,tCan,need,prod,m};
+  const need={pick:Math.max(cons?1:0,Math.ceil(cons/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp+sm.addImp};
+  return {act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,P,A,pP,pA,morT,rev,pers,mezzi,fissi,tCan,need,prod,m};
 }
 function globalCosts(){
   const emp=S.warehouses.reduce((a,w)=>a+staffTot(w),0);
@@ -1062,7 +1101,7 @@ function step(){
     const k=computeWH(w); w.kpi=k;
     w.morale+= (k.morT-w.morale)*0.012;
     w.acc.P+=k.P; w.acc.A+=k.A; w.acc.n++;
-    const wk=w.wk||(w.wk={n:0,P:0,A:0,sat:0,mor:0,mov:0,trips:0,rev:0,cost:0}); wk.n++; wk.P+=k.P; wk.A+=k.A; wk.sat+=k.sat; wk.mor+=w.morale;
+    const wk=w.wk||(w.wk={n:0,P:0,A:0,sat:0,mor:0,mov:0,trips:0,rev:0,cost:0}); wk.n++; wk.P+=k.P; wk.A+=k.A; wk.sat+=k.sat; wk.satM=(wk.satM||0)+k.satM; wk.mor+=w.morale;
     wk.mov+=k.mov/30; wk.trips+=k.viaggi/30; wk.rev+=k.rev/30; wk.cost+=(k.pers+k.mezzi+k.fissi+k.tCan)/30;
     cur.ric+=k.rev/30; cur.pers+=k.pers/30; cur.mezzi+=k.mezzi/30; cur.fissi+=k.fissi/30; cur.tech+=k.tCan/30;
     dRic+=k.rev/30; dCost+=(k.pers+k.mezzi+k.fissi+k.tCan)/30;
@@ -1093,7 +1132,7 @@ function weekEnd(){
   if(!S.weeks) S.weeks=[]; const rows={}; let any=false;
   S.warehouses.forEach(w=>{const k=w.wk; if(!k||!k.n) return; any=true;
     const act=S.clients.filter(c=>c.wh===w.id&&c.status==='attivo'); const sA=act.filter(c=>c.sA).map(c=>c.sA);
-    rows[w.id]={P:k.P/k.n,A:k.A/k.n,sat:k.sat/k.n,mor:k.mor/k.n,mov:Math.round(k.mov),trips:Math.round(k.trips),rev:k.rev,cost:k.cost,
+    rows[w.id]={P:k.P/k.n,A:k.A/k.n,sat:k.sat/k.n,satM:(k.satM||0)/k.n,obj:w.satObj||0,mor:k.mor/k.n,mov:Math.round(k.mov),trips:Math.round(k.trips),rev:k.rev,cost:k.cost,
       sP:act.length?Math.max(...act.map(c=>c.sP)):null,sA:sA.length?Math.max(...sA):null};
     w.wk=null;});
   const cli={}; S.clients.filter(c=>c.status==='attivo').forEach(c=>{const r=rows[c.wh]; if(r) cli[c.id]={P:r.P,A:r.A,sP:c.sP,sA:c.sA,sat:c.sat,wh:whById(c.wh).name};});
@@ -1183,6 +1222,13 @@ const EVENTS=[
   opts:[{t:'Rallenta tutto',e:'Puntualità −6 per 7 giorni',f:()=>mod('all',{P:-6},7)},
         {t:'Si viaggia lo stesso',e:'Puntualità −2; rischio incidente',f:()=>{mod('all',{P:-2},7); if(Math.random()<0.15){S.cash-=9000;S.rep-=4;toast('Un camion è finito fuori strada: 9.000 € di danni','bad');}}},
         {t:'"Conosco ogni curva"',e:'Puntualità −1, nessun rischio',req:()=>ceo().tal.includes('Un milione di km al volante'),reqT:'Un milione di km al volante',f:()=>mod('all',{P:-1},7)}]},
+ {id:'camion_dedicato',src:'Ufficio traffico',title:'"Il mio camion non lo divido con nessuno"',cond:()=>S.warehouses.some(w=>w.tech.sinergia&&S.clients.filter(c=>c.wh===w.id&&c.status==='attivo').length>=2),
+  text:'',
+  setup:ev=>{const w=pick(S.warehouses.filter(w=>w.tech.sinergia&&S.clients.filter(c=>c.wh===w.id&&c.status==='attivo').length>=2));ev.w=w;ev.c=pick(S.clients.filter(c=>c.wh===w.id&&c.status==='attivo'));
+    ev.text=`Il responsabile acquisti di ${ev.c.name} ha visto i suoi bancali sullo stesso bilico di un altro cliente. "Paghiamo noi, il camion è nostro". A ${w.name} l'ufficio traffico alza gli occhi al cielo.`;},
+  opts:[{t:'Camion dedicato per tre mesi',e:'Saturazione dei mezzi −10 nel magazzino, soddisfazione +6',f:function(){mod(this.w.id,{sm:-10},90);this.c.sat=clamp(this.c.sat+6,0,100);}},
+        {t:'Spiega che il prezzo regge solo così',e:'Soddisfazione −6',f:function(){this.c.sat=clamp(this.c.sat-6,0,100);}},
+        {t:'Mostragli i grafici dei km risparmiati',e:'Nessun effetto: si convince',req:()=>ceo().st.neg>=13||ceo().tal.includes('Parla per acronimi'),reqT:'Negoziazione 13 o Parla per acronimi',f:()=>{}}]},
  {id:'sciopero',src:'Il Sole 24 Pallet',title:'Sciopero nazionale degli autotrasportatori',cond:()=>Math.random()<0.5,
   text:'Le associazioni fermano i camion per 5 giorni contro il caro gasolio.',
   opts:[{t:'Aderisci',e:'Puntualità −15 per 5 giorni, morale +8, reputazione +2',f:()=>{mod('all',{P:-15,mor:8},5);S.rep+=2;}},
@@ -1540,6 +1586,13 @@ function makeDraggable(el,id){
 }
 function renderWin(id){const el=document.getElementById('win-'+id);if(!el)return;const b=el.querySelector('.win-b');const st=b.scrollTop;b.innerHTML=(VIEWS[id]||(()=>''))();b.scrollTop=st;}
 function renderAll(){renderTop();const ae=document.activeElement;Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id);if(el&&ae&&el.contains(ae)&&ae.matches('select,input'))return;if(id==='enciclopedia')return;if(id!=='gare'||!UI.bidEditing)renderWin(id);});renderDock();}
+function satObjTxt(sm){
+  if(!sm.obj) return `<div class="sm">Senza obiettivo i camion partono pieni al ${Math.round(sm.nat)}%: è il carico che viene da sé.</div>`;
+  const tip=tipParts('Capacità di pianificazione '+Math.round(sm.pot)+'%',[['Base',sm.nat],...sm.cP],'');
+  if(sm.obj<=sm.nat) return `<div class="sm ok" data-tip="${tip}">Obiettivo già raggiunto senza sforzo: i camion partono al ${Math.round(sm.val)}%.</div>`;
+  if(sm.short>0.5) return `<div class="sm bad" data-tip="${tip}">Il personale non ci sta dietro: arriva al ${Math.round(sm.val)}% e il morale ne risente.${sm.addImp?` Servirebbero ${sm.addImp} ${kw('impiegati',sm.addImp>1?'impiegati':'impiegato')} in più.`:''}</div>`;
+  return `<div class="sm ok" data-tip="${tip}">Obiettivo raggiunto: camion pieni al ${Math.round(sm.val)}%${sm.val>sm.obj+1?', il personale fa anche meglio':''}. In cambio la ${kw('puntualita','puntualità')} perde ${f1(0.06*sm.push)}.</div>`;
+}
 const kpiCls=(v,s)=>s==null?'ok':v>=s?'ok':v>=s-2?'warn':'bad';
 const barColor=v=>v>=0.85?'var(--bad)':v>=0.7?'var(--warn)':'var(--ok)';
 function tipParts(title,parts,unit){return `<div class='tt'>${esc(title)}</div>`+parts.map(([n,v])=>`<div class='tr'><span>${esc(n)}</span><span>${n==='Base'?f1(v):(v>=0?'+':'')+f1(v)}${unit||''}</span></div>`).join('');}
@@ -1574,9 +1627,10 @@ const VIEWS={
   return `${tabs}
   <div class="row"><span class="h3" style="font-size:19px">${esc(w.name)} (${w.prov})</span><span class="sm">${w.own?'di proprietà':'in affitto'} · ${eur(w.fixed)}/mese</span></div>
   <div><div class="row"><span class="lab">${kw('saturazione')}</span><span class="num">${n0(k.stock)} / ${n0(w.cap)} posti · ${Math.round(k.sat*100)}%</span></div><div class="bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div></div>
-  <div class="kpis">
+  <div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">
    <div class="kpi" data-tip="${tipParts('Puntualità '+f1(k.P)+'%',k.pP,'')}"><div class="lab">${kw('puntualita')}</div><b>${f1(k.P)}%</b></div>
    <div class="kpi" data-tip="${tipParts('Accuratezza '+f1(k.A)+'%',k.pA,'')}"><div class="lab">${kw('accuratezza')}</div><b>${f1(k.A)}%</b></div>
+   <div class="kpi" data-tip="${tipParts('Saturazione dei mezzi '+Math.round(k.satM)+'%',k.sm.pS,'')}"><div class="lab">${kw('saturazione_mezzi','Saturazione mezzi')}</div><b class="${k.sm.obj&&k.satM<k.sm.obj-0.5?'bad':''}">${Math.round(k.satM)}%</b></div>
   </div>
   <div class="card"><div class="row"><span class="h3">Personale</span><span class="sm">${kw('morale','morale')} <b class="${w.morale>=60?'ok':w.morale>=45?'warn':'bad'}">${Math.round(w.morale)}</b></span></div>
    <div class="lab">Magazzino e ufficio</div>
@@ -1584,6 +1638,8 @@ const VIEWS={
    <div class="lab">Trasporti</div>
    <div class="staff">${['autCE','autB'].map(r=>staffRow(r,w.staff[r],k.need[r])).join('')}</div>
    <div class="sm">${kw('motrici')}: ${w.motrici} di proprietà${Math.max(0,w.staff.autCE-w.motrici)?` + ${Math.max(0,w.staff.autCE-w.motrici)} in leasing`:''}${w.staff.autB?` · ${w.staff.autB} furgoni in leasing`:''} · ${k.viaggi} viaggi al mese</div>
+   <label class="row" style="align-items:center"><span class="lab">${kw('obiettivo_sat','Obiettivo minimo di saturazione')}</span><select data-act="setsatobj" data-wh="${w.id}" aria-label="Obiettivo minimo di saturazione dei mezzi">${SAT_OBJ.map(v=>`<option value="${v}" ${(w.satObj||0)===v?'selected':''}>${v?'almeno '+v+'%':'nessuno'}</option>`).join('')}</select></label>
+   ${satObjTxt(k.sm)}
    <label class="row" style="align-items:center"><span style="display:flex;align-items:center;gap:8px"><img class="px mini" src="${w.mgr==='ceo'?IMG[ceo().id]:w.mgr?IMG['m_'+w.mgr]:IMG.imp}" alt="" width="48" height="56" style="${w.mgr?'':'opacity:.3'}"><span class="lab">${kw('manager','Manager')}</span></span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
    ${k.m.none?'<div class="sm bad">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
   </div>
@@ -1733,12 +1789,12 @@ const VIEWS={
         ...(c.sA?[{n:'Accuratezza richiesta',short:'Richiesta A',c:KPI_C.A,dash:true,v:hs.map(h=>h.sA)}]:[])]}); }
   } else {
     const w=whById(sh);
-    head=['Settimana','Puntualità','Accuratezza','Saturazione','Morale','Pallet mov.','Viaggi','Ricavi','Costi','Margine'];
+    head=['Settimana','Puntualità','Accuratezza','Saturazione','Morale','Pallet mov.','Viaggi','Ricavi','Costi','Margine','Sat. mezzi'];
     const hist=W.map(x=>({d:x.d,...x.rows[w.id]})).filter(x=>x.P!=null).slice(-12);
     hist.forEach((h,i)=>{const r=i+2;
-      rows.push(`<tr><th>${r}</th>${td('A'+r,wkLabel(h.d),'',wkLabel(h.d),1)}${td('B'+r,pct(h.P),kpiCls(h.P,h.sP),`=MEDIA(Puntualità giornaliera; 7 giorni) → soglia più severa ${h.sP?f1(h.sP)+'%':'—'}`)}${td('C'+r,pct(h.A),kpiCls(h.A,h.sA),`=MEDIA(Accuratezza giornaliera; 7 giorni) → soglia più severa ${h.sA?f1(h.sA)+'%':'—'}`)}${td('D'+r,pct(h.sat*100),h.sat>0.95?'bad':h.sat>0.85?'warn':'','=posti occupati / posti disponibili')}${td('E'+r,Math.round(h.mor),h.mor<45?'bad':h.mor<55?'warn':'','=MEDIA(morale; 7 giorni)')}${td('F'+r,n0(h.mov),'','=pallet in entrata + in uscita')}${td('G'+r,n0(h.trips),'','=viaggi di distribuzione + viaggi di ritiro')}${td('H'+r,eur(h.rev),'','=SOMMA(ricavi giornalieri)')}${td('I'+r,eur(h.cost),'','=personale + mezzi + immobile + tecnologie')}${td('J'+r,eur(h.rev-h.cost),h.rev-h.cost<0?'bad':'ok',`=H${r}-I${r}`)}</tr>`);});
+      rows.push(`<tr><th>${r}</th>${td('A'+r,wkLabel(h.d),'',wkLabel(h.d),1)}${td('B'+r,pct(h.P),kpiCls(h.P,h.sP),`=MEDIA(Puntualità giornaliera; 7 giorni) → soglia più severa ${h.sP?f1(h.sP)+'%':'—'}`)}${td('C'+r,pct(h.A),kpiCls(h.A,h.sA),`=MEDIA(Accuratezza giornaliera; 7 giorni) → soglia più severa ${h.sA?f1(h.sA)+'%':'—'}`)}${td('D'+r,pct(h.sat*100),h.sat>0.95?'bad':h.sat>0.85?'warn':'','=posti occupati / posti disponibili')}${td('E'+r,Math.round(h.mor),h.mor<45?'bad':h.mor<55?'warn':'','=MEDIA(morale; 7 giorni)')}${td('F'+r,n0(h.mov),'','=pallet in entrata + in uscita')}${td('G'+r,n0(h.trips),'','=viaggi di distribuzione + viaggi di ritiro')}${td('H'+r,eur(h.rev),'','=SOMMA(ricavi giornalieri)')}${td('I'+r,eur(h.cost),'','=personale + mezzi + immobile + tecnologie')}${td('J'+r,eur(h.rev-h.cost),h.rev-h.cost<0?'bad':'ok',`=H${r}-I${r}`)}${td('K'+r,h.satM==null?'':pct(h.satM),h.obj&&h.satM<h.obj-0.5?'bad':h.obj?'ok':'',`=MEDIA(pallet caricati / capienza dei camion; 7 giorni)${h.obj?' → obiettivo minimo '+h.obj+'%':''}`)}</tr>`);});
     if(hist.length){const n=hist.length+2,m=k=>hist.reduce((a,x)=>a+x[k],0)/hist.length,s=k=>hist.reduce((a,x)=>a+x[k],0);
-      rows.push(`<tr class="tot"><th>${n}</th>${td('A'+n,'Media / Totale','','Media / Totale',1)}${td('B'+n,pct(m('P')),'',`=MEDIA(B2:B${n-1})`)}${td('C'+n,pct(m('A')),'',`=MEDIA(C2:C${n-1})`)}${td('D'+n,pct(m('sat')*100),'',`=MEDIA(D2:D${n-1})`)}${td('E'+n,Math.round(m('mor')),'',`=MEDIA(E2:E${n-1})`)}${td('F'+n,n0(s('mov')),'',`=SOMMA(F2:F${n-1})`)}${td('G'+n,n0(s('trips')),'',`=SOMMA(G2:G${n-1})`)}${td('H'+n,eur(s('rev')),'',`=SOMMA(H2:H${n-1})`)}${td('I'+n,eur(s('cost')),'',`=SOMMA(I2:I${n-1})`)}${td('J'+n,eur(s('rev')-s('cost')),s('rev')-s('cost')<0?'bad':'ok',`=SOMMA(J2:J${n-1})`)}</tr>`);}
+      rows.push(`<tr class="tot"><th>${n}</th>${td('A'+n,'Media / Totale','','Media / Totale',1)}${td('B'+n,pct(m('P')),'',`=MEDIA(B2:B${n-1})`)}${td('C'+n,pct(m('A')),'',`=MEDIA(C2:C${n-1})`)}${td('D'+n,pct(m('sat')*100),'',`=MEDIA(D2:D${n-1})`)}${td('E'+n,Math.round(m('mor')),'',`=MEDIA(E2:E${n-1})`)}${td('F'+n,n0(s('mov')),'',`=SOMMA(F2:F${n-1})`)}${td('G'+n,n0(s('trips')),'',`=SOMMA(G2:G${n-1})`)}${td('H'+n,eur(s('rev')),'',`=SOMMA(H2:H${n-1})`)}${td('I'+n,eur(s('cost')),'',`=SOMMA(I2:I${n-1})`)}${td('J'+n,eur(s('rev')-s('cost')),s('rev')-s('cost')<0?'bad':'ok',`=SOMMA(J2:J${n-1})`)}${(()=>{const v=hist.filter(x=>x.satM!=null);return td('K'+n,v.length?pct(v.reduce((a,x)=>a+x.satM,0)/v.length):'','',`=MEDIA(K2:K${n-1})`);})()}</tr>`);}
   }
   if(sh!=='sum'&&sh!=='cli'){ const w=whById(sh); const hs=W.map(x=>({d:x.d,...x.rows[w.id]})).filter(x=>x.P!=null);
     charts=lineChart('wh',{h:230,title:`${w.name}: andamento dei KPI`,labels:hs.map(h=>short(h.d)),unit:'%',series:[
@@ -1831,6 +1887,7 @@ const ACT={
   const w=whById(d.wh);if(w.staff[r]<=0)return;w.staff[r]--;mod(w.id,{mor:-4},30);
   S.cash-=sal; S.cur.altro+=sal; toast(`Licenziamento: ${eur(sal)} di buonuscita, morale in calo`,'warn'); renderAll();
  },
+ setsatobj(d,el){ const w=whById(d.wh); w.satObj=+el.value||0; renderAll(); },
  setmgr(d,el){
   const w=whById(d.wh); const v=el.value;
   S.warehouses.forEach(x=>{ if(x.id!==w.id&&x.mgr===v) x.mgr=null; });
