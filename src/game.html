@@ -150,6 +150,8 @@ table.t td.r,table.t th.r{text-align:right}
 select,input[type=text]{font:inherit;padding:5px 7px;border:2px solid var(--ink);background:#fff;min-width:0;max-width:100%}
 input[type=range]{width:100%;accent-color:var(--accent)}
 .split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.chbar i{display:block;height:100%}
+.chbar i+i{border-left:1px solid #16202e}
 .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .kpi{padding:6px 8px;background:#fff;border:2px solid var(--ink);cursor:help}
 .kpi b{font-family:var(--f-disp);font-size:26px}
@@ -382,7 +384,7 @@ const TECH=[
  {id:'rotte',tree:'log',tier:2,row:2,req:['gps'],name:'Pianificazione rotte',year:2007,cost:35000,days:50,inst:15000,mese:600,P:2,fuel:0.05,sm:5,weeks:4,desc:'Percorsi ottimizzati: gasolio −5%, saturazione dei mezzi +5.'},
  {id:'rf',tree:'log',tier:3,row:0,req:['wms'],name:'Radiofrequenza',year:2004,cost:25000,days:40,inst:30000,mese:400,A:1,P:0.5,prod:0.1,weeks:4,desc:'Terminali senza carta: produttività +10%.'},
  {id:'verticale',tree:'log',tier:3,row:1,req:['wms','anticoll'],name:'Magazzino verticale',year:2012,cost:80000,days:120,inst:400000,mese:2500,A:0.5,cap:0.2,weeks:10,desc:'Scaffalature automatiche: capacità +20%.'},
- {id:'sinergia',tree:'log',tier:3,row:2,req:['rotte'],name:'Sinergia in pianificazione',year:2008,cost:45000,days:60,inst:15000,mese:500,smC:7,smMax:30,weeks:6,desc:'Merce di clienti diversi sullo stesso camion: saturazione dei mezzi +7 per ogni cliente oltre il primo (massimo +30).'},
+ {id:'sinergia',tree:'log',tier:3,row:2,req:['rotte'],name:'Sinergia in pianificazione',year:2008,cost:45000,days:60,inst:15000,mese:500,smC:7,smMax:30,weeks:6,desc:'Merce di clienti diversi sullo stesso camion: saturazione dei mezzi +7 per ogni cliente oltre il primo (massimo +30), se servono gli stessi canali.'},
  {id:'ptl',tree:'log',tier:4,row:0,req:['rf'],name:'Pick-to-light',year:2008,cost:40000,days:60,inst:80000,mese:600,A:2,P:0.5,prod:0.15,weeks:4,desc:'Picking guidato dalle luci: produttività +15%.'},
  {id:'amr',tree:'log',tier:5,row:0,req:['ptl','verticale'],name:'Robot mobili (AMR)',year:2018,cost:150000,days:150,inst:600000,mese:4000,A:1,P:1,prod:0.4,weeks:12,desc:'Robot che portano gli scaffali agli operatori: produttività +40%.'},
  {id:'gestionale',tree:'org',tier:1,row:0,name:'Gestionale amministrativo',year:2002,cost:15000,days:30,desc:'Fatture e paghe informatizzate: costi fissi −3%, ogni impiegato regge più volume.'},
@@ -513,55 +515,72 @@ const ORIGINS={
  borgosd:{n:'Segherie di Borgo San Dalmazzo (CN)',lon:7.49,lat:44.33}
 };
 // zones: la prima è quella del contratto iniziale; mode: 'ritiro' = andiamo noi a prendere la merce, 'consegna' = la porta il cliente
-// veh: 'B' = distribuzione con furgoni (autisti patente B), altrimenti bilici (patente CE); i ritiri sono sempre con il bilico
+// ch: canali di distribuzione in % dei pallet (vedi CHANNELS); i ritiri sono sempre con il bilico
 const CINFO={
- 'Pastificio Mezzemaniche':{zones:['reg_lig','reg_pie','prov_Alessandria'],src:'gragnano',mode:'consegna'},
- 'Mobilificio Brianzolo':{zones:['reg_lom','nordovest'],src:'meda',mode:'ritiro'},
- 'Saponaria Italia':{zones:['nordovest','reg_pie'],src:'casale',mode:'ritiro'},
- 'Caffè Portuale':{zones:['reg_lig','reg_pie'],src:'portoge',mode:'ritiro'},
- 'Caseificio Stracchinelli':{zones:['reg_lom','nordovest','prov_Milano'],src:'melzo',mode:'ritiro'},
- 'Ferramenta Bullonati':{zones:['nordovest','reg_lom'],src:'lumezzane',mode:'ritiro'},
- 'Elettrofulmine':{zones:['nordovest','nord'],src:'portoge',mode:'ritiro'},
- 'FarmaSpa':{zones:['nordovest','nord'],src:'latina',mode:'consegna',veh:'B'},
- 'Supermercati Carrellone':{zones:['reg_lom','nordovest'],src:'fornitori',mode:'consegna'},
- 'Birrificio Schiumetti':{zones:['nordovest','nord'],src:'udine',mode:'consegna'},
- 'Acque Fonte Frizzantina':{zones:['reg_lom','reg_pie','nordovest'],src:'pellegrino',mode:'ritiro'},
- 'Arredamenti Brugola':{zones:['nordovest','reg_lom'],src:'svezia',mode:'consegna'},
- 'Moda Grucciani':{zones:['nord','prov_Milano'],src:'atelier',mode:'ritiro',veh:'B'},
- 'Pneumatici Battistrada':{zones:['reg_pie','nordovest','nord'],src:'settimo',mode:'ritiro'},
- 'Crema Spalmella':{zones:['nordovest','reg_pie'],src:'alba',mode:'ritiro'},
- 'Riseria La Mondina':{zones:['reg_lom','reg_pie','prov_Milano'],src:'vercelli',mode:'ritiro'},
- 'Scarpinando':{zones:['nordovest','nord'],src:'erfurt',mode:'consegna',veh:'B'},
- 'Tuttosubito Italia':{zones:['nord','nordovest'],src:'mondo',mode:'consegna',veh:'B'},
- 'Spesa Veloce':{zones:['prov_Milano','prov_Torino'],src:'ortomercato',mode:'ritiro',veh:'B'},
- 'Spedizioni Tricolore':{zones:['italia'],src:'roma',mode:'consegna',veh:'B'},
- 'Discount Prezzaccio':{zones:['reg_pie','prov_Torino','prov_Cuneo'],src:'fornitori',mode:'consegna'},
- 'Mobili Truciolotto':{zones:['reg_lom','prov_Milano'],src:'seveso',mode:'ritiro'},
- 'Fai-da-Te Planet':{zones:['nordovest','nord'],src:'castelsg',mode:'consegna'},
- 'Cosmetici Belletto':{zones:['nordovest','nord'],src:'crema',mode:'ritiro',veh:'B'},
- 'Aeronautica Volavia':{zones:['nord','reg_lom'],src:'samarate',mode:'ritiro'},
- 'Salumificio Bresaolotti':{zones:['reg_lom','nordovest','prov_Milano'],src:'chiavenna',mode:'ritiro'},
- 'Cioccolateria Sabauda':{zones:['reg_pie','nordovest'],src:'pinerolo',mode:'ritiro'},
- 'Lavatrix Elettrodomestici':{zones:['nordovest','nord'],src:'comerio',mode:'ritiro'},
- 'Cantine Tanninello':{zones:['reg_pie','nordovest'],src:'barolo',mode:'ritiro'},
- 'Crocchette Codamossa':{zones:['nordovest','reg_lom'],src:'cremona',mode:'consegna'},
- 'Seterie del Lario':{zones:['nord','reg_lom'],src:'como',mode:'ritiro',veh:'B'},
- 'Materiali Edili Cazzuolini':{zones:['reg_lom','prov_Bergamo'],src:'calusco',mode:'ritiro'},
- 'Giocattoli Trottolino':{zones:['nordovest','nord'],src:'portoge',mode:'consegna'},
- 'Pellet Fiammella':{zones:['reg_pie','prov_Cuneo'],src:'borgosd',mode:'ritiro'}
+ 'Pastificio Mezzemaniche':{zones:['reg_lig','reg_pie','prov_Alessandria'],src:'gragnano',mode:'consegna',ch:{gdo:60,horeca:25,dett:15}},
+ 'Mobilificio Brianzolo':{zones:['reg_lom','nordovest'],src:'meda',mode:'ritiro',ch:{dett:80,ecom:20}},
+ 'Saponaria Italia':{zones:['nordovest','reg_pie'],src:'casale',mode:'ritiro',ch:{gdo:80,dett:20}},
+ 'Caffè Portuale':{zones:['reg_lig','reg_pie'],src:'portoge',mode:'ritiro',ch:{horeca:60,gdo:30,dett:10}},
+ 'Caseificio Stracchinelli':{zones:['reg_lom','nordovest','prov_Milano'],src:'melzo',mode:'ritiro',ch:{gdo:55,horeca:30,dett:15}},
+ 'Ferramenta Bullonati':{zones:['nordovest','reg_lom'],src:'lumezzane',mode:'ritiro',ch:{dett:75,gdo:25}},
+ 'Elettrofulmine':{zones:['nordovest','nord'],src:'portoge',mode:'ritiro',ch:{gdo:50,dett:20,ecom:30}},
+ 'FarmaSpa':{zones:['nordovest','nord'],src:'latina',mode:'consegna',ch:{dett:85,ecom:15}},
+ 'Supermercati Carrellone':{zones:['reg_lom','nordovest'],src:'fornitori',mode:'consegna',ch:{gdo:100}},
+ 'Birrificio Schiumetti':{zones:['nordovest','nord'],src:'udine',mode:'consegna',ch:{horeca:70,gdo:30}},
+ 'Acque Fonte Frizzantina':{zones:['reg_lom','reg_pie','nordovest'],src:'pellegrino',mode:'ritiro',ch:{gdo:60,horeca:35,dett:5}},
+ 'Arredamenti Brugola':{zones:['nordovest','reg_lom'],src:'svezia',mode:'consegna',ch:{dett:60,ecom:40}},
+ 'Moda Grucciani':{zones:['nord','prov_Milano'],src:'atelier',mode:'ritiro',ch:{dett:75,ecom:25}},
+ 'Pneumatici Battistrada':{zones:['reg_pie','nordovest','nord'],src:'settimo',mode:'ritiro',ch:{ind:100}},
+ 'Crema Spalmella':{zones:['nordovest','reg_pie'],src:'alba',mode:'ritiro',ch:{gdo:75,dett:25}},
+ 'Riseria La Mondina':{zones:['reg_lom','reg_pie','prov_Milano'],src:'vercelli',mode:'ritiro',ch:{gdo:55,horeca:35,dett:10}},
+ 'Scarpinando':{zones:['nordovest','nord'],src:'erfurt',mode:'consegna',ch:{ecom:100}},
+ 'Tuttosubito Italia':{zones:['nord','nordovest'],src:'mondo',mode:'consegna',ch:{ecom:100}},
+ 'Spesa Veloce':{zones:['prov_Milano','prov_Torino'],src:'ortomercato',mode:'ritiro',ch:{ecom:100}},
+ 'Spedizioni Tricolore':{zones:['italia'],src:'roma',mode:'consegna',ch:{ecom:70,dett:30}},
+ 'Discount Prezzaccio':{zones:['reg_pie','prov_Torino','prov_Cuneo'],src:'fornitori',mode:'consegna',ch:{gdo:100}},
+ 'Mobili Truciolotto':{zones:['reg_lom','prov_Milano'],src:'seveso',mode:'ritiro',ch:{dett:50,gdo:30,ecom:20}},
+ 'Fai-da-Te Planet':{zones:['nordovest','nord'],src:'castelsg',mode:'consegna',ch:{gdo:70,ecom:30}},
+ 'Cosmetici Belletto':{zones:['nordovest','nord'],src:'crema',mode:'ritiro',ch:{gdo:40,dett:40,ecom:20}},
+ 'Aeronautica Volavia':{zones:['nord','reg_lom'],src:'samarate',mode:'ritiro',ch:{ind:100}},
+ 'Salumificio Bresaolotti':{zones:['reg_lom','nordovest','prov_Milano'],src:'chiavenna',mode:'ritiro',ch:{gdo:50,horeca:35,dett:15}},
+ 'Cioccolateria Sabauda':{zones:['reg_pie','nordovest'],src:'pinerolo',mode:'ritiro',ch:{gdo:40,dett:35,horeca:15,ecom:10}},
+ 'Lavatrix Elettrodomestici':{zones:['nordovest','nord'],src:'comerio',mode:'ritiro',ch:{gdo:45,dett:25,ecom:30}},
+ 'Cantine Tanninello':{zones:['reg_pie','nordovest'],src:'barolo',mode:'ritiro',ch:{horeca:60,dett:25,gdo:15}},
+ 'Crocchette Codamossa':{zones:['nordovest','reg_lom'],src:'cremona',mode:'consegna',ch:{gdo:50,dett:35,ecom:15}},
+ 'Seterie del Lario':{zones:['nord','reg_lom'],src:'como',mode:'ritiro',ch:{ind:100}},
+ 'Materiali Edili Cazzuolini':{zones:['reg_lom','prov_Bergamo'],src:'calusco',mode:'ritiro',ch:{ind:100}},
+ 'Giocattoli Trottolino':{zones:['nordovest','nord'],src:'portoge',mode:'consegna',ch:{gdo:50,dett:35,ecom:15}},
+ 'Pellet Fiammella':{zones:['reg_pie','prov_Cuneo'],src:'borgosd',mode:'ritiro',ch:{dett:60,gdo:40}}
 };
-const cinfo=c=>CINFO[c.name]||{zones:['nordovest'],src:'fornitori',mode:'consegna'};
+const cinfo=c=>CINFO[c.name]||{zones:['nordovest'],src:'fornitori',mode:'consegna',ch:{gdo:50,dett:50}};
+// canali di distribuzione: veh = mezzo, sat = carico rispetto alla media, prezzo = tariffa di distribuzione, pick = lavoro di preparazione, P/A = effetto sui KPI
+const CHANNELS=[
+ {id:'gdo',n:'GDO',c:'R',veh:'CE',sat:1.2,price:0.9,pick:0.8,P:-0.8,A:0,d:'Piattaforme dei supermercati: bilici pieni, appuntamento fisso allo scarico.'},
+ {id:'horeca',n:'Horeca',c:'O',veh:'B',sat:0.6,price:1.3,pick:1.2,P:-0.4,A:-0.3,d:'Bar, ristoranti e hotel: furgoni, tante piccole consegne all\'alba.'},
+ {id:'dett',n:'Dettaglio',c:'Y',veh:'B',sat:0.8,price:1.15,pick:1.3,P:0,A:-0.6,d:'Negozi, farmacie, ferramenta: giri misti e picking a colli.'},
+ {id:'ecom',n:'E-commerce',c:'T',veh:'B',sat:0.7,price:1.25,pick:1.6,P:-0.4,A:-1,d:'Consegne a casa: pacchi, picking a pezzo e tanti resi.'},
+ {id:'ind',n:'Industria',c:'D',veh:'CE',sat:1.1,price:0.9,pick:0.7,P:0.5,A:0.3,d:'Stabilimenti e cantieri: bilici, orari flessibili, margini bassi. Chi lavora per l\'industria non ha altri canali.'}
+];
+const chMix=c=>{const m=cinfo(c).ch,t=Object.values(m).reduce((a,v)=>a+v,0)||1;return CHANNELS.filter(x=>m[x.id]).map(x=>({...x,s:m[x.id]/t}));};
+const chAvg=(c,k)=>chMix(c).reduce((a,x)=>a+x.s*x[k],0);
+// affinità tra due clienti: quota di pallet sugli stessi canali (0-1)
+const chOverlap=(a,b)=>{const ma=cinfo(a).ch,mb=cinfo(b).ch,ta=Object.values(ma).reduce((x,v)=>x+v,0),tb=Object.values(mb).reduce((x,v)=>x+v,0);return CHANNELS.reduce((x,ch)=>x+Math.min((ma[ch.id]||0)/ta,(mb[ch.id]||0)/tb),0);};
+function chBar(c,w){const mx=chMix(c);
+  const tip=`<div class='tt'>Canali di distribuzione</div>`+mx.map(x=>`<div class='tr'><span><b style='color:${TPAL[x.c]}'>■</b> ${x.n}</span><span>${Math.round(x.s*100)}%</span></div>`).join('')+wikiHint();
+  return `<span class="chbar" role="img" aria-label="Canali: ${mx.map(x=>x.n+' '+Math.round(x.s*100)+'%').join(', ')}" data-act="wiki" data-id="canali" data-tip="${tip}" style="display:inline-flex;width:${w||120}px;height:12px;border:2px solid #16202e;cursor:help;vertical-align:middle">${mx.map(x=>`<i style="width:${x.s*100}%;background:${TPAL[x.c]}"></i>`).join('')}</span>`;}
 function distKm(lo1,la1,lo2,la2){const r=Math.PI/180,a=Math.sin((la2-la1)*r/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin((lo2-lo1)*r/2)**2;return 6371*2*Math.asin(Math.sqrt(a));}
 // km di un viaggio di distribuzione (andata e ritorno) e di un viaggio di ritiro
 function clientLog(c,w,sm){
   const s=SITES[w.site], z=ZONES[c.zone]||ZONES.nordovest;
   const cs=z.cities.map(n=>CITIES.find(x=>x[0]===n));
   const avg=cs.length?cs.reduce((a,x)=>a+distKm(s.lon,s.lat,x[1],x[2]),0)/cs.length:350;
-  sm=sm||(w.kpi&&w.kpi.satM)||SAT0;
-  const oKm=Math.round(2*avg*1.3+30), out=Math.ceil(c.pal/(Math.round(CAPV*sm)/100));
+  sm=sm||(w.kpi&&w.kpi.satM)||SAT0; const mf=(w.kpi&&w.kpi.mixF)||1;
+  // ogni canale ha il suo carico: la saturazione del magazzino è la media, i canali si distribuiscono attorno
+  const oKm=Math.round(2*avg*1.3+30), chs=chMix(c).map(x=>{const p=c.pal*x.s, ld=Math.min(95,sm*x.sat/mf); return {id:x.id,n:x.n,veh:x.veh,p,ld,trips:p>0?Math.ceil(p/(Math.round(CAPV*ld)/100)):0};});
+  const out=chs.reduce((a,x)=>a+x.trips,0), oB=chs.filter(x=>x.veh==='B').reduce((a,x)=>a+x.trips,0);
   const o=ORIGINS[c.src]||ORIGINS.fornitori, iKm=Math.round(2*distKm(s.lon,s.lat,o.lon,o.lat)*1.3+20);
-  const inn=c.mode==='ritiro'?Math.ceil(c.pal/33):0, veh=cinfo(c).veh==='B'?'B':'CE';
-  return {oKm,out,iKm,in:inn,km:out*oKm+inn*iKm,veh,kmB:veh==='B'?out*oKm:0,kmCE:(veh==='B'?0:out*oKm)+inn*iKm};
+  const inn=c.mode==='ritiro'?Math.ceil(c.pal/33):0, veh=oB===0?'CE':oB===out?'B':'mix';
+  return {oKm,out,iKm,in:inn,km:out*oKm+inn*iKm,veh,chs,kmB:oB*oKm,kmCE:(out-oB)*oKm+inn*iKm};
 }
 const RGLYPH={S:['.####','#....','#....','.###.','....#','....#','####.'],A:['.###.','#...#','#...#','#####','#...#','#...#','#...#'],B:['####.','#...#','#...#','####.','#...#','#...#','####.'],
  C:['.####','#....','#....','#....','#....','#....','.####'],D:['####.','#...#','#...#','#...#','#...#','#...#','####.'],F:['#####','#....','#....','####.','#....','#....','#....']};
@@ -589,7 +608,9 @@ function logInfoHtml(c,w){
   const t=clientLog(c,w), z=ZONES[c.zone]||ZONES.nordovest, o=ORIGINS[c.src]||ORIGINS.fornitori;
   return `<table class="t num">
    <tr><td>${kw('zona','Distribuzione')}</td><td class="r"><b>${esc(z.n)}</b>${z.cities.length>1?` · ${z.cities.length} province`:''}</td></tr>
-   <tr><td></td><td class="r sm">${t.out} viaggi/mese da ${n0(t.oKm)} km (andata e ritorno) con ${t.veh==='B'?kw('autisti_b','furgoni'):kw('autisti_ce','bilici')}</td></tr>
+   <tr><td></td><td class="r sm">${t.out} viaggi/mese da ${n0(t.oKm)} km (andata e ritorno) con ${t.veh==='B'?kw('autisti_b','furgoni'):t.veh==='CE'?kw('autisti_ce','bilici'):kw('autisti_ce','bilici')+' e '+kw('autisti_b','furgoni')}</td></tr>
+   <tr><td>${kw('canali','Canali')}</td><td class="r">${chBar(c,160)}</td></tr>
+   <tr><td></td><td class="r sm">${t.chs.map(x=>`${x.n}: ${x.trips} ${x.veh==='B'?'furgoni':'bilici'} al ${Math.round(x.ld)}%`).join(' · ')}</td></tr>
    <tr><td>${kw('ritiro','Merce in arrivo da')}</td><td class="r"><b>${esc(o.n)}</b></td></tr>
    <tr><td></td><td class="r sm">${c.mode==='ritiro'?`<span style="color:var(--accent-d,#c8551f)">la andiamo a prendere noi</span>: ${t.in} viaggi/mese da ${n0(t.iKm)} km`:'la consegna il cliente con i suoi mezzi'}</td></tr></table>`;
 }
@@ -756,9 +777,9 @@ Da non confondere con la [[saturazione_mezzi|saturazione dei mezzi]], che misura
 
 Non puoi fare un'offerta in una [[gare|gara]] se la merce del nuovo cliente non ci sta. Il [[tech_verticale|magazzino verticale]] aggiunge il 20% di posti.`);
 wk('saturazione_mezzi','kpi','Saturazione dei mezzi',`Quanto sono pieni in media i camion che escono dal magazzino: pallet caricati diviso capienza (33 pallet).`,
-`Si parte dal 48%: ogni cliente ha i suoi camion e spesso partono mezzi vuoti. Più alta è la saturazione, meno viaggi servono per gli stessi pallet: meno km, meno gasolio e meno [[autisti]]. Il ricavo invece non cambia, perché il cliente paga a pallet: tutto il risparmio è margine.
+`Si parte dal 48%: ogni cliente ha i suoi camion e spesso partono mezzi vuoti. Il mix dei [[canali]] sposta la base: la GDO riempie i bilici, l'horeca manda in giro furgoni mezzi vuoti. Più alta è la saturazione, meno viaggi servono per gli stessi pallet: meno km, meno gasolio e meno [[autisti]]. Il ricavo invece non cambia, perché il cliente paga a pallet: tutto il risparmio è margine.
 
-Senza sforzo la saturazione sale con il [[tech_gps|GPS]] (+2), la [[tech_rotte|pianificazione rotte]] (+5) e soprattutto con la [[tech_sinergia|sinergia in pianificazione]], che mette sullo stesso camion la merce di clienti diversi: +7 per ogni cliente oltre il primo, fino a +30. Più clienti hai nel magazzino, più conviene.
+Senza sforzo la saturazione sale con il [[tech_gps|GPS]] (+2), la [[tech_rotte|pianificazione rotte]] (+5) e soprattutto con la [[tech_sinergia|sinergia in pianificazione]], che mette sullo stesso camion la merce di clienti diversi: +7 per ogni cliente oltre il primo, fino a +30, moltiplicato per l'**affinità** media tra i clienti (quanta parte dei pallet va sugli stessi [[canali]]). Due fornitori di bar si dividono i giri; un supermercato e un negozio online quasi per niente.
 
 Per andare oltre serve un [[obiettivo_sat|obiettivo minimo]] imposto dalla direzione. Massimo 95%. Per i furgoni la capienza si conta in colli, ma il conto è lo stesso.`);
 wk('obiettivo_sat','kpi','Obiettivo minimo di saturazione',`Il livello minimo di saturazione dei mezzi che la direzione impone a un magazzino. Raggiungerlo costa sempre qualcosa.`,
@@ -811,7 +832,7 @@ In sede lavorano i [[pianificatori]] del traffico, che servono a tutti i magazzi
 
 Ogni cliente dice con che mezzo vuole le consegne (vedi [[zona]]), quindi vincere una [[gare|gara]] cambia chi devi [[assunzioni|assumere]]. La finestra Personale mostra l'organico di tutti i magazzini.`);
 wk('magazzinieri','pers','Magazzinieri',`Preparano gli ordini: prelevano i colli e compongono i pallet in uscita. Ognuno ne prepara circa 900 al mese.`,
-`Un magazziniere prepara circa 900 pallet al mese con un [[morale]] di 70, di più con le [[tecnologie]] di produttività (radiofrequenza, pick-to-light, robot).
+`Un magazziniere prepara circa 900 pallet al mese con un [[morale]] di 70 (meno con i [[canali]] a colli e a pezzo: dettaglio, horeca, e-commerce), di più con le [[tecnologie]] di produttività (radiofrequenza, pick-to-light, robot).
 
 Se non bastano crolla soprattutto l'[[accuratezza]] (−8 punti per ogni 100% di lavoro in eccesso), un po' la [[puntualita]], e il personale si stanca. Costano 18.000 € lordi l'anno, cioè circa 2.130 € al mese di [[costo_azienda|costo aziendale]].`);
 wk('carrellisti','pers','Carrellisti',`Guidano il muletto: scaricano i camion, mettono a scaffale e caricano. Ognuno fa circa 1.800 movimenti al mese.`,
@@ -847,7 +868,7 @@ wk('autisti_ce','pers','Autisti patente CE',`Guidano bilici e motrici: ognuno co
 
 Ognuno guida una [[motrici|motrice]]. Costano 23.000 € lordi l'anno più 1.100 € al mese di spese del mezzo. In Italia ne mancano davvero: un'[[assunzioni|assunzione]] richiede 3-6 settimane, quindi assumi appena vinci una gara.`);
 wk('autisti_b','pers','Autisti patente B',`Guidano i furgoni fino a 3,5 tonnellate: consegne in città, negozi, farmacie, e-commerce. Ognuno copre circa 4.000 km al mese.`,
-`Servono ai clienti con tante consegne piccole: e-commerce, farmaceutica, moda, cosmetica, spesa a domicilio. Il traffico e le soste fanno meno km al giorno di un bilico.
+`Servono ai [[canali]] con tante consegne piccole: horeca, dettaglio ed e-commerce. Il traffico e le soste fanno meno km al giorno di un bilico.
 
 Costano 19.000 € lordi l'anno più 900 € al mese di furgone in leasing, e il furgone consuma la metà. Si trovano in fretta (2-3 settimane con l'annuncio), ma cambiano lavoro spesso.`);
 wk('manager','pers','Manager di magazzino',`Il capo di un magazzino. Le sue Operazioni, Precisione e Leadership decidono i KPI e il morale.`,
@@ -890,6 +911,16 @@ wk('prezzo','cli','Prezzo rispetto al listino',`Lo sconto o il ricarico che offr
 `Il listino è calcolato su stoccaggio, [[movimenti]] e trasporto (vedi [[ricavi]]). Il prezzo scelto resta per tutti i 24 mesi del [[contratto]]: uno sconto troppo aggressivo può farti lavorare in perdita.`);
 wk('contratto','cli','Contratto',`Dura 24 mesi e parte 30 giorni dopo la gara vinta. Alla scadenza il cliente rinnova se la soddisfazione è almeno 50.`,
 `Nei 30 giorni prima dell'avvio prepara il [[magazzino]]: [[assunzioni|assumi]] il [[personale]] che serve. Alla scadenza il rinnovo è automatico se la [[soddisfazione]] è almeno 50 (40 con il [[tech_kam|Key account management]]); altrimenti il cliente passa alla concorrenza.`);
+wk('canali','cli','Canali di distribuzione',`Dove finisce la merce del cliente: supermercati, bar e ristoranti, negozi, case dei clienti online, stabilimenti. Ogni cliente ha il suo mix in percentuale.`,
+`Ogni cliente divide i suoi pallet tra cinque canali (la barra colorata nelle gare e nella scheda cliente):
+
+• **GDO**: piattaforme dei supermercati. Bilici pieni (carico ×1,2), appuntamento fisso allo scarico ([[puntualita]] −0,8), tariffa di distribuzione ×0,9, poco [[magazzinieri|picking]] (×0,8).
+• **Horeca**: bar, ristoranti e hotel. Furgoni ([[autisti_b|patente B]]) mezzi vuoti (carico ×0,6), consegne all'alba (puntualità −0,4, [[accuratezza]] −0,3), tariffa ×1,3, picking ×1,2.
+• **Dettaglio**: negozi, farmacie, ferramenta. Furgoni, carico ×0,8, picking a colli ×1,3, accuratezza −0,6, tariffa ×1,15.
+• **E-commerce**: consegne a casa. Furgoni, carico ×0,7, picking a pezzo ×1,6, accuratezza −1, puntualità −0,4, tariffa ×1,25.
+• **Industria**: stabilimenti e cantieri. Bilici ([[autisti_ce|patente CE]]), carico ×1,1, orari flessibili (puntualità +0,5, accuratezza +0,3), picking ×0,7, tariffa ×0,9. **Chi lavora per l'industria non ha altri canali.**
+
+Gli effetti si pesano sui pallet di tutti i clienti del magazzino. Il carico dei canali sposta la [[saturazione_mezzi|saturazione dei mezzi]]: la saturazione del magazzino è la media, e ogni canale viaggia più pieno o più vuoto di così. La [[tech_sinergia|sinergia in pianificazione]] rende solo tra clienti che servono gli stessi canali.`);
 wk('zona','cli','Zona di distribuzione',`Dove il cliente vuole le consegne: una provincia, una regione, tutto il Nord-Ovest o il Nord Italia.`,
 `Più è grande la zona, più km per ogni viaggio. Ogni viaggio porta 16 pallet e si conta andata e ritorno, con il 30% in più per le strade vere. I km decidono quanti [[autisti]] servono e i costi dei mezzi, ma aumentano anche il prezzo del trasporto pagato dal cliente.
 
@@ -913,7 +944,7 @@ wk('ricavi','eco','Ricavi',`Quanto paga ogni cliente al mese: posti occupati, mo
 `Per ogni cliente:
 • 5,50 € al mese per ogni posto pallet occupato;
 • 3,80 € per ogni [[movimenti|movimento]] (entrata e uscita);
-• 18 € per pallet consegnato, più 5 centesimi per ogni km del viaggio;
+• 18 € per pallet consegnato, più 5 centesimi per ogni km del viaggio, × la tariffa media dei [[canali]] del cliente (da ×0,9 per GDO e industria a ×1,3 per l'horeca);
 • 1,50 € per km dei viaggi di [[ritiro]].
 
 Il totale si moltiplica per il [[prezzo]] offerto in gara.`);
@@ -978,7 +1009,7 @@ function wikiText(t){
   return esc(t).split('\n\n').map(p=>{
     // senza etichetta si usa il nome della voce, in minuscolo a metà frase (ma non le sigle: CEO, WMS…)
     p=p.replace(/\[\[([^|\]]+)(?:\|([^\]]+))?\]\]/g,(m,id,l,at,str)=>{ if(l) return kw(id,l); let n=(WIKI[id]||{n:id}).n;
-      if(at>0&&!/(\.|•|:)\s*$/.test(str.slice(0,at))&&/^\S[a-zà-ù]/.test(n)) n=n[0].toLowerCase()+n.slice(1); return kw(id,esc(n)); }).replace(/\*([^*]+)\*/g,'<i>$1</i>').replace(/\n/g,'<br>');
+      if(at>0&&!/(\.|•|:)\s*$/.test(str.slice(0,at))&&/^\S[a-zà-ù]/.test(n)) n=n[0].toLowerCase()+n.slice(1); return kw(id,esc(n)); }).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\*([^*]+)\*/g,'<i>$1</i>').replace(/\n/g,'<br>');
     return `<p>${p}</p>`;}).join('');
 }
 function catIcon(cat,sz){ const c=WIKI_CAT.find(x=>x[0]===cat); const d=c&&c[2]&&DOCK.find(x=>x[0]===c[2]);
@@ -1010,6 +1041,7 @@ function newGame(ceoId,coName,color){
   const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,capo:0,autB:0,autCE:1,imp:2};
   (C.startTech||[]).forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true;});
   S.clients.push({id:nid('c'),...C.client,zone:cinfo(C.client).zones[0],src:cinfo(C.client).src,mode:cinfo(C.client).mode,wh:wh.id,mult:1,sat:60,status:'attivo',start:0,end:24*30,storico:true});
+  chMigrate(); // autisti B per la parte di merce che va con i furgoni
   news('La Gazzetta del Muletto',`Nasce ${S.company.name}`,`${C.name} apre l'anno con un solo cliente, ${C.client.name}. Con il magazzino quasi vuoto i conti sono in rosso: servono nuovi clienti dalle gare d'appalto.`);
   S.uid=uid;
 }
@@ -1021,7 +1053,7 @@ function addWarehouse(site,own,fixed,motrici){
 }
 const ceo=()=>CEOS.find(c=>c.id===S.ceoId);
 const whById=id=>S.warehouses.find(w=>w.id===id);
-const clientRev=c=>{const w=S&&whById(c.wh); const t=w?clientLog(c,w):{oKm:240,in:0,iKm:0}; return (c.stock*T_ST+2*c.pal*T_MO+c.pal*(18+0.05*t.oKm)+t.in*t.iKm*1.5)*c.mult*rankOf(c).rev;};
+const clientRev=c=>{const w=S&&whById(c.wh); const t=w?clientLog(c,w):{oKm:240,in:0,iKm:0}; return (c.stock*T_ST+2*c.pal*T_MO+c.pal*(18+0.05*t.oKm)*chAvg(c,'price')+t.in*t.iKm*1.5)*c.mult*rankOf(c).rev;};
 function news(src,title,text){S.news.unshift({day:S.day,src,title,text}); if(S.news.length>80)S.news.pop();}
 
 /* ====================== MOTORE ====================== */
@@ -1048,11 +1080,13 @@ function impNeed(cons){return 1+Math.ceil(cons/(R('gestionale')?2000:1500));}
 function welfarePts(k){return WELFARE.filter(w=>S.welfare[w.id]).reduce((a,w)=>a+w[k],0);}
 function modSum(wh,k){return S.mods.filter(m=>m.until>S.day&&(m.scope==='all'||m.scope===wh.id)).reduce((a,m)=>a+(m[k]||0),0);}
 // saturazione dei mezzi: quanto sono pieni in media i camion in uscita (% della capienza)
-function satMezzi(wh,n,m,needImp){
-  let nat=SAT0; const pS=[['Base',SAT0]];
+function satMezzi(wh,act,m,needImp,mixF){
+  const n=act.length; let nat=SAT0*mixF; const pS=[['Base',SAT0]]; if(Math.abs(mixF-1)>0.005) pS.push(['Mix dei canali',SAT0*(mixF-1)]);
+  // affinità media tra le coppie di clienti: la sinergia rende solo se i clienti servono gli stessi canali
+  let aff=0,np=0; for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){aff+=chOverlap(act[i],act[j]);np++;} aff=np?aff/np:0;
   TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t);
     if(t.sm){pS.push([t.name,t.sm*f]); nat+=t.sm*f;}
-    if(t.smC&&n>1){const v=Math.min(t.smMax,t.smC*(n-1))*f; pS.push([`Sinergia tra ${n} clienti`,v]); nat+=v;} });
+    if(t.smC&&n>1){const v=Math.min(t.smMax,t.smC*(n-1)*aff)*f; pS.push([`Sinergia tra ${n} clienti (affinità ${Math.round(aff*100)}%)`,v]); nat+=v;} });
   // capacità di pianificazione: fin dove il personale riesce a spingere i carichi se la direzione impone un obiettivo
   const obj=wh.satObj||0, extra=clamp((wh.staff.imp||0)-needImp,-3,3);
   const cP=[['Operazioni di '+m.name.split(' ')[0],1.2*(m.op-10)],['Morale',0.25*(wh.morale-60)]];
@@ -1063,13 +1097,16 @@ function satMezzi(wh,n,m,needImp){
   if(obj>nat){ val=pot>=obj?obj+0.35*(pot-obj):Math.max(nat,pot); pS.push([`Obiettivo ${obj}%: lavoro del personale`,Math.min(95,val)-nat]); }
   val=Math.min(95,val);
   const short=obj>nat?Math.max(0,obj-pot):0, addImp=obj>nat?clamp(Math.ceil((obj-(pot-8*extra))/8),0,3):0;
-  return {val,nat,pot,obj,push:Math.max(0,val-nat),short,addImp,pS,cP};
+  return {val,nat,pot,obj,push:Math.max(0,val-nat),short,addImp,pS,cP,aff};
 }
 function computeWH(wh,extra){
   const act=S.clients.filter(c=>c.wh===wh.id&&c.status==='attivo'); if(extra) act.push(extra);
   const stock=act.reduce((a,c)=>a+c.stock,0), cons=act.reduce((a,c)=>a+c.pal,0), mov=2*cons;
-  const m=mgrStats(wh), needImp=impNeed(cons), sm=satMezzi(wh,act.length,m,needImp);
-  const lg=act.map(c=>clientLog(c,wh,sm.val)), km=lg.reduce((a,t)=>a+t.km,0), viaggi=lg.reduce((a,t)=>a+t.out+t.in,0);
+  // mix dei canali del magazzino, pesato sui pallet
+  const chW=k=>cons?act.reduce((a,c)=>a+c.pal*chAvg(c,k),0)/cons:(k==='sat'||k==='pick'?1:0);
+  const mixF=chW('sat'), pickF=chW('pick');
+  const m=mgrStats(wh), needImp=impNeed(cons), sm=satMezzi(wh,act,m,needImp,mixF);
+  const lg=act.map(c=>clientLog(c,{...wh,kpi:{mixF}},sm.val)), km=lg.reduce((a,t)=>a+t.km,0), viaggi=lg.reduce((a,t)=>a+t.out+t.in,0);
   const kmB=lg.reduce((a,t)=>a+t.kmB,0), kmCE=lg.reduce((a,t)=>a+t.kmCE,0), st=wh.staff;
   let tA=0,tP=0,tMor=0,tProd=0,tCan=0; const tparts=[];
   let fuelMul=1;
@@ -1077,14 +1114,14 @@ function computeWH(wh,extra){
   const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd);
   // carrellisti: tutti i movimenti (doppia produttività col muletto); magazzinieri: preparano i pallet in uscita
   const use=(load,n,per)=>load===0?0:(n>0?load/(n*per):9);
-  const uCar=use(mov,st.car,2*prod), uPick=use(cons,st.pick,prod), uB=use(kmB,st.autB,KM_B), uCE=use(kmCE,st.autCE,KM_CE);
+  const uCar=use(mov,st.car,2*prod), uPick=use(cons*pickF,st.pick,prod), uB=use(kmB,st.autB,KM_B), uCE=use(kmCE,st.autCE,KM_CE);
   const cap=capOf(wh); const sat=stock/cap;
   const impShort=Math.max(0,needImp-st.imp);
   const needCapo=Math.floor((st.pick+st.car)/10), capoShort=Math.max(0,needCapo-st.capo);
   const pNeed=planNeed(), planShort=Math.max(0,pNeed-S.office.plan), giri=pNeed>0&&!planShort?0.96:1;
   const mP=modSum(wh,'P'), mA=modSum(wh,'A'), mMor=modSum(wh,'mor');
   const pP=[['Base',92],['Operazioni di '+m.name.split(' ')[0],0.4*(m.op-10)]];
-  if(tP) pP.push(['Tecnologie',tP]); if(mP) pP.push(['Eventi',mP]);
+  if(tP) pP.push(['Tecnologie',tP]); if(mP) pP.push(['Eventi',mP]); const chP=chW('P'), chA=chW('A'); if(Math.abs(chP)>0.05) pP.push(['Canali di distribuzione',chP]);
   const dOp=dirStat('op'); if(dOp!=null) pP.push(['Direttore operativo',0.15*(dOp-10)]);
   if(uCE>1) pP.push(['Autisti CE insufficienti',-20*(uCE-1)]); if(uB>1) pP.push(['Autisti B insufficienti',-20*(uB-1)]);
   if(uCar>1.05) pP.push(['Carrellisti insufficienti',-8*(uCar-1.05)]); if(uPick>1.05) pP.push(['Magazzinieri insufficienti',-3*(uPick-1.05)]);
@@ -1092,7 +1129,7 @@ function computeWH(wh,extra){
   if(planShort) pP.push(['Pianificatori del traffico insufficienti',-2*planShort]);
   if(sm.push>0.5) pP.push(['Camion che aspettano il carico completo',-0.06*sm.push]);
   const pA=[['Base',96],['Precisione di '+m.name.split(' ')[0],0.3*(m.prec-10)],['Morale',0.04*(wh.morale-60)]];
-  if(tA) pA.push(['Tecnologie',tA]); if(mA) pA.push(['Eventi',mA]); if(R('iso')) pA.push(['Certificazione ISO',0.5]);
+  if(tA) pA.push(['Tecnologie',tA]); if(mA) pA.push(['Eventi',mA]); if(Math.abs(chA)>0.05) pA.push(['Canali di distribuzione',chA]); if(R('iso')) pA.push(['Certificazione ISO',0.5]);
   if(sat>0.85) pA.push(['Saturazione oltre 85%',-25*(sat-0.85)]); if(uPick>1) pA.push(['Magazzinieri insufficienti',-8*(uPick-1)]); if(uCar>1) pA.push(['Carrellisti insufficienti',-3*(uCar-1)]);
   if(impShort) pA.push(['Impiegati insufficienti',-1*impShort]);
   if(capoShort) pA.push(['Capiturno insufficienti',-1*capoShort]); if(wh.coop) pA.push(['Facchini in cooperativa',COOP.A]);
@@ -1104,8 +1141,8 @@ function computeWH(wh,extra){
   // bilici: gasolio, manutenzione e pedaggi; furgoni: consumano e costano meno, sempre in leasing
   const mezzi=giri*kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+giri*kmB*(0.12*S.fuel*fuelMul+0.06)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100+st.autB*900;
   const fissi=(wh.fixed+1000)*fixedMul();
-  const need={pick:Math.max(cons?1:0,Math.ceil(cons/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp+sm.addImp,capo:needCapo};
-  return {act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,P,A,pP,pA,morT,rev,pers,mezzi,fissi,tCan,need,prod,m};
+  const need={pick:Math.max(cons?1:0,Math.ceil(cons*pickF/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp+sm.addImp,capo:needCapo};
+  return {act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,mixF,pickF,P,A,pP,pA,morT,rev,pers,mezzi,fissi,tCan,need,prod,m};
 }
 function globalCosts(){
   const emp=S.warehouses.reduce((a,w)=>a+staffTot(w),0)+S.office.plan;
@@ -1474,6 +1511,11 @@ function fillSave(s){
 function rebalanceDrivers(){
   if(!S.staffMig) return; delete S.staffMig;
   S.warehouses.forEach(w=>{const k=computeWH(w), mv=Math.min(k.need.autB,Math.max(0,w.staff.autCE-k.need.autCE)); w.staff.autCE-=mv; w.staff.autB+=mv;});
+}
+// canali di distribuzione (dal 2026): i clienti di prima ora usano anche i furgoni; gli autisti CE in più passano alla patente B e quelli che mancano vengono assunti una volta sola
+function chMigrate(){
+  if(S.chV) return; S.chV=1;
+  S.warehouses.forEach(w=>{const k=computeWH(w), mv=Math.min(k.need.autB,Math.max(0,w.staff.autCE-k.need.autCE)); w.staff.autCE-=mv; w.staff.autB=Math.max(w.staff.autB+mv,k.need.autB);});
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify({S,uid}));}catch(e){}}
 function load(){try{const r=localStorage.getItem(KEY);if(!r)return null;return JSON.parse(r);}catch(e){return null;}}
@@ -2071,7 +2113,7 @@ Object.assign(ACT,{
  pickceo(d){const old=CEOS.find(c=>c.id===startSel.ceo);const inp=$('#coname-in');const typed=inp?inp.value:'';startSel.ceo=d.id;if(!typed||typed===old.company)startSel.name='';else startSel.name=typed;showStart();},
  pickcolor(d){startSel.color=d.c;applyColor(d.c);startSel.name=$('#coname-in').value;showStart();},
  startgame(){const nm=($('#coname-in').value||'').trim();uid=1;newGame(startSel.ceo,nm,startSel.color);boot();},
- continue(){const sv=load();if(!sv)return;S=fillSave(migrateStaff(renameClients(sv.S)));S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;rebalanceDrivers();boot();}
+ continue(){const sv=load();if(!sv)return;S=fillSave(migrateStaff(renameClients(sv.S)));S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){m.tal=d.tal;m.role=d.role;}});if(S.project===undefined)S.project=null;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();}
 });
 function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;

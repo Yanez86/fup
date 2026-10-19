@@ -13,14 +13,14 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Entrambi sono limitati tra 50 e 99,9.
 - **Morale**: obiettivo = 58 + 0,6·(Leadership−10) + welfare + tecnologie + Academy 3 + direttore HR·0,3·(Lead−10) − 20·(sovraccarico magazzinieri) − 20·(sovraccarico carrellisti) − 20·(sovraccarico del gruppo di autisti più carico). Ogni giorno il morale si avvicina all'obiettivo dell'1,2% della differenza.
 - Le abilità usate sono quelle del manager del magazzino; senza manager le prestazioni calano.
-- **Saturazione dei mezzi** (`satMezzi()`): quanto sono pieni in media i camion in uscita, in % della capienza (`CAPV` = 33 pallet). Base 48,5% (16 pallet a viaggio). Viaggi di distribuzione = ceil(pallet / (33 × saturazione)): più saturazione = meno viaggi, km, gasolio e autisti; il ricavo non cambia.
-  - Saturazione naturale = 48,5 + GPS 2 + pianificazione rotte 5 + **Sinergia in pianificazione** 7 × (clienti attivi nel magazzino − 1), massimo +30 (tutte valgono a metà e al contrario durante l'apprendimento).
+- **Saturazione dei mezzi** (`satMezzi()`): quanto sono pieni in media i camion in uscita, in % della capienza (`CAPV` = 33 pallet). Base 48,5% (16 pallet a viaggio) × fattore di carico medio dei canali. Più saturazione = meno viaggi, km, gasolio e autisti; il ricavo non cambia.
+  - Saturazione naturale = 48,5 + GPS 2 + pianificazione rotte 5 + **Sinergia in pianificazione** 7 × (clienti attivi nel magazzino − 1) × affinità media tra le coppie di clienti (somma dei minimi delle quote per canale), massimo +30 (tutte valgono a metà e al contrario durante l'apprendimento).
   - **Obiettivo minimo** (`w.satObj`, nessuno / 55-90%), scelto nella finestra del magazzino. Capacità di pianificazione = naturale + 1,2·(Operazioni del manager−10) + 0,25·(morale−60) + 8 × impiegati in più del necessario (tra −3 e +3) + eventi.
   - Se l'obiettivo supera la naturale: con capacità ≥ obiettivo la saturazione è obiettivo + 35% dell'eccedenza; altrimenti si ferma alla capacità (mai sotto la naturale). Massimo 95%.
   - Costi: Puntualità −0,06 per ogni punto sopra la naturale (camion che aspettano il carico); morale obiettivo −0,5 per ogni punto di obiettivo non raggiunto. Gli impiegati necessari mostrati salgono di quanti ne servono per raggiungere l'obiettivo (massimo 3).
 
 ## Economia (mensile)
-- Ricavo per cliente = (posti pallet·5,5 + 2·pallet movimentati·3,8 + pallet·(18 + 0,05·km di un viaggio di distribuzione) + viaggi di ritiro·km del ritiro·1,5) × moltiplicatore dell'offerta.
+- Ricavo per cliente = (posti pallet·5,5 + 2·pallet movimentati·3,8 + pallet·(18 + 0,05·km di un viaggio di distribuzione)·tariffa media dei canali + viaggi di ritiro·km del ritiro·1,5) × moltiplicatore dell'offerta.
 - Personale: RAL magazzinieri 18.000, carrellisti 19.500, impiegati di magazzino 22.000, autisti patente B 19.000, autisti patente CE 23.000, × 1,42 di oneri, ÷ 12.
 - Mezzi: km CE × (0,25 l/km × gasolio × riduzione rotte + 0,13) €/km + km B × (0,12 l/km × gasolio × riduzione rotte + 0,06) €/km, più 1.100 € per autista CE, 2.100 € di leasing per ogni autista CE oltre le motrici di proprietà e 900 € di furgone in leasing per autista B.
 - Ogni autista CE copre 5.200 km al mese, ogni autista B 4.000 (traffico e soste in città). Se gli autisti sono troppo pochi, la Puntualità cala.
@@ -31,7 +31,8 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 ## Clienti e contratti
 - Ogni cliente ha un **logo** in pixel art 16×16 (`LOGO`).
 - **Zona di distribuzione** (`ZONES`): può essere una provincia, una regione (Piemonte, Lombardia, Liguria), tutto il Nord-Ovest o il Nord Italia (che comprende anche Piacenza e Verona). "Tutta Italia" esiste già ma è bloccata finché la mappa non si allarga: i clienti che la richiedono (Spedizioni Tricolore) non partecipano alle gare. La zona viene scelta a ogni gara tra quelle possibili per quel cliente (`CINFO.zones`); il cliente iniziale usa la prima.
-- Viaggi di distribuzione = ceil(pallet/16). Km di un viaggio = 2 × distanza media tra il magazzino e i capoluoghi della zona × 1,3 + 30.
+- **Canali di distribuzione** (`CHANNELS`, `CINFO.ch` in % dei pallet): GDO, Horeca, Dettaglio, E-commerce, Industria. Chi ha il canale Industria non ha altri canali. Per canale: mezzo (GDO e Industria bilici CE; Horeca, Dettaglio, E-commerce furgoni B), carico rispetto alla media del magazzino (GDO ×1,2, Horeca ×0,6, Dettaglio ×0,8, E-commerce ×0,7, Industria ×1,1), tariffa di distribuzione (×0,9 / 1,3 / 1,15 / 1,25 / 0,9), lavoro dei magazzinieri (×0,8 / 1,2 / 1,3 / 1,6 / 0,7), Puntualità (−0,8 / −0,4 / 0 / −0,4 / +0,5) e Accuratezza (0 / −0,3 / −0,6 / −1 / +0,3). Gli effetti su KPI e magazzinieri si pesano sui pallet di tutti i clienti del magazzino.
+- Viaggi di distribuzione: per ogni canale ceil(pallet del canale / (33 × carico del canale)), con carico = saturazione del magazzino × fattore del canale / fattore medio del magazzino (max 95%). Km di un viaggio = 2 × distanza media tra il magazzino e i capoluoghi della zona × 1,3 + 30.
 - **Approvvigionamento** (`CINFO.src`, `ORIGINS`): da dove arriva la merce. Con `ritiro` andiamo noi a prenderla: ceil(pallet/33) viaggi a pieno carico, ciascuno di 2 × distanza × 1,3 + 20 km. Così servono più autisti e più gasolio, ma c'è anche più fatturato. Con `consegna` la merce la porta il cliente e per noi non ci sono costi.
 - Sulla mappa, "Mostra sulla mappa" dalla finestra Clienti disegna le linee verso la zona e la linea di arrivo della merce (arancione se il ritiro è nostro, bianca se consegna il cliente).
 - **Lenti della mappa** (`LENSES`, pulsanti in basso a destra o tasto L): cambiano cosa mostra la mappa, come le modalità mappa dei giochi Paradox. Per ora: *Mappa normale* e *Province* (le 25 province di Piemonte, Valle d'Aosta, Lombardia e Liguria con sigla, colori diversi tra province confinanti e bordo più spesso dove hai un magazzino; il tooltip mostra regione, capoluogo, tuoi magazzini e siti in affitto). Sono solo visualizzazione, non cambiano le regole.
@@ -63,11 +64,11 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Attrattività = 40 + welfare + (reputazione−50)·0,5 + 5.
 - Ogni magazzino ha sei mestieri (`ROLES`, `w.staff`): magazzinieri (`pick`), carrellisti (`car`), capiturno (`capo`), impiegati di magazzino (`imp`), autisti patente B (`autB`), autisti patente CE (`autCE`). Non ci sono più impiegati di sede.
 - Produttività base `prod` = 900 × (0,7 + 0,3·morale/70) × (1 + tecnologie di produttività).
-- Magazzinieri necessari = pallet consegnati al mese / prod (preparano i pallet in uscita, pesano sull'Accuratezza).
+- Magazzinieri necessari = pallet consegnati al mese × lavoro medio dei canali / prod (preparano i pallet in uscita, pesano sull'Accuratezza).
 - Carrellisti necessari = movimenti (2 × pallet) / (2·prod) (scaricano, stoccano e caricano col muletto, pesano sulla Puntualità).
 - Impiegati necessari per magazzino = 1 + ceil(pallet consegnati / 1.500) (2.000 con il gestionale).
-- Autisti B necessari = km di distribuzione dei clienti con `CINFO.veh='B'` / 4.000. Autisti CE = km di distribuzione degli altri clienti + km di tutti i ritiri, / 5.200.
-- Clienti con furgoni (`veh:'B'`): FarmaSpa, Moda Grucciani, Scarpinando, Tuttosubito Italia, Spesa Veloce, Spedizioni Tricolore, Cosmetici Belletto, Seterie del Lario.
+- Autisti B necessari = km di distribuzione dei canali con furgoni (Horeca, Dettaglio, E-commerce) / 4.000. Autisti CE = km dei canali con bilici (GDO, Industria) + km di tutti i ritiri, / 5.200.
+- Furgoni o bilici dipendono dai **canali di distribuzione** del cliente (vedi Clienti e contratti).
 - Tempi base di assunzione (annuncio / agenzia, giorni): magazzinieri 20/6, carrellisti 25/8, impiegati 20/7, autisti B 15/6, autisti CE 40/16.
 - **Capoturno** (`capo`): ne serve uno ogni 10 tra magazzinieri e carrellisti (floor). Ognuno che manca: morale obiettivo −4, Accuratezza −1. RAL 25.000.
 - **Pianificatori del traffico** (`S.office.plan`, in sede): necessari = floor(viaggi al mese di tutti i clienti attivi / 80). Ognuno che manca: Puntualità −2 in tutti i magazzini. Con la squadra al completo (e almeno uno necessario) i costi a km dei mezzi −4%. RAL 26.000.
