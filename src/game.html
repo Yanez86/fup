@@ -68,6 +68,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .spd{display:flex;gap:4px}
 .spd button{width:36px;height:34px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font-family:var(--f-disp);font-weight:700;box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
 .spd button[aria-pressed="true"]{background:var(--accent);color:var(--ink);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
+.optb{width:36px;height:34px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink4);background:var(--ink3);box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
+.optb:hover{border-color:#fff}
 .spacer{flex:1}
 .stats{display:flex;gap:6px;flex-wrap:wrap}
 .paused{font-family:var(--f-disp);font-size:15px;padding:3px 8px;background:var(--bad);border:2px solid #fff}
@@ -253,7 +255,7 @@ html,body{overscroll-behavior:none}
 .mob #top .logo{font-size:19px}
 .mob #top .logo small,.mob #top .spacer{display:none}
 .mob .date{font-size:14px;padding:3px 6px}
-.mob .spd button{width:38px;height:36px}
+.mob .spd button,.mob .optb{width:38px;height:36px}
 .mob .paused{display:none}
 .mob #top .stats{gap:4px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
 .mob #top .stats .chip.opt2{display:none}
@@ -318,6 +320,7 @@ html,body{overscroll-behavior:none}
     <button data-act="speed" data-v="2" aria-label="Velocità 2">››</button>
     <button data-act="speed" data-v="3" aria-label="Velocità 3">›››</button>
   </div>
+  <button class="optb" data-act="options" aria-label="Opzioni" title="Opzioni"><svg width="20" height="20" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="#16202e" d="M4 0h2v1h1v1h1v-1h1v1h1v1h-1v1h1v2h-1v1h1v1h-1v1h-1v-1h-1v1h-1v1h-2v-1h-1v-1h-1v1h-1v-1h-1v-1h1v-1h-1v-2h1v-1h-1v-1h1v-1h1v1h1v-1h1z"/><path fill="#d8e2ee" d="M4 1h2v1h1v1h1v4h-1v1h-1v1h-2v-1h-1v-1h-1v-4h1v-1h1z"/><path fill="#16202e" d="M4 4h2v2h-2z"/></svg></button>
   <span class="paused" id="paused" hidden>In pausa</span>
   <div class="spacer"></div>
   <div class="stats num" id="stats"></div>
@@ -2215,7 +2218,10 @@ const ACT={
  wikiback(){ if(!(UI.wikiBack||[]).length) return; UI.wiki=UI.wikiBack.pop(); wikiShow(); },
  wikihome(){ (UI.wikiBack=UI.wikiBack||[]).push(UI.wiki); UI.wiki=null; wikiShow(); },
  save(){save();toast('Partita salvata','ok');},
- restart(){closeModal();showStart();}
+ restart(){closeModal();showStart();},
+ options(){if($('#modal').innerHTML)return;if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);}
+   showModal(`<div class="src"><span>Opzioni</span><span>${shortDate(S.day)}</span></div><div class="win-b"><button class="btn pri" data-act="closemodal">Riprendi</button><button class="btn" data-act="quitgame">Esci dal gioco</button><p class="sm" style="margin:0">Uscendo la partita viene salvata: la ritrovi con «Continua la partita» nella schermata iniziale.</p></div>`);},
+ quitgame(){UI.evSpeed=0;if(!S.over)save();closeModal();Object.keys(UI.open).forEach(closeWin);showStart();}
 };
 function wikiShow(){
   const old=document.querySelector('#wiki-list'), ls=old?old.scrollTop:0;
