@@ -227,6 +227,7 @@ table.t td.r,table.t th.r{text-align:right}
 .wh-warn{font-size:14px;color:#ff8a8d}
 .tr-c{display:flex;flex-direction:column;gap:6px}.tr-r{display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid var(--panel2)}.tr-r .tkp{flex:none}
 .tr-t{display:flex;flex-direction:column;min-width:0;flex:1}.tr-m{flex:none;font-size:14px}.tr-f{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;font-size:14px}
+.tr-rule .wh-sm{gap:1px}
 .tr-sq{display:flex;flex-wrap:wrap;gap:6px 16px;margin:4px 0}
 .mob .tr-r .tkp{width:56px;height:18px}
 .mfx-l{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;margin-top:6px}.mfx-l .lab{margin-right:2px}
@@ -1004,6 +1005,28 @@ const WELFARE=[
 // policy aziendali: regole accese o spente per tutta l'azienda. fx: mor/P/A (punti in ogni magazzino), prod (produttività), pers (costo del personale dei magazzini),
 // fuel (gasolio), fix (costi fissi), att (attrattività), sat (soddisfazione dei clienti al mese), rep (reputazione al mese), gara (punteggio nelle gare);
 // moltiplicatori: staff (peso dei reparti in affanno su puntualità e accuratezza), learn (apprendimento delle tecnologie), planHire (tempo per assumere pianificatori)
+// regole del traffico: si accendono e spengono per magazzino dall'Ufficio traffico. fx: sm (saturazione dei mezzi, punti), P/A (KPI), mor (morale obiettivo),
+// prod (produttività), drv (costo degli autisti), km (costo variabile a km dei mezzi), sat (soddisfazione dei clienti del magazzino al mese)
+const TR_CD=30;  // giorni prima di poter cambiare di nuovo una regola nello stesso magazzino
+const TR_RULES=[
+ {id:'routine',name:'Giri a giorni fissi',fx:{sm:8,P:-1},pro:'Camion più pieni: saturazione dei mezzi +8',con:'Puntualità −1: chi ordina il giorno sbagliato aspetta il giro',
+  txt:'Ogni zona ha i suoi giorni: il lunedì Brianza, il martedì Bergamasca. La merce si accumula e parte tutta insieme, sui camion pieni.'},
+ {id:'cutoff',name:'Cut-off degli ordini alle 14',fx:{A:1,sm:-4},pro:'Accuratezza +1: gli ordini si preparano con calma',con:'Saturazione dei mezzi −4: gli ordini arrivati dopo partono il giorno dopo, su camion meno pieni',
+  txt:'Gli ordini arrivati dopo le 14 si preparano domani. Niente più corse delle 17:58, ma qualche camion parte con un buco in fondo.'},
+ {id:'pieni',name:'Si parte solo a camion pieno',fx:{sm:14,P:-2.5,sat:-1},pro:'Saturazione dei mezzi +14: meno viaggi, meno autisti e meno gasolio',con:'Puntualità −2,5 e soddisfazione dei clienti −1 al mese: la merce aspetta che il camion si riempia',
+  txt:'Il camion non esce dal piazzale finché non è pieno. Il controllo di gestione applaude, il cliente che aspetta un pallet solo un po\' meno.'},
+ {id:'alba',name:'Partenze all\'alba',fx:{P:1,mor:-2,drv:0.08},pro:'Puntualità +1: i camion evitano le code delle tangenziali',con:'Costo degli autisti +8% (indennità per l\'orario) e morale −2',
+  txt:'I camion partono alle 4:30, prima che la tangenziale si blocchi. Alle 8 sono già al primo scarico.'},
+ {id:'slot',name:'Scarichi su prenotazione',fx:{P:0.5,prod:0.05,sat:-0.5},pro:'Puntualità +0,5 e produttività +5%: niente code in banchina',con:'Soddisfazione dei clienti −0,5 al mese: fornitori e clienti devono prenotare lo slot',
+  txt:'Chi porta merce prenota l\'orario di scarico sul portale. Le baie lavorano senza code, ma qualcuno si presenta lo stesso senza appuntamento.'},
+ {id:'ritorni',name:'Ritorni carichi',fx:{km:0.1,P:-0.5},pro:'Costo a km dei mezzi −10%: al ritorno i camion portano merce di altri',con:'Puntualità −0,5: per caricare al ritorno qualche giro si allunga',
+  txt:'Dopo l\'ultimo scarico il camion passa da un fornitore o da un altro trasportatore e torna carico. Il viaggio a vuoto diventa un viaggio pagato.'},
+ {id:'sabato',name:'Consegne anche il sabato',fx:{P:1.2,mor:-3,drv:0.06},pro:'Puntualità +1,2: il lavoro del venerdì non scivola al lunedì',con:'Costo degli autisti +6% e morale −3',
+  txt:'Una squadra ridotta consegna anche il sabato mattina. I negozi ringraziano, le famiglie degli autisti meno.'}
+];
+const trOn=(w,id)=>!!(w&&w.rules&&w.rules[id]&&w.rules[id].on);
+const trSum=(w,k)=>TR_RULES.reduce((a,r)=>a+(trOn(w,r.id)&&r.fx[k]||0),0);
+const trWait=(w,id)=>{const c=w.rules&&w.rules[id]; return c?Math.max(0,c.day+TR_CD-S.day):0;};
 const POL_CD=90;  // giorni prima di poter cambiare di nuovo la stessa policy
 const POLICIES=[
  {id:'zerostra',name:'Zero straordinario',tech:'regolamento',opp:'sabato',fx:{mor:4,staff:1.5},pro:'Morale +4 in tutti i magazzini',con:'I reparti in affanno pesano il 50% in più su puntualità e accuratezza: nessuno resta a coprire i picchi',
@@ -1902,6 +1925,17 @@ Ogni cliente ha i suoi camioncini, uno per [[canali|canale]]: i quadratini color
 Il costo è quello pieno di un km nel magazzino: stipendi degli autisti, mezzi, noleggi, manutenzione e gasolio, divisi per i km fatti. Se gli autisti sono troppi per i km da fare, ogni km costa di più. Il ricavo di un pallet ha una parte fissa e una che cresce con la distanza: per questo le zone lontane, servite con camion mezzi vuoti, finiscono spesso in perdita.
 
 Da qui si sceglie anche l'[[obiettivo_sat|obiettivo di carico]]. Sulla mappa la lente **Viaggi** disegna i giri: linee più spesse = più viaggi; verde camion pieni, giallo a metà, rosso quasi vuoti; tratteggiate se il trasporto è in perdita; in arancione i [[ritiro|ritiri]] dai fornitori.`);
+wk('regole_traffico','cli','Regole del traffico',`Regole da accendere o spegnere magazzino per magazzino dall'Ufficio traffico: giorni fissi, cut-off, camion solo pieni, partenze all'alba e altre. Ognuna ha un vantaggio e un prezzo.`,
+`Si scelgono nell'[[traffico|Ufficio traffico]] e valgono solo per quel magazzino. Dopo un cambio servono 30 giorni prima di cambiare di nuovo la stessa regola.
+• **Giri a giorni fissi**: [[saturazione_mezzi|saturazione dei mezzi]] +8, [[puntualita]] −1.
+• **Cut-off degli ordini alle 14**: [[accuratezza]] +1, saturazione dei mezzi −4.
+• **Si parte solo a camion pieno**: saturazione dei mezzi +14, puntualità −2,5, [[soddisfazione]] dei clienti del magazzino −1 al mese.
+• **Partenze all'alba**: puntualità +1, costo degli autisti +8%, [[morale]] −2.
+• **Scarichi su prenotazione**: puntualità +0,5, produttività +5%, soddisfazione −0,5 al mese.
+• **Ritorni carichi**: costo a km dei mezzi −10%, puntualità −0,5.
+• **Consegne anche il sabato**: puntualità +1,2, costo degli autisti +6%, morale −3.
+
+Più saturazione vuol dire meno viaggi, meno km e meno autisti, a parità di ricavi. Le regole si sommano: giorni fissi e camion solo pieni insieme fanno camion pienissimi, ma i clienti con soglie di puntualità alte se ne accorgono. Nel Riepilogo, scheda Modificatori, compaiono come «Regole del traffico».`);
 wk('ritiro','cli','Ritiro o consegna',`Da dove arriva la merce: la consegna il cliente con i suoi mezzi, oppure la vai a prendere tu.`,
 `Con "consegna" la merce arriva al magazzino gratis. Con "ritiro" mandi un bilico da 33 pallet fino allo stabilimento del cliente: servono più [[autisti_ce|autisti CE]] e più gasolio, ma il cliente paga 1,5 € per ogni km di ritiro.`);
 wk('concorrenti','cli','Concorrenti',`Gruppo Bartolazzi, Logistix Global, F.lli Brambilla e la Cooperativa La Fatica: si prendono le gare che perdi.`,
@@ -2305,6 +2339,7 @@ function modSum(wh,k){return S.mods.filter(m=>m.until>S.day&&(m.scope==='all'||m
 // saturazione dei mezzi: quanto sono pieni in media i camion in uscita (% della capienza)
 function satMezzi(wh,act,m,needImp,mixF){
   const n=act.length; let nat=SAT0*mixF; const pS=[['Base',SAT0]]; if(Math.abs(mixF-1)>0.005) pS.push(['Mix dei canali',SAT0*(mixF-1)]);
+  const trS=trSum(wh,'sm'); if(n&&trS){pS.push(['Regole del traffico',trS]); nat+=trS;}
   const mSm=mgrFx(m).sm; if(n&&Math.abs(mSm)>0.05){pS.push(['Operazioni di '+m.name.split(' ')[0],mSm]); nat+=mSm;}
   // affinità media tra le coppie di clienti: la sinergia rende solo se i clienti servono gli stessi canali
   let aff=0,np=0; for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){aff+=chOverlap(act[i],act[j]);np++;} aff=np?aff/np:0;
@@ -2338,7 +2373,7 @@ function computeWH(wh,extra){
   // servizi di welfare del magazzino: niente apprendimento, valgono da subito
   let wMor=0,wP=0,wA=0,wCan=0; TECH.forEach(t=>{ if(t.tree!=='wel'||!wh.tech[t.id]) return; wMor+=t.mor||0; wP+=t.P||0; wA+=t.A||0; tProd+=t.prod||0; wCan+=welMese(t); });
   const mf=mgrFx(m), kmB1=KM_B*mf.km, kmCE1=KM_CE*mf.km;
-  const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd+polSum('prod'))*(1-condPen(wh))*(wh.build?0.95:1)*mf.prod;
+  const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd+polSum('prod'))*(1-condPen(wh))*(wh.build?0.95:1)*mf.prod*(1+trSum(wh,'prod'));
   // carrellisti: tutti i movimenti (doppia produttività col muletto); magazzinieri: preparano i pallet in uscita
   const use=(load,n,per)=>load===0?0:(n>0?load/(n*per):9);
   const uCar=use(mov,st.car,2.5*prod), uPick=use(cons*pickF,st.pick,prod), uB=use(kmB,st.autB,kmB1), uCE=use(kmCE,st.autCE,kmCE1);
@@ -2355,27 +2390,29 @@ function computeWH(wh,extra){
   if(uCar>1.05) pP.push(['Carrellisti insufficienti',-8*(uCar-1.05)*sk]); if(uPick>1.05) pP.push(['Magazzinieri insufficienti',-3*(uPick-1.05)*sk]);
   if(impShort) pP.push(['Impiegati insufficienti',-1.5*impShort*sk]);
   const poP=polSum('P'), poA=polSum('A'); if(poP) pP.push(['Policy aziendali',poP]);
+  const trP=trSum(wh,'P'), trA=trSum(wh,'A'); if(trP) pP.push(['Regole del traffico',trP]);
   if(planShort) pP.push(['Pianificatori del traffico insufficienti',-2*planShort]);
   if(sm.push>0.5) pP.push(['Camion che aspettano il carico completo',-0.06*sm.push]);
   const pA=[['Base',96],['Precisione di '+m.name.split(' ')[0],0.3*(m.prec-10)],['Morale',0.04*(wh.morale-60)]];
   if(tA) pA.push(['Tecnologie',tA]); if(wA) pA.push(['Servizi di welfare',wA]); if(mA) pA.push(['Eventi',mA]); if(Math.abs(chA)>0.05) pA.push(['Canali di distribuzione',chA]); if(R('iso')) pA.push(['Certificazione ISO',0.5]);
   if(sat>0.85) pA.push(['Magazzino pieno oltre l\'85%',-25*(sat-0.85)]); if(uPick>1) pA.push(['Magazzinieri insufficienti',-8*(uPick-1)*sk]); if(uCar>1) pA.push(['Carrellisti insufficienti',-3*(uCar-1)*sk]);
-  if(impShort) pA.push(['Impiegati insufficienti',-1*impShort*sk]); if(poA) pA.push(['Policy aziendali',poA]);
+  if(impShort) pA.push(['Impiegati insufficienti',-1*impShort*sk]); if(poA) pA.push(['Policy aziendali',poA]); if(trA) pA.push(['Regole del traffico',trA]);
   const exN=act.filter(c=>c.exit).length; if(exN) pA.push(['Inventario di uscita',-1*exN]);
   if(capoShort) pA.push(['Capiturno insufficienti',-1*capoShort]); if(wh.coop) pA.push(['Facchini in cooperativa',COOP.A]);
   const P=clamp(pP.reduce((a,x)=>a+x[1],0),50,99.9), A=clamp(pA.reduce((a,x)=>a+x[1],0),50,99.9);
   const dHr=dirStat('hr');
   // morale verso cui tende il magazzino: le voci servono anche al Riepilogo (scheda Modificatori)
-  const pM=[['Base',58],['Leadership di '+m.name.split(' ')[0],0.6*(m.lead-10)],['Benefit aziendali',welfarePts('mor')],['Tecnologie',tMor],['Servizi di welfare',wMor],['Eventi',mMor],[tl,talWh(wh,'mor')],['Direttore risorse umane',dHr!=null?0.3*(dHr-10):0],['Policy aziendali',polSum('mor')],
+  const pM=[['Base',58],['Leadership di '+m.name.split(' ')[0],0.6*(m.lead-10)],['Benefit aziendali',welfarePts('mor')],['Tecnologie',tMor],['Servizi di welfare',wMor],['Eventi',mMor],[tl,talWh(wh,'mor')],['Direttore risorse umane',dHr!=null?0.3*(dHr-10):0],['Policy aziendali',polSum('mor')],['Regole del traffico',trSum(wh,'mor')],
     ['Magazzinieri insufficienti',-20*Math.max(0,uPick-1)],['Carrellisti insufficienti',-20*Math.max(0,uCar-1)],['Capiturno insufficienti',-4*capoShort],['Facchini in cooperativa',wh.coop?COOP.mor*fireMul(wh):0],
     ['Autisti insufficienti',-20*Math.max(0,Math.max(uB,uCE)-1)],['Personale che non sta dietro all\'obiettivo di carico',-0.5*sm.short]].filter((x,i)=>i===0||Math.abs(x[1])>0.05);
   const morT=clamp(pM.reduce((a,x)=>a+x[1],0),0,100);
   const rev=act.reduce((a,c)=>a+clientRev(c),0);
-  const pers=ROLES.reduce((a,r)=>a+(st[r]||0)*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12*(1+polSum('pers'));
+  const pers=ROLES.reduce((a,r)=>a+(st[r]||0)*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12*(1+polSum('pers'))+((st.autB||0)*RAL.autB+(st.autCE||0)*RAL.autCE)*COEF/12*trSum(wh,'drv');
   // bilici: gasolio, manutenzione e pedaggi; furgoni: consumano e costano meno, sempre in leasing
-  const mezzi=giri*kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+giri*kmB*(0.12*S.fuel*fuelMul+0.06)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100+st.autB*900;
+  const kmM=giri*(1-trSum(wh,'km'));
+  const mezzi=kmM*kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+kmM*kmB*(0.12*S.fuel*fuelMul+0.06)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100+st.autB*900;
   // costo pieno di un km, separato per bilici e furgoni (autisti, mezzi, gasolio): serve all'Ufficio traffico
-  const drv=r=>(st[r]||0)*RAL[r]*COEF/12*(1+polSum('pers')), mzCE=giri*kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100;
+  const drv=r=>(st[r]||0)*RAL[r]*COEF/12*(1+polSum('pers')+trSum(wh,'drv')), mzCE=kmM*kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100;
   const tr={cCE:mzCE+drv('autCE'),cB:mezzi-mzCE+drv('autB')}; tr.kmCE=kmCE?tr.cCE/kmCE:0; tr.kmB=kmB?tr.cB/kmB:0;
   const manut=manutMese(wh), fissi=((wh.fixed+1000)*fixedMul()*mf.fix+manut)*(1+talWh(wh,'fix'));
   const need={pick:Math.max(cons?1:0,Math.ceil(cons*pickF/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2.5*prod))),autB:Math.ceil(kmB/kmB1),autCE:Math.ceil(kmCE/kmCE1),imp:needImp+sm.addImp,capo:needCapo,fm:1};
@@ -2510,7 +2547,7 @@ function monthEnd(){
   S.clients.filter(c=>c.status==='attivo').forEach(c=>{
     const w=whById(c.wh); const P=w.acc.n?w.acc.P/w.acc.n:w.kpi.P, A=w.acc.n?w.acc.A/w.acc.n:w.kpi.A;
     const wP=P-c.sP, wA=c.sA?A-c.sA:9, wv=Math.min(wP,wA);
-    c.lastP=P; c.lastA=A; c.sat+=polSum('sat');
+    c.lastP=P; c.lastA=A; c.sat+=polSum('sat')+trSum(w,'sat');
     if(wv>=0){c.sat+=3+(R('edi')?1:0)+(R('kam')?1:0); repUp(0.15);}
     else if(wv>=-2){c.sat-=4;}
     else {c.sat-=10;}
@@ -4086,6 +4123,10 @@ const VIEWS={
    <label class="row" style="align-items:center"><span class="lab">${kw('obiettivo_sat','Obiettivo di carico')}</span><select data-act="setsatobj" data-wh="${w.id}" aria-label="Obiettivo minimo di saturazione dei mezzi">${SAT_OBJ.map(v=>`<option value="${v}" ${(w.satObj||0)===v?'selected':''}>${v?'almeno '+v+'%':'nessuno'}</option>`).join('')}</select></label>
    ${satObjTxt(k.sm)}
    <div class="row" style="align-items:center"><span class="sm">${lossN?`<b class="bad">${lossN} ${lossN===1?'cliente ha':'clienti hanno'} i trasporti in perdita</b>: zone troppo lontane, camion mezzi vuoti o prezzo basso.`:'Sulla mappa, la lente Viaggi mostra tutti i giri.'}</span><button class="btn sm2" data-act="lenstrips">Lente Viaggi</button></div></div>
+  <div class="card"><div class="row"><span class="h3">${kw('regole_traffico','Regole del traffico')}</span><span class="sm">solo per ${esc(w.name)}</span></div>
+   ${TR_RULES.map(r=>{const on=trOn(w,r.id), wt=trWait(w,r.id);
+    return `<label class="wh-sw tr-rule"><span class="wh-sm"><span><b>${esc(r.name)}</b></span><span class="sm ok">${esc(r.pro)}</span><span class="sm bad">${esc(r.con)}</span>${wt?`<span class="sm">Si può cambiare dal ${shortDate(S.day+wt)}</span>`:''}</span><input type="checkbox" class="sw" data-act="trrule" data-wh="${w.id}" data-id="${r.id}" ${on?'checked':''} ${wt?'disabled':''} aria-label="${esc(r.name)}"></label>`;}).join('')}
+   <div class="sm">Dopo un cambio servono ${TR_CD} giorni prima di poter cambiare di nuovo la stessa regola.</div></div>
   ${G.length?G.sort((a,b)=>(a[1].rev-a[1].cost)-(b[1].rev-b[1].cost)).map(card).join(''):'<div class="sm">Nessun cliente attivo in questo magazzino.</div>'}`;
  },
  giornale(){
@@ -4199,6 +4240,7 @@ const ACT={
  sheet(d){UI.sel.sheet=d.id;UI.sel.cell='A1';renderWin('report');},
  cell(d){UI.sel.cell=d.ref;renderWin('report');},
  lens(d){UI.lens=d.id;renderMap();syncTrucks();},
+ trrule(d,el){const w=whById(d.wh); if(!w||trWait(w,d.id)){el.checked=trOn(w,d.id);return;} w.rules=w.rules||{}; w.rules[d.id]={on:el.checked,day:S.day}; const r=TR_RULES.find(x=>x.id===d.id); toast(`${w.name}: ${r.name} ${el.checked?'attiva':'spenta'}`,el.checked?'ok':'warn'); renderAll();},
  lenstrips(){ACT.lens({id:'trips'}); if(MOB) closeWin('traffico');},
  clidet(d){UI.cliOpen=UI.cliOpen||{}; UI.cliOpen[d.id]=!UI.cliOpen[d.id]; renderWin('clienti');},
  mapcli(d){UI.mapCli=UI.mapCli===d.id?null:d.id;renderMap();syncTrucks();renderAll();},
@@ -4456,6 +4498,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.28',t:'Regole del traffico',x:['Nell\'Ufficio traffico sette regole da accendere magazzino per magazzino: giri a giorni fissi, cut-off degli ordini alle 14, si parte solo a camion pieno, partenze all\'alba, scarichi su prenotazione, ritorni carichi e consegne anche il sabato.','Ognuna ha un vantaggio e un prezzo: più camion pieni ma meno puntualità, più accuratezza ma camion più vuoti, più puntualità ma autisti che costano di più. Dopo un cambio servono 30 giorni per cambiarla di nuovo.']},
  {v:'0.27',t:'Chi guida il magazzino',x:['Il manager conta davvero: le sue Operazioni rendono più produttivi magazzinieri e carrellisti, fanno fare più km agli autisti e riempiono di più i camion. Precisione, Leadership, Amministrazione e Innovazione pesano su accuratezza, assunzioni, costi dell\'immobile e apprendimento delle tecnologie.','Nella finestra del magazzino il riquadro «Effetto del manager» mostra quanto vale chi lo guida. Un magazzino senza manager va avanti alla meno peggio.','Nuova finestra Ufficio traffico: per ogni cliente i camioncini con i pallet caricati, i viaggi, i km e quanto si guadagna o si perde col trasporto. I clienti in perdita stanno in cima.','Nuova lente della mappa «Viaggi»: i giri dei camion colorati da quanto sono pieni, tratteggiati se in perdita.']},
  {v:'0.26',t:'Conti che tornano',x:['Un magazzino pieno e ben gestito ora guadagna: gli autisti CE fanno 6.500 km al mese, un carrellista regge più movimenti, nei magazzini piccoli basta un impiegato e il primo pianificatore serve da 150 viaggi al mese.','Partenza più giusta: il cliente storico parte più contento e con gli autisti che servono; Rivalta Scrivia e Genova Voltri sono più grandi, Marco parte con più cassa e alcune committenti cercano un logistico anche in Liguria.','Le stime delle gare contano anche i clienti già vinti che devono ancora partire: niente più magazzini riempiti oltre il 100% per errore.','Diventare grandi resta possibile, ma non è più una passeggiata: la reputazione sopra 50 sale più piano, nelle gare il prezzo pesa di più e la reputazione un po\' meno, al rinnovo il buyer chiede 5 punti di sconto sul ricarico e la sinergia tra clienti riempie i camion fino a +15.','Eventi più sensati: neve al Frejus, allerta in Liguria, moda e ZTL a Milano capitano solo dove lavori; il morale delle scelte si sente subito; ritoccate le opzioni che erano sempre giuste o sempre sbagliate (sciopero, nebbia, lockdown, rotonda, gratta e vinci, Superenalotto, telecamere e altre).','Cooperativa: accuratezza −1 invece di −0,5. Magazzino verticale e robot AMR costano meno da installare.']},
  {v:'0.25',t:'Il menu in tasca',x:['Tecnologia più chiara: in cima la ricerca in corso, quante tecnologie hai, la velocità data dall\'Innovazione e cosa resta da installare; nell\'albero le caselle bloccate dicono cosa serve prima, quelle ricercate avvisano se mancano in qualche magazzino e un\'etichetta «gara» segna le tecnologie chieste dalle gare aperte.','Report KPI più chiaro: in cima quattro riquadri con la settimana appena chiusa (puntualità, accuratezza, margine e clienti sotto soglia), nei fogli la settimana più recente è in alto e nella scheda Clienti un quadratino colorato dice subito chi è sotto soglia.','Sul telefono i tasti in basso diventano un solo pulsante «Menu»: si apre un elenco da sinistra, diviso in Operazioni, Azienda e Informazioni, e ogni voce dice in una riga come sta il suo reparto (gare aperte, reparto in affanno, ricerca in corso).','La mappa e le finestre usano tutto lo schermo del telefono.','La casella della data ha sempre la stessa larghezza: i pulsanti accanto non si spostano più ogni giorno. Sul telefono il mese è abbreviato.','Profili dei manager e dei dirigenti più ricchi: intestazione scura col ritratto, l\'abilità più forte in evidenza, un esagono con il profilo delle sei abilità accanto alle barre colorate, e i talenti spiegati per esteso con effetto e battuta.','Il giornale ha le rubriche colorate (gare, clienti, azienda, cronaca) con i filtri in cima e le notizie divise per mese.','Espansione: i magazzini liberi divisi per regione, con posti e affitto in una riga e il costo di apertura dentro il pulsante «Affitta».','Policy aziendali divise in accese, spente e da sbloccare; quelle da sbloccare stanno in un elenco corto con gli effetti nel suggerimento.','Direzione: quanti posti sono coperti in cima, ogni poltrona con ritratto, effetto e scelta del direttore, le schede dei dirigenti come quelle dei manager.','Azienda e CEO: le abilità e i talenti del CEO mostrati come nei profili dei manager (esagono, barre, talenti spiegati), utile o perdita del mese in evidenza, benefit con un interruttore.','Gare d\'appalto più semplici: l\'elenco delle gare aperte con logo e scadenza, i requisiti in quattro caselle e una sezione «La tua offerta» con la probabilità di vincere in grande, i KPI previsti a confronto con le soglie e il carico dei reparti dopo il contratto.','Nuova finestra Clienti: in cima ricavi, soddisfazione media e clienti a rischio; ogni cliente ha i suoi KPI a confronto con la soglia, un\'etichetta di stato (attivo, rinnovo a rischio, in uscita) e i dettagli su trasporti e contratto che si aprono con un tocco.','Anche la finestra Personale è più ordinata: quattro riquadri in cima (persone, reparti in affanno, assunzioni in arrivo, manager), per ogni magazzino l\'elenco dei reparti con una barra del carico, i manager divisi tra «in squadra» e «disponibili».','La scheda del magazzino è più chiara: in cima nome, occupazione e manager; quattro riquadri colorati per puntualità, accuratezza, mezzi pieni e morale (verde, giallo o rosso rispetto alle soglie dei clienti); per ogni reparto una barra del carico e i pulsanti − e +; un interruttore per la cooperativa e il conto del mese in quattro caselle.','Restano due velocità più la pausa: la terza, troppo veloce per seguire il gioco, è stata tolta.']},
