@@ -54,6 +54,10 @@ NOSIDE = '''(sel)=>{const el=document.querySelector(sel), out=[];
   el.querySelectorAll('button').forEach(b=>{if(b.offsetParent&&b.scrollWidth>b.clientWidth+1) out.push('testo fuori dal pulsante: '+b.innerText.slice(0,30));});
   return out;}'''
 
+SEED = '''()=>{const F=window.__FUP; [['gino',1],['marco',2],['valeria',3]].forEach(([c,n])=>{F.slot=n; F.newGame(c); F.S.company.name='Prova '+n;
+  for(let d=0;d<35;d++){document.querySelector('#modal').innerHTML=''; F.step();} document.querySelector('#modal').innerHTML=''; if(n===3) F.S.cash=-12000; F.save();
+  const k=F.slotKey(n), v=JSON.parse(localStorage.getItem(k)); v.at=Date.now()-(n===2?0:86400000*n); localStorage.setItem(k,JSON.stringify(v));}); F.slot=1;}'''
+
 async def intro(pg, shot):
     # schermata introduttiva: il camioncino arriva, poi un tocco la chiude e resta la schermata iniziale
     await pg.wait_for_timeout(2900)
@@ -72,9 +76,18 @@ async def phone(b, w, h, name, errs):
     pg = await ctx.new_page(); pg.on('pageerror', lambda e: errs.append(f'{name}: {e}'))
     await pg.goto('file://' + PAGE)
     assert await pg.evaluate("document.documentElement.classList.contains('mob')"), 'layout telefono non attivo'
+    # schermata principale con due partite salvate (il terzo posto resta per la partita del test)
+    await pg.evaluate(SEED); await pg.evaluate(f"localStorage.removeItem(window.__FUP.slotKey(3))"); await pg.reload()
     await intro(pg, f'shot_tel_{name}_intro.png')
-    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_avvio.png'))
+    assert await pg.evaluate("document.querySelectorAll('#start .sv').length") == 2, f'{name}: partite salvate mancanti'
+    assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: la schermata principale scorre di lato'
+    assert await pg.evaluate("[...document.querySelectorAll('#start button')].filter(b=>b.offsetParent&&b.scrollWidth>b.clientWidth+1).map(b=>b.innerText.slice(0,30))") == [], f'{name}: testo fuori dai pulsanti della schermata principale'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_avvio.png'), full_page=True)
+    await pg.tap('#start .news summary'); await pg.wait_for_timeout(100)
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_novita.png'), full_page=True)
+    await pg.tap('#start .news summary')
     # creazione del CEO e dell'azienda a passaggi: ogni schermata deve stare nella larghezza del telefono
+    await pg.tap('[data-act=newgame]')
     await pg.tap('[data-act=pickceo][data-id=custom]')
     await pg.fill('#cc-nome', 'Ornella'); await pg.fill('#cc-cognome', 'Bancalini'); await pg.tap('[data-act=sugg][data-f=nick]')
     for st in ['identita', 'abilita', 'studi', 'cv', 'azienda']:
@@ -212,6 +225,8 @@ async def main():
         assert await pg.evaluate("document.querySelector('#start .news').open"), 'elenco delle novità non si apre'
         await pg.screenshot(path=os.path.join(OUT, 'shot_novita.png'))
         await pg.click('#start .news summary')
+        assert await pg.query_selector('#start .hm-empty') and await pg.evaluate("!document.querySelector('#start [data-act=newgame]').disabled"), 'schermata principale senza partite'
+        await pg.click('[data-act=newgame]')
         # i tooltip devono stare sopra a tutto: schermata iniziale (talenti dei CEO) e finestre aperte
         TIP_ON_TOP = '''(()=>{const t=document.querySelector('#tip'),r=t.getBoundingClientRect();t.style.pointerEvents='auto';const e=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);t.style.pointerEvents='';return !t.hidden&&!!e&&!!e.closest('#tip');})()'''
         await pg.hover('#start .ceo[data-id=edoardo] .tal')
@@ -615,6 +630,22 @@ async def main():
         await pg.click('#start [data-act=delno]'); await pg.wait_for_selector('#start [data-act=continue]')
         await pg.click('#start [data-act=delask]'); await pg.click('#start [data-act=delsave]')
         assert not await pg.query_selector('#start [data-act=continue]') and await pg.evaluate('()=>!localStorage.getItem(window.__FUP.KEY)'), 'cancellazione dalla schermata iniziale'
+        # tre posti di salvataggio: l'ultima giocata in cima, con tre partite il pulsante per una nuova si spegne
+        await pg.evaluate(SEED); await pg.reload(); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
+        hm = await pg.evaluate("({n:document.querySelectorAll('#start .sv').length, top:document.querySelector('#start .sv.top .sv-co').innerText, full:document.querySelector('#start [data-act=newgame]').disabled})")
+        assert hm == {'n': 3, 'top': 'Prova 2', 'full': True}, hm
+        await pg.screenshot(path=os.path.join(OUT, 'shot_avvio_partite.png'), full_page=True)
+        await pg.click('#start [data-act=delask][data-slot="3"]'); await pg.click('#start [data-act=delsave][data-slot="3"]')
+        hm = await pg.evaluate("({n:document.querySelectorAll('#start .sv').length, full:document.querySelector('#start [data-act=newgame]').disabled, s3:localStorage.getItem(window.__FUP.slotKey(3))})")
+        assert hm == {'n': 2, 'full': False, 's3': None}, hm
+        await pg.click('[data-act=newgame]'); assert await pg.query_selector('#start .ceos'), 'nuova partita senza scelta del CEO'
+        await pg.click('[data-act=stback]'); await pg.wait_for_selector('#start .sv.top')
+        await pg.click('#start [data-act=continue][data-slot="1"]'); await pg.evaluate(CLEAR)
+        r = await pg.evaluate('''()=>{const F=window.__FUP; F.S.company.name='Prova 1 bis'; F.save();
+          const g=n=>{const v=JSON.parse(localStorage.getItem(F.slotKey(n))); return v&&v.S.company.name;}; return {slot:F.slot, s1:g(1), s2:g(2)};}''')
+        assert r == {'slot': 1, 's1': 'Prova 1 bis', 's2': 'Prova 2'}, r
+        await pg.evaluate('()=>window.__FUP.ACT.quitgame()')
+        assert await pg.inner_text('#start .sv.top .sv-co') == 'Prova 1 bis', 'la partita appena giocata deve andare in cima'
         await b.close()
     if errs:
         print('ERRORI JS:', *errs, sep='\n  '); sys.exit(1)

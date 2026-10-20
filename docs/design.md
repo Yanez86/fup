@@ -239,6 +239,7 @@ Regole per tutta l'azienda, accese o spente dalla finestra Policy (`POLICIES` in
 - Il gioco funziona su computer e su telefono. Sotto i 760 px di larghezza (o 500 di altezza) si attiva il layout da telefono: finestre a tutto schermo, una sopra l'altra; menu in basso su due righe in verticale, a sinistra su due colonne in orizzontale; barra in alto compatta (cassa, mese scorso, reputazione).
 - Comandi al tocco: un dito sposta la mappa, due dita fanno lo zoom. Primo tocco su una parola chiave = tooltip, secondo tocco = voce dell'enciclopedia (dentro l'enciclopedia i collegamenti si aprono subito). Tenere premuto un pulsante mostra il suo tooltip. Il menu riporta davanti una finestra coperta invece di chiuderla.
 - Web app: da GitHub Pages si installa sulla schermata Home (manifest, icone da `tools/icone.py`, service worker `sw.js` che tiene una copia per giocare senza rete; la pagina si scarica fresca quando c'è connessione).
+- Fino a 3 partite salvate, ognuna nel suo posto: la schermata principale le mostra (la più recente in cima) con il pulsante «Crea nuova partita», che si spegne quando i posti sono pieni. Una partita nuova si salva subito nel primo posto libero.
 - Salvataggio automatico ogni volta che il gioco va in secondo piano. Tornando nel gioco il tempo riparte da dove era: i giorni non scorrono mentre l'app è chiusa.
 
 ## Idee aperte

@@ -613,6 +613,70 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 @media (prefers-reduced-motion: reduce){#intro *,#intro .truck svg{animation:none!important;opacity:1!important} #intro .truck{transform:translateX(-50%)!important}}
 .news summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .news ul{margin:6px 0 0;padding-left:20px;line-height:1.45} .news h4{margin:10px 0 0;font-family:var(--f-disp);font-size:16px}
+/* schermata principale: insegna col camioncino, partite salvate, nuova partita, novità a tendina */
+#start .box.home{max-width:780px}
+.hm-hero{position:relative;height:196px;background:var(--ink3);border-bottom:3px solid var(--ink2);overflow:hidden}
+.hm-bar{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;gap:8px;padding:7px 14px;background:var(--ink);color:var(--line);font-family:var(--f-disp);font-size:15px}
+.hm-ttl{position:absolute;left:28px;top:50px;display:flex;flex-direction:column;gap:6px}
+#start .hm-ttl h1{font-size:72px;font-weight:700;line-height:.9;color:#fff;letter-spacing:2px;text-shadow:4px 4px 0 var(--accent),7px 7px 0 var(--ink2)}
+.hm-ttl .sub{font-family:var(--f-disp);font-size:22px;color:var(--yellow);text-shadow:2px 2px 0 var(--ink2)}
+.hm-truck{position:absolute;right:64px;bottom:26px;width:168px;height:144px}.hm-truck svg{display:block;width:100%;height:100%}
+.hm-road{position:absolute;left:0;right:0;bottom:0;height:26px;border-top:3px solid var(--ink4);background:var(--ink) repeating-linear-gradient(90deg,var(--yellow) 0 24px,transparent 24px 48px) 0 50%/100% 4px no-repeat}
+.hm-b{padding:24px 28px 28px;display:flex;flex-direction:column;gap:18px}
+.hm-h{display:flex;align-items:center;gap:10px}.hm-h h2{margin:0;font-family:var(--f-disp);font-size:26px;font-weight:600}
+.hm-n{padding:1px 8px;background:var(--ink);color:#fff;font-family:var(--f-disp);font-size:15px}
+.sv{background:#fff;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2),3px 3px 0 var(--ink);padding:10px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.sv-pic{width:64px;height:64px;flex:none;background:var(--tint);border:2px solid var(--ink);overflow:hidden}.sv-pic img{display:block;margin:-6px 0 0 -16px}
+.sv-m{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:3px}
+.sv-nm{display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap}
+.sv-co{font-family:var(--f-disp);font-size:20px;font-weight:600;overflow-wrap:anywhere}
+.sv-tag{padding:1px 6px;border:2px solid;font-size:12px;font-weight:600}
+.sv-tag.bad{background:#fde3e3;border-color:var(--bad-t)}.sv-tag.ok{background:#e3f4d9;border-color:var(--ok-t)}.sv-tag.warn{background:#fff4c7;border-color:var(--warn-t)}
+.sv-sub{font-size:14px;color:var(--muted)}.sv-sub b{color:var(--ink)}
+.sv-ln{display:flex;gap:2px 14px;font-size:14px;flex-wrap:wrap}
+.sv-act{display:flex;gap:8px;align-items:center;flex:none}.sv-act .btn{min-height:44px}
+.sv .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.sv-del{width:44px;height:44px;padding:0}
+.sv-ask{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;justify-content:space-between;padding:8px 10px;background:#fff4f4;border:2px solid var(--bad-t);font-size:14px}
+.sv.top{display:grid;grid-template-columns:112px minmax(0,1fr);grid-template-rows:auto 1fr;gap:10px 18px;padding:16px;border-width:3px;box-shadow:inset 0 -4px 0 var(--panel2),4px 4px 0 var(--ink)}
+.sv.top .sv-pic{grid-row:1/3;width:112px;height:128px;border-width:3px;box-sizing:border-box;display:flex;align-items:flex-end;justify-content:center;box-shadow:inset 0 -6px 0 rgba(22,32,46,.18)}
+.sv.top .sv-pic img{margin:0}
+.sv-hd{display:flex;flex-direction:column;gap:4px;min-width:0}.sv.top .sv-co{font-size:30px;font-weight:700;line-height:1.05}
+.sv-bd{grid-column:2;display:flex;flex-direction:column;gap:10px;min-width:0}.sv-bd .sv-ask{flex-basis:auto}
+.sv-last{padding:2px 8px;background:var(--yellow);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);font-family:var(--f-disp);font-size:14px;font-weight:600}
+.sv-tiles{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);gap:8px}
+.sv-tile{padding:6px 8px;background:var(--panel);border:2px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:0}
+.sv-tile span{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.sv-tile b{font-family:var(--f-disp);font-size:18px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-kpi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px}
+.sv-k{display:flex;align-items:center;gap:8px;font-size:13px}.sv-k>span:first-child{width:84px;flex:none}
+.sv-k .t{flex:1;height:10px;background:var(--panel2);border:2px solid var(--ink);position:relative}.sv-k .t i{position:absolute;left:0;top:0;bottom:0}
+.sv.top .sv-act{justify-content:flex-end;flex-wrap:wrap}
+#start .btn.pri.sv-go{font-size:22px;font-weight:700;padding:8px 26px;min-height:52px;border-width:3px;box-shadow:inset 0 -4px 0 var(--accent-d),inset 0 3px 0 var(--accent-l),3px 3px 0 var(--ink)}
+.sv-go2{font-size:17px;font-weight:600;padding:8px 16px}
+.hm-empty{padding:20px;background:#fff;border:2px dashed var(--ink4);text-align:center;display:flex;flex-direction:column;gap:4px}.hm-empty b{font-family:var(--f-disp);font-size:20px}.hm-empty span{color:var(--muted)}
+.hm-new{width:100%;min-height:76px;padding:12px 18px;border:3px solid var(--ink);background:var(--yellow);box-shadow:inset 0 -5px 0 var(--warn-d),inset 0 3px 0 #ffe680,4px 4px 0 var(--ink);display:flex;align-items:center;gap:16px;text-align:left;color:var(--ink);font-family:var(--f-body);font-size:15px;cursor:pointer}
+.hm-new .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.hm-new b{font-family:var(--f-disp);font-size:26px;font-weight:700;line-height:1.05}
+.hm-plus{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--ink)}
+.hm-new .ar{font-family:var(--f-disp);font-size:32px;font-weight:700}
+.hm-new:disabled{background:var(--panel2);box-shadow:inset 0 -5px 0 var(--line),4px 4px 0 var(--ink);cursor:not-allowed}.hm-new:disabled .hm-plus,.hm-new:disabled .ar{opacity:.4}
+#start .news{padding:0;gap:0;box-shadow:inset 0 -3px 0 var(--panel2),3px 3px 0 var(--ink)}
+#start .news summary{list-style:none;min-height:56px;padding:10px 14px;gap:12px;flex-wrap:nowrap;font-weight:400}
+#start .news summary::-webkit-details-marker{display:none}
+.nw-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}.nw-h{display:flex;align-items:center;gap:8px}.nw-h b{font-family:var(--f-disp);font-size:20px;font-weight:600}
+.nw-v{padding:1px 7px;background:var(--accent);border:2px solid var(--ink);font-family:var(--f-disp);font-size:14px;font-weight:600}
+.nw-s{color:var(--muted)}
+.nw-ar{width:36px;height:36px;flex:none;box-sizing:border-box;background:var(--panel);border:2px solid var(--ink);display:flex;align-items:center;justify-content:center}
+.news[open] .nw-ar svg{transform:rotate(180deg)}
+.nw-l{border-top:2px solid var(--ink);max-height:340px;overflow-y:auto;padding:6px 0}
+.nw-e{display:flex;gap:14px;padding:10px 16px}
+.nw-e .v{display:flex;flex-direction:column;align-items:center;gap:4px;flex:none;width:52px}
+.nw-e .v b{width:100%;box-sizing:border-box;padding:3px 0;text-align:center;background:var(--ink);color:#fff;border:2px solid var(--ink);font-family:var(--f-disp);font-size:15px;font-weight:600}
+.nw-e:first-child .v b{background:var(--accent);color:var(--ink)}.nw-e .v i{flex:1;width:2px;background:var(--line)}
+.nw-c{flex:1;min-width:0}#start .nw-c h4{margin:0;font-size:17px;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.nw-new{padding:0 5px;background:var(--ok-d);color:#fff;border:2px solid var(--ink);font-size:12px}
+#start .nw-c ul{margin:4px 0 0;padding-left:18px;font-size:15px}
+.hm-cred{display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;color:var(--muted)}.hm-cred svg{width:24px;height:28px;flex:none}
 .ccbox{gap:10px}
 .lobby{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .lb-slot{gap:6px;border-width:3px}.lb-slot.off{opacity:.6}.lb-slot.me{background:#fff9ef}
@@ -814,6 +878,21 @@ html,body{overscroll-behavior:none}
 .mob .vign{display:none}
 .mob #start{padding:calc(10px + env(safe-area-inset-top, 0px) + var(--glass, 0px)) max(8px, env(safe-area-inset-right, 0px)) 16px max(8px, env(safe-area-inset-left, 0px))}
 .mob #start h1{font-size:34px}
+.mob .hm-hero{height:150px}.mob .hm-bar{font-size:13px;padding:5px 10px}.mob .hm-ttl{left:16px;top:36px;gap:4px}
+.mob #start .hm-ttl h1{font-size:54px;text-shadow:3px 3px 0 var(--accent),5px 5px 0 var(--ink2)}.mob .hm-ttl .sub{font-size:16px}
+.mob .hm-truck{right:12px;bottom:19px;width:112px;height:96px}
+.mob .hm-road{height:20px;background:var(--ink) repeating-linear-gradient(90deg,var(--yellow) 0 16px,transparent 16px 32px) 0 50%/100% 3px no-repeat}
+.mob .hm-b{padding:16px 12px 18px;gap:14px}.mob .hm-h h2{font-size:22px}
+.mob .sv{padding:10px;gap:10px}.mob .sv-pic{width:56px;height:56px}.mob .sv-pic img{margin:-8px 0 0 -20px}.mob .sv-m{flex-basis:200px}
+.mob .sv-co{font-size:18px}.mob .sv>.sv-act{flex:1 1 100%}.mob .sv-act .btn:not(.sv-del){flex:1}.mob .sv.top .sv-act .btn:not(.sv-go){flex:none}.mob .sv-act .btn{min-height:48px}.mob .sv-del{width:48px}
+.mob .sv.top{grid-template-columns:80px minmax(0,1fr);gap:12px;padding:12px}
+.mob .sv.top .sv-pic{grid-row:1;width:80px;height:92px;display:block}.mob .sv.top .sv-pic img{margin:-4px 0 0 -11px}
+.mob .sv.top .sv-co{font-size:23px}.mob .sv-last{align-self:flex-start;font-size:12px;padding:1px 6px}
+.mob .sv-bd{grid-column:1/3}.mob .sv-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.mob .sv-tile b{font-size:17px}
+.mob .sv-kpi{grid-template-columns:minmax(0,1fr)}.mob #start .btn.pri.sv-go{font-size:21px;padding:8px 14px}
+.mob .hm-new{min-height:72px;padding:10px 12px;gap:12px;font-size:13px}.mob .hm-new b{font-size:22px}.mob .hm-new .ar{font-size:28px}
+.mob #start .news summary{padding:10px 12px;gap:10px}.mob .nw-p{display:none}.mob .nw-l{max-height:none}
+.mob .nw-e{gap:10px;padding:8px 12px}.mob .nw-e .v{width:46px}.mob #start .nw-c ul{font-size:14px;padding-left:16px}
 .mob .ceos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:30px 12px 14px;margin:-16px -12px 0}
 .mob .ceo{flex:0 0 min(78%,250px);scroll-snap-align:center}
 .mob .ceo-art{height:200px}.mob .ceo-art img{width:160px;height:187px}
@@ -4120,10 +4199,14 @@ function chMigrate(){
   S.warehouses.forEach(w=>{const k=computeWH(w), mv=Math.min(k.need.autB,Math.max(0,w.staff.autCE-k.need.autCE)); w.staff.autCE-=mv; w.staff.autB=Math.max(w.staff.autB+mv,k.need.autB);});
 }
 // si salva sempre l'azienda del giocatore, con dentro le aziende avversarie
-function save(){const H=HUM||S; if(!H||S.bot) return; try{localStorage.setItem(KEY,JSON.stringify({S:H,uid}));}catch(e){}}
-// le partite della versione 3 (senza avversari) si caricano ancora: diventano partite classiche da soli
-function delSave(){try{localStorage.removeItem(KEY);localStorage.removeItem(KEY_OLD);}catch(e){}}
-function load(){try{const r=localStorage.getItem(KEY)||localStorage.getItem(KEY_OLD);if(!r)return null;return JSON.parse(r);}catch(e){return null;}}
+// tre posti di salvataggio: il primo usa la chiave di sempre, così la partita salvata prima della 0.54 resta al suo posto
+const SLOTS=3, slotKey=n=>n>1?`${KEY}-${n}`:KEY;
+let slot=1;  // il posto della partita in corso
+function save(){const H=HUM||S; if(!H||S.bot) return; try{localStorage.setItem(slotKey(slot),JSON.stringify({S:H,uid,at:Date.now()}));}catch(e){}}
+// le partite della versione 3 (senza avversari) si caricano ancora nel primo posto: diventano partite classiche da soli
+function delSave(n=slot){try{localStorage.removeItem(slotKey(n));if(n===1)localStorage.removeItem(KEY_OLD);}catch(e){}}
+function load(n=slot){try{const r=localStorage.getItem(slotKey(n))||(n===1&&localStorage.getItem(KEY_OLD));if(!r)return null;return JSON.parse(r);}catch(e){return null;}}
+const freeSlot=()=>{for(let n=1;n<=SLOTS;n++) if(!load(n)) return n; return 0;};
 
 /* ====================== MAPPA ====================== */
 const view={s:1,x:0,y:0}, MW=1520, MH=800; // mappa: 760x400 in pixel art mostrata a 2x (da Nizza a Trieste)
@@ -5472,15 +5555,15 @@ const ACT={
  wikiback(){ if(!(UI.wikiBack||[]).length) return; UI.wiki=UI.wikiBack.pop(); wikiShow(); },
  wikihome(){ (UI.wikiBack=UI.wikiBack||[]).push(UI.wiki); UI.wiki=null; wikiShow(); },
  save(){save();toast('Partita salvata','ok');},
- restart(){closeModal();startSel.step='scelta';startSel.stamp=false;showStart();},
+ restart(){if(S&&!S.over)save();closeModal();Object.keys(UI.open).forEach(closeWin);startSel.step='home';startSel.del=0;startSel.stamp=false;showStart();},
  options(){if($('#modal').innerHTML)return;if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);}
    showModal(`<div class="src"><span>Opzioni</span><span>${shortDate(S.day)}</span></div><div class="win-b"><button class="btn pri" data-act="closemodal">Riprendi</button><button class="btn" data-act="quitgame">Esci dal gioco</button><button class="btn" data-act="delgame">Cancella la partita</button>${contMode()?'':`<label class="optchk"><input type="checkbox" data-act="evpause" ${HUM&&HUM.cfg&&HUM.cfg.noPause?'':'checked'}>Metti in pausa quando arriva un evento da decidere</label>`}<p class="sm" style="margin:0">Uscendo la partita viene salvata: la ritrovi con «Continua la partita» nella schermata iniziale.</p></div>`);},
- delask(){startSel.del=true;showStart();},
- delno(){startSel.del=false;showStart();},
- delsave(){delSave();startSel.del=false;showStart();toast('Partita cancellata','ok');},
+ delask(d){startSel.del=+d.slot||1;showStart();},
+ delno(){startSel.del=0;showStart();},
+ delsave(d){delSave(+d.slot||startSel.del||1);startSel.del=0;showStart();toast('Partita cancellata','ok');},
  delgame(){showModal(`<div class="src"><span>Cancella la partita</span><span>${shortDate(S.day)}</span></div><div class="win-b"><p style="margin:0">Vuoi cancellare per sempre <b>${esc(HUM.company.name)}</b>? La partita sparisce e non si può recuperare.</p><div class="row"><button class="btn" data-act="closemodal">No, continuo</button><button class="btn del" data-act="delgameok">Sì, cancella</button></div></div>`);},
- delgameok(){UI.evSpeed=0;delSave();closeModal();Object.keys(UI.open).forEach(closeWin);startSel.del=false;startSel.step='scelta';showStart();toast('Partita cancellata','ok');},
- quitgame(){UI.evSpeed=0;if(!S.over)save();closeModal();Object.keys(UI.open).forEach(closeWin);showStart();}
+ delgameok(){UI.evSpeed=0;delSave();closeModal();Object.keys(UI.open).forEach(closeWin);startSel.del=0;startSel.step='home';showStart();toast('Partita cancellata','ok');},
+ quitgame(){UI.evSpeed=0;if(!S.over)save();closeModal();Object.keys(UI.open).forEach(closeWin);startSel.step='home';startSel.del=0;showStart();}
 };
 function wikiShow(){
   const old=document.querySelector('#wiki-list'), ls=old?old.scrollTop:0;
@@ -5552,7 +5635,7 @@ document.addEventListener('mousemove',e=>{if(tip.hidden||Date.now()-touchT<1000)
 
 /* ====================== AVVIO ====================== */
 {const b=$('.optb'); if(b&&ICONE.ui.opzioni) b.innerHTML=pxSvg(ICONE.ui.opzioni,32);}  // ingranaggio delle Opzioni
-let startSel={step:'scelta',ceo:'gino',color:'#ff7a3d',name:'',claim:'',logo:'camion',cc:null,err:'',stamp:false,lb:null};
+let startSel={step:'home',slot:0,del:0,ceo:'gino',color:'#ff7a3d',name:'',claim:'',logo:'camion',cc:null,err:'',stamp:false,lb:null};
 /* --- CEO creato dal giocatore: punti da distribuire tra abilità e talenti --- */
 const CC_PTS=58, CC_TRAITS=3, CC_IMGS=['cc1','cc2','cc3','cc4','cc5','cc6','cc7','cc8','cc9','cc10'];
 const ccNew=()=>({nome:'',cognome:'',nick:'',motto:'',eta:38,img:'cc1',base:'gino',st:{op:8,prec:8,neg:8,lead:8,amm:8,inn:8},edu:null,tal:[]});
@@ -5591,7 +5674,7 @@ function startKeep(){const inp=$('#coname-in'); if(inp){const t=inp.value; start
   const cc=startSel.cc; if(cc&&$('#cc-nome')){cc.nome=$('#cc-nome').value;cc.cognome=$('#cc-cognome').value;cc.eta=$('#cc-eta').value;cc.nick=$('#cc-nick').value;cc.motto=$('#cc-motto').value;}}
 function stepper(){const fl=stFlow(), i=fl.indexOf(startSel.step);
   return `<ol class="steps" aria-label="Passaggi">${fl.map((s,j)=>`<li><button class="${j<i?'done':''}" ${j<i?`data-act="stgo" data-to="${s}"`:'disabled'} aria-current="${j===i?'step':'false'}" aria-label="${ST_N[s]}"><b>${j+1}</b><span>${ST_N[s]}</span></button></li>`).join('')}</ol><div class="st-lbl">Passo ${i+1} di ${fl.length} · ${ST_N[startSel.step]}</div>`;}
-function stNav(next,label){return `<div class="row st-nav">${startSel.step!=='scelta'?`<button class="btn" data-act="stback">‹ Indietro</button>`:'<span></span>'}
+function stNav(next,label){return `<div class="row st-nav"><button class="btn" data-act="stback">‹ Indietro</button>
   ${startSel.err?`<span class="bad" role="alert" style="font-weight:600;flex:1;text-align:center">${esc(startSel.err)}</span>`:''}${next}</div>`;}
 const nextBtn=t=>`<button class="btn pri" data-act="stnext" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">${t} ›</button>`;
 const suggBtn=f=>`<button class="btn sm2" data-act="sugg" data-f="${f}" aria-label="Suggerisci">Suggerisci</button>`;
@@ -5723,6 +5806,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.54',t:'Tre partite salvate',x:['Nuova schermata principale: in alto l\'insegna col camioncino, sotto le tue partite salvate e il pulsante giallo «Crea nuova partita». La scelta del CEO arriva dopo, toccando quel pulsante.','Puoi tenere fino a 3 partite. Ognuna ha la sua scheda con il ritratto del CEO, la data, la cassa, magazzini e clienti; l\'ultima giocata sta in cima, più grande, con Puntualità e Accuratezza. Il cestino cancella una partita, dopo la conferma.','La partita che avevi già salvato è al suo posto: la trovi nella prima scheda.','Le novità stanno in un menu a tendina in fondo alla schermata principale.']},
  {v:'0.53',t:'Lenti e pausa a portata di dito',x:['Le lenti della mappa stanno dentro un solo pulsante con la lente d\'ingrandimento (con la piccola icona della lente attiva): toccalo e scegli quella che vuoi.','Sul telefono, accanto a «Menu», c\'è il pulsante del tempo: ogni tocco passa da pausa a velocità x1, poi x2, poi di nuovo pausa. La barra in alto ora sta su una riga sola.']},
  {v:'0.52',t:'iPhone senza sfocature',x:['Su iPhone con iOS 26 il sistema sfoca la parte alta dello schermo: nell\'app installata la barra con logo e pulsanti scende un po\', fuori dalla zona sfocata.']},
  {v:'0.51',t:'I crediti',x:['In fondo alla schermata iniziale ci sono i crediti: «un gioco Happy Squid Inc.» con il calamaro viola.']},
@@ -5778,9 +5862,9 @@ const CHANGELOG=[
  {v:'0.1',t:'Primo pallet',x:['Prototipo giocabile: mappa del Nord-Ovest, gare, magazzini, tecnologie ed eventi.']},
 ];
 const VER=CHANGELOG[0].v;
-function newsCard(){const L=CHANGELOG[0];
-  return `<details class="card news"><summary>Novità della versione ${VER}: ${esc(L.t)} <span class="sm">· ${TOUCH?'tocca':'clicca'} per l'elenco completo</span></summary>
-   ${CHANGELOG.map(c=>`<h4>${c.v} · ${esc(c.t)}</h4><ul>${c.x.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`).join('')}</details>`;}
+function newsCard(){
+  return `<details class="card news"><summary>${pxSvg(ICONE.menu.giornale,32)}<span class="nw-t"><span class="nw-h"><b>Novità</b><span class="nw-v">${VER}</span></span><span class="nw-s"><span class="nw-p">Ultimo aggiornamento: </span>${esc(CHANGELOG[0].t)}</span></span><span class="nw-ar">${pxSvg(ICONE.ui.giu,16)}</span></summary>
+   <div class="nw-l">${CHANGELOG.map((c,i)=>`<div class="nw-e"><div class="v"><b>${c.v}</b><i></i></div><div class="nw-c"><h4>${esc(c.t)}${i?'':'<span class="nw-new">NUOVO</span>'}</h4><ul>${c.x.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div>`).join('')}</div></details>`;}
 /* --- schermata introduttiva: camioncino in pixel art (56x48) con il collo e il pallet dell'icona --- */
 function introTruck(){let r='';const R=(x0,y0,x1,y1,c)=>{r+=`<rect x="${x0}" y="${y0}" width="${x1-x0+1}" height="${y1-y0+1}" fill="${c}"/>`;};
   const K=TPAL.K,cab='#3d8fd6',cabD='#2a6aa8';
@@ -5816,7 +5900,7 @@ function ceoCard(id,on,arch,st,img,nm,sub,body,ft){const t=st?topStat(st):null;
    <div class="ceo-art">${img?`<img class="px" src="${img}" alt="Ritratto di ${esc(nm)}" width="128" height="150">`:'<span class="q">?</span>'}</div>
    <div class="ceo-nm">${esc(nm)}<small>${sub}</small></div>
    <div class="ceo-bd">${body}</div><div class="ceo-ft">${ft}</div>${on?'<span class="ceo-ok">SCELTO!</span>':''}</button>`;}
-function stepScelta(){const sv=load(), cc=startSel.cc;
+function stepScelta(){const cc=startSel.cc;
   const st=CEOS.map(c=>ceoCard(c.id,startSel.ceo===c.id,c.arch,c.st,IMG[c.id],c.name,`${c.age} anni · ${esc(c.origin)}`,ceoBars(c.st)+talentIcons(c.tal,32),`<span>${eur(c.cash)}</span><span class="sm">${esc(SITES[c.site].name)}</span>`)).join('')
    +(cc?ceoCard('custom',startSel.ceo==='custom','Fatto su misura',ccStats(cc),IMG[cc.img],ccName(cc)||'Il tuo CEO','Tocca per modificarlo',ceoBars(ccStats(cc))+talentIcons(ccTal(cc),32),'<span>Modifica ›</span>')
      :ceoCard('custom',false,'Fatto su misura',null,null,'Crea il tuo CEO','Nome, abilità e carattere',`<span class="sm">${CC_PTS} punti da distribuire tra abilità e talenti. Il resto è colpa tua.</span>`,'<span>Inizia ›</span>'));
@@ -5827,18 +5911,52 @@ function stepScelta(){const sv=load(), cc=startSel.cc;
   return `<div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
    <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord Italia, da Torino a Trieste. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
    ${installCard()}
-   ${sv&&sv.S&&!sv.S.over?`<div class="card pend">${startSel.del?`<div class="row" style="flex-wrap:wrap;align-items:center"><span><b>Cancellare per sempre ${esc(sv.S.company.name)}?</b> <span class="sm">La partita sparisce e non si può recuperare.</span></span><span class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto"><button class="btn" data-act="delno">No, tienila</button><button class="btn del" data-act="delsave">Sì, cancella</button></span></div>`
-    :`<div class="row" style="flex-wrap:wrap;align-items:center"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><span class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto"><button class="btn" data-act="delask">Cancella</button><button class="btn pri" data-act="continue">Continua la partita</button></span></div>`}</div>`:''}
    <div class="lab">Scegli il tuo CEO</div><div class="ceos">${st}</div>${det}`;}
+/* --- schermata principale: le partite salvate (fino a SLOTS posti), il pulsante per una nuova partita e le novità --- */
+const hmIc=(k,sz)=>pxSvg(ICONE.ui[k]||ICONE.menu[k],sz);
+// quando si è giocato l'ultima volta: oggi o ieri con l'ora, poi il giorno
+function agoTxt(at){if(!at) return ''; const d=new Date(at),n=new Date(),day=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()),dd=Math.round((day(n)-day(d))/864e5),hm=`${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+  return dd<=0?`oggi alle ${hm}`:dd===1?`ieri alle ${hm}`:`il ${d.getDate()} ${MESI[d.getMonth()]}${d.getFullYear()!==n.getFullYear()?' '+d.getFullYear():''}`;}
+// riassunto di un salvataggio per la sua scheda (funziona anche con i salvataggi vecchi, prima di fillSave)
+function slotInfo(n,sv){const s=sv.S, B=s.boss||s.custom||CEOS.find(c=>c.id===s.ceoId)||{name:'—'}, t=dateOf(s.day), act=(s.clients||[]).filter(c=>c.status==='attivo'),
+  H=s.hist||[], h=H[H.length-1], nb=(s.bots||[]).length, won=s.won&&s.won.co, thr=k=>Math.max(0,...act.map(c=>c[k]||0));
+  return {n,s,B,at:sv.at||0,last:agoTxt(sv.at),img:IMG[B.img||B.id]||IMG.anon,tint:(COLORS.find(c=>c[0]===s.company.color)||[0,0,'#e6eef3'])[2],
+    date:`${MESI[t.getUTCMonth()]} ${t.getUTCFullYear()}`,mode:(MODES[s.cfg&&s.cfg.mode]||MODES.classica).n+(nb?` · ${nb} ${nb===1?'avversario':'avversari'}`:''),
+    wh:(s.warehouses||[]).length,cl:act.length,kpi:h?[['Puntualità',h.P,thr('sP')],['Accuratezza',h.A,thr('sA')]]:null,
+    tag:s.over?['bad','Fallita']:won==='me'?['ok','Partita vinta']:won?['warn','Ha vinto un avversario']:s.cash<0?['bad','Cassa in rosso']:null};}
+const svTile=(ic,lab,v,cls)=>`<div class="sv-tile"><span>${hmIc(ic,16)}${lab}</span><b class="${cls||''}">${v}</b></div>`;
+const svKpi=([n,v,t])=>`<div class="sv-k" data-tip="${n} media dell'ultimo mese${t?` · la soglia più alta dei tuoi clienti è ${f1(t)}%`:''}"><span>${n}</span><span class="t"><i style="width:${clamp(v,0,100)}%;background:var(--${v>=t?'ok':'bad'})"></i></span><b>${f1(v)}%</b></div>`;
+function slotCard(x,top){const {n,s}=x, nm=esc(s.company.name), go=`${s.over?'Rivedi':'Continua'} ›`, tag=x.tag?`<span class="sv-tag ${x.tag[0]}">${x.tag[1]}</span>`:'',
+  pic=`<div class="sv-pic"><img class="px" src="${x.img}" alt="Ritratto di ${esc(x.B.name)}" width="96" height="112"></div>`,
+  ask=startSel.del===n?`<div class="sv-ask" role="alert"><span><b>Cancellare per sempre ${nm}?</b> La partita sparisce e non si può recuperare.</span><span class="sv-act"><button class="btn" data-act="delno">No, tienila</button><button class="btn del" data-act="delsave" data-slot="${n}">Sì, cancella</button></span></div>`:'';
+  if(top) return `<div class="sv top" style="--tint:${x.tint}">${pic}
+   <div class="sv-hd"><div class="sv-nm"><span class="sv-last">ULTIMA PARTITA</span>${tag}<span class="sv-sub">${x.last?`giocata ${x.last} · `:''}${esc(x.mode)}</span></div><span class="sv-co">${nm}</span><span class="sv-sub">CEO <b>${esc(x.B.name)}</b></span></div>
+   <div class="sv-bd"><div class="sv-tiles">${svTile('calendario','Data',x.date)}${svTile('cassa','Cassa',eur(s.cash),s.cash<0?'bad':'ok')}${svTile('magazzini','Magazzini',x.wh)}${svTile('clienti','Clienti',x.cl)}</div>
+    ${x.kpi?`<div class="sv-kpi">${x.kpi.map(svKpi).join('')}</div>`:''}
+    ${ask||`<div class="sv-act"><button class="btn" data-act="delask" data-slot="${n}">${hmIc('cestino',16)}Cancella</button><button class="btn pri sv-go" data-act="continue" data-slot="${n}">${go}</button></div>`}</div></div>`;
+  return `<div class="sv" style="--tint:${x.tint}">${pic}<div class="sv-m"><div class="sv-nm"><span class="sv-co">${nm}</span>${tag}</div><span class="sv-sub">${esc(x.B.name)} · ${esc(x.mode)}</span>
+   <span class="sv-ln"><b>${x.date}</b><span>Cassa <b class="${s.cash<0?'bad':'ok'}">${eur(s.cash)}</b></span><span>${x.wh} ${x.wh===1?'magazzino':'magazzini'} · ${x.cl} ${x.cl===1?'cliente':'clienti'}</span>${x.last?`<span class="sv-sub">giocata ${x.last}</span>`:''}</span></div>
+   ${ask||`<div class="sv-act"><button class="btn sv-del" data-act="delask" data-slot="${n}" aria-label="Cancella la partita ${nm}">${hmIc('cestino',32)}</button><button class="btn sv-go2" data-act="continue" data-slot="${n}">${go}</button></div>`}</div>`;}
+function stepHome(){const L=[]; for(let n=1;n<=SLOTS;n++){const sv=load(n); if(sv&&sv.S&&sv.S.company) L.push(slotInfo(n,sv));}
+  L.sort((a,b)=>b.at-a.at); const full=L.length>=SLOTS;
+  return `<div class="hm-h">${hmIc('salva',32)}<h2>Partite salvate</h2><span class="hm-n" aria-label="${L.length} posti occupati su ${SLOTS}">${L.length}/${SLOTS}</span></div>
+   ${L.length?L.map((x,i)=>slotCard(x,!i)).join(''):'<div class="hm-empty"><b>Nessuna partita salvata</b><span>Il piazzale è vuoto: è il momento di scaricare il primo pallet.</span></div>'}
+   <button class="hm-new" data-act="newgame" ${full?'disabled':''}><span class="hm-plus">${hmIc('nuova',32)}</span><span class="t"><b>Crea nuova partita</b><span>${full?`Tutti e ${SLOTS} i posti sono occupati: cancella una partita per iniziarne un'altra.`:'Scegli il CEO, dai un nome all\'azienda e apri il primo magazzino a gennaio 2002.'}</span></span><span class="ar" aria-hidden="true">›</span></button>
+   ${newsCard()}<div class="hm-cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></div>`;}
 function showStart(){
   setSpeedSafe(0); WIKI_ON=false; const k=startSel.step;
+  if(k==='home'){
+    $('#start').innerHTML=`<div class="box home"><div class="hm-hero"><div class="hm-bar"><span>Versione ${VER}</span><span>Nord Italia · gennaio 2002</span></div>
+     <div class="hm-ttl"><h1>FUP</h1><div class="sub">Fino all'ultimo pallet</div></div><div class="hm-truck">${introTruck()}</div><div class="hm-road"></div></div><div class="hm-b">${stepHome()}</div></div>`;
+    if(lastStep!==k){$('#start').scrollTop=0;lastStep=k;} return;
+  }
   if(!startSel.lb) startSel.lb=lbDef();
   const body={scelta:stepScelta,cc1:stepCC1,cc2:stepCC2,cc3:stepCC3,cv:stepCV,az:stepAz,visura:stepVisura,lobby:stepLobby}[k]();
   const next={scelta:nextBtn(startSel.ceo==='custom'?'Crea il CEO':'Avanti: l\'azienda'),cc1:nextBtn('Avanti: abilità'),cc2:nextBtn('Avanti: studi e carattere'),cc3:nextBtn('Vedi il curriculum'),cv:nextBtn('Confermo, è tutto vero'),az:nextBtn('Iscrivi alla Camera di Commercio'),
     visura:startSel.stamp?nextBtn('Avanti: la partita'):`<button class="btn pri" data-act="stamp" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Timbra la visura</button>`,
     lobby:`<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Inizia la partita ›</button>`}[k];
   $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP · versione ${VER}</span><span>Nord Italia, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
-   ${k!=='scelta'?stepper():''}${body}${stNav(next)}${k==='scelta'?newsCard():''}</div></div>`;
+   ${k!=='scelta'?stepper():''}${body}${stNav(next)}</div></div>`;
   if(k==='scelta'){const r=$('#start .ceos'),e=r&&r.querySelector('[aria-pressed=true]');if(e&&r.scrollWidth>r.clientWidth)r.scrollLeft=e.offsetLeft-(r.clientWidth-e.offsetWidth)/2;}
   if(lastStep!==k){$('#start').scrollTop=0;lastStep=k;}
 }
@@ -5867,7 +5985,7 @@ function stValid(k){const cc=startSel.cc;
   return '';}
 function stGo(to){if(!(startSel.step==='visura'&&to==='lobby'))startSel.stamp=false; startSel.step=to;startSel.err='';showStart();}
 Object.assign(ACT,{
- introgo(){const el=$('#intro');if(!el.innerHTML||el.classList.contains('go'))return;el.classList.add('go','out');setTimeout(()=>{el.innerHTML='';el.className='';delete el.dataset.act;const b=$('#start [data-act=startgame]');if(b)b.focus({preventScroll:true});},matchMedia('(prefers-reduced-motion: reduce)').matches?0:600);},
+ introgo(){const el=$('#intro');if(!el.innerHTML||el.classList.contains('go'))return;el.classList.add('go','out');setTimeout(()=>{el.innerHTML='';el.className='';delete el.dataset.act;const b=$('#start [data-act=continue],#start [data-act=newgame]');if(b)b.focus({preventScroll:true});},matchMedia('(prefers-reduced-motion: reduce)').matches?0:600);},
  installapp(){if(!installEvt)return;startKeep();installEvt.prompt();installEvt.userChoice.finally(()=>{installEvt=null;showStart();});},
  pickceo(d){startKeep();startSel.ceo=d.id;startSel.err='';if(d.id==='custom'){if(!startSel.cc)startSel.cc=ccNew();stGo('cc1');return;}showStart();},
  pickcolor(d){startKeep();startSel.color=d.c;applyColor(d.c);showStart();},
@@ -5878,7 +5996,8 @@ Object.assign(ACT,{
    else {const t=d.f==='claim'?startSel:cc;t[d.f]=pick(SUGG[d.f],t[d.f]||'');}
    showStart();},
  stnext(){startKeep();const k=startSel.step,e=stValid(k);if(e){startSel.err=e;showStart();return;}const fl=stFlow();stGo(fl[fl.indexOf(k)+1]);},
- stback(){startKeep();const fl=stFlow();stGo(fl[Math.max(0,fl.indexOf(startSel.step)-1)]);},
+ stback(){startKeep();const fl=stFlow(),i=fl.indexOf(startSel.step);stGo(i>0?fl[i-1]:'home');},
+ newgame(){const n=freeSlot();if(!n)return;startSel.slot=n;startSel.del=0;stGo('scelta');},
  stgo(d){startKeep();stGo(d.to);},
  stamp(){startSel.stamp=true;showStart();},
  ccst(d){startKeep();const cc=startSel.cc;cc.st[d.k]=clamp(cc.st[d.k]+(+d.d),1,18);startSel.err='';showStart();},
@@ -5886,7 +6005,7 @@ Object.assign(ACT,{
  cctal(d){startKeep();const cc=startSel.cc;if(cc.tal.includes(d.n))cc.tal=cc.tal.filter(n=>n!==d.n);else if(cc.tal.length<CC_TRAITS)cc.tal.push(d.n);startSel.err='';showStart();},
  ccimg(d){startKeep();const cc=startSel.cc,i=CC_IMGS.indexOf(cc.img);cc.img=CC_IMGS[(i+(+d.d)+CC_IMGS.length)%CC_IMGS.length];showStart();},
  ccbase(d){startKeep();startSel.cc.base=d.id;showStart();},
- startgame(){startKeep();const custom=startSel.ceo==='custom';
+ startgame(){startKeep();const custom=startSel.ceo==='custom';slot=startSel.slot||freeSlot()||1;
    if(custom){const e=ccErr(startSel.cc);if(e){startSel.err=e;showStart();return;}}
    startSel.err='';uid=1;newGame(startSel.ceo,coName(),startSel.color,custom?ccCeo(startSel.cc):null,{logo:startSel.logo,claim:startSel.claim.trim()});
    const L=startSel.lb||lbDef(); HUM=S; S.cfg={mode:L.mode,win:{...L.win},fatturato:L.fatturato,reputazione:L.reputazione,traguardo:L.traguardo};
@@ -5894,13 +6013,13 @@ Object.assign(ACT,{
    if(S.bots.length) news('Il Sole 24 Pallet',`Quattro aziende per un mercato solo`,`Nel Nord partono insieme a ${S.company.name} anche ${S.bots.map(b=>`${b.company.name} di ${b.boss.name}`).join(', ')}. Le gare d'appalto saranno una battaglia.`);
    if(L.mode==='persistente') S.clock={at:Date.now(),day:0};
    if(contMode()) S.speed=1;
-   startSel.step='scelta';startSel.stamp=false;boot();},
+   startSel.step='home';startSel.stamp=false;boot();save();},
  lbbot(d){startKeep();const b=startSel.lb.bots[d.id]; if(!b) return; b[d.k]=d.k==='on'?d.v==='1':d.v; showStart();},
  lbfold(d){const b=startSel.lb.bots[d.id]; if(!b) return; startKeep(); b.fold=!b.fold; showStart();},
  lbmode(d){startSel.lb.mode=d.v; showStart();},
  lbwin(d){const w=startSel.lb.win; w[d.id]=!w[d.id]; showStart();},
  lbwt(d){startSel.lb[d.id]=+d.v; showStart();},
- continue(){startSel.del=false;const sv=load();if(!sv)return;S=fillSave(migrateStaff(renameClients(sv.S)));HUM=S;if(!S.cfg)S.cfg={mode:'classica',win:{}};if(MODES[S.cfg.mode]&&MODES[S.cfg.mode].off){S.cfg.mode='classica';delete S.clock;}S.bots=(S.bots||[]).map(b=>fillSave(b));if(contMode())S.speed=1;S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){if(!m.log.length)m.tal=[...d.tal];m.role=d.role;}});if(S.project===undefined)S.project=null;if(S.speed>2)S.speed=2;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();}
+ continue(d){startSel.del=0;const n=+(d&&d.slot)||1,sv=load(n);if(!sv)return;slot=n;S=fillSave(migrateStaff(renameClients(sv.S)));HUM=S;if(!S.cfg)S.cfg={mode:'classica',win:{}};if(MODES[S.cfg.mode]&&MODES[S.cfg.mode].off){S.cfg.mode='classica';delete S.clock;}S.bots=(S.bots||[]).map(b=>fillSave(b));if(contMode())S.speed=1;S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){if(!m.log.length)m.tal=[...d.tal];m.role=d.role;}});if(S.project===undefined)S.project=null;if(S.speed>2)S.speed=2;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();if(S.over)ACT.finale();}
 });
 function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;
@@ -5969,6 +6088,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,debt,loanLimit};
+window.__FUP={get S(){return S;},cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,debt,loanLimit};
 })();
 </script>
