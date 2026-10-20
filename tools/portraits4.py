@@ -143,10 +143,14 @@ person('matteo',skin='chiara',hair='#4a3426',hairl='#6e4e38',hairstyle='messy',c
 person('beatrice',skin='chiara',hair='#b9bec5',hairl='#dfe3e8',hairstyle='bob',cloth='#16202e',clothd='#0c131d',clothl='#2f3d52',lips='#b0505a',earring='#c3d0dc',collar=cc_col('#f4f5f7'))
 person('paolo',skin='media',hair='#9aa0a8',hairl='#c9ced4',hairstyle='short',cloth='#5a3e2b',clothd='#3e2a1c',clothl='#7a5a40',glasses='#16202e',collar=tie('#9b6bff'))
 person('federico',skin='scura',hair='#2c2420',hairl='#463830',hairstyle='short',cloth='#1f9e8f',clothd='#157366',clothl='#3dd6c4',beard='#2c2420',collar=tie('#16202e'))
+def tshirt(col):   # maglietta girocollo: bordino scuro attorno al collo
+    def f(c):
+        m=ell(24,41,6,3.2)&~ell(24,40.5,4.6,2.2)&(yy>40); c.fill(m,col)
+    return f
 # Andrew Goodheart: biondo, capelli corti, occhiali squadrati dalla montatura spessa
 def sq_glasses(c):
     c.px(line_px(16,22,21)+line_px(26,32,21)+[(15,22),(15,23),(15,24),(33,22),(33,23),(33,24)],'#16202e')
-person('andrew',skin='chiara',hair='#e8c25a',hairl='#fbe39a',haird='#b08a2e',hairstyle='short',cloth='#3a6db0',clothd='#264f86',clothl='#5a8bd0',glasses='#16202e',collar=tie('#e0393e'),extra=sq_glasses)
+person('andrew',skin='chiara',hair='#e8c25a',hairl='#fbe39a',haird='#b08a2e',hairstyle='short',cloth='#2e9e48',clothd='#1f7a34',clothl='#5cc472',glasses='#16202e',collar=tshirt('#1f7a34'),extra=sq_glasses)
 NEW=['giorgio','aisha','ivan','sara','nicola','elena','matteo','beatrice','paolo','federico','andrew']
 
 # posto vacante: sagoma anonima in ombra (p_anonimo), con un punto di domanda sul petto
