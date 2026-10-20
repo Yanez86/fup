@@ -117,6 +117,16 @@ async def phone(b, w, h, name, errs):
     await pg.evaluate(BOT, 'gino')
     for _ in range(5): await pg.evaluate(CLEAR)
     await pg.evaluate("()=>{window.__FUP.S.speed=0;document.querySelector('#modal').innerHTML='';document.querySelector('#toasts').innerHTML='';}")
+    # pagina Produttività del magazzino: grafico con lo storico e dettaglio delle voci, dentro lo schermo
+    if not await pg.query_selector('#win-magazzini'): await menu(pg, 'magazzini')
+    await pg.tap('#win-magazzini [data-act=whprod][data-on="1"]')
+    assert await pg.query_selector('#win-magazzini svg[data-chart^=pr_]'), f'{name}: grafico della produttività mancante'
+    assert await pg.evaluate(FITS, '#win-magazzini'), f'{name}: produttività esce dallo schermo'
+    bad = await pg.evaluate(NOSIDE, '#win-magazzini')
+    assert not bad, f'{name}: produttività: {bad}'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_produttivita.png'), full_page=True)
+    await pg.tap('#win-magazzini [data-act=whprod][data-on="0"]')
+    assert await pg.query_selector('#win-magazzini [data-act=whprod][data-on="1"]'), f'{name}: non si torna al magazzino'
     if await pg.query_selector('#win-magazzini'): await pg.tap('#win-magazzini [data-act=close]')
     await menu(pg, 'riepilogo')
     for t in ['gen','soldi','op','cli','pers','mod']:
