@@ -31,8 +31,8 @@ html{background:var(--ink)}
 html,body{height:100%}
 /* web app installata su iPhone (iOS 26): lo schermo «utile» risulta più corto dell'altezza della barra di stato e in fondo resta una banda vuota; allungando la pagina gli elementi fissi tornano fino al bordo */
 @media (display-mode:standalone), (display-mode:fullscreen){html{min-height:calc(100% + env(safe-area-inset-top, 0px))}}
-/* iOS 26 nell'app installata sfoca circa 40 punti sotto la barra di stato (effetto di sistema, non si spegne): in verticale la barra, il menu e la schermata iniziale scendono di --glass */
-@media (display-mode:standalone), (display-mode:fullscreen){html.mob:not(.land){--glass:40px}}
+/* iOS 26 nell'app installata sfoca una striscia sotto la barra di stato (effetto di sistema, non si spegne; 40 punti di margine erano troppi): in verticale la barra, il menu e la schermata iniziale scendono di --glass */
+@media (display-mode:standalone), (display-mode:fullscreen){html.mob:not(.land){--glass:20px}}
 body{margin:0;background:var(--ink);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0}
 button{font:inherit;cursor:pointer;color:inherit}
@@ -602,6 +602,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #intro .ver{font-size:14px;color:#c3d0dc}
 #intro .cred{position:absolute;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));z-index:1;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f-disp);font-size:16px;color:#fff3c4;opacity:0;animation:introPop .4s 2.6s forwards}
 .land #intro .cred{bottom:max(4px,env(safe-area-inset-bottom))} .land #intro .road::after{bottom:36px}
+#intro .wip{display:flex;align-items:center;gap:10px;max-width:420px;margin-top:6px;padding:8px 12px;background:#16202e;border:3px solid #ffd23f;box-shadow:4px 4px 0 #0c131d;font-size:14px;line-height:1.35;color:#fff3c4;text-align:left}
+#intro .wip b{color:#ffd23f}
+.land #intro .bot{flex-flow:row wrap;justify-content:center;gap:6px 14px} .land #intro .ver{order:3;flex-basis:100%;text-align:center}
+.land #intro .wip{margin-top:0;padding:4px 10px;font-size:12px;max-width:380px}
 #intro .cred svg{width:24px;height:28px;flex:none;filter:drop-shadow(2px 2px 0 #0c131d)}
 .land #intro .bot .btn{padding:8px 22px} .land #intro .ttl{padding-bottom:8px}
 @keyframes introIn{from{transform:translateX(calc(-50vw - 110%))}to{transform:translateX(-50%)}}
@@ -4199,7 +4203,7 @@ function chMigrate(){
   S.warehouses.forEach(w=>{const k=computeWH(w), mv=Math.min(k.need.autB,Math.max(0,w.staff.autCE-k.need.autCE)); w.staff.autCE-=mv; w.staff.autB=Math.max(w.staff.autB+mv,k.need.autB);});
 }
 // si salva sempre l'azienda del giocatore, con dentro le aziende avversarie
-// tre posti di salvataggio: il primo usa la chiave di sempre, così la partita salvata prima della 0.54 resta al suo posto
+// tre posti di salvataggio: il primo usa la chiave di sempre, così la partita salvata prima della 0.56 resta al suo posto
 const SLOTS=3, slotKey=n=>n>1?`${KEY}-${n}`:KEY;
 let slot=1;  // il posto della partita in corso
 function save(){const H=HUM||S; if(!H||S.bot) return; try{localStorage.setItem(slotKey(slot),JSON.stringify({S:H,uid,at:Date.now()}));}catch(e){}}
@@ -5806,7 +5810,9 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.54',t:'Tre partite salvate',x:['Nuova schermata principale: in alto l\'insegna col camioncino, sotto le tue partite salvate e il pulsante giallo «Crea nuova partita». La scelta del CEO arriva dopo, toccando quel pulsante.','Puoi tenere fino a 3 partite. Ognuna ha la sua scheda con il ritratto del CEO, la data, la cassa, magazzini e clienti; l\'ultima giocata sta in cima, più grande, con Puntualità e Accuratezza. Il cestino cancella una partita, dopo la conferma.','La partita che avevi già salvato è al suo posto: la trovi nella prima scheda.','Le novità stanno in un menu a tendina in fondo alla schermata principale.']},
+ {v:'0.56',t:'Tre partite salvate',x:['Nuova schermata principale: in alto l\'insegna col camioncino, sotto le tue partite salvate e il pulsante giallo «Crea nuova partita». La scelta del CEO arriva dopo, toccando quel pulsante.','Puoi tenere fino a 3 partite. Ognuna ha la sua scheda con il ritratto del CEO, la data, la cassa, magazzini e clienti; l\'ultima giocata sta in cima, più grande, con Puntualità e Accuratezza. Il cestino cancella una partita, dopo la conferma.','La partita che avevi già salvato è al suo posto: la trovi nella prima scheda.','Le novità stanno in un menu a tendina in fondo alla schermata principale.']},
+ {v:'0.55',t:'Barra più in alto',x:['Su iPhone la barra con logo e pulsanti risale un po\': resta fuori dalla zona sfocata senza lasciare troppo vuoto sopra.']},
+ {v:'0.54',t:'Lavori in corso',x:['Nella schermata iniziale un cartello giallo avvisa che il gioco è in sviluppo: non tutto funziona come dovrebbe, proprio come nelle vere logistiche.']},
  {v:'0.53',t:'Lenti e pausa a portata di dito',x:['Le lenti della mappa stanno dentro un solo pulsante con la lente d\'ingrandimento (con la piccola icona della lente attiva): toccalo e scegli quella che vuoi.','Sul telefono, accanto a «Menu», c\'è il pulsante del tempo: ogni tocco passa da pausa a velocità x1, poi x2, poi di nuovo pausa. La barra in alto ora sta su una riga sola.']},
  {v:'0.52',t:'iPhone senza sfocature',x:['Su iPhone con iOS 26 il sistema sfoca la parte alta dello schermo: nell\'app installata la barra con logo e pulsanti scende un po\', fuori dalla zona sfocata.']},
  {v:'0.51',t:'I crediti',x:['In fondo alla schermata iniziale ci sono i crediti: «un gioco Happy Squid Inc.» con il calamaro viola.']},
@@ -5881,13 +5887,16 @@ function introTruck(){let r='';const R=(x0,y0,x1,y1,c)=>{r+=`<rect x="${x0}" y="
   [10,44].forEach(x=>{R(x-2,40,x+2,47,K);R(x-3,41,x+3,46,K);R(x-1,42,x+1,45,TPAL.S);R(x,43,x,44,TPAL.D);});
   return `<svg viewBox="0 0 56 48" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
 // logo Happy Squid Inc. (lo stesso del sito): v viola, w bianco, k contorno
+// cartello di pericolo per l'avviso «lavori in corso» dello splash (12×12, contorno K, fascia scura y)
+const WIP_ICON=['.....KK.....','....KYYK....','....KYYK....','...KYKKYK...','...KYKKYK...','..KYYKKYYK..','..KYYKKYYK..','.KYYYKKYYYK.','.KYYYYYYYYK.','KyyyyKKyyyyK','KyyyyyyyyyyK','KKKKKKKKKKKK'];
 function squidLogo(){const P={v:'#9b6bff',w:'#fff',k:'#16202e'},G=['....vvvv....','...vvvvvv...','..vvvvvvvv..','.vvvvvvvvvv.','.vvvvvvvvvv.','.vwkvvvvwkv.','.vwkvvvvwkv.','.vvvkvvkvvv.','.vvvvkkvvvv.','vvvvvvvvvvvv','v.vv.vv.vv.v','v.v..vv..v.v','v..v.vv.v..v','.v..v..v..v.'];let r='';
   G.forEach((row,y)=>[...row].forEach((c,x)=>{if(P[c])r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${P[c]}"/>`;}));
   return `<svg viewBox="0 0 12 14" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
 function showIntro(){
   $('#intro').innerHTML=`<div class="ttl"><h1>FUP</h1><div class="sub">Fino all'ultimo pallet</div></div>
    <div class="lane"><div class="truck"><div class="puff"></div>${introTruck()}</div></div>
-   <div class="road"><div class="bot"><button class="btn pri" data-act="introgo">${TOUCH?'Tocca':'Clicca'} per entrare</button><span class="ver">Versione ${VER} · ${esc(CHANGELOG[0].t)}</span></div>
+   <div class="road"><div class="bot"><button class="btn pri" data-act="introgo">${TOUCH?'Tocca':'Clicca'} per entrare</button><span class="ver">Versione ${VER} · ${esc(CHANGELOG[0].t)}</span>
+   <div class="wip">${pxSvg(WIP_ICON,24)}<span><b>Lavori in corso.</b> Il gioco è in sviluppo e non tutto funziona come dovrebbe… proprio come nelle vere logistiche.</span></div></div>
    <div class="cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></div></div>`;
   $('#intro').dataset.act='introgo';
 }
