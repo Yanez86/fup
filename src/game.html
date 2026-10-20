@@ -2822,7 +2822,7 @@ function step(){
     if(t.id==='iso'||t.id==='marketing') S.rep=clamp(S.rep+5,0,100);
     news('La Gazzetta del Muletto',`Ricerca completata: ${t.name}`,perWh(t)?'Ora si può installare nei magazzini dalla finestra Tecnologia.':t.desc);
     if(t.id==='direzione') notify('green','direzione','La Gazzetta del Muletto','Nasce la squadra dei dirigenti','La struttura direzionale è pronta. Dal menu Direzione nomina fino a cinque direttori: ognuno guida un\'area di tutta l\'azienda con la sua abilità principale.','direzione');
-    else noteVar('tech',`Ricerca completata: ${t.name}${perWh(t)?' · installala nei magazzini':''}`); } }
+    else notify('green','tecnologia','Ufficio ricerca',`Ricerca completata: ${t.name}`,perWh(t)?'Ora va installata nei magazzini: apri la tecnologia e scegli dove.':t.desc,'tecnologia',{tree:t.tree,tech:t.id},'techdone'); } }
   // gare
   // clienti in uscita dopo il recesso
   S.clients.filter(c=>c.exit&&c.status==='attivo'&&S.day>=c.exit.day).forEach(exitClient);
@@ -3904,6 +3904,7 @@ function noteAlerts(){
   const q=staffPeople().filter(p=>p.quit&&!p.quit.ret), u=staffPeople().filter(p=>!p.quit&&(p.unh||0)>=20);
   if(q.length) a.push({id:'quit',col:'red',ic:'personale',title:q.length===1?`${q[0].name} sta per andarsene`:`${q.length} persone stanno per andarsene`,text:q.length===1?`Ha dato le dimissioni: lascia l'azienda il ${shortDate(q[0].quit.day)}.`:'Hanno dato le dimissioni: trovi i nomi nella finestra Personale.',win:'personale'});
   if(u.length) a.push({id:'unh',col:'yellow',ic:'policy',title:u.length===1?`${u[0].name} è scontento delle policy`:`${u.length} persone scontente delle policy`,text:'Una pretesa sulle policy aziendali non è rispettata: se va avanti così arriva un ultimatum.',win:'policy'});
+  if(!S.project&&TECH.some(techOpen)) a.push({id:'research',col:'yellow',ic:'tecnologia',title:'Nessuna ricerca in corso',text:'L\'ufficio ricerca è fermo: scegli la prossima tecnologia da studiare.',win:'tecnologia'});
   if(R('direzione')&&Object.values(S.dirs).some(v=>!v)) a.push({id:'dir',col:'yellow',ic:'direzione',title:'Posti da dirigente liberi',text:'Nella finestra Direzione puoi nominare i direttori che mancano.',win:'direzione'});
   return a;
 }
@@ -5511,6 +5512,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.45',t:'Ricerca sotto controllo',x:['Quando non stai ricercando nessuna tecnologia compare una tessera gialla nelle notifiche: toccala per aprire subito la finestra Tecnologia. Sparisce appena avvii una ricerca.','A fine ricerca arriva una notifica verde con il nome della tecnologia: toccandola si apre già selezionata, pronta da installare nei magazzini.']},
  {v:'0.44',t:'Scelta del CEO in fila',x:['Nella scelta del CEO le schede occupano tutta la larghezza, una sotto l\'altra, con il ritratto a sinistra e abilità, talenti e cliente storico a destra.']},
  {v:'0.43',t:'Ci vediamo in tribunale',x:['Nuovo evento: qualche settimana dopo un licenziamento la persona può impugnarlo e chiedere di tornare. La riassumi, chiudi con una conciliazione, vai in tribunale (rischioso, meglio con un CEO bravo in Amministrazione) o, se sai negoziare, le trovi un posto da un cliente.']},
  {v:'0.42',t:'Tagli e reputazione',x:['Licenziare ora pesa anche sulla reputazione (−0,3 a persona), oltre alla buonuscita e al calo di morale nel magazzino.','Dal quarto licenziamento in un mese scatta l\'ondata: finisce sul giornale, la reputazione scende di più e il morale cala di 2 punti in tutti i magazzini. Per i picchi della stagione conviene la cooperativa, che si manda via gratis.','Anche le aziende CPU licenziano quando finisce la stagione di picco, guardando il mese dopo per non restare scoperte. Le Facili sono prudenti, le Normali evitano le ondate, le Spietate tagliano senza pietà e finiscono sul giornale.']},
