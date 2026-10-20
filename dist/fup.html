@@ -29,6 +29,8 @@
 /* sfondo scuro come la barra e il menu: su iPhone si vede sotto la barra di stato e sotto il menu, dove la mappa non arriva */
 html{background:var(--ink)}
 html,body{height:100%}
+/* web app installata su iPhone (iOS 26): lo schermo «utile» risulta più corto dell'altezza della barra di stato e in fondo resta una banda vuota; allungando la pagina gli elementi fissi tornano fino al bordo */
+@media (display-mode:standalone), (display-mode:fullscreen){html{min-height:calc(100% + env(safe-area-inset-top, 0px))}}
 body{margin:0;background:var(--ink);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0}
 button{font:inherit;cursor:pointer;color:inherit}
@@ -38,12 +40,12 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .num{font-variant-numeric:tabular-nums}
 
 /* Mappa */
-#mapwrap{position:fixed;inset:0;overflow:hidden;cursor:grab;touch-action:none}
+#mapwrap{position:fixed;left:0;right:0;top:0;height:100vh;height:100lvh;overflow:hidden;cursor:grab;touch-action:none}
 #mapwrap.drag{cursor:grabbing}
 #map{position:absolute;left:0;top:0;width:1520px;height:800px;transform-origin:0 0}
 #map img{position:absolute;inset:0;width:1520px;height:800px}
 #map svg{position:absolute;inset:0;overflow:visible}
-.vign{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 55%, rgba(8,20,40,0) 55%, rgba(8,20,40,.4) 100%)}
+.vign{position:fixed;left:0;right:0;top:0;height:100vh;height:100lvh;pointer-events:none;background:radial-gradient(ellipse at 50% 55%, rgba(8,20,40,0) 55%, rgba(8,20,40,.4) 100%)}
 .lbl{font-family:var(--f-disp);font-weight:600;fill:var(--ink);stroke:#f4f7fa;stroke-width:3px;paint-order:stroke}
 .mk{cursor:pointer}
 .plbl{font-family:var(--f-disp);font-weight:600;fill:#fff;stroke:var(--ink);stroke-width:3px;paint-order:stroke;pointer-events:none;letter-spacing:1px}
@@ -790,6 +792,8 @@ html,body{overscroll-behavior:none}
 .mob #tip{max-width:min(340px, calc(100vw - 16px))}
 .mob .ovl{padding:8px}
 .mob .modal{max-height:calc(100dvh - 16px)}
+/* sul telefono lo schermo è alto e stretto: l'alone scuro dei bordi copriva le Alpi sotto la barra e sembrava una sfocatura */
+.mob .vign{display:none}
 .mob #start{padding:10px max(8px, env(safe-area-inset-right, 0px)) 16px max(8px, env(safe-area-inset-left, 0px))}
 .mob #start h1{font-size:34px}
 .mob .ceos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:30px 12px 14px;margin:-16px -12px 0}
@@ -4104,12 +4108,14 @@ function load(){try{const r=localStorage.getItem(KEY)||localStorage.getItem(KEY_
 
 /* ====================== MAPPA ====================== */
 const view={s:1,x:0,y:0}, MW=1520, MH=800; // mappa: 760x400 in pixel art mostrata a 2x (da Nizza a Trieste)
+// altezza vera dello schermo: su iPhone innerHeight può essere più bassa della mappa, che va fino al bordo inferiore
+function vpH(){return Math.max(innerHeight,$('#mapwrap').clientHeight);}
 function fitMap(){
-  const W=innerWidth,H=innerHeight; const s0=Math.max(W/MW,H/MH);
+  const W=innerWidth,H=vpH(); const s0=Math.max(W/MW,H/MH);
   view.min=s0; if(view.s<s0||!view.init){view.s=s0;view.x=(W-MW*s0)/2;view.y=(H-MH*s0)/2;view.init=1;}
   clampView(); applyView();
 }
-function clampView(){const W=innerWidth,H=innerHeight;view.x=clamp(view.x,W-MW*view.s,0);view.y=clamp(view.y,H-MH*view.s,0);}
+function clampView(){const W=innerWidth,H=vpH();view.x=clamp(view.x,W-MW*view.s,0);view.y=clamp(view.y,H-MH*view.s,0);}
 function applyView(){$('#map').style.transform=`translate(${view.x}px,${view.y}px) scale(${view.s})`;}
 // zoom tenendo fermo il punto (mx,my) dello schermo
 function zoomAt(mx,my,ns){ns=clamp(ns,view.min,view.min*3.2);view.x=mx-(mx-view.x)*ns/view.s;view.y=my-(my-view.y)*ns/view.s;view.s=ns;clampView();applyView();}
@@ -5690,6 +5696,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.50',t:'iPhone a tutto schermo',x:['Sull\'app installata su iPhone la mappa arriva fino al bordo in basso: sparita la banda scura sotto i pulsanti.','Sul telefono tolto l\'alone scuro ai bordi della mappa, che in alto sotto la barra sembrava una sfocatura.']},
  {v:'0.49',t:'Report della partita',x:['A fine partita (vittoria, sconfitta o fallimento) c\'è il pulsante «Report della partita»: esito, il titolo che ti sei guadagnato, i totali di tutta la partita e i record.','Grafici della crescita: fatturato e utile, dipendenti per reparto, magazzini e clienti, cassa e debito, KPI, reputazione e morale, pallet movimentati.','Una tabella anno per anno, la cronaca con le tappe importanti (magazzini aperti, gare vinte, clienti persi, ricerche, eventi, traguardi) e, se giochi contro altre aziende, la classifica finale con il fatturato di ognuna.','Il report si apre anche a partita in corso, dal Riepilogo.']},
  {v:'0.48',t:'CEO da collezione',x:['La scelta del CEO è fatta di carte collezionabili: in alto il tipo di personaggio (Vecchia scuola, Figlio d\'arte, Squalo delle gare, Il nerd del WMS) nel colore della sua abilità più forte, poi ritratto, abilità a barre, talenti e cassa.','La carta scelta si solleva e prende l\'adesivo «SCELTO!»; sotto compaiono la sua storia, il magazzino e il cliente storico. Sul telefono le carte si scorrono col dito.']},
  {v:'0.47',t:'X per chiudere',x:['Nelle schede delle notifiche il pulsante «Archivia» è diventato una X in alto a destra: toccala per togliere la notizia (o tutto il gruppo) dalla colonna.']},
