@@ -978,26 +978,44 @@ const TENDER_POOL=[
  {name:'Ricambi Nautici Bolina',slogan:'Nodi marinari, tempi da terraferma',sector:'Nautica',stock:200,pal:90,sP:91,sA:97,diff:0},
  {name:'Panettoni Canditelli',slogan:'Lievita tutto l\'anno, si vende a dicembre',sector:'Dolciario da ricorrenza',stock:900,pal:450,sP:95,sA:97,diff:3}
 ];
-// STAGIONALITÀ: volumi di ogni committente per stagione [primavera, estate, autunno, inverno]; seasProf() li riporta a media 1 sull'anno
+// STAGIONALITÀ: volumi di ogni committente mese per mese [gennaio … dicembre]; seasProf() li riporta a media 1 sull'anno
 const SEASON={
- 'Pastificio Mezzemaniche':[1,0.92,1.03,1.05],'Mobilificio Brianzolo':[1.05,0.8,1.1,1.05],'Saponaria Italia':[1.02,0.95,1,1.03],'Caffè Portuale':[1,0.85,1.05,1.1],
- 'Caseificio Stracchinelli':[1.02,0.9,1.03,1.05],'Ferramenta Bullonati':[1.1,0.95,1,0.85],'Elettrofulmine':[0.9,0.8,1.1,1.25],'FarmaSpa':[0.95,0.88,1.05,1.15],
- 'Supermercati Carrellone':[1,0.96,1,1.08],'Birrificio Schiumetti':[1.1,1.55,0.85,0.5],'Acque Fonte Frizzantina':[1.1,1.65,0.8,0.45],'Arredamenti Brugola':[1.05,0.85,1.1,1],
- 'Moda Grucciani':[1.15,0.8,1.15,0.9],'Pneumatici Battistrada':[1.2,0.7,1.35,0.75],'Crema Spalmella':[0.95,0.6,1.15,1.3],'Riseria La Mondina':[1,0.9,1.05,1.05],
- 'Scarpinando':[1,0.85,1.15,1.1],'Tuttosubito Italia':[0.9,0.8,1.1,1.35],'Spesa Veloce':[1,0.8,1.05,1.15],'Spedizioni Tricolore':[0.95,0.82,1.1,1.3],
- 'Discount Prezzaccio':[1,0.96,1,1.05],'Mobili Truciolotto':[1.05,0.85,1.1,1],'Fai-da-Te Planet':[1.3,1.05,0.95,0.7],'Cosmetici Belletto':[0.95,1.1,0.9,1.2],
- 'Aeronautica Volavia':[1,0.92,1.03,1.05],'Salumificio Bresaolotti':[1,1.1,0.95,1],'Cioccolateria Sabauda':[1,0.25,1.2,1.55],'Lavatrix Elettrodomestici':[1,0.9,1,1.1],
- 'Cantine Tanninello':[0.9,0.75,1.15,1.2],'Crocchette Codamossa':[1,0.97,1,1.03],'Seterie del Lario':[1.1,0.75,1.1,1.05],'Materiali Edili Cazzuolini':[1.2,1.1,1.05,0.65],
- 'Giocattoli Trottolino':[0.6,0.5,1.7,1.2],'Pellet Fiammella':[0.6,0.15,1.6,1.65],'Torrefazione Tazzulella':[1,0.85,1.05,1.1],'Bevande Spillatutto':[1.05,1.5,0.85,0.6],
- 'Surgelati Polo Sud':[1,1.3,0.9,0.8],'Dolciaria Cornettone':[1,1.15,0.95,0.9],'Acciaierie Tondino':[1.05,0.85,1.05,1.05],'Scatolificio Cartonetti':[0.95,0.9,1.1,1.05],
- 'Parafarmacie Croceverde':[0.95,1.1,0.9,1.05],'Ortofrutta Fresco Fresco':[1.05,1.25,1,0.7],'Prosciuttificio Stagionelli':[0.95,1.05,0.9,1.1],'Caseificio Scagliagrana':[0.95,0.85,1.05,1.15],
- 'Piastrelle Sassuolini':[1.1,0.85,1.05,1],'Ricambi Pistoncino':[1.05,0.85,1.05,1.05],'Piadificio Sfogliarola':[1,1.6,0.8,0.6],'Cantine Bollicioso':[0.85,0.85,1,1.6],
- 'Occhialeria Lentescura':[1.25,1.35,0.75,0.65],'Frutteti Melarossa':[0.95,0.65,1.4,1],'Torrefazione Borascura':[1,0.85,1.05,1.1],'Cucine Incastrella':[1.05,0.85,1.1,1],
- 'Scarponi Ramponcino':[0.7,0.5,1.4,1.4],'Supermercati Sporta Piena':[1,0.96,1,1.08],'Pastificio Sfoglia Tirata':[1,0.8,1.05,1.2],'Macchine Avvolgix':[1.05,0.85,1.05,1.05],
- 'Panetteria Crosticina':[1,0.93,1.02,1.05],'Vivai Pollicioverde':[1.7,1,0.8,0.5],'Legnami Segatura':[1.1,1.05,1,0.85],'Lavanderie Candeggio':[1,1.5,0.9,0.6],
- 'Distillerie Grappino':[0.8,0.55,1.15,1.5],'Frantoio Ponentino':[0.9,0.75,1.1,1.25],'Ricambi Agricoli Trattorello':[1.3,1.2,0.9,0.6],'Mangimi Pastone':[1,0.95,1,1.05],
- 'Cartoleria Temperino':[0.75,1.35,1.15,0.75],'Sedie Dondolina':[1.15,1.1,0.9,0.85],'Bici Pedalina':[1.45,1.25,0.75,0.55],'Grolle Amicizia':[0.8,0.7,1.1,1.4],
- 'Imballaggi Pluriball':[0.95,0.9,1.1,1.05],'Tipografia Refuso':[1,0.85,1.1,1.05],'Ricambi Nautici Bolina':[1.4,1.4,0.7,0.5],'Panettoni Canditelli':[0.4,0.05,1.5,2.05]
+ 'Pastificio Mezzemaniche':[1.06,1.05,1.02,1.01,0.99,0.95,0.93,0.84,1.01,1.04,1.04,1.05],'Mobilificio Brianzolo':[1.06,1.06,1.06,1.06,1,0.87,0.81,0.78,1.04,1.11,1.1,1.07],
+ 'Saponaria Italia':[1.04,1.04,1.03,1.03,1.01,0.98,0.96,0.86,1,1.01,1.02,1.03],'Caffè Portuale':[1.11,1.08,1.04,1.01,0.97,0.89,0.86,0.8,1.01,1.06,1.07,1.1],
+ 'Caseificio Stracchinelli':[1.06,1.05,1.04,1.03,1,0.94,0.91,0.83,1.01,1.04,1.04,1.05],'Ferramenta Bullonati':[0.88,0.95,1.07,1.14,1.1,1.02,0.98,0.88,1.02,1.04,1,0.92],
+ 'Elettrofulmine':[1,0.8,0.85,0.85,0.9,1,0.85,0.6,0.95,1.1,1.7,1.4],'FarmaSpa':[1.15,1.1,1,0.95,0.93,0.9,0.88,0.81,1.01,1.05,1.08,1.13],
+ 'Supermercati Carrellone':[0.95,0.95,1,1,1,1,0.97,0.9,1,1,1.03,1.2],'Birrificio Schiumetti':[0.49,0.54,0.79,0.99,1.38,1.68,1.78,1.28,0.99,0.69,0.59,0.79],
+ 'Acque Fonte Frizzantina':[0.45,0.5,0.75,1,1.39,1.79,1.94,1.59,1,0.65,0.5,0.45],'Arredamenti Brugola':[1.01,1.02,1.05,1.06,1.01,0.91,0.86,0.81,1.05,1.11,1.08,1.03],
+ 'Moda Grucciani':[1.1,1.3,1.3,1,0.9,0.8,0.8,0.6,1.3,1.3,1,0.6],'Pneumatici Battistrada':[0.69,0.79,1.48,1.57,0.89,0.59,0.59,0.49,0.79,1.67,1.57,0.89],
+ 'Crema Spalmella':[1.23,1.12,1.02,0.97,0.82,0.61,0.51,0.61,1.23,1.23,1.33,1.33],'Riseria La Mondina':[1.06,1.05,1.02,1.01,0.98,0.93,0.91,0.83,1.02,1.06,1.06,1.06],
+ 'Scarpinando':[1.3,0.9,0.9,1,1,0.9,1.1,0.7,0.9,1,1.3,1],'Tuttosubito Italia':[0.9,0.8,0.85,0.85,0.9,0.85,0.8,0.75,0.95,1.1,1.7,1.55],
+ 'Spesa Veloce':[1.16,1.12,1.05,1.01,0.96,0.86,0.81,0.77,1,1.06,1.08,1.13],'Spedizioni Tricolore':[0.85,0.85,0.9,0.9,0.9,0.85,0.8,0.7,0.95,1.1,1.6,1.6],
+ 'Discount Prezzaccio':[1.06,1.04,1.02,1.01,1,0.98,0.97,0.86,1,1.01,1.02,1.04],'Mobili Truciolotto':[1.01,1.02,1.05,1.06,1.01,0.91,0.86,0.81,1.05,1.11,1.08,1.03],
+ 'Fai-da-Te Planet':[0.7,0.8,1.2,1.4,1.4,1.2,1,0.8,1,0.9,0.8,0.8],'Cosmetici Belletto':[0.78,0.83,0.88,0.93,1.08,1.22,1.08,0.69,0.88,0.98,1.27,1.37],
+ 'Aeronautica Volavia':[1.1,1.09,1.06,1.05,1.03,0.99,0.97,0.55,1.05,1.08,1.09,0.93],'Salumificio Bresaolotti':[0.99,0.99,0.99,0.99,1.01,1.06,1.09,1.05,0.97,0.94,0.95,0.98],
+ 'Cioccolateria Sabauda':[1.23,1.33,1.44,1.13,0.62,0.21,0.1,0.21,0.82,1.44,1.85,1.64],'Lavatrix Elettrodomestici':[1.11,1.08,1.04,1.01,0.98,0.93,0.91,0.82,0.98,1.01,1.03,1.08],
+ 'Cantine Tanninello':[0.9,0.85,0.9,0.95,0.85,0.7,0.6,0.5,1,1.31,1.61,1.81],'Crocchette Codamossa':[1.04,1.03,1.02,1.01,1,0.99,0.98,0.87,1,1.01,1.02,1.03],
+ 'Seterie del Lario':[1.1,1.11,1.14,1.15,1.06,0.87,0.78,0.48,1.06,1.15,1.14,0.95],'Materiali Edili Cazzuolini':[0.62,0.72,1.13,1.23,1.33,1.23,1.23,0.51,1.23,1.13,1.03,0.62],
+ 'Giocattoli Trottolino':[0.42,0.52,0.63,0.63,0.63,0.52,0.52,0.73,1.36,2.09,2.5,1.46],'Pellet Fiammella':[1.54,1.13,0.62,0.31,0.15,0.1,0.15,0.41,1.23,2.05,2.36,1.95],
+ 'Torrefazione Tazzulella':[1.11,1.08,1.04,1.01,0.97,0.89,0.86,0.8,1.01,1.06,1.07,1.1],'Bevande Spillatutto':[0.54,0.59,0.79,0.98,1.28,1.57,1.67,1.38,0.98,0.79,0.64,0.79],
+ 'Surgelati Polo Sud':[0.74,0.79,0.89,0.99,1.09,1.29,1.39,1.29,0.99,0.89,0.79,0.84],'Dolciaria Cornettone':[0.9,0.93,0.97,1,1.04,1.11,1.15,1.1,1,0.95,0.94,0.91],
+ 'Acciaierie Tondino':[1.1,1.1,1.1,1.1,1.05,0.94,0.89,0.52,1.05,1.1,1.1,0.94],'Scatolificio Cartonetti':[1.1,1.08,1.03,1,0.99,0.96,0.95,0.55,1.11,1.16,1.14,0.95],
+ 'Parafarmacie Croceverde':[1.05,1.02,0.98,0.95,0.99,1.06,1.1,1.05,0.95,0.9,0.94,1.01],'Ortofrutta Fresco Fresco':[0.71,0.71,0.86,1.01,1.21,1.36,1.36,1.11,1.06,0.96,0.91,0.76],
+ 'Prosciuttificio Stagionelli':[1.1,1.06,0.99,0.95,0.97,1.03,1.05,1.01,0.94,0.9,0.95,1.05],'Caseificio Scagliagrana':[1.16,1.11,1.01,0.96,0.93,0.88,0.86,0.8,1.01,1.06,1.09,1.13],
+ 'Piastrelle Sassuolini':[1.01,1.04,1.08,1.11,1.05,0.92,0.86,0.8,1.01,1.06,1.05,1.02],'Ricambi Pistoncino':[1.1,1.1,1.1,1.1,1.05,0.94,0.89,0.52,1.05,1.1,1.1,0.94],
+ 'Piadificio Sfogliarola':[0.49,0.49,0.59,0.89,1.18,1.67,2.07,1.97,1.08,0.59,0.49,0.49],'Cantine Bollicioso':[0.6,0.7,0.8,0.8,0.9,0.9,0.8,0.5,0.8,1.2,1.8,2.2],
+ 'Occhialeria Lentescura':[0.63,0.83,1.25,1.46,1.46,1.46,1.25,0.73,0.83,0.73,0.63,0.73],'Frutteti Melarossa':[0.92,0.87,0.82,0.77,0.72,0.62,0.62,1.03,1.74,1.64,1.23,1.03],
+ 'Torrefazione Borascura':[1.11,1.08,1.04,1.01,0.97,0.89,0.86,0.8,1.01,1.06,1.07,1.1],'Cucine Incastrella':[1.01,1.02,1.05,1.06,1.01,0.91,0.86,0.81,1.05,1.11,1.08,1.03],
+ 'Scarponi Ramponcino':[1.2,0.9,0.6,0.5,0.4,0.4,0.5,0.8,1.3,1.7,1.9,1.8],'Supermercati Sporta Piena':[0.95,0.95,1,1,1,1,0.97,0.9,1,1,1.03,1.2],
+ 'Pastificio Sfoglia Tirata':[0.9,0.9,1,1,0.9,0.8,0.75,0.7,1,1.1,1.31,1.61],'Macchine Avvolgix':[1.1,1.1,1.1,1.1,1.05,0.94,0.89,0.52,1.05,1.1,1.1,0.94],
+ 'Panetteria Crosticina':[1.06,1.05,1.02,1.01,0.99,0.96,0.94,0.85,1.01,1.03,1.04,1.05],'Vivai Pollicioverde':[0.4,0.6,1.6,2,1.6,1.1,0.8,0.6,0.9,1,0.8,0.6],
+ 'Legnami Segatura':[0.89,0.96,1.09,1.16,1.15,1.12,1.11,0.6,1.07,1.05,1.01,0.79],'Lavanderie Candeggio':[0.59,0.59,0.69,0.89,1.18,1.48,1.67,1.67,1.18,0.79,0.59,0.69],
+ 'Distillerie Grappino':[1.4,1.2,0.9,0.7,0.6,0.5,0.5,0.6,0.9,1.3,1.6,1.8],'Frantoio Ponentino':[1.2,1,0.9,0.8,0.8,0.7,0.6,0.5,0.7,1.1,1.8,1.9],
+ 'Ricambi Agricoli Trattorello':[0.61,0.91,1.31,1.41,1.41,1.31,1.11,0.91,1.01,0.91,0.61,0.5],'Mangimi Pastone':[1.1,1.09,1.07,1.05,1.04,1.01,1,0.56,1.04,1.05,1.06,0.93],
+ 'Cartoleria Temperino':[1.02,0.71,0.61,0.61,0.61,0.81,1.63,2.03,1.83,0.81,0.61,0.71],'Sedie Dondolina':[0.85,0.93,1.07,1.15,1.14,1.11,1.1,1.05,0.95,0.9,0.89,0.86],
+ 'Bici Pedalina':[0.5,0.7,1.3,1.6,1.6,1.4,1.1,0.7,0.8,0.8,0.7,0.8],'Grolle Amicizia':[1.4,1.3,0.9,0.7,0.6,0.8,0.9,0.9,0.7,0.9,1.3,1.6],
+ 'Imballaggi Pluriball':[1.1,1.08,1.03,1,0.99,0.96,0.95,0.55,1.11,1.16,1.14,0.95],'Tipografia Refuso':[1.06,1.05,1.02,1.01,0.97,0.89,0.86,0.81,1.05,1.11,1.1,1.07],
+ 'Ricambi Nautici Bolina':[0.51,0.72,1.33,1.64,1.64,1.44,1.23,0.82,0.82,0.72,0.62,0.51],'Panettoni Canditelli':[0.3,0.4,0.9,0.7,0.1,0.05,0.05,0.2,1,2,3.3,3]
 };
 // RANK delle committenti: media di 4 voti 0-100. Il voto sui ricavi si calcola dai volumi; gli altri tre sono [desiderabilità, pubblicità, solidità]
 const RANK_F={
@@ -1552,10 +1570,11 @@ function seasChart(c){
   let bands='', j=0; for(let i=1;i<=n;i++) if(i===n||seasonOf(d0+i*7)!==seasonOf(d0+j*7)){bands+=`<rect x="${X(j)}" y="${T-4}" width="${X(i)-X(j)}" height="${B-T+4}" fill="${SEAS_BG[seasonOf(d0+j*7)]}"/>`; j=i;}
   let mon=''; for(let i=0;i<365;i++){const t=dateOf(d0+i); if(t.getUTCDate()===1){const x=Math.round(i/364*W); mon+=`<line x1="${x}" y1="${B}" x2="${x}" y2="${B+3}" stroke="#4a5f7a" stroke-width="1"/><text x="${x+2}" y="${H-3}" font-size="10" fill="#4a5768">${MESI[t.getUTCMonth()].slice(0,1).toUpperCase()}</text>`;}}
   const now=Math.round(c.pal*v[0]), pc=x=>{const k=Math.round((x-1)*100); return k===0?'±0%':(k>0?'+':'−')+Math.abs(k)+'%';};
-  const tip=`<div class='tt'>Stagionalità ${lv[0]}</div>Pallet al mese previsti oggi: <b>${n0(now)}</b> (media dell'anno ${n0(c.pal)}).<br>${SEAS_N.map((x,i)=>`${x[1]}: ${pc(p[i])}`).join(' · ')}`;
+  const hi=p.indexOf(Math.max(...p)), lo=p.indexOf(Math.min(...p)), mn=i=>MESI[i][0].toUpperCase()+MESI[i].slice(1);
+  const tip=`<div class='tt'>Stagionalità ${lv[0]}</div>Pallet al mese previsti oggi: <b>${n0(now)}</b> (media dell'anno ${n0(c.pal)}).<br>${p.map((x,i)=>`${MESI[i].slice(0,3)} ${pc(x)}`).join(' · ')}`;
   return `<div class="seas"><div class="seas-h"><span class="lab">${kw('stagionalita','Stagionalità')}</span><span class="pill seas-p ${lv[1]}">${lv[0]}</span><span class="sm">prossimi 12 mesi · oggi <b>${n0(now)}</b> pallet</span></div>
-   <svg class="seas-g" viewBox="0 0 ${W} ${H}" role="img" aria-label="Volumi previsti nei prossimi 12 mesi: ${SEAS_N.map((x,i)=>x[1]+' '+pc(p[i])).join(', ')}" data-tip="${tip}">${bands}<line x1="0" y1="${Y(1)}" x2="${W}" y2="${Y(1)}" stroke="#4a5f7a" stroke-width="1" stroke-dasharray="4 3"/><line x1="0" y1="${B}" x2="${W}" y2="${B}" stroke="#16202e" stroke-width="1"/>${mon}<polyline fill="none" stroke="#ff7a3d" stroke-width="2" stroke-linejoin="round" points="${v.map((x,i)=>X(i)+','+Y(x)).join(' ')}"/><rect x="0" y="${Y(v[0])-3}" width="6" height="6" fill="#ff7a3d" stroke="#16202e" stroke-width="1"/></svg>
-   <div class="seas-l">${SEAS_N.map((x,i)=>`<span class="seas-s">${seasIcon(i,16)}<span>${x[1]} <b class="${p[i]>=1.005?'':'muted'}">${pc(p[i])}</b></span></span>`).join('')}</div>
+   <svg class="seas-g" viewBox="0 0 ${W} ${H}" role="img" aria-label="Volumi previsti nei prossimi 12 mesi: ${p.map((x,i)=>MESI[i]+' '+pc(x)).join(', ')}" data-tip="${tip}">${bands}<line x1="0" y1="${Y(1)}" x2="${W}" y2="${Y(1)}" stroke="#4a5f7a" stroke-width="1" stroke-dasharray="4 3"/><line x1="0" y1="${B}" x2="${W}" y2="${B}" stroke="#16202e" stroke-width="1"/>${mon}<polyline fill="none" stroke="#ff7a3d" stroke-width="2" stroke-linejoin="round" points="${v.map((x,i)=>X(i)+','+Y(x)).join(' ')}"/><rect x="0" y="${Y(v[0])-3}" width="6" height="6" fill="#ff7a3d" stroke="#16202e" stroke-width="1"/></svg>
+   <div class="seas-l"><span class="seas-s">${seasIcon(Math.floor(((hi+10)%12)/3),16)}<span>Picco: ${mn(hi)} <b>${pc(p[hi])}</b></span></span><span class="seas-s">${seasIcon(Math.floor(((lo+10)%12)/3),16)}<span>Mese più vuoto: ${mn(lo)} <b class="muted">${pc(p[lo])}</b></span></span></div>
    <div class="seas-k sm"><span><i class="seas-ln"></i>volumi previsti</span><span><i class="seas-ln dash"></i>media dell'anno</span></div></div>`;}
 function chBar(c,w){const mx=chMix(c);
   const tip=`<div class='tt'>Canali di distribuzione</div>`+mx.map(x=>`<div class='tr'><span><b style='color:${TPAL[x.c]}'>■</b> ${x.n}</span><span>${Math.round(x.s*100)}%</span></div>`).join('')+wikiHint();
@@ -1731,15 +1750,14 @@ const yearOf=d=>dateOf(d).getUTCFullYear();
 const SEAS_N=[['pri','Primavera'],['est','Estate'],['aut','Autunno'],['inv','Inverno']];
 const seasonOf=d=>Math.floor(((dateOf(d).getUTCMonth()+10)%12)/3);
 const seasIcon=(i,sz)=>ICONE.ui['s_'+SEAS_N[i][0]]?pxSvg(ICONE.ui['s_'+SEAS_N[i][0]],sz||16):'';
-// profilo di una committente riportato a media 1 (chi non è in SEASON non ha stagionalità)
-function seasProf(name){const v=SEASON[name]||[1,1,1,1], m=(v[0]+v[1]+v[2]+v[3])/4; return v.map(x=>x/m);}
-// fattore dei volumi nel giorno d: si passa da una stagione all'altra con una curva morbida tra i centri (15 apr, 15 lug, 15 ott, 15 gen)
-const SEAS_C=[104,195,287,379,469];
-function seasMul(name,d){const p=seasProf(name), t=dateOf(d), y=t.getUTCFullYear(); let x=(t-Date.UTC(y,0,1))/86400000; if(x<SEAS_C[0]) x+=365;
-  let i=0; while(i<3&&x>=SEAS_C[i+1]) i++; const f=(x-SEAS_C[i])/(SEAS_C[i+1]-SEAS_C[i]), k=(1-Math.cos(Math.PI*f))/2;
-  return p[i]*(1-k)+p[(i+1)%4]*k;}
-// intensità della stagionalità: differenza tra stagione piena e stagione morta
-function seasLev(name){const p=seasProf(name), a=Math.max(...p)-Math.min(...p); return a<0.25?['lieve','ok']:a<0.7?['media','warn']:['forte','bad'];}
+// profilo mensile di una committente riportato a media 1 (chi non è in SEASON non ha stagionalità)
+function seasProf(name){const v=SEASON[name]||Array(12).fill(1), m=v.reduce((a,x)=>a+x,0)/12; return v.map(x=>x/m);}
+// fattore dei volumi nel giorno d: da un mese all'altro con una curva morbida tra le metà dei mesi
+function seasMul(name,d){const p=seasProf(name), t=dateOf(d), dm=new Date(Date.UTC(t.getUTCFullYear(),t.getUTCMonth()+1,0)).getUTCDate();
+  const x=t.getUTCMonth()+(t.getUTCDate()-0.5)/dm-0.5, i=Math.floor(x), f=x-i, k=(1-Math.cos(Math.PI*f))/2;
+  return p[(i+12)%12]*(1-k)+p[(i+13)%12]*k;}
+// intensità della stagionalità: differenza tra il mese più pieno e il più vuoto
+function seasLev(name){const p=seasProf(name), a=Math.max(...p)-Math.min(...p); return a<0.35?['lieve','ok']:a<1?['media','warn']:['forte','bad'];}
 // pallet al mese di oggi: le committenti sotto contratto seguono la stagione, le gare mostrano la media dell'anno
 const palOf=c=>c.status?Math.round(c.pal*seasMul(c.name,S.day)):c.pal;
 // numero della settimana nell'anno (1-53), contando dal 1° gennaio
@@ -2106,17 +2124,17 @@ Il giorno dell'uscita: 45% tutto liscio; 25% differenze inventariali (da 4 a 10 
 
 Prima dell'avvio si può **rinunciare** al contratto: 2 mesi di fatturato di penale, nessun preavviso. Il modo gratuito per uscire è non rinnovare alla [[contratto|scadenza]].`);
 wk('stagionalita','cli','Stagionalità',`Ogni committente vende di più o di meno secondo la stagione: i pallet da preparare e consegnare salgono e scendono durante l'anno.`,
-`Le stagioni sono quattro: **primavera** (marzo-maggio), **estate** (giugno-agosto), **autunno** (settembre-novembre) e **inverno** (dicembre-febbraio). L'icona accanto alla data, in alto, mostra quella in corso.
+`L'icona accanto alla data, in alto, mostra la stagione in corso: **primavera** (marzo-maggio), **estate** (giugno-agosto), **autunno** (settembre-novembre) e **inverno** (dicembre-febbraio). I volumi però cambiano mese per mese.
 
-Ogni committente ha il suo profilo, cioè quanto lavora in ogni stagione rispetto alla sua media dell'anno. I pallet al mese del contratto sono la media: d'estate un produttore di bevande ne muove molti di più, uno di panettoni quasi nessuno. Tra una stagione e l'altra il volume cambia a poco a poco, senza salti.
+Ogni committente ha il suo profilo **mese per mese**, cioè quanto lavora in ogni mese rispetto alla sua media dell'anno. I pallet al mese del contratto sono la media: a luglio un produttore di bevande ne muove quasi il doppio, uno di panettoni quasi nessuno. Da un mese all'altro il volume cambia a poco a poco, senza salti.
 
-• **Lieve** (meno di 25 punti tra la stagione piena e quella morta): GDO, alimentare secco, molte industrie. Spesso c'è solo un piccolo calo ad agosto.
-• **Media** (da 25 a 70 punti): moda, elettronica, e-commerce (il picco di Natale), pneumatici (il cambio gomme).
-• **Forte** (oltre 70 punti): bevande e gelateria in estate; panettoni, cioccolato, pellet e spumanti in inverno; giocattoli in autunno; vivai e biciclette in primavera.
+• **Lieve** (meno di 35 punti tra il mese più pieno e il più vuoto): GDO, alimentare secco, petfood. Spesso c'è solo un calo ad agosto e un po' di lavoro in più a dicembre.
+• **Media** (da 35 a 100 punti): moda (saldi e collezioni), elettronica ed e-commerce (Black Friday a novembre), pneumatici (cambio gomme a marzo-aprile e ottobre-novembre), industria e cantieri (agosto chiuso).
+• **Forte** (oltre 100 punti): bevande e piadine a giugno-agosto; panettoni (con la colomba a marzo), cioccolato, pellet e spumanti tra ottobre e gennaio; giocattoli a ottobre-novembre; cartoleria ad agosto-settembre; mele a settembre; vivai e biciclette in primavera.
 
 Cosa cambia: con più pallet salgono i movimenti, il lavoro di [[magazzinieri]] e carrellisti, i viaggi e i ricavi di movimentazione e trasporto; i posti pallet occupati (e il loro affitto) restano quelli del contratto. Nei mesi di picco serve più personale, in quelli morti il magazzino è sovradimensionato: i [[clienti]] con stagioni opposte si compensano.
 
-Il grafico nella scheda della committente (e nelle [[gare]]) mostra i volumi previsti per i prossimi 12 mesi: la linea arancione è la previsione, quella tratteggiata la media dell'anno. Le gare indicano sempre la media.`);
+Il grafico nella scheda della committente (e nelle [[gare]]) mostra i volumi previsti per i prossimi 12 mesi: la linea arancione è la previsione, quella tratteggiata la media dell'anno, sotto il mese di picco e quello più vuoto (tocca il grafico per tutti e dodici i mesi). Le gare indicano sempre la media.`);
 wk('canali','cli','Canali di distribuzione',`Dove finisce la merce del cliente: supermercati, bar e ristoranti, negozi, case dei clienti online, stabilimenti. Ogni cliente ha il suo mix in percentuale.`,
 `Ogni cliente divide i suoi pallet tra cinque canali (la barra colorata nelle gare e nella scheda cliente):
 
@@ -5436,6 +5454,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.41',t:'Mese per mese',x:['La stagionalità delle committenti ora va mese per mese: agosto chiuso per l\'industria e i cantieri, il Black Friday a novembre per elettronica ed e-commerce, il cambio gomme a marzo-aprile e ottobre-novembre, la colomba di Pasqua e il panettone a novembre-dicembre, la cartoleria prima della scuola, le mele a settembre.','Sotto il grafico della committente ci sono il mese di picco e quello più vuoto; toccando il grafico si vedono tutti e dodici i mesi.']},
  {v:'0.40',t:'Avversari Standard',x:['Le aziende CPU partono tutte con un comportamento Standard, equilibrato tra prezzo, qualità e crescita, a difficoltà Normale.','Nella lobby comportamento e difficoltà di ogni azienda CPU stanno in una tendina chiusa che mostra la scelta attuale: aprila per cambiarli (Standard, Prezzo, Qualità, Espansione; Facile, Normale, Spietato).']},
  {v:'0.39',t:'Lobby più chiara',x:['Nella lobby le aziende guidate dal computer hanno l\'etichetta CPU, la tua l\'etichetta TU.','Le regole della partita sono in ordine: ritmo del tempo, condizioni di vittoria (con l\'obiettivo da scegliere) e sconfitta, più un riepilogo finale che dice contro chi giochi e come si vince.']},
  {v:'0.38',t:'Le stagioni',x:['Le committenti ora vendono di più o di meno secondo la stagione: le bevande e le piadine volano d\'estate, panettoni, cioccolato e pellet d\'inverno, i giocattoli in autunno, vivai e biciclette in primavera. Tante altre hanno solo un piccolo calo ad agosto.','Con la stagione cambiano i pallet da preparare e da consegnare, quindi lavoro, viaggi e ricavi: nei mesi di picco serve più gente, in quelli morti il magazzino è largo. I posti pallet occupati restano quelli del contratto.','Nella scheda di ogni committente e nelle gare c\'è un piccolo grafico con i volumi previsti per i prossimi 12 mesi, e un\'etichetta che dice se la stagionalità è lieve, media o forte.','Accanto alla data, in alto, un\'icona mostra la stagione: fiore, sole, foglia o fiocco di neve.','Nuova committente: Panettoni Canditelli, dal forno di Cornaredo. Lievita tutto l\'anno, si vende a dicembre.']},
