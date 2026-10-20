@@ -31,8 +31,8 @@ html{background:var(--ink)}
 html,body{height:100%}
 /* web app installata su iPhone (iOS 26): lo schermo «utile» risulta più corto dell'altezza della barra di stato e in fondo resta una banda vuota; allungando la pagina gli elementi fissi tornano fino al bordo */
 @media (display-mode:standalone), (display-mode:fullscreen){html{min-height:calc(100% + env(safe-area-inset-top, 0px))}}
-/* iOS 26 nell'app installata sfoca circa 40 punti sotto la barra di stato (effetto di sistema, non si spegne): in verticale la barra, il menu e la schermata iniziale scendono di --glass */
-@media (display-mode:standalone), (display-mode:fullscreen){html.mob:not(.land){--glass:40px}}
+/* iOS 26 nell'app installata sfoca una striscia sotto la barra di stato (effetto di sistema, non si spegne; 40 punti di margine erano troppi): in verticale la barra, il menu e la schermata iniziale scendono di --glass */
+@media (display-mode:standalone), (display-mode:fullscreen){html.mob:not(.land){--glass:20px}}
 body{margin:0;background:var(--ink);color:var(--ink);font-family:var(--f-body);font-size:16px;overflow:hidden;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0}
 button{font:inherit;cursor:pointer;color:inherit}
@@ -5727,6 +5727,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.55',t:'Barra più in alto',x:['Su iPhone la barra con logo e pulsanti risale un po\': resta fuori dalla zona sfocata senza lasciare troppo vuoto sopra.']},
  {v:'0.54',t:'Lavori in corso',x:['Nella schermata iniziale un cartello giallo avvisa che il gioco è in sviluppo: non tutto funziona come dovrebbe, proprio come nelle vere logistiche.']},
  {v:'0.53',t:'Lenti e pausa a portata di dito',x:['Le lenti della mappa stanno dentro un solo pulsante con la lente d\'ingrandimento (con la piccola icona della lente attiva): toccalo e scegli quella che vuoi.','Sul telefono, accanto a «Menu», c\'è il pulsante del tempo: ogni tocco passa da pausa a velocità x1, poi x2, poi di nuovo pausa. La barra in alto ora sta su una riga sola.']},
  {v:'0.52',t:'iPhone senza sfocature',x:['Su iPhone con iOS 26 il sistema sfoca la parte alta dello schermo: nell\'app installata la barra con logo e pulsanti scende un po\', fuori dalla zona sfocata.']},
