@@ -140,3 +140,17 @@ MENU['giornale'] = ('Il giornale', m_giornale)
 
 LENS = {}
 UI = {}
+
+# pulsante Produttività nella finestra del magazzino: pallet con la freccia in su (10x10, mostrata a 20 px)
+def u_prod():
+    return ['....KK....',
+            '...KGGK...',
+            '..KGGGGK..',
+            '.KggGGggK.',
+            '.KKKGGKKK.',
+            '...KggK...',
+            'KKKKKKKKKK',
+            'KNNNNNNNNK',
+            'KnKKnnKKnK',
+            'KKKKKKKKKK']
+UI['prod'] = ('Produttività', u_prod)

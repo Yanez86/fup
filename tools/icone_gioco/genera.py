@@ -8,7 +8,7 @@ I disegni stanno nei moduli di questa cartella:
   talenti*.py      T[nome del talento]  = (tipo, funzione)   16x16, nella tessera 20x20 col filetto del tipo
   tecnologie*.py   TE[id]               = (albero, nome, f)  12x12, nella cornice dell'albero
   policy*.py       POL[id]              = (nome, f)          12x12, sul foglio del regolamento
-  interfaccia*.py  ST (abilità 10x10), MENU, LENS, UI (16x16)"""
+  interfaccia*.py  ST (abilità 10x10), MENU, LENS (16x16), UI (pulsanti, quadrate di qualsiasi misura)"""
 import importlib, json, os, re, sys
 from PIL import Image, ImageDraw
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -58,6 +58,7 @@ def check(out):
     for kind, d in out.items():
         n = SIZE[kind]
         for k, rows in d.items():
+            if kind == 'ui': n = len(rows)   # pulsanti: basta che sia quadrata
             if len(rows) != n or any(len(r) != n for r in rows): err.append(f'{kind}/{k}: deve essere {n}x{n}')
             bad = {c for r in rows for c in r if c != '.' and (c not in M.PAL or c not in tpal)}
             if bad: err.append(f'{kind}/{k}: lettere senza colore in TPAL {sorted(bad)}')
