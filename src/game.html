@@ -2075,8 +2075,14 @@ wk('assunzioni','pers','Assunzioni',`Annuncio (economico ma lento) o agenzia int
 `I tempi base con l'annuncio o con l'agenzia: [[magazzinieri]] 20 o 6 giorni, [[carrellisti]] 25 o 8, [[impiegati]] 20 o 7, [[autisti_b|autisti B]] 15 o 6, [[autisti_ce|autisti CE]] 40 o 16, [[capoturno|capiturno]] e [[pianificatori]] 25 o 8. Con la [[cooperativa]] magazzinieri e carrellisti arrivano in 3 giorni, gratis. Si accorciano con i [[welfare|benefit aziendali]], i [[welfare_mag|servizi di welfare del magazzino]], la [[reputazione]], l'[[tech_hr|ufficio del personale]], l'[[tech_academy|Academy aziendale]] e il [[dir_hr|direttore HR]].
 
 Assumi in anticipo: quando vinci una [[gare|gara]] hai 30 giorni prima che il cliente parta.`);
-wk('licenziamenti','pers','Licenziamenti',`Costano un mese di stipendio di buonuscita e abbassano il morale del magazzino per 30 giorni.`,
-`Il pulsante − toglie una persona subito. Paghi la buonuscita e il [[morale]] del magazzino scende di 4 punti per un mese. Utile quando perdi un cliente e il personale resta senza lavoro. Le persone della [[cooperativa]] si mandano via gratis e senza calo di morale.`);
+wk('licenziamenti','pers','Licenziamenti',`Costano un mese di stipendio di buonuscita, abbassano il morale del magazzino per 30 giorni e un po' la reputazione. Troppi in un mese fanno notizia.`,
+`Il pulsante − toglie una persona subito. Paghi un mese di stipendio di buonuscita, il [[morale]] del magazzino scende di 4 punti per un mese e la [[reputazione]] perde 0,3 punti. Utile quando perdi un cliente o finisce la [[stagionalita|stagione]] di picco e il personale resta senza lavoro.
+
+**Ondata di licenziamenti**: dal quarto licenziamento in 30 giorni la notizia finisce sul giornale. Ogni licenziamento in più toglie altri 0,8 punti di reputazione e il morale scende di 2 punti in tutti i magazzini per un mese.
+
+Le persone della [[cooperativa]] si mandano via gratis, senza calo di morale né di reputazione: per i picchi stagionali sono la scelta più comoda.
+
+Le aziende [[avversari|avversarie]] seguono le stesse regole. Le Facili licenziano di rado e mai col morale basso, le Normali lasciano andare chi resta senza lavoro ma evitano le ondate, le Spietate tagliano appena il lavoro cala, anche a ondate. Tutte guardano il lavoro del mese dopo, per non licenziare alla vigilia di un picco.`);
 wk('welfare','pers','Benefit aziendali',`Buoni pasto, assicurazione sanitaria, premio di produzione: costano ogni mese per dipendente ma alzano il morale ovunque e accorciano le assunzioni.`,
 `Si attivano dalla finestra Azienda e valgono per tutti i dipendenti, in tutti i magazzini:
 • Buoni pasto: 110 € a testa al mese, morale +5, attrattività +6;
@@ -2534,6 +2540,26 @@ function mgrFx(m){const d=k=>(m[k]==null?10:m[k])-10;
 function mgrTal(wh){ if(wh.mgr==='ceo') return ceo().tal||[]; const m=S.managers.find(x=>x.id===wh.mgr); return m?(m.tal||[]):[]; }
 function talWh(wh,k){return mgrTal(wh).reduce((a,n)=>a+(((TALENTS[n]||{}).wh||{})[k]||0),0);}
 const fireMul=wh=>mgrTal(wh).some(n=>(TALENTS[n]||{}).fire)?0.5:1;  // Ex sindacalista: licenziamenti e cooperativa pesano la metà sul morale
+// licenziamenti, stesse regole per il giocatore e per gli avversari: buonuscita di un mese, morale del magazzino −4 per 30 giorni, reputazione −0,3.
+// Dal 4° licenziamento in 30 giorni è un'ondata: reputazione −0,8 in più a testa, morale −2 in tutti i magazzini e la notizia sul giornale
+const FIRE={mor:-4,rep:-0.3,wave:4,waveRep:-0.8,waveMor:-2,days:30};
+const firesRecent=()=>(S.fires||[]).filter(d=>S.day-d<FIRE.days).length;
+function fireOne(w,r){
+  const sal=RAL[r]*COEF/12;
+  if(r==='plan'){ if(S.office.plan<=0) return null; S.office.plan--; w=null; }
+  else { if(!w||w.staff[r]<=0) return null; w.staff[r]--; if(isCoop(w,r)) return {coop:true}; }   // la cooperativa li riprende gratis
+  S.cash-=sal; S.cur.altro+=sal;
+  S.fires=(S.fires||[]).filter(d=>S.day-d<FIRE.days); S.fires.push(S.day); S.firedN=(S.firedN||0)+1;
+  const wave=S.fires.length>=FIRE.wave;
+  if(w) S.mods.push({scope:w.id,mor:FIRE.mor*fireMul(w),until:S.day+FIRE.days,src:'Licenziamenti'});
+  repUp(FIRE.rep+(wave?FIRE.waveRep:0));
+  if(wave){ S.mods.push({scope:'all',mor:FIRE.waveMor,until:S.day+FIRE.days,src:'Ondata di licenziamenti'});
+    if(S.waveDay==null||S.day-S.waveDay>=FIRE.days){ S.waveDay=S.day; const co=S, n=S.fires.length;
+      if(isBot()) withCo(HUM,()=>news('La Gazzetta del Muletto',`${co.company.name} taglia il personale`,`${n} licenziamenti in un mese: ${co.boss.name} parla di «adeguamento ai volumi», i sindacati di «gente usata e buttata». In banchina si lavora a testa bassa.`));
+      else { news('La Gazzetta del Muletto',`${S.company.name} taglia il personale`,`${n} licenziamenti in un mese. I sindacati protestano, i candidati se lo ricordano.`);
+        notify('yellow','personale','La Gazzetta del Muletto','Ondata di licenziamenti',`${n} licenziamenti in 30 giorni: la notizia è sul giornale. Reputazione in calo e morale −2 in tutti i magazzini per un mese. Per i picchi di lavoro conviene la cooperativa, che si manda via gratis.`,'personale'); } } }
+  return {sal,wave};
+}
 // talenti che contano nelle gare: quelli del CEO (alcuni solo con le committenti S e A) e quelli del direttore commerciale
 function talGara(t){ const C=ceo().tal, dc=dirStat('comm')!=null?personById(S.dirs.comm):null; let v=0;
   C.forEach(n=>{const x=TALENTS[n]; if(x) v+=(x.gara||0)+(isNaz(t)?(x.naz||0):0);});
@@ -2997,7 +3023,11 @@ const BOT_STYLE={
  qualita:{n:'Qualità',d:'Prezzi pieni, KPI alti e tecnologie: punta ai clienti esigenti.',mult:1.02,keep:0.14,tech:['barcode','formazione','gestionale','wms','freddo','commerciale','edi','gps','iso','rf','controllo','kam','ptl','accordi','ecom']},
  espansione:{n:'Espansione',d:'Apre magazzini e chiede prestiti: cresce in fretta, ma rischia di più.',mult:0.97,keep:0.1,grow:true,tech:['commerciale','gestionale','gps','freddo','barcode','marketing','edi','wms','rotte','kam','accordi','ecom','direzione']}
 };
-const BOT_DIFF={facile:{n:'Facile',d:'Parte con meno soldi, decide ogni due settimane e convince poco i buyer (−4 nelle gare).',cash:0.85,mult:0.03,gara:-4,every:14},normale:{n:'Normale',d:'Gioca con le tue stesse regole.',cash:1,mult:0,gara:0,every:7},spietato:{n:'Spietato',d:'Parte con il 30% di cassa in più e conosce tutti i buyer: +5 nel punteggio delle gare.',cash:1.3,mult:0,gara:5,every:7}};
+// fire: quando licenzia chi resta senza lavoro. lo = carico del reparto sotto cui licenzia (oggi e fra un mese), to = carico massimo dopo il taglio,
+// max = persone per reparto a ogni decisione, mor = non licenzia sotto questo morale, wave = evita le ondate di licenziamenti
+const BOT_DIFF={facile:{n:'Facile',d:'Parte con meno soldi, decide ogni due settimane e convince poco i buyer (−4 nelle gare). Licenzia di rado e mai col morale basso.',cash:0.85,mult:0.03,gara:-4,every:14,fire:{lo:0.45,to:0.7,max:1,mor:55,wave:true}},
+ normale:{n:'Normale',d:'Gioca con le tue stesse regole. Lascia andare chi resta senza lavoro, ma evita le ondate di licenziamenti.',cash:1,mult:0,gara:0,every:7,fire:{lo:0.6,to:0.8,max:1,mor:45,wave:true}},
+ spietato:{n:'Spietato',d:'Parte con il 30% di cassa in più e conosce tutti i buyer: +5 nel punteggio delle gare. Appena il lavoro cala taglia il personale, anche a ondate, e se ne frega del morale.',cash:1.3,mult:0,gara:5,every:7,fire:{lo:0.8,to:0.92,max:3,mor:0,wave:false}}};
 const stSum=p=>STATS.reduce((a,s)=>a+(p.st[s.k]||0),0);
 function newRival(ceoId,color,logo,style,diff,k){
   const sv=S; newGame(ceoId,null,color,null,{logo}); const b=S; S=sv;
@@ -3034,11 +3064,14 @@ function botBust(b){
 }
 function botThink(){
   const st=BOT_STYLE[S.bot.style]||BOT_STYLE.standard, df=BOT_DIFF[S.bot.diff]||BOT_DIFF.normale;
-  botStaff(); botMgr(); botBids(st,df); botTech(st); botGrow(st); botShrink(); botMoney(st);
+  botStaff(df); botMgr(); botBids(st,df); botTech(st); botGrow(st); botShrink(); botMoney(st);
 }
 function botPay(v){S.cash-=v; S.cur.altro+=v;}
 // personale: assume guardando il carico dei reparti (contando i contratti che partono a breve) e lascia andare chi è di troppo
-function botStaff(){
+// carico dei reparti fra qualche giorno, con i volumi della stagione di allora
+function loadAt(w,days){const d0=S.day; S.day+=days; const l=staffLoad(w,computeWH(w)); S.day=d0; return l;}
+function botStaff(df){
+  const F=(df||BOT_DIFF.normale).fire;
   S.warehouses.forEach(w=>{
     const pend=S.clients.filter(c=>c.wh===w.id&&c.status==='avvio'&&c.start-S.day<=45); pend.forEach(c=>c.status='attivo');
     const real=w.staff, tmp={...real}; ROLES.forEach(r=>tmp[r]+=S.queue.filter(q=>q.wh===w.id&&q.role===r).length);
@@ -3046,7 +3079,12 @@ function botStaff(){
     for(let i=0;i<40;i++){ const l=staffLoad(w,computeWH(w)), r=['fm','autCE','car','pick','autB','imp','capo'].find(r=>l[r]>1);
       if(!r) break; tmp[r]++; const h=HIRE[r]; S.queue.push({role:r,wh:w.id,days:hireDays(h.ann[0],w,r)}); botPay(h.ann[1]); }
     const l=staffLoad(w,computeWH(w)); w.staff=real; pend.forEach(c=>c.status='avvio');
-    if(!pend.length) ['autCE','autB','car','pick','imp'].forEach(r=>{ if(real[r]>1&&l[r]<0.6&&!S.queue.some(q=>q.wh===w.id&&q.role===r)){ real[r]--; botPay(RAL[r]*COEF/12); } });
+    // chi è di troppo oggi e anche fra un mese (così non si licenzia prima di un picco della stagione)
+    if(!pend.length){ const ah=loadAt(w,30);
+      ['autCE','autB','car','pick','imp'].forEach(r=>{ for(let n=0;n<F.max;n++){ const c=real[r], lr=Math.max(l[r],ah[r]);
+        if(c<=1||lr>=F.lo||lr*c/(c-1)>F.to||S.queue.some(q=>q.wh===w.id&&q.role===r)) break;
+        if(w.morale<F.mor||(F.wave&&firesRecent()>=FIRE.wave-1)) break;
+        fireOne(w,r); l[r]=l[r]*c/(c-1); ah[r]=ah[r]*c/(c-1); } }); }
   });
   while(S.office.plan+S.queue.filter(q=>q.role==='plan').length<planNeed()){ S.queue.push({role:'plan',wh:null,days:hireDays(HIRE.plan.ann[0],null,'plan')}); botPay(HIRE.plan.ann[1]); }
 }
@@ -4444,7 +4482,7 @@ const VIEWS={
     <div class="wh-sm"><div class="wh-nm">${kw(ROLE_WK[r],ROLE[r])}</div>
      ${bar?`<div class="wh-ld" data-tip="<div class='tt'>Carico di lavoro ${Math.round(l*100)}%</div>${l>1.02?'In affanno: KPI e morale peggiorano. Assumi qualcuno.':l>0.85?'Al limite: un picco di lavoro lo manda in affanno.':'Tutto sotto controllo.'}"><div class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></div><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b></div>`:`<div class="sm wh-nm">${loadTxt(r,l,have)}</div>`}
      ${inq?`<div class="sm wh-inq">+${inq} in arrivo</div>`:''}</div>
-    <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia: ${esc(ROLE1[r]||ROLE[r])}" data-tip="Licenzia">−</button><b class="num ${bar&&l>1.02?'bad':''}">${have}</b><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi: ${esc(ROLE1[r]||ROLE[r])}" data-tip="Assumi">+</button></div></div>`;};
+    <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia: ${esc(ROLE1[r]||ROLE[r])}" data-tip="<div class='tt'>Licenzia</div>Un mese di stipendio di buonuscita, morale del magazzino −4 per un mese, reputazione −0,3. Dal 4° licenziamento in 30 giorni è un'ondata: finisce sul giornale.">−</button><b class="num ${bar&&l>1.02?'bad':''}">${have}</b><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi: ${esc(ROLE1[r]||ROLE[r])}" data-tip="Assumi">+</button></div></div>`;};
   const thr=key=>{const v=cl.filter(c=>c.status==='attivo'&&c[key]!=null).map(c=>c[key]);return v.length?Math.max(...v):null;};
   const sP=thr('sP'), sA=thr('sA'), mor=Math.round(w.morale), morC=mor>=60?'ok':mor>=45?'warn':'bad';
   const satC=k.sm.obj&&k.satM<k.sm.obj-0.5?'bad':'';
@@ -4590,7 +4628,7 @@ const VIEWS={
     <div class="wh-sm"><div class="wh-nm">${kw('pianificatori',ROLE.plan)}</div>
      ${pn&&pl<9?`<div class="wh-ld"><div class="bar"><i style="width:${Math.min(100,pl*100/1.5)}%;background:${loadCol(pl)}"></i></div><b style="color:${loadCol(pl)}">${Math.round(pl*100)}%</b></div>`:`<div class="sm wh-nm">${pn?'<span class="bad">nessuno: giri non organizzati</span>':'i giri li organizzi tu'}</div>`}
      ${pq?`<div class="sm wh-inq">+${pq} in arrivo</div>`:''}</div>
-    <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="plan" ${S.office.plan<=0?'disabled':''} aria-label="Licenzia: pianificatore del traffico" data-tip="Licenzia">−</button><b class="num ${pl>1.02?'bad':''}">${S.office.plan}</b><button class="btn sm2 pri" data-act="hire" data-role="plan" aria-label="Assumi: pianificatore del traffico" data-tip="Assumi">+</button></div></div>
+    <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="plan" ${S.office.plan<=0?'disabled':''} aria-label="Licenzia: pianificatore del traffico" data-tip="<div class='tt'>Licenzia</div>Un mese di stipendio di buonuscita, morale del magazzino −4 per un mese, reputazione −0,3. Dal 4° licenziamento in 30 giorni è un'ondata: finisce sul giornale.">−</button><b class="num ${pl>1.02?'bad':''}">${S.office.plan}</b><button class="btn sm2 pri" data-act="hire" data-role="plan" aria-label="Assumi: pianificatore del traffico" data-tip="Assumi">+</button></div></div>
    <div class="sm">${pn?`Organizzano i giri dei camion di tutti i magazzini: ognuno che manca toglie 2 punti di puntualità ovunque, con la squadra al completo i km costano il 4% in meno.`:`Fino a 150 viaggi al mese i giri li organizzi tu, poi serve un pianificatore ogni 150 viaggi.`}</div></div>
   <div class="card"><div class="row"><span class="h3">${kw('assunzioni')} in corso</span><span class="sm">${S.queue.length||'nessuna'}</span></div>
    ${S.queue.map(q=>`<div class="pr-q"><img class="px" src="${IMG[q.role]}" alt="" width="24" height="28"><span class="wh-nm">${ROLE1[q.role]||ROLE[q.role]} <span class="sm">${q.wh?esc(whById(q.wh).name):'sede'}</span></span><span class="pill">${wks(q.days)}</span></div>`).join('')}
@@ -5094,12 +5132,10 @@ const ACT={
    {t:`Agenzia interinale · ${wks(hireDays(h.age[0],w,r))}`,e:`${eur(h.age[1])}`,f:()=>doHire(r,d.wh,hireDays(h.age[0],w,r),h.age[1])}]);
  },
  fire(d){
-  const r=d.role; const sal=RAL[r]*COEF/12;
-  if(r==='plan'){if(S.office.plan<=0)return;S.office.plan--;}
-  else {const w=whById(d.wh);if(w.staff[r]<=0)return;w.staff[r]--;
-   if(isCoop(w,r)){toast(`La cooperativa riprende 1 ${ROLE1[r]}: nessuna buonuscita`,'ok');renderAll();return;}
-   mod(w.id,{mor:-4*fireMul(w)},30);}
-  S.cash-=sal; S.cur.altro+=sal; toast(`Licenziamento: ${eur(sal)} di buonuscita, morale in calo`,'warn'); renderAll();
+  const r=d.role, x=fireOne(r==='plan'?null:whById(d.wh),r); if(!x) return;
+  if(x.coop) toast(`La cooperativa riprende 1 ${ROLE1[r]}: nessuna buonuscita`,'ok');
+  else toast(`Licenziamento: ${eur(x.sal)} di buonuscita, morale e reputazione in calo${x.wave?'. È un\'ondata di licenziamenti!':''}`,x.wave?'bad':'warn');
+  renderAll();
  },
  norenew(d){const c=S.clients.find(x=>x.id===d.id); c.noRenew=!c.noRenew; renderAll();},
  recedi(d){const c=S.clients.find(x=>x.id===d.id), e=exitTerms(c);
@@ -5454,6 +5490,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.42',t:'Tagli e reputazione',x:['Licenziare ora pesa anche sulla reputazione (−0,3 a persona), oltre alla buonuscita e al calo di morale nel magazzino.','Dal quarto licenziamento in un mese scatta l\'ondata: finisce sul giornale, la reputazione scende di più e il morale cala di 2 punti in tutti i magazzini. Per i picchi della stagione conviene la cooperativa, che si manda via gratis.','Anche le aziende CPU licenziano quando finisce la stagione di picco, guardando il mese dopo per non restare scoperte. Le Facili sono prudenti, le Normali evitano le ondate, le Spietate tagliano senza pietà e finiscono sul giornale.']},
  {v:'0.41',t:'Mese per mese',x:['La stagionalità delle committenti ora va mese per mese: agosto chiuso per l\'industria e i cantieri, il Black Friday a novembre per elettronica ed e-commerce, il cambio gomme a marzo-aprile e ottobre-novembre, la colomba di Pasqua e il panettone a novembre-dicembre, la cartoleria prima della scuola, le mele a settembre.','Sotto il grafico della committente ci sono il mese di picco e quello più vuoto; toccando il grafico si vedono tutti e dodici i mesi.']},
  {v:'0.40',t:'Avversari Standard',x:['Le aziende CPU partono tutte con un comportamento Standard, equilibrato tra prezzo, qualità e crescita, a difficoltà Normale.','Nella lobby comportamento e difficoltà di ogni azienda CPU stanno in una tendina chiusa che mostra la scelta attuale: aprila per cambiarli (Standard, Prezzo, Qualità, Espansione; Facile, Normale, Spietato).']},
  {v:'0.39',t:'Lobby più chiara',x:['Nella lobby le aziende guidate dal computer hanno l\'etichetta CPU, la tua l\'etichetta TU.','Le regole della partita sono in ordine: ritmo del tempo, condizioni di vittoria (con l\'obiettivo da scegliere) e sconfitta, più un riepilogo finale che dice contro chi giochi e come si vince.']},
