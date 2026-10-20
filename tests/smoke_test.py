@@ -99,6 +99,10 @@ async def phone(b, w, h, name, errs):
         if st == 'studi': await pg.tap('[data-act=ccedu][data-n="Diplomato geometra"]')
         assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: {st} scorre di lato'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_{st}.png'), full_page=True)
+        # Indietro e Avanti sulla stessa riga, testo dentro i pulsanti
+        nav = await pg.evaluate("(()=>{const b=[...document.querySelectorAll('#start .st-nav>.btn')].map(e=>e.getBoundingClientRect());return {riga:Math.abs(b[0].top-b[1].top)<2,dentro:b[1].right<=innerWidth}})()")
+        assert nav["riga"] and nav["dentro"], f"{name}: pulsanti in fondo a {st} {nav}"
+        if st == 'azienda': await pg.locator('#start .st-nav').screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_pulsanti.png'))
         await pg.tap('[data-act=stnext]')
     await pg.tap('[data-act=stamp]'); await pg.wait_for_timeout(700)
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: la visura scorre di lato'
