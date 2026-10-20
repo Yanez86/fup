@@ -1006,7 +1006,8 @@ const WELFARE=[
 // fuel (gasolio), fix (costi fissi), att (attrattività), sat (soddisfazione dei clienti al mese), rep (reputazione al mese), gara (punteggio nelle gare);
 // moltiplicatori: staff (peso dei reparti in affanno su puntualità e accuratezza), learn (apprendimento delle tecnologie), planHire (tempo per assumere pianificatori)
 // regole del traffico: si accendono e spengono per magazzino dall'Ufficio traffico. fx: sm (saturazione dei mezzi, punti), P/A (KPI), mor (morale obiettivo),
-// prod (produttività), drv (costo degli autisti), km (costo variabile a km dei mezzi), sat (soddisfazione dei clienti del magazzino al mese)
+// prod (produttività), drv (costo degli autisti), km (costo variabile a km dei mezzi), sat (soddisfazione dei clienti del magazzino al mese),
+// wpers (costo di magazzinieri, carrellisti e capiturno), cap (posti pallet), rev (ricavi dei clienti del magazzino), kmB (km al mese di un autista B)
 const TR_CD=30;  // giorni prima di poter cambiare di nuovo una regola nello stesso magazzino
 const TR_RULES=[
  {id:'routine',name:'Giri a giorni fissi',fx:{sm:8,P:-1},pro:'Camion più pieni: saturazione dei mezzi +8',con:'Puntualità −1: chi ordina il giorno sbagliato aspetta il giro',
@@ -1022,7 +1023,13 @@ const TR_RULES=[
  {id:'ritorni',name:'Ritorni carichi',fx:{km:0.1,P:-0.5},pro:'Costo a km dei mezzi −10%: al ritorno i camion portano merce di altri',con:'Puntualità −0,5: per caricare al ritorno qualche giro si allunga',
   txt:'Dopo l\'ultimo scarico il camion passa da un fornitore o da un altro trasportatore e torna carico. Il viaggio a vuoto diventa un viaggio pagato.'},
  {id:'sabato',name:'Consegne anche il sabato',fx:{P:1.2,mor:-3,drv:0.06},pro:'Puntualità +1,2: il lavoro del venerdì non scivola al lunedì',con:'Costo degli autisti +6% e morale −3',
-  txt:'Una squadra ridotta consegna anche il sabato mattina. I negozi ringraziano, le famiglie degli autisti meno.'}
+  txt:'Una squadra ridotta consegna anche il sabato mattina. I negozi ringraziano, le famiglie degli autisti meno.'},
+ {id:'notte',name:'Doppio turno in magazzino',fx:{P:1,mor:-3,wpers:0.1},pro:'Puntualità +1: gli ordini si preparano di notte e all\'alba i camion sono già carichi',con:'Costo di magazzinieri, carrellisti e capiturno +10% (maggiorazione notturna) e morale −3',
+  txt:'Il magazzino lavora anche dalle 22 alle 6. Al mattino le baie sono già piene di pallet pronti, e in reparto si incrociano facce stanche.'},
+ {id:'blocchi',name:'Stoccaggio a blocchi',fx:{cap:0.15,A:-1.5},pro:'Posti pallet +15%: i pallet si impilano a terra, senza scaffali',con:'Accuratezza −1,5: per prendere il pallet in fondo si spostano quelli davanti, e qualcuno si perde',
+  txt:'Nelle corsie libere i pallet si impilano a terra, tre di altezza. Il magazzino si allarga senza un cantiere, ma il pallet giusto è sempre quello sotto.'},
+ {id:'piano',name:'Consegna al piano',fx:{rev:0.04,kmB:-0.15,sat:1},pro:'Ricavi dei clienti +4% e soddisfazione +1 al mese: il furgonista porta la merce fin dentro il negozio',con:'Gli autisti con patente B fanno il 15% di km in meno: servono più furgonisti',
+  txt:'Il collo non si lascia sul marciapiede: si porta al piano, dentro il negozio o in magazzino dal cliente. Si fattura il servizio, ma ogni consegna dura il doppio.'}
 ];
 const trOn=(w,id)=>!!(w&&w.rules&&w.rules[id]&&w.rules[id].on);
 const trSum=(w,k)=>TR_RULES.reduce((a,r)=>a+(trOn(w,r.id)&&r.fx[k]||0),0);
@@ -1926,7 +1933,7 @@ Ogni cliente ha i suoi camioncini, uno per [[canali|canale]]: i quadratini color
 Il costo è quello pieno di un km nel magazzino: stipendi degli autisti, mezzi, noleggi, manutenzione e gasolio, divisi per i km fatti. Se gli autisti sono troppi per i km da fare, ogni km costa di più. Il ricavo di un pallet ha una parte fissa e una che cresce con la distanza: per questo le zone lontane, servite con camion mezzi vuoti, finiscono spesso in perdita.
 
 Da qui si sceglie anche l'[[obiettivo_sat|obiettivo di carico]]. Sulla mappa la lente **Viaggi** disegna i giri: linee più spesse = più viaggi; verde camion pieni, giallo a metà, rosso quasi vuoti; tratteggiate se il trasporto è in perdita; in arancione i [[ritiro|ritiri]] dai fornitori.`);
-wk('regole_traffico','cli','Regole del traffico',`Regole da accendere o spegnere magazzino per magazzino dall'Ufficio traffico: giorni fissi, cut-off, camion solo pieni, partenze all'alba e altre. Ognuna ha un vantaggio e un prezzo.`,
+wk('regole_traffico','cli','Regole del traffico',`Regole da accendere o spegnere magazzino per magazzino dall'Ufficio traffico: giorni fissi, cut-off, camion solo pieni, partenze all'alba, doppio turno, stoccaggio a blocchi e altre. Ognuna ha un vantaggio e un prezzo.`,
 `Si scelgono nell'[[traffico|Ufficio traffico]] e valgono solo per quel magazzino. Dopo un cambio servono 30 giorni prima di cambiare di nuovo la stessa regola.
 • **Giri a giorni fissi**: [[saturazione_mezzi|saturazione dei mezzi]] +8, [[puntualita]] −1.
 • **Cut-off degli ordini alle 14**: [[accuratezza]] +1, saturazione dei mezzi −4.
@@ -1935,6 +1942,9 @@ wk('regole_traffico','cli','Regole del traffico',`Regole da accendere o spegnere
 • **Scarichi su prenotazione**: puntualità +0,5, produttività +5%, soddisfazione −0,5 al mese.
 • **Ritorni carichi**: costo a km dei mezzi −10%, puntualità −0,5.
 • **Consegne anche il sabato**: puntualità +1,2, costo degli autisti +6%, morale −3.
+• **Doppio turno in magazzino**: puntualità +1, costo di magazzinieri, carrellisti e capiturno +10%, morale −3.
+• **Stoccaggio a blocchi**: posti pallet +15%, accuratezza −1,5.
+• **Consegna al piano**: ricavi dei clienti del magazzino +4%, soddisfazione +1 al mese, ma gli [[autisti_b|autisti B]] fanno il 15% di km in meno.
 
 Più saturazione vuol dire meno viaggi, meno km e meno autisti, a parità di ricavi. Le regole si sommano: giorni fissi e camion solo pieni insieme fanno camion pienissimi, ma i clienti con soglie di puntualità alte se ne accorgono. Nel Riepilogo, scheda Modificatori, compaiono come «Regole del traffico».`);
 wk('ritiro','cli','Ritiro o consegna',`Da dove arriva la merce: la consegna il cliente con i suoi mezzi, oppure la vai a prendere tu.`,
@@ -2320,7 +2330,7 @@ function straordCost(w){return Math.round((100-(w.cond==null?100:w.cond))*w.cap*
 function expAdd(w){const b=SITES[w.site]?SITES[w.site].cap:w.cap; return Math.round(b*MAINT.expPct/50)*50;}
 function expCost(w){return expAdd(w)*MAINT.expEur;}
 function expRent(w){const b=SITES[w.site]?SITES[w.site].rent:w.fixed; return Math.round(b*MAINT.expPct/100)*100;}
-function capOf(w){const t=TECH.find(x=>x.id==='verticale'); return Math.round(w.cap*(1+(w.tech.verticale&&techFactor(w,t)>0?t.cap:0))*(1-condPen(w)));}
+function capOf(w){const t=TECH.find(x=>x.id==='verticale'); return Math.round(w.cap*(1+(w.tech.verticale&&techFactor(w,t)>0?t.cap:0)+trSum(w,'cap'))*(1-condPen(w)));}
 function perWh(t){return (t.tree==='log'||t.tree==='wel')&&!t.pol;}
 // servizi di welfare installati in un magazzino: canone scontato dalla Piattaforma welfare
 function welMese(t){return t.tree==='wel'&&R('welfare2')?t.mese*0.7:t.mese;}
@@ -2373,7 +2383,7 @@ function computeWH(wh,extra){
   TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t); tA+=(t.A||0)*f; tP+=(t.P||0)*f; tMor+=(t.mor||0)*(f>0?1:0); tProd+=(t.prod||0)*(f>0?1:0); if(f>0&&t.fuel) fuelMul*=1-t.fuel; tCan+=t.mese; });
   // servizi di welfare del magazzino: niente apprendimento, valgono da subito
   let wMor=0,wP=0,wA=0,wCan=0; TECH.forEach(t=>{ if(t.tree!=='wel'||!wh.tech[t.id]) return; wMor+=t.mor||0; wP+=t.P||0; wA+=t.A||0; tProd+=t.prod||0; wCan+=welMese(t); });
-  const mf=mgrFx(m), kmB1=KM_B*mf.km, kmCE1=KM_CE*mf.km;
+  const mf=mgrFx(m), kmB1=KM_B*mf.km*(1+trSum(wh,'kmB')), kmCE1=KM_CE*mf.km;
   const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd+polSum('prod'))*(1-condPen(wh))*(wh.build?0.95:1)*mf.prod*(1+trSum(wh,'prod'));
   // carrellisti: tutti i movimenti (doppia produttività col muletto); magazzinieri: preparano i pallet in uscita
   const use=(load,n,per)=>load===0?0:(n>0?load/(n*per):9);
@@ -2407,8 +2417,8 @@ function computeWH(wh,extra){
     ['Magazzinieri insufficienti',-20*Math.max(0,uPick-1)],['Carrellisti insufficienti',-20*Math.max(0,uCar-1)],['Capiturno insufficienti',-4*capoShort],['Facchini in cooperativa',wh.coop?COOP.mor*fireMul(wh):0],
     ['Autisti insufficienti',-20*Math.max(0,Math.max(uB,uCE)-1)],['Personale che non sta dietro all\'obiettivo di carico',-0.5*sm.short]].filter((x,i)=>i===0||Math.abs(x[1])>0.05);
   const morT=clamp(pM.reduce((a,x)=>a+x[1],0),0,100);
-  const rev=act.reduce((a,c)=>a+clientRev(c),0);
-  const pers=ROLES.reduce((a,r)=>a+(st[r]||0)*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12*(1+polSum('pers'))+((st.autB||0)*RAL.autB+(st.autCE||0)*RAL.autCE)*COEF/12*trSum(wh,'drv');
+  const rev=act.reduce((a,c)=>a+clientRev(c),0)*(1+trSum(wh,'rev'));
+  const pers=ROLES.reduce((a,r)=>a+(st[r]||0)*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12*(1+polSum('pers'))+((st.autB||0)*RAL.autB+(st.autCE||0)*RAL.autCE)*COEF/12*trSum(wh,'drv')+['pick','car','capo'].reduce((a,r)=>a+(st[r]||0)*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12*trSum(wh,'wpers');
   // bilici: gasolio, manutenzione e pedaggi; furgoni: consumano e costano meno, sempre in leasing
   const kmM=giri*(1-trSum(wh,'km'));
   const mezzi=kmM*kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+kmM*kmB*(0.12*S.fuel*fuelMul+0.06)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100+st.autB*900;
@@ -4513,6 +4523,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.30',t:'Notte, blocchi e piani',x:['Tre nuove regole nell\'Ufficio traffico: doppio turno in magazzino (più puntualità, ma il turno di notte costa e stanca), stoccaggio a blocchi (più posti pallet senza cantieri, ma più errori) e consegna al piano (ricavi e clienti contenti, ma servono più furgonisti).']},
  {v:'0.29',t:'Regole del traffico',x:['Nell\'Ufficio traffico sette regole da accendere magazzino per magazzino: giri a giorni fissi, cut-off degli ordini alle 14, si parte solo a camion pieno, partenze all\'alba, scarichi su prenotazione, ritorni carichi e consegne anche il sabato.','Ognuna ha un vantaggio e un prezzo: più camion pieni ma meno puntualità, più accuratezza ma camion più vuoti, più puntualità ma autisti che costano di più. Dopo un cambio servono 30 giorni per cambiarla di nuovo.']},
  {v:'0.28',t:'Valigia sempre pronta',x:['Nuovo talento «Job hopper»: buon negoziatore, ma dopo un anno senza aumenti la concorrenza si fa viva e rischi di perderlo. Ce l\'ha Chiara Ferraris, e lo puoi scegliere anche per il tuo CEO.']},
  {v:'0.27',t:'Chi guida il magazzino',x:['Il manager conta davvero: le sue Operazioni rendono più produttivi magazzinieri e carrellisti, fanno fare più km agli autisti e riempiono di più i camion. Precisione, Leadership, Amministrazione e Innovazione pesano su accuratezza, assunzioni, costi dell\'immobile e apprendimento delle tecnologie.','Nella finestra del magazzino il riquadro «Effetto del manager» mostra quanto vale chi lo guida. Un magazzino senza manager va avanti alla meno peggio.','Nuova finestra Ufficio traffico: per ogni cliente i camioncini con i pallet caricati, i viaggi, i km e quanto si guadagna o si perde col trasporto. I clienti in perdita stanno in cima.','Nuova lente della mappa «Viaggi»: i giri dei camion colorati da quanto sono pieni, tratteggiati se in perdita.']},
