@@ -152,3 +152,17 @@ def p_sicurezza():
     r = process(c.rows())
     return ov(r, ['', '', '.....yy', '.....yy', '.....yy', '.....yy'])
 POL['sicurezza'] = ('Corso sicurezza obbligatorio', p_sicurezza)
+
+def p_dueore():
+    # busta della mail con l'orologio: risposta entro due ore
+    c = Cv(12); c.rect(0, 4, 7, 10, 'W'); c.disc(8.5, 3.5, 3.2, 'Y')
+    r = process(c.rows(), keep='W')
+    return ov(r, ['',
+                  '........K',
+                  '........K',
+                  '........KK',
+                  '',
+                  '.K....K',
+                  '..K..K',
+                  '...KK'])
+POL['dueore'] = ('Rispondiamo entro 2 ore', p_dueore)

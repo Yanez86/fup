@@ -139,3 +139,11 @@ def t_clima():
             '..KSSSSSSK..',
             '..KKKKKKKK..']
 TE['clima'] = ('wel', 'Raffrescatori in reparto', t_clima)
+
+def t_portale():
+    # schermo con il pallet e la spunta verde: il cliente segue i suoi pallet da solo
+    c = Cv(12)
+    c.rect(0, 1, 11, 8, 'D'); c.rect(1, 2, 10, 7, 'L'); c.rect(5, 9, 6, 9, 'S'); c.rect(3, 10, 8, 10, 'S')
+    r = process(c.rows(), keep='L')
+    return ov(r, ['', '', '', '..NNN...G', '..NNN..G', '..nnnGG', '..n.n.G', ''])
+TE['portale'] = ('mkt', 'Portale clienti', t_portale)
