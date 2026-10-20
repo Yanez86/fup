@@ -593,6 +593,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #intro .bot{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:introPop .4s 2.4s forwards}
 #intro .bot .btn{font-size:20px;padding:12px 26px}
 #intro .ver{font-size:14px;color:#c3d0dc}
+#intro .cred{position:absolute;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));z-index:1;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f-disp);font-size:16px;color:#fff3c4;opacity:0;animation:introPop .4s 2.6s forwards}
+.land #intro .cred{bottom:max(4px,env(safe-area-inset-bottom))} .land #intro .road::after{bottom:36px}
+#intro .cred svg{width:24px;height:28px;flex:none;filter:drop-shadow(2px 2px 0 #0c131d)}
 .land #intro .bot .btn{padding:8px 22px} .land #intro .ttl{padding-bottom:8px}
 @keyframes introIn{from{transform:translateX(calc(-50vw - 110%))}to{transform:translateX(-50%)}}
 @keyframes introOut{from{transform:translateX(-50%)}to{transform:translateX(60vw)}}
@@ -5696,6 +5699,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.51',t:'Firmato Happy Squid',x:['In fondo alla schermata iniziale ci sono i crediti: «un gioco Happy Squid Inc.» con il calamaro viola.']},
  {v:'0.50',t:'iPhone a tutto schermo',x:['Sull\'app installata su iPhone la mappa arriva fino al bordo in basso: sparita la banda scura sotto i pulsanti.','Sul telefono tolto l\'alone scuro ai bordi della mappa, che in alto sotto la barra sembrava una sfocatura.']},
  {v:'0.49',t:'Report della partita',x:['A fine partita (vittoria, sconfitta o fallimento) c\'è il pulsante «Report della partita»: esito, il titolo che ti sei guadagnato, i totali di tutta la partita e i record.','Grafici della crescita: fatturato e utile, dipendenti per reparto, magazzini e clienti, cassa e debito, KPI, reputazione e morale, pallet movimentati.','Una tabella anno per anno, la cronaca con le tappe importanti (magazzini aperti, gare vinte, clienti persi, ricerche, eventi, traguardi) e, se giochi contro altre aziende, la classifica finale con il fatturato di ognuna.','Il report si apre anche a partita in corso, dal Riepilogo.']},
  {v:'0.48',t:'CEO da collezione',x:['La scelta del CEO è fatta di carte collezionabili: in alto il tipo di personaggio (Vecchia scuola, Figlio d\'arte, Squalo delle gare, Il nerd del WMS) nel colore della sua abilità più forte, poi ritratto, abilità a barre, talenti e cassa.','La carta scelta si solleva e prende l\'adesivo «SCELTO!»; sotto compaiono la sua storia, il magazzino e il cliente storico. Sul telefono le carte si scorrono col dito.']},
@@ -5766,10 +5770,15 @@ function introTruck(){let r='';const R=(x0,y0,x1,y1,c)=>{r+=`<rect x="${x0}" y="
   // ruote
   [10,44].forEach(x=>{R(x-2,40,x+2,47,K);R(x-3,41,x+3,46,K);R(x-1,42,x+1,45,TPAL.S);R(x,43,x,44,TPAL.D);});
   return `<svg viewBox="0 0 56 48" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
+// logo Happy Squid Inc. (lo stesso del sito): v viola, w bianco, k contorno
+function squidLogo(){const P={v:'#9b6bff',w:'#fff',k:'#16202e'},G=['....vvvv....','...vvvvvv...','..vvvvvvvv..','.vvvvvvvvvv.','.vvvvvvvvvv.','.vwkvvvvwkv.','.vwkvvvvwkv.','.vvvkvvkvvv.','.vvvvkkvvvv.','vvvvvvvvvvvv','v.vv.vv.vv.v','v.v..vv..v.v','v..v.vv.v..v','.v..v..v..v.'];let r='';
+  G.forEach((row,y)=>[...row].forEach((c,x)=>{if(P[c])r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${P[c]}"/>`;}));
+  return `<svg viewBox="0 0 12 14" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
 function showIntro(){
   $('#intro').innerHTML=`<div class="ttl"><h1>FUP</h1><div class="sub">Fino all'ultimo pallet</div></div>
    <div class="lane"><div class="truck"><div class="puff"></div>${introTruck()}</div></div>
-   <div class="road"><div class="bot"><button class="btn pri" data-act="introgo">${TOUCH?'Tocca':'Clicca'} per entrare</button><span class="ver">Versione ${VER} · ${esc(CHANGELOG[0].t)}</span></div></div>`;
+   <div class="road"><div class="bot"><button class="btn pri" data-act="introgo">${TOUCH?'Tocca':'Clicca'} per entrare</button><span class="ver">Versione ${VER} · ${esc(CHANGELOG[0].t)}</span></div>
+   <div class="cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></div></div>`;
   $('#intro').dataset.act='introgo';
 }
 // carte della scelta: colore dell'abilità più forte, barre delle abilità, adesivo sulla carta scelta
