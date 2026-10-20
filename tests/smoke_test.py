@@ -168,8 +168,9 @@ async def phone(b, w, h, name, errs):
         assert not bad, f'{name}: finestra {wn}: {bad}'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_dato_{wn}.png'), full_page=True)
         if wn == 'cassa':
-            r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,c0=S.cash,d0=F.debt(); document.querySelector('#win-cassa [data-act=loantake]').click();
-              const l=(S.loans||[])[(S.loans||[]).length-1]; if(!l) return {got:false,d0}; const got=S.cash-c0>=l.amt-1, left=l.left; for(let i=0;i<32;i++){document.querySelector('#modal').innerHTML='';F.step();}
+            # il bot dei tre anni a volte fallisce: per provare il prestito l'azienda torna in piedi
+            r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; S.over=false; S.cash=Math.max(S.cash,150000); const c0=S.cash,d0=F.debt(); document.querySelector('#win-cassa [data-act=loantake]').click();
+              const l=(S.loans||[])[(S.loans||[]).length-1]; if(!l) return {got:false,d0}; const got=S.cash-c0>=l.amt-1, left=l.left; for(let i=0;i<32;i++){document.querySelector('#modal').innerHTML='';S.cash=Math.max(S.cash,150000);F.step();}
               return {got, paid:l.left<left, d0, d1:F.debt(), over:S.over, day:S.day};}''')
             assert r['got'] and r['paid'], f'{name}: prestito non funziona {r}'
         await pg.tap(f'#win-{wn} [data-act=close]')
@@ -234,12 +235,16 @@ async def main():
         await pg.click('[data-act=stnext]')
         assert await pg.evaluate("document.querySelectorAll('#start .lb-slot').length") == 4, 'lobby senza i 4 posti'
         await pg.click('[data-act=lbbot][data-id=gino][data-k=on][data-v="0"]')   # un avversario resta fuori
-        await pg.click('[data-act=lbbot][data-id=edoardo][data-k=diff][data-v=spietato]')
+        # comportamento e difficoltà: tendina chiusa con Standard · Normale, si apre per cambiarli
+        assert await pg.evaluate("[...document.querySelectorAll('#start .lb-slot.cpu:not(.off) .lb-fh')].every(b=>b.innerText.includes('Standard · Normale')&&b.getAttribute('aria-expanded')==='false')"), 'le CPU devono partire Standard · Normale, a tendina chiusa'
+        assert not await pg.query_selector('#start [data-act=lbbot][data-k=diff]'), 'la tendina deve partire chiusa'
+        await pg.click('[data-act=lbfold][data-id=edoardo]'); await pg.click('[data-act=lbbot][data-id=edoardo][data-k=diff][data-v=spietato]')
+        await pg.click('[data-act=lbfold][data-id=valeria]'); await pg.click('[data-act=lbbot][data-id=valeria][data-k=style][data-v=prezzo]')
         await pg.click('[data-act=lbwin][data-id=reputazione]')
         await pg.screenshot(path=os.path.join(OUT, 'shot_crea_7_lobby.png'), full_page=True)
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
-        lb = await pg.evaluate('()=>{const F=window.__FUP,H=F.HUM;return {n:H.bots.length,ids:H.bots.map(b=>b.bot.id),diff:H.bots.find(b=>b.bot.id==="edoardo").bot.diff,win:H.cfg.win,mode:H.cfg.mode,cols:[H.company.color,...H.bots.map(b=>b.company.color)]}}')
-        assert lb['n'] == 2 and 'gino' not in lb['ids'] and 'marco' not in lb['ids'] and lb['diff'] == 'spietato', lb
+        lb = await pg.evaluate('()=>{const F=window.__FUP,H=F.HUM;return {n:H.bots.length,ids:H.bots.map(b=>b.bot.id),diff:H.bots.find(b=>b.bot.id==="edoardo").bot.diff,sty:Object.fromEntries(H.bots.map(b=>[b.bot.id,b.bot.style])),win:H.cfg.win,mode:H.cfg.mode,cols:[H.company.color,...H.bots.map(b=>b.company.color)]}}')
+        assert lb['n'] == 2 and 'gino' not in lb['ids'] and 'marco' not in lb['ids'] and lb['diff'] == 'spietato' and lb['sty'] == {'edoardo': 'standard', 'valeria': 'prezzo'}, lb
         assert lb['win']['reputazione'] and lb['mode'] == 'classica' and len(set(lb['cols'])) == 3, lb
         c = await pg.evaluate('()=>{const S=window.__FUP.S;return {id:S.ceoId,n:S.custom.name,tal:S.custom.tal,st:S.custom.st,co:S.company.name,logo:S.company.logo,claim:S.company.claim,nick:S.custom.nick,wh:S.warehouses[0].site,cl:S.clients[0].name}}')
         assert c['id'] == 'custom' and c['n'] == 'Ornella Bancalini' and c['co'] == 'Trasporti Bancalini', c

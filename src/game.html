@@ -592,6 +592,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .lb-win{display:flex;flex-direction:column;gap:6px;padding:8px;border:2px dashed #8a93a3;background:#fff}.lb-win.on{border:2px solid var(--ink);background:#fff9ef;box-shadow:inset 4px 0 0 var(--accent)}
 .lb-chk{display:flex;align-items:center;gap:8px;min-height:36px;padding:0;background:none;border:0;cursor:pointer;text-align:left;font:inherit;color:var(--ink)}.lb-chk b{font-family:var(--f-disp);font-size:16px}.lb-chk:disabled{cursor:default;opacity:.5}
 .lb-chk .lb-box{display:inline-flex;align-items:center;justify-content:center;flex:none;width:24px;height:24px;border:3px solid var(--ink);background:#fff;font-weight:700}.lb-chk[aria-pressed="true"] .lb-box{background:var(--accent);color:#fff}
+.lb-fold{border:2px solid var(--ink);background:#fff}.lb-fold.open{box-shadow:3px 3px 0 var(--ink)}
+.lb-fh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%;min-height:44px;padding:6px 10px;background:var(--panel2);border:0;text-align:left;color:var(--ink)}.lb-fh b{font-family:var(--f-disp);font-size:16px}
+.lb-car{margin-left:auto;font-size:18px;font-weight:700}.lb-fold.open .lb-fh{border-bottom:2px solid var(--ink)}
+.lb-fb{display:flex;flex-direction:column;gap:6px;padding:8px 10px}
 .lb-wt{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .lb-sum{display:flex;align-items:center;gap:10px;padding:10px;background:#16202e;color:#fff;border:3px solid var(--ink)}.lb-sum .lb-num{background:var(--accent)}
 .cls-l{display:flex;flex-direction:column;gap:8px}.cls{gap:6px;border-width:3px}.cls.me{background:#fff9ef}.cls.off{opacity:.55}
@@ -2160,7 +2164,7 @@ wk('ritiro','cli','Ritiro o consegna',`Da dove arriva la merce: la consegna il c
 wk('concorrenti','cli','Concorrenti',`Gruppo Bartolazzi, Logistix Global, F.lli Brambilla e la Cooperativa La Fatica: il resto del mercato, che si prende le gare che nessuno vince.`,
 `Non li vedi lavorare, ma ci sono: una [[gare|gara]] che non va né a te né a un'[[avversari|azienda avversaria]] finisce a uno di loro, di solito con uno sconto aggressivo. Le aziende avversarie vere, quelle degli altri CEO, le trovi in [[classifica]].`);
 wk('lobby','basi','Lobby',`L'ultimo passaggio prima di iniziare: le quattro aziende in gara, il ritmo del tempo e le condizioni di vittoria.`,
-`È divisa in due parti. **1 · Le aziende in gara**: nel primo posto, con l'etichetta **TU**, ci sei tu. Negli altri tre, con l'etichetta scura **CPU**, ci sono gli altri CEO giocabili, guidati dal computer: per ognuno scegli se è in gara, lo [[avversari|stile]] e la difficoltà. Se li lasci tutti fuori giochi da solo, come una volta, senza vittoria: si va avanti finché la cassa regge.
+`È divisa in due parti. **1 · Le aziende in gara**: nel primo posto, con l'etichetta **TU**, ci sei tu. Negli altri tre, con l'etichetta scura **CPU**, ci sono gli altri CEO giocabili, guidati dal computer: per ognuno scegli se è in gara e, dalla tendina «Comportamento e difficoltà», il [[avversari|comportamento]] e la difficoltà (all'inizio Standard e Normale). Se li lasci tutti fuori giochi da solo, come una volta, senza vittoria: si va avanti finché la cassa regge.
 
 **2 · Regole della partita**: il [[tempo|ritmo del tempo]], una o più [[vittoria|condizioni di vittoria]] e la sconfitta (cassa sotto −50.000 € a fine mese). In fondo un riepilogo dice in una riga contro chi giochi e come si vince. Ogni azienda ha un colore e un logo diversi.`);
 wk('avversari','basi','Aziende avversarie',`Le aziende degli altri CEO, guidate dal computer con le tue stesse regole: gare, personale, ricerca, magazzini, prestiti. E possono fallire.`,
@@ -2168,7 +2172,8 @@ wk('avversari','basi','Aziende avversarie',`Le aziende degli altri CEO, guidate 
 
 Le offerte: per ogni gara prova i suoi magazzini e qualche prezzo, scarta quelle dove i KPI previsti non superano le [[soglie]] e quelle che non rendono abbastanza, poi sceglie l'offerta con il guadagno atteso più alto (probabilità di vincere × margine in più al mese).
 
-Gli stili:
+I comportamenti (all'inizio sono tutte **Standard** a difficoltà **Normale**; nella lobby si cambiano aprendo la tendina «Comportamento e difficoltà» di ogni azienda CPU):
+• **Standard**: la via di mezzo. Prezzi quasi pieni, margini medi, un po' di tutto nella ricerca; apre magazzini solo quando i conti tornano.
 • **Prezzo**: offerte al ribasso, si accontenta di margini piccoli, poca tecnologia.
 • **Qualità**: prezzi pieni e margini larghi, KPI alti, tecnologie di logistica.
 • **Espansione**: apre magazzini appena i conti lo permettono e chiede più prestiti. Cresce in fretta, ma rischia di più.
@@ -2969,12 +2974,12 @@ function gameOver(){
 /* ====================== AVVERSARI ====================== */
 // le altre tre aziende della partita: guidate dal computer con uno stile (come gioca) e una difficoltà (quanto è brava)
 const BOT_STYLE={
+ standard:{n:'Standard',d:'Equilibrato: prezzi giusti, un po\' di tutto nella ricerca, apre magazzini quando i conti tornano.',mult:0.99,keep:0.11,tech:['gestionale','barcode','commerciale','gps','wms','freddo','edi','formazione','rotte','controllo','kam','marketing','iso','accordi','ecom','direzione']},
  prezzo:{n:'Prezzo',d:'Offerte al ribasso per vincere tante gare, poca tecnologia.',mult:0.95,keep:0.08,tech:['gestionale','gps','commerciale','rotte','barcode','regolamento','controllo','freddo','wms','hr','edi','marketing','kam','sinergia']},
  qualita:{n:'Qualità',d:'Prezzi pieni, KPI alti e tecnologie: punta ai clienti esigenti.',mult:1.02,keep:0.14,tech:['barcode','formazione','gestionale','wms','freddo','commerciale','edi','gps','iso','rf','controllo','kam','ptl','accordi','ecom']},
  espansione:{n:'Espansione',d:'Apre magazzini e chiede prestiti: cresce in fretta, ma rischia di più.',mult:0.97,keep:0.1,grow:true,tech:['commerciale','gestionale','gps','freddo','barcode','marketing','edi','wms','rotte','kam','accordi','ecom','direzione']}
 };
 const BOT_DIFF={facile:{n:'Facile',d:'Parte con meno soldi, decide ogni due settimane e convince poco i buyer (−4 nelle gare).',cash:0.85,mult:0.03,gara:-4,every:14},normale:{n:'Normale',d:'Gioca con le tue stesse regole.',cash:1,mult:0,gara:0,every:7},spietato:{n:'Spietato',d:'Parte con il 30% di cassa in più e conosce tutti i buyer: +5 nel punteggio delle gare.',cash:1.3,mult:0,gara:5,every:7}};
-const BOT_DEF={gino:'prezzo',edoardo:'espansione',valeria:'qualita',marco:'qualita'};
 const stSum=p=>STATS.reduce((a,s)=>a+(p.st[s.k]||0),0);
 function newRival(ceoId,color,logo,style,diff,k){
   const sv=S; newGame(ceoId,null,color,null,{logo}); const b=S; S=sv;
@@ -3010,7 +3015,7 @@ function botBust(b){
     notify('yellow','classifica','Il Sole 24 Pallet',`${b.company.name} fallisce`,`${b.boss.name} chiude: i magazzini di ${b.warehouses.map(w=>w.name).join(', ')} tornano liberi e i suoi clienti presto cercheranno un nuovo logistico con delle gare. Restano in corsa ${liveCo().length} aziende.`,'classifica'); });
 }
 function botThink(){
-  const st=BOT_STYLE[S.bot.style]||BOT_STYLE.qualita, df=BOT_DIFF[S.bot.diff]||BOT_DIFF.normale;
+  const st=BOT_STYLE[S.bot.style]||BOT_STYLE.standard, df=BOT_DIFF[S.bot.diff]||BOT_DIFF.normale;
   botStaff(); botMgr(); botBids(st,df); botTech(st); botGrow(st); botShrink(); botMoney(st);
 }
 function botPay(v){S.cash-=v; S.cur.altro+=v;}
@@ -5372,17 +5377,21 @@ const lbDef=()=>({bots:{},mode:'classica',win:{ultimo:true,fatturato:true,reputa
 const myBase=()=>startSel.ceo==='custom'?startSel.cc.base:startSel.ceo;
 // le aziende avversarie: i CEO giocabili che non hai scelto, ognuno con un colore e un logo diversi dai tuoi
 function lbRivals(){ const L=startSel.lb, cols=COLORS.map(c=>c[0]).filter(c=>c!==startSel.color), logos=Object.keys(CO_LOGOS).filter(l=>l!==startSel.logo);
-  return CEOS.filter(c=>c.id!==myBase()).map((c,i)=>{ const b=L.bots[c.id]||(L.bots[c.id]={on:true,style:BOT_DEF[c.id]||'qualita',diff:'normale'}); return {C:c,b,color:cols[i%cols.length],logo:logos[(i*3+1)%logos.length]}; }); }
+  return CEOS.filter(c=>c.id!==myBase()).map((c,i)=>{ const b=L.bots[c.id]||(L.bots[c.id]={on:true,style:'standard',diff:'normale'}); return {C:c,b,color:cols[i%cols.length],logo:logos[(i*3+1)%logos.length]}; }); }
 function stepLobby(){
   const L=startSel.lb, R0=lbRivals(), me=startSel.ceo==='custom'?ccCeo(startSel.cc):startCeo(), nOn=R0.filter(r=>r.b.on).length;
   const seg=(act,id,k,opts,cur)=>`<div class="seg" role="group">${opts.map(([v,n,d])=>`<button class="btn sm2" data-act="${act}" data-id="${id}" data-k="${k}" data-v="${v}" aria-pressed="${cur===v}"${d?` data-tip="<div class='tt'>${esc(n)}</div>${esc(d)}"`:''}>${esc(n)}</button>`).join('')}</div>`;
   const tag=(cpu,on)=>cpu?`<span class="lb-tag cpu${on?'':' off'}" data-tip="<div class='tt'>CPU</div>Azienda guidata dal computer, con le tue stesse regole.">CPU</span>`:`<span class="lb-tag tu">TU</span>`;
+  // tendina «Comportamento e difficoltà» di un'azienda CPU: chiusa mostra solo la scelta attuale (all'inizio Standard · Normale)
+  const fold=r=>{const St=BOT_STYLE[r.b.style], D=BOT_DIFF[r.b.diff], op=!!r.b.fold;
+    return `<div class="lb-fold${op?' open':''}"><button class="lb-fh" data-act="lbfold" data-id="${r.C.id}" aria-expanded="${op}"><span class="lab">Comportamento e difficoltà</span><b>${esc(St.n)} · ${esc(D.n)}</b><span class="lb-car" aria-hidden="true">${op?'▴':'▾'}</span></button>
+     ${op?`<div class="lb-fb"><div class="lab">${kw('avversari','Comportamento')}</div>${seg('lbbot',r.C.id,'style',Object.entries(BOT_STYLE).map(([k,x])=>[k,x.n,x.d]),r.b.style)}<div class="sm">${esc(St.d)}</div>
+      <div class="lab">Difficoltà</div>${seg('lbbot',r.C.id,'diff',Object.entries(BOT_DIFF).map(([k,x])=>[k,x.n,x.d]),r.b.diff)}<div class="sm">${esc(D.d)}</div></div>`:''}</div>`;};
   const slot=r=>`<div class="card lb-slot cpu${r.b.on?'':' off'}" style="border-color:${r.b.on?r.color:'var(--ink)'}">
     <div class="lb-h"><span class="lb-pic">${tag(1,r.b.on)}<img class="px" src="${IMG[r.C.id]}" alt="Ritratto di ${esc(r.C.name)}" width="72" height="84"></span><div class="wh-sm"><b class="disp lb-n">${esc(r.C.name)}</b>
      <span class="co-tag">${coLogoSvg(r.logo,r.color,24)}<span>${esc(r.C.company)}</span></span><span class="sm">${esc(SITES[r.C.site].name)} · ${eur(Math.round(r.C.cash*BOT_DIFF[r.b.diff].cash/1000)*1000)}</span>${statChips(r.C.st,12)}</div></div>
     ${seg('lbbot',r.C.id,'on',[['1','In gara'],['0','Fuori']],r.b.on?'1':'0')}
-    ${r.b.on?`<div class="lab">${kw('avversari','Stile')}</div>${seg('lbbot',r.C.id,'style',Object.entries(BOT_STYLE).map(([k,x])=>[k,x.n,x.d]),r.b.style)}<div class="sm">${esc(BOT_STYLE[r.b.style].d)}</div>
-     <div class="lab">Difficoltà</div>${seg('lbbot',r.C.id,'diff',Object.entries(BOT_DIFF).map(([k,x])=>[k,x.n,x.d]),r.b.diff)}`:'<div class="sm">Non partecipa a questa partita.</div>'}</div>`;
+    ${r.b.on?fold(r):'<div class="sm">Non partecipa a questa partita.</div>'}</div>`;
   const you=`<div class="card lb-slot me" style="border-color:${startSel.color}"><div class="lb-h"><span class="lb-pic">${tag(0)}<img class="px" src="${IMG[me.img||me.id]}" alt="Il tuo CEO" width="72" height="84"></span><div class="wh-sm"><b class="disp lb-n">${esc(me.name)}</b>
     <span class="co-tag">${coLogoSvg(startSel.logo,startSel.color,24)}<span>${esc(coName())}</span></span><span class="sm">${esc(SITES[me.site].name)} · ${eur(me.cash)}</span>${statChips(me.st,12)}</div></div>
     <div class="sm">${nOn?`Giochi tu. ${nOn===1?'L\'altra azienda è guidata':`Le altre ${nOn} aziende sono guidate`} dal computer (CPU), con le tue stesse regole: gare, personale, ricerca e cassa.`:'Giochi tu, da solo: nessuna azienda CPU in gara.'}</div></div>`;
@@ -5427,6 +5436,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.40',t:'Avversari Standard',x:['Le aziende CPU partono tutte con un comportamento Standard, equilibrato tra prezzo, qualità e crescita, a difficoltà Normale.','Nella lobby comportamento e difficoltà di ogni azienda CPU stanno in una tendina chiusa che mostra la scelta attuale: aprila per cambiarli (Standard, Prezzo, Qualità, Espansione; Facile, Normale, Spietato).']},
  {v:'0.39',t:'Lobby più chiara',x:['Nella lobby le aziende guidate dal computer hanno l\'etichetta CPU, la tua l\'etichetta TU.','Le regole della partita sono in ordine: ritmo del tempo, condizioni di vittoria (con l\'obiettivo da scegliere) e sconfitta, più un riepilogo finale che dice contro chi giochi e come si vince.']},
  {v:'0.38',t:'Le stagioni',x:['Le committenti ora vendono di più o di meno secondo la stagione: le bevande e le piadine volano d\'estate, panettoni, cioccolato e pellet d\'inverno, i giocattoli in autunno, vivai e biciclette in primavera. Tante altre hanno solo un piccolo calo ad agosto.','Con la stagione cambiano i pallet da preparare e da consegnare, quindi lavoro, viaggi e ricavi: nei mesi di picco serve più gente, in quelli morti il magazzino è largo. I posti pallet occupati restano quelli del contratto.','Nella scheda di ogni committente e nelle gare c\'è un piccolo grafico con i volumi previsti per i prossimi 12 mesi, e un\'etichetta che dice se la stagionalità è lieve, media o forte.','Accanto alla data, in alto, un\'icona mostra la stagione: fiore, sole, foglia o fiocco di neve.','Nuova committente: Panettoni Canditelli, dal forno di Cornaredo. Lievita tutto l\'anno, si vende a dicembre.']},
  {v:'0.37',t:'Un solo ritmo',x:['Tolti per ora i ritmi del tempo senza pausa (Veloce, Tranquilla e Persistente): senza il gioco online non avevano senso. Si gioca sempre in Classica, con pausa e due velocità; le partite salvate con un altro ritmo ripartono in Classica.']},
@@ -5574,6 +5584,7 @@ Object.assign(ACT,{
    if(contMode()) S.speed=1;
    startSel.step='scelta';startSel.stamp=false;boot();},
  lbbot(d){startKeep();const b=startSel.lb.bots[d.id]; if(!b) return; b[d.k]=d.k==='on'?d.v==='1':d.v; showStart();},
+ lbfold(d){const b=startSel.lb.bots[d.id]; if(!b) return; startKeep(); b.fold=!b.fold; showStart();},
  lbmode(d){startSel.lb.mode=d.v; showStart();},
  lbwin(d){const w=startSel.lb.win; w[d.id]=!w[d.id]; showStart();},
  lbwt(d){startSel.lb[d.id]=+d.v; showStart();},
