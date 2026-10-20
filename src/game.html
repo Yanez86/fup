@@ -537,11 +537,12 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #start{position:fixed;inset:0;z-index:70;overflow:auto;background:rgba(8,16,30,.7);padding:24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px))}
 #start .box{max-width:1080px;margin:0 auto;background:var(--panel);border:3px solid var(--ink2);box-shadow:inset 0 0 0 2px #fff, 8px 8px 0 rgba(12,19,29,.6)}
 #start h1{margin:0;font-family:var(--f-disp);font-size:40px;line-height:1;text-shadow:3px 3px 0 var(--accent)}
-.ceos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.ceo{display:flex;flex-direction:column;gap:6px;padding:10px;background:#fff;border:3px solid var(--ink);cursor:pointer;text-align:left;box-shadow:inset 0 -3px 0 var(--panel2)}
+.ceos{display:flex;flex-direction:column;gap:10px}
+.ceo{display:flex;flex-direction:row;align-items:center;gap:14px;width:100%;padding:10px;background:#fff;border:3px solid var(--ink);cursor:pointer;text-align:left;box-shadow:inset 0 -3px 0 var(--panel2)}
 .ceo[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 3px var(--accent), 4px 4px 0 var(--ink)}
 .sw{width:30px;height:30px;border:3px solid var(--ink)}
-.ceos.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.ceo .portrait{flex:none;width:128px;height:150px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.ceo-i{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 
 /* Schermata introduttiva: il camioncino porta il pallet dell'icona */
 #intro:empty{display:none}
@@ -674,8 +675,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 @keyframes timbro{0%{transform:scale(2.6) rotate(-30deg);opacity:0}70%{transform:scale(.94) rotate(-14deg);opacity:.95}100%{transform:scale(1) rotate(-14deg);opacity:.88}}
 @media (prefers-reduced-motion:reduce){.timbro{animation:none}}
 .sw[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
-@media (max-width:900px){.ceos{grid-template-columns:repeat(2,minmax(0,1fr))}.lb-opts{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:640px){.ceos{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:900px){.lb-opts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* Telefono (classe .mob su <html>, vedi setMobile): finestre a tutto schermo tra la barra in alto e il menu,
    menu in basso (in verticale) o a sinistra su due colonne (in orizzontale), pulsanti grandi per il dito.
@@ -763,8 +763,9 @@ html,body{overscroll-behavior:none}
 .mob .modal{max-height:calc(100dvh - 16px)}
 .mob #start{padding:10px max(8px, env(safe-area-inset-right, 0px)) 16px max(8px, env(safe-area-inset-left, 0px))}
 .mob #start h1{font-size:34px}
-.mob .ceos{grid-template-columns:repeat(2,minmax(0,1fr))}
-.mob .ceo{padding:6px}
+.mob .ceo{padding:6px;gap:10px;align-items:flex-start}
+.mob .ceo .portrait{width:96px;height:112px}
+.mob .ceo .portrait img{width:96px;height:112px}
 .mob .lobby,.mob .lb-opts,.mob .lb-wins{grid-template-columns:minmax(0,1fr)}.mob .cls-k{grid-template-columns:repeat(3,minmax(0,1fr))}.mob .cls-w{grid-template-columns:96px minmax(0,1fr) 40px}
 .mob .cc-top{grid-template-columns:minmax(0,1fr);justify-items:center}
 .mob .cc-top > *{width:100%}
@@ -5517,7 +5518,8 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.44',t:'Cestino',x:['Nella schermata iniziale, accanto a «Continua la partita», c\'è il pulsante «Cancella» per eliminare la partita salvata (chiede conferma prima).','Anche dalle Opzioni durante il gioco puoi cancellare la partita in corso e tornare alla schermata iniziale.']},
+ {v:'0.45',t:'Cestino',x:['Nella schermata iniziale, accanto a «Continua la partita», c\'è il pulsante «Cancella» per eliminare la partita salvata (chiede conferma prima).','Anche dalle Opzioni durante il gioco puoi cancellare la partita in corso e tornare alla schermata iniziale.']},
+ {v:'0.44',t:'Scelta del CEO in fila',x:['Nella scelta del CEO le schede occupano tutta la larghezza, una sotto l\'altra, con il ritratto a sinistra e abilità, talenti e cliente storico a destra.']},
  {v:'0.43',t:'Ci vediamo in tribunale',x:['Nuovo evento: qualche settimana dopo un licenziamento la persona può impugnarlo e chiedere di tornare. La riassumi, chiudi con una conciliazione, vai in tribunale (rischioso, meglio con un CEO bravo in Amministrazione) o, se sai negoziare, le trovi un posto da un cliente.']},
  {v:'0.42',t:'Tagli e reputazione',x:['Licenziare ora pesa anche sulla reputazione (−0,3 a persona), oltre alla buonuscita e al calo di morale nel magazzino.','Dal quarto licenziamento in un mese scatta l\'ondata: finisce sul giornale, la reputazione scende di più e il morale cala di 2 punti in tutti i magazzini. Per i picchi della stagione conviene la cooperativa, che si manda via gratis.','Anche le aziende CPU licenziano quando finisce la stagione di picco, guardando il mese dopo per non restare scoperte. Le Facili sono prudenti, le Normali evitano le ondate, le Spietate tagliano senza pietà e finiscono sul giornale.']},
  {v:'0.41',t:'Mese per mese',x:['La stagionalità delle committenti ora va mese per mese: agosto chiuso per l\'industria e i cantieri, il Black Friday a novembre per elettronica ed e-commerce, il cambio gomme a marzo-aprile e ottobre-novembre, la colomba di Pasqua e il panettone a novembre-dicembre, la cartoleria prima della scuola, le mele a settembre.','Sotto il grafico della committente ci sono il mese di picco e quello più vuoto; toccando il grafico si vedono tutti e dodici i mesi.']},
@@ -5589,22 +5591,22 @@ function showIntro(){
 }
 function stepScelta(){const sv=load();
   const st=CEOS.map(c=>{const s=SITES[c.site];return `<button class="ceo" data-act="pickceo" data-id="${c.id}" aria-pressed="${startSel.ceo===c.id}">
-    <div class="portrait" style="height:150px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden"><img class="px" src="${IMG[c.id]}" alt="Ritratto di ${esc(c.name)}" width="128" height="150"></div>
-    <b class="disp" style="font-size:18px">${esc(c.name)}</b><span class="sm">${c.age} anni · ${esc(c.origin)}</span>
+    <div class="portrait"><img class="px" src="${IMG[c.id]}" alt="Ritratto di ${esc(c.name)}" width="128" height="150"></div>
+    <div class="ceo-i"><b class="disp" style="font-size:18px">${esc(c.name)}</b><span class="sm">${c.age} anni · ${esc(c.origin)}</span>
     <span class="sm" style="color:var(--ink)">${esc(s.name)} (${s.prov}) · ${n0(s.cap)} posti · ${eur(c.cash)}</span>
     <span>${statChips(c.st,14)}</span>
     ${talentIcons(c.tal,32)}
-    <span class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,24)} Cliente storico: ${esc(c.client.name)} ${rankIcon(c.client,18)}</span></button>`;}).join('')
+    <span class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,24)} Cliente storico: ${esc(c.client.name)} ${rankIcon(c.client,18)}</span></div></button>`;}).join('')
    +(()=>{const cc=startSel.cc;return `<button class="ceo" data-act="pickceo" data-id="custom" aria-pressed="${startSel.ceo==='custom'}">
-    <div class="portrait" style="height:150px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden"><img class="px" src="${IMG[cc?cc.img:'cc1']}" alt="" width="128" height="150"></div>
-    <b class="disp" style="font-size:18px">${cc&&ccName(cc)?esc(ccName(cc)):'Crea il tuo CEO'}</b><span class="sm">Nome, abilità, titolo di studio e carattere li scegli tu</span>
-    ${cc?`<span>${statChips(ccStats(cc),14)}</span>${talentIcons(ccTal(cc),32)}`:`<span class="sm" style="color:var(--ink)">${CC_PTS} punti da distribuire tra abilità e talenti</span>`}</button>`;})();
+    <div class="portrait"><img class="px" src="${IMG[cc?cc.img:'cc1']}" alt="" width="128" height="150"></div>
+    <div class="ceo-i"><b class="disp" style="font-size:18px">${cc&&ccName(cc)?esc(ccName(cc)):'Crea il tuo CEO'}</b><span class="sm">Nome, abilità, titolo di studio e carattere li scegli tu</span>
+    ${cc?`<span>${statChips(ccStats(cc),14)}</span>${talentIcons(ccTal(cc),32)}`:`<span class="sm" style="color:var(--ink)">${CC_PTS} punti da distribuire tra abilità e talenti</span>`}</div></button>`;})();
   return `<div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
    <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord Italia, da Torino a Trieste. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
    ${installCard()}
    ${sv&&sv.S&&!sv.S.over?`<div class="card pend">${startSel.del?`<div class="row" style="flex-wrap:wrap;align-items:center"><span><b>Cancellare per sempre ${esc(sv.S.company.name)}?</b> <span class="sm">La partita sparisce e non si può recuperare.</span></span><span class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto"><button class="btn" data-act="delno">No, tienila</button><button class="btn del" data-act="delsave">Sì, cancella</button></span></div>`
     :`<div class="row" style="flex-wrap:wrap;align-items:center"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><span class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto"><button class="btn" data-act="delask">Cancella</button><button class="btn pri" data-act="continue">Continua la partita</button></span></div>`}</div>`:''}
-   <div class="lab">Scegli il tuo CEO</div><div class="ceos five">${st}</div>`;}
+   <div class="lab">Scegli il tuo CEO</div><div class="ceos">${st}</div>`;}
 function showStart(){
   setSpeedSafe(0); WIKI_ON=false; const k=startSel.step;
   if(!startSel.lb) startSel.lb=lbDef();
