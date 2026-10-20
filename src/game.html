@@ -65,7 +65,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .chip{display:flex;flex-direction:column;justify-content:center;line-height:1.1;padding:2px 10px;background:#1d2a3b;border:2px solid #2f4057;min-width:0}
 .chip span:first-child{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--hi)}
 .chip b{font-family:var(--f-disp);font-size:18px;font-weight:600}
-.date{font-family:var(--f-disp);font-size:17px;padding:3px 10px;min-width:calc(12em + 24px);text-align:center;white-space:nowrap;box-sizing:border-box;background:var(--ink3);border:2px solid var(--ink4);box-shadow:inset 0 -2px 0 #1d2a3b}
+.date{font-family:var(--f-disp);font-size:17px;padding:3px 10px;min-width:calc(8.3em + 24px);text-align:center;white-space:nowrap;box-sizing:border-box;background:var(--ink3);border:2px solid var(--ink4);box-shadow:inset 0 -2px 0 #1d2a3b}
 .spd{display:flex;gap:4px}.spd[hidden]{display:none}
 .spd button{width:36px;height:34px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font-family:var(--f-disp);font-weight:700;box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
 .spd button[aria-pressed="true"]{background:var(--accent);color:var(--ink);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
@@ -626,7 +626,7 @@ html,body{overscroll-behavior:none}
 .mob #top{gap:6px 8px;padding:4px max(8px, env(safe-area-inset-right, 0px)) 5px max(8px, env(safe-area-inset-left, 0px));padding-top:calc(4px + env(safe-area-inset-top, 0px))}
 .mob #top .logo{font-size:19px}
 .mob #top .logo small,.mob #top .spacer{display:none}
-.mob .date{font-size:14px;padding:3px 6px;min-width:calc(8.3em + 16px)}  /* sul telefono il mese è abbreviato */
+.mob .date{font-size:14px;padding:3px 6px;min-width:calc(8.3em + 16px)}
 .mob .spd button{width:38px;height:36px}.mob .optb{width:40px;height:38px}
 .mob .paused{display:none}.mob .wkn{font-size:13px;padding:3px 5px}.mob .clk{font-size:13px;padding:3px 6px}.mob .clk b{display:none}
 .mob #top .stats{gap:4px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
@@ -1618,7 +1618,7 @@ const DAY0=Date.UTC(2002,0,1);
 const MESI=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
 const GG=['dom','lun','mar','mer','gio','ven','sab'];
 const dateOf=d=>new Date(DAY0+d*86400000);
-const fmtDateS=d=>{const t=dateOf(d);return `${GG[t.getUTCDay()]} ${t.getUTCDate()} ${MESI[t.getUTCMonth()].slice(0,3)} ${t.getUTCFullYear()}`};
+const fmtMonth=d=>{const t=dateOf(d);return `${MESI[t.getUTCMonth()]} ${t.getUTCFullYear()}`};  // in alto: solo mese e anno, accanto alla settimana
 const fmtDate=d=>{const t=dateOf(d);return `${GG[t.getUTCDay()]} ${t.getUTCDate()} ${MESI[t.getUTCMonth()]} ${t.getUTCFullYear()}`};
 const shortDate=d=>{const t=dateOf(d);return `${t.getUTCDate()} ${MESI[t.getUTCMonth()].slice(0,3)} ${t.getUTCFullYear()}`};
 const yearOf=d=>dateOf(d).getUTCFullYear();
@@ -1647,7 +1647,7 @@ Panoramica: [[cassa]], utile e [[ricavi]] del mese scorso, [[reputazione]], clie
 
 I grafici si aggiornano alla fine di ogni mese, quando si chiudono i conti: ne servono almeno due per vedere una linea. I numeri di puntualità e accuratezza sono la media dei magazzini, non pesata sui volumi. Ogni riquadro si apre nell'enciclopedia.`);
 wk('tempo','basi','Tempo e ritmo',`Il tempo si conta a settimane. Il ritmo si sceglie nella lobby: Classica (pausa e due velocità), Veloce, Tranquilla o Persistente (una settimana per ogni giorno vero).`,
-`Dietro le quinte il gioco ricalcola ogni giorno tutti i magazzini: [[puntualita]], [[accuratezza]], [[morale]], costi e ricavi. Ogni lunedì arriva il [[report]] della settimana, alla fine di ogni mese si chiudono i conti: [[soddisfazione]] dei clienti, [[penali]], [[conto|conto economico]] e prezzo del [[gasolio]]. Le durate (ricerche, assunzioni, cantieri, preavvisi) sono indicate in settimane; in alto, accanto alla data, c'è il numero della settimana.
+`Dietro le quinte il gioco ricalcola ogni giorno tutti i magazzini: [[puntualita]], [[accuratezza]], [[morale]], costi e ricavi. Ogni lunedì arriva il [[report]] della settimana, alla fine di ogni mese si chiudono i conti: [[soddisfazione]] dei clienti, [[penali]], [[conto|conto economico]] e prezzo del [[gasolio]]. Le durate (ricerche, assunzioni, cantieri, preavvisi) sono indicate in settimane; in alto ci sono il numero della settimana, il mese e l'anno.
 
 Il ritmo si sceglie nella [[lobby]] e non si cambia durante la partita:
 • **Classica**: come una volta. Spazio mette in pausa, i tasti 1 e 2 cambiano velocità: una settimana dura 7 secondi oppure 3. Quando compare un [[eventi|evento]] o un messaggio importante il tempo si ferma da solo finché non rispondi.
@@ -3856,7 +3856,7 @@ function otifNow(){ const ws=S.warehouses.filter(w=>w.kpi), m=ws.reduce((a,w)=>a
 function otifGap(){ let g=null; S.clients.filter(c=>c.status==='attivo').forEach(c=>{const k=(whById(c.wh)||{}).kpi; if(!k) return;
   const v=Math.min(k.P-c.sP,c.sA?k.A-c.sA:99); g=g==null?v:Math.min(g,v);}); return g; }
 function renderTop(){
-  $('#date').textContent=MOB?fmtDateS(S.day):fmtDate(S.day);
+  $('#date').textContent=fmtMonth(S.day);
   $('#wkn').textContent=(MOB?'S':'Settimana ')+weekOf(S.day); $('#wkn').dataset.tip=`<div class='tt'>Settimana ${weekOf(S.day)} del ${yearOf(S.day)}</div>Il tempo del gioco si conta a settimane: il lunedì arriva il report KPI. ${esc(MODES[modeOf()].d)}`;
   const cm=contMode(); document.querySelector('.spd').hidden=cm; const ck=$('#clk'); ck.hidden=!cm;
   if(cm){const m=modeOf(); ck.innerHTML=`<i></i>${MODES[m].n}${m==='persistente'&&HUM.clock?`<b class="sm" style="color:#c9d3dd">· domani tra ${clockLeft()}</b>`:''}`; ck.dataset.tip=`<div class='tt'>Tempo senza pausa: ${MODES[m].n}</div>${esc(MODES[m].d)} Se non rispondi a un evento entro due settimane, decide il tuo vice.`;}
@@ -5114,6 +5114,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.36',t:'Settimana dopo settimana',x:['In alto non c\'è più la data del giorno: restano la settimana, il mese e l\'anno (per esempio «Settimana 22» e «maggio 2002»).']},
  {v:'0.35',t:'Quattro per un mercato',x:['Prima di iniziare c\'è la lobby, come in Civilization: la tua azienda e quelle degli altri tre CEO (Gino, Edoardo, Valeria, Marco), guidate dal computer. Per ognuno scegli se gioca, lo stile (Prezzo, Qualità, Espansione) e la difficoltà (Facile, Normale, Spietato).','Gli avversari giocano con le tue stesse regole: fanno offerte segrete alle gare, assumono, aprono magazzini, chiedono prestiti e possono fallire. Un magazzino o un manager preso da loro non è più sul mercato.','Nella scheda di una gara vedi quali avversari hanno già fatto un\'offerta. Con più aziende in gara ci sono anche più gare aperte.','Condizioni di vittoria, anche più di una insieme: Fino all\'ultimo pallet (resti solo tu), Fatturato, Reputazione e Al traguardo (vince chi vale di più in un certo anno).','Nuova finestra Classifica, con le aziende in ordine di valore e i progressi verso la vittoria. I magazzini avversari compaiono sulla mappa nel loro colore.','Il ritmo del tempo si sceglie nella lobby: Classica (pausa e due velocità, come prima), Veloce, Tranquilla o Persistente, dove una settimana di gioco dura un giorno vero e il tempo passa anche a gioco chiuso. Al ritorno un riepilogo racconta cosa è successo.','Senza pausa, se non rispondi a un evento entro due settimane decide il tuo vice.','Tutto si conta a settimane: in alto c\'è il numero della settimana, e ricerche, assunzioni, cantieri e preavvisi sono indicati in settimane.']},
  {v:'0.34',t:'Numeri da toccare',x:['In alto c\'è un nuovo numero: l\'OTIF, cioè gli ordini arrivati in orario e senza errori. Diventa rosso se un cliente è sotto soglia.','Tutti i numeri in alto si toccano: Cassa apre il bilancio, Mese scorso le entrate e le spese voce per voce, Morale lo stato d\'animo di ogni magazzino, OTIF puntualità, accuratezza e occupazione nel dettaglio.','Dalla finestra della cassa puoi chiedere un prestito alla banca, in 2, 4 o 6 anni: il tasso migliora con la reputazione. Le rate si pagano a fine mese e il prestito si può estinguere prima.','Sul telefono la cassa in alto è più corta: le migliaia diventano k e i milioni m (per esempio € 489k o € 1,2m). La cifra esatta è nel suggerimento.']},
  {v:'0.33',t:'Icone nuove',x:['Tutte le icone ridisegnate in pixel art più grande e più chiara: i 94 talenti, le 45 tecnologie, le policy, le sei abilità, il menu a sinistra, le lenti della mappa e il pulsante delle opzioni.','Stile unico e piatto, come i pulsanti del gioco: bordo scuro, una fascia più scura in basso e un\'ombra netta, senza riflessi. Le tessere dei talenti hanno il filetto verde, rosso o giallo a seconda che il talento sia positivo, negativo o misto.','Le icone hanno sempre misure piene (2 o 3 pixel dello schermo per ogni pixel del disegno), così restano nitide anche sul telefono.']},
