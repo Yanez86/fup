@@ -2080,7 +2080,9 @@ wk('licenziamenti','pers','Licenziamenti',`Costano un mese di stipendio di buonu
 
 **Ondata di licenziamenti**: dal quarto licenziamento in 30 giorni la notizia finisce sul giornale. Ogni licenziamento in più toglie altri 0,8 punti di reputazione e il morale scende di 2 punti in tutti i magazzini per un mese.
 
-Le persone della [[cooperativa]] si mandano via gratis, senza calo di morale né di reputazione: per i picchi stagionali sono la scelta più comoda.
+Qualche settimana dopo un licenziamento può arrivare l'[[eventi|evento]] del **licenziamento impugnato**: la persona fa causa e chiede di tornare. Puoi reintegrarla (morale +3, reputazione +1), chiudere con una conciliazione (quattro mensilità), andare in tribunale (45% di vincere, di più con l'[[st_amm|Amministrazione]] del CEO; se perdi torna al lavoro con dieci mensilità di arretrati e reputazione −3) oppure, con Negoziazione 13 o da Ex sindacalista, trovarle un posto da un cliente.
+
+Le persone della [[cooperativa]] si mandano via gratis, senza calo di morale né di reputazione, e non fanno causa: per i picchi stagionali sono la scelta più comoda.
 
 Le aziende [[avversari|avversarie]] seguono le stesse regole. Le Facili licenziano di rado e mai col morale basso, le Normali lasciano andare chi resta senza lavoro ma evitano le ondate, le Spietate tagliano appena il lavoro cala, anche a ondate. Tutte guardano il lavoro del mese dopo, per non licenziare alla vigilia di un picco.`);
 wk('welfare','pers','Benefit aziendali',`Buoni pasto, assicurazione sanitaria, premio di produzione: costano ogni mese per dipendente ma alzano il morale ovunque e accorciano le assunzioni.`,
@@ -2542,6 +2544,7 @@ function talWh(wh,k){return mgrTal(wh).reduce((a,n)=>a+(((TALENTS[n]||{}).wh||{}
 const fireMul=wh=>mgrTal(wh).some(n=>(TALENTS[n]||{}).fire)?0.5:1;  // Ex sindacalista: licenziamenti e cooperativa pesano la metà sul morale
 // licenziamenti, stesse regole per il giocatore e per gli avversari: buonuscita di un mese, morale del magazzino −4 per 30 giorni, reputazione −0,3.
 // Dal 4° licenziamento in 30 giorni è un'ondata: reputazione −0,8 in più a testa, morale −2 in tutti i magazzini e la notizia sul giornale
+const IMP_NOMI=[['Gianni Ruggeri',0],['Patrizia Colombo',1],['Salvatore Esposito',0],['Loredana Brambilla',1],['Mirko Zanetti',0],['Ornella Gatti',1],['Ivano Bertoldi',0],['Samira El Idrissi',1],['Cristian Ferraro',0],['Daniela Fontana',1]];
 const FIRE={mor:-4,rep:-0.3,wave:4,waveRep:-0.8,waveMor:-2,days:30};
 const firesRecent=()=>(S.fires||[]).filter(d=>S.day-d<FIRE.days).length;
 function fireOne(w,r){
@@ -2549,7 +2552,7 @@ function fireOne(w,r){
   if(r==='plan'){ if(S.office.plan<=0) return null; S.office.plan--; w=null; }
   else { if(!w||w.staff[r]<=0) return null; w.staff[r]--; if(isCoop(w,r)) return {coop:true}; }   // la cooperativa li riprende gratis
   S.cash-=sal; S.cur.altro+=sal;
-  S.fires=(S.fires||[]).filter(d=>S.day-d<FIRE.days); S.fires.push(S.day); S.firedN=(S.firedN||0)+1;
+  S.fires=(S.fires||[]).filter(d=>S.day-d<FIRE.days); S.fires.push(S.day); S.firedN=(S.firedN||0)+1; S.lastFired={day:S.day,wh:w?w.id:null,role:r};   // per l'evento del licenziamento impugnato
   const wave=S.fires.length>=FIRE.wave;
   if(w) S.mods.push({scope:w.id,mor:FIRE.mor*fireMul(w),until:S.day+FIRE.days,src:'Licenziamenti'});
   repUp(FIRE.rep+(wave?FIRE.waveRep:0));
@@ -3218,6 +3221,23 @@ const F_MASTER=m=>ageOf(m)<45&&!m.tal.includes('Master in supply chain'), F_CELL
   F_CUOCO=m=>!m.tal.includes('Cuoco provetto'), F_VIDEO=m=>m.wh&&!m.tal.includes('Guru dei social'), F_FIGLI=m=>ageOf(m)<46&&!m.tal.includes('Tre figli piccoli'),
   F_KARAOKE=m=>!m.tal.includes('Re del karaoke'), F_GOLF=e=>!e.tal.includes('Golfista'), F_POLITICA=e=>!e.tal.includes('Consigliere comunale');
 const EVENTS=[
+ // dopo un licenziamento (non della cooperativa): chi è stato mandato via fa causa e chiede di tornare
+ {id:'impugna',src:'Ufficio del personale',title:'Licenziamento impugnato',
+  cond:()=>!!S.lastFired&&S.day-S.lastFired.day>=10&&S.day-S.lastFired.day<=120&&(S.lastFired.role==='plan'||!!whById(S.lastFired.wh)),
+  setup:ev=>{const lf=S.lastFired; S.lastFired=null; const [nm,gf]=pick(IMP_NOMI), g=(m,f)=>gf?f:m;
+    ev.role=lf.role; ev.w=whById(lf.wh)||null; ev.nm=nm; ev.title=`${nm} impugna il licenziamento`;
+    ev.text=`È arrivata una raccomandata dello studio legale Cavillo & Associati: ${nm}, ${ROLE1[lf.role]} ${ev.w?'a '+ev.w.name:'in sede'} ${g('licenziato','licenziata')} ${wks(S.day-lf.day)} fa, impugna il licenziamento. Chiede il reintegro «con effetto immediato», gli stipendi arretrati e, già che c'è, le scuse scritte. In ${ev.w?'banchina':'ufficio'} non si parla d'altro: tutti vogliono vedere come va a finire.`;},
+  opts:[{t:'Reintegro: torna al lavoro',d:'Ammetti che forse avevi esagerato e richiami la persona al suo posto. In squadra la notizia fa piacere.',e:'Torna al lavoro (lo stipendio riparte, la buonuscita è persa), morale +3 nel magazzino, reputazione +1',r:'Primo giorno di rientro: mezz\'ora di anticipo e una vaschetta di pasticcini per tutti. Qualcuno ha applaudito, il caporeparto ha fatto finta di niente.',
+         f:function(){ if(this.role==='plan') S.office.plan++; else if(this.w){ this.w.staff[this.role]++; mod(this.w.id,{mor:3},30); } repUp(1); }},
+        {t:'Conciliazione in sede sindacale',d:'Ti siedi al tavolo con il sindacato e chiudi con una cifra. Niente reintegro, niente causa, nessuno ne parla più.',e:'Quattro mensilità di stipendio, nessun altro effetto',r:'Firma, stretta di mano, caffè della macchinetta offerto dal sindacalista. Pratica chiusa, conto più leggero.',
+         f:function(){ S.cash-=Math.round(4*RAL[this.role]*COEF/12); }},
+        {t:'Ci vediamo in tribunale',d:'Non tratti: l\'avvocato dice che hai buone carte. Speriamo abbia ragione.',e:'Avvocato 3.000 €. Probabilità di vincere 45%, più alta con l\'Amministrazione del CEO; se perdi: reintegro, dieci mensilità di risarcimento e reputazione −3',r:'Tre udienze, due rinvii e un giudice che sbadigliava. Alla fine è arrivata la sentenza.',
+         f:function(){ S.cash-=3000; const p=clamp(0.45+(ceo().st.amm-10)*0.03,0.2,0.8);
+           if(Math.random()<p) toast('Causa vinta: il licenziamento era regolare','ok');
+           else { S.cash-=Math.round(10*RAL[this.role]*COEF/12); repUp(-3); if(this.role==='plan') S.office.plan++; else if(this.w) this.w.staff[this.role]++;
+             toast('Causa persa: torna al lavoro e incassa dieci mensilità di arretrati','bad'); } }},
+        {t:'«Ti trovo io un posto migliore»',d:'Chiami un cliente che cerca personale e gli trovi un lavoro lì, con uno stipendio un po\' più alto. Ritira la causa e ti manda pure un messaggio di ringraziamento.',e:'Nessun costo, reputazione +1',req:()=>ceo().st.neg>=13||ceo().tal.includes('Ex sindacalista'),reqT:'Negoziazione 13 o Ex sindacalista',r:'Nel nuovo posto si trova benissimo, e il cliente pure: ti ha detto che, se hai altre persone così, le prende volentieri.',
+         f:function(){ repUp(1); }}]},
  {id:'nebbia',src:'Radio Traffico Nord',title:'Nebbia in Val Padana',cond:()=>[10,11,0,1].includes(monthOf(S.day)),
   text:'Stamattina la Val Padana è sparita sotto la nebbia: visibilità sotto i 50 metri da Pavia a Brescia, e la radio parla già di tamponamenti sulla A4. Gli autisti chiamano uno dopo l\'altro: vogliono sapere se possono rallentare, anche a costo di arrivare tardi dai clienti.',
   opts:[{t:'Rallenta tutto',d:'Mandi un messaggio a tutti: velocità ridotta, fari accesi e nessuna fretta. I clienti aspetteranno.',e:'Puntualità −4 per 5 giorni',r:'Gli autisti arrivano tardi ma tutti interi. Qualche cliente brontola, nessuno si fa male.',f:()=>mod('all',{P:-4},5)},
@@ -5490,6 +5510,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.43',t:'Ci vediamo in tribunale',x:['Nuovo evento: qualche settimana dopo un licenziamento la persona può impugnarlo e chiedere di tornare. La riassumi, chiudi con una conciliazione, vai in tribunale (rischioso, meglio con un CEO bravo in Amministrazione) o, se sai negoziare, le trovi un posto da un cliente.']},
  {v:'0.42',t:'Tagli e reputazione',x:['Licenziare ora pesa anche sulla reputazione (−0,3 a persona), oltre alla buonuscita e al calo di morale nel magazzino.','Dal quarto licenziamento in un mese scatta l\'ondata: finisce sul giornale, la reputazione scende di più e il morale cala di 2 punti in tutti i magazzini. Per i picchi della stagione conviene la cooperativa, che si manda via gratis.','Anche le aziende CPU licenziano quando finisce la stagione di picco, guardando il mese dopo per non restare scoperte. Le Facili sono prudenti, le Normali evitano le ondate, le Spietate tagliano senza pietà e finiscono sul giornale.']},
  {v:'0.41',t:'Mese per mese',x:['La stagionalità delle committenti ora va mese per mese: agosto chiuso per l\'industria e i cantieri, il Black Friday a novembre per elettronica ed e-commerce, il cambio gomme a marzo-aprile e ottobre-novembre, la colomba di Pasqua e il panettone a novembre-dicembre, la cartoleria prima della scuola, le mele a settembre.','Sotto il grafico della committente ci sono il mese di picco e quello più vuoto; toccando il grafico si vedono tutti e dodici i mesi.']},
  {v:'0.40',t:'Avversari Standard',x:['Le aziende CPU partono tutte con un comportamento Standard, equilibrato tra prezzo, qualità e crescita, a difficoltà Normale.','Nella lobby comportamento e difficoltà di ogni azienda CPU stanno in una tendina chiusa che mostra la scelta attuale: aprila per cambiarli (Standard, Prezzo, Qualità, Espansione; Facile, Normale, Spietato).']},
