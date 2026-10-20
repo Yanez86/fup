@@ -222,6 +222,9 @@ async def phone(b, w, h, name, errs):
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
         bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
         assert not bad, f'{name}: finestra {wn}: {bad}'
+        # le cifre in colonna non vanno a capo (ogni numero resta su una riga)
+        rotti = await pg.evaluate("""w=>[...document.querySelectorAll(w+' table.num td.r')].filter(td=>{const r=document.createRange();r.selectNodeContents(td);return new Set([...r.getClientRects()].filter(x=>x.width>0).map(x=>Math.round(x.top))).size>1&&!td.textContent.includes('/')}).map(td=>td.textContent)""", f'#win-{wn}')
+        assert not rotti, f'{name}: finestra {wn}: numeri a capo {rotti}'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_dato_{wn}.png'), full_page=True)
         if wn == 'cassa':
             # il bot dei tre anni a volte fallisce: per provare il prestito l'azienda torna in piedi
