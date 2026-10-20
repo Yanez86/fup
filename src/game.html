@@ -161,6 +161,14 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .rp-ev{display:flex;flex-direction:column;gap:1px;padding:4px 0;border-bottom:1px dashed var(--line);font-size:14px}
 .mob .rp-mod3{grid-template-columns:minmax(0,1fr)}
 .rp-scroll{overflow-x:auto}
+.card.fin-h{flex-direction:row;gap:12px;align-items:center;border-width:3px}.fin-h.ok{background:#e3f4d9}.fin-h.bad{background:#fde3e3}.fin-h.warn{background:#fff4c7}
+.fin-hb{display:flex;flex-direction:column;gap:3px;min-width:0}
+.fin-esito{font-family:var(--f-disp);font-size:28px;line-height:1.05}
+.card.fin-rk{align-items:flex-start;gap:2px;background:#2a3a50;color:#fff}.fin-rk .lab{color:#c9d3dd}.fin-rk b{font-size:24px;color:#ffd23f}.fin-rk .sm{color:#e3e9ef}
+.fin-cr{display:grid;grid-template-columns:24px 92px minmax(0,1fr);gap:8px;align-items:center;padding:4px 0;border-bottom:1px dashed var(--line);font-size:14px}.fin-cr:last-child{border-bottom:0}
+.fin-ic{display:flex}.fin-yc{display:flex;flex-direction:column;gap:2px;padding:6px 0;border-bottom:1px dashed var(--line)}.fin-yc:last-of-type{border-bottom:0}.fin-me td{background:#fff8dc}
+.mob .fin-cr{grid-template-columns:24px minmax(0,1fr)}.mob .fin-cr>span:last-child{grid-column:2}
+.mob .fin-esito{font-size:24px}
 .lnk{border:0;background:none;padding:0;font:inherit;color:#2f5fa0;text-decoration:underline;cursor:pointer;text-align:left}
 .mob .rp-tiles,.mob .rp-tiles.c4{grid-template-columns:repeat(2,minmax(0,1fr))}
 .mob .rp-hr{grid-template-columns:minmax(0,120px) minmax(30px,1fr) auto}
@@ -2218,6 +2226,14 @@ wk('vittoria','basi','Condizioni di vittoria',`Si scelgono nella lobby, anche pi
 • **Al traguardo**: il 1° gennaio del 2008, 2012 o 2020 vince l'azienda con il [[valore]] più alto.
 
 Se vince un'altra azienda hai perso la partita, ma puoi continuare a giocare per l'onore; se fallisci tu la partita finisce. A che punto è ognuno lo vedi in [[classifica]].`);
+wk('report_finale','basi','Report della partita',`Il resoconto di tutta la partita: com'è finita, i numeri totali, la crescita anno per anno e la cronaca delle tappe importanti.`,
+`Si apre da solo a fine partita (pulsante «Report della partita» quando vinci, perdi o fallisci) e in ogni momento dal [[riepilogo|Riepilogo]], scheda Panoramica. Ha cinque schede:
+
+<b>Sintesi</b>: l'esito, il titolo che ti sei guadagnato (dipende dal miglior [[ricavi|fatturato]] in 12 mesi: da «Padroncino con ambizioni» a «Colosso dell'interporto»), i totali di tutta la partita (fatturato, utile, pallet, viaggi, [[gare]] vinte, [[penali]], ricerche) e i record.
+<b>Crescita</b>: grafici di fatturato e utile, dipendenti (magazzino, autisti, ufficio traffico), magazzini e clienti, cassa e [[prestiti|debito]], [[puntualita|puntualità]] e [[accuratezza]], [[reputazione]] e [[morale]], pallet movimentati. Nei primi tre anni un punto per mese, poi un punto per anno.
+<b>Anno per anno</b>: una riga per ogni anno, con i totali in fondo.
+<b>Cronaca</b>: le tappe della partita in ordine di data: magazzini aperti, gare vinte, clienti persi, ricerche, [[eventi]], prestiti, cambi di [[ceo|CEO]] e traguardi (10, 25, 50... dipendenti; 1, 3, 6... milioni di fatturato in 12 mesi; reputazione 50, 70, 90).
+<b>Avversari</b>: la classifica finale per [[valore]] e il fatturato di ogni anno azienda per azienda (solo se giochi contro altre aziende).`);
 wk('valore','eco','Valore dell\'azienda',`Cassa meno prestiti, più magazzini di proprietà e motrici, più due volte l'utile degli ultimi 12 mesi (se positivo).`,
 `È il numero che ordina la [[classifica]] e decide la [[vittoria]] «Al traguardo». I magazzini di proprietà valgono 120 € a posto pallet e le motrici 30.000 € l'una, come nel [[bilancio]]; i [[prestiti]] ancora da restituire si tolgono. L'utile conta perché chi compra un'azienda paga anche quello che guadagnerà.`);
 wk('classifica','basi','Classifica',`Le aziende in gara in ordine di valore, con cassa, fatturato, clienti, magazzini, reputazione e i progressi verso la vittoria.`,
@@ -2390,6 +2406,7 @@ function newGame(ceoId,coName,color,custom,co){
      execs:EXECS.map(newPerson),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false,hist:[],tw:{win:0,lose:0,skip:0},pol:{},notes:[],noteId:0};
   const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,capo:0,autB:0,autCE:1,imp:1,fm:0};
   (C.startTech||[]).forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true;});
+  S.log=[{d:0,ic:'azienda',t:`Nasce ${S.company.name}: ${C.name} apre il primo magazzino a ${wh.name}`}]; S.yrs=[];
   S.clients.push({id:nid('c'),...C.client,zone:cinfo(C.client).zones[0],src:cinfo(C.client).src,mode:cinfo(C.client).mode,wh:wh.id,mult:1,sat:70,status:'attivo',start:0,end:24*30,storico:true});
   chMigrate(); // autisti B per la parte di merce che va con i furgoni
   {const k=computeWH(wh); wh.staff.autCE=Math.max(wh.staff.autCE,k.need.autCE); wh.staff.autB=Math.max(wh.staff.autB,k.need.autB);} // si parte con gli autisti che servono al cliente storico
@@ -2524,7 +2541,7 @@ function newBoss(c){ const old=S.boss, p=c.p, nb={id:p.id,name:p.name,sx:p.sx,bd
     p.hired=false; p.wh=null; p.quit=null; p.retired=true; p.promoted=true; nb.img='m_'+p.id; nb.origin=c.k==='in'?`Promoss${oa(p)} dall'interno`:`Scelt${oa(p)} dall'head hunter`; nb.bio=`${p.role}. Diventa CEO di ${S.company.name} nel ${yearOf(S.day)}.`; }
   else if(c.k==='f'){ (S.usedF=S.usedF||[]).push(p.id); nb.img=p.id; nb.origin=p.origin; nb.bio=`${p.bio} Nel ${yearOf(S.day)} lascia ${p.company} per guidare ${S.company.name}.`; }
   else { nb.img='anon'; nb.origin='Nipote del fondatore'; nb.bio=`Laurea in Bocconi, due anni a Londra e un cognome che in magazzino conoscono tutti. Prende il posto dello zio nel ${yearOf(S.day)}.`; }
-  plog(nb,`Diventa CEO di ${S.company.name}`);
+  plog(nb,`Diventa CEO di ${S.company.name}`); chron('azienda',`${nb.name} prende il posto di ${old.name} come CEO`);
   (S.alumni=S.alumni||[]).push({name:old.name,from:old.since||0,to:S.day});
   S.boss=nb;
   news('La Gazzetta del Muletto',`${nb.name} è il nuovo CEO di ${S.company.name}`,`${old.name} va in pensione dopo ${Math.max(1,Math.round((S.day-(old.since||0))/365))} anni. Il passaggio di consegne è avvenuto con una stretta di mano e un mazzo di chiavi che nessuno sa più a cosa servono.`);
@@ -2821,7 +2838,7 @@ function step(){
   S.cash+=dRic-dCost;
   polDaily();
   // ricerca in corso
-  if(S.project){ S.project.left--; if(S.project.left<=0){ const t=TECH.find(x=>x.id===S.project.tech); S.project=null; S.researched[t.id]=true;
+  if(S.project){ S.project.left--; if(S.project.left<=0){ const t=TECH.find(x=>x.id===S.project.tech); S.project=null; S.researched[t.id]=true; chron('tecnologia',`Ricerca completata: ${t.name}`);
     if(t.id==='iso'||t.id==='marketing') S.rep=clamp(S.rep+5,0,100);
     news('La Gazzetta del Muletto',`Ricerca completata: ${t.name}`,perWh(t)?'Ora si può installare nei magazzini dalla finestra Tecnologia.':t.desc);
     if(t.id==='direzione') notify('green','direzione','La Gazzetta del Muletto','Nasce la squadra dei dirigenti','La struttura direzionale è pronta. Dal menu Direzione nomina fino a cinque direttori: ognuno guida un\'area di tutta l\'azienda con la sua abilità principale.','direzione');
@@ -2870,8 +2887,29 @@ function histPush(c){
     P:avg(w=>kp(w,'P')||0),A:avg(w=>kp(w,'A')||0),sat:avg(w=>w.kpi?w.kpi.sat*100:0),mor:avg(w=>w.morale),
     mov:wk.reduce((a,x)=>a+Object.values(x.rows).reduce((b,r)=>b+r.mov,0),0),trips:wk.reduce((a,x)=>a+Object.values(x.rows).reduce((b,r)=>b+r.trips,0),0),
     staff,cli:S.clients.filter(x=>x.status==='attivo').length,wh:ws.length,stock:ws.reduce((a,w)=>a+(w.kpi?w.kpi.stock:0),0),cap:ws.reduce((a,w)=>a+capOf(w),0)});
-  if(H.length>(S.bot?24:240)) H.shift();
+  if(H.length>(S.bot?24:600)) H.shift();
+  // a gennaio l'anno appena chiuso va nell'archivio (resta anche quando i mesi vecchi escono da S.hist)
+  if(dateOf(S.day).getUTCMonth()===0){ const y=yearOf(S.day-1); S.yrs=(S.yrs||[]).filter(r=>r.y!==y); S.yrs.push(yrSum(H,y)); }
+  if(!S.bot) chronMiles();
 }
+// riassunto di un anno dai mesi di S.hist: somme per i soldi e i pallet, la fine dell'anno per persone, magazzini e clienti
+const histStaff=h=>h&&h.staff?Object.values(h.staff).reduce((a,v)=>a+v,0):0;
+function yrSum(H,y){ const R=H.filter(h=>yearOf(h.d-1)===y), L=R[R.length-1]||{}, sm=k=>R.reduce((a,h)=>a+(h[k]||0),0), av=k=>R.length?sm(k)/R.length:0;
+  return {y,n:R.length,ric:sm('ric'),util:sm('util'),pen:sm('pen'),mov:sm('mov'),trips:sm('trips'),staff:histStaff(L),peak:Math.max(0,...R.map(histStaff)),sg:sGrp(L.staff),wh:L.wh||0,cli:L.cli||0,rep:L.rep||0,cash:L.cash||0,debt:L.debt||0,P:av('P'),A:av('A'),mor:av('mor')}; }
+// anni di un'azienda: quelli archiviati più quelli ancora solo in S.hist (l'anno in corso, o i salvataggi di prima della 0.48)
+function yrsOf(c){ const o={}; (c.yrs||[]).forEach(r=>o[r.y]=r); const H=c.hist||[];
+  [...new Set(H.map(h=>yearOf(h.d-1)))].forEach(y=>{ const r=yrSum(H,y); if(!o[y]||(o[y].n<r.n)) o[y]=r; });
+  return Object.values(o).sort((a,b)=>a.y-b.y); }
+/* cronaca della partita: le tappe importanti per il report di fine partita (solo l'azienda del giocatore) */
+function chron(ic,t,k){ if(isBot()||!S) return; const L=S.log=S.log||[]; if(k&&L.some(x=>x.k===k)) return;
+  L.push({d:S.day,ic,t,...(k?{k}:{})}); if(L.length>400) L.splice(1,1); }
+// traguardi controllati a fine mese: primo utile, dipendenti, fatturato in 12 mesi, reputazione
+const MILE_STAFF=[10,25,50,100,200,400,800], MILE_REV=[1e6,3e6,6e6,12e6,25e6,50e6], MILE_REP=[50,70,90];
+function chronMiles(){ const H=S.hist, L=H[H.length-1]; if(!L) return;
+  if(L.util>0) chron('cassa','Primo mese chiuso in utile: '+eur(L.util),'m_ut');
+  const st=histStaff(L); MILE_STAFF.forEach(n=>{ if(st>=n) chron('personale',`L'azienda arriva a ${n} dipendenti`,'m_st'+n); });
+  const r=H.slice(-12).reduce((a,h)=>a+h.ric,0); MILE_REV.forEach(n=>{ if(r>=n) chron('riepilogo',`Fatturato oltre ${euK(n)} in 12 mesi`,'m_rv'+n); });
+  MILE_REP.forEach(n=>{ if(S.rep>=n) chron('classifica',`Reputazione a ${n}: i buyer ti chiamano per nome`,'m_rp'+n); }); }
 function monthEnd(){
   S.months++;
   // guasti nei magazzini senza facility manager
@@ -2895,16 +2933,16 @@ function monthEnd(){
     const miss=Math.max(0,-wP)+(c.sA?Math.max(0,-wA):0), p=clientRev(c)*Math.min(PEN_MAX,penPct(c)*miss)/100; c.lastPen=p; pen+=p;
     if(p>=1) news('Il Sole 24 Pallet',`Penale da ${c.name}`,`KPI sotto soglia di ${f1(miss)} punti: il contratto prevede ${eur(p)} di penale.`);
     c.sat=clamp(c.sat,0,100);
-    if(c.sat<25){c.status='perso';S.rep-=rankOf(c).lost;notify('red','clienti','Il Sole 24 Pallet',`${c.name} ha disdetto il contratto`,'«Ritardi ed errori non sono più accettabili», fa sapere il cliente: la soddisfazione era scesa sotto il 25%.','clienti');news('Il Sole 24 Pallet',`${c.name} lascia ${S.company.name}`,`"Ritardi ed errori non sono più accettabili", fa sapere il cliente.`);}
+    if(c.sat<25){c.status='perso';S.rep-=rankOf(c).lost;chron('clienti',`${c.name} disdice il contratto: ritardi ed errori di troppo`);notify('red','clienti','Il Sole 24 Pallet',`${c.name} ha disdetto il contratto`,'«Ritardi ed errori non sono più accettabili», fa sapere il cliente: la soddisfazione era scesa sotto il 25%.','clienti');news('Il Sole 24 Pallet',`${c.name} lascia ${S.company.name}`,`"Ritardi ed errori non sono più accettabili", fa sapere il cliente.`);}
     else if(c.exit){ /* in uscita: niente rinnovo */ }
-    else if(S.day>=c.end&&c.noRenew){c.status='perso';c.ended='scaduto';noteVar('cli',`Contratto con ${c.name} concluso`);news('Il Sole 24 Pallet',`${S.company.name} non rinnova con ${c.name}`,`Il contratto è scaduto e non è stato rinnovato: nessuna penale.`);}
+    else if(S.day>=c.end&&c.noRenew){c.status='perso';c.ended='scaduto';chron('clienti',`Finisce il contratto con ${c.name}, senza rinnovo`);noteVar('cli',`Contratto con ${c.name} concluso`);news('Il Sole 24 Pallet',`${S.company.name} non rinnova con ${c.name}`,`Il contratto è scaduto e non è stato rinnovato: nessuna penale.`);}
     else if(S.day>=c.end){
       const dur=c.dur||24;
       if(c.sat>=(R('kam')?40:50)){c.end=S.day+dur*30;c.warned=false;
         // al rinnovo il buyer rinegozia: un ricarico sul listino scende di 5 punti (mai sotto il listino)
         const m0=c.mult; if(m0>1) c.mult=Math.max(1,Math.round((m0-RENEW_CUT)*100)/100);
         noteVar('cli',`${c.name} rinnova per altri ${dur} mesi`);news('Il Sole 24 Pallet',`${c.name} rinnova`,`Contratto prolungato di ${dur} mesi.${c.mult<m0?` Il buyer ottiene uno sconto: il prezzo passa da ${sgnp((m0-1)*100)} a ${sgnp((c.mult-1)*100)} sul listino.`:''}`);}
-      else {c.status='perso';notify('red','clienti','Il Sole 24 Pallet',`${c.name} non rinnova`,'Il contratto è scaduto e il cliente passa alla concorrenza: la soddisfazione non bastava.','clienti');news('Il Sole 24 Pallet',`${c.name} non rinnova`,`Il cliente passa alla concorrenza.`);}
+      else {c.status='perso';chron('clienti',`${c.name} non rinnova e passa alla concorrenza`);notify('red','clienti','Il Sole 24 Pallet',`${c.name} non rinnova`,'Il contratto è scaduto e il cliente passa alla concorrenza: la soddisfazione non bastava.','clienti');news('Il Sole 24 Pallet',`${c.name} non rinnova`,`Il cliente passa alla concorrenza.`);}
     }
   });
   S.clients.filter(c=>c.status==='attivo'&&!c.exit&&!c.warned&&c.end-S.day<=60).forEach(c=>{c.warned=true;
@@ -3012,14 +3050,15 @@ function resolveTender(t){
 // il contratto vinto entra nell'azienda S (il giocatore o un'avversaria)
 function winTender(t,bid){
   const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,zone:t.zone,src:t.src,mode:t.mode,wh:bid.wh,mult:bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+(t.dur||24)*30,dur:t.dur||24};
-  S.clients.push(c); if(!S.bot) t.result={win:true}; S.tw.win++; repUp(rankOf(c).win);
+  S.clients.push(c); if(!S.bot) t.result={win:true}; S.tw.win++; repUp(rankOf(c).win); chron('gare',`Vinta la gara di ${t.name} per ${zoneName(t.zone)}`);
   if(S.bot&&HUM) withCo(HUM,()=>{ if(!t.bid) news('Il Sole 24 Pallet',`${t.name} sceglie ${t.result.by}`,`La gara per ${zoneName(t.zone)} va a ${t.result.by}. Noi non avevamo fatto offerte.`); });
   return c;
 }
 function gameOver(){
+  if(!S.over){ S.overDay=S.day; chron('cassa','La cassa scende sotto i −50.000 €: l\'azienda fallisce'); }
   S.over=true; S.speed=0; save();
   const yrs=(S.day/365).toFixed(1).replace('.',',');
-  showModal(`<div class="src"><span>Il Sole 24 Pallet</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:22px">${esc(S.company.name)} porta i libri in tribunale</h3><p style="margin:0">Dopo ${yrs} anni la cassa è scesa sotto i −50.000 €. ${esc(ceo().name)} commenta: "Era meglio fare il padroncino".</p><button class="btn pri" data-act="restart">Nuova partita</button></div>`);
+  showModal(`<div class="src"><span>Il Sole 24 Pallet</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:22px">${esc(S.company.name)} porta i libri in tribunale</h3><p style="margin:0">Dopo ${yrs} anni la cassa è scesa sotto i −50.000 €. ${esc(ceo().name)} commenta: "Era meglio fare il padroncino".</p><div class="row"><button class="btn" data-act="finale">Report della partita</button><button class="btn pri" data-act="restart">Nuova partita</button></div></div>`);
 }
 
 /* ====================== AVVERSARI ====================== */
@@ -3066,7 +3105,7 @@ function botBust(b){
   b.over=true; b.overDay=b.day;
   b.clients.forEach(c=>{if(c.status!=='perso') c.status='perso';});
   [...b.managers,...b.execs].forEach(p=>{p.hired=false; p.wh=null;});
-  withCo(HUM,()=>{ news('Il Sole 24 Pallet',`${b.company.name} porta i libri in tribunale`,`La cassa è scesa sotto i −50.000 €. I suoi magazzini tornano in affitto, i suoi clienti cercano un nuovo logistico e ${b.boss.name} commenta: «Era meglio fare il padroncino».`);
+  withCo(HUM,()=>{ chron('classifica',`${b.company.name} di ${b.boss.name} fallisce`); news('Il Sole 24 Pallet',`${b.company.name} porta i libri in tribunale`,`La cassa è scesa sotto i −50.000 €. I suoi magazzini tornano in affitto, i suoi clienti cercano un nuovo logistico e ${b.boss.name} commenta: «Era meglio fare il padroncino».`);
     notify('yellow','classifica','Il Sole 24 Pallet',`${b.company.name} fallisce`,`${b.boss.name} chiude: i magazzini di ${b.warehouses.map(w=>w.name).join(', ')} tornano liberi e i suoi clienti presto cercheranno un nuovo logistico con delle gare. Restano in corsa ${liveCo().length} aziende.`,'classifica'); });
 }
 function botThink(){
@@ -3191,7 +3230,7 @@ function checkWin(){
     if(id==='traguardo'&&yearOf(HUM.day)>=cfg.traguardo){w=L.reduce((a,c)=>coValue(c)>coValue(a)?c:a,L[0]);why=id;}
     if(w) break; }
   if(!w) return;
-  HUM.won={co:w.bot?w.bot.id:'me',why,day:HUM.day}; save();
+  HUM.won={co:w.bot?w.bot.id:'me',why,day:HUM.day}; withCo(HUM,()=>chron('classifica',w===HUM?`Vinci la partita: ${WINS[why].n}`:`${w.company.name} vince la partita: ${WINS[why].n}`)); save();
   showWin(w,why);
 }
 function showWin(w,why){
@@ -3202,7 +3241,7 @@ function showWin(w,why){
   showModal(`<div class="src"><span>Il Sole 24 Pallet</span><span>${shortDate(HUM.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:22px">${me?'Hai vinto!':`Ha vinto ${esc(w.company.name)}`}</h3>
    <div class="ev-who"><span><img class="px" src="${ceoImg(w.boss)}" alt="" width="36" height="42">${esc(w.boss.name)}</span><span>${coLogoSvg(w.company.logo,w.company.color,28)}${esc(w.company.name)}</span></div>
    <p class="ev-x">${me?`Condizione di vittoria «${esc(WINS[why].n)}»: ${esc(winTxt(why,cfg))} In magazzino si stappa lo spumante e qualcuno scrive il tuo nome sul pallet numero uno.`:`Condizione di vittoria «${esc(WINS[why].n)}»: ${esc(winTxt(why,cfg))} Nei bar del piazzale non si parla d'altro. Tu puoi rifarti in una nuova partita, o continuare a giocare per l'onore.`}</p>
-   <div class="row"><button class="btn" data-act="openclass">Classifica</button><button class="btn" data-act="closemodal">Continua a giocare</button><button class="btn pri" data-act="restart">Nuova partita</button></div></div>`);
+   <div class="row"><button class="btn" data-act="finale">Report della partita</button><button class="btn" data-act="openclass">Classifica</button><button class="btn" data-act="closemodal">Continua a giocare</button><button class="btn pri" data-act="restart">Nuova partita</button></div></div>`);
 }
 /* ====================== EVENTI ====================== */
 function mod(scope,o,days){S.mods.push({scope,...o,until:S.day+days,src:UI.modSrc||null});  // src: titolo dell'evento, per il Riepilogo
@@ -3846,7 +3885,7 @@ function evResolve(p){
   const ev=evUnpack(p,p.title,p.src); if(!ev) return;
   const o=ev.opts[p.i]; if(!o) return;
   UI.chg=[]; UI.evMsg=[]; evApply(ev,o); const ch=UI.chg, msg=UI.evMsg; UI.chg=null; UI.evMsg=null;
-  news(ev.src,`${ev.title}: com'è andata`,o.r||o.d||'');
+  news(ev.src,`${ev.title}: com'è andata`,o.r||o.d||''); chron('evento',`${ev.title}: «${o.t}»`);
   noteAdd({k:'res',col:'blue',ic:'evento',src:ev.src,title:ev.title,text:o.r||o.d||'',pick:o.t,eff:o.e,msg,ch:ch.map(c=>({...c,p:c.p.id}))});
 }
 function pinIcon(){const P=['..XXXX..','.XOOOOX.','XOOXXOOX','XOOXXOOX','.XOOOOX.','..XOOX..','...XX...'];let r='';P.forEach((row,y)=>[...row].forEach((c,x)=>{if(c!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${c==='X'?TPAL.K:TPAL.O}"/>`;}));return `<svg width="18" height="16" viewBox="-1 -1 10 9" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
@@ -4201,7 +4240,7 @@ const DOCK=[
  ['enciclopedia','Enciclopedia (tasto E)','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="1" y="0" width="9" height="10" fill="#9b6bff"/><rect x="1" y="0" width="2" height="10" fill="#6f43cf"/><rect x="3" y="9" width="7" height="2" fill="#fff"/><rect x="5" y="2" width="3" height="1" fill="#ffd23f"/><rect x="7" y="3" width="1" height="2" fill="#ffd23f"/><rect x="6" y="5" width="1" height="1" fill="#ffd23f"/><rect x="6" y="7" width="1" height="1" fill="#ffd23f"/></svg>'],
  ['giornale','Il giornale','<svg width="24" height="20" viewBox="0 0 12 10" shape-rendering="crispEdges"><rect x="0" y="0" width="12" height="10" fill="#f4f1ec"/><rect x="1" y="1" width="10" height="2" fill="#16202e"/><rect x="1" y="4" width="4" height="4" fill="#8a96a6"/><rect x="6" y="4" width="5" height="1" fill="#16202e"/><rect x="6" y="6" width="5" height="1" fill="#16202e"/></svg>']
 ];
-const TITLES={classifica:'Classifica',policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',traffico:'Ufficio traffico',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP',cassa:'Cassa e bilancio',mese:'Conti del mese scorso',morale:'Morale dei dipendenti',otif:'OTIF e livelli di servizio'};
+const TITLES={finale:'Report della partita',classifica:'Classifica',policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',traffico:'Ufficio traffico',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP',cassa:'Cassa e bilancio',mese:'Conti del mese scorso',morale:'Morale dei dipendenti',otif:'OTIF e livelli di servizio'};
 // sul telefono il menu è raggruppato e ogni voce dice in una riga come sta il suo reparto
 const DOCK_G=[['Operazioni',['magazzini','traffico','personale','clienti','gare','espansione']],['Azienda',['azienda','riepilogo','direzione','policy','tecnologia']],['Informazioni',['classifica','report','enciclopedia','giornale']]];
 DOCK.forEach(d=>{if(ICONE.menu[d[0]])d[2]=pxSvg(ICONE.menu[d[0]],32);});  // icone 16x16 a 32 px (tools/icone_gioco)
@@ -4253,7 +4292,7 @@ function openWin(id,opts){
   UI.open[id]=true; if(opts) Object.assign(UI.sel,opts); noteSeenWin(id);
   let el=document.getElementById('win-'+id);
   if(!el){
-    el=document.createElement('section'); el.className='win'+(id==='enciclopedia'?' wkw':id==='tecnologia'||id==='report'||id==='riepilogo'?' xwide':['magazzini','gare','azienda','direzione','cassa','mese','morale','otif','classifica'].includes(id)?' wide':''); el.id='win-'+id;
+    el=document.createElement('section'); el.className='win'+(id==='enciclopedia'?' wkw':id==='tecnologia'||id==='report'||id==='riepilogo'||id==='finale'?' xwide':['magazzini','gare','azienda','direzione','cassa','mese','morale','otif','classifica'].includes(id)?' wide':''); el.id='win-'+id;
     el.setAttribute('aria-label',TITLES[id]);
     const i=Object.keys(UI.pos).length; const p=UI.pos[id]||{x:Math.min(innerWidth-420,90+((i*36)%240)),y:86+((i*30)%180)};
     if(id==='magazzini'||id==='gare'){p.x=Math.max(90,innerWidth-680);} if(id==='enciclopedia'){p.x=Math.max(90,innerWidth-900);p.y=86;} if(id==='tecnologia'){p.x=90;}
@@ -4331,6 +4370,26 @@ const modTxt=m=>Object.keys(MOD_N).filter(k=>m[k]).map(k=>`<span class="${m[k]>0
 function rpPerson(p,role,extra){
   return `<div class="rp-pp"><div class="rp-ppn"><b>${esc(p.name)}</b><span class="sm">${role}</span></div>${statChips(p.st,14)}${(p.tal||[]).length?talentIcons(p.tal,22):''}
    ${(p.tal||[]).filter(n=>TALENTS[n]).map(n=>`<div class="sm rp-fx"><b>${esc(n)}</b>: ${esc(TALENTS[n].fx)}</div>`).join('')}${extra||''}</div>`;}
+// ---- report di fine partita ----
+const FIN_TABS=[['sint','Sintesi'],['cresc','Crescita'],['anni','Anno per anno'],['cron','Cronaca'],['avv','Avversari']];
+// persone per gruppo: magazzino (con capiturno, impiegati e facility manager), autisti, ufficio traffico
+const sGrp=st=>{st=st||{}; return {m:(st.pick||0)+(st.car||0)+(st.capo||0)+(st.imp||0)+(st.fm||0),a:(st.autB||0)+(st.autCE||0),u:st.plan||0};};
+// il titolo di fine partita dipende dal fatturato migliore in 12 mesi
+const FIN_RANK=[[0,'Padroncino con ambizioni','Un magazzino, tanta buona volontà e un furgone che fa un rumore strano in quarta.'],
+ [1e6,'Terzista di fiducia','I clienti ti chiamano quando il loro logistico non risponde al telefono.'],
+ [3e6,'Operatore logistico regionale','Sulla tangenziale riconoscono i tuoi camion, e qualcuno suona per salutare.'],
+ [8e6,'Big del Nord','Agli Stati generali del pallet ti danno la sedia in prima fila, quella con il cuscino.'],
+ [20e6,'Colosso dell\'interporto','Quando sbagli una consegna ne parla il telegiornale regionale.']];
+function finRank(){
+  if(S.over) return [0,'Era meglio fare il padroncino','I libri sono in tribunale, ma il muletto te lo sei tenuto: non si sa mai.'];
+  const H=S.hist||[]; let b=0; for(let i=0;i<H.length;i++) b=Math.max(b,H.slice(Math.max(0,i-11),i+1).reduce((a,h)=>a+h.ric,0));
+  yrsOf(S).forEach(r=>{ if(r.n===12) b=Math.max(b,r.ric); });
+  const r=[...FIN_RANK].reverse().find(x=>b>=x[0]); return HUM&&HUM.won&&HUM.won.co==='me'&&r[0]<8e6?[r[0],r[1]+' e campione',r[2]+' E stavolta hai vinto tu.']:r; }
+function finOutcome(){
+  if(S.over) return {cls:'bad',t:'Fallimento',s:`Il ${shortDate(S.overDay||S.day)} la cassa è scesa sotto i −50.000 € e l'azienda ha portato i libri in tribunale.`};
+  const w=HUM.won; if(w){ const co=w.co==='me'?HUM:rivals().find(b=>b.bot.id===w.co);
+    return w.co==='me'?{cls:'ok',t:'Vittoria',s:`Il ${shortDate(w.day)} hai vinto la partita: ${WINS[w.why].n}.`}:{cls:'warn',t:'Sconfitta',s:`Il ${shortDate(w.day)} ha vinto ${co?co.company.name:'un\'altra azienda'}: ${WINS[w.why].n}.`}; }
+  return {cls:'',t:'Partita in corso',s:'Ecco come sta andando finora: il report si completa quando la partita finisce.'}; }
 const RP_TABS=[['gen','Panoramica'],['soldi','Conti'],['op','Operazioni'],['cli','Clienti'],['pers','Persone'],['mod','Modificatori']];
 const RP_COST=[['pers','Personale','#2f7fd6'],['mezzi','Mezzi e gasolio','#ff7a3d'],['fissi','Immobili e fissi','#7b4fe0'],['tech','Tecnologie','#1f9e8f'],['mgr','Manager','#c98a00'],['welf','Welfare e benefit','#c2185b'],['pen','Penali','#e0393e'],['altro','Altro (una tantum ed eventi)','#8a96a6'],['int','Interessi sui prestiti','#5a6b80']];
 const costOf=h=>RP_COST.reduce((a,[k])=>a+(h[k]||0),0);
@@ -4777,7 +4836,7 @@ const VIEWS={
     </div>
     <div class="lc-row">${lineChart('rp_cash',{title:'Cassa a fine mese',labels:lab,xl:'',nice:1,min:-1e12,max:1e12,ml:62,mr:14,labels2:false,fmt:fE,ax:euK,empty,series:[{n:'Cassa',c:SERIES_C[0],v:H.map(h=>h.cash)}],w:440,h:220,maxLab:5})}
     ${rpCols('Utile di ogni mese',lab.slice(-24),H.slice(-24).map(h=>h.util),empty)}</div>
-    <div class="sm">Ogni numero si apre nell'enciclopedia. I grafici si aggiornano alla fine di ogni mese, quando si chiudono i conti.</div>`;
+    <div class="row" style="align-items:center"><span class="sm">Ogni numero si apre nell'enciclopedia. I grafici si aggiornano alla fine di ogni mese, quando si chiudono i conti.</span><button class="btn sm2" data-act="finale">Report della partita</button></div>`;
   } else if(tab==='soldi'){
     const y12=H.slice(-12), sR=y12.reduce((a,h)=>a+h.ric,0), sC=y12.reduce((a,h)=>a+costOf(h),0), tot=H.reduce((a,h)=>a+h.util,0), pen=H.reduce((a,h)=>a+(h.pen||0),0);
     const years={}; H.forEach(h=>{const y=yearOf(h.d-1); const o=years[y]||(years[y]={r:0,c:0,n:0}); o.r+=h.ric; o.c+=costOf(h); o.n++;});
@@ -5015,6 +5074,91 @@ const VIEWS={
    <div class="sm">Dopo un cambio servono ${wks(TR_CD)} prima di poter cambiare di nuovo la stessa regola.</div></div>
   ${G.length?G.sort((a,b)=>(a[1].rev-a[1].cost)-(b[1].rev-b[1].cost)).map(card).join(''):'<div class="sm">Nessun cliente attivo in questo magazzino.</div>'}`;
  },
+ // ---- report di fine partita: esito, numeri di tutta la partita, crescita, anno per anno, cronaca, avversari ----
+ finale(){
+  const tabs0=FIN_TABS.filter(t=>t[0]!=='avv'||rivals().length), tab=tabs0.some(t=>t[0]===UI.tab.fin)?UI.tab.fin:'sint'; UI.tab.fin=tab;
+  const H=S.hist||[], Y=yrsOf(S), end=S.over?(S.overDay||S.day):S.day, out=finOutcome(), tw=S.tw||{win:0,lose:0,skip:0}, bids=tw.win+tw.lose;
+  const ws=S.warehouses, staffNow=ROLES.reduce((a,r)=>a+ws.reduce((b,w)=>b+w.staff[r],0),0)+S.office.plan;
+  const sm=k=>Y.reduce((a,r)=>a+(r[k]||0),0), yrs=Math.floor(end/365), mos=Math.floor((end%365)/30.4);
+  const tabs=`<div class="tabs rp-tabs" role="tablist">${tabs0.map(([id,n])=>`<button role="tab" aria-selected="${id===tab}" data-act="fintab" data-id="${id}">${n}</button>`).join('')}</div>`;
+  const ceos=[...(S.alumni||[]).map(a=>`${esc(a.name)} <span class="sm">(${yearOf(a.from)}–${yearOf(a.to)})</span>`),`${esc(S.boss.name)} <span class="sm">(dal ${yearOf(S.boss.since||0)})</span>`];
+  const head=`<div class="card fin-h ${out.cls}"><img class="px" src="${ceoImg(S.boss)}" alt="" width="72" height="84"><div class="fin-hb">
+    <span class="fin-esito">${esc(out.t)}</span><span class="co-tag">${coLogoSvg(S.company.logo,S.company.color,28)}<b class="h3">${esc(S.company.name)}</b></span>
+    <span class="sm">${esc(out.s)}</span><span class="sm">Dal ${shortDate(0)} al ${shortDate(end)}: ${yrs?yrs+(yrs>1?' anni':' anno')+' e ':''}${mos} ${mos===1?'mese':'mesi'}. ${ceos.length>1?'CEO: ':'CEO '}${ceos.join(', ')}.</span></div></div>`;
+  let body='';
+  if(tab==='sint'){
+    const rk=finRank(), best=Y.reduce((a,r)=>!a||r.ric>a.ric?r:a,null), bestU=Y.reduce((a,r)=>!a||r.util>a.util?r:a,null);
+    const peak=Math.max(staffNow,...H.map(histStaff),...Y.map(r=>r.peak||0)), whMax=Math.max(ws.length,...H.map(h=>h.wh||0),...Y.map(r=>r.wh||0));
+    const lost=S.clients.filter(c=>c.status==='perso').length, nT=Object.keys(S.researched).length, rep0=H.length?H[0].rep:S.rep;
+    let run=0,bestRun=0; H.forEach(h=>{run=h.util>0?run+1:0; bestRun=Math.max(bestRun,run);});
+    const bM=H.reduce((a,h)=>!a||h.util>a.util?h:a,null), wM=H.reduce((a,h)=>!a||h.util<a.util?h:a,null);
+    const tot=sm('util');
+    body=`<div class="card fin-rk"><span class="lab">Il tuo titolo</span><b class="disp">${esc(rk[1])}</b><span class="sm">${esc(rk[2])}</span></div>
+    <div class="rp-tiles c4">
+     ${rpTile('Fatturato totale',euK(sm('ric')),best?`record ${best.y}: ${euK(best.ric)}`:'nessun mese chiuso','ricavi')}
+     ${rpTile(tot>=0?'Utile totale':'Perdita totale',euK(tot),bestU&&bestU.util>0?`record ${bestU.y}: ${euK(bestU.util)}`:'nessun anno in utile','conto',tot>=0?'ok':'bad')}
+     ${rpTile('Valore dell\'azienda',S.over?'—':euK(coValue(S)),S.over?'fallita: non vale più niente':'cassa, beni e utili, meno i debiti','valore',S.over?'bad':'')}
+     ${rpTile('Cassa finale',euK(S.cash),debt()?`prestiti da restituire ${euK(debt())}`:'nessun debito','cassa',S.cash<0?'bad':'')}
+     ${rpTile('Dipendenti',n0(staffNow),`picco ${n0(peak)}`,'personale')}
+     ${rpTile('Magazzini',ws.length,`al massimo ${whMax}`,'magazzino')}
+     ${rpTile('Gare vinte',`${tw.win} su ${bids}`,bids?`${Math.round(tw.win/bids*100)}% delle offerte · ${lost} clienti persi`:'nessuna offerta','gare')}
+     ${rpTile('Reputazione',Math.round(S.rep)+' / 100',`all'inizio ${Math.round(rep0)}`,'reputazione')}
+     ${rpTile('Pallet movimentati',n0(sm('mov')),`${n0(sm('trips'))} viaggi`,'movimenti')}
+     ${rpTile('Ricerche completate',`${nT} su ${TECH.length}`,'tecnologie','ricerca')}
+     ${rpTile('Penali pagate',euK(sm('pen')),sm('pen')?'per KPI sotto soglia':'nessuna','penali',sm('pen')?'bad':'ok')}
+     ${rpTile('Mesi in utile',`${H.filter(h=>h.util>0).length} su ${H.length}`,bestRun?`serie più lunga: ${bestRun} di fila`:'nessuno','conto')}
+    </div>
+    ${bM?`<div class="card"><span class="h3">Record</span>
+     <div class="az-r"><span>Mese migliore</span><b class="num ok">${monLab(bM.d)} · ${eur(bM.util)}</b></div>
+     <div class="az-r"><span>Mese peggiore</span><b class="num ${wM.util<0?'bad':''}">${monLab(wM.d)} · ${eur(wM.util)}</b></div>
+     ${best?`<div class="az-r"><span>Anno con più fatturato</span><b class="num">${best.y} · ${eur(best.ric)}</b></div>`:''}
+     <div class="az-r"><span>Più dipendenti insieme</span><b class="num">${n0(peak)}</b></div></div>`:''}
+    <div class="sm">Il ${kw('report_finale','report della partita')} si può aprire anche a partita in corso dal Riepilogo: i numeri sono quelli di oggi.</div>`;
+  } else if(tab==='cresc'){
+    // fino a tre anni si guarda mese per mese, poi anno per anno
+    const byY=H.length>36, P=byY?Y:H, lab=byY?Y.map(r=>String(r.y)+(r.n<12?'*':'')):H.map(h=>monLab(h.d)), xl=byY?'Anno ':'';
+    const g=P.map(r=>byY?r.sg||sGrp(null):sGrp(r.staff)), per=byY?'per anno':'per mese';
+    const empty='I grafici compaiono dalla fine del secondo mese.', c2={w:440,h:230,maxLab:5,xl,empty};
+    body=`<div class="sm">${byY?'Un punto per ogni anno (* = anno non completo): soldi e pallet sono la somma dell\'anno, persone, magazzini e clienti quelli di fine anno.':'Un punto per ogni mese.'}</div>
+    <div class="lc-row">${lineChart('fn_ru',{...c2,title:`Fatturato e utile ${per}`,labels:lab,nice:1,min:-1e12,max:1e12,ml:62,mr:118,fmt:v=>eur(v),ax:euK,series:[{n:'Fatturato',c:SERIES_C[0],v:P.map(r=>r.ric)},{n:'Utile',c:SERIES_C[3],v:P.map(r=>r.util)}]})}
+     ${lineChart('fn_st',{...c2,title:'Dipendenti',labels:lab,nice:1,min:0,max:1e9,mr:118,fmt:n0,ax:n0,series:[{n:'Totale',c:SERIES_C[2],v:P.map(r=>byY?r.staff:histStaff(r))},{n:'Magazzino',c:SERIES_C[1],v:g.map(x=>x.m)},{n:'Autisti',c:SERIES_C[0],v:g.map(x=>x.a)},{n:'Ufficio traffico',short:'Ufficio',c:SERIES_C[4],v:g.map(x=>x.u)}]})}</div>
+    <div class="lc-row">${lineChart('fn_wc',{...c2,title:'Magazzini e clienti attivi',labels:lab,nice:1,min:0,max:1e9,mr:118,fmt:n0,ax:n0,series:[{n:'Magazzini',c:SERIES_C[1],v:P.map(r=>r.wh||0)},{n:'Clienti attivi',short:'Clienti',c:SERIES_C[0],v:P.map(r=>r.cli||0)}]})}
+     ${lineChart('fn_cd',{...c2,title:'Cassa e debito a fine periodo',labels:lab,nice:1,min:-1e12,max:1e12,ml:62,mr:118,fmt:v=>eur(v),ax:euK,series:[{n:'Cassa',c:SERIES_C[0],v:P.map(r=>r.cash)},{n:'Debito',c:SERIES_C[1],v:P.map(r=>r.debt||0)}]})}</div>
+    <div class="lc-row">${lineChart('fn_pa',{...c2,title:'Puntualità e accuratezza (media)',labels:lab,unit:'%',mr:118,series:[{n:'Puntualità',c:KPI_C.P,v:P.map(r=>r.P)},{n:'Accuratezza',c:KPI_C.A,v:P.map(r=>r.A)}]})}
+     ${lineChart('fn_rm',{...c2,title:'Reputazione e morale',labels:lab,nice:1,min:0,max:100,mr:118,fmt:v=>Math.round(v),series:[{n:'Reputazione',c:SERIES_C[4],v:P.map(r=>r.rep)},{n:'Morale medio',short:'Morale',c:SERIES_C[5],v:P.map(r=>r.mor)}]})}</div>
+    ${lineChart('fn_mv',{...c2,title:`Pallet movimentati ${per}`,labels:lab,nice:1,min:0,max:1e12,ml:62,mr:14,labels2:false,fmt:n0,ax:n0,w:880,h:200,maxLab:10,series:[{n:'Pallet movimentati',c:SERIES_C[1],v:P.map(r=>r.mov)}]})}`;
+  } else if(tab==='anni'){
+    const row=r=>`<tr><td>${r.y}${r.n<12?` <span class="sm">(${r.n} ${r.n===1?'mese':'mesi'})</span>`:''}</td><td class="r">${euK(r.ric)}</td><td class="r ${r.util>=0?'ok':'bad'}">${euK(r.util)}</td><td class="r">${r.ric?f1(r.util/r.ric*100)+'%':'—'}</td><td class="r">${n0(r.staff)}</td><td class="r">${r.wh}</td><td class="r">${r.cli}</td><td class="r">${n0(r.mov)}</td><td class="r">${f1(r.P)} / ${f1(r.A)}</td><td class="r">${Math.round(r.rep)}</td><td class="r ${r.cash<0?'bad':''}">${euK(r.cash)}</td></tr>`;
+    // sul telefono la tabella non ci sta: una schedina per anno
+    const yc=r=>`<div class="fin-yc"><b class="h3">${r.y}${r.n<12?` <span class="sm">(${r.n} ${r.n===1?'mese':'mesi'})</span>`:''}</b>${[['Fatturato',euK(r.ric)],['Utile',`<span class="${r.util>=0?'ok':'bad'}">${euK(r.util)}</span>`],['Dipendenti',n0(r.staff)],['Magazzini',r.wh],['Clienti',r.cli],['Pallet',n0(r.mov)],['Punt. / Accur.',`${f1(r.P)} / ${f1(r.A)}`],['Reputazione',Math.round(r.rep)],['Cassa',euK(r.cash)]].map(([n,v])=>`<div class="az-r"><span>${n}</span><b class="num">${v}</b></div>`).join('')}</div>`;
+    if(MOB) body=`<div class="card"><span class="h3">Anno per anno</span>${Y.slice().reverse().map(yc).join('')||'<div class="sm">Il primo mese non si è ancora chiuso.</div>'}
+     ${Y.length>1?`<div class="az-ut ${sm('util')>=0?'ok':'bad'}"><span class="lab">Totale: fatturato ${euK(sm('ric'))}</span><b>${euK(sm('util'))}</b></div>`:''}
+     <div class="sm">Fatturato, utile e pallet sono la somma dell'anno; il resto è quello di fine anno (i KPI sono la media dei mesi).</div></div>`;
+    else body=`<div class="card"><span class="h3">Anno per anno</span><div class="rp-scroll"><table class="t num"><tr><th>Anno</th><th class="r">${kw('ricavi','Fatturato')}</th><th class="r">Utile</th><th class="r">Margine</th><th class="r">Dipendenti</th><th class="r">Magazzini</th><th class="r">Clienti</th><th class="r">Pallet</th><th class="r">${kw('puntualita','Punt.')} / ${kw('accuratezza','Accur.')}</th><th class="r">${kw('reputazione','Reput.')}</th><th class="r">Cassa</th></tr>
+     ${Y.map(row).join('')||'<tr><td colspan="11" class="sm">Il primo mese non si è ancora chiuso.</td></tr>'}
+     ${Y.length>1?`<tr class="tot"><td><b>Totale</b></td><td class="r"><b>${euK(sm('ric'))}</b></td><td class="r ${sm('util')>=0?'ok':'bad'}"><b>${euK(sm('util'))}</b></td><td class="r">${sm('ric')?f1(sm('util')/sm('ric')*100)+'%':'—'}</td><td colspan="3"></td><td class="r"><b>${n0(sm('mov'))}</b></td><td colspan="3"></td></tr>`:''}</table></div>
+     <div class="sm">Fatturato, utile e pallet sono la somma dell'anno; dipendenti, magazzini, clienti, reputazione e cassa sono quelli di fine anno; i KPI sono la media dei mesi.</div></div>
+    ${Y.length?rpCols('Utile di ogni anno',Y.map(r=>String(r.y)),Y.map(r=>r.util),''):''}`;
+  } else if(tab==='cron'){
+    const L=(S.log&&S.log.length?S.log:[{d:0,ic:'azienda',t:`Nasce ${S.company.name}`}]).slice(), G={};
+    L.forEach(x=>{(G[yearOf(x.d)]=G[yearOf(x.d)]||[]).push(x);});
+    body=`<div class="sm">Le tappe della partita, dalla prima all'ultima: magazzini, gare, clienti, ricerche, eventi, prestiti e traguardi.</div>
+    ${Object.keys(G).sort().map(y=>`<div class="card"><span class="h3">${y}</span>${G[y].map(x=>`<div class="fin-cr"><span class="fin-ic">${noteIc(x.ic,20)}</span><span class="sm num">${shortDate(x.d)}</span><span>${esc(x.t)}</span></div>`).join('')}</div>`).join('')}
+    ${S.log&&S.log.length>1?'':'<div class="sm">La cronaca si registra dalla versione 0.48: nelle partite iniziate prima mancano le tappe più vecchie.</div>'}`;
+  } else {
+    const rows=allCo().map(c=>({c,v:c.over?-1e12:coValue(c),r12:rev12(c),Y:yrsOf(c)})).sort((a,b)=>b.v-a.v);
+    const ys=[...new Set(rows.flatMap(x=>x.Y.map(r=>r.y)))].sort();
+    const stf=c=>ROLES.reduce((a,r)=>a+c.warehouses.reduce((b,w)=>b+w.staff[r],0),0)+c.office.plan;
+    body=`<div class="card"><span class="h3">Classifica finale</span><div class="rp-scroll"><table class="t num"><tr><th>#</th><th>Azienda</th><th class="r">${kw('valore','Valore')}</th><th class="r">Fatturato 12 mesi</th><th class="r">Dipendenti</th><th class="r">Magazzini</th><th class="r">Clienti</th><th class="r">Gare vinte</th><th class="r">${kw('reputazione','Reput.')}</th></tr>
+     ${rows.map((x,i)=>{const c=x.c; return `<tr${c===HUM?' class="fin-me"':''}><td>${c.over?'✝':i+1}</td><td><span class="co-tag">${coLogoSvg(c.company.logo,c.company.color,20)}<b>${esc(c.company.name)}${c===HUM?' · tu':''}</b></span><div class="sm">${esc(c.boss.name)}${c.over?` · fallita il ${shortDate(c.overDay||c.day)}`:''}</div></td>
+      <td class="r">${c.over?'—':euK(x.v)}</td><td class="r">${euK(x.r12)}</td><td class="r">${c.over?'—':n0(stf(c))}</td><td class="r">${c.over?'—':c.warehouses.length}</td><td class="r">${c.clients.filter(k=>k.status==='attivo').length}</td><td class="r">${(c.tw||{}).win||0}</td><td class="r">${Math.round(c.rep)}</td></tr>`;}).join('')}</table></div></div>
+    ${lineChart('fn_av',{title:'Fatturato di ogni anno, azienda per azienda',labels:ys.map(String),xl:'Anno ',nice:1,min:0,max:1e12,ml:62,mr:14,labels2:false,fmt:v=>eur(v),ax:euK,w:880,h:240,maxLab:10,empty:'Il grafico compare dopo il secondo anno.',
+      series:rows.map(x=>({n:x.c.company.name,c:x.c.company.color,v:ys.map(y=>{const r=x.Y.find(r=>r.y===y); return r?r.ric:null;})}))})}
+    <div class="sm">L'anno in corso conta solo i mesi già chiusi.</div>`;
+  }
+  const done=S.over||HUM.won;
+  return `${head}${tabs}${body}<div class="row">${rivals().length?'<button class="btn" data-act="openclass">Classifica</button>':''}${done?'<button class="btn pri" data-act="restart">Nuova partita</button>':'<span class="sm">La partita è ancora in corso: il report si aggiorna ogni mese.</span>'}</div>`;
+ },
  classifica(){
   const cfg=HUM.cfg||{win:{}}, on=Object.keys(WINS).filter(k=>cfg.win&&cfg.win[k]);
   if(!rivals().length) return `<div class="sm">Stai giocando da solo: niente ${kw('avversari','aziende avversarie')} e niente classifica. Le aziende in gara si scelgono nella ${kw('lobby')}, quando inizi una nuova partita.</div>`;
@@ -5033,7 +5177,7 @@ const VIEWS={
       <div><span class="lab">Magazzini</span><b>${c.warehouses.length}</b></div>
       <div><span class="lab">${kw('reputazione')}</span><b>${Math.round(c.rep)}</b></div></div>
       ${on.map(k=>{const p=winProg(k,c,cfg); return `<div class="cls-w"><span class="sm">${esc(WINS[k].n)}</span><div class="bar"><i style="width:${Math.round(p*100)}%;background:${c.company.color}"></i></div><b class="sm num">${Math.round(p*100)}%</b></div>`;}).join('')}`}</div>`;};
-  return `${won?`<div class="card pend"><b>${won===HUM?'Hai vinto la partita':`Ha vinto ${esc(won.company.name)}`}</b><span class="sm">${esc(WINS[HUM.won.why].n)}, il ${shortDate(HUM.won.day)}. Si può continuare a giocare.</span></div>`:''}
+  return `${won?`<div class="card pend"><b>${won===HUM?'Hai vinto la partita':`Ha vinto ${esc(won.company.name)}`}</b><span class="sm">${esc(WINS[HUM.won.why].n)}, il ${shortDate(HUM.won.day)}. Si può continuare a giocare.</span><button class="btn sm2" data-act="finale">Report della partita</button></div>`:''}
    <div class="sm">${on.length?`${kw('vittoria','Si vince')} con: ${on.map(k=>`<b>${esc(WINS[k].n)}</b> (${esc(winTxt(k,cfg))})`).join(' · ')}`:'Nessuna condizione di vittoria: si gioca per il primato.'}</div>
    <div class="cls-l">${rows.map(card).join('')}</div>
    <div class="sm">Le aziende sono in ordine di ${kw('valore')}. Ritmo del tempo: ${kw('tempo',MODES[modeOf()].n)}.</div>`;
@@ -5194,13 +5338,15 @@ const ACT={
  loanamt(d){UI.sel.loanA=+d.v;renderWin('cassa');},
  loandur(d){UI.sel.loanN=+d.v;renderWin('cassa');},
  loantake(){const A=+UI.sel.loanA, N=LOAN_DUR.includes(+UI.sel.loanN)?+UI.sel.loanN:48; if(!(A>0)||A>loanLimit()) return; const r=loanRate(N);
-  (S.loans=S.loans||[]).push({amt:A,left:A,rate:r,n:N,rata:loanRata(A,r,N),day:S.day}); S.cash+=A; S.cur.prest=(S.cur.prest||0)+A;
+  (S.loans=S.loans||[]).push({amt:A,left:A,rate:r,n:N,rata:loanRata(A,r,N),day:S.day}); S.cash+=A; S.cur.prest=(S.cur.prest||0)+A; chron('cassa',`Prestito di ${eur(A)} in ${N/12} anni al ${f1(r)}%`);
   toast(`Prestito firmato: ${eur(A)} in cassa, rata ${eur(loanRata(A,r,N))} al mese per ${N/12} anni`,'ok');
   news('Il Sole 24 Pallet',`${S.company.name} ottiene un finanziamento`,`La banca concede ${eur(A)} al ${f1(r)}% in ${N/12} anni. Il direttore di filiale assicura che «è un investimento sul territorio».`); renderAll();},
  loanpay(d){const l=(S.loans||[])[+d.i]; if(!l) return; const ex=Math.round(l.left*(1+LOAN_FEE)); if(S.cash<ex) return;
   S.cash-=ex; S.cur.int=(S.cur.int||0)+ex-l.left; S.cur.rimb=(S.cur.rimb||0)+l.left; S.loans.splice(+d.i,1);
   toast(`Prestito estinto: pagati ${eur(ex)}`,'ok'); renderAll();},
  rptab(d){UI.tab.rp=d.id;renderWin('riepilogo');},
+ fintab(d){UI.tab.fin=d.id;renderWin('finale');},
+ finale(){if($('#modal').innerHTML)closeModal(); openWin('finale');},
  sheet(d){UI.sel.sheet=d.id;UI.sel.cell='A1';renderWin('report');},
  cell(d){UI.sel.cell=d.ref;renderWin('report');},
  lens(d){UI.lens=d.id;renderMap();syncTrucks();},
@@ -5222,7 +5368,7 @@ const ACT={
  fireexec(d){const e=S.execs.find(x=>x.id===d.id); const c=e.ral/12*COEF; S.cash-=c; S.cur.altro+=c; e.hired=false; Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===e.id)S.dirs[k]=null;}); renderAll();},
  rent(d){
   const s=SITES[d.id]; const cost=2*s.rent+15000; if(S.cash<cost||siteTaken(d.id))return;
-  S.cash-=cost; S.cur.altro+=cost; const w=addWarehouse(d.id,false,0,0);
+  S.cash-=cost; S.cur.altro+=cost; const w=addWarehouse(d.id,false,0,0); chron('magazzini',`Apre il magazzino di ${s.name} (${n0(s.cap)} posti pallet)`);
   news('Il Sole 24 Pallet',`${S.company.name} apre a ${s.name}`,`Nuovo magazzino da ${n0(s.cap)} posti pallet.`); repUp(3);
   toast(`Nuovo magazzino a ${s.name}: assumi personale e un manager`,'ok'); renderMap(); syncTrucks(); openWin('magazzini',{wh:w.id}); renderAll();
  },
@@ -5523,6 +5669,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.48',t:'Report della partita',x:['A fine partita (vittoria, sconfitta o fallimento) c\'è il pulsante «Report della partita»: esito, il titolo che ti sei guadagnato, i totali di tutta la partita e i record.','Grafici della crescita: fatturato e utile, dipendenti per reparto, magazzini e clienti, cassa e debito, KPI, reputazione e morale, pallet movimentati.','Una tabella anno per anno, la cronaca con le tappe importanti (magazzini aperti, gare vinte, clienti persi, ricerche, eventi, traguardi) e, se giochi contro altre aziende, la classifica finale con il fatturato di ognuna.','Il report si apre anche a partita in corso, dal Riepilogo.']},
  {v:'0.47',t:'X per chiudere',x:['Nelle schede delle notifiche il pulsante «Archivia» è diventato una X in alto a destra: toccala per togliere la notizia (o tutto il gruppo) dalla colonna.']},
  {v:'0.46',t:'Ricerca sotto controllo',x:['Quando non stai ricercando nessuna tecnologia compare una tessera gialla nelle notifiche: toccala per aprire subito la finestra Tecnologia. Sparisce appena avvii una ricerca.','A fine ricerca arriva una notifica verde con il nome della tecnologia: toccandola si apre già selezionata, pronta da installare nei magazzini.']},
  {v:'0.45',t:'Cestino',x:['Nella schermata iniziale, accanto a «Continua la partita», c\'è il pulsante «Cancella» per eliminare la partita salvata (chiede conferma prima).','Anche dalle Opzioni durante il gioco puoi cancellare la partita in corso e tornare alla schermata iniziale.']},
