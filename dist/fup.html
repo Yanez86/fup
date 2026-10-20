@@ -301,7 +301,7 @@ input.sw:disabled{opacity:.45;cursor:not-allowed}
 .pr-cols{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:8px;align-items:start}
 .mob .pr-cols{grid-template-columns:minmax(0,1fr)}
 .pr-r{align-items:baseline;gap:8px}.pr-r>span{min-width:0;flex:1}.pr-r b{white-space:nowrap;flex-shrink:0;padding-right:2px}
-.pr-g{margin-top:8px}.pr-ms{display:flex;flex-wrap:wrap;gap:4px}.pr-miss{cursor:help}
+.pr-g{margin-top:8px}
 /* finestra Clienti */
 .cl{gap:8px}
 .cl-h{display:flex;align-items:center;gap:10px}
@@ -4198,7 +4198,7 @@ function prodIcon(){return `<svg width="16" height="16" viewBox="0 0 8 8" shape-
 // finestra del magazzino, pagina Produttività: grafico settimanale e tutte le voci che la muovono
 function prodView(w,k,ld){
   const F=k.prF, idx=k.prod/PROD_BASE*100, pc=v=>(v>=0?'+':'−')+f1(Math.abs(v*100))+'%', cls=v=>v>0.0005?'ok':v<-0.0005?'bad':'';
-  const row=(n,v,sub)=>`<div class="row pr-r"><span>${n}${sub?` <span class="sm">${sub}</span>`:''}</span><b class="${cls(v)}">${Math.abs(v)<0.0005?'—':pc(v)}</b></div>`;
+  const row=(n,v,sub,tip)=>`<div class="row pr-r"${tip?` data-tip="${tip}"`:''}><span>${n}${sub?` <span class="sm">${sub}</span>`:''}</span><b class="${cls(v)}">${Math.abs(v)<0.0005?'—':pc(v)}</b></div>`;
   const grp=(g,lab,wiki)=>{const it=F.l.filter(x=>x[0]===g||(g==='t'&&x[0]==='l')); if(!it.length) return '';
     return `<div class="lab pr-g">${kw(wiki,lab)}</div>`+it.map(([t,n,v])=>row(esc(n),v,t==='l'?'in apprendimento, conta dopo':'')).join('');};
   const mgr=k.m.none?'nessun manager':(w.mgr==='ceo'?ceo().name:k.m.name);
@@ -4206,8 +4206,6 @@ function prodView(w,k,ld){
   const chart=lineChart('pr_'+w.id,{title:'Produttività e carico dei magazzinieri, settimana per settimana',labels:lab,unit:'%',nice:1,min:0,max:200,fmt:v=>Math.round(v)+'%',ax:v=>v+'%',
     empty:'Il grafico compare dalla seconda settimana: ogni lunedì il gioco registra la produttività della settimana appena finita.',mr:MOB?118:150,maxLab:MOB?3:5,w:MOB?440:860,h:MOB?240:250,
     series:[{n:'Produttività',c:SERIES_C[0],v:H.map(h=>h.v/PROD_BASE*100)},{n:'Carico magazzinieri',short:'Carico mag.',c:SERIES_C[1],v:H.map(h=>h.lp*100)},{n:'Base (900 pallet)',short:'Base',c:'#8a96a6',dash:1,v:H.map(()=>100)}]});
-  // tecnologie e servizi che alzerebbero la produttività e qui non ci sono ancora
-  const miss=TECH.filter(t=>t.prod>0&&(t.tree==='log'||t.tree==='wel')&&!w.tech[t.id]).map(t=>`<span class="pill pr-miss" data-act="wiki" data-id="tech_${t.id}" role="button" tabindex="0">${esc(t.name)} +${Math.round(t.prod*100)}%${R(t.id)?' · da installare':''}</span>`).join('');
   const lp=ld.pick, lc=ld.car, lTxt=l=>l>=9?'nessuno':Math.round(l*100)+'%';
   return `<div class="row pr-hd"><button class="btn sm2" data-act="whprod" data-on="0" aria-label="Torna al magazzino">‹ ${esc(w.name)}</button><span class="h3">${prodIcon()} ${kw('produttivita','Produttività')}</span></div>
   <div class="wh-kpis">
@@ -4220,7 +4218,7 @@ function prodView(w,k,ld){
   <div class="pr-cols">
    <div class="card"><span class="h3">Da cosa dipende</span>
     <div class="row pr-r"><span>Base: un ${kw('magazzinieri','magazziniere')} con ${kw('morale')} 70</span><b>${PROD_BASE} pallet</b></div>
-    ${row(`${kw('morale')} ${Math.round(w.morale)}`,F.mor-1,'ogni 10 punti sopra o sotto 70 valgono circa il 4%')}
+    ${row(`${kw('morale')} ${Math.round(w.morale)}`,F.mor-1,'',`<div class='tt'>Morale e produttività</div>70 è la base: ogni 10 punti sopra o sotto valgono circa il 4%.`)}
     ${grp('t','Tecnologie di logistica','installazione')}${grp('w','Servizi di welfare','welfare_mag')}${grp('p','Policy aziendali','policy')}${F.tr!==1?grp('r','Regole del traffico','regole_traffico'):''}
     <div class="lab pr-g">Magazzino e manager</div>
     ${row(kw('manutenzione','Stato del magazzino')+' '+Math.round(w.cond==null?100:w.cond)+'%',F.cond-1,F.cond<1?'sotto il 70%':'')}
@@ -4234,7 +4232,6 @@ function prodView(w,k,ld){
     <div class="row pr-r"><span>Pallet in uscita al mese</span><b>${n0(k.cons)}</b></div>
     <div class="row pr-r"><span>${kw('movimenti')} al mese</span><b>${n0(k.mov)}</b></div>
     <div class="sm">Più produttività vuol dire meno persone per lo stesso lavoro: il ${kw('carico','carico')} scende senza assumere.</div>
-    ${miss?`<div class="lab pr-g">Per salire ancora</div><div class="pr-ms">${miss}</div>`:''}
    </div>
   </div>`;
 }
@@ -4598,7 +4595,7 @@ function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=docum
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
  {v:'0.32',t:'Ordine inglese',x:['Nuovo manager sul mercato: Andrew Goodheart, biondo con gli occhiali squadrati. Precisione e Leadership altissime, ma è stacanovista, maniaco dell\'ordine e job hopper: tienilo contento o te lo porta via la concorrenza.']},
- {v:'0.31',t:'Quanto rende il magazzino',x:['Nella finestra del magazzino c\'è il nuovo pulsante Produttività: mostra quanti pallet prepara al mese ogni magazziniere e quanti movimenti fa ogni carrellista.','Un grafico segue la produttività settimana per settimana, insieme al carico di lavoro dei magazzinieri: si vede subito se una tecnologia o un calo di morale ha cambiato le cose.','Il dettaglio elenca tutto quello che la muove (morale, tecnologie, welfare, policy, regole del traffico, stato del magazzino, cantiere, manager) e cosa potresti aggiungere per salire ancora.','Nuova voce dell\'enciclopedia: Produttività.']},
+ {v:'0.31',t:'Quanto rende il magazzino',x:['Nella finestra del magazzino c\'è il nuovo pulsante Produttività: mostra quanti pallet prepara al mese ogni magazziniere e quanti movimenti fa ogni carrellista.','Un grafico segue la produttività settimana per settimana, insieme al carico di lavoro dei magazzinieri: si vede subito se una tecnologia o un calo di morale ha cambiato le cose.','Il dettaglio elenca tutto quello che la muove: morale, tecnologie, welfare, policy, regole del traffico, stato del magazzino, cantiere e manager.','Nuova voce dell\'enciclopedia: Produttività.']},
  {v:'0.30',t:'Notte, blocchi e piani',x:['Tre nuove regole nell\'Ufficio traffico: doppio turno in magazzino (più puntualità, ma il turno di notte costa e stanca), stoccaggio a blocchi (più posti pallet senza cantieri, ma più errori) e consegna al piano (ricavi e clienti contenti, ma servono più furgonisti).']},
  {v:'0.29',t:'Regole del traffico',x:['Nell\'Ufficio traffico sette regole da accendere magazzino per magazzino: giri a giorni fissi, cut-off degli ordini alle 14, si parte solo a camion pieno, partenze all\'alba, scarichi su prenotazione, ritorni carichi e consegne anche il sabato.','Ognuna ha un vantaggio e un prezzo: più camion pieni ma meno puntualità, più accuratezza ma camion più vuoti, più puntualità ma autisti che costano di più. Dopo un cambio servono 30 giorni per cambiarla di nuovo.']},
  {v:'0.28',t:'Valigia sempre pronta',x:['Nuovo talento «Job hopper»: buon negoziatore, ma dopo un anno senza aumenti la concorrenza si fa viva e rischi di perderlo. Ce l\'ha Chiara Ferraris, e lo puoi scegliere anche per il tuo CEO.']},
