@@ -116,6 +116,7 @@ Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Opera
   - `naz` (da CEO): punteggio nelle gare delle committenti S e A (Parla per acronimi +3, Dialetto stretto −3).
   - `gara` (da CEO o direttore commerciale): punteggio in tutte le gare (Conosce tutti al bar +2).
   - `drv` (da CEO): tempi di assunzione degli autisti (Un milione di km al volante ×0,7).
+  - Job hopper (Negoziazione +2, Innovazione +1, Leadership −1): un manager o dirigente assunto che non ha aumenti da oltre 365 giorni apre l'evento «Il richiamo di LinkedIn» (oltre a «Un'offerta dalla concorrenza»): aumento del 15%, progetto nuovo (50%: Innovazione +1 e resta, altrimenti lascia dopo 30 giorni) o far finta di niente (75% lascia dopo 30 giorni). Da CEO apre l'evento «Un head hunter ti cerca» (rifiutare: reputazione +2 e morale +3 per 30 giorni; colloquio: Negoziazione +1 e morale −4 per 30 giorni). Ce l'ha Chiara Ferraris.
 
 ## Età, storia dei personaggi, pensione e successione
 - Il CEO in carica è `S.boss` (copia modificabile; `ceo()` lo restituisce). Manager e dirigenti in `S.managers` / `S.execs` sono copie dei dati, con `st` e `tal` propri.
