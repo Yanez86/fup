@@ -81,6 +81,11 @@ async def phone(b, w, h, name, errs):
     await pg.tap('[data-act=stamp]'); await pg.wait_for_timeout(700)
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: la visura scorre di lato'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_visura.png'), full_page=True)
+    # lobby: le quattro aziende, il ritmo del tempo e le condizioni di vittoria
+    await pg.tap('[data-act=stnext]'); await pg.wait_for_timeout(200)
+    assert await pg.evaluate("document.querySelectorAll('#start .lb-slot').length") == 4, f'{name}: lobby senza i 4 posti'
+    assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: la lobby scorre di lato'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_lobby.png'), full_page=True)
     await pg.tap('[data-act=startgame]'); await pg.tap('[data-act=closemodal]')
     await pg.wait_for_timeout(100)
     # menu: un solo pulsante sulla mappa; aperto, l'elenco sta nello schermo e ha tutte le voci
@@ -88,7 +93,7 @@ async def phone(b, w, h, name, errs):
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
     await pg.tap('#burger'); await pg.wait_for_timeout(250)
     assert await pg.evaluate(FITS, '#dock'), f'{name}: menu aperto fuori schermo'
-    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 14, f'{name}: mancano voci nel menu'
+    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 15, f'{name}: mancano voci nel menu'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_menu.png'))
     await pg.tap('#dock .dh [data-act=menu]'); await pg.wait_for_timeout(250)
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu non si chiude'
@@ -207,7 +212,16 @@ async def main():
         await pg.click('[data-act=stnext]'); await pg.click('[data-act=stamp]'); await pg.wait_for_timeout(700)
         assert await pg.query_selector('#start .timbro')
         await pg.screenshot(path=os.path.join(OUT, 'shot_crea_6_visura.png'), full_page=True)
+        await pg.click('[data-act=stnext]')
+        assert await pg.evaluate("document.querySelectorAll('#start .lb-slot').length") == 4, 'lobby senza i 4 posti'
+        await pg.click('[data-act=lbbot][data-id=gino][data-k=on][data-v="0"]')   # un avversario resta fuori
+        await pg.click('[data-act=lbbot][data-id=edoardo][data-k=diff][data-v=spietato]')
+        await pg.click('[data-act=lbwin][data-id=reputazione]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_crea_7_lobby.png'), full_page=True)
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
+        lb = await pg.evaluate('()=>{const F=window.__FUP,H=F.HUM;return {n:H.bots.length,ids:H.bots.map(b=>b.bot.id),diff:H.bots.find(b=>b.bot.id==="edoardo").bot.diff,win:H.cfg.win,mode:H.cfg.mode,cols:[H.company.color,...H.bots.map(b=>b.company.color)]}}')
+        assert lb['n'] == 2 and 'gino' not in lb['ids'] and 'marco' not in lb['ids'] and lb['diff'] == 'spietato', lb
+        assert lb['win']['reputazione'] and lb['mode'] == 'classica' and len(set(lb['cols'])) == 3, lb
         c = await pg.evaluate('()=>{const S=window.__FUP.S;return {id:S.ceoId,n:S.custom.name,tal:S.custom.tal,st:S.custom.st,co:S.company.name,logo:S.company.logo,claim:S.company.claim,nick:S.custom.nick,wh:S.warehouses[0].site,cl:S.clients[0].name}}')
         assert c['id'] == 'custom' and c['n'] == 'Ornella Bancalini' and c['co'] == 'Trasporti Bancalini', c
         assert c['logo'] == 'muletto' and c['claim'] == 'Ogni bancale è una promessa.' and c['nick'] == 'la Bolla', c
@@ -228,9 +242,12 @@ async def main():
         assert await pg.evaluate("document.querySelector('#ov [aria-label=Viaggi]')!==null"), 'lente Viaggi non disegnata'
         await pg.screenshot(path=os.path.join(OUT, 'shot_lente_viaggi.png'))
         await pg.keyboard.press('KeyL')  # torna alla mappa normale
-        for w in ['azienda','magazzini','traffico','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia']:
+        for w in ['azienda','magazzini','traffico','clienti','gare','report','personale','direzione','policy','espansione','giornale','classifica','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
             assert await pg.evaluate(FITS, f'#win-{w}'), f'finestra {w} esce dal fondo dello schermo'
+            if w == 'classifica':
+                assert await pg.eval_on_selector_all('#win-classifica .cls', 'e=>e.length') == 3, 'classifica senza le 3 aziende'
+                await pg.screenshot(path=os.path.join(OUT, 'shot_classifica.png'))
         for t in ['log','org','mkt','wel']:
             await pg.click(f'#win-tecnologia [data-act=seltree][data-id={t}]')
             await pg.screenshot(path=os.path.join(OUT, f'shot_tree_{t}.png'))
@@ -450,6 +467,38 @@ async def main():
         await pg.screenshot(path=os.path.join(OUT, 'shot_riepilogo_mod_pieno.png'))
         await pg.evaluate("()=>{const b=document.querySelector('#win-riepilogo .win-b');b.scrollTop=b.scrollHeight;}")
         await pg.screenshot(path=os.path.join(OUT, 'shot_riepilogo_mod_pieno_sotto.png'))
+        # partita completa con 3 avversari: due anni senza errori, offerte vere nelle gare, magazzini rivali sulla mappa
+        r = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino',null,{mode:'classica',win:{reputazione:true},reputazione:200});
+          const H=F.HUM; H.bots=[['edoardo','espansione'],['valeria','qualita'],['marco','prezzo']].map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],'normale',i));
+          let bids=0;
+          for(let d=0;d<730&&!H.over;d++){ const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}
+            H.cash=Math.max(H.cash,300000); bids+=H.tenders.filter(t=>t.bids&&Object.keys(t.bids).length&&t.deadline===H.day).length; F.step(); }
+          F.ACT.toggle({id:'classifica'});
+          return {bids,cli:H.bots.map(b=>b.clients.filter(c=>c.status==='attivo').length),day:H.day,mk:document.querySelectorAll('#ov [data-act=openclass]').length,
+            sizeKB:Math.round(JSON.stringify(H).length/1024)};}''')
+        assert r['bids'] > 3 and sum(r['cli']) > 6 and r['day'] >= 729, r
+        print('avversari dopo 2 anni:', r)
+        assert r['sizeKB'] < 2500, f'salvataggio troppo grande: {r}'
+        # vittoria: una condizione facile fa comparire la finestra di fine partita
+        w = await pg.evaluate('''()=>{const F=window.__FUP,H=F.HUM; document.querySelector('#modal').innerHTML=''; H.cfg.reputazione=1; F.checkWin();
+          return {won:H.won,txt:document.querySelector('#modal').innerText};}''')
+        assert w['won'] and 'vinto' in w['txt'].lower(), w
+        await pg.screenshot(path=os.path.join(OUT, 'shot_vittoria.png'))
+        await pg.click('#modal [data-act=openclass]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_classifica_fine.png'))
+        # tempo senza pausa: in modalità Veloce i giorni passano anche con una finestra aperta
+        d0 = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('valeria',null,{mode:'veloce',win:{}}); F.S.speed=1; F.ACT.options(); return F.S.day;}''')
+        await pg.wait_for_timeout(3500)
+        d1 = await pg.evaluate('()=>window.__FUP.S.day')
+        assert d1 >= d0 + 1, f'tempo fermo in modalità veloce: {d0} -> {d1}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_tempo_veloce.png'))
+        # modalità persistente: dieci giorni veri di assenza diventano dieci settimane recuperate, con il riepilogo
+        await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('marco',null,{mode:'persistente',win:{}});
+          F.S.clock={at:Date.now()-10*86400000,day:0}; F.S.speed=1;}''')
+        await pg.wait_for_selector('#modal .modal', timeout=20000)
+        pr = await pg.evaluate('()=>({day:window.__FUP.S.day,txt:document.querySelector("#modal").innerText})')
+        assert 69 <= pr['day'] <= 71 and 'settimane' in pr['txt'], pr
+        await pg.screenshot(path=os.path.join(OUT, 'shot_persistente_rientro.png'))
         await b.close()
     if errs:
         print('ERRORI JS:', *errs, sep='\n  '); sys.exit(1)

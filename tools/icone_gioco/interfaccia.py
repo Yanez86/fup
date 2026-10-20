@@ -137,6 +137,14 @@ def m_giornale():
     return ov(r, ['', '', '', '..KKKKKKKKKK', '..KKKKKKKKKK', '', '..SSSS.KKKKK', '..SSSS', '..SSSS.KKKKK', '..SSSS', '..SSSS.KKKKK', '', '..KKKKKKKKKK'])
 MENU['giornale'] = ('Il giornale', m_giornale)
 
+def m_classifica():
+    # podio a tre gradini (argento, oro, bronzo) con la stella sopra il primo
+    c = Cv(16); c.rect(1, 9, 4, 14, 'S'); c.rect(5, 6, 10, 14, 'Y'); c.rect(11, 10, 14, 14, 'O')
+    c.rect(7, 0, 8, 4, 'Y'); c.rect(5, 2, 10, 2, 'Y')
+    r = process(c.rows())
+    return ov(r, ['', '', '', '', '', '', '', '', '.......KK', '......KKK', '.......KK', '.......KK', '.......KK'])
+MENU['classifica'] = ('Classifica', m_classifica)
+
 
 LENS = {}
 UI = {}
