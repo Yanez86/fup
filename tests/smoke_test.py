@@ -106,6 +106,8 @@ async def phone(b, w, h, name, errs):
         await pg.tap('[data-act=stnext]')
     await pg.tap('[data-act=stamp]'); await pg.wait_for_timeout(700)
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: la visura scorre di lato'
+    lati = await pg.evaluate("[...document.querySelectorAll('#start, #start *')].filter(e=>['auto','scroll'].includes(getComputedStyle(e).overflowX)&&e.scrollWidth>e.clientWidth+1).map(e=>e.className)")
+    assert lati == [], f'{name}: la visura scorre di lato dentro la finestra {lati}'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_visura.png'), full_page=True)
     # lobby: le quattro aziende, il ritmo del tempo e le condizioni di vittoria
     await pg.tap('[data-act=stnext]'); await pg.wait_for_timeout(200)
