@@ -556,6 +556,21 @@ async def main():
         pr = await pg.evaluate('()=>({day:window.__FUP.S.day,txt:document.querySelector("#modal").innerText})')
         assert 69 <= pr['day'] <= 71 and 'settimane' in pr['txt'], pr
         await pg.screenshot(path=os.path.join(OUT, 'shot_persistente_rientro.png'))
+        # cancellare la partita: dalle opzioni in gioco e dalla schermata iniziale, sempre con conferma
+        await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('marco'); F.S.speed=0; F.save(); F.ACT.options();}''')
+        await pg.click('#modal [data-act=delgame]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_cancella_conferma.png'))
+        await pg.click('#modal [data-act=closemodal]')
+        assert await pg.evaluate('()=>!!localStorage.getItem(window.__FUP.KEY)'), 'salvataggio sparito senza conferma'
+        await pg.evaluate('()=>window.__FUP.ACT.options()'); await pg.click('#modal [data-act=delgame]'); await pg.click('#modal [data-act=delgameok]')
+        assert await pg.evaluate('()=>!localStorage.getItem(window.__FUP.KEY)'), 'salvataggio non cancellato'
+        assert not await pg.query_selector('#start [data-act=continue]'), 'partita cancellata ancora nella schermata iniziale'
+        await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino'); F.save();}''')
+        await pg.evaluate('()=>location.reload()'); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
+        await pg.click('#start [data-act=delask]'); await pg.screenshot(path=os.path.join(OUT, 'shot_cancella_avvio.png'))
+        await pg.click('#start [data-act=delno]'); await pg.wait_for_selector('#start [data-act=continue]')
+        await pg.click('#start [data-act=delask]'); await pg.click('#start [data-act=delsave]')
+        assert not await pg.query_selector('#start [data-act=continue]') and await pg.evaluate('()=>!localStorage.getItem(window.__FUP.KEY)'), 'cancellazione dalla schermata iniziale'
         await b.close()
     if errs:
         print('ERRORI JS:', *errs, sep='\n  '); sys.exit(1)

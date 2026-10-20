@@ -204,6 +204,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .btn{max-width:100%;overflow-wrap:break-word;padding:7px 12px;border:2px solid var(--ink);background:#fff;font-family:var(--f-disp);font-size:15px;box-shadow:inset 0 -3px 0 #c9d3dd, 2px 2px 0 var(--ink)}
 .btn.pri{background:var(--accent);box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l), 2px 2px 0 var(--ink);font-weight:600}
 .btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.del{background:var(--bad);color:#fff;box-shadow:inset 0 -3px 0 var(--bad-d), 2px 2px 0 var(--ink);font-weight:600}
 .btn.sm2{padding:4px 9px;font-size:14px;box-shadow:inset 0 -2px 0 #c9d3dd, 1px 1px 0 var(--ink)}
 .pill{display:inline-block;padding:0 6px;font-size:13px;font-weight:600;border:1px solid var(--ink)}
 .ok{color:var(--ok-t)} .warn{color:var(--warn-t)} .bad{color:var(--bad-t)}
@@ -4032,6 +4033,7 @@ function chMigrate(){
 // si salva sempre l'azienda del giocatore, con dentro le aziende avversarie
 function save(){const H=HUM||S; if(!H||S.bot) return; try{localStorage.setItem(KEY,JSON.stringify({S:H,uid}));}catch(e){}}
 // le partite della versione 3 (senza avversari) si caricano ancora: diventano partite classiche da soli
+function delSave(){try{localStorage.removeItem(KEY);localStorage.removeItem(KEY_OLD);}catch(e){}}
 function load(){try{const r=localStorage.getItem(KEY)||localStorage.getItem(KEY_OLD);if(!r)return null;return JSON.parse(r);}catch(e){return null;}}
 
 /* ====================== MAPPA ====================== */
@@ -5266,7 +5268,12 @@ const ACT={
  save(){save();toast('Partita salvata','ok');},
  restart(){closeModal();startSel.step='scelta';startSel.stamp=false;showStart();},
  options(){if($('#modal').innerHTML)return;if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);}
-   showModal(`<div class="src"><span>Opzioni</span><span>${shortDate(S.day)}</span></div><div class="win-b"><button class="btn pri" data-act="closemodal">Riprendi</button><button class="btn" data-act="quitgame">Esci dal gioco</button>${contMode()?'':`<label class="optchk"><input type="checkbox" data-act="evpause" ${HUM&&HUM.cfg&&HUM.cfg.noPause?'':'checked'}>Metti in pausa quando arriva un evento da decidere</label>`}<p class="sm" style="margin:0">Uscendo la partita viene salvata: la ritrovi con «Continua la partita» nella schermata iniziale.</p></div>`);},
+   showModal(`<div class="src"><span>Opzioni</span><span>${shortDate(S.day)}</span></div><div class="win-b"><button class="btn pri" data-act="closemodal">Riprendi</button><button class="btn" data-act="quitgame">Esci dal gioco</button><button class="btn" data-act="delgame">Cancella la partita</button>${contMode()?'':`<label class="optchk"><input type="checkbox" data-act="evpause" ${HUM&&HUM.cfg&&HUM.cfg.noPause?'':'checked'}>Metti in pausa quando arriva un evento da decidere</label>`}<p class="sm" style="margin:0">Uscendo la partita viene salvata: la ritrovi con «Continua la partita» nella schermata iniziale.</p></div>`);},
+ delask(){startSel.del=true;showStart();},
+ delno(){startSel.del=false;showStart();},
+ delsave(){delSave();startSel.del=false;showStart();toast('Partita cancellata','ok');},
+ delgame(){showModal(`<div class="src"><span>Cancella la partita</span><span>${shortDate(S.day)}</span></div><div class="win-b"><p style="margin:0">Vuoi cancellare per sempre <b>${esc(HUM.company.name)}</b>? La partita sparisce e non si può recuperare.</p><div class="row"><button class="btn" data-act="closemodal">No, continuo</button><button class="btn del" data-act="delgameok">Sì, cancella</button></div></div>`);},
+ delgameok(){UI.evSpeed=0;delSave();closeModal();Object.keys(UI.open).forEach(closeWin);startSel.del=false;startSel.step='scelta';showStart();toast('Partita cancellata','ok');},
  quitgame(){UI.evSpeed=0;if(!S.over)save();closeModal();Object.keys(UI.open).forEach(closeWin);showStart();}
 };
 function wikiShow(){
@@ -5510,6 +5517,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.44',t:'Cestino',x:['Nella schermata iniziale, accanto a «Continua la partita», c\'è il pulsante «Cancella» per eliminare la partita salvata (chiede conferma prima).','Anche dalle Opzioni durante il gioco puoi cancellare la partita in corso e tornare alla schermata iniziale.']},
  {v:'0.43',t:'Ci vediamo in tribunale',x:['Nuovo evento: qualche settimana dopo un licenziamento la persona può impugnarlo e chiedere di tornare. La riassumi, chiudi con una conciliazione, vai in tribunale (rischioso, meglio con un CEO bravo in Amministrazione) o, se sai negoziare, le trovi un posto da un cliente.']},
  {v:'0.42',t:'Tagli e reputazione',x:['Licenziare ora pesa anche sulla reputazione (−0,3 a persona), oltre alla buonuscita e al calo di morale nel magazzino.','Dal quarto licenziamento in un mese scatta l\'ondata: finisce sul giornale, la reputazione scende di più e il morale cala di 2 punti in tutti i magazzini. Per i picchi della stagione conviene la cooperativa, che si manda via gratis.','Anche le aziende CPU licenziano quando finisce la stagione di picco, guardando il mese dopo per non restare scoperte. Le Facili sono prudenti, le Normali evitano le ondate, le Spietate tagliano senza pietà e finiscono sul giornale.']},
  {v:'0.41',t:'Mese per mese',x:['La stagionalità delle committenti ora va mese per mese: agosto chiuso per l\'industria e i cantieri, il Black Friday a novembre per elettronica ed e-commerce, il cambio gomme a marzo-aprile e ottobre-novembre, la colomba di Pasqua e il panettone a novembre-dicembre, la cartoleria prima della scuola, le mele a settembre.','Sotto il grafico della committente ci sono il mese di picco e quello più vuoto; toccando il grafico si vedono tutti e dodici i mesi.']},
@@ -5594,7 +5602,8 @@ function stepScelta(){const sv=load();
   return `<div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
    <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord Italia, da Torino a Trieste. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
    ${installCard()}
-   ${sv&&sv.S&&!sv.S.over?`<div class="card pend"><div class="row"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><button class="btn pri" data-act="continue">Continua la partita</button></div></div>`:''}
+   ${sv&&sv.S&&!sv.S.over?`<div class="card pend">${startSel.del?`<div class="row" style="flex-wrap:wrap;align-items:center"><span><b>Cancellare per sempre ${esc(sv.S.company.name)}?</b> <span class="sm">La partita sparisce e non si può recuperare.</span></span><span class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto"><button class="btn" data-act="delno">No, tienila</button><button class="btn del" data-act="delsave">Sì, cancella</button></span></div>`
+    :`<div class="row" style="flex-wrap:wrap;align-items:center"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><span class="row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto"><button class="btn" data-act="delask">Cancella</button><button class="btn pri" data-act="continue">Continua la partita</button></span></div>`}</div>`:''}
    <div class="lab">Scegli il tuo CEO</div><div class="ceos five">${st}</div>`;}
 function showStart(){
   setSpeedSafe(0); WIKI_ON=false; const k=startSel.step;
@@ -5665,7 +5674,7 @@ Object.assign(ACT,{
  lbmode(d){startSel.lb.mode=d.v; showStart();},
  lbwin(d){const w=startSel.lb.win; w[d.id]=!w[d.id]; showStart();},
  lbwt(d){startSel.lb[d.id]=+d.v; showStart();},
- continue(){const sv=load();if(!sv)return;S=fillSave(migrateStaff(renameClients(sv.S)));HUM=S;if(!S.cfg)S.cfg={mode:'classica',win:{}};if(MODES[S.cfg.mode]&&MODES[S.cfg.mode].off){S.cfg.mode='classica';delete S.clock;}S.bots=(S.bots||[]).map(b=>fillSave(b));if(contMode())S.speed=1;S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){if(!m.log.length)m.tal=[...d.tal];m.role=d.role;}});if(S.project===undefined)S.project=null;if(S.speed>2)S.speed=2;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();}
+ continue(){startSel.del=false;const sv=load();if(!sv)return;S=fillSave(migrateStaff(renameClients(sv.S)));HUM=S;if(!S.cfg)S.cfg={mode:'classica',win:{}};if(MODES[S.cfg.mode]&&MODES[S.cfg.mode].off){S.cfg.mode='classica';delete S.clock;}S.bots=(S.bots||[]).map(b=>fillSave(b));if(contMode())S.speed=1;S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){if(!m.log.length)m.tal=[...d.tal];m.role=d.role;}});if(S.project===undefined)S.project=null;if(S.speed>2)S.speed=2;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();}
 });
 function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;
