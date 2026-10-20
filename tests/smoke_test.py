@@ -157,6 +157,16 @@ async def phone(b, w, h, name, errs):
         await pg.tap(f'#win-riepilogo [data-act=rptab][data-id={t}]')
         assert await pg.evaluate(FITS, '#win-riepilogo'), f'{name}: riepilogo {t} esce dallo schermo'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_riepilogo_{t}.png'))
+    # report della partita (anche a partita in corso, dal Riepilogo): ogni scheda resta dentro lo schermo
+    await pg.tap('#win-riepilogo [data-act=rptab][data-id=gen]')
+    await pg.tap('#win-riepilogo [data-act=finale]')
+    for t in ['sint','cresc','anni','cron']:
+        await pg.tap(f'#win-finale [data-act=fintab][data-id={t}]')
+        assert await pg.evaluate(FITS, '#win-finale'), f'{name}: report {t} esce dallo schermo'
+        bad = await pg.evaluate(NOSIDE, '#win-finale')
+        assert not bad, f'{name}: report {t}: {bad}'
+        await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_finale_{t}.png'))
+    await pg.tap('#win-finale [data-act=close]')
     await pg.tap('#win-riepilogo [data-act=close]')
     # numeri in alto: ognuno apre la sua finestra di dettaglio; dalla cassa si chiede un prestito
     for wn in ['cassa','mese','morale','otif']:
@@ -543,6 +553,24 @@ async def main():
         await pg.screenshot(path=os.path.join(OUT, 'shot_vittoria.png'))
         await pg.click('#modal [data-act=openclass]')
         await pg.screenshot(path=os.path.join(OUT, 'shot_classifica_fine.png'))
+        # report di fine partita: dalla classifica, con tutte le schede; la cronaca ha le tappe della partita
+        await pg.click('#win-classifica [data-act=finale]')
+        for t in ['sint','cresc','anni','cron','avv']:
+            await pg.click(f'#win-finale [data-act=fintab][data-id={t}]')
+            await pg.screenshot(path=os.path.join(OUT, f'shot_finale_{t}.png'))
+        fin = await pg.evaluate('''()=>{const F=window.__FUP,H=F.HUM,q=s=>document.querySelectorAll('#win-finale '+s).length; F.ACT.fintab({id:'sint'}); const r={tiles:q('.rp-t'),esito:document.querySelector('#win-finale .fin-esito').innerText};
+          F.ACT.fintab({id:'cresc'}); r.charts=q('svg[data-chart^=fn_]'); F.ACT.fintab({id:'cron'}); r.cron=q('.fin-cr'); r.log=(H.log||[]).length; F.ACT.fintab({id:'avv'}); r.avv=q('tr')-1;
+          // più di tre anni di storia: i grafici passano a un punto per anno
+          const h0=H.hist; H.hist=h0.concat(h0.map(h=>({...h,d:h.d+730}))); F.ACT.fintab({id:'cresc'}); r.yr=document.querySelector('#win-finale svg[data-chart=fn_ru]').closest('figure').innerText.includes('anno'); H.hist=h0;
+          return r;}''')
+        assert fin['tiles'] >= 12 and fin['esito'] in ('Vittoria','Sconfitta') and fin['charts'] == 7 and fin['cron'] >= 5 and fin['avv'] == 4 and fin['yr'], fin
+        print('report di fine partita:', fin)
+        # fallimento: il pulsante nella finestra apre il report
+        await pg.evaluate("()=>{const F=window.__FUP; document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.newGame('gino'); const S=F.S; for(let i=0;i<70;i++) F.step(); S.cash=-90000; for(let i=0;i<31&&!S.over;i++) F.step();}")
+        await pg.click('#modal [data-act=finale]')
+        assert 'Fallimento' in await pg.inner_text('#win-finale .fin-esito'), 'report dopo il fallimento'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_finale_fallimento.png'))
+        await pg.evaluate("()=>document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click())")
         # tempo senza pausa: in modalità Veloce i giorni passano anche con una finestra aperta
         d0 = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('valeria',null,{mode:'veloce',win:{}}); F.S.speed=1; F.ACT.options(); return F.S.day;}''')
         await pg.wait_for_timeout(3500)
