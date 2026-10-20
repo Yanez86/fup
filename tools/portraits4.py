@@ -36,7 +36,7 @@ def save2(c,name):
     a=np.zeros((H,W,4),np.uint8); a[...,:3]=c.img.astype(np.uint8); a[...,3]=np.where(c.obj,255,0)
     Image.fromarray(a,'RGBA').resize((W*2,H*2),Image.NEAREST).save(OUT+f'p_{name}.png')
 SKINS={'chiara':('#f1c4a0','#d29a76','#fbdcc0','#b07a58'),'media':(SK,SKD,SKL,SKDD),'scura':('#c98f62','#a26c45','#dcaa80','#83532f')}
-def person(name,skin='media',hair='#3d2419',hairl=None,hairstyle='short',cloth='#26365c',clothd=None,clothl=None,glasses=None,beard=None,mustache=None,lips=None,collar=None,extra=None,bald=False,earring=None):
+def person(name,skin='media',hair='#3d2419',hairl=None,hairstyle='short',cloth='#26365c',clothd=None,clothl=None,glasses=None,beard=None,mustache=None,lips=None,collar=None,extra=None,bald=False,earring=None,haird='#1c1612'):
     s,sd,sl,sdd=SKINS[skin]; hl=hairl or hair
     c=Canvas()
     torso=ell(24,58,24,18)&(yy<56)
@@ -56,7 +56,7 @@ def person(name,skin='media',hair='#3d2419',hairl=None,hairstyle='short',cloth='
     c.px([(x,35) for x in range(20,29)],sd)
     if hairstyle=='short':
         h=(ell(24,15,10.8,6.5)&(yy<18.5))|(rect(14,14,16.5,22)&head)|(rect(31.5,14,34,22)&head)
-        c.shaded(h,hair,'#1c1612',hl,20,10,11,6)
+        c.shaded(h,hair,haird,hl,20,10,11,6)
     elif hairstyle=='buzz':
         h=(ell(24,15.5,10.5,6)&(yy<17.5))
         c.shaded(h,hair,'#1c1612',hl,20,10,11,6); dots=h&(((xx.astype(int)+yy.astype(int))%2)==0); c.img[dots]=c.img[dots]*0.8
@@ -143,7 +143,11 @@ person('matteo',skin='chiara',hair='#4a3426',hairl='#6e4e38',hairstyle='messy',c
 person('beatrice',skin='chiara',hair='#b9bec5',hairl='#dfe3e8',hairstyle='bob',cloth='#16202e',clothd='#0c131d',clothl='#2f3d52',lips='#b0505a',earring='#c3d0dc',collar=cc_col('#f4f5f7'))
 person('paolo',skin='media',hair='#9aa0a8',hairl='#c9ced4',hairstyle='short',cloth='#5a3e2b',clothd='#3e2a1c',clothl='#7a5a40',glasses='#16202e',collar=tie('#9b6bff'))
 person('federico',skin='scura',hair='#2c2420',hairl='#463830',hairstyle='short',cloth='#1f9e8f',clothd='#157366',clothl='#3dd6c4',beard='#2c2420',collar=tie('#16202e'))
-NEW=['giorgio','aisha','ivan','sara','nicola','elena','matteo','beatrice','paolo','federico']
+# Andrew Goodheart: biondo, capelli corti, occhiali squadrati dalla montatura spessa
+def sq_glasses(c):
+    c.px(line_px(16,22,21)+line_px(26,32,21)+[(15,22),(15,23),(15,24),(33,22),(33,23),(33,24)],'#16202e')
+person('andrew',skin='chiara',hair='#e8c25a',hairl='#fbe39a',haird='#b08a2e',hairstyle='short',cloth='#3a6db0',clothd='#264f86',clothl='#5a8bd0',glasses='#16202e',collar=tie('#e0393e'),extra=sq_glasses)
+NEW=['giorgio','aisha','ivan','sara','nicola','elena','matteo','beatrice','paolo','federico','andrew']
 
 # posto vacante: sagoma anonima in ombra (p_anonimo), con un punto di domanda sul petto
 def anonimo():
@@ -164,7 +168,7 @@ bg=Image.new('RGBA',(10*104,120),(42,58,80,255))
 for i in range(10):
     im=Image.open(OUT+f'p_cc{i+1}.png'); bg.alpha_composite(im,(4+i*104,4))
 bg.save(ROOT+'/tools/out/cc_preview.png')
-bg=Image.new('RGBA',(10*104,120),(42,58,80,255))
+bg=Image.new('RGBA',(len(NEW)*104,120),(42,58,80,255))
 for i,n in enumerate(NEW):
     im=Image.open(OUT+f'p_{n}.png'); bg.alpha_composite(im,(4+i*104,4))
 bg.save(ROOT+'/tools/out/nuovi_preview.png')
