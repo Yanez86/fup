@@ -1,5 +1,6 @@
 # Pubblica il gioco su GitHub Pages a ogni push su main.
-# Il sito mostra dist/fup.html come pagina principale, con accanto i file della web app.
+# Il sito mostra dist/fup.html come pagina principale, con accanto i file della web app;
+# il sito di presentazione (cartella sito/) va in /fup/sito/.
 name: Pubblica su GitHub Pages
 on:
   push:
@@ -26,6 +27,8 @@ jobs:
           cp dist/fup.html _site/index.html
           # web app installabile sul telefono: manifest, service worker e icone
           cp dist/manifest.webmanifest dist/sw.js dist/icona_*.png _site/
+          # sito di presentazione, raggiungibile da /fup/sito/
+          cp -r sito _site/sito
           touch _site/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

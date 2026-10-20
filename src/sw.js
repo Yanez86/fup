@@ -18,6 +18,8 @@ self.addEventListener('fetch', e => {
     return;
   }
   if (url.origin !== location.origin) return;
+  // il sito di presentazione non fa parte del gioco: niente copia salvata, così non prende il posto della pagina del gioco
+  if (url.pathname.startsWith(new URL('sito/', self.registration.scope).pathname)) return;
   // file del gioco: prima la rete, poi la copia salvata
   e.respondWith(fetch(req).then(r => {
     if (r.ok) { const cp = r.clone(); caches.open(CACHE).then(c => c.put(req.mode === 'navigate' ? './' : req, cp)); }
