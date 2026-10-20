@@ -117,6 +117,7 @@ Ogni abilità ha un'icona 8×8 e un colore fisso, usati ovunque nel gioco: Opera
   - `naz` (da CEO): punteggio nelle gare delle committenti S e A (Parla per acronimi +3, Dialetto stretto −3).
   - `gara` (da CEO o direttore commerciale): punteggio in tutte le gare (Conosce tutti al bar +2).
   - `drv` (da CEO): tempi di assunzione degli autisti (Un milione di km al volante ×0,7).
+  - Job hopper (Negoziazione +2, Innovazione +1, Leadership −1): un manager o dirigente assunto che non ha aumenti da oltre 365 giorni apre l'evento «Il richiamo di LinkedIn» (oltre a «Un'offerta dalla concorrenza»): aumento del 15%, progetto nuovo (50%: Innovazione +1 e resta, altrimenti lascia dopo 30 giorni) o far finta di niente (75% lascia dopo 30 giorni). Da CEO apre l'evento «Un head hunter ti cerca» (rifiutare: reputazione +2 e morale +3 per 30 giorni; colloquio: Negoziazione +1 e morale −4 per 30 giorni). Ce l'ha Chiara Ferraris.
 
 ## Età, storia dei personaggi, pensione e successione
 - Il CEO in carica è `S.boss` (copia modificabile; `ceo()` lo restituisce). Manager e dirigenti in `S.managers` / `S.execs` sono copie dei dati, con `st` e `tal` propri.
@@ -168,7 +169,7 @@ Regole per tutta l'azienda, accese o spente dalla finestra Policy (`POLICIES` in
 **Pretese** (`POL_TAL`, dai talenti di manager e dirigenti assunti; il CEO non ne ha): *Ex sindacalista* vuole Zero straordinario e Niente cooperative, odia Sabato obbligatorio; *Stacanovista* vuole Sabato obbligatorio, odia Zero straordinario e Settimana corta; *Sempre al telefono* odia Telefoni nell'armadietto; *Excel-dipendente* vuole Doppia spunta; *Parla con i robot* la odia; *Braccino corto* vuole Spending review, *Mano larga* la odia; *Cena col buyer* vuole Il cliente ha sempre ragione; *Insonne* vuole Smart working, *Ha fatto il militare* lo odia e vuole il Corso sicurezza. Contano solo le policy sbloccate.
 - Ogni giorno con una pretesa non rispettata (e non tollerata) lo scontento `unh` sale di 1; senza pretese scende di 2.
 - A 30 arriva l'ultimatum: accontentare (la policy cambia subito, anche dentro i 90 giorni), aumento del 15% (tollera per sempre tutte le policy che oggi non digerisce) oppure tenere il punto (lascia l'azienda dopo 30 giorni; se nel frattempo la pretesa viene rispettata ritira le dimissioni).
-- Evento casuale «Un'offerta dalla concorrenza» per chi non ha avuto aumenti da oltre un anno: pareggiare (+20%, tollera le policy di oggi), controproposta +8% (50% accetta, altrimenti se ne va dopo 30 giorni), rifiutare (67% se ne va dopo 30 giorni).
+- Evento casuale «Un'offerta dalla concorrenza» per chi non ha avuto aumenti da oltre due anni (un anno per chi ha il talento Job hopper, con il suo evento dedicato): pareggiare (+20%, tollera le policy di oggi), controproposta +8% (50% accetta, altrimenti se ne va dopo 30 giorni), rifiutare (67% se ne va dopo 30 giorni).
 
 ## Eventi
 - Uno ogni 30-55 giorni (il primo verso il 25° giorno). Un evento non si ripete prima di 240 giorni; quelli con `once` capitano una sola volta.
