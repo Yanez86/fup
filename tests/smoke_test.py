@@ -58,6 +58,11 @@ SEED = '''()=>{const F=window.__FUP; [['gino',1],['marco',2],['valeria',3]].forE
   for(let d=0;d<35;d++){document.querySelector('#modal').innerHTML=''; F.step();} document.querySelector('#modal').innerHTML=''; if(n===3) F.S.cash=-12000; F.save();
   const k=F.slotKey(n), v=JSON.parse(localStorage.getItem(k)); v.at=Date.now()-(n===2?0:86400000*n); localStorage.setItem(k,JSON.stringify(v));}); F.slot=1;}'''
 
+# barra in alto: in pausa tutti i riquadri hanno la stessa altezza e «In pausa» sta in fondo a destra
+BAR = '''()=>{window.__FUP.ACT.speed({v:'0'}); const hs=[...document.querySelectorAll('#top .wkn,#top .date,#top .optb,#top .paused,#top .chip')].filter(e=>e.offsetParent).map(e=>Math.round(e.getBoundingClientRect().height));
+  const p=document.querySelector('#paused').getBoundingClientRect(), t=document.querySelector('#top').getBoundingClientRect();
+  return {hs:[...new Set(hs)], eq:new Set(hs).size===1, right:!document.querySelector('#paused').hidden&&p.width>0&&t.right-p.right<30&&p.top<t.top+60};}'''
+
 async def intro(pg, shot):
     # schermata introduttiva: il camioncino arriva, poi un tocco la chiude e resta la schermata iniziale
     await pg.wait_for_timeout(2900)
@@ -107,14 +112,14 @@ async def phone(b, w, h, name, errs):
     await pg.wait_for_timeout(100)
     # menu: un solo pulsante sulla mappa; aperto, l'elenco sta nello schermo e ha tutte le voci
     assert await pg.evaluate(FITS, '#burger'), f'{name}: pulsante Menu fuori schermo'
-    # pulsante della velocità accanto al Menu: pausa -> x1 -> x2 -> pausa
+    # pulsante della velocità accanto al Menu: pausa <-> tempo che scorre (niente x2)
     assert await pg.evaluate(FITS, '#ppb'), f'{name}: pulsante pausa fuori schermo'
     pr = await pg.evaluate("[document.querySelector('#ppb').getBoundingClientRect(),document.querySelector('#burger').getBoundingClientRect()].map(r=>[r.left,r.right,r.height])")
     assert pr[0][1] <= pr[1][0] and pr[0][2] == pr[1][2], f'{name}: pulsante pausa sovrapposto o di altezza diversa {pr}'
     v0 = await pg.evaluate('window.__FUP.S.speed'); seen = []
-    for i in range(3):
+    for i in range(2):
         await pg.tap('#ppb'); seen.append(await pg.evaluate('window.__FUP.S.speed'))
-    assert sorted(seen) == [0, 1, 2] and seen[2] == v0, f'{name}: il pulsante pausa non cicla {v0} {seen}'
+    assert sorted(seen) == [0, 1] and seen[1] == v0, f'{name}: il pulsante pausa non alterna {v0} {seen}'
     await pg.tap('#lenses [data-act=lensmenu]'); await pg.wait_for_timeout(100)
     assert await pg.evaluate(FITS, '#lenses'), f'{name}: lenti aperte fuori schermo'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_lenti.png'))
@@ -133,6 +138,8 @@ async def phone(b, w, h, name, errs):
     top = await pg.evaluate('''()=>{const y=s=>Math.round(document.querySelector(s).getBoundingClientRect().top), w=document.querySelector('#wkn'), d=document.querySelector('#date');
       const ws=['S1','S52'].map(t=>{w.textContent=t;return w.offsetWidth;}), ds=['gen 02','set 08'].map(t=>{d.textContent=t;return d.offsetWidth;});
       return {row:Math.abs(y('#wkn')-y('#top .optb'))<12, ws, ds, txt:(window.__FUP.ACT.speed({v:'0'}),document.querySelector('#date').textContent)};}''')
+    bar = await pg.evaluate(BAR)
+    assert bar['eq'] and bar['right'], f'{name}: barra in alto {bar}'
     assert top['row'] and top['ws'][0] == top['ws'][1] and top['ds'][0] == top['ds'][1] and top['txt'] == 'gen 02', f'{name}: barra in alto {top}'
     # notifiche: l'evento arriva come tessera, con il cartellino accanto; la tessera apre la finestra, «Decidi più tardi» la lascia lì
     await pg.evaluate(FIRE, 'cesto'); await pg.wait_for_timeout(100)
@@ -293,6 +300,9 @@ async def main():
         await pg.click('#dock [data-id=azienda]')
         await pg.screenshot(path=os.path.join(OUT, 'shot_azienda_ceo_creato.png'))
         await pg.click('#dock [data-id=azienda]')
+        bar = await pg.evaluate(BAR)
+        assert bar['eq'] and bar['right'] and await pg.evaluate("document.querySelectorAll('#top .spd button').length") == 2, f'barra in alto {bar}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_barra_pausa.png'), clip={'x': 0, 'y': 0, 'width': 1440, 'height': 120})
         # lente delle province
         assert not await pg.is_visible('#lenses [data-act=lens][data-id=prov]'), 'le lenti devono partire chiuse'
         await pg.click('#lenses [data-act=lensmenu]')

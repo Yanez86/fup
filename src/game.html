@@ -69,29 +69,40 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .mk:hover .mk-ring{stroke:var(--yellow)}
 
 /* Barra superiore */
-#top{position:fixed;left:0;right:0;top:0;z-index:30;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-  padding:6px max(16px, env(safe-area-inset-right, 0px)) 6px max(16px, env(safe-area-inset-left, 0px));padding-top:calc(6px + env(safe-area-inset-top, 0px));
+#top{--bh:42px;position:fixed;left:0;right:0;top:0;z-index:30;display:grid;grid-template-columns:minmax(0,auto) 1fr auto;align-items:center;gap:16px;
+  padding:8px max(16px, env(safe-area-inset-right, 0px)) 6px max(16px, env(safe-area-inset-left, 0px));padding-top:calc(8px + env(safe-area-inset-top, 0px));
   background:var(--ink);color:#fff;border-bottom:3px solid var(--accent);box-shadow:inset 0 -3px 0 var(--ink2), 0 4px 0 rgba(12,19,29,.45)}
 #top .logo{font-family:var(--f-disp);font-weight:700;font-size:22px;letter-spacing:1px;text-shadow:2px 2px 0 var(--ink2);display:flex;align-items:center;gap:8px}
 #top #cologo{display:flex}
+/* barra in alto: logo a sinistra, al centro tempo, opzioni e numeri (vanno a capo se lo schermo è stretto), pausa a destra.
+   Settimana, data, tempo, opzioni, numeri e pausa sono riquadri della stessa altezza */
+#top .tgrp{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px}
+#top .logo{min-width:0}#top .logo small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:15em}
+@media (max-width:1499px){#top .logo small{display:none}}
+#top .clk[hidden]{display:none}
+/* riquadri: settimana, data, tempo, opzioni, numeri e pausa sono riquadri della stessa altezza */
+#top .wkn,#top .date,#top .clk,#top .spd button,#top .optb,#top .paused,#top .chip{height:var(--bh);box-sizing:border-box;flex:none}
+#top .wkn,#top .date,#top .clk,#top .paused{display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px;font-size:16px}
+#top .chip{min-width:88px;padding:0 10px}
+#top .paused[hidden]{display:flex;visibility:hidden}
 #top .logo small{font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--hi);letter-spacing:0;text-shadow:none}
 .chip{display:flex;flex-direction:column;justify-content:center;line-height:1.1;padding:2px 10px;background:#1d2a3b;border:2px solid #2f4057;min-width:0}
-.chip span:first-child{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--hi)}
-.chip b{font-family:var(--f-disp);font-size:18px;font-weight:600}
+.chip span:first-child{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--hi)}
+.chip b{font-family:var(--f-disp);font-size:17px;font-weight:600}
 .date{font-family:var(--f-disp);font-size:17px;padding:3px 10px;min-width:calc(8.3em + 46px);text-align:center;white-space:nowrap;box-sizing:border-box;background:var(--ink3);border:2px solid var(--ink4);box-shadow:inset 0 -2px 0 #1d2a3b}
 .spd{display:flex;gap:4px}.spd[hidden]{display:none}
-.spd button{width:36px;height:34px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font-family:var(--f-disp);font-weight:700;box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
+.spd button{width:44px;height:34px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font-family:var(--f-disp);font-weight:700;box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
 .spd button[aria-pressed="true"]{background:var(--accent);color:var(--ink);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
-.optb{width:40px;height:38px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink4);background:var(--ink3);box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
+.optb{width:44px;height:38px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink4);background:var(--ink3);box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
 .optb:hover{border-color:#fff}
 .spacer{flex:1}
 .stats{display:flex;gap:6px;flex-wrap:wrap}
 .wkn{font-family:var(--f-disp);font-size:15px;padding:4px 8px;box-sizing:border-box;min-width:8.2em;text-align:center;background:var(--accent);color:var(--ink);border:2px solid var(--ink);box-shadow:inset 0 -2px 0 var(--accent-d);white-space:nowrap;cursor:pointer}
 .clk{font-family:var(--f-disp);font-size:15px;padding:4px 10px;background:var(--ink3);border:2px solid var(--ink4);white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:6px}.clk[hidden]{display:none}.clk i{width:10px;height:10px;background:var(--ok);box-shadow:0 0 0 2px var(--ink);animation:clkb 2s steps(2) infinite}@keyframes clkb{50%{opacity:.35}}
-.paused{font-family:var(--f-disp);font-size:15px;padding:3px 8px;background:var(--bad);border:2px solid #fff}
+.paused{font-family:var(--f-disp);font-size:15px;padding:3px 8px;min-width:8.2em;background:var(--bad);border:2px solid #fff;box-shadow:inset 0 -2px 0 #9c2a2a;white-space:nowrap}
 
 /* Menu laterale */
-#dock{position:fixed;left:max(12px, env(safe-area-inset-left, 0px));top:88px;z-index:25;display:flex;flex-direction:column;gap:6px;padding:6px;background:var(--ink);border:3px solid var(--ink2);box-shadow:inset 0 2px 0 var(--ink3), 5px 5px 0 rgba(12,19,29,.55)}
+#dock{position:fixed;left:max(12px, env(safe-area-inset-left, 0px));top:calc(var(--top-h, 64px) + 14px);z-index:25;display:flex;flex-direction:column;gap:6px;padding:6px;background:var(--ink);border:3px solid var(--ink2);box-shadow:inset 0 2px 0 var(--ink3), 5px 5px 0 rgba(12,19,29,.55)}
 #dock button{width:48px;height:44px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink4);background:var(--ink3);box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a;position:relative}
 #dock button.on{background:var(--accent);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
 #dock .di{display:flex;align-items:center;justify-content:center}
@@ -484,7 +495,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .wk-home .kws{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:14px}
 
 /* Notifiche: colonna di tessere a destra (grandi le importanti, piccole le varie), schedina che si apre accanto, cartellino temporaneo */
-#notes{position:fixed;z-index:24;right:max(16px, env(safe-area-inset-right, 0px));top:calc(var(--top-h, 104px) + 22px);display:flex;flex-direction:column;align-items:flex-end;gap:16px}
+#notes{position:fixed;z-index:24;right:max(16px, env(safe-area-inset-right, 0px));top:calc(var(--top-h, 64px) + 62px);display:flex;flex-direction:column;align-items:flex-end;gap:16px}
 #notes:empty{display:none}
 .nt{position:relative;display:flex;align-items:center;justify-content:center;padding:0;border:3px solid var(--ink2);box-shadow:inset 0 -4px 0 rgba(0,0,0,.28), inset 0 3px 0 rgba(255,255,255,.35), 4px 4px 0 rgba(12,19,29,.55)}
 .nt.big{width:60px;height:60px}
@@ -804,16 +815,18 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 html,body{overscroll-behavior:none}
 .mob body{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .mob input[type=text]{-webkit-user-select:text;user-select:text;font-size:16px}
-.mob #top{gap:6px;padding:4px max(8px, env(safe-area-inset-right, 0px)) 5px max(8px, env(safe-area-inset-left, 0px));padding-top:calc(4px + env(safe-area-inset-top, 0px) + var(--glass, 0px))}
+.mob #top{--bh:38px;display:flex;flex-wrap:wrap;gap:6px;row-gap:6px;padding:4px max(8px, env(safe-area-inset-right, 0px)) 5px max(8px, env(safe-area-inset-left, 0px));padding-top:calc(4px + env(safe-area-inset-top, 0px) + var(--glass, 0px))}
 .mob #top .logo{font-size:19px}
 .mob #top .logo small,.mob #top .spacer{display:none}
-.mob .date{font-size:14px;padding:3px 6px;min-width:5em}
+.mob #top .wkn,.mob #top .date,.mob #top .clk,.mob #top .paused{font-size:14px;padding:0 7px}.mob .date{min-width:5em}
 .mob .spd button{width:36px;height:36px}.mob .optb{width:38px;height:38px}
 @media (max-width:379px){.mob #top .logo .lt{display:none}}
-.mob .paused{display:none}.mob .wkn{font-size:13px;padding:3px 5px;min-width:3em}.mob .clk{font-size:13px;padding:3px 6px}.mob .clk b{display:none}
-.mob #top .stats{gap:4px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.mob .paused{min-width:0;margin-left:auto}.mob #top .paused[hidden]{display:none}.mob .wkn{min-width:3.6em}.mob .clk b{display:none}
+.mob #top .tgrp{display:contents}
+.mob #top .stats{order:2;flex:1 0 100%;gap:4px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
 .mob #top .stats .chip.opt2{display:none}
-.mob .chip{padding:1px 7px;flex:none}
+.mob.land #top .stats{order:0;flex:0 1 auto;min-width:0}
+.mob #top .chip{padding:0 7px;min-width:0}
 .mob .chip span:first-child{font-size:10px}
 .mob .chip b{font-size:15px}
 /* menu del telefono: pulsante «Menu» in basso a destra, elenco che entra da sinistra sopra tutto */
@@ -844,7 +857,6 @@ html,body{overscroll-behavior:none}
 .mob .spd{display:none !important}
 .mob #ppb{position:fixed;right:calc(max(12px, env(safe-area-inset-right, 0px)) + var(--burg-w, 130px) + 8px);bottom:calc(14px + env(safe-area-inset-bottom, 0px));z-index:26;display:flex;align-items:center;justify-content:center;width:54px;height:54px;background:var(--ink3);color:#fff;border:3px solid var(--ink);box-shadow:inset 0 -4px 0 #1d2a3b, inset 0 2px 0 #3b4f6a, 4px 4px 0 rgba(12,19,29,.55);font:700 22px var(--f-disp)}
 .mob #ppb[data-v="0"]{background:var(--bad)}
-.mob #ppb[data-v="2"]{background:var(--accent);color:var(--ink);box-shadow:inset 0 -4px 0 var(--accent-d), inset 0 2px 0 var(--accent-l), 4px 4px 0 rgba(12,19,29,.55)}
 .mob.menu #ppb,#ppb[hidden]{display:none}
 .mob.haswin #lenses{display:none}
 .mob .win{left:var(--win-l) !important;right:0;top:var(--top-h) !important;bottom:var(--win-b);width:auto !important;max-width:none;max-height:none;border-width:0 0 0 3px;box-shadow:none}
@@ -948,18 +960,18 @@ html,body{overscroll-behavior:none}
 
 <header id="top">
   <div class="logo"><span class="lt">FUP</span> <span id="cologo"></span><small id="coname"></small></div>
+  <div class="tgrp">
   <div class="wkn num" id="wkn" data-act="wiki" data-id="tempo" role="button">—</div>
   <div class="date num" id="date" data-act="wiki" data-id="stagionalita" role="button">—</div>
   <div class="clk" id="clk" data-act="wiki" data-id="tempo" role="button" hidden></div>
   <div class="spd" role="group" aria-label="Velocità del tempo">
     <button data-act="speed" data-v="0" aria-label="Pausa (spazio)">II</button>
     <button data-act="speed" data-v="1" aria-label="Velocità 1">›</button>
-    <button data-act="speed" data-v="2" aria-label="Velocità 2">››</button>
   </div>
   <button class="optb" data-act="options" aria-label="Opzioni" title="Opzioni"><svg width="20" height="20" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="#16202e" d="M4 0h2v1h1v1h1v-1h1v1h1v1h-1v1h1v2h-1v1h1v1h-1v1h-1v-1h-1v1h-1v1h-2v-1h-1v-1h-1v1h-1v-1h-1v-1h1v-1h-1v-2h1v-1h-1v-1h1v-1h1v1h1v-1h1z"/><path fill="#d8e2ee" d="M4 1h2v1h1v1h1v4h-1v1h-1v1h-2v-1h-1v-1h-1v-4h1v-1h1z"/><path fill="#16202e" d="M4 4h2v2h-2z"/></svg></button>
-  <span class="paused" id="paused" hidden>In pausa</span>
-  <div class="spacer"></div>
   <div class="stats num" id="stats"></div>
+  </div>
+  <span class="paused" id="paused" hidden>In pausa</span>
 </header>
 
 <nav id="dock" aria-label="Menu"></nav>
@@ -1943,7 +1955,7 @@ wk('tempo','basi','Tempo e ritmo',`Il tempo si conta a settimane. Per ora c'è u
 `Dietro le quinte il gioco ricalcola ogni giorno tutti i magazzini: [[puntualita]], [[accuratezza]], [[morale]], costi e ricavi. Ogni lunedì arriva il [[report]] della settimana, alla fine di ogni mese si chiudono i conti: [[soddisfazione]] dei clienti, [[penali]], [[conto|conto economico]] e prezzo del [[gasolio]]. Le durate (ricerche, assunzioni, cantieri, preavvisi) sono indicate in settimane; in alto ci sono il numero della settimana, il mese e l'anno.
 
 Il ritmo si sceglie nella [[lobby]] e non si cambia durante la partita:
-• **Classica**: come una volta. Spazio mette in pausa, i tasti 1 e 2 cambiano velocità: una settimana dura 7 secondi oppure 3. Quando compare un [[eventi|evento]] o un messaggio importante il tempo si ferma da solo finché non rispondi.
+• **Classica**: come una volta. Spazio mette in pausa e fa ripartire il tempo (anche il tasto 1): una settimana dura 7 secondi. Quando compare un [[eventi|evento]] o un messaggio importante il tempo si ferma da solo finché non rispondi.
 • **Veloce**: niente pausa, una settimana ogni 10 secondi (un anno in circa 9 minuti).
 • **Tranquilla**: niente pausa, una settimana al minuto (un anno in poco meno di un'ora).
 • **Persistente**: una settimana di gioco per ogni giorno vero, e il tempo passa anche a gioco chiuso: un anno dura 52 giorni. Quando riapri, il gioco recupera le settimane passate (al massimo un anno) e mostra il riepilogo «Mentre eri via».
@@ -4565,7 +4577,7 @@ function renderTop(){
   document.querySelectorAll('.spd button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===S.speed)));
   $('#paused').hidden=S.speed!==0;
   $('#pauseovl').hidden=S.speed!==0||!!S.over||cm;
-  {const pb=$('#ppb'); pb.hidden=cm; pb.dataset.v=S.speed; pb.textContent=['II','›','››'][S.speed]||'›'; pb.setAttribute('aria-label',['In pausa: tocca per x1','Velocità x1: tocca per x2','Velocità x2: tocca per la pausa'][S.speed]||'Velocità');}
+  {const pb=$('#ppb'); pb.hidden=cm; pb.dataset.v=S.speed; pb.textContent=S.speed?'II':'›'; pb.setAttribute('aria-label',S.speed?'Il tempo scorre: tocca per la pausa':'In pausa: tocca per far scorrere il tempo');}
   const last=S.last?S.last.util:null;
   const mor=S.warehouses.reduce((a,w)=>a+w.morale,0)/S.warehouses.length, ot=otifNow(), om=otifGap();
   const more=`<div class='sm' style='color:#c9d3dd;margin-top:4px'>${TOUCH?'Tocca':'Clic'} per i dettagli</div>`;
@@ -5641,7 +5653,7 @@ const ACT={
  cell(d){UI.sel.cell=d.ref;renderWin('report');},
  lens(d){UI.lens=d.id;UI.lensOpen=false;renderMap();syncTrucks();},
  lensmenu(){UI.lensOpen=!UI.lensOpen;renderLenses();},
- spdcycle(){setSpeed((S.speed+1)%3);},
+ spdcycle(){setSpeed(S.speed?0:1);},
  trrule(d,el){const w=whById(d.wh); if(!w||trWait(w,d.id)){el.checked=trOn(w,d.id);return;} w.rules=w.rules||{}; w.rules[d.id]={on:el.checked,day:S.day}; const r=TR_RULES.find(x=>x.id===d.id); toast(`${w.name}: ${r.name} ${el.checked?'attiva':'spenta'}`,el.checked?'ok':'warn'); renderAll();},
  lenstrips(){ACT.lens({id:'trips'}); if(MOB) closeWin('traffico');},
  clidet(d){UI.cliOpen=UI.cliOpen||{}; UI.cliOpen[d.id]=!UI.cliOpen[d.id]; renderWin('clienti');},
@@ -5729,7 +5741,7 @@ function wikiShow(){
   if(c&&(c.offsetTop<l.scrollTop||c.offsetTop>l.scrollTop+l.clientHeight-30)) l.scrollTop=c.offsetTop-l.clientHeight/3;
 }
 function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh:r==='plan'?null:wh,days});toast(`Ricerca avviata: arriva tra ${wks(days)}`,'ok');}
-function setSpeed(v){if(contMode())v=1; S.speed=v;renderTop();}
+function setSpeed(v){if(contMode())v=1; S.speed=Math.min(v,1);renderTop();}
 function showModal(html){if(contMode()&&!AUTO)UI.auto={due:S.day+7,f:closeModal}; $('#modal').innerHTML=`<div class="ovl"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;const b=$('#modal button');if(b)b.focus();}
 function closeModal(){$('#modal').innerHTML='';UI.auto=null;if(UI.evSpeed){setSpeed(UI.evSpeed);UI.evSpeed=0;} if((UI.mq||[]).length&&S&&!S.over) modalInfo(...UI.mq.shift());}
 function showChoice(title,text,opts){UI.choice=opts.map(o=>o.f);UI.evSpeed=S.speed;S.speed=0;renderTop();
@@ -5753,7 +5765,7 @@ document.addEventListener('keydown',e=>{
   if($('#modal').innerHTML) return;
   if(e.code==='KeyE'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ACT.toggle({id:'enciclopedia'});return;}
   if(e.code==='Space'){e.preventDefault();setSpeed(S.speed?0:(UI.prevSpeed||1));if(S.speed)UI.prevSpeed=S.speed;}
-  if(['Digit1','Digit2'].includes(e.code)){setSpeed(+e.code.slice(5));UI.prevSpeed=S.speed;}
+  if(e.code==='Digit1'){setSpeed(1);UI.prevSpeed=1;}
   if(e.key==='Escape'&&UI.menu){setMenu(false);return;}
   if(e.code==='KeyL'){const i=LENSES.findIndex(l=>l.id===(UI.lens||'base'));ACT.lens({id:LENSES[(i+1)%LENSES.length].id});}
 });
@@ -5962,6 +5974,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.59',t:'Barra in alto più ordinata',x:['Il tempo ha una sola velocità: tolto il pulsante x2. Restano pausa e avanti (spazio o il tasto 1); sul telefono il pulsante accanto a «Menu» alterna pausa e avanti.','Il riquadro rosso «In pausa» sta in fondo a destra nella barra in alto, anche sul telefono, oltre alla scritta sulla mappa.','Settimana, data, pulsanti del tempo, opzioni e numeri dell\'azienda sono riquadri della stessa altezza, centrati nella barra; sul computer largo tutto sta su una riga sola.']},
  {v:'0.58',t:'Partite online',x:['Nella schermata principale c\'è il riquadro «Salvataggio online»: entra con Google e le tue partite si salvano anche online, così le ritrovi sul telefono e sul computer.','Puoi anche giocare come ospite, senza account: le partite vanno online legate al browser, e con «Collega Google» le porti sul tuo account senza perdere niente.','Se la stessa partita è andata avanti su due dispositivi, il gioco ti chiede quale versione tenere.','Ogni partita si può scaricare su file come copia di sicurezza e ricaricare con «Carica da file»; durante il gioco c\'è «Scarica la partita su file» nelle Opzioni.']},
  {v:'0.57',t:'Si vede quando è in pausa',x:['Quando il tempo è fermo la mappa si copre di barre grigie oblique con la scritta «Pausa» al centro: si capisce subito che il gioco è fermo. Le finestre e i pulsanti restano sopra e si usano come sempre.']},
  {v:'0.56',t:'Tre partite salvate',x:['Nuova schermata principale: in alto l\'insegna col camioncino, sotto le tue partite salvate e il pulsante giallo «Crea nuova partita». La scelta del CEO arriva dopo, toccando quel pulsante.','Puoi tenere fino a 3 partite. Ognuna ha la sua scheda con il ritratto del CEO, la data, la cassa, magazzini e clienti; l\'ultima giocata sta in cima, più grande, con Puntualità e Accuratezza. Il cestino cancella una partita, dopo la conferma.','La partita che avevi già salvato è al suo posto: la trovi nella prima scheda.','Le novità stanno in un menu a tendina in fondo alla schermata principale.']},
@@ -6222,7 +6235,7 @@ Object.assign(ACT,{
  lbmode(d){startSel.lb.mode=d.v; showStart();},
  lbwin(d){const w=startSel.lb.win; w[d.id]=!w[d.id]; showStart();},
  lbwt(d){startSel.lb[d.id]=+d.v; showStart();},
- continue(d){startSel.del=0;const n=+(d&&d.slot)||1,sv=load(n);if(!sv)return;slot=n;S=fillSave(migrateStaff(renameClients(sv.S)));HUM=S;if(!S.cfg)S.cfg={mode:'classica',win:{}};if(MODES[S.cfg.mode]&&MODES[S.cfg.mode].off){S.cfg.mode='classica';delete S.clock;}S.bots=(S.bots||[]).map(b=>fillSave(b));if(contMode())S.speed=1;S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){if(!m.log.length)m.tal=[...d.tal];m.role=d.role;}});if(S.project===undefined)S.project=null;if(S.speed>2)S.speed=2;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();if(S.over)ACT.finale();}
+ continue(d){startSel.del=0;const n=+(d&&d.slot)||1,sv=load(n);if(!sv)return;slot=n;S=fillSave(migrateStaff(renameClients(sv.S)));HUM=S;if(!S.cfg)S.cfg={mode:'classica',win:{}};if(MODES[S.cfg.mode]&&MODES[S.cfg.mode].off){S.cfg.mode='classica';delete S.clock;}S.bots=(S.bots||[]).map(b=>fillSave(b));if(contMode())S.speed=1;S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){if(!m.log.length)m.tal=[...d.tal];m.role=d.role;}});if(S.project===undefined)S.project=null;if(S.speed>1)S.speed=1;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();if(S.over)ACT.finale();}
 });
 function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;
