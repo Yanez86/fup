@@ -478,6 +478,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .nt-n{position:absolute;right:-8px;top:-8px;min-width:20px;height:20px;padding:0 4px;box-sizing:border-box;background:var(--accent);color:var(--ink);border:2px solid #fff;font:700 12px/16px var(--f-body);text-align:center}
 .nt-sep{width:46px;height:3px;margin:-2px 0 -6px;background:var(--ink2);box-shadow:0 2px 0 rgba(255,255,255,.25)}
 #notepop{position:fixed;z-index:26;width:360px;max-height:calc(100vh - 16px);overflow:auto;background:var(--panel);border:3px solid var(--ink2);box-shadow:inset 0 0 0 2px #fff, 6px 6px 0 rgba(12,19,29,.55)}
+#notepop .src{align-items:center;padding:5px 6px 5px 12px}
+#notepop .np-x{display:flex;align-items:center;gap:10px}
 #notepop .np-b{padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px}
 #notepop p{margin:0;line-height:1.45;font-size:15px}
 #notepop .row{display:flex;gap:8px;flex-wrap:wrap}
@@ -1847,7 +1849,7 @@ wk('notifiche','basi','Notifiche',`La colonna di tessere a destra della mappa: d
 • **I problemi aperti** (un reparto in affanno, pianificatori che non bastano, qualcuno che sta per andarsene, posti da dirigente liberi) restano finché non li risolvi: la tessera apre la finestra dove si sistemano.
 • **Sotto la riga le notizie varie**, tessere piccole raggruppate per tipo con il numero: nuove gare, assunzioni arrivate, ricerche finite, clienti, il [[report]] del lunedì. Si leggono anche aprendo la finestra di cui parlano.
 
-Quando arriva qualcosa di importante, accanto alla colonna compare per qualche secondo un cartellino con «Apri» e «Dopo»; poi resta solo la tessera, che lampeggia finché non la guardi. «Archivia» toglie una notizia; le notizie varie se ne vanno da sole dopo 8 settimane, le importanti dopo 12. Se le tessere non ci stanno tutte, le ultime finiscono in «+N». Tutto resta anche nel [[giornale]].`);
+Quando arriva qualcosa di importante, accanto alla colonna compare per qualche secondo un cartellino con «Apri» e «Dopo»; poi resta solo la tessera, che lampeggia finché non la guardi. la X in alto a destra della schedina toglie una notizia; le notizie varie se ne vanno da sole dopo 8 settimane, le importanti dopo 12. Se le tessere non ci stanno tutte, le ultime finiscono in «+N». Tutto resta anche nel [[giornale]].`);
 wk('giornale','basi','Il giornale',`L'archivio delle notizie: gare, contratti, ricerche concluse, scelte fatte negli eventi.`,
 `La Gazzetta del Muletto e Il Sole 24 Pallet raccontano cosa succede alla tua azienda e al mercato. Utile per ricordare chi ha vinto una [[gare|gara]] che hai perso e cosa hai deciso negli [[eventi]].`);
 wk('mappa','basi','Mappa',`Il Nord Italia in pixel art, da Nizza a Trieste: magazzini, città servite e camion in viaggio.`,
@@ -3959,19 +3961,21 @@ function renderNotes(){
   renderPop(); placeCard();
 }
 // schedina accanto alla tessera: la notizia intera, l'elenco di un gruppo o le tessere che non ci stanno
+// la X in alto a destra toglie la notizia (o tutto il gruppo) dalla colonna
+const noteX=(act,id)=>`<button class="xbtn" data-act="${act}" data-id="${id}" aria-label="Chiudi la notifica" data-tip="Chiudi la notifica">x</button>`;
 function closePop(){ UI.pop=null; const p=$('#notepop'); if(p&&!p.hidden){p.hidden=true; p.innerHTML='';} }
 function renderPop(){
   const p=$('#notepop'), P=UI.pop; if(!p) return; if(!P){closePop(); return;}
   let html='', anchor='';
   if(P.t==='n'){ const n=noteById(P.id); if(!n){closePop(); return;} anchor=`[data-act=note][data-id="${n.id}"]`;
     const ch=(n.ch||[]).map(c=>({...c,p:people().find(x=>x.id===c.p)})).filter(c=>c.p);
-    html=`<div class="src"><span>${esc(n.src)}</span><span>${shortDate(n.day)}</span></div><div class="np-b"><h3 class="h3" style="font-size:19px">${esc(n.k==='res'?'Com\'è andata: '+n.title:n.title)}</h3>
+    html=`<div class="src"><span>${esc(n.src)}</span><span class="np-x"><span>${shortDate(n.day)}</span>${noteX('notedel',n.id)}</span></div><div class="np-b"><h3 class="h3" style="font-size:19px">${esc(n.k==='res'?'Com\'è andata: '+n.title:n.title)}</h3>
       ${n.k==='res'?`<div class="ev-q">Hai scelto «${esc(n.pick)}»</div>`:''}<p>${esc(n.text)}</p>${(n.msg||[]).map(m=>`<div class="np-m ${m[1]}">${esc(m[0])}</div>`).join('')}
       ${n.eff?`<small class="ev-res"><i>Effetti:</i> ${esc(n.eff)}</small>`:''}${ch.length?`<div class="ev-chg">${chgHtml(ch)}</div>`:''}
-      <div class="row">${n.win?`<button class="btn pri" data-act="noteopen" data-id="${n.id}">${esc(winLbl(n.win))}</button>`:''}<button class="btn${n.win?'':' pri'}" data-act="notedel" data-id="${n.id}">${n.k==='res'?'Ok':'Archivia'}</button></div></div>`; }
+      ${n.win?`<div class="row"><button class="btn pri" data-act="noteopen" data-id="${n.id}">${esc(winLbl(n.win))}</button></div>`:''}</div>`; }
   else if(P.t==='g'){ const G=NOTE_G[P.g], L=S.notes.filter(n=>n.k==='var'&&n.g===P.g); if(!L.length){closePop(); return;} anchor=`[data-act=noteg][data-id="${P.g}"]`;
-    html=`<div class="src"><span>${esc(G.n)}</span><span>${L.length===1?'1 notizia':L.length+' notizie'}</span></div><div class="np-b"><ul class="np-l">${L.slice(0,8).map(n=>`<li><span>${esc(n.title)}</span><small>${shortDate(n.day)}</small></li>`).join('')}</ul>${L.length>8?`<div class="sm">E altre ${L.length-8}.</div>`:''}
-      <div class="row"><button class="btn pri" data-act="notegopen" data-id="${P.g}">${esc(winLbl(G.win))}</button><button class="btn" data-act="notegdel" data-id="${P.g}">Archivia</button></div></div>`; }
+    html=`<div class="src"><span>${esc(G.n)}</span><span class="np-x"><span>${L.length===1?'1 notizia':L.length+' notizie'}</span>${noteX('notegdel',P.g)}</span></div><div class="np-b"><ul class="np-l">${L.slice(0,8).map(n=>`<li><span>${esc(n.title)}</span><small>${shortDate(n.day)}</small></li>`).join('')}</ul>${L.length>8?`<div class="sm">E altre ${L.length-8}.</div>`:''}
+      <div class="row"><button class="btn pri" data-act="notegopen" data-id="${P.g}">${esc(winLbl(G.win))}</button></div></div>`; }
   else { const L=UI.noteHid||[]; if(!L.length){closePop(); return;} anchor='[data-act=notemore]';
     html=`<div class="src"><span>Altre notifiche</span><span>${L.length}</span></div><div class="np-b">${L.map(x=>x.t==='n'?`<button class="np-r" data-act="note" data-id="${x.n.id}">${noteIc(x.n.ic,32)}<span>${esc(x.n.title)}</span></button>`
       :x.t==='a'?`<button class="np-r" data-act="noteal" data-id="${x.a.id}">${noteIc(x.a.ic,32)}<span>${esc(x.a.title)}</span></button>`
@@ -5540,7 +5544,8 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.47',t:'CEO da collezione',x:['La scelta del CEO è fatta di carte collezionabili: in alto il tipo di personaggio (Vecchia scuola, Figlio d\'arte, Squalo delle gare, Il nerd del WMS) nel colore della sua abilità più forte, poi ritratto, abilità a barre, talenti e cassa.','La carta scelta si solleva e prende l\'adesivo «SCELTO!»; sotto compaiono la sua storia, il magazzino e il cliente storico. Sul telefono le carte si scorrono col dito.']},
+ {v:'0.48',t:'CEO da collezione',x:['La scelta del CEO è fatta di carte collezionabili: in alto il tipo di personaggio (Vecchia scuola, Figlio d\'arte, Squalo delle gare, Il nerd del WMS) nel colore della sua abilità più forte, poi ritratto, abilità a barre, talenti e cassa.','La carta scelta si solleva e prende l\'adesivo «SCELTO!»; sotto compaiono la sua storia, il magazzino e il cliente storico. Sul telefono le carte si scorrono col dito.']},
+ {v:'0.47',t:'X per chiudere',x:['Nelle schede delle notifiche il pulsante «Archivia» è diventato una X in alto a destra: toccala per togliere la notizia (o tutto il gruppo) dalla colonna.']},
  {v:'0.46',t:'Ricerca sotto controllo',x:['Quando non stai ricercando nessuna tecnologia compare una tessera gialla nelle notifiche: toccala per aprire subito la finestra Tecnologia. Sparisce appena avvii una ricerca.','A fine ricerca arriva una notifica verde con il nome della tecnologia: toccandola si apre già selezionata, pronta da installare nei magazzini.']},
  {v:'0.45',t:'Cestino',x:['Nella schermata iniziale, accanto a «Continua la partita», c\'è il pulsante «Cancella» per eliminare la partita salvata (chiede conferma prima).','Anche dalle Opzioni durante il gioco puoi cancellare la partita in corso e tornare alla schermata iniziale.']},
  {v:'0.44',t:'Scelta del CEO in fila',x:['Nella scelta del CEO le schede occupano tutta la larghezza, una sotto l\'altra, con il ritratto a sinistra e abilità, talenti e cliente storico a destra.']},
