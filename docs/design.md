@@ -91,7 +91,7 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Attrattività = 45 + benefit aziendali + (reputazione−50)·0,5 + servizi di welfare del magazzino + Academy aziendale 5.
 - Con il talento «Un milione di km al volante» del CEO, autisti B e CE si assumono nel 30% di tempo in meno.
 - Ogni magazzino ha sei mestieri (`ROLES`, `w.staff`): magazzinieri (`pick`), carrellisti (`car`), capiturno (`capo`), impiegati di magazzino (`imp`), autisti patente B (`autB`), autisti patente CE (`autCE`). Non ci sono più impiegati di sede.
-- Produttività base `prod` = 900 × (0,7 + 0,3·morale/70) × (1 + tecnologie di produttività).
+- Produttività `prod` (pallet al mese per magazziniere, `PROD_BASE` = 900) = 900 × (0,7 + 0,3·morale/70) × (1 + tecnologie installate e apprese + servizi di welfare + policy) × (1 − penalità dello stato del magazzino) × (0,95 se c'è un cantiere) × effetto Operazioni del manager × (1 + regole del traffico del magazzino). Un carrellista fa 2,5 × `prod` movimenti. `computeWH()` restituisce le voci in `prF`; a fine settimana la media finisce in `w.ph` (max 156 settimane) con il carico di magazzinieri e carrellisti, e la pagina Produttività della finestra del magazzino ne fa il grafico.
 - Magazzinieri necessari = pallet consegnati al mese × lavoro medio dei canali / prod (preparano i pallet in uscita, pesano sull'Accuratezza).
 - Carrellisti necessari = movimenti (2 × pallet) / (2,5·prod) (scaricano, stoccano e caricano col muletto, pesano sulla Puntualità).
 - Impiegati necessari per magazzino = max(1; ceil(pallet consegnati / 1.500)) (2.000 con il gestionale).

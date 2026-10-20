@@ -295,6 +295,13 @@ input.sw:disabled{opacity:.45;cursor:not-allowed}
 .pr-ma{display:flex;justify-content:flex-end}
 .pr-ma .btn.pri{min-width:140px}
 .wh-kpis.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.wh-prodbtn{display:flex;width:100%;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;text-align:left;min-height:44px}
+.wh-prodbtn>span:first-child{display:inline-flex;align-items:center;gap:6px}
+.pr-hd{align-items:center;justify-content:flex-start;gap:10px}.pr-hd .h3{display:inline-flex;align-items:center;gap:6px}
+.pr-cols{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:8px;align-items:start}
+.mob .pr-cols{grid-template-columns:minmax(0,1fr)}
+.pr-r{align-items:baseline;gap:8px}.pr-r>span{min-width:0;flex:1}.pr-r b{white-space:nowrap;flex-shrink:0;padding-right:2px}
+.pr-g{margin-top:8px}.pr-ms{display:flex;flex-wrap:wrap;gap:4px}.pr-miss{cursor:help}
 /* finestra Clienti */
 .cl{gap:8px}
 .cl-h{display:flex;align-items:center;gap:10px}
@@ -1773,6 +1780,18 @@ wk('personale','pers','Personale',`Sette figure per ogni magazzino (magazzinieri
 In sede lavorano i [[pianificatori]] del traffico, che servono a tutti i magazzini. Magazzinieri e carrellisti si possono anche prendere da una [[cooperativa]].
 
 Ogni cliente ha i suoi [[canali]] di distribuzione, che decidono se servono bilici o furgoni, quindi vincere una [[gare|gara]] cambia chi devi [[assunzioni|assumere]]. La finestra Personale mostra l'organico di tutti i magazzini con il [[carico|carico di lavoro]] di ogni reparto.`);
+wk('produttivita','pers','Produttività',`Quanti pallet prepara al mese un magazziniere: 900 con il morale a 70 è il 100%. Più è alta, meno persone servono per lo stesso lavoro.`,
+`Si parte da 900 pallet al mese per [[magazzinieri|magazziniere]]; un [[carrellisti|carrellista]] fa due volte e mezza quei [[movimenti]]. Poi le voci si moltiplicano tra loro:
+• [[morale]]: 70 è la base, ogni 10 punti sopra o sotto valgono circa il 4%;
+• [[tecnologie]] di logistica [[installazione|installate]] e finite di imparare: Formazione +3%, Radiofrequenza +10%, Pick-to-light +15%, Robot AMR +40%;
+• [[welfare_mag|servizi di welfare]]: Mensa +3%, Raffrescatori +2%;
+• [[policy]]: Doppia spunta −5%, Settimana corta −10%, Rotazione delle mansioni −2%, Corso sicurezza −2%;
+• [[manutenzione|stato del magazzino]]: sotto il 70%, −0,6% per ogni punto mancante;
+• [[ampliamento|cantiere di ampliamento]]: −5% finché durano i lavori;
+• [[regole_traffico|regole del traffico]] del magazzino: Scarichi su prenotazione +5%;
+• [[st_op|Operazioni]] del [[manager]]: +2,5% per ogni punto sopra 10 (al contrario sotto), tra −20% e +20%.
+
+I [[canali]] a colli e a pezzo non toccano la produttività ma aumentano il lavoro per ogni pallet. Nella finestra del magazzino il pulsante Produttività mostra il grafico settimana per settimana, con il [[carico|carico di lavoro]] dei magazzinieri, e tutte le voci una per una.`);
 wk('carico','pers','Carico di lavoro',`Quanto è sotto sforzo un reparto: fino all'85% va tranquillo, al 100% è al limite, oltre è in affanno e i KPI scendono. Nessuno ti dice quanti assumere: lo decidi tu.`,
 `Il carico confronta il lavoro da fare con quello che le persone riescono a fare in un mese:
 • [[magazzinieri]]: pallet da preparare, circa 900 a testa;
@@ -2240,6 +2259,7 @@ function mgrStats(wh){
   return {op:5,prec:6,neg:6,lead:5,amm:6,inn:5,name:'Nessun manager',none:true};
 }
 // effetti delle abilità di chi guida il magazzino (per punto sopra 10; sotto 10 al contrario)
+const PROD_BASE=900;  // pallet al mese preparati da un magazziniere con morale 70 (un carrellista fa 2,5 volte i movimenti)
 const MGR_K={prod:0.025,km:0.015,sm:1,P:0.3,hire:0.02,fix:0.005,learn:0.03,inv:0.05};
 function mgrFx(m){const d=k=>(m[k]==null?10:m[k])-10;
   return {prod:clamp(1+MGR_K.prod*d('op'),0.8,1.2),km:clamp(1+MGR_K.km*d('op'),0.85,1.15),sm:MGR_K.sm*d('op'),P:MGR_K.P*d('op'),
@@ -2380,11 +2400,15 @@ function computeWH(wh,extra){
   const kmB=lg.reduce((a,t)=>a+t.kmB,0), kmCE=lg.reduce((a,t)=>a+t.kmCE,0), st=wh.staff;
   let tA=0,tP=0,tMor=0,tProd=0,tCan=0;
   let fuelMul=1-polSum('fuel');
-  TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t); tA+=(t.A||0)*f; tP+=(t.P||0)*f; tMor+=(t.mor||0)*(f>0?1:0); tProd+=(t.prod||0)*(f>0?1:0); if(f>0&&t.fuel) fuelMul*=1-t.fuel; tCan+=t.mese; });
+  const prL=[];  // voci della produttività: [gruppo, nome, valore]; 'l' = tecnologia ancora in apprendimento
+  TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t); tA+=(t.A||0)*f; tP+=(t.P||0)*f; tMor+=(t.mor||0)*(f>0?1:0); tProd+=(t.prod||0)*(f>0?1:0); if(t.prod) prL.push([f>0?'t':'l',t.name,f>0?t.prod:0]); if(f>0&&t.fuel) fuelMul*=1-t.fuel; tCan+=t.mese; });
   // servizi di welfare del magazzino: niente apprendimento, valgono da subito
-  let wMor=0,wP=0,wA=0,wCan=0; TECH.forEach(t=>{ if(t.tree!=='wel'||!wh.tech[t.id]) return; wMor+=t.mor||0; wP+=t.P||0; wA+=t.A||0; tProd+=t.prod||0; wCan+=welMese(t); });
+  let wMor=0,wP=0,wA=0,wCan=0; TECH.forEach(t=>{ if(t.tree!=='wel'||!wh.tech[t.id]) return; wMor+=t.mor||0; wP+=t.P||0; wA+=t.A||0; tProd+=t.prod||0; if(t.prod) prL.push(['w',t.name,t.prod]); wCan+=welMese(t); });
   const mf=mgrFx(m), kmB1=KM_B*mf.km*(1+trSum(wh,'kmB')), kmCE1=KM_CE*mf.km;
-  const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd+polSum('prod'))*(1-condPen(wh))*(wh.build?0.95:1)*mf.prod*(1+trSum(wh,'prod'));
+  POLICIES.forEach(p=>{ if(polOn(p.id)&&p.fx.prod) prL.push(['p',p.name,p.fx.prod]); });
+  TR_RULES.forEach(r=>{ if(trOn(wh,r.id)&&r.fx.prod) prL.push(['r',r.name,r.fx.prod]); });
+  const prF={mor:0.7+0.3*wh.morale/70,add:1+tProd+polSum('prod'),cond:1-condPen(wh),build:wh.build?0.95:1,mgr:mf.prod,tr:1+trSum(wh,'prod'),l:prL};
+  const prod=PROD_BASE*prF.mor*prF.add*prF.cond*prF.build*prF.mgr*prF.tr;
   // carrellisti: tutti i movimenti (doppia produttività col muletto); magazzinieri: preparano i pallet in uscita
   const use=(load,n,per)=>load===0?0:(n>0?load/(n*per):9);
   const uCar=use(mov,st.car,2.5*prod), uPick=use(cons*pickF,st.pick,prod), uB=use(kmB,st.autB,kmB1), uCE=use(kmCE,st.autCE,kmCE1);
@@ -2427,7 +2451,7 @@ function computeWH(wh,extra){
   const tr={cCE:mzCE+drv('autCE'),cB:mezzi-mzCE+drv('autB')}; tr.kmCE=kmCE?tr.cCE/kmCE:0; tr.kmB=kmB?tr.cB/kmB:0;
   const manut=manutMese(wh), fissi=((wh.fixed+1000)*fixedMul()*mf.fix+manut)*(1+talWh(wh,'fix'));
   const need={pick:Math.max(cons?1:0,Math.ceil(cons*pickF/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2.5*prod))),autB:Math.ceil(kmB/kmB1),autCE:Math.ceil(kmCE/kmCE1),imp:needImp+sm.addImp,capo:needCapo,fm:1};
-  return {tr,mf,manut,act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,mixF,pickF,P,A,pP,pA,pM,morT,rev,pers,mezzi,fissi,tCan,wCan,need,prod,m};
+  return {tr,mf,manut,act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,mixF,pickF,P,A,pP,pA,pM,morT,rev,pers,mezzi,fissi,tCan,wCan,need,prod,prF,m};
 }
 // carico di lavoro di ogni reparto: 1 = la squadra ce la fa giusta, oltre 1 è in affanno (9 = nessuno a fare un lavoro che c'è)
 // riquadro con gli effetti delle abilità di chi guida il magazzino (finestra del magazzino)
@@ -2486,7 +2510,7 @@ function step(){
     if(w.build){ w.build.left--; if(w.build.left<=0){ w.cap+=w.build.add; w.fixed+=w.build.rent; w.exp=(w.exp||0)+1; const a=w.build.add; w.build=null;
       toast(`Ampliamento finito a ${w.name}: +${n0(a)} posti pallet`,'ok'); news('Il Sole 24 Pallet',`${S.company.name} amplia ${w.name}`,`Il cantiere è chiuso: il magazzino sale a ${n0(w.cap)} posti pallet.`);} }
     w.acc.P+=k.P; w.acc.A+=k.A; w.acc.n++;
-    const wk=w.wk||(w.wk={n:0,P:0,A:0,sat:0,mor:0,mov:0,trips:0,rev:0,cost:0}); wk.n++; wk.P+=k.P; wk.A+=k.A; wk.sat+=k.sat; wk.satM=(wk.satM||0)+k.satM; wk.mor+=w.morale;
+    const wk=w.wk||(w.wk={n:0,P:0,A:0,sat:0,mor:0,mov:0,trips:0,rev:0,cost:0}); wk.n++; wk.P+=k.P; wk.A+=k.A; wk.sat+=k.sat; wk.satM=(wk.satM||0)+k.satM; wk.mor+=w.morale; wk.prod=(wk.prod||0)+k.prod; wk.lPick=(wk.lPick||0)+Math.min(2,k.uPick); wk.lCar=(wk.lCar||0)+Math.min(2,k.uCar);
     const kc=k.pers+k.mezzi+k.fissi+k.tCan+k.wCan;
     wk.mov+=k.mov/30; wk.trips+=k.viaggi/30; wk.rev+=k.rev/30; wk.cost+=kc/30;
     cur.ric+=k.rev/30; cur.pers+=k.pers/30; cur.mezzi+=k.mezzi/30; cur.fissi+=k.fissi/30; cur.tech+=k.tCan/30; cur.welf+=k.wCan/30;
@@ -2528,6 +2552,7 @@ function weekEnd(){
     const act=S.clients.filter(c=>c.wh===w.id&&c.status==='attivo'); const sA=act.filter(c=>c.sA).map(c=>c.sA);
     rows[w.id]={P:k.P/k.n,A:k.A/k.n,sat:k.sat/k.n,satM:(k.satM||0)/k.n,obj:w.satObj||0,mor:k.mor/k.n,mov:Math.round(k.mov),trips:Math.round(k.trips),rev:k.rev,cost:k.cost,
       sP:act.length?Math.max(...act.map(c=>c.sP)):null,sA:sA.length?Math.max(...sA):null};
+    if(k.prod){ if(!w.ph) w.ph=[]; w.ph.push({d:S.day,v:k.prod/k.n,lp:k.lPick/k.n,lc:k.lCar/k.n}); if(w.ph.length>156) w.ph.shift(); }  // storico della produttività: una riga a settimana, 3 anni
     w.wk=null;});
   const cli={}; S.clients.filter(c=>c.status==='attivo').forEach(c=>{const r=rows[c.wh]; if(r) cli[c.id]={P:r.P,A:r.A,sP:c.sP,sA:c.sA,sat:c.sat,wh:whById(c.wh).name};});
   if(!any) return; S.weeks.push({d:S.day,rows,cli}); if(S.weeks.length>26) S.weeks.shift(); S.repNew=true;
@@ -3647,6 +3672,7 @@ const VIEWS={
   const mgrOpts=[w.mgr==='ceo'||!S.warehouses.some(x=>x.mgr==='ceo')?`<option value="ceo" ${w.mgr==='ceo'?'selected':''}>${esc(ceo().name)} (CEO)</option>`:'',...S.managers.filter(m=>m.hired&&!seatOf(m.id)&&(!m.wh||m.wh===w.id)).map(m=>`<option value="${m.id}" ${w.mgr===m.id?'selected':''}>${esc(m.name)}</option>`)].join('');
   const cl=S.clients.filter(c=>c.wh===w.id&&c.status!=='perso');
   const ld=staffLoad(w,k);
+  if(UI.whProd) return tabs+prodView(w,k,ld);
   // una riga per reparto: ritratto, nome, barra del carico e [− numero +]
   const staffRow=(r,have)=>{const inq=q.filter(x=>x.role===r).length, l=ld[r], bar=r!=='fm'&&!(r==='capo'&&l===0)&&l<9;
    return `<div class="wh-st"><img class="px" src="${have?IMG[r]:IMG.anon}" alt="${have?'':'Nessuno in questo ruolo'}" width="40" height="46">
@@ -3676,6 +3702,7 @@ const VIEWS={
    ${tile(satC||(k.sm.obj?'ok':''),kw('saturazione_mezzi','Mezzi pieni'),Math.round(k.satM)+'%',k.sm.obj?'obiettivo '+k.sm.obj+'%':k.viaggi+' viaggi/mese',tipParts('Saturazione dei mezzi '+Math.round(k.satM)+'%',k.sm.pS,''))}
    ${tile(morC,kw('morale'),mor,'su 100','')}
   </div>
+  <button class="btn wh-prodbtn" data-act="whprod" data-on="1" aria-label="Apri la produttività del magazzino"><span>${prodIcon()}Produttività <b>${Math.round(k.prod/PROD_BASE*100)}%</b></span><span class="sm">${n0(k.prod)} pallet al mese a magazziniere · grafico e dettaglio ›</span></button>
   <div class="card"><div class="row"><span class="h3">Personale</span><span class="sm">${kw('carico','carico di lavoro')}</span></div>
    <div class="lab">Magazzino e ufficio</div>
    ${['pick','car','capo','imp'].map(r=>staffRow(r,w.staff[r])).join('')}
@@ -4165,6 +4192,51 @@ const VIEWS={
     return `${h}<div class="np ${i===0&&f==='all'?'np-top':''}"><div class="np-t"><span class="np-tag" style="background:${t[2]}">${t[1]}</span><span class="sm">${esc(n.src)} · ${shortDate(n.day)}</span></div><b>${esc(n.title)}</b><div class="sm" style="color:var(--ink)">${esc(n.text)}</div></div>`;}).join('')||'<div class="sm">Nessuna notizia di questo tipo nelle ultime settimane.</div>'}`;
  }
 };
+// icona 8×8 della produttività: un pallet con la freccia in su
+function prodIcon(){return `<svg width="16" height="16" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="5" width="5" height="1" fill="#c98a00"/><rect x="0" y="7" width="5" height="1" fill="#8a5f36"/><rect x="0" y="6" width="1" height="1" fill="#8a5f36"/><rect x="2" y="6" width="1" height="1" fill="#8a5f36"/><rect x="4" y="6" width="1" height="1" fill="#8a5f36"/><rect x="0" y="2" width="5" height="3" fill="#ff9f43"/><rect x="6" y="1" width="1" height="7" fill="#2e9e48"/><rect x="5" y="2" width="3" height="1" fill="#2e9e48"/><rect x="6" y="0" width="1" height="1" fill="#2e9e48"/></svg>`;}
+// finestra del magazzino, pagina Produttività: grafico settimanale e tutte le voci che la muovono
+function prodView(w,k,ld){
+  const F=k.prF, idx=k.prod/PROD_BASE*100, pc=v=>(v>=0?'+':'−')+f1(Math.abs(v*100))+'%', cls=v=>v>0.0005?'ok':v<-0.0005?'bad':'';
+  const row=(n,v,sub)=>`<div class="row pr-r"><span>${n}${sub?` <span class="sm">${sub}</span>`:''}</span><b class="${cls(v)}">${Math.abs(v)<0.0005?'—':pc(v)}</b></div>`;
+  const grp=(g,lab,wiki)=>{const it=F.l.filter(x=>x[0]===g||(g==='t'&&x[0]==='l')); if(!it.length) return '';
+    return `<div class="lab pr-g">${kw(wiki,lab)}</div>`+it.map(([t,n,v])=>row(esc(n),v,t==='l'?'in apprendimento, conta dopo':'')).join('');};
+  const mgr=k.m.none?'nessun manager':(w.mgr==='ceo'?ceo().name:k.m.name);
+  const H=w.ph||[], lab=H.map(h=>shortDate(h.d));
+  const chart=lineChart('pr_'+w.id,{title:'Produttività e carico dei magazzinieri, settimana per settimana',labels:lab,unit:'%',nice:1,min:0,max:200,fmt:v=>Math.round(v)+'%',ax:v=>v+'%',
+    empty:'Il grafico compare dalla seconda settimana: ogni lunedì il gioco registra la produttività della settimana appena finita.',mr:MOB?118:150,maxLab:MOB?3:5,w:MOB?440:860,h:MOB?240:250,
+    series:[{n:'Produttività',c:SERIES_C[0],v:H.map(h=>h.v/PROD_BASE*100)},{n:'Carico magazzinieri',short:'Carico mag.',c:SERIES_C[1],v:H.map(h=>h.lp*100)},{n:'Base (900 pallet)',short:'Base',c:'#8a96a6',dash:1,v:H.map(()=>100)}]});
+  // tecnologie e servizi che alzerebbero la produttività e qui non ci sono ancora
+  const miss=TECH.filter(t=>t.prod>0&&(t.tree==='log'||t.tree==='wel')&&!w.tech[t.id]).map(t=>`<span class="pill pr-miss" data-act="wiki" data-id="tech_${t.id}" role="button" tabindex="0">${esc(t.name)} +${Math.round(t.prod*100)}%${R(t.id)?' · da installare':''}</span>`).join('');
+  const lp=ld.pick, lc=ld.car, lTxt=l=>l>=9?'nessuno':Math.round(l*100)+'%';
+  return `<div class="row pr-hd"><button class="btn sm2" data-act="whprod" data-on="0" aria-label="Torna al magazzino">‹ ${esc(w.name)}</button><span class="h3">${prodIcon()} ${kw('produttivita','Produttività')}</span></div>
+  <div class="wh-kpis">
+   <div class="kpi wh-k ${idx>=95?'ok':idx>=85?'warn':'bad'}"><div class="lab">${kw('produttivita','Produttività')}</div><b>${Math.round(idx)}%</b><div class="sm">base 100% = ${PROD_BASE} pallet</div></div>
+   <div class="kpi wh-k"><div class="lab">${kw('magazzinieri','Magazziniere')}</div><b>${n0(k.prod)}</b><div class="sm">pallet al mese</div></div>
+   <div class="kpi wh-k"><div class="lab">${kw('carrellisti','Carrellista')}</div><b>${n0(k.prod*2.5)}</b><div class="sm">movimenti al mese</div></div>
+   <div class="kpi wh-k ${lp>1.02?'bad':lp>0.85?'warn':'ok'}"><div class="lab">${kw('carico','Carico')}</div><b>${lTxt(lp)}</b><div class="sm">carrellisti ${lTxt(lc)}</div></div>
+  </div>
+  <div class="card">${chart}</div>
+  <div class="pr-cols">
+   <div class="card"><span class="h3">Da cosa dipende</span>
+    <div class="row pr-r"><span>Base: un ${kw('magazzinieri','magazziniere')} con ${kw('morale')} 70</span><b>${PROD_BASE} pallet</b></div>
+    ${row(`${kw('morale')} ${Math.round(w.morale)}`,F.mor-1,'ogni 10 punti sopra o sotto 70 valgono circa il 4%')}
+    ${grp('t','Tecnologie di logistica','installazione')}${grp('w','Servizi di welfare','welfare_mag')}${grp('p','Policy aziendali','policy')}${F.tr!==1?grp('r','Regole del traffico','regole_traffico'):''}
+    <div class="lab pr-g">Magazzino e manager</div>
+    ${row(kw('manutenzione','Stato del magazzino')+' '+Math.round(w.cond==null?100:w.cond)+'%',F.cond-1,F.cond<1?'sotto il 70%':'')}
+    ${row(kw('ampliamento','Cantiere di ampliamento'),F.build-1,w.build?'finché durano i lavori':'nessun cantiere')}
+    ${row(`${statIcon('op',12)} Operazioni del ${kw('manager')}`,F.mgr-1,esc(mgr))}
+    <div class="row rp-tot"><span>Totale <span class="sm">(le voci si moltiplicano)</span></span><b>${Math.round(idx)}% · ${n0(k.prod)} pallet</b></div>
+   </div>
+   <div class="card"><span class="h3">Il lavoro da fare</span>
+    <div class="row pr-r"><span>${kw('canali','Canali')} dei clienti</span><b>${k.pickF>1.005?'+'+Math.round((k.pickF-1)*100)+'% di lavoro':'normale'}</b></div>
+    <div class="sm">${k.pickF>1.005?`Con merce a colli o a pezzo ogni pallet in uscita costa ai magazzinieri ${Math.round((k.pickF-1)*100)}% di lavoro in più.`:'I clienti spediscono soprattutto pallet interi: nessun lavoro in più.'}</div>
+    <div class="row pr-r"><span>Pallet in uscita al mese</span><b>${n0(k.cons)}</b></div>
+    <div class="row pr-r"><span>${kw('movimenti')} al mese</span><b>${n0(k.mov)}</b></div>
+    <div class="sm">Più produttività vuol dire meno persone per lo stesso lavoro: il ${kw('carico','carico')} scende senza assumere.</div>
+    ${miss?`<div class="lab pr-g">Per salire ancora</div><div class="pr-ms">${miss}</div>`:''}
+   </div>
+  </div>`;
+}
 function strutturaCard(w,k,staffRow){
   const c=Math.round(w.cond==null?100:w.cond), pen=condPen(w), fm=w.staff.fm>0, sc=straordCost(w), ec=expCost(w), full=(w.exp||0)>=MAINT.expMax;
   const col=c>=MAINT.soglia?'var(--ok)':c>=40?'var(--warn)':'var(--bad)';
@@ -4217,6 +4289,7 @@ const ACT={
  close(d){closeWin(d.id);},
  openwh(d){openWin('magazzini',{wh:d.id});},
  site(d){UI.sel.site=d.id;openWin('espansione');},
+ whprod(d){UI.whProd=d.on==='1';renderWin('magazzini');const b=document.querySelector('#win-magazzini .win-b');if(b)b.scrollTop=0;},
  selwh(d){UI.sel.wh=d.id;renderWin('magazzini');renderWin('tecnologia');renderWin('traffico');},
  newsf(d){UI.newsF=d.id;renderWin('giornale');},
  garelog(){UI.gareLog=!UI.gareLog;renderWin('gare');},
@@ -4523,6 +4596,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.31',t:'Quanto rende il magazzino',x:['Nella finestra del magazzino c\'è il nuovo pulsante Produttività: mostra quanti pallet prepara al mese ogni magazziniere e quanti movimenti fa ogni carrellista.','Un grafico segue la produttività settimana per settimana, insieme al carico di lavoro dei magazzinieri: si vede subito se una tecnologia o un calo di morale ha cambiato le cose.','Il dettaglio elenca tutto quello che la muove (morale, tecnologie, welfare, policy, regole del traffico, stato del magazzino, cantiere, manager) e cosa potresti aggiungere per salire ancora.','Nuova voce dell\'enciclopedia: Produttività.']},
  {v:'0.30',t:'Notte, blocchi e piani',x:['Tre nuove regole nell\'Ufficio traffico: doppio turno in magazzino (più puntualità, ma il turno di notte costa e stanca), stoccaggio a blocchi (più posti pallet senza cantieri, ma più errori) e consegna al piano (ricavi e clienti contenti, ma servono più furgonisti).']},
  {v:'0.29',t:'Regole del traffico',x:['Nell\'Ufficio traffico sette regole da accendere magazzino per magazzino: giri a giorni fissi, cut-off degli ordini alle 14, si parte solo a camion pieno, partenze all\'alba, scarichi su prenotazione, ritorni carichi e consegne anche il sabato.','Ognuna ha un vantaggio e un prezzo: più camion pieni ma meno puntualità, più accuratezza ma camion più vuoti, più puntualità ma autisti che costano di più. Dopo un cambio servono 30 giorni per cambiarla di nuovo.']},
  {v:'0.28',t:'Valigia sempre pronta',x:['Nuovo talento «Job hopper»: buon negoziatore, ma dopo un anno senza aumenti la concorrenza si fa viva e rischi di perderlo. Ce l\'ha Chiara Ferraris, e lo puoi scegliere anche per il tuo CEO.']},
