@@ -293,7 +293,8 @@ input.sw:checked{background:var(--ok)}
 input.sw:checked::after{left:26px}
 input.sw:disabled{opacity:.45;cursor:not-allowed}
 .wh-chips{display:flex;flex-wrap:wrap;gap:6px}
-.wh-chips>span{font-size:14px;padding:2px 8px;background:var(--panel);border:2px solid var(--line);white-space:nowrap}
+.wh-chips>span{font-size:14px;padding:2px 8px;background:var(--panel);border:2px solid var(--line);white-space:nowrap;max-width:100%;box-sizing:border-box}
+.wh-chips>span.wr{white-space:normal}
 .wh-chips b{font-family:var(--f-disp)}
 .wh-cl{display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid var(--panel2)}
 .wh-cl:last-child{border-bottom:0}
@@ -5231,6 +5232,8 @@ function makeDraggable(el,id){
   h.addEventListener('pointerup',()=>d=null);
 }
 function renderWin(id){const el=document.getElementById('win-'+id);if(!el)return;const b=el.querySelector('.win-b');const st=b.scrollTop;b.innerHTML=(VIEWS[id]||(()=>''))();b.scrollTop=st;}
+// ricalcola subito i KPI dei magazzini (cambio di manager, dirigenti, personale): senza, in pausa resterebbero quelli di ieri
+function kpiNow(){ if(S&&S.warehouses) S.warehouses.forEach(w=>w.kpi=computeWH(w)); }
 function renderAll(){renderTop();const ae=document.activeElement;Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id);if(el&&ae&&el.contains(ae)&&ae.matches('select,input'))return;if(id==='enciclopedia')return;if(id!=='gare'||!UI.bidEditing)renderWin(id);});renderDock();layoutVars();}
 function satObjTxt(sm){
   if(!sm.obj) return `<div class="sm">Senza obiettivo i camion partono pieni al ${Math.round(sm.nat)}%: è il carico che viene da sé.</div>`;
@@ -5559,7 +5562,7 @@ const VIEWS={
      <div class="kpi wh-k ${c.sA?x.cA:''}"><div class="lab">${kw('accuratezza')}</div><b>${f1(x.A)}%</b><div class="sm">${c.sA?'soglia '+f1(c.sA)+'%':'non richiesta'}</div></div>
      <div class="kpi wh-k ${satC(c.sat)}"><div class="lab">${kw('soddisfazione','Soddisf.')}</div><b>${Math.round(c.sat)}</b><div class="bar"><i style="width:${c.sat}%;background:var(--${satC(c.sat)})"></i></div></div>
     </div>
-    <div class="wh-chips"><span><b>${eur(clientRev(c))}</b>/mese</span><span>${kw('contratto','scade')} <b>${shortDate(c.end)}</b> · ${mesi} mesi</span><span class="${c.lastPen>=1?'bad':''}">${kw('penali')}: ${c.lastPen>=1?`<b>${eur(c.lastPen)}</b> il mese scorso`:penTxt(c)}</span></div>`}
+    <div class="wh-chips"><span><b>${eur(clientRev(c))}</b>/mese</span><span>${kw('contratto','scade')} <b>${shortDate(c.end)}</b> · ${mesi} mesi</span><span class="wr ${c.lastPen>=1?'bad':''}">${kw('penali')}: ${c.lastPen>=1?`<b>${eur(c.lastPen)}</b> il mese scorso`:penTxt(c)}</span></div>`}
     ${seasChart(c)}
     ${c.exit?`<div class="sm bad">${kw('recesso','In uscita')}: l'ultimo camion parte il <b>${shortDate(c.exit.day)}</b>. Fino ad allora i KPI contano.</div>`:''}
     <div class="cl-a"><button class="btn sm2" data-act="clidet" data-id="${c.id}" aria-expanded="${open}">${open?'▴ Meno dettagli':'▾ Trasporti e contratto'}</button><button class="btn sm2" data-act="mapcli" data-id="${c.id}" aria-pressed="${UI.mapCli===c.id}">${UI.mapCli===c.id?'Nascondi dalla mappa':'Sulla mappa'}</button></div>
@@ -6285,7 +6288,7 @@ const ACT={
   const r=d.role, x=fireOne(OFFICE.includes(r)?null:whById(d.wh),r); if(!x) return;
   if(x.coop) toast(`La cooperativa riprende 1 ${ROLE1[r]}: nessuna buonuscita`,'ok');
   else toast(`Licenziamento: ${eur(x.sal)} di buonuscita, morale e reputazione in calo${x.wave?'. È un\'ondata di licenziamenti!':''}`,x.wave?'bad':'warn');
-  renderAll();
+  kpiNow(); renderAll();
  },
  norenew(d){const c=S.clients.find(x=>x.id===d.id); c.noRenew=!c.noRenew; renderAll();},
  recedi(d){const c=S.clients.find(x=>x.id===d.id), e=exitTerms(c);
@@ -6300,16 +6303,16 @@ const ACT={
   if(e.avvio){c.status='perso';c.ended='rinuncia';news('Il Sole 24 Pallet',`${S.company.name} rinuncia a ${c.name}`,`Il contratto non partirà: penale di ${eur(e.pen)}.`);}
   else {c.exit={day:S.day+e.days};news('Il Sole 24 Pallet',`${S.company.name} recede dal contratto con ${c.name}`,`Penale di ${eur(e.pen)}; l'ultimo camion partirà il ${shortDate(c.exit.day)}.`);}
   toast(`Penale pagata: ${eur(e.pen)}`,'warn'); renderAll();},
- setsatobj(d,el){ const w=whById(d.wh); w.satObj=+el.value||0; renderAll(); },
+ setsatobj(d,el){ const w=whById(d.wh); w.satObj=+el.value||0; kpiNow(); renderAll(); },
  setmgr(d,el){
   const w=whById(d.wh); const v=el.value;
   S.warehouses.forEach(x=>{ if(x.id!==w.id&&x.mgr===v) x.mgr=null; });
   S.managers.forEach(m=>{ if(m.wh===w.id) m.wh=null; });
-  w.mgr=v||null; const m=S.managers.find(x=>x.id===v); if(m){ m.wh=w.id; if(isCs(m.id)) S.cs.resp=null; } renderAll();
+  w.mgr=v||null; const m=S.managers.find(x=>x.id===v); if(m){ m.wh=w.id; if(isCs(m.id)) S.cs.resp=null; } kpiNow(); renderAll();
  },
  // assunzione immediata, senza trattativa: la usano solo i test
  hiremgr(d){const m=S.managers.find(x=>x.id===d.id);delete m.arr;m.hired=true;m.raiseDay=S.day;m.unh=0;m.quit=null;toast(`${m.name} entra in azienda: assegnalo a un magazzino o alla direzione`,'ok');const w=S.warehouses.find(w=>!w.mgr);if(w){w.mgr=m.id;m.wh=w.id;}renderAll();},
- firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});if(isCs(m.id))S.cs.resp=null;m.hired=false;m.wh=null;if(m.gen)S.managers=S.managers.filter(x=>x!==m);renderAll();},
+ firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});if(isCs(m.id))S.cs.resp=null;m.hired=false;m.wh=null;if(m.gen)S.managers=S.managers.filter(x=>x!==m);kpiNow();renderAll();},
  mtab(d){UI.sel.mtab=d.id; renderWin('manager');},
  gomgr(d){ if(d.k) UI.hh={...(UI.hh||{min:14}),k:d.k}; if(MOB) setMenu(false); openWin('manager',{mtab:d.tab||'cand'}); },
  offstep(d){ const x=candById(d.id); if(!x) return; const n=negs()[d.id], ask=x.p.ral; UI.offer=UI.offer||{};
@@ -6359,7 +6362,7 @@ const ACT={
  install(d){const t=TECH.find(x=>x.id===d.id), w=whById(d.wh); if(!R(t.id)||w.tech[t.id]||S.cash<t.inst||(t.tree==='wel'&&polOn('spending')))return; S.cash-=t.inst; S.cur[t.tree==='wel'?'welf':'tech']+=t.inst; w.tech[t.id]={day:S.day};
   toast(t.weeks?`${t.name} installato a ${w.name}: inizia l'apprendimento`:`${t.name} attivo a ${w.name}`,'ok'); renderAll();},
  canceltech(){ if(!S.project)return; const r=S.project.cost*0.5; S.cash+=r; S.cur.tech-=r; toast(`Ricerca annullata: rimborsati ${eur(r)}`,'warn'); S.project=null; renderAll(); },
- setdir(d,el){const v=el.value||null; Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===v)S.dirs[k]=null;}); S.dirs[d.role]=v; if(isCs(v)) S.cs.resp=null; if(v){const p=personById(v); toast(`${p.name} è il nuovo ${DIR_ROLES.find(r=>r.id===d.role).name.toLowerCase()}`,'ok');} renderAll();},
+ setdir(d,el){const v=el.value||null; Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===v)S.dirs[k]=null;}); S.dirs[d.role]=v; if(isCs(v)) S.cs.resp=null; if(v){const p=personById(v); toast(`${p.name} è il nuovo ${DIR_ROLES.find(r=>r.id===d.role).name.toLowerCase()}`,'ok');} kpiNow(); renderAll();},
  rent(d){
   const s=SITES[d.id]; const cost=2*s.rent+15000; if(S.cash<cost||siteTaken(d.id))return;
   S.cash-=cost; S.cur.altro+=cost; const w=addWarehouse(d.id,false,0,0); chron('magazzini',`Apre il magazzino di ${s.name} (${n0(s.cap)} posti pallet)`);
@@ -6371,10 +6374,10 @@ const ACT={
   if(el.checked&&polOn('nocoop')){el.checked=false; toast('La policy Niente cooperative vieta i facchini in cooperativa','warn'); return;}
   if(el.checked){w.coop=true;mod(w.id,{mor:-5*fireMul(w)},30);toast(`${w.name}: magazzinieri e carrellisti passano alla cooperativa. I sindacati non sono contenti.`,'warn');}
   else {const c=600*n;w.coop=false;S.cash-=c;S.cur.altro+=c;mod(w.id,{mor:5},60);toast(`${w.name}: ${n} persone assunte direttamente, ${eur(c)} di pratiche`,'ok');}
-  renderAll();
+  kpiNow(); renderAll();
  },
  welfare(d,el){S.welfare[d.id]=el.checked;renderAll();},
- straord(d){const w=whById(d.wh), c=straordCost(w); if(!w.staff.fm||S.cash<c||w.cond>=95)return; S.cash-=c; S.cur.altro+=c; w.cond=100; toast(`${w.name}: manutenzione straordinaria fatta, stato al 100%`,'ok'); renderAll();},
+ straord(d){const w=whById(d.wh), c=straordCost(w); if(!w.staff.fm||S.cash<c||w.cond>=95)return; S.cash-=c; S.cur.altro+=c; w.cond=100; kpiNow(); toast(`${w.name}: manutenzione straordinaria fatta, stato al 100%`,'ok'); renderAll();},
  amplia(d){const w=whById(d.wh), c=expCost(w); if(!w.staff.fm||w.build||(w.exp||0)>=MAINT.expMax||S.cash<c)return; S.cash-=c; S.cur.altro+=c;
   w.build={left:MAINT.expGg,total:MAINT.expGg,add:expAdd(w),rent:expRent(w)}; toast(`Cantiere aperto a ${w.name}: +${n0(expAdd(w))} posti tra ${wks(MAINT.expGg)}`,'ok'); renderAll();},
  bidwh(d,el){UI.bid.wh=el.value;renderWin('gare');},
@@ -6665,7 +6668,7 @@ function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=docum
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
  {v:'0.65',t:'Meno gare, quando capita',x:['Le gare d\'appalto non sono più sempre lì tutte insieme: arrivano una alla volta, quando capita, ognuna con la sua scadenza. Da solo ne arrivano circa 15 l\'anno (prima 25), con tre avversari circa 24 (prima 50). Di solito ne trovi aperte 2 o 3; a volte nessuna per qualche settimana.','L\'Ufficio commerciale porta un terzo di gare in più, ogni azienda avversaria il 20% in più.']},
- {v:'0.64',t:'Controllo generale',x:['Le aziende avversarie non falliscono più per colpa del customer service: prendono un responsabile solo quando servono almeno due addetti (dall\'8° cliente), non assumono gente per i picchi di poche settimane, lasciano andare prima chi resta senza lavoro (anche in sede) e non pagano più manager senza incarico. Nelle prove tornano a reggere come prima delle ultime novità.','Pensioni e ultimatum dei manager restano tra le notifiche anche se salvi e riapri la partita (prima la domanda spariva). Con «Il cliente ha sempre ragione» accesa non si può più dire di no ai clienti nemmeno negli eventi normali (ordine del venerdì, cambio di buyer, caro gasolio).','Regole corrette: «Consegna al piano» alza i ricavi solo dei clienti serviti con i furgoni (prima valeva anche per chi va solo in bilico); «Limite 80 all\'ora per i bilici» fa risparmiare gasolio solo ai bilici; il supplemento di un picco si paga sui pallet in più e non sui posti a stock; un candidato che non sopporta le tue policy può dire di no anche invece di fare una controproposta.','Doppioni tolti: talenti con effetti identici ora sono diversi (Tifo sfegatato, Guru dei social, Tre figli piccoli, Motociclista, Laureato in scienze politiche, Collezionista di camion d\'epoca), due drammi dei clienti nuovi, la voce OTIF dell\'enciclopedia scritta due volte, eventi che raccontavano la stessa scena. La Torrefazione Tazzulella ora serve la riviera adriatica d\'estate, «Imballaggi Pluriball» diventa «Imballaggi Scoppiabolle» con stabilimento in Veneto, e l\'head hunter si chiama «Selezioni Testafina & Figli».','Testi allineati alle regole: niente più x2 nella descrizione del tempo, tempi in settimane, effetti dei direttori HR e finanziario, quali tecnologie sbloccano le policy, il nuovo avviso «Manca il facility manager», il conteggio dei dipendenti che ora include gli addetti al customer service.']},
+ {v:'0.64',t:'Controllo generale',x:['Sul telefono la riga delle penali nella scheda dei clienti va a capo invece di far uscire la pagina di lato.','Quando cambi il manager di un magazzino (o un dirigente, o i facchini in cooperativa) gli effetti e i KPI si aggiornano subito, anche col gioco in pausa: prima restavano quelli del giorno prima fino al giorno successivo.','Le aziende avversarie non falliscono più per colpa del customer service: prendono un responsabile solo quando servono almeno due addetti (dall\'8° cliente), non assumono gente per i picchi di poche settimane, lasciano andare prima chi resta senza lavoro (anche in sede) e non pagano più manager senza incarico. Nelle prove tornano a reggere come prima delle ultime novità.','Pensioni e ultimatum dei manager restano tra le notifiche anche se salvi e riapri la partita (prima la domanda spariva). Con «Il cliente ha sempre ragione» accesa non si può più dire di no ai clienti nemmeno negli eventi normali (ordine del venerdì, cambio di buyer, caro gasolio).','Regole corrette: «Consegna al piano» alza i ricavi solo dei clienti serviti con i furgoni (prima valeva anche per chi va solo in bilico); «Limite 80 all\'ora per i bilici» fa risparmiare gasolio solo ai bilici; il supplemento di un picco si paga sui pallet in più e non sui posti a stock; un candidato che non sopporta le tue policy può dire di no anche invece di fare una controproposta.','Doppioni tolti: talenti con effetti identici ora sono diversi (Tifo sfegatato, Guru dei social, Tre figli piccoli, Motociclista, Laureato in scienze politiche, Collezionista di camion d\'epoca), due drammi dei clienti nuovi, la voce OTIF dell\'enciclopedia scritta due volte, eventi che raccontavano la stessa scena. La Torrefazione Tazzulella ora serve la riviera adriatica d\'estate, «Imballaggi Pluriball» diventa «Imballaggi Scoppiabolle» con stabilimento in Veneto, e l\'head hunter si chiama «Selezioni Testafina & Figli».','Testi allineati alle regole: niente più x2 nella descrizione del tempo, tempi in settimane, effetti dei direttori HR e finanziario, quali tecnologie sbloccano le policy, il nuovo avviso «Manca il facility manager», il conteggio dei dipendenti che ora include gli addetti al customer service.']},
  {v:'0.63',t:'Ricerca dei manager',x:['Nuova finestra «Manager» nel menu: chi è in squadra, i candidati e l\'head hunter. Manager e dirigenti ora sono la stessa cosa: chi assumi può guidare un magazzino, sedere in Direzione o guidare il customer service.','Ogni manager ha un rango da S a F, come i clienti: più è alto, più è bravo e più chiede di stipendio.','Ci sono sempre tre candidature spontanee di rango basso, che cambiano ogni qualche settimana. Le aziende avversarie le possono assumere prima di te.','L\'head hunter cerca tre profili con il valore minimo che vuoi in un\'abilità: più alto è il minimo, più ci mette e più costa. Metà della parcella subito, l\'altra metà a ogni assunzione.','Lo stipendio si tratta: fai un\'offerta e il candidato risponde dopo qualche giorno. Può firmare, fare una controproposta, chiedere di più o offendersi. Le policy che non gli piacciono pesano.','Chi firma non arriva subito: una settimana per le candidature spontanee, da 2 a 8 settimane di preavviso per chi viene dall\'head hunter. Ogni tanto il vecchio datore di lavoro fa una controfferta.']},
  {v:'0.62',t:'Picchi di consegna e overstock',x:['I clienti non hanno solo drammi: a volte annunciano un picco di consegne (per 2-4 settimane i pallet salgono da ×1,5 fino a ×2,5) e scegli se accettare tutto, chiedere un supplemento, prenderne metà o rifiutare. Se accetti tutto e i KPI reggono, alla fine il cliente è più contento.','Overstock: un cliente chiede di parcheggiare da 80 pallet in su per qualche mese in una zona precisa. Proponi tu uno dei tuoi magazzini: più è lontano dalla zona, meno paga, e oltre i 100 km può rinunciare. I posti restano occupati fino alla fine, e alla scadenza il cliente può chiedere una proroga.','Picchi e overstock si vedono nella finestra Customer service e in quella del magazzino.','Nuova tecnologia «Portale clienti» nell\'albero Mercato (qualità del servizio +10) e nuova policy «Rispondiamo entro 2 ore» (qualità +8, ma servono più addetti). Con la policy «Il cliente ha sempre ragione» non si rifiutano picchi e overstock e non si chiedono supplementi.']},
  {v:'0.61',t:'Customer service',x:['Nuova finestra «Customer service» nel menu: un responsabile e, dal quarto cliente, gli addetti in sede rispondono ai clienti. Finché non nomini nessuno se ne occupa il CEO, ma con una penalità.','La qualità del servizio dipende da Negoziazione e Precisione di chi guida il reparto, dai suoi talenti e dagli addetti che mancano. Sopra 70 i clienti sono un po\' più contenti ogni mese, sotto 35 un po\' meno.','Ogni tanto un cliente ha un problema enorme che a guardarlo bene è una sciocchezza: il bancale dietro la macchinetta del caffè, l\'etichetta storta, l\'autista che non ha salutato. Il customer service sistema da solo le piccole; le altre arrivano come tessera gialla e scegli tu se mandare il manager, scrivere una mail o chiamare il titolare.','Tre nuovi manager adatti al customer service (Mirella Cattaneo, Gianfranco Lodigiani e, dal 2005, Kevin Sartori) e tre nuovi talenti con i loro eventi: Voce da call center, Risponde anche alle 23, Promette tutto.','Anche le aziende avversarie hanno il loro customer service, con le stesse regole.']},
