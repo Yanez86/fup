@@ -56,6 +56,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 #lenses{position:fixed;right:max(16px, env(safe-area-inset-right, 0px));bottom:max(16px, env(safe-area-inset-bottom, 0px));z-index:25;display:flex;align-items:center;gap:6px;padding:6px;background:var(--ink);border:3px solid var(--ink2);box-shadow:inset 0 2px 0 var(--ink3), 5px 5px 0 rgba(12,19,29,.55)}
 #lenses .lab{color:var(--hi);font-family:var(--f-disp);font-size:14px;padding:0 4px}
 #lenses button{width:44px;height:40px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink4);background:var(--ink3);box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
+#lenses .lfan{display:none;gap:6px;padding-right:8px;margin-right:2px;border-right:2px solid var(--ink4)}
+#lenses.open .lfan{display:flex}
+#lenses .lkey{width:48px;height:44px;position:relative;border-color:#fff;background:var(--accent);box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
+#lenses .lkey .lcur{position:absolute;right:-8px;top:-10px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;background:var(--ink3);border:2px solid var(--ink)}
+#lenses.open .lkey .lcur{display:none}
 #lenses button[aria-pressed="true"]{background:var(--accent);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
 .mk:hover .mk-ring{stroke:var(--yellow)}
 
@@ -86,7 +91,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 #dock button{width:48px;height:44px;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink4);background:var(--ink3);box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a;position:relative}
 #dock button.on{background:var(--accent);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
 #dock .di{display:flex;align-items:center;justify-content:center}
-#dock .dl,#burger,#dockshade{display:none}
+#dock .dl,#burger,#dockshade,#ppb{display:none}
 #dock .badge{position:absolute;right:-7px;top:-7px;min-width:20px;height:20px;padding:0 4px;background:var(--bad);color:#fff;border:2px solid #fff;font:700 12px/16px var(--f-body)}
 
 /* Finestre */
@@ -757,6 +762,14 @@ html,body{overscroll-behavior:none}
 .mob #dock button.on .dl small{color:var(--ink)}
 .mob #lenses{right:auto;left:max(8px, env(safe-area-inset-left, 0px));bottom:calc(14px + env(safe-area-inset-bottom, 0px));padding:4px}
 .mob #lenses .lab{display:none}
+.mob #lenses{flex-direction:column;align-items:stretch}
+.mob #lenses .lfan{flex-direction:column;padding:0 0 8px;margin:0 0 2px;border-right:0;border-bottom:2px solid var(--ink4)}
+.mob #lenses button{width:48px;height:44px}
+.mob .spd{display:none !important}
+.mob #ppb{position:fixed;right:calc(max(12px, env(safe-area-inset-right, 0px)) + var(--burg-w, 130px) + 8px);bottom:calc(14px + env(safe-area-inset-bottom, 0px));z-index:26;display:flex;align-items:center;justify-content:center;width:54px;height:54px;background:var(--ink3);color:#fff;border:3px solid var(--ink);box-shadow:inset 0 -4px 0 #1d2a3b, inset 0 2px 0 #3b4f6a, 4px 4px 0 rgba(12,19,29,.55);font:700 22px var(--f-disp)}
+.mob #ppb[data-v="0"]{background:var(--bad)}
+.mob #ppb[data-v="2"]{background:var(--accent);color:var(--ink);box-shadow:inset 0 -4px 0 var(--accent-d), inset 0 2px 0 var(--accent-l), 4px 4px 0 rgba(12,19,29,.55)}
+.mob.menu #ppb,#ppb[hidden]{display:none}
 .mob.haswin #lenses{display:none}
 .mob .win{left:var(--win-l) !important;right:0;top:var(--top-h) !important;bottom:var(--win-b);width:auto !important;max-width:none;max-height:none;border-width:0 0 0 3px;box-shadow:none}
 .mob .win-h{cursor:default;padding:4px 6px 4px 12px}
@@ -858,6 +871,7 @@ html,body{overscroll-behavior:none}
 <nav id="dock" aria-label="Menu"></nav>
 <div id="dockshade" data-act="menu" aria-hidden="true"></div>
 <button id="burger" data-act="menu" aria-label="Apri il menu" aria-expanded="false"><span class="bl" aria-hidden="true"><i></i><i></i><i></i></span>Menu</button>
+<button id="ppb" data-act="spdcycle" aria-label="Velocità del tempo">II</button>
 <nav id="lenses" aria-label="Lenti della mappa"></nav>
 <div id="wins"></div>
 <div id="toasts" aria-live="polite"></div>
@@ -4207,8 +4221,12 @@ const LENSES=[
 ];
 LENSES.forEach(l=>{if(ICONE.lens[l.id])l.ic=pxSvg(ICONE.lens[l.id],32);});
 function renderLenses(){
-  $('#lenses').innerHTML='<span class="lab">Lenti</span>'+LENSES.map(l=>`<button data-act="lens" data-id="${l.id}" aria-pressed="${(UI.lens||'base')===l.id}" aria-label="Lente: ${esc(l.n)}" data-tip="<div class='tt'>${esc(l.n)}</div>${esc(l.d)}${TOUCH?'':"<br><span class='sm'>Tasto L per cambiare lente</span>"}">${l.ic}</button>`).join('');
+  const cur=LENSES.find(l=>l.id===(UI.lens||'base'))||LENSES[0], key=ICONE.ui.lente?pxSvg(ICONE.ui.lente,32):'L';
+  $('#lenses').classList.toggle('open',!!UI.lensOpen);
+  $('#lenses').innerHTML='<span class="lab">Lenti</span><div class="lfan">'+LENSES.map(l=>`<button data-act="lens" data-id="${l.id}" aria-pressed="${cur.id===l.id}" aria-label="Lente: ${esc(l.n)}" data-tip="<div class='tt'>${esc(l.n)}</div>${esc(l.d)}${TOUCH?'':"<br><span class='sm'>Tasto L per cambiare lente</span>"}">${l.ic}</button>`).join('')+
+    `</div><button class="lkey" data-act="lensmenu" aria-expanded="${!!UI.lensOpen}" aria-label="Lenti della mappa (ora: ${esc(cur.n)})" data-tip="<div class='tt'>Lenti della mappa</div>Ora: <b>${esc(cur.n)}</b>. ${TOUCH?'Tocca':'Clicca'} per scegliere un'altra lente.">${key}<span class="lcur">${cur.ic.replace(/width="\d+" height="\d+"/,'width="16" height="16"')}</span></button>`;
 }
+
 // camion animati (solo estetica)
 let trucks=[], lastT=0;
 const TRUCK=c=>`<rect x="0" y="0" width="13" height="8" fill="#16202e"/><rect x="1" y="1" width="11" height="6" fill="${c}"/><rect x="13" y="2" width="6" height="6" fill="#16202e"/><rect x="14" y="3" width="4" height="2" fill="#bfe6ff"/><rect x="2" y="8" width="3" height="3" fill="#16202e"/><rect x="13" y="8" width="3" height="3" fill="#16202e"/>`;
@@ -4257,6 +4275,7 @@ function layoutVars(){
   const r=document.documentElement.style;
   r.setProperty('--top-h',Math.round($('#top').getBoundingClientRect().bottom)+'px');
   if(!MOB) return;
+  r.setProperty('--burg-w',Math.round($('#burger').getBoundingClientRect().width||130)+'px');
   r.setProperty('--win-l','0px'); r.setProperty('--win-b','0px');  // il menu è un pannello che si apre sopra: non toglie spazio
 }
 const DOCK=[
@@ -4312,6 +4331,7 @@ function renderTop(){
   $('#coname').textContent=S.company.name; $('#cologo').innerHTML=coLogoSvg(S.company.logo,S.company.color,24);
   document.querySelectorAll('.spd button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===S.speed)));
   $('#paused').hidden=S.speed!==0;
+  {const pb=$('#ppb'); pb.hidden=cm; pb.dataset.v=S.speed; pb.textContent=['II','›','››'][S.speed]||'›'; pb.setAttribute('aria-label',['In pausa: tocca per x1','Velocità x1: tocca per x2','Velocità x2: tocca per la pausa'][S.speed]||'Velocità');}
   const last=S.last?S.last.util:null;
   const mor=S.warehouses.reduce((a,w)=>a+w.morale,0)/S.warehouses.length, ot=otifNow(), om=otifGap();
   const more=`<div class='sm' style='color:#c9d3dd;margin-top:4px'>${TOUCH?'Tocca':'Clic'} per i dettagli</div>`;
@@ -5385,7 +5405,9 @@ const ACT={
  finale(){if($('#modal').innerHTML)closeModal(); openWin('finale');},
  sheet(d){UI.sel.sheet=d.id;UI.sel.cell='A1';renderWin('report');},
  cell(d){UI.sel.cell=d.ref;renderWin('report');},
- lens(d){UI.lens=d.id;renderMap();syncTrucks();},
+ lens(d){UI.lens=d.id;UI.lensOpen=false;renderMap();syncTrucks();},
+ lensmenu(){UI.lensOpen=!UI.lensOpen;renderLenses();},
+ spdcycle(){setSpeed((S.speed+1)%3);},
  trrule(d,el){const w=whById(d.wh); if(!w||trWait(w,d.id)){el.checked=trOn(w,d.id);return;} w.rules=w.rules||{}; w.rules[d.id]={on:el.checked,day:S.day}; const r=TR_RULES.find(x=>x.id===d.id); toast(`${w.name}: ${r.name} ${el.checked?'attiva':'spenta'}`,el.checked?'ok':'warn'); renderAll();},
  lenstrips(){ACT.lens({id:'trips'}); if(MOB) closeWin('traffico');},
  clidet(d){UI.cliOpen=UI.cliOpen||{}; UI.cliOpen[d.id]=!UI.cliOpen[d.id]; renderWin('clienti');},
@@ -5705,7 +5727,8 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.53',t:'Lavori in corso',x:['Nella schermata iniziale un cartello giallo avvisa che il gioco è in sviluppo: non tutto funziona come dovrebbe, proprio come nelle vere logistiche.']},
+ {v:'0.54',t:'Lavori in corso',x:['Nella schermata iniziale un cartello giallo avvisa che il gioco è in sviluppo: non tutto funziona come dovrebbe, proprio come nelle vere logistiche.']},
+ {v:'0.53',t:'Lenti e pausa a portata di dito',x:['Le lenti della mappa stanno dentro un solo pulsante con la lente d\'ingrandimento (con la piccola icona della lente attiva): toccalo e scegli quella che vuoi.','Sul telefono, accanto a «Menu», c\'è il pulsante del tempo: ogni tocco passa da pausa a velocità x1, poi x2, poi di nuovo pausa. La barra in alto ora sta su una riga sola.']},
  {v:'0.52',t:'iPhone senza sfocature',x:['Su iPhone con iOS 26 il sistema sfoca la parte alta dello schermo: nell\'app installata la barra con logo e pulsanti scende un po\', fuori dalla zona sfocata.']},
  {v:'0.51',t:'I crediti',x:['In fondo alla schermata iniziale ci sono i crediti: «un gioco Happy Squid Inc.» con il calamaro viola.']},
  {v:'0.50',t:'iPhone a tutto schermo',x:['Sull\'app installata su iPhone la mappa arriva fino al bordo in basso: sparita la banda scura sotto i pulsanti.','Sul telefono tolto l\'alone scuro ai bordi della mappa, che in alto sotto la barra sembrava una sfocatura.']},

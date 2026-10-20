@@ -50,3 +50,11 @@ def u_opzioni():
     c.clear_disc(7.5, 7.5, 2.0)
     return process(c.rows())
 UI['opzioni'] = ('Opzioni', u_opzioni)
+
+def u_lente():
+    # lente d'ingrandimento: apre la scelta delle lenti della mappa
+    c = Cv(16)
+    c.disc(6, 6, 5.2, 'S'); c.disc(6, 6, 3.6, 'L')
+    for k in range(4): c.rect(9+k, 10+k, 10+k, 11+k, 'N')
+    return process(c.rows())
+UI['lente'] = ('Lenti della mappa', u_lente)
