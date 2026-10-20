@@ -1240,7 +1240,10 @@ const penPct=c=>PEN_PCT[c.name]||0;
 const penTxt=c=>penPct(c)?`${penPct(c)}% del fatturato per ogni punto sotto soglia (max ${PEN_MAX}%)`:'nessuna penale nel contratto';
 const DUR_RANK={S:[24,36,36],A:[24,36],B:[12,24,36],C:[12,24],D:[12,24],F:[12,12,24]}; // durate possibili del contratto (mesi) per rank
 const RENEW_CUT=0.05; // al rinnovo il ricarico sul listino scende di 5 punti
-const minTenders=()=>(R('commerciale')?4:3)+rivals().filter(c=>!c.over).length; // gare sempre aperte almeno: il mercato cresce con le aziende in gara
+// ritmo delle gare: in media una nuova ogni 24 giorni da soli (circa 15 l'anno), +20% per ogni azienda avversaria viva, un terzo in più con l'Ufficio commerciale
+const tenderGap=()=>24/((1+0.2*rivals().filter(c=>!c.over).length)*(R('commerciale')?4/3:1));
+// attesa fino alla prossima gara, a caso (esponenziale, tra un quarto e il triplo della media): le gare arrivano irregolari, a volte vicine, a volte nessuna
+const tenderWait=()=>Math.max(1,Math.round(tenderGap()*clamp(-Math.log(1-Math.random()),0.25,3)));
 // recesso anticipato: penale in mesi di fatturato, giorni di preavviso, reputazione persa
 function exitTerms(c){const mesi=Math.max(0,Math.round((c.end-S.day)/30)), avvio=c.status==='avvio';
   return {mesi,avvio,pen:Math.round(clientRev(c)*(avvio?2:clamp(2+0.25*mesi,2,8))/100)*100,days:avvio?0:(isNaz(c)?90:60),rep:Math.ceil(rankOf(c).lost/2)};}
@@ -1298,7 +1301,7 @@ const TECH=[
  {id:'controllo',tree:'org',tier:3,row:1,req:['direzione'],name:'Controllo di gestione',cost:40000,wk:9,desc:'Budget e analisi dei costi: costi fissi −4%. Sblocca la policy «Spending review».',txt:'Budget, centri di costo e una riunione al mese sui numeri. Si scopre dove spariscono i soldi.'},
  {id:'academy',tree:'org',tier:4,row:0,req:['welfare2'],name:'Academy aziendale',cost:60000,wk:13,desc:'Scuola interna per tutta l\'azienda: apprendimento delle tecnologie −30% e attrattività +5 in tutti i magazzini (chi cerca lavoro vede che si può crescere).',txt:'Una scuola interna con aule e formatori. Chi ha esperienza insegna ai nuovi.'},
  {id:'iso',tree:'org',tier:4,row:1,req:['controllo'],name:'Certificazione ISO 9001',cost:45000,wk:17,desc:'Accuratezza +0,5 ovunque, reputazione +5, punteggio nelle gare +3.',txt:'Procedure scritte, controlli e un ente esterno che verifica. I clienti si fidano di più.'},
- {id:'commerciale',tree:'mkt',tier:1,row:0,name:'Ufficio commerciale',cost:15000,wk:4,desc:'Più gare: ce ne sono sempre almeno 4 aperte invece di 3.',txt:'Venditori che cercano nuovi clienti e seguono le gare. Non si aspetta più che squilli il telefono.'},
+ {id:'commerciale',tree:'mkt',tier:1,row:0,name:'Ufficio commerciale',cost:15000,wk:4,desc:'Più gare: ne arrivano un terzo in più.',txt:'Venditori che cercano nuovi clienti e seguono le gare. Non si aspetta più che squilli il telefono.'},
  {id:'freddo',tree:'mkt',tier:1,row:1,name:'Catena del freddo',cost:30000,wk:6,desc:'Certificazione per freschi e farmaci: sblocca le gare che la richiedono.',txt:'Celle refrigerate, sonde e registri delle temperature. Servono per latticini, surgelati e farmaci.'},
  {id:'edi',tree:'mkt',tier:2,row:0,req:['commerciale'],name:'EDI con i clienti',cost:30000,wk:7,desc:'Ordini automatici: soddisfazione +1 al mese sopra soglia. Richiesto dalla grande distribuzione.',txt:'I sistemi dell\'azienda e quelli del cliente si parlano da soli. Ordini e bolle viaggiano senza fax.'},
  {id:'marketing',tree:'mkt',tier:2,row:1,req:['commerciale'],name:'Marketing e fiere',cost:25000,wk:6,desc:'Stand alle fiere di settore: reputazione +5 subito e +0,2 al mese.',txt:'Stand alle fiere, brochure e qualche cena con i buyer. Il nome dell\'azienda inizia a girare.'},
@@ -2416,7 +2419,7 @@ wk('clienti','cli','Clienti',`Le aziende che ti affidano la merce: pagano per i 
 `Ogni cliente ha un volume (posti pallet occupati e pallet consegnati al mese), delle [[soglie]] di servizio, una [[zona]] di distribuzione e un modo di farti arrivare la merce ([[ritiro]] o consegna). È servito da un solo [[magazzino]].
 
 Il primo cliente è quello storico del tuo CEO; tutti gli altri arrivano dalle [[gare]].`);
-wk('gare','cli','Gare d\'appalto',`Un cliente cerca un fornitore logistico: hai poco più di 6 settimane per fare un'offerta. Ci sono sempre almeno tre gare aperte (quattro con l'Ufficio commerciale), una in più per ogni [[avversari|azienda avversaria]] in gara: quando una si chiude ne arriva un'altra. Escono più spesso i clienti piccoli (rank C, D, F) e le zone piccole, come una sola provincia.`,
+wk('gare','cli','Gare d\'appalto',`Un cliente cerca un fornitore logistico: hai poco più di 6 settimane per fare un'offerta. Le gare arrivano una alla volta, quando capita: in media una ogni 3 settimane e mezza (circa 15 l'anno), a volte due vicine, a volte nessuna per qualche settimana. Ogni [[avversari|azienda avversaria]] in gara porta il 20% di gare in più, l'Ufficio commerciale un terzo in più. Escono più spesso i clienti piccoli (rank C, D, F) e le zone piccole, come una sola provincia.`,
 `Scegli il [[magazzino]] e il [[prezzo]]. Il gioco stima i KPI che avresti e la probabilità di vincere, che dipende da:
 • il prezzo: ogni 1% di sconto vale +1,5 punti (e ogni 1% di ricarico li toglie);
 • i KPI previsti rispetto alle [[soglie]] del cliente (stare sotto pesa molto; stare sopra aiuta, ma oltre un punto e mezzo di margine non conta più);
@@ -2424,7 +2427,7 @@ wk('gare','cli','Gare d\'appalto',`Un cliente cerca un fornitore logistico: hai 
 • la [[tech_iso|certificazione ISO]];
 • la difficoltà del cliente (i grandi sono più contesi).
 
-Ogni cliente ha un [[rank]] da S a F. Alcuni clienti chiedono [[tech_richieste|tecnologie obbligatorie]]. Se vinci il [[contratto]] parte dopo 4 settimane; se non partecipi, il cliente va a un [[concorrenti|concorrente]]. Con l'[[tech_commerciale|ufficio commerciale]] ci sono più gare aperte insieme.
+Ogni cliente ha un [[rank]] da S a F. Alcuni clienti chiedono [[tech_richieste|tecnologie obbligatorie]]. Se vinci il [[contratto]] parte dopo 4 settimane; se non partecipi, il cliente va a un [[concorrenti|concorrente]]. Con l'[[tech_commerciale|ufficio commerciale]] arrivano più gare.
 
 Anche le [[avversari|aziende avversarie]] fanno le loro offerte, segrete. Ogni offerta vale exp((punteggio − concorrenza) / 6) e il resto del mercato vale 1: vince un'offerta a sorte, con probabilità proporzionale al suo valore. Con una sola offerta è la probabilità che vedi nella finestra; ogni avversario che partecipa se ne prende una parte. Nella scheda della gara vedi chi ha già fatto un'offerta, ma non a che prezzo.`);
 wk('prezzo','cli','Prezzo rispetto al listino',`Lo sconto o il ricarico che offri in gara, da −20% a +20%. Più basso = più probabilità, meno margine.`,
@@ -3439,8 +3442,9 @@ function step(){
   // il mercato delle gare è uno solo, quello del giocatore: le aziende avversarie fanno le loro offerte da lì
   if(!S.bot){
     S.tenders.filter(t=>t.deadline===d&&!t.done).forEach(resolveTender);
-    // ci sono sempre almeno tre gare aperte (una in più per ogni azienda avversaria)
-    while(S.tenders.filter(t=>!t.done).length<minTenders() && newTender());
+    // le gare arrivano una alla volta (S.tNext = giorno della prossima)
+    if(S.tNext==null) tendersInit();
+    if(d>=S.tNext){ newTender(); S.tNext=d+tenderWait(); }
     S.tenders=S.tenders.filter(t=>!t.done||d-t.deadline<30);
   }
   S.mods=S.mods.filter(m=>m.until>d);
@@ -3579,18 +3583,24 @@ const zoneScale=(tpl,z)=>clamp(Math.pow(zoneW(z)/zoneW(cinfo(tpl).zones[0]),0.6)
 // estrazione pesata: escono più spesso le committenti di rank basso e le zone piccole
 const TW_RANK={S:0.7,A:0.8,B:1,C:1.4,D:1.7,F:1.7}, TW_ZONE={prov:2.2,grp:1.5,reg:1,macro:0.6};
 const wpick=(a,w)=>{let x=Math.random()*a.reduce((s,v)=>s+w(v),0);return a.find(v=>(x-=w(v))<0)||a[a.length-1];};
-function newTender(){
+// age: giorni già passati dall'apertura (le gare di inizio partita, perché non scadano tutte insieme)
+function newTender(age=0){
   const pool=TENDER_POOL.filter(t=>freeZones(t).length&&(!(t.req||[]).includes('ecom')||liveCo().some(c=>c.researched.ecom)));
   if(!pool.length) return false;
   const tpl=wpick(pool,t=>TW_RANK[rankOf(t).r]||1);
   const zone=wpick(freeZones(tpl),z=>TW_ZONE[ZONES[z].k]||1), k=rnd(0.75,1.25)*zoneScale(tpl,zone);
-  const t={id:nid('t'),...tpl,stock:Math.max(50,Math.round(tpl.stock*k/10)*10),pal:Math.max(50,Math.round(tpl.pal*k/10)*10),open:S.day,deadline:S.day+45,dur:pick(DUR_RANK[rankOf(tpl).r]),bid:null,done:false,result:null};
+  const t={id:nid('t'),...tpl,stock:Math.max(50,Math.round(tpl.stock*k/10)*10),pal:Math.max(50,Math.round(tpl.pal*k/10)*10),open:S.day-age,deadline:S.day+45-age,dur:pick(DUR_RANK[rankOf(tpl).r]),bid:null,done:false,result:null};
   {const ci=cinfo(tpl); t.zone=zone; t.src=ci.src; t.mode=ci.mode;}
   S.tenders.push(t);
   const zn=zoneName(t.zone), again=S.clients.some(c=>c.name===t.name&&c.status!=='perso');
   noteVar('gare',`Nuova gara: ${t.name} (${zn}), scade il ${shortDate(t.deadline)}`);
   news('Il Sole 24 Pallet',`Gara d'appalto: ${t.name}, ${zn}`,`${again?'Già nostra committente in un\'altra zona, ora cerca un logistico anche qui. ':''}${n0(t.pal)} pallet al mese, ${n0(t.stock)} posti. Offerte entro il ${shortDate(t.deadline)}. Contratto di ${t.dur} mesi.`);
   return true;
+}
+// prime gare: a inizio partita ce n'è già qualcuna, con scadenze diverse; un salvataggio di prima della 0.65 tiene le gare che ha e passa al nuovo ritmo
+function tendersInit(){
+  if(!S.tenders.some(t=>!t.done)) for(let i=0,n=Math.max(2,Math.round(45/tenderGap()));i<n;i++) newTender(Math.round(i*35/n));
+  S.tNext=S.day+tenderWait();
 }
 // nome della committente con la zona, quando serve distinguere più contratti o gare della stessa azienda
 const cname=c=>c.name+(c.zone&&[...S.clients.filter(x=>x.status!=='perso'),...S.tenders.filter(x=>!x.done)].filter(x=>x.name===c.name).length>1?' · '+zoneName(c.zone):'');
@@ -5548,7 +5558,8 @@ const VIEWS={
  },
  gare(){
   const open=S.tenders.filter(t=>!t.done), done=S.tenders.filter(t=>t.done).slice(-4).reverse();
-  if(!open.length&&!done.length) return `<div class="sm">Nessuna ${kw('gare','gara')} aperta: le committenti libere sono finite. Ne arriveranno quando qualche cliente cambia logistico.</div>`;
+  const none=`<div class="sm">Nessuna ${kw('gare','gara')} aperta, per ora: le gare arrivano quando capita, in media una ogni ${wks(tenderGap())}.</div>`;
+  if(!open.length&&!done.length) return none;
   const sel=open.find(t=>t.id===UI.sel.tender)||open[0];
   const cell=(lab,val,sub,cls)=>`<div class="${cls||''}"><span class="lab">${lab}</span><b>${val}</b>${sub?`<span class="sm">${sub}</span>`:''}</div>`;
   let detail='';
@@ -5581,7 +5592,7 @@ const VIEWS={
      </div>
     </div>`;
   }
-  return `${open.length>1?`<div class="lab">${kw('gare','Gare aperte')} · ${open.length}</div><div class="gr-list">${open.map(t=>`<button class="gr-t" data-act="seltender" data-id="${t.id}" aria-pressed="${t.id===(sel&&sel.id)}">${logoSvg(t.name,28)}<span class="wh-sm"><b class="wh-nm">${esc(t.name)}</b><span class="sm wh-nm">${esc(zoneName(t.zone))}</span></span>${t.bid?'<span class="pill cl-st ok">✓ offerta</span>':`<span class="sm gr-dl">scade ${shortDate(t.deadline)}</span>`}</button>`).join('')}</div>`:''}${detail}
+  return `${open.length?'':none}${open.length>1?`<div class="lab">${kw('gare','Gare aperte')} · ${open.length}</div><div class="gr-list">${open.map(t=>`<button class="gr-t" data-act="seltender" data-id="${t.id}" aria-pressed="${t.id===(sel&&sel.id)}">${logoSvg(t.name,28)}<span class="wh-sm"><b class="wh-nm">${esc(t.name)}</b><span class="sm wh-nm">${esc(zoneName(t.zone))}</span></span>${t.bid?'<span class="pill cl-st ok">✓ offerta</span>':`<span class="sm gr-dl">scade ${shortDate(t.deadline)}</span>`}</button>`).join('')}</div>`:''}${detail}
    ${done.length?`<div class="lab">Risultati recenti</div><div class="card" style="gap:0">`+done.map(t=>{const w=t.result&&t.result.win;return `<div class="pr-q">${logoSvg(t.name,24)}<span class="wh-sm"><span class="wh-nm">${esc(t.name)}</span><span class="sm wh-nm">${esc(zoneName(t.zone))}${t.result&&!w?` · ${t.bid?'vinta da':'presa da'} ${esc(t.result.by)}`:''}</span></span><span class="pill cl-st ${w?'ok':t.bid?'bad':''}">${t.result?(w?'Vinta':t.bid?'Persa':'Non partecipato'):''}</span></div>`;}).join('')+'</div>':''}`;
  },
  personale(){
@@ -6642,6 +6653,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.65',t:'Meno gare, quando capita',x:['Le gare d\'appalto non sono più sempre lì tutte insieme: arrivano una alla volta, quando capita, ognuna con la sua scadenza. Da solo ne arrivano circa 15 l\'anno (prima 25), con tre avversari circa 24 (prima 50). Di solito ne trovi aperte 2 o 3; a volte nessuna per qualche settimana.','L\'Ufficio commerciale porta un terzo di gare in più, ogni azienda avversaria il 20% in più.']},
  {v:'0.64',t:'Controllo generale',x:['Le aziende avversarie non falliscono più per colpa del customer service: prendono un responsabile solo quando servono almeno due addetti (dall\'8° cliente), non assumono gente per i picchi di poche settimane, lasciano andare prima chi resta senza lavoro (anche in sede) e non pagano più manager senza incarico. Nelle prove tornano a reggere come prima delle ultime novità.','Pensioni e ultimatum dei manager restano tra le notifiche anche se salvi e riapri la partita (prima la domanda spariva). Con «Il cliente ha sempre ragione» accesa non si può più dire di no ai clienti nemmeno negli eventi normali (ordine del venerdì, cambio di buyer, caro gasolio).','Regole corrette: «Consegna al piano» alza i ricavi solo dei clienti serviti con i furgoni (prima valeva anche per chi va solo in bilico); «Limite 80 all\'ora per i bilici» fa risparmiare gasolio solo ai bilici; il supplemento di un picco si paga sui pallet in più e non sui posti a stock; un candidato che non sopporta le tue policy può dire di no anche invece di fare una controproposta.','Doppioni tolti: talenti con effetti identici ora sono diversi (Tifo sfegatato, Guru dei social, Tre figli piccoli, Motociclista, Laureato in scienze politiche, Collezionista di camion d\'epoca), due drammi dei clienti nuovi, la voce OTIF dell\'enciclopedia scritta due volte, eventi che raccontavano la stessa scena. La Torrefazione Tazzulella ora serve la riviera adriatica d\'estate, «Imballaggi Pluriball» diventa «Imballaggi Scoppiabolle» con stabilimento in Veneto, e l\'head hunter si chiama «Selezioni Testafina & Figli».','Testi allineati alle regole: niente più x2 nella descrizione del tempo, tempi in settimane, effetti dei direttori HR e finanziario, quali tecnologie sbloccano le policy, il nuovo avviso «Manca il facility manager», il conteggio dei dipendenti che ora include gli addetti al customer service.']},
  {v:'0.63',t:'Ricerca dei manager',x:['Nuova finestra «Manager» nel menu: chi è in squadra, i candidati e l\'head hunter. Manager e dirigenti ora sono la stessa cosa: chi assumi può guidare un magazzino, sedere in Direzione o guidare il customer service.','Ogni manager ha un rango da S a F, come i clienti: più è alto, più è bravo e più chiede di stipendio.','Ci sono sempre tre candidature spontanee di rango basso, che cambiano ogni qualche settimana. Le aziende avversarie le possono assumere prima di te.','L\'head hunter cerca tre profili con il valore minimo che vuoi in un\'abilità: più alto è il minimo, più ci mette e più costa. Metà della parcella subito, l\'altra metà a ogni assunzione.','Lo stipendio si tratta: fai un\'offerta e il candidato risponde dopo qualche giorno. Può firmare, fare una controproposta, chiedere di più o offendersi. Le policy che non gli piacciono pesano.','Chi firma non arriva subito: una settimana per le candidature spontanee, da 2 a 8 settimane di preavviso per chi viene dall\'head hunter. Ogni tanto il vecchio datore di lavoro fa una controfferta.']},
  {v:'0.62',t:'Picchi di consegna e overstock',x:['I clienti non hanno solo drammi: a volte annunciano un picco di consegne (per 2-4 settimane i pallet salgono da ×1,5 fino a ×2,5) e scegli se accettare tutto, chiedere un supplemento, prenderne metà o rifiutare. Se accetti tutto e i KPI reggono, alla fine il cliente è più contento.','Overstock: un cliente chiede di parcheggiare da 80 pallet in su per qualche mese in una zona precisa. Proponi tu uno dei tuoi magazzini: più è lontano dalla zona, meno paga, e oltre i 100 km può rinunciare. I posti restano occupati fino alla fine, e alla scadenza il cliente può chiedere una proroga.','Picchi e overstock si vedono nella finestra Customer service e in quella del magazzino.','Nuova tecnologia «Portale clienti» nell\'albero Mercato (qualità del servizio +10) e nuova policy «Rispondiamo entro 2 ore» (qualità +8, ma servono più addetti). Con la policy «Il cliente ha sempre ragione» non si rifiutano picchi e overstock e non si chiedono supplementi.']},
@@ -6900,6 +6912,7 @@ Object.assign(ACT,{
    const L=startSel.lb||lbDef(); HUM=S; S.cfg={mode:L.mode,win:{...L.win},fatturato:L.fatturato,reputazione:L.reputazione,traguardo:L.traguardo};
    S.bots=lbRivals().filter(r=>r.b.on).map((r,i)=>newRival(r.C.id,r.color,r.logo,r.b.style,r.b.diff,i));
    if(S.bots.length) news('Il Sole 24 Pallet',`Quattro aziende per un mercato solo`,`Nel Nord partono insieme a ${S.company.name} anche ${S.bots.map(b=>`${b.company.name} di ${b.boss.name}`).join(', ')}. Le gare d'appalto saranno una battaglia.`);
+   tendersInit();
    if(L.mode==='persistente') S.clock={at:Date.now(),day:0};
    if(contMode()) S.speed=1;
    startSel.step='home';startSel.stamp=false;boot();save();},
