@@ -225,6 +225,12 @@ table.t td.r,table.t th.r{text-align:right}
 .wh-mgr img,.wh-st img{width:40px;height:46px;background:#3a6db0;border:2px solid var(--ink);flex:none}
 .wh-mgr .lab{flex:1}
 .wh-warn{font-size:14px;color:#ff8a8d}
+.tr-c{display:flex;flex-direction:column;gap:6px}.tr-r{display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid var(--panel2)}.tr-r .tkp{flex:none}
+.tr-t{display:flex;flex-direction:column;min-width:0;flex:1}.tr-m{flex:none;font-size:14px}.tr-f{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;font-size:14px}
+.tr-sq{display:flex;flex-wrap:wrap;gap:6px 16px;margin:4px 0}
+.mob .tr-r .tkp{width:56px;height:18px}
+.mfx-l{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;margin-top:6px}.mfx-l .lab{margin-right:2px}
+.mfx{display:inline-flex;align-items:center;gap:4px;font-size:13px;padding:2px 6px;border:2px solid #16202e;background:#22324a;color:#e8eef5}.mfx b{font-weight:600}.mfx.ok b{color:#6fdc8c}.mfx.bad b{color:#ff8a8d}
 .wh-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .kpi.wh-k{border-top-width:6px;padding:5px 8px;display:flex;flex-direction:column;min-width:0}
 .kpi.wh-k.ok{border-top-color:var(--ok)}.kpi.wh-k.warn{border-top-color:var(--warn)}.kpi.wh-k.bad{border-top-color:var(--bad)}
@@ -917,7 +923,7 @@ const EXIT_RISK=[
 ];
 function exitClient(c){
   const w=whById(c.wh), A=w&&w.kpi?w.kpi.A:97;
-  const opts=EXIT_RISK.filter(r=>r.id!=='late'||!c.exit.late).map(r=>({...r,w:r.w+(r.id==='inv'?5*Math.max(0,97-A):0)}));
+  const opts=EXIT_RISK.filter(r=>r.id!=='late'||!c.exit.late).map(r=>({...r,w:r.id==='inv'?(r.w+5*Math.max(0,97-A))*(w?mgrFx(mgrStats(w)).inv:1):r.w}));
   let x=Math.random()*opts.reduce((a,r)=>a+r.w,0); const r=opts.find(o=>(x-=o.w)<0)||opts[0];
   if(r.id==='late'){c.exit.late=true; c.exit.day+=21; modalInfo('Ufficio traffico',`${c.name}: ${r.t}`,r.d(c)); return;}
   const v=r.cost?r.cost(c):0; S.cash-=v; S.cur.pen+=v; if(r.rep) S.rep=clamp(S.rep-r.rep,0,100);
@@ -1605,7 +1611,7 @@ Il magazzino del CEO è di proprietà, gli altri sono in affitto: in entrambi i 
 // KPI
 wk('puntualita','kpi','Puntualità',`Percentuale di consegne arrivate in orario. Dipende soprattutto dalle Operazioni del manager e dagli autisti.`,
 `Si parte da 92% e poi si somma:
-• +0,4 per ogni punto di [[st_op|Operazioni]] del [[manager]] sopra 10 (sotto 10 toglie);
+• +0,3 per ogni punto di [[st_op|Operazioni]] del [[manager]] sopra 10 (sotto 10 toglie);
 • le [[tecnologie]] installate (GPS, rotte, radiofrequenza…);
 • il [[dir_op|direttore operativo]];
 • i [[canali]] dei clienti (la GDO toglie, l'industria aggiunge) e i pulmini dei [[welfare_mag|servizi di welfare]];
@@ -1675,12 +1681,12 @@ wk('abilita','abil','Abilità',`Sei numeri che descrivono ogni personaggio. 10 �
 
 I [[talenti]] sono già compresi nei numeri che vedi.`);
 const STAT_TXT={
- op:`Nel [[manager]] di un magazzino alza la [[puntualita]]: +0,4 per ogni punto sopra 10, e toglie altrettanto sotto. Nel [[dir_op|direttore operativo]] vale +0,15 di puntualità in tutti i magazzini per ogni punto sopra 10.`,
- prec:`Nel [[manager]] di un magazzino alza l'[[accuratezza]]: +0,3 per ogni punto sopra 10. Utile soprattutto con i clienti esigenti come farmaceutica ed elettronica.`,
+ op:`Nel [[manager]] di un magazzino, per ogni punto sopra 10 (e al contrario sotto): [[puntualita]] +0,3, produttività di [[magazzinieri]] e [[carrellisti]] +2,5%, km al mese degli autisti +1,5% e [[saturazione_mezzi|camion più pieni]] di 1 punto. È l'abilità che fa risparmiare più persone e camion. Nel [[dir_op|direttore operativo]] vale +0,15 di puntualità in tutti i magazzini per ogni punto sopra 10.`,
+ prec:`Nel [[manager]] di un magazzino alza l'[[accuratezza]]: +0,3 per ogni punto sopra 10, e meno differenze inventariali quando un cliente se ne va. Utile soprattutto con i clienti esigenti come farmaceutica ed elettronica.`,
  neg:`Quella del [[ceo|CEO]] pesa in ogni [[gare|gara]]: +1 al punteggio per ogni punto sopra 10. Il [[dir_comm|direttore commerciale]] aggiunge +0,8 per punto. Negli [[eventi]] con i clienti apre risposte migliori.`,
- lead:`Nel [[manager]] di un magazzino alza il [[morale]] obiettivo: +0,6 per ogni punto sopra 10. Il [[dir_hr|direttore HR]] lo alza in tutti i magazzini e accorcia le [[assunzioni]]. Negli [[eventi]] con il personale apre risposte migliori.`,
- amm:`Il [[dir_fin|direttore finanziario]] taglia i [[costi]] fissi dello 0,5% per ogni punto sopra 10. Negli [[eventi]] con fisco, banche e burocrazia apre risposte migliori.`,
- inn:`Quella del [[ceo|CEO]] accorcia le [[ricerca|ricerche]]: −3% di tempo per ogni punto sopra 10 (fino a −40%). Se il [[dir_tech|direttore tecnologia]] ne ha di più, si usa la sua. Negli [[eventi]] tecnologici apre risposte migliori.`
+ lead:`Nel [[manager]] di un magazzino alza il [[morale]] obiettivo (+0,6 per ogni punto sopra 10) e accorcia le [[assunzioni]] in quel magazzino (−2% per punto). Il [[dir_hr|direttore HR]] lo alza in tutti i magazzini e accorcia le [[assunzioni]]. Negli [[eventi]] con il personale apre risposte migliori.`,
+ amm:`Nel [[manager]] di un magazzino taglia i costi dell'immobile dello 0,5% per ogni punto sopra 10. Il [[dir_fin|direttore finanziario]] taglia i [[costi]] fissi dello 0,5% per ogni punto sopra 10. Negli [[eventi]] con fisco, banche e burocrazia apre risposte migliori.`,
+ inn:`Quella del [[ceo|CEO]] accorcia le [[ricerca|ricerche]]: −3% di tempo per ogni punto sopra 10 (fino a −40%). Se il [[dir_tech|direttore tecnologia]] ne ha di più, si usa la sua. Nel [[manager]] di un magazzino accorcia l'apprendimento delle [[tecnologie]] installate lì (−3% per punto sopra 10). Negli [[eventi]] tecnologici apre risposte migliori.`
 };
 STATS.forEach(s=>wk('st_'+s.k,'abil',s.n,s.d,STAT_TXT[s.k],sz=>statIcon(s.k,sz)));
 // Talenti
@@ -1798,8 +1804,14 @@ wk('autisti_b','pers','Autisti patente B',`Guidano i furgoni fino a 3,5 tonnella
 `Servono ai [[canali]] con tante consegne piccole: horeca, dettaglio ed e-commerce. Il traffico e le soste fanno meno km al giorno di un bilico.
 
 Costano 19.000 € lordi l'anno più 900 € al mese di furgone in leasing, e il furgone consuma la metà. Si trovano in fretta (2-3 settimane con l'annuncio), ma cambiano lavoro spesso.`);
-wk('manager','pers','Manager di magazzino',`Il capo di un magazzino. Le sue Operazioni, Precisione e Leadership decidono i KPI e il morale.`,
-`Il manager usa tre [[abilita|abilità]]: [[st_op|Operazioni]] per la [[puntualita]], [[st_prec|Precisione]] per l'[[accuratezza]] e [[st_lead|Leadership]] per il [[morale]]. Anche i suoi [[talenti]] con l'effetto «nel magazzino che guida» contano lì. Senza manager il magazzino va avanti con valori scarsi (7, 7 e 6).
+wk('manager','pers','Manager di magazzino',`Il capo di un magazzino. Le sue abilità decidono KPI, morale, produttività, km degli autisti e costi del magazzino.`,
+`Ogni [[abilita|abilità]] del manager pesa sul suo magazzino (per ogni punto sopra 10; sotto 10 al contrario):
+• [[st_op|Operazioni]]: produttività di [[magazzinieri]] e [[carrellisti]] +2,5%, km al mese degli autisti +1,5%, [[saturazione_mezzi|camion più pieni]] +1, [[puntualita]] +0,3;
+• [[st_prec|Precisione]]: [[accuratezza]] +0,3 e meno differenze inventariali quando un cliente esce;
+• [[st_lead|Leadership]]: [[morale]] +0,6 e [[assunzioni]] più veloci del 2%;
+• [[st_amm|Amministrazione]]: costi dell'immobile −0,5%;
+• [[st_inn|Innovazione]]: apprendimento delle [[tecnologie]] −3%.
+Un buon manager operativo fa risparmiare persone e camion; uno scarso li fa costare. Nella finestra del magazzino il riquadro «Effetto del manager» mostra i numeri. Anche i suoi [[talenti]] con l'effetto «nel magazzino che guida» contano lì. Senza manager il magazzino va avanti alla meno peggio, come se lo guidasse qualcuno con Operazioni 5, Precisione 6, Leadership 5, Amministrazione 6 e Innovazione 5.
 
 All'inizio il manager è il [[ceo|CEO]]. Gli altri si assumono dalla finestra Personale e si assegnano dal menu a tendina del magazzino. Un manager senza magazzino può diventare un [[direzione|direttore]].
 
@@ -1882,6 +1894,14 @@ I volumi dipendono dagli abitanti della zona: una gara per tutto il Nord vale mo
 Più è grande la zona, più km per ogni viaggio: si conta la distanza media dal magazzino ai capoluoghi della zona, andata e ritorno, con il 30% in più per le strade vere. Quanti pallet porta ogni viaggio lo dice la [[saturazione_mezzi|saturazione dei mezzi]]. I km decidono quanti [[autisti]] servono e i costi dei mezzi, ma aumentano anche il prezzo del trasporto pagato dal cliente.
 
 Il mezzo dipende dai [[canali]] del cliente: GDO e industria viaggiano con i bilici, guidati dagli [[autisti_ce|autisti con patente CE]]; horeca, dettaglio ed e-commerce con i furgoni, guidati dagli [[autisti_b|autisti con patente B]].`);
+wk('traffico','cli','Ufficio traffico',`La finestra dei giri dei camion: quanti viaggi, quanto sono pieni, quanto costano e quanto rendono, cliente per cliente.`,
+`Per ogni [[magazzino]] mostra viaggi e km del mese, la [[saturazione_mezzi|saturazione dei mezzi]] e il margine dei trasporti. La squadra dei trasporti: [[autisti_ce|autisti CE]], [[autisti_b|autisti B]], [[pianificatori]] e [[motrici]], con il loro [[carico]].
+
+Ogni cliente ha i suoi camioncini, uno per [[canali|canale]]: i quadratini colorati sono i pallet caricati, quindi un camion mezzo vuoto si vede subito. Accanto ci sono i viaggi del mese, i pallet a viaggio e i km. In fondo il ricavo e il costo del trasporto per quel cliente, e quanto si guadagna o si perde a viaggio. I clienti in perdita stanno in cima.
+
+Il costo è quello pieno di un km nel magazzino: stipendi degli autisti, mezzi, noleggi, manutenzione e gasolio, divisi per i km fatti. Se gli autisti sono troppi per i km da fare, ogni km costa di più. Il ricavo di un pallet ha una parte fissa e una che cresce con la distanza: per questo le zone lontane, servite con camion mezzi vuoti, finiscono spesso in perdita.
+
+Da qui si sceglie anche l'[[obiettivo_sat|obiettivo di carico]]. Sulla mappa la lente **Viaggi** disegna i giri: linee più spesse = più viaggi; verde camion pieni, giallo a metà, rosso quasi vuoti; tratteggiate se il trasporto è in perdita; in arancione i [[ritiro|ritiri]] dai fornitori.`);
 wk('ritiro','cli','Ritiro o consegna',`Da dove arriva la merce: la consegna il cliente con i suoi mezzi, oppure la vai a prendere tu.`,
 `Con "consegna" la merce arriva al magazzino gratis. Con "ritiro" mandi un bilico da 33 pallet fino allo stabilimento del cliente: servono più [[autisti_ce|autisti CE]] e più gasolio, ma il cliente paga 1,5 € per ogni km di ritiro.`);
 wk('concorrenti','cli','Concorrenti',`Gruppo Bartolazzi, Logistix Global, F.lli Brambilla e la Cooperativa La Fatica: si prendono le gare che perdi.`,
@@ -2170,10 +2190,15 @@ function newBoss(c){ const old=S.boss, p=c.p, nb={id:p.id,name:p.name,sx:p.sx,bd
 
 /* ====================== MOTORE ====================== */
 function mgrStats(wh){
-  if(wh.mgr==='ceo'){const s=ceo().st;return {op:s.op,prec:s.prec,lead:s.lead,name:ceo().name,ceo:true};}
+  if(wh.mgr==='ceo'){const s=ceo().st;return {...s,name:ceo().name,ceo:true};}
   const m=S.managers.find(x=>x.id===wh.mgr); if(m) return {...m.st,name:m.name};
-  return {op:7,prec:7,lead:6,name:'Nessun manager',none:true};
+  return {op:5,prec:6,neg:6,lead:5,amm:6,inn:5,name:'Nessun manager',none:true};
 }
+// effetti delle abilità di chi guida il magazzino (per punto sopra 10; sotto 10 al contrario)
+const MGR_K={prod:0.025,km:0.015,sm:1,P:0.3,hire:0.02,fix:0.005,learn:0.03,inv:0.05};
+function mgrFx(m){const d=k=>(m[k]==null?10:m[k])-10;
+  return {prod:clamp(1+MGR_K.prod*d('op'),0.8,1.2),km:clamp(1+MGR_K.km*d('op'),0.85,1.15),sm:MGR_K.sm*d('op'),P:MGR_K.P*d('op'),
+    hire:clamp(1-MGR_K.hire*d('lead'),0.8,1.2),fix:clamp(1-MGR_K.fix*d('amm'),0.95,1.05),learn:clamp(1-MGR_K.learn*d('inn'),0.7,1.3),inv:clamp(1-MGR_K.inv*d('prec'),0.5,1.5)};}
 // talenti di chi guida il magazzino (il CEO o il manager): gli effetti «nel magazzino che guida» valgono solo lì
 function mgrTal(wh){ if(wh.mgr==='ceo') return ceo().tal||[]; const m=S.managers.find(x=>x.id===wh.mgr); return m?(m.tal||[]):[]; }
 function talWh(wh,k){return mgrTal(wh).reduce((a,n)=>a+(((TALENTS[n]||{}).wh||{})[k]||0),0);}
@@ -2268,7 +2293,7 @@ function whAtt(wh){return wh?TECH.filter(t=>t.tree==='wel'&&wh.tech[t.id]).reduc
 function techFactor(wh,t){
   const it=wh.tech[t.id]; if(!it) return 0;
   let weeks=t.weeks;
-  mgrTal(wh).forEach(n=>{const l=TALENTS[n]&&TALENTS[n].learn; if(l) weeks*=l;}); if(R('academy')) weeks*=0.7; weeks*=polMul('learn');
+  mgrTal(wh).forEach(n=>{const l=TALENTS[n]&&TALENTS[n].learn; if(l) weeks*=l;}); if(R('academy')) weeks*=0.7; weeks*=polMul('learn'); weeks*=mgrFx(mgrStats(wh)).learn;
   return (S.day-it.day)<weeks*7 ? -0.5 : 1;
 }
 // pianificatori del traffico, in sede: il CEO regge da solo fino a 150 viaggi al mese (PLAN_TRIPS)
@@ -2280,6 +2305,7 @@ function modSum(wh,k){return S.mods.filter(m=>m.until>S.day&&(m.scope==='all'||m
 // saturazione dei mezzi: quanto sono pieni in media i camion in uscita (% della capienza)
 function satMezzi(wh,act,m,needImp,mixF){
   const n=act.length; let nat=SAT0*mixF; const pS=[['Base',SAT0]]; if(Math.abs(mixF-1)>0.005) pS.push(['Mix dei canali',SAT0*(mixF-1)]);
+  const mSm=mgrFx(m).sm; if(n&&Math.abs(mSm)>0.05){pS.push(['Operazioni di '+m.name.split(' ')[0],mSm]); nat+=mSm;}
   // affinità media tra le coppie di clienti: la sinergia rende solo se i clienti servono gli stessi canali
   let aff=0,np=0; for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){aff+=chOverlap(act[i],act[j]);np++;} aff=np?aff/np:0;
   TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t);
@@ -2311,16 +2337,17 @@ function computeWH(wh,extra){
   TECH.forEach(t=>{ if(t.tree!=='log'||!wh.tech[t.id]) return; const f=techFactor(wh,t); tA+=(t.A||0)*f; tP+=(t.P||0)*f; tMor+=(t.mor||0)*(f>0?1:0); tProd+=(t.prod||0)*(f>0?1:0); if(f>0&&t.fuel) fuelMul*=1-t.fuel; tCan+=t.mese; });
   // servizi di welfare del magazzino: niente apprendimento, valgono da subito
   let wMor=0,wP=0,wA=0,wCan=0; TECH.forEach(t=>{ if(t.tree!=='wel'||!wh.tech[t.id]) return; wMor+=t.mor||0; wP+=t.P||0; wA+=t.A||0; tProd+=t.prod||0; wCan+=welMese(t); });
-  const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd+polSum('prod'))*(1-condPen(wh))*(wh.build?0.95:1);
+  const mf=mgrFx(m), kmB1=KM_B*mf.km, kmCE1=KM_CE*mf.km;
+  const prod=900*(0.7+0.3*wh.morale/70)*(1+tProd+polSum('prod'))*(1-condPen(wh))*(wh.build?0.95:1)*mf.prod;
   // carrellisti: tutti i movimenti (doppia produttività col muletto); magazzinieri: preparano i pallet in uscita
   const use=(load,n,per)=>load===0?0:(n>0?load/(n*per):9);
-  const uCar=use(mov,st.car,2.5*prod), uPick=use(cons*pickF,st.pick,prod), uB=use(kmB,st.autB,KM_B), uCE=use(kmCE,st.autCE,KM_CE);
+  const uCar=use(mov,st.car,2.5*prod), uPick=use(cons*pickF,st.pick,prod), uB=use(kmB,st.autB,kmB1), uCE=use(kmCE,st.autCE,kmCE1);
   const cap=capOf(wh); const sat=stock/cap;
   const impShort=Math.max(0,needImp-st.imp);
   const needCapo=Math.floor((st.pick+st.car)/10), capoShort=Math.max(0,needCapo-st.capo);
   const pNeed=planNeed(), planShort=Math.max(0,pNeed-S.office.plan), giri=pNeed>0&&!planShort?0.96:1;
   const mP=modSum(wh,'P'), mA=modSum(wh,'A'), mMor=modSum(wh,'mor'), tl='Talenti di '+m.name.split(' ')[0], tlP=talWh(wh,'P');
-  const pP=[['Base',92],['Operazioni di '+m.name.split(' ')[0],0.4*(m.op-10)]];
+  const pP=[['Base',92],['Operazioni di '+m.name.split(' ')[0],mf.P]];
   if(tP) pP.push(['Tecnologie',tP]); if(wP) pP.push(['Servizi di welfare',wP]); if(mP) pP.push(['Eventi',mP]); if(tlP) pP.push([tl,tlP]); const chP=chW('P'), chA=chW('A'); if(Math.abs(chP)>0.05) pP.push(['Canali di distribuzione',chP]);
   const dOp=dirStat('op'); if(dOp!=null) pP.push(['Direttore operativo',0.15*(dOp-10)]);
   const sk=polMul('staff');  // policy: zero straordinario (i reparti in affanno pesano di più) o sabato obbligatorio (di meno)
@@ -2347,11 +2374,26 @@ function computeWH(wh,extra){
   const pers=ROLES.reduce((a,r)=>a+(st[r]||0)*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12*(1+polSum('pers'));
   // bilici: gasolio, manutenzione e pedaggi; furgoni: consumano e costano meno, sempre in leasing
   const mezzi=giri*kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+giri*kmB*(0.12*S.fuel*fuelMul+0.06)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100+st.autB*900;
-  const manut=manutMese(wh), fissi=((wh.fixed+1000)*fixedMul()+manut)*(1+talWh(wh,'fix'));
-  const need={pick:Math.max(cons?1:0,Math.ceil(cons*pickF/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2.5*prod))),autB:Math.ceil(kmB/KM_B),autCE:Math.ceil(kmCE/KM_CE),imp:needImp+sm.addImp,capo:needCapo,fm:1};
-  return {manut,act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,mixF,pickF,P,A,pP,pA,pM,morT,rev,pers,mezzi,fissi,tCan,wCan,need,prod,m};
+  // costo pieno di un km, separato per bilici e furgoni (autisti, mezzi, gasolio): serve all'Ufficio traffico
+  const drv=r=>(st[r]||0)*RAL[r]*COEF/12*(1+polSum('pers')), mzCE=giri*kmCE*(0.25*S.fuel*fuelMul+0.08+0.05)+st.autCE*1100+Math.max(0,st.autCE-wh.motrici)*2100;
+  const tr={cCE:mzCE+drv('autCE'),cB:mezzi-mzCE+drv('autB')}; tr.kmCE=kmCE?tr.cCE/kmCE:0; tr.kmB=kmB?tr.cB/kmB:0;
+  const manut=manutMese(wh), fissi=((wh.fixed+1000)*fixedMul()*mf.fix+manut)*(1+talWh(wh,'fix'));
+  const need={pick:Math.max(cons?1:0,Math.ceil(cons*pickF/prod)),car:Math.max(mov?1:0,Math.ceil(mov/(2.5*prod))),autB:Math.ceil(kmB/kmB1),autCE:Math.ceil(kmCE/kmCE1),imp:needImp+sm.addImp,capo:needCapo,fm:1};
+  return {tr,mf,manut,act,cap,stock,cons,mov,viaggi,km,kmB,kmCE,uCar,uPick,uB,uCE,sat,satM:sm.val,sm,mixF,pickF,P,A,pP,pA,pM,morT,rev,pers,mezzi,fissi,tCan,wCan,need,prod,m};
 }
 // carico di lavoro di ogni reparto: 1 = la squadra ce la fa giusta, oltre 1 è in affanno (9 = nessuno a fare un lavoro che c'è)
+// riquadro con gli effetti delle abilità di chi guida il magazzino (finestra del magazzino)
+function mgrFxHtml(m){ const f=mgrFx(m), pc=v=>Math.round((v-1)*100), it=[];
+  const add=(k,lab,v,txt,good)=>{ if(Math.abs(v)<0.5) return; it.push(`<span class="mfx ${good?'ok':'bad'}">${statIcon(k,12)}${lab} <b>${txt}</b></span>`); };
+  add('op','produttività',pc(f.prod),sgnp(pc(f.prod)),f.prod>1);
+  add('op','km degli autisti',pc(f.km),sgnp(pc(f.km)),f.km>1);
+  add('op','camion più pieni',f.sm,sgn(f.sm),f.sm>0);
+  add('op','puntualità',f.P*2,sgn(f.P),f.P>0);
+  add('prec','accuratezza',0.3*(m.prec-10)*2,sgn(0.3*(m.prec-10)),m.prec>10);
+  add('lead','tempi di assunzione',pc(f.hire),sgnp(pc(f.hire)),f.hire<1);
+  add('amm','costi fissi',pc(f.fix)*2,sgnp(pc(f.fix)),f.fix<1);
+  add('inn','apprendimento tecnologie',pc(f.learn),sgnp(pc(f.learn)),f.learn<1);
+  return it.length?`<div class="mfx-l"><span class="lab">${kw('manager','Effetto del manager')}</span>${it.join('')}</div>`:''; }
 function staffLoad(w,k){
   const st=w.staff, r=(need,n)=>need<=0?0:(n>0?need/n:9), crew=Math.floor((st.pick+st.car)/10);
   return {pick:k.uPick,car:k.uCar,autB:k.uB,autCE:k.uCE,imp:r(Math.max(1,k.cons/(R('gestionale')?2000:1500))+k.sm.addImp,st.imp),capo:r(crew,st.capo),fm:st.fm>0?0:9};
@@ -3288,7 +3330,9 @@ const LENSES=[
  {id:'base',n:'Mappa normale',d:'Città, magazzini e siti in affitto.',
   ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="11" height="10" fill="#5fb4f0"/><rect x="0" y="3" width="7" height="7" fill="#8ed15b"/><rect x="2" y="1" width="6" height="3" fill="#8ed15b"/><rect x="5" y="4" width="2" height="2" fill="#16202e"/><rect x="2" y="7" width="2" height="2" fill="#fff"/></svg>'},
  {id:'prov',n:'Province',d:'Le 47 province del Nord, dalla Valle d\'Aosta al Friuli e all\'Emilia-Romagna. Passa sopra a una provincia per i dettagli.',draw:lensProv,
-  ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="5" height="5" fill="#ff7a3d"/><rect x="5" y="0" width="6" height="4" fill="#5fb4f0"/><rect x="0" y="5" width="4" height="5" fill="#ffd23f"/><rect x="4" y="5" width="7" height="5" fill="#2e9e48"/><rect x="5" y="4" width="6" height="1" fill="#2e9e48"/><rect x="4" y="0" width="1" height="10" fill="#16202e"/><rect x="0" y="4" width="11" height="1" fill="#16202e"/></svg>'}
+  ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="5" height="5" fill="#ff7a3d"/><rect x="5" y="0" width="6" height="4" fill="#5fb4f0"/><rect x="0" y="5" width="4" height="5" fill="#ffd23f"/><rect x="4" y="5" width="7" height="5" fill="#2e9e48"/><rect x="5" y="4" width="6" height="1" fill="#2e9e48"/><rect x="4" y="0" width="1" height="10" fill="#16202e"/><rect x="0" y="4" width="11" height="1" fill="#16202e"/></svg>'},
+ {id:'trips',n:'Viaggi',d:'I giri dei camion: una linea per cliente, spessa quanto i viaggi del mese. Verde = camion pieni, giallo = a metà, rosso = quasi vuoti; tratteggiata se il trasporto è in perdita. In arancione i ritiri dai fornitori.',draw:lensTrips,
+  ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="11" height="10" fill="#2a3a50"/><rect x="1" y="7" width="3" height="2" fill="#ff7a3d"/><rect x="3" y="5" width="2" height="2" fill="#6fdc8c"/><rect x="5" y="3" width="2" height="2" fill="#6fdc8c"/><rect x="7" y="1" width="3" height="2" fill="#6fdc8c"/><rect x="4" y="8" width="6" height="1" fill="#ffc53d"/></svg>'}
 ];
 function renderLenses(){
   $('#lenses').innerHTML='<span class="lab">Lenti</span>'+LENSES.map(l=>`<button data-act="lens" data-id="${l.id}" aria-pressed="${(UI.lens||'base')===l.id}" aria-label="Lente: ${esc(l.n)}" data-tip="<div class='tt'>${esc(l.n)}</div>${esc(l.d)}${TOUCH?'':"<br><span class='sm'>Tasto L per cambiare lente</span>"}">${l.ic}</button>`).join('');
@@ -3347,6 +3391,7 @@ const DOCK=[
  ['azienda','Azienda e CEO','<svg width="22" height="24" viewBox="0 0 11 12" shape-rendering="crispEdges"><rect x="3" y="0" width="5" height="5" fill="#f2c79b"/><rect x="3" y="0" width="5" height="2" fill="#6b4a2b"/><rect x="1" y="6" width="9" height="6" fill="#ffd23f"/><rect x="5" y="6" width="1" height="4" fill="#16202e"/></svg>'],
  ['magazzini','Magazzini','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="0" y="3" width="12" height="8" fill="#d8e3ee"/><rect x="1" y="0" width="10" height="3" fill="#8a96a6"/><rect x="4" y="6" width="4" height="5" fill="#3a4658"/></svg>'],
  ['clienti','Clienti','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="0" y="3" width="12" height="8" fill="#16202e"/><rect x="1" y="4" width="10" height="6" fill="#8a5f36"/><rect x="4" y="0" width="4" height="1" fill="#d8e3ee"/><rect x="3" y="1" width="1" height="2" fill="#d8e3ee"/><rect x="8" y="1" width="1" height="2" fill="#d8e3ee"/><rect x="5" y="6" width="2" height="2" fill="#ffd23f"/></svg>'],
+ ['traffico','Ufficio traffico','<svg width="26" height="20" viewBox="0 0 13 10" shape-rendering="crispEdges"><rect x="0" y="1" width="8" height="6" fill="#e8eef5"/><rect x="1" y="3" width="2" height="3" fill="#8ed15b"/><rect x="4" y="3" width="2" height="3" fill="#ffd23f"/><rect x="8" y="3" width="4" height="4" fill="#ff7a3d"/><rect x="9" y="4" width="2" height="1" fill="#bfe6ff"/><rect x="1" y="7" width="2" height="2" fill="#16202e"/><rect x="9" y="7" width="2" height="2" fill="#16202e"/></svg>'],
  ['gare','Gare d\'appalto','<svg width="18" height="22" viewBox="0 0 8 10" shape-rendering="crispEdges"><rect x="0" y="0" width="8" height="10" fill="#fff"/><rect x="1" y="2" width="6" height="1" fill="#16202e"/><rect x="1" y="4" width="6" height="1" fill="#16202e"/><rect x="1" y="6" width="4" height="1" fill="#16202e"/></svg>'],
  ['personale','Personale e manager','<svg width="26" height="22" viewBox="0 0 13 11" shape-rendering="crispEdges"><rect x="1" y="0" width="4" height="4" fill="#f2c79b"/><rect x="0" y="5" width="6" height="6" fill="#5fb4f0"/><rect x="8" y="0" width="4" height="4" fill="#c98762"/><rect x="7" y="5" width="6" height="6" fill="#8ed15b"/></svg>'],
  ['direzione','Direzione','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="4" y="0" width="4" height="3" fill="#ffd23f"/><rect x="5" y="3" width="2" height="2" fill="#d8e3ee"/><rect x="1" y="5" width="10" height="1" fill="#d8e3ee"/><rect x="1" y="6" width="1" height="2" fill="#d8e3ee"/><rect x="10" y="6" width="1" height="2" fill="#d8e3ee"/><rect x="5" y="6" width="2" height="2" fill="#d8e3ee"/><rect x="0" y="8" width="3" height="3" fill="#5fb4f0"/><rect x="4" y="8" width="4" height="3" fill="#ff7a3d"/><rect x="9" y="8" width="3" height="3" fill="#8ed15b"/></svg>'],
@@ -3358,9 +3403,9 @@ const DOCK=[
  ['enciclopedia','Enciclopedia (tasto E)','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="1" y="0" width="9" height="10" fill="#9b6bff"/><rect x="1" y="0" width="2" height="10" fill="#6f43cf"/><rect x="3" y="9" width="7" height="2" fill="#fff"/><rect x="5" y="2" width="3" height="1" fill="#ffd23f"/><rect x="7" y="3" width="1" height="2" fill="#ffd23f"/><rect x="6" y="5" width="1" height="1" fill="#ffd23f"/><rect x="6" y="7" width="1" height="1" fill="#ffd23f"/></svg>'],
  ['giornale','Il giornale','<svg width="24" height="20" viewBox="0 0 12 10" shape-rendering="crispEdges"><rect x="0" y="0" width="12" height="10" fill="#f4f1ec"/><rect x="1" y="1" width="10" height="2" fill="#16202e"/><rect x="1" y="4" width="4" height="4" fill="#8a96a6"/><rect x="6" y="4" width="5" height="1" fill="#16202e"/><rect x="6" y="6" width="5" height="1" fill="#16202e"/></svg>']
 ];
-const TITLES={policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP'};
+const TITLES={policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',traffico:'Ufficio traffico',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP'};
 // sul telefono il menu è raggruppato e ogni voce dice in una riga come sta il suo reparto
-const DOCK_G=[['Operazioni',['magazzini','personale','clienti','gare','espansione']],['Azienda',['azienda','riepilogo','direzione','policy','tecnologia']],['Informazioni',['report','enciclopedia','giornale']]];
+const DOCK_G=[['Operazioni',['magazzini','traffico','personale','clienti','gare','espansione']],['Azienda',['azienda','riepilogo','direzione','policy','tecnologia']],['Informazioni',['report','enciclopedia','giornale']]];
 function setMenu(on){UI.menu=!!on&&MOB; document.documentElement.classList.toggle('menu',UI.menu); const b=$('#burger'); if(b){b.setAttribute('aria-expanded',String(UI.menu)); b.setAttribute('aria-label',UI.menu?'Chiudi il menu':'Apri il menu');}}
 function renderDock(){
   const openT=S.tenders.filter(t=>!t.done&&!t.bid).length;
@@ -3478,6 +3523,38 @@ const RP_TABS=[['gen','Panoramica'],['soldi','Conti'],['op','Operazioni'],['cli'
 const RP_COST=[['pers','Personale','#2f7fd6'],['mezzi','Mezzi e gasolio','#ff7a3d'],['fissi','Immobili e fissi','#7b4fe0'],['tech','Tecnologie','#1f9e8f'],['mgr','Manager','#c98a00'],['welf','Welfare e benefit','#c2185b'],['pen','Penali','#e0393e'],['altro','Altro (una tantum ed eventi)','#8a96a6']];
 const costOf=h=>RP_COST.reduce((a,[k])=>a+(h[k]||0),0);
 
+// Ufficio traffico: giri di un cliente con ricavo e costo del trasporto (costo pieno a km del magazzino: autisti, mezzi, gasolio)
+function giriCli(c,w,k){
+  const t=clientLog(c,w), rk=c.mult*rankOf(c).rev, ck=v=>v==='B'?k.tr.kmB:k.tr.kmCE;
+  const ch=t.chs.filter(x=>x.trips).map(x=>{const C=CHANNELS.find(y=>y.id===x.id);
+    return {...x,c:C.c,km:x.trips*t.oKm,rev:x.p*(18+0.05*t.oKm)*C.price*rk,cost:x.trips*t.oKm*ck(x.veh),pal:x.trips?x.p/x.trips:0};});
+  const rit=t.in?{trips:t.in,km:t.in*t.iKm,rev:t.in*t.iKm*1.5*rk,cost:t.in*t.iKm*k.tr.kmCE,ld:Math.min(95,c.pal/t.in/CAPV*100)}:null;
+  const rev=ch.reduce((a,x)=>a+x.rev,0)+(rit?rit.rev:0), cost=ch.reduce((a,x)=>a+x.cost,0)+(rit?rit.cost:0);
+  return {t,ch,rit,rev,cost,trips:t.out+t.in,km:t.km};
+}
+const eurC=v=>Math.abs(v)>=10000?(v<0?'−':'')+'€ '+f1(Math.abs(v)/1000)+'k':eur(v);
+const eurKm=v=>v.toFixed(2).replace('.',',')+' €';
+const ldCol=ld=>ld>=65?'#6fdc8c':ld>=45?'#ffc53d':'#ff8a8d';
+// camioncino in pixel art: i quadratini sono i pallet caricati, del colore del canale
+function truckPx(veh,ld,col){ const big=veh!=='B', n=big?10:4, f=Math.max(0,Math.min(n,Math.round(ld/100*n))), W=big?40:22;
+  let r=`<rect x="0" y="0" width="${W-8}" height="10" fill="#16202e"/><rect x="1" y="1" width="${W-10}" height="8" fill="#e8eef5"/>`;
+  for(let i=0;i<f;i++) r+=`<rect x="${2+i*3}" y="3" width="2" height="5" fill="${col}"/>`;
+  r+=`<rect x="${W-8}" y="3" width="8" height="7" fill="#16202e"/><rect x="${W-7}" y="4" width="5" height="2" fill="#bfe6ff"/><rect x="${W-7}" y="7" width="6" height="2" fill="${big?'#ff7a3d':'#5fb4f0'}"/>`;
+  r+=`<rect x="3" y="10" width="4" height="3" fill="#16202e"/><rect x="${W-7}" y="10" width="4" height="3" fill="#16202e"/>${big?`<rect x="9" y="10" width="4" height="3" fill="#16202e"/>`:''}`;
+  return `<svg class="tkp" width="${W*2}" height="26" viewBox="0 0 ${W} 13" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
+// lente «Viaggi»: una linea per cliente dal magazzino alla sua zona, spessa quanto i viaggi, colorata da quanto sono pieni i camion
+function lensTrips(){ const L=[],R=[];
+  S.warehouses.forEach(w=>{ const k=w.kpi||computeWH(w), s=SITES[w.site], [x0,y0]=pt(s.lon,s.lat);
+    S.clients.filter(c=>c.wh===w.id&&c.status==='attivo').forEach(c=>{ const g=giriCli(c,w,k), cs=((ZONES[c.zone]||ZONES.nordovest).cities).map(n=>CITIES.find(x=>x[0]===n)).filter(Boolean);
+      if(!cs.length) return; const lon=cs.reduce((a,x)=>a+x[1],0)/cs.length, lat=cs.reduce((a,x)=>a+x[2],0)/cs.length, [x1,y1]=pt(lon,lat);
+      const out=g.ch.reduce((a,x)=>a+x.trips,0), ld=out?g.ch.reduce((a,x)=>a+x.ld*x.trips,0)/out:0, m=g.rev-g.cost;
+      const tip=`<div class='tt'>${esc(c.name)}</div>${esc(w.name)} → ${esc(zoneName(c.zone))}<br>${out} viaggi al mese, camion pieni al ${Math.round(ld)}%<br>Trasporto: ${m>=0?'guadagno':'perdita'} di ${eur(Math.abs(m))} al mese`;
+      L.push(`<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="#16202e" stroke-width="${clamp(2+out/8,3,12)+3}" stroke-linecap="round" opacity=".6"/><line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="${ldCol(ld)}" stroke-width="${clamp(2+out/8,3,12)}" stroke-linecap="round" ${m<0?'stroke-dasharray="10 6"':''} data-tip="${tip}"/>`);
+      R.push(`<circle cx="${x1}" cy="${y1}" r="6" fill="${ldCol(ld)}" stroke="#16202e" stroke-width="2" data-tip="${tip}"/>`);
+      if(g.rit){const o=ORIGINS[c.src]||ORIGINS.fornitori, [x2,y2]=pt(o.lon,o.lat); L.push(`<line x1="${x2}" y1="${y2}" x2="${x0}" y2="${y0}" stroke="#ff7a3d" stroke-width="3" stroke-dasharray="4 4" opacity=".9" data-tip="<div class='tt'>Ritiro: ${esc(c.name)}</div>${g.rit.trips} viaggi al mese da ${esc(o.n||c.src)}"/>`);}
+    }); });
+  return [`<g aria-label="Viaggi" shape-rendering="auto">`,...L,...R,'</g>'];
+}
 const VIEWS={
  azienda(){
   const C=ceo(), L=S.last;
@@ -3529,6 +3606,7 @@ const VIEWS={
    <div class="bar wh-bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div>
    <label class="wh-mgr"><img class="px" src="${mgrImg}" alt="${w.mgr?'':'Posto vacante'}" width="40" height="46"><span class="lab">${kw('manager','Manager')}</span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
    ${k.m.none?'<div class="wh-warn">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
+   ${mgrFxHtml(k.m)}
   </div>
   <div class="wh-kpis">
    ${tile(sP!=null?kpiCls(k.P,sP):'',kw('puntualita'),f1(k.P)+'%',sP!=null?'soglia '+f1(sP)+'%':'nessuna soglia',tipParts('Puntualità '+f1(k.P)+'%',k.pP,''))}
@@ -3982,6 +4060,34 @@ const VIEWS={
   }
   return `<div class="wk${UI.wikiQ?' q':''}">${side}<article class="wk-art">${art}</article></div>`;
  },
+ traffico(){
+  const w=whById(UI.sel.wh)||S.warehouses[0]; UI.sel.wh=w.id; const k=w.kpi||computeWH(w), ld=staffLoad(w,k), pl=planLoad();
+  const tabs=S.warehouses.length>1?`<div class="tabs" role="tablist">${S.warehouses.map(x=>`<button role="tab" aria-selected="${x.id===w.id}" data-act="selwh" data-id="${x.id}">${esc(x.name)}</button>`).join('')}</div>`:'';
+  const tile=(cls,lab,val,sub)=>`<div class="kpi wh-k ${cls}"><div class="lab">${lab}</div><b>${val}</b><div class="sm">${sub}</div></div>`;
+  const cl=S.clients.filter(c=>c.wh===w.id&&c.status==='attivo'), G=cl.map(c=>[c,giriCli(c,w,k)]);
+  const tRev=G.reduce((a,[,g])=>a+g.rev,0), tCost=G.reduce((a,[,g])=>a+g.cost,0), lossN=G.filter(([,g])=>g.rev<g.cost).length;
+  const satC=k.sm.obj&&k.satM<k.sm.obj-0.5?'bad':k.satM>=65?'ok':k.satM<45?'warn':'';
+  const pct=l=>`<b style="color:${loadCol(l)}">${l>=9?'—':Math.round(l*100)+'%'}</b>`;
+  const card=([c,g])=>{ const m=g.rev-g.cost;
+    return `<div class="card tr-c ${m<0?'cl-bad':''}"><div class="row" style="align-items:center"><span class="row" style="gap:8px;align-items:center;justify-content:flex-start;min-width:0">${logoSvg(c.name,28)}<b class="wh-nm">${esc(c.name)}</b></span><span class="sm">${esc(zoneName(c.zone))}</span></div>
+     ${g.ch.map(x=>`<div class="tr-r">${truckPx(x.veh,x.ld,TPAL[x.c])}<span class="tr-t"><b>${x.trips} ${x.veh==='B'?'giri in furgone':'viaggi in bilico'}</b><span class="sm">${esc(x.n)} · ${Math.round(x.pal)} pallet a viaggio · pieni al <b style="color:${ldCol(x.ld)}">${Math.round(x.ld)}%</b></span></span><span class="tr-m num">${n0(x.km)} km</span></div>`).join('')}
+     ${g.rit?`<div class="tr-r">${truckPx('CE',g.rit.ld,'#ff7a3d')}<span class="tr-t"><b>${g.rit.trips} viaggi di ${kw('ritiro','ritiro')}</b><span class="sm">dal fornitore al magazzino, a pieno carico</span></span><span class="tr-m num">${n0(g.rit.km)} km</span></div>`:''}
+     <div class="tr-f"><span>Trasporto: ricavo <b>${eur(g.rev)}</b> · costo <b>${eur(g.cost)}</b></span><span class="${m>=0?'ok':'bad'}"><b>${m>=0?'+':'−'}${eur(Math.abs(m))}</b> al mese${g.trips?` · ${m>=0?'+':'−'}${eur(Math.abs(m)/g.trips)} a viaggio`:''}</span></div></div>`;};
+  return `${tabs}
+  <div class="wh-kpis">
+   ${tile('',kw('viaggi','Viaggi'),n0(k.viaggi),'al mese')}
+   ${tile('',kw('km','Km'),n0(k.km),'al mese')}
+   ${tile(satC,kw('saturazione_mezzi','Carico'),Math.round(k.satM)+'%',k.sm.obj?'obiettivo '+k.sm.obj+'%':'camion pieni')}
+   ${tile(tRev>=tCost?'ok':'bad',kw('traffico','Margine'),eurC(tRev-tCost),'trasporti al mese')}
+  </div>
+  <div class="card"><div class="row"><span class="h3">${kw('traffico','La squadra dei trasporti')}</span><span class="sm">${kw('carico','carico')}</span></div>
+   <div class="tr-sq"><span>${kw('autisti_ce','Autisti CE')} <b>${w.staff.autCE}</b> ${pct(ld.autCE)}</span><span>${kw('autisti_b','Autisti B')} <b>${w.staff.autB}</b> ${pct(ld.autB)}</span><span>${kw('pianificatori','Pianificatori')} <b>${S.office.plan}</b> ${pl?pct(pl):'<b class="ok">il CEO basta</b>'}</span><span>${kw('motrici')} <b>${w.motrici}</b>${Math.max(0,w.staff.autCE-w.motrici)?` +${Math.max(0,w.staff.autCE-w.motrici)} a noleggio`:''}</span></div>
+   <div class="sm">Costo pieno di un km (autisti, mezzi e gasolio): bilico <b>${k.tr.kmCE?eurKm(k.tr.kmCE):'—'}</b>, furgone <b>${k.tr.kmB?eurKm(k.tr.kmB):'—'}</b>. Il ricavo a km scende con la distanza: le zone lontane rendono meno.</div>
+   <label class="row" style="align-items:center"><span class="lab">${kw('obiettivo_sat','Obiettivo di carico')}</span><select data-act="setsatobj" data-wh="${w.id}" aria-label="Obiettivo minimo di saturazione dei mezzi">${SAT_OBJ.map(v=>`<option value="${v}" ${(w.satObj||0)===v?'selected':''}>${v?'almeno '+v+'%':'nessuno'}</option>`).join('')}</select></label>
+   ${satObjTxt(k.sm)}
+   <div class="row" style="align-items:center"><span class="sm">${lossN?`<b class="bad">${lossN} ${lossN===1?'cliente ha':'clienti hanno'} i trasporti in perdita</b>: zone troppo lontane, camion mezzi vuoti o prezzo basso.`:'Sulla mappa, la lente Viaggi mostra tutti i giri.'}</span><button class="btn sm2" data-act="lenstrips">Lente Viaggi</button></div></div>
+  ${G.length?G.sort((a,b)=>(a[1].rev-a[1].cost)-(b[1].rev-b[1].cost)).map(card).join(''):'<div class="sm">Nessun cliente attivo in questo magazzino.</div>'}`;
+ },
  giornale(){
   if(!S.news.length) return '<div class="sm">Nessuna notizia.</div>';
   const f=NEWS_F.some(x=>x[0]===UI.newsF)?UI.newsF:'all';
@@ -4036,7 +4142,7 @@ function innUsed(){const d=dirStat('tech');return Math.max(ceo().st.inn,d==null?
 function techDays(t){return Math.max(5,Math.round(t.days*clamp(1-0.03*(innUsed()-10),0.6,1.5)));}
 function hireDays(base,wh,r){const att=45+welfarePts('att')+polSum('att')+(S.rep-50)*0.5+whAtt(wh)+(R('academy')?5:0);const h=dirStat('hr');
   const drv=r==='autB'||r==='autCE'?ceo().tal.reduce((a,n)=>a*((TALENTS[n]||{}).drv||1),1):1;  // Un milione di km al volante: il CEO conosce tutti gli autisti
-  return Math.max(3,Math.round(base*clamp(1+(55-att)/40,0.6,1.8)*(R('hr')?0.8:1)*(h!=null?1-0.02*(h-10):1)*drv*(r==='plan'?polMul('planHire'):1)));}
+  return Math.max(3,Math.round(base*clamp(1+(55-att)/40,0.6,1.8)*(R('hr')?0.8:1)*(h!=null?1-0.02*(h-10):1)*(wh?mgrFx(mgrStats(wh)).hire:1)*drv*(r==='plan'?polMul('planHire'):1)));}
 const ACT={
  speed(d){setSpeed(+d.v);},
  menu(){setMenu(!UI.menu);},
@@ -4045,7 +4151,7 @@ const ACT={
  close(d){closeWin(d.id);},
  openwh(d){openWin('magazzini',{wh:d.id});},
  site(d){UI.sel.site=d.id;openWin('espansione');},
- selwh(d){UI.sel.wh=d.id;renderWin('magazzini');renderWin('tecnologia');},
+ selwh(d){UI.sel.wh=d.id;renderWin('magazzini');renderWin('tecnologia');renderWin('traffico');},
  newsf(d){UI.newsF=d.id;renderWin('giornale');},
  garelog(){UI.gareLog=!UI.gareLog;renderWin('gare');},
  seltender(d){UI.sel.tender=d.id;renderWin('gare');},
@@ -4093,6 +4199,7 @@ const ACT={
  sheet(d){UI.sel.sheet=d.id;UI.sel.cell='A1';renderWin('report');},
  cell(d){UI.sel.cell=d.ref;renderWin('report');},
  lens(d){UI.lens=d.id;renderMap();syncTrucks();},
+ lenstrips(){ACT.lens({id:'trips'}); if(MOB) closeWin('traffico');},
  clidet(d){UI.cliOpen=UI.cliOpen||{}; UI.cliOpen[d.id]=!UI.cliOpen[d.id]; renderWin('clienti');},
  mapcli(d){UI.mapCli=UI.mapCli===d.id?null:d.id;renderMap();syncTrucks();renderAll();},
  seltree(d){UI.sel.tree=d.id;UI.sel.tech=null;renderWin('tecnologia');},
@@ -4349,6 +4456,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.27',t:'Chi guida il magazzino',x:['Il manager conta davvero: le sue Operazioni rendono più produttivi magazzinieri e carrellisti, fanno fare più km agli autisti e riempiono di più i camion. Precisione, Leadership, Amministrazione e Innovazione pesano su accuratezza, assunzioni, costi dell\'immobile e apprendimento delle tecnologie.','Nella finestra del magazzino il riquadro «Effetto del manager» mostra quanto vale chi lo guida. Un magazzino senza manager va avanti alla meno peggio.','Nuova finestra Ufficio traffico: per ogni cliente i camioncini con i pallet caricati, i viaggi, i km e quanto si guadagna o si perde col trasporto. I clienti in perdita stanno in cima.','Nuova lente della mappa «Viaggi»: i giri dei camion colorati da quanto sono pieni, tratteggiati se in perdita.']},
  {v:'0.26',t:'Conti che tornano',x:['Un magazzino pieno e ben gestito ora guadagna: gli autisti CE fanno 6.500 km al mese, un carrellista regge più movimenti, nei magazzini piccoli basta un impiegato e il primo pianificatore serve da 150 viaggi al mese.','Partenza più giusta: il cliente storico parte più contento e con gli autisti che servono; Rivalta Scrivia e Genova Voltri sono più grandi, Marco parte con più cassa e alcune committenti cercano un logistico anche in Liguria.','Le stime delle gare contano anche i clienti già vinti che devono ancora partire: niente più magazzini riempiti oltre il 100% per errore.','Diventare grandi resta possibile, ma non è più una passeggiata: la reputazione sopra 50 sale più piano, nelle gare il prezzo pesa di più e la reputazione un po\' meno, al rinnovo il buyer chiede 5 punti di sconto sul ricarico e la sinergia tra clienti riempie i camion fino a +15.','Eventi più sensati: neve al Frejus, allerta in Liguria, moda e ZTL a Milano capitano solo dove lavori; il morale delle scelte si sente subito; ritoccate le opzioni che erano sempre giuste o sempre sbagliate (sciopero, nebbia, lockdown, rotonda, gratta e vinci, Superenalotto, telecamere e altre).','Cooperativa: accuratezza −1 invece di −0,5. Magazzino verticale e robot AMR costano meno da installare.']},
  {v:'0.25',t:'Il menu in tasca',x:['Tecnologia più chiara: in cima la ricerca in corso, quante tecnologie hai, la velocità data dall\'Innovazione e cosa resta da installare; nell\'albero le caselle bloccate dicono cosa serve prima, quelle ricercate avvisano se mancano in qualche magazzino e un\'etichetta «gara» segna le tecnologie chieste dalle gare aperte.','Report KPI più chiaro: in cima quattro riquadri con la settimana appena chiusa (puntualità, accuratezza, margine e clienti sotto soglia), nei fogli la settimana più recente è in alto e nella scheda Clienti un quadratino colorato dice subito chi è sotto soglia.','Sul telefono i tasti in basso diventano un solo pulsante «Menu»: si apre un elenco da sinistra, diviso in Operazioni, Azienda e Informazioni, e ogni voce dice in una riga come sta il suo reparto (gare aperte, reparto in affanno, ricerca in corso).','La mappa e le finestre usano tutto lo schermo del telefono.','La casella della data ha sempre la stessa larghezza: i pulsanti accanto non si spostano più ogni giorno. Sul telefono il mese è abbreviato.','Profili dei manager e dei dirigenti più ricchi: intestazione scura col ritratto, l\'abilità più forte in evidenza, un esagono con il profilo delle sei abilità accanto alle barre colorate, e i talenti spiegati per esteso con effetto e battuta.','Il giornale ha le rubriche colorate (gare, clienti, azienda, cronaca) con i filtri in cima e le notizie divise per mese.','Espansione: i magazzini liberi divisi per regione, con posti e affitto in una riga e il costo di apertura dentro il pulsante «Affitta».','Policy aziendali divise in accese, spente e da sbloccare; quelle da sbloccare stanno in un elenco corto con gli effetti nel suggerimento.','Direzione: quanti posti sono coperti in cima, ogni poltrona con ritratto, effetto e scelta del direttore, le schede dei dirigenti come quelle dei manager.','Azienda e CEO: le abilità e i talenti del CEO mostrati come nei profili dei manager (esagono, barre, talenti spiegati), utile o perdita del mese in evidenza, benefit con un interruttore.','Gare d\'appalto più semplici: l\'elenco delle gare aperte con logo e scadenza, i requisiti in quattro caselle e una sezione «La tua offerta» con la probabilità di vincere in grande, i KPI previsti a confronto con le soglie e il carico dei reparti dopo il contratto.','Nuova finestra Clienti: in cima ricavi, soddisfazione media e clienti a rischio; ogni cliente ha i suoi KPI a confronto con la soglia, un\'etichetta di stato (attivo, rinnovo a rischio, in uscita) e i dettagli su trasporti e contratto che si aprono con un tocco.','Anche la finestra Personale è più ordinata: quattro riquadri in cima (persone, reparti in affanno, assunzioni in arrivo, manager), per ogni magazzino l\'elenco dei reparti con una barra del carico, i manager divisi tra «in squadra» e «disponibili».','La scheda del magazzino è più chiara: in cima nome, occupazione e manager; quattro riquadri colorati per puntualità, accuratezza, mezzi pieni e morale (verde, giallo o rosso rispetto alle soglie dei clienti); per ogni reparto una barra del carico e i pulsanti − e +; un interruttore per la cooperativa e il conto del mese in quattro caselle.','Restano due velocità più la pausa: la terza, troppo veloce per seguire il gioco, è stata tolta.']},
  {v:'0.24',t:'Il tempo passa per tutti',x:['I personaggi invecchiano: a ogni compleanno i giovani imparano qualcosa, gli anziani perdono un po\' di smalto.','23 nuovi eventi personali per il CEO, i manager e i dirigenti: corsi serali, master, notti in magazzino, karaoke col buyer, candidature in Comune. Alcune scelte cambiano le abilità e danno (o tolgono) talenti.','9 nuovi talenti, tra cui Mentore, Esaurito, Ex fumatore, Patentino del muletto ed Esperto di dogane.','Manager e dirigenti vanno in pensione dai 64 anni, con tre mesi di preavviso. Dal 2004 al 2018 arrivano sul mercato 10 candidati nuovi.','Dai 65 anni anche il CEO pensa alla pensione: quando lascia scegli il successore tra i tuoi manager, il mercato, i fondatori delle altre aziende o il nipote. E si continua a giocare.','Sotto ogni ritratto c\'è la storia del personaggio: i talenti guadagnati, i compleanni importanti, le promozioni.']},

@@ -88,7 +88,7 @@ async def phone(b, w, h, name, errs):
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
     await pg.tap('#burger'); await pg.wait_for_timeout(250)
     assert await pg.evaluate(FITS, '#dock'), f'{name}: menu aperto fuori schermo'
-    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 13, f'{name}: mancano voci nel menu'
+    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 14, f'{name}: mancano voci nel menu'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_menu.png'))
     await pg.tap('#dock .dh [data-act=menu]'); await pg.wait_for_timeout(250)
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu non si chiude'
@@ -96,7 +96,7 @@ async def phone(b, w, h, name, errs):
     assert zoom[1] > zoom[0] * 1.5, f'{name}: pinch non ha zoomato {zoom}'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_mappa.png'))
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
-    for wn in ['azienda','riepilogo','magazzini','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
+    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
         await menu(pg, wn)
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
         bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
@@ -197,9 +197,12 @@ async def main():
         n = await pg.evaluate("document.querySelectorAll('#ov path.prov').length")
         assert n == 47, f'province disegnate: {n}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_lente_province.png'))
-        await pg.keyboard.press('KeyL')  # torna alla mappa normale
+        await pg.keyboard.press('KeyL')  # lente dei viaggi
         assert await pg.evaluate("document.querySelectorAll('#ov path.prov').length") == 0
-        for w in ['azienda','magazzini','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia']:
+        assert await pg.evaluate("document.querySelector('#ov [aria-label=Viaggi]')!==null"), 'lente Viaggi non disegnata'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_lente_viaggi.png'))
+        await pg.keyboard.press('KeyL')  # torna alla mappa normale
+        for w in ['azienda','magazzini','traffico','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
             assert await pg.evaluate(FITS, f'#win-{w}'), f'finestra {w} esce dal fondo dello schermo'
         for t in ['log','org','mkt','wel']:
