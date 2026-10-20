@@ -183,3 +183,39 @@ bg=Image.new('RGBA',(len(NEW)*104,120),(42,58,80,255))
 for i,n in enumerate(NEW):
     im=Image.open(OUT+f'p_{n}.png'); bg.alpha_composite(im,(4+i*104,4))
 bg.save(ROOT+'/tools/out/nuovi_preview.png')
+
+# volti generici per i candidati creati dal gioco (p_v0 ... p_v39): 0-19 uomini, 20-39 donne;
+# fascia d'età (i%20)//7: 0 giovani, 1 di mezza età, 2 anziani (capelli grigi). Il gioco sceglie il volto adatto (FACES in game.html)
+import random as _r
+_R=_r.Random(2026)
+CLOTH=[('#26365c','#1b2238','#3a4f80'),('#2e9e48','#1f7a34','#5cc472'),('#e0393e','#a8262b','#ff6a6e'),('#4a5f7a','#33445a','#6b819e'),('#5a3e2b','#3e2a1c','#7a5a40'),
+       ('#9b6bff','#6f43cf','#c8adff'),('#ff7a3d','#c8551f','#ffb07a'),('#1f9e8f','#157366','#3dd6c4'),('#3a4658','#2a3442','#4f5d72'),('#5fb4f0','#3a8ccc','#a9dcff'),
+       ('#e8a317','#b97f0c','#ffd36b'),('#16202e','#0c131d','#2f3d52')]
+HAIR_Y=[('#2c2420','#463830'),('#3d2419','#5a3a28'),('#4a3426','#6e4e38'),('#1c1612','#3d2419'),('#b98a4e','#d9ad6c'),('#7a3220','#a3482c'),('#d9ad6c','#f0d090'),('#5a2430','#8a3a4a')]
+HAIR_O=[('#9aa0a8','#c9ced4'),('#b9bec5','#dfe3e8'),('#5d636b','#8a9098'),('#c9ced4','#eef1f4')]
+NECK=['#ffd23f','#e0393e','#5fb4f0','#16202e','#2e9e48','#9b6bff','#f4f5f7']
+VOLTI=[]
+for i in range(40):
+    f=i>=20; band=(i%20)//7
+    skin=_R.choice(['chiara','chiara','media','media','media','scura'])
+    hair,hairl=_R.choice(HAIR_O if band==2 or (band==1 and _R.random()<0.3) else HAIR_Y)
+    cl,cd,cll=_R.choice(CLOTH)
+    kw=dict(skin=skin,hair=hair,hairl=hairl,cloth=cl,clothd=cd,clothl=cll)
+    if _R.random()<0.3: kw['glasses']=_R.choice(['#16202e','#16202e','#8a5f36'])
+    if f:
+        kw['hairstyle']=_R.choice(['perm','bob','perm','curly']) if band==2 else _R.choice(['bob','long','curly','long','bob'])
+        kw['lips']=_R.choice(['#b8323a','#c85a62','#a83a3a','#b0505a','#8f3a3a'])
+        if _R.random()<0.5: kw['earring']=_R.choice(['#e2b84a','#c3d0dc'])
+        kw['collar']=_R.choice([cc_col(_R.choice(NECK)),tshirt(cd),None])
+    else:
+        kw['hairstyle']=_R.choice(['short','buzz','messy','short']+(['bald','bald'] if band>0 else []))
+        r=_R.random()
+        if r<0.22: kw['beard']=hair
+        elif r<0.36 and band>0: kw['mustache']=hair
+        kw['collar']=_R.choice([tie(_R.choice(NECK)),tie(_R.choice(NECK)),polo(cd),tshirt(cd)])
+    if kw.get('collar') is None: kw.pop('collar',None)
+    person(f'v{i}',**kw); VOLTI.append(f'v{i}')
+bg=Image.new('RGBA',(10*104,4*120),(42,58,80,255))
+for i,n in enumerate(VOLTI):
+    im=Image.open(OUT+f'p_{n}.png'); bg.alpha_composite(im,(4+(i%10)*104,4+(i//10)*120))
+bg.save(ROOT+'/tools/out/volti_preview.png')

@@ -127,7 +127,7 @@ async def phone(b, w, h, name, errs):
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
     await pg.tap('#burger'); await pg.wait_for_timeout(250)
     assert await pg.evaluate(FITS, '#dock'), f'{name}: menu aperto fuori schermo'
-    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 16, f'{name}: mancano voci nel menu'
+    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 17, f'{name}: mancano voci nel menu'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_menu.png'))
     await pg.tap('#dock .dh [data-act=menu]'); await pg.wait_for_timeout(250)
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu non si chiude'
@@ -152,12 +152,20 @@ async def phone(b, w, h, name, errs):
     await pg.tap('#modal [data-act=closemodal]')
     assert await pg.evaluate("()=>window.__FUP.S.notes.some(n=>n.k==='ev')"), f'{name}: evento sparito con «Decidi più tardi»'
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
-    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','customer','gare','report','personale','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
+    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','customer','gare','report','personale','manager','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
         await menu(pg, wn)
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
         bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
         assert not bad, f'{name}: finestra {wn}: {bad}'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{wn}.png'))
+        if wn == 'manager':   # le altre due schede: candidati con la trattativa e head hunter
+            for tb in ['cand', 'hh']:
+                await pg.tap(f'#win-manager [data-act=mtab][data-id={tb}]')
+                bad = await pg.evaluate(NOSIDE, '#win-manager')
+                assert not bad, f'{name}: finestra manager, scheda {tb}: {bad}'
+                await pg.evaluate("()=>{const e=document.querySelector('#win-manager .ng'); if(e) e.scrollIntoView({block:'center'});}")
+                await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_manager_{tb}.png'))
+            await pg.tap('#win-manager [data-act=mtab][data-id=team]')
         await pg.tap(f'#win-{wn} [data-act=close]')
     # parola chiave: primo tocco = tooltip, secondo tocco = enciclopedia
     await menu(pg, 'magazzini')
@@ -317,7 +325,7 @@ async def main():
         assert await pg.evaluate("document.querySelector('#ov [aria-label=Viaggi]')!==null"), 'lente Viaggi non disegnata'
         await pg.screenshot(path=os.path.join(OUT, 'shot_lente_viaggi.png'))
         await pg.keyboard.press('KeyL')  # torna alla mappa normale
-        for w in ['azienda','magazzini','traffico','clienti','gare','report','personale','direzione','policy','espansione','giornale','classifica','tecnologia']:
+        for w in ['azienda','magazzini','traffico','clienti','gare','report','personale','manager','direzione','policy','espansione','giornale','classifica','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
             assert await pg.evaluate(FITS, f'#win-{w}'), f'finestra {w} esce dal fondo dello schermo'
             if w == 'classifica':
@@ -346,7 +354,9 @@ async def main():
         await pg.screenshot(path=os.path.join(OUT, 'shot_tree_wel_inst.png'))
         await pg.click('#dock [data-id=direzione]')  # chiude la finestra aperta prima...
         if not await pg.query_selector('#win-direzione'): await pg.click('#dock [data-id=direzione]')  # ...e la riapre in primo piano
-        await pg.click('#win-direzione [data-act=hireexec][data-id=ottavio]')
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.ACT.hiremgr({id:'ottavio'}); const o=S.managers.find(m=>m.id==='ottavio'); S.warehouses.forEach(w=>{if(w.mgr==='ottavio')w.mgr=null;}); o.wh=null;}")
+        await pg.click('#dock [data-id=direzione]')
+        if not await pg.query_selector('#win-direzione'): await pg.click('#dock [data-id=direzione]')
         await pg.select_option('#win-direzione select[data-role=fin]', 'ottavio')
         await pg.screenshot(path=os.path.join(OUT, 'shot_direzione.png'))
         st = await pg.evaluate('()=>({barcode:!!window.__FUP.S.warehouses[0].tech.barcode, fin:window.__FUP.S.dirs.fin})')
@@ -373,6 +383,40 @@ async def main():
           F.step(); const n=S.notes.find(x=>x.k==='ev'); if(n) F.ACT.note({id:n.id}); const m=document.querySelector('#modal'); const ok=!!n&&m.textContent.includes('minaccia'); m.querySelectorAll('[data-act=evopt]')[2].click();
           for(let i=0;i<31;i++){ F.step(); document.querySelector('#modal').innerHTML=''; } return {ok, hired:c.hired};}''')
         assert r['ok'] and not r['hired'], f'dimissioni dopo il preavviso: {r}'
+        # ricerca dei manager: candidature spontanee, trattativa (firma, controproposta, offesa), head hunter, preavviso e controfferta
+        r = await pg.evaluate("""()=>{const F=window.__FUP; document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.newGame('gino'); const S=F.S, out={}; S.nextEvent=1e9;
+          const clr=()=>{document.querySelector('#modal').innerHTML='';};
+          const B=F.mktList(); out.board=B.length; out.low=B.every(p=>p.gen&&p.face!=null&&['F','D','C'].includes(F.mRank(p))&&p.ral>=25000&&p.ral<=60000);
+          // offerta generosa: firma e arriva dopo una settimana
+          const a=B[0]; a.mn=0.9; F.negOffer(a.id,F.needOf(a)*1.02); for(let i=0;i<8&&!S.managers.some(m=>m.id===a.id);i++){clr(); F.step();}
+          const qa=S.managers.find(m=>m.id===a.id); out.sign=!!qa&&qa.arr!=null&&!F.mktList().some(p=>p.id===a.id)&&F.mktList().length===3;
+          for(let i=0;i<8;i++){clr(); F.step();} out.arrived=!!qa&&qa.hired&&qa.arr==null;
+          // offerta un po' bassa: controproposta, poi la accetti
+          const b=F.mktList()[0]; b.mn=0.9; F.negOffer(b.id,F.needOf(b)*0.93); for(let i=0;i<8&&!(S.negs[b.id]&&S.negs[b.id].counter);i++){clr(); F.step();}
+          const nb=S.negs[b.id]; out.counter=!!nb&&nb.counter>=F.needOf(b); out.alert=F.S.notes.some(n=>n.title.includes('controproposta'));
+          F.ACT.toggle({id:'manager'}); F.ACT.mtab({id:'cand'}); out.okBtn=!!document.querySelector('#win-manager [data-act=negok]');
+          F.ACT.negok({id:b.id}); out.signB=S.managers.some(m=>m.id===b.id&&m.arr!=null);
+          // offerta ridicola: si offende e sparisce
+          const c=F.mktList()[0]; c.mn=0.9; F.negOffer(c.id,F.needOf(c)*0.6); for(let i=0;i<8&&S.negs[c.id];i++){clr(); F.step();} out.off=!F.mktList().some(p=>p.id===c.id)&&!S.managers.some(m=>m.id===c.id);
+          // head hunter: metà parcella subito, tre profili con l'abilità chiesta
+          S.cash=400000; const fee=F.hhFee(16), h=F.hhStart('prec',16); out.paid=Math.abs(S.cash-(400000-Math.round(fee/2/500)*500))<1; out.second=F.hhStart('op',10)===null;
+          for(let i=0;i<120&&S.hh.length;i++){clr(); F.step();} const cs=S.cands.map(x=>x.p||S.managers.find(m=>m.id===x.ref));
+          out.found=cs.length===3&&cs.every(p=>p.st.prec>=16); out.hhNote=S.notes.some(n=>n.title.includes('tre profili'));
+          // firma tramite head hunter con controfferta: si lascia andare e il posto resta vuoto
+          const R0=Math.random; Math.random=()=>0.05; const x=F.candById(cs[0].id), q=F.signCand(x.p,x.p.ral,x); Math.random=R0;
+          out.pre=q.arr-S.day===F.MGR.arr[F.mRank(q)]&&q.cof!=null&&S.cands.length===2;
+          let ev=null; for(let i=0;i<60&&!ev;i++){ F.step(); ev=S.notes.find(n=>n.k==='ev'&&n.ev.id==='controfferta'); if(!ev) clr(); }
+          out.cof=!!ev; if(ev){ F.ACT.note({id:ev.id}); const bt=document.querySelectorAll('#modal [data-act=evopt]'); bt[2].click(); for(let i=0;i<3;i++){clr(); F.step();} }
+          out.gone=!S.managers.some(m=>m.id===q.id&&(m.hired||m.arr!=null));
+          F.ACT.mtab({id:'hh'}); out.hhTab=!!document.querySelector('#win-manager [data-act=hhgo]');
+          return out;}""")
+        assert all(r.values()), f'ricerca dei manager: {r}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_manager_hh.png'))
+        await pg.evaluate("()=>window.__FUP.ACT.mtab({id:'cand'})")
+        await pg.screenshot(path=os.path.join(OUT, 'shot_manager_candidati.png'))
+        await pg.evaluate("()=>window.__FUP.ACT.mtab({id:'team'})")
+        await pg.screenshot(path=os.path.join(OUT, 'shot_manager_squadra.png'))
+        await pg.evaluate("()=>document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click())")
         # enciclopedia: tutti i collegamenti [[id]] puntano a voci esistenti; parole chiave, ricerca e navigazione
         bad = await pg.evaluate('''()=>{const W=window.__FUP.WIKI,out=[];Object.values(W).forEach(w=>(w.t||'').replace(/\\[\\[([^|\\]]+)/g,(m,id)=>{if(!W[id])out.push(w.id+' -> '+id);}));return out;}''')
         assert not bad, bad
@@ -428,7 +472,8 @@ async def main():
         mig = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('marco'); const S=F.S;
           const w=S.warehouses[0]; w.staff={mag:5,aut:3}; S.imp=3; S.queue=[{role:'imp',wh:null,days:5},{role:'aut',wh:w.id,days:9}];
           S.clients.push({...S.clients[0],id:'cx',name:'Tuttosubito Italia',zone:'nordovest',pal:400});
-          delete S.boss; delete S.alumni; S.managers=S.managers.filter(m=>!m.from).map(m=>{const x={...m}; delete x.bd; delete x.log; delete x.ann; return x;}); S.execs.forEach(e=>{delete e.bd; delete e.log;});
+          delete S.boss; delete S.alumni; const EX=['ottavio','giulia','roberto']; S.execs=S.managers.filter(m=>EX.includes(m.id)).map(e=>{const x={...e}; delete x.bd; delete x.log; return x;}); S.execs[0].hired=true;
+          S.managers=S.managers.filter(m=>!m.from&&!EX.includes(m.id)).map(m=>{const x={...m}; delete x.bd; delete x.log; delete x.ann; return x;}); delete S.hh; delete S.cands; delete S.negs; delete S.mkt;
           F.save(); return true;}''')
         await pg.evaluate('()=>location.reload()'); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached'); await pg.wait_for_selector('[data-act=continue]')
         await pg.click('[data-act=continue]'); await pg.evaluate(CLEAR)
@@ -436,8 +481,10 @@ async def main():
         assert st['imp'] is None and sum(st['st'].values()) == 8+3 and st['st']['autB'] > 0, st
         assert st['q'] == ['imp:true', 'autCE:true'], st
         assert await pg.evaluate('()=>window.__FUP.S.office.plan===0 && window.__FUP.S.warehouses[0].coop===false')
-        st = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S;return {boss:S.boss.name,age:F.ageOf(S.boss),m:S.managers.length,bd:F.people().every(p=>p.bd!=null&&Array.isArray(p.log))}}''')
-        assert st['boss'] == 'Marco Pellegrino' and st['age'] == 36 and st['m'] >= 13 and st['bd'], st
+        st = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S;return {boss:S.boss.name,age:F.ageOf(S.boss),m:S.managers.length,bd:F.people().every(p=>p.bd!=null&&Array.isArray(p.log)),
+          ex:S.execs.length,ott:(S.managers.find(m=>m.id==='ottavio')||{}).hired,hh:Array.isArray(S.hh)&&Array.isArray(S.cands)&&!!S.negs,board:F.mktList().length}}''')
+        assert st['boss'] == 'Marco Pellegrino' and st['age'] == 36 and st['m'] >= 23 and st['bd'], st
+        assert st['ex'] == 0 and st['ott'] and st['hh'] and st['board'] == 3, f'dirigenti convertiti in manager: {st}'
         # eventi dei talenti: ognuno compare con il suo talento e tutte le scelte funzionano
         r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame(null,F.ccCeo(Object.assign(F.ccNew(),{nome:'Prova',cognome:'Eventi',edu:'Autodidatta'})));
           const S=F.S,evs=F.EVENTS.filter(e=>e.id.startsWith('t_')),bad=[];S.boss.tal=[];
@@ -508,7 +555,7 @@ async def main():
         # eventi personali: CEO, manager e dirigenti; tutte le scelte funzionano e cambiano abilità e talenti
         r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame('gino');const S=F.S,bad=[],w=S.warehouses[0];
           document.querySelector('#modal').innerHTML=''; S.researched.direzione=true; ['chiara','davide','rosa'].forEach(id=>F.ACT.hiremgr({id}));
-          const c=S.managers.find(m=>m.id==='chiara'); w.mgr='chiara'; c.wh=w.id; S.execs.forEach(e=>{e.hired=true;}); S.dirs.fin=S.execs[0].id;
+          const c=S.managers.find(m=>m.id==='chiara'); w.mgr='chiara'; c.wh=w.id; ['ottavio','giulia'].forEach(id=>{S.managers.find(m=>m.id===id).hired=true;}); S.dirs.fin='ottavio';
           S.boss.tal.push('Fumatore incallito','Stacanovista');
           const evs=F.EVENTS.filter(e=>/^(p|m|d|x)_/.test(e.id));
           evs.forEach(e=>{try{e.cond();}catch(x){bad.push(e.id+': cond '+x);} e.opts.forEach((o,i)=>{const ev={...e}, T=F.people().map(p=>[p,[...p.tal],{...p.st},p.quit]);try{if(ev.setup)ev.setup(ev);if(!ev.text)bad.push(e.id+': testo');if(!ev.p)bad.push(e.id+': persona');o.f.call(ev);}catch(x){bad.push(e.id+'/'+i+': '+x);}
@@ -578,7 +625,7 @@ async def main():
         # un'azienda più ricca: tecnologie, manager, un dirigente, welfare e un evento in corso
         await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0];
           ['barcode','formazione','gestionale','direzione','iso'].forEach(t=>S.researched[t]=true); w.tech.barcode={day:S.day-200}; w.tech.formazione={day:S.day-2};
-          const m=S.managers[0]; m.hired=true; w.mgr=m.id; const e=S.execs[0]; e.hired=true; S.dirs.op=e.id; S.welfare.buoni=true;
+          const m=S.managers[0]; m.hired=true; w.mgr=m.id; const e=S.managers.find(x=>x.id==='ottavio'); e.hired=true; S.dirs.op=e.id; S.welfare.buoni=true;
           S.mods.push({scope:'all',P:-6,mor:3,until:S.day+7,src:'Nebbia in Val Padana'}); F.ACT.rptab({id:'mod'});}''')
         await pg.screenshot(path=os.path.join(OUT, 'shot_riepilogo_mod_pieno.png'))
         await pg.evaluate("()=>{const b=document.querySelector('#win-riepilogo .win-b');b.scrollTop=b.scrollHeight;}")
@@ -602,9 +649,11 @@ async def main():
           for(let d=0;d<730&&!H.over;d++){ const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}
             H.cash=Math.max(H.cash,300000); bids+=H.tenders.filter(t=>t.bids&&Object.keys(t.bids).length&&t.deadline===H.day).length; F.step(); }
           F.ACT.toggle({id:'classifica'});
-          return {bids,cli:H.bots.map(b=>b.clients.filter(c=>c.status==='attivo').length),day:H.day,mk:document.querySelectorAll('#ov [data-act=openclass]').length,
+          const gm=H.bots.reduce((a,b)=>a+b.managers.filter(m=>m.gen&&(m.hired||m.arr!=null)).length,0), more=H.bots.some(b=>b.warehouses.length>1);
+          return {gm,more,board:F.mktList().length,bids,cli:H.bots.map(b=>b.clients.filter(c=>c.status==='attivo').length),day:H.day,mk:document.querySelectorAll('#ov [data-act=openclass]').length,
             sizeKB:Math.round(JSON.stringify(H).length/1024)};}''')
         assert r['bids'] > 3 and sum(r['cli']) > 6 and r['day'] >= 729, r
+        assert r['board'] == 3 and (r['gm'] >= 1 or not r['more']), f'le avversarie non assumono dalle candidature spontanee: {r}'
         print('avversari dopo 2 anni:', r)
         assert r['sizeKB'] < 2500, f'salvataggio troppo grande: {r}'
         # vittoria: una condizione facile fa comparire la finestra di fine partita

@@ -89,7 +89,7 @@ def m_personale():
     c.rect(1, 9, 7, 14, 'B'); c.rect(9, 9, 14, 14, 'G')
     r = process(c.rows())
     return r
-MENU['personale'] = ('Personale e manager', m_personale)
+MENU['personale'] = ('Personale', m_personale)
 def m_direzione():
     c = Cv(16); c.rect(5, 1, 10, 4, 'Y'); c.rect(1, 10, 4, 13, 'B'); c.rect(6, 10, 9, 13, 'O'); c.rect(11, 10, 14, 13, 'G')
     r = process(c.rows())
