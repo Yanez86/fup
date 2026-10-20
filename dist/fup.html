@@ -536,12 +536,31 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #start{position:fixed;inset:0;z-index:70;overflow:auto;background:rgba(8,16,30,.7);padding:24px max(16px, env(safe-area-inset-right, 0px)) 24px max(16px, env(safe-area-inset-left, 0px))}
 #start .box{max-width:1080px;margin:0 auto;background:var(--panel);border:3px solid var(--ink2);box-shadow:inset 0 0 0 2px #fff, 8px 8px 0 rgba(12,19,29,.6)}
 #start h1{margin:0;font-family:var(--f-disp);font-size:40px;line-height:1;text-shadow:3px 3px 0 var(--accent)}
-.ceos{display:flex;flex-direction:column;gap:10px}
-.ceo{display:flex;flex-direction:row;align-items:center;gap:14px;width:100%;padding:10px;background:#fff;border:3px solid var(--ink);cursor:pointer;text-align:left;box-shadow:inset 0 -3px 0 var(--panel2)}
-.ceo[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 3px var(--accent), 4px 4px 0 var(--ink)}
-.sw{width:30px;height:30px;border:3px solid var(--ink)}
-.ceo .portrait{flex:none;width:128px;height:150px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
-.ceo-i{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+/* scelta del CEO: carte collezionabili, colore dell'abilità più forte (--hc, --hb) */
+.ceos{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;padding:16px 4px 10px}
+.ceo{position:relative;display:flex;flex-direction:column;padding:0;background:#fff;border:4px solid var(--ink);cursor:pointer;text-align:left;box-shadow:5px 5px 0 rgba(12,19,29,.45);transition:transform .15s}
+@media (hover:hover){.ceo:hover{transform:translateY(-4px)}}
+.ceo[aria-pressed="true"]{transform:translateY(-10px) rotate(-1.5deg);box-shadow:0 0 0 4px var(--accent),8px 14px 0 rgba(12,19,29,.45)}
+.ceo-hd{display:flex;align-items:center;gap:6px;min-height:34px;background:var(--hc);color:#fff;font-family:var(--f-disp);font-size:15px;line-height:1.1;padding:5px 8px;border-bottom:4px solid var(--ink);text-shadow:2px 2px 0 rgba(0,0,0,.35)}
+.ceo-hd .stc{margin-left:auto;flex:none}
+.ceo-art{display:flex;justify-content:center;align-items:flex-end;height:160px;overflow:hidden;border-bottom:4px solid var(--ink);background:radial-gradient(circle,var(--hc) 1.5px,transparent 2px) 0 0/10px 10px,var(--hb)}
+.ceo-art img{width:128px;height:150px}
+.ceo-art .q{align-self:center;font-family:var(--f-disp);font-size:90px;line-height:1;color:var(--ink3)}
+.ceo.new .ceo-art{background:repeating-linear-gradient(45deg,var(--panel2) 0 10px,#fff 10px 20px)}
+.ceo-nm{background:var(--ink);color:#fff3c4;font-family:var(--f-disp);font-size:19px;line-height:1.1;padding:5px 8px}
+.ceo-nm small{display:block;font-family:var(--f-body);font-size:12px;color:var(--hi)}
+.ceo-bd{flex:1;display:flex;flex-direction:column;gap:8px;padding:8px}
+.ceo-ft{display:flex;justify-content:space-between;align-items:center;gap:6px;border-top:3px dashed var(--line);padding:6px 8px;font-family:var(--f-disp);font-size:15px}
+.ceo-ok{position:absolute;top:44px;right:-12px;transform:rotate(8deg);font-family:var(--f-disp);font-size:20px;color:#fff;background:var(--accent);border:3px solid var(--ink);padding:1px 10px;box-shadow:3px 3px 0 var(--ink);pointer-events:none}
+.cbars{display:flex;flex-direction:column;gap:4px}
+.cbar{display:flex;align-items:center;gap:6px}
+.cbar .t{flex:1;min-width:30px;height:10px;background:#dfe6ee;border:2px solid var(--ink);position:relative}
+.cbar .t i{position:absolute;left:0;top:0;bottom:0;background:var(--sc);box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+.cbar b{font-family:var(--f-disp);font-size:14px;width:20px;text-align:right}
+.ceo-d{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 18px;align-items:center;border-left:8px solid var(--hc)}
+.ceo-d q{font-style:italic}
+.ceo-d .cl{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+@media (max-width:1000px){.ceos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:30px 12px 14px;margin:-16px -12px 0}.ceo{flex:0 0 min(78%,250px);scroll-snap-align:center}}
 
 /* Schermata introduttiva: il camioncino porta il pallet dell'icona */
 #intro:empty{display:none}
@@ -762,9 +781,11 @@ html,body{overscroll-behavior:none}
 .mob .modal{max-height:calc(100dvh - 16px)}
 .mob #start{padding:10px max(8px, env(safe-area-inset-right, 0px)) 16px max(8px, env(safe-area-inset-left, 0px))}
 .mob #start h1{font-size:34px}
-.mob .ceo{padding:6px;gap:10px;align-items:flex-start}
-.mob .ceo .portrait{width:96px;height:112px}
-.mob .ceo .portrait img{width:96px;height:112px}
+.mob .ceos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:30px 12px 14px;margin:-16px -12px 0}
+.mob .ceo{flex:0 0 min(78%,250px);scroll-snap-align:center}
+.mob .ceo-art{height:200px}.mob .ceo-art img{width:160px;height:187px}
+.mob .ceo-d{grid-template-columns:minmax(0,1fr)}
+.mob.land .ceo{flex-basis:210px}.mob.land .ceo-art{height:130px}.mob.land .ceo-art img{width:96px;height:112px}
 .mob .lobby,.mob .lb-opts,.mob .lb-wins{grid-template-columns:minmax(0,1fr)}.mob .cls-k{grid-template-columns:repeat(3,minmax(0,1fr))}.mob .cls-w{grid-template-columns:96px minmax(0,1fr) 40px}
 .mob .cc-top{grid-template-columns:minmax(0,1fr);justify-items:center}
 .mob .cc-top > *{width:100%}
@@ -859,19 +880,19 @@ const SITES={
  fernetti:{name:'Trieste Fernetti',prov:'TS',lon:13.83,lat:45.70,cap:2000,rent:5500}
 };
 const CEOS=[
- {id:'gino',name:'Gino Bertolotti',age:52,origin:'Ex padroncino',site:'rivalta',cash:180000,motrici:3,fixed:3500,rep:45,company:'Trasporti Bertolotti',
+ {id:'gino',arch:'Vecchia scuola',name:'Gino Bertolotti',age:52,origin:'Ex padroncino',site:'rivalta',cash:180000,motrici:3,fixed:3500,rep:45,company:'Trasporti Bertolotti',
   st:{op:17,prec:9,neg:5,lead:14,amm:6,inn:2},tal:['Un milione di km al volante','Allergico al gestionale','Dialetto stretto'],
   bio:'Trent\'anni sulle strade d\'Europa, poi il capannone di Rivalta comprato con la liquidazione. Diffida di tutto ciò che ha una presa elettrica.',
   client:{name:'Pastificio Mezzemaniche',slogan:'Al dente o rimborsati',sector:'Alimentare secco',stock:700,pal:300,sP:92,sA:null}},
- {id:'edoardo',name:'Edoardo Ferretti',age:31,origin:'Figlio del fondatore',site:'pioltello',cash:320000,motrici:2,fixed:5500,rep:50,company:'Ferretti Logistica',
+ {id:'edoardo',arch:'Figlio d\'arte',name:'Edoardo Ferretti',age:31,origin:'Figlio del fondatore',site:'pioltello',cash:320000,motrici:2,fixed:5500,rep:50,company:'Ferretti Logistica',
   st:{op:6,prec:7,neg:13,lead:6,amm:12,inn:10},tal:['Laureato in Bocconi','Papà ha sempre ragione','Sempre al telefono'],
   bio:'Ha ereditato il magazzino di Pioltello e un padre che passa "solo per un caffè" tutti i giorni alle 8.',
   client:{name:'Mobilificio Brianzolo',slogan:'Il divano di tua nonna, da tre generazioni',sector:'Arredamento',stock:1100,pal:350,sP:88,sA:94}},
- {id:'valeria',name:'Valeria Conti',sx:'f',age:44,origin:'Ex manager di multinazionale',site:'novara',cash:220000,motrici:2,fixed:4200,rep:45,company:'Conti Logistica',
+ {id:'valeria',arch:'Squalo delle gare',name:'Valeria Conti',sx:'f',age:44,origin:'Ex manager di multinazionale',site:'novara',cash:220000,motrici:2,fixed:4200,rep:45,company:'Conti Logistica',
   st:{op:13,prec:10,neg:18,lead:5,amm:10,inn:9},tal:['Parla per acronimi','Stacanovista','Cena col buyer'],
   bio:'Quindici anni di slide e KPI in una multinazionale. Dorme quattro ore a notte e lo considera un vantaggio competitivo.',
   client:{name:'Saponaria Italia',slogan:'Detersivi per un mondo più bianco',sector:'Largo consumo',stock:900,pal:500,sP:92,sA:95}},
- {id:'marco',name:'Marco Pellegrino',age:36,origin:'Ingegnere gestionale',site:'voltri',cash:300000,motrici:1,fixed:3000,rep:42,company:'Pellegrino Smart Logistics',
+ {id:'marco',arch:'Il nerd del WMS',name:'Marco Pellegrino',age:36,origin:'Ingegnere gestionale',site:'voltri',cash:300000,motrici:1,fixed:3000,rep:42,company:'Pellegrino Smart Logistics',
   st:{op:9,prec:13,neg:5,lead:5,amm:11,inn:17},tal:['Excel-dipendente','Parla con i robot','Calma olimpica'],startTech:['barcode'],
   bio:'Ha progettato magazzini automatici per altri, ora ne vuole uno suo. Ogni pallet ha un codice, ogni codice un foglio Excel.',
   client:{name:'Caffè Portuale',slogan:'Tostato col sale del porto',sector:'Alimentare secco',stock:700,pal:300,sP:90,sA:97}}
@@ -5511,7 +5532,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.44',t:'Scelta del CEO in fila',x:['Nella scelta del CEO le schede occupano tutta la larghezza, una sotto l\'altra, con il ritratto a sinistra e abilità, talenti e cliente storico a destra.']},
+ {v:'0.44',t:'CEO da collezione',x:['La scelta del CEO è fatta di carte collezionabili: in alto il tipo di personaggio (Vecchia scuola, Figlio d\'arte, Squalo delle gare, Il nerd del WMS) nel colore della sua abilità più forte, poi ritratto, abilità a barre, talenti e cassa.','La carta scelta si solleva e prende l\'adesivo «SCELTO!»; sotto compaiono la sua storia, il magazzino e il cliente storico. Sul telefono le carte si scorrono col dito.']},
  {v:'0.43',t:'Ci vediamo in tribunale',x:['Nuovo evento: qualche settimana dopo un licenziamento la persona può impugnarlo e chiedere di tornare. La riassumi, chiudi con una conciliazione, vai in tribunale (rischioso, meglio con un CEO bravo in Amministrazione) o, se sai negoziare, le trovi un posto da un cliente.']},
  {v:'0.42',t:'Tagli e reputazione',x:['Licenziare ora pesa anche sulla reputazione (−0,3 a persona), oltre alla buonuscita e al calo di morale nel magazzino.','Dal quarto licenziamento in un mese scatta l\'ondata: finisce sul giornale, la reputazione scende di più e il morale cala di 2 punti in tutti i magazzini. Per i picchi della stagione conviene la cooperativa, che si manda via gratis.','Anche le aziende CPU licenziano quando finisce la stagione di picco, guardando il mese dopo per non restare scoperte. Le Facili sono prudenti, le Normali evitano le ondate, le Spietate tagliano senza pietà e finiscono sul giornale.']},
  {v:'0.41',t:'Mese per mese',x:['La stagionalità delle committenti ora va mese per mese: agosto chiuso per l\'industria e i cantieri, il Black Friday a novembre per elettronica ed e-commerce, il cambio gomme a marzo-aprile e ottobre-novembre, la colomba di Pasqua e il panettone a novembre-dicembre, la cartoleria prima della scuola, le mele a settembre.','Sotto il grafico della committente ci sono il mese di picco e quello più vuoto; toccando il grafico si vedono tutti e dodici i mesi.']},
@@ -5581,23 +5602,28 @@ function showIntro(){
    <div class="road"><div class="bot"><button class="btn pri" data-act="introgo">${TOUCH?'Tocca':'Clicca'} per entrare</button><span class="ver">Versione ${VER} · ${esc(CHANGELOG[0].t)}</span></div></div>`;
   $('#intro').dataset.act='introgo';
 }
-function stepScelta(){const sv=load();
-  const st=CEOS.map(c=>{const s=SITES[c.site];return `<button class="ceo" data-act="pickceo" data-id="${c.id}" aria-pressed="${startSel.ceo===c.id}">
-    <div class="portrait"><img class="px" src="${IMG[c.id]}" alt="Ritratto di ${esc(c.name)}" width="128" height="150"></div>
-    <div class="ceo-i"><b class="disp" style="font-size:18px">${esc(c.name)}</b><span class="sm">${c.age} anni · ${esc(c.origin)}</span>
-    <span class="sm" style="color:var(--ink)">${esc(s.name)} (${s.prov}) · ${n0(s.cap)} posti · ${eur(c.cash)}</span>
-    <span>${statChips(c.st,14)}</span>
-    ${talentIcons(c.tal,32)}
-    <span class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,24)} Cliente storico: ${esc(c.client.name)} ${rankIcon(c.client,18)}</span></div></button>`;}).join('')
-   +(()=>{const cc=startSel.cc;return `<button class="ceo" data-act="pickceo" data-id="custom" aria-pressed="${startSel.ceo==='custom'}">
-    <div class="portrait"><img class="px" src="${IMG[cc?cc.img:'cc1']}" alt="" width="128" height="150"></div>
-    <div class="ceo-i"><b class="disp" style="font-size:18px">${cc&&ccName(cc)?esc(ccName(cc)):'Crea il tuo CEO'}</b><span class="sm">Nome, abilità, titolo di studio e carattere li scegli tu</span>
-    ${cc?`<span>${statChips(ccStats(cc),14)}</span>${talentIcons(ccTal(cc),32)}`:`<span class="sm" style="color:var(--ink)">${CC_PTS} punti da distribuire tra abilità e talenti</span>`}</div></button>`;})();
+// carte della scelta: colore dell'abilità più forte, barre delle abilità, adesivo sulla carta scelta
+const topStat=st=>STATS.reduce((a,x)=>st[x.k]>st[a.k]?x:a,STATS[0]);
+const ceoBars=st=>`<div class="cbars">${STATS.map(x=>`<div class="cbar" style="--sc:${x.c}" data-act="wiki" data-id="st_${x.k}" data-tip="${statTip(x,st[x.k])}">${statIcon(x.k,14)}<span class="t"><i style="width:${Math.min(100,st[x.k]*5)}%"></i></span><b>${st[x.k]}</b></div>`).join('')}</div>`;
+function ceoCard(id,on,arch,st,img,nm,sub,body,ft){const t=st?topStat(st):null;
+  return `<button class="ceo${st?'':' new'}" data-act="pickceo" data-id="${id}" aria-pressed="${on}" style="--hc:${t?t.c:'var(--ink3)'};--hb:${t?t.bg:'#fff'}">
+   <div class="ceo-hd">${esc(arch)}${t?statBadge(t.k,null,16):''}</div>
+   <div class="ceo-art">${img?`<img class="px" src="${img}" alt="Ritratto di ${esc(nm)}" width="128" height="150">`:'<span class="q">?</span>'}</div>
+   <div class="ceo-nm">${esc(nm)}<small>${sub}</small></div>
+   <div class="ceo-bd">${body}</div><div class="ceo-ft">${ft}</div>${on?'<span class="ceo-ok">SCELTO!</span>':''}</button>`;}
+function stepScelta(){const sv=load(), cc=startSel.cc;
+  const st=CEOS.map(c=>ceoCard(c.id,startSel.ceo===c.id,c.arch,c.st,IMG[c.id],c.name,`${c.age} anni · ${esc(c.origin)}`,ceoBars(c.st)+talentIcons(c.tal,32),`<span>${eur(c.cash)}</span><span class="sm">${esc(SITES[c.site].name)}</span>`)).join('')
+   +(cc?ceoCard('custom',startSel.ceo==='custom','Fatto su misura',ccStats(cc),IMG[cc.img],ccName(cc)||'Il tuo CEO','Tocca per modificarlo',ceoBars(ccStats(cc))+talentIcons(ccTal(cc),32),'<span>Modifica ›</span>')
+     :ceoCard('custom',false,'Fatto su misura',null,null,'Crea il tuo CEO','Nome, abilità e carattere',`<span class="sm">${CC_PTS} punti da distribuire tra abilità e talenti. Il resto è colpa tua.</span>`,'<span>Inizia ›</span>'));
+  const c=CEOS.find(x=>x.id===startSel.ceo), s=c&&SITES[c.site], t=c&&topStat(c.st);
+  const det=c?`<div class="card ceo-d" style="--hc:${t.c}"><div style="display:flex;flex-direction:column;gap:6px"><b class="disp" style="font-size:20px">${esc(c.name)}</b><q>${esc(c.bio)}</q></div>
+    <div style="display:flex;flex-direction:column;gap:6px"><span class="sm">Magazzino: <b>${esc(s.name)} (${s.prov})</b> · ${n0(s.cap)} posti · ${c.motrici} motrici</span>
+    <span class="sm cl">${logoSvg(c.client.name,24)} Cliente storico: <b>${esc(c.client.name)}</b> ${rankIcon(c.client,18)}</span></div></div>`:'';
   return `<div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
    <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord Italia, da Torino a Trieste. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
    ${installCard()}
    ${sv&&sv.S&&!sv.S.over?`<div class="card pend"><div class="row"><span><b>${esc(sv.S.company.name)}</b> · ${fmtDate(sv.S.day)}</span><button class="btn pri" data-act="continue">Continua la partita</button></div></div>`:''}
-   <div class="lab">Scegli il tuo CEO</div><div class="ceos">${st}</div>`;}
+   <div class="lab">Scegli il tuo CEO</div><div class="ceos">${st}</div>${det}`;}
 function showStart(){
   setSpeedSafe(0); WIKI_ON=false; const k=startSel.step;
   if(!startSel.lb) startSel.lb=lbDef();
@@ -5607,6 +5633,7 @@ function showStart(){
     lobby:`<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Inizia la partita ›</button>`}[k];
   $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP · versione ${VER}</span><span>Nord Italia, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
    ${k!=='scelta'?stepper():''}${body}${stNav(next)}${k==='scelta'?newsCard():''}</div></div>`;
+  if(k==='scelta'){const r=$('#start .ceos'),e=r&&r.querySelector('[aria-pressed=true]');if(e&&r.scrollWidth>r.clientWidth)r.scrollLeft=e.offsetLeft-(r.clientWidth-e.offsetWidth)/2;}
   if(lastStep!==k){$('#start').scrollTop=0;lastStep=k;}
 }
 let lastStep='';
