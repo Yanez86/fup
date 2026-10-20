@@ -8,13 +8,14 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'tools', 'out'); os.makedirs(OUT, exist_ok=True)
 PAGE = os.path.join(ROOT, 'dist', 'fup.html')
 
-CLEAR = '''()=>{const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}}'''
+CLEAR = '''()=>{const F=window.__FUP,n=(F.S.notes||[]).find(x=>x.k==='ev');F.cardsOff();if(n&&!document.querySelector('#modal').innerHTML)F.ACT.note({id:n.id});const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}}'''
 BOT = '''(ceo)=>{
  const F=window.__FUP; const out=[];
  if(ceo==='custom') F.newGame(null,F.ccCeo(Object.assign(F.ccNew(),{nome:'Ornella',cognome:'Bancalini',base:'valeria',edu:'Ingegnere dei trasporti',tal:['Calma olimpica','Parla con i robot']})));
  else F.newGame(ceo);
  const S=F.S;
- const clr=()=>{const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}};
+ // risponde subito agli eventi (aprendo la tessera) e chiude le finestre, come un giocatore sbrigativo
+ const clr=()=>{const n=(S.notes||[]).find(x=>x.k==='ev'); if(n&&!document.querySelector('#modal').innerHTML) F.ACT.note({id:n.id}); const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}};
  for(let d=0; d<365*3 && !S.over; d++){
    S.speed=1; clr();
    S.tenders.filter(t=>!t.done&&!t.bid).forEach(t=>{ const e=F.bidEstimate(t,S.warehouses[0].id,0.95); if(e&&e.fits&&e.sat<0.85) t.bid={wh:S.warehouses[0].id,mult:0.95}; });
@@ -40,6 +41,9 @@ PINCH = r'''()=>{const mw=document.querySelector('#mapwrap'), m=document.querySe
   for(let i=1;i<=5;i++){ev('pointermove',1,150-i*15,400);ev('pointermove',2,250+i*15,400);}
   ev('pointerup',1,75,400); ev('pointerup',2,325,400);
   const sc=t=>+((t.match(/scale\(([\d.]+)\)/)||[])[1]||0); return [sc(s0),sc(m.style.transform)];}'''
+# fa arrivare subito un evento preciso (come notifica nella colonna a destra)
+FIRE = '''(id)=>{const F=window.__FUP,S=F.S;document.querySelector('#modal').innerHTML='';S.nextEvent=1e9;S.seen={};const e=F.EVENTS.find(x=>x.id===id);
+  const old=e.cond;e.cond=()=>true;F.EVENTS.forEach(x=>{if(x!==e)S.seen[x.id]=S.day;});F.fireEvent();e.cond=old;}'''
 FITS = '''(sel)=>{const r=document.querySelector(sel).getBoundingClientRect();
   return r.left>=-1&&r.top>=-1&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1&&document.documentElement.scrollWidth<=innerWidth;}'''
 
@@ -100,6 +104,21 @@ async def phone(b, w, h, name, errs):
     zoom = await pg.evaluate(PINCH)
     assert zoom[1] > zoom[0] * 1.5, f'{name}: pinch non ha zoomato {zoom}'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_mappa.png'))
+    # barra in alto: tutto su una riga sopra i numeri, riquadri di settimana e mese sempre larghi uguali
+    top = await pg.evaluate('''()=>{const y=s=>Math.round(document.querySelector(s).getBoundingClientRect().top), w=document.querySelector('#wkn'), d=document.querySelector('#date');
+      const ws=['S1','S52'].map(t=>{w.textContent=t;return w.offsetWidth;}), ds=['gen 02','set 08'].map(t=>{d.textContent=t;return d.offsetWidth;});
+      return {row:Math.abs(y('#wkn')-y('#top .optb'))<12, ws, ds, txt:(window.__FUP.ACT.speed({v:'0'}),document.querySelector('#date').textContent)};}''')
+    assert top['row'] and top['ws'][0] == top['ws'][1] and top['ds'][0] == top['ds'][1] and top['txt'] == 'gen 02', f'{name}: barra in alto {top}'
+    # notifiche: l'evento arriva come tessera, con il cartellino accanto; la tessera apre la finestra, «Decidi più tardi» la lascia lì
+    await pg.evaluate(FIRE, 'cesto'); await pg.wait_for_timeout(100)
+    for sel in ['#notes', '#notecard']:
+        assert await pg.evaluate(FITS, sel), f'{name}: {sel} fuori dallo schermo'
+    assert await pg.evaluate("()=>document.querySelector('#notes').getBoundingClientRect().bottom<=document.querySelector('#burger').getBoundingClientRect().top"), f'{name}: notifiche sotto il pulsante Menu'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_notifiche.png'))
+    await pg.tap('#notes [data-act=note]')
+    assert await pg.query_selector('#modal [data-act=evopt]'), f'{name}: la tessera non apre l\'evento'
+    await pg.tap('#modal [data-act=closemodal]')
+    assert await pg.evaluate("()=>window.__FUP.S.notes.some(n=>n.k==='ev')"), f'{name}: evento sparito con «Decidi più tardi»'
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
     for wn in ['azienda','riepilogo','magazzini','traffico','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
         await menu(pg, wn)
@@ -151,7 +170,7 @@ async def phone(b, w, h, name, errs):
         if wn == 'cassa':
             r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,c0=S.cash,d0=F.debt(); document.querySelector('#win-cassa [data-act=loantake]').click();
               const l=(S.loans||[])[(S.loans||[]).length-1]; if(!l) return {got:false,d0}; const got=S.cash-c0>=l.amt-1, left=l.left; for(let i=0;i<32;i++){document.querySelector('#modal').innerHTML='';F.step();}
-              return {got, paid:l.left<left, d0, d1:F.debt()};}''')
+              return {got, paid:l.left<left, d0, d1:F.debt(), over:S.over, day:S.day};}''')
             assert r['got'] and r['paid'], f'{name}: prestito non funziona {r}'
         await pg.tap(f'#win-{wn} [data-act=close]')
     await ctx.close()
@@ -286,8 +305,8 @@ async def main():
         assert await pg.eval_on_selector('#win-policy [data-act=poltog][data-id=zerostra]', 'e=>e.disabled'), 'la policy si può cambiare subito'
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; F.ACT.hiremgr({id:'davide'}); F.ACT.hiremgr({id:'rosa'});
           const d=S.managers.find(x=>x.id==='davide'), r0=d.ral; let ult=0;
-          for(let i=0;i<40;i++){ F.step(); const m=document.querySelector('#modal'); const b=m.querySelector('[data-act=evopt]');
-            if(b&&m.textContent.includes('minaccia')){ ult++; m.querySelectorAll('[data-act=evopt]')[1].click(); } else if(m.innerHTML){const c=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(c) c.click();} }
+          for(let i=0;i<40;i++){ F.step(); const n=S.notes.find(x=>x.k==='ev'); if(n) F.ACT.note({id:n.id}); const m=document.querySelector('#modal');
+            if(n&&n.title.includes('minaccia')){ ult++; m.querySelectorAll('[data-act=evopt]')[1].click(); } else if(m.innerHTML){const c=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(c) c.click();} }
           const rosa=S.managers.find(x=>x.id==='rosa');
           return {ult, tol:!!(d.tol||{}).zerostra, raise:d.ral>r0, g:F.grievances(d).length, rosa:F.grievances(rosa).map(x=>x.id)};}''')
         assert r['ult'] >= 1 and r['tol'] and r['raise'] and r['g'] == 0, r
@@ -295,7 +314,7 @@ async def main():
         if not await pg.query_selector('#win-policy'): await pg.click('#dock [data-id=policy]')
         await pg.screenshot(path=os.path.join(OUT, 'shot_policy.png'))
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; F.ACT.hiremgr({id:'chiara'}); const c=S.managers.find(x=>x.id==='chiara'); c.unh=29;
-          F.step(); const m=document.querySelector('#modal'); const ok=m.textContent.includes('minaccia'); m.querySelectorAll('[data-act=evopt]')[2].click();
+          F.step(); const n=S.notes.find(x=>x.k==='ev'); if(n) F.ACT.note({id:n.id}); const m=document.querySelector('#modal'); const ok=!!n&&m.textContent.includes('minaccia'); m.querySelectorAll('[data-act=evopt]')[2].click();
           for(let i=0;i<31;i++){ F.step(); document.querySelector('#modal').innerHTML=''; } return {ok, hired:c.hired};}''')
         assert r['ok'] and not r['hired'], f'dimissioni dopo il preavviso: {r}'
         # enciclopedia: tutti i collegamenti [[id]] puntano a voci esistenti; parole chiave, ricerca e navigazione
@@ -381,19 +400,35 @@ async def main():
           return {bad,small:small/n,open:F.S.tenders.length};}''')
         assert not r['bad'] and r['small'] > 0.4, r
         # eventi: l'effetto della scelta arriva il giorno dopo, con il racconto di com'è andata
-        await pg.evaluate("()=>{const F=window.__FUP;F.newGame('marco');F.S.speed=0;document.querySelector('#modal').innerHTML='';F.S.nextEvent=1e9;const e=F.EVENTS.find(x=>x.id==='cesto');F.S.seen={};const old=e.cond;e.cond=()=>true;F.EVENTS.forEach(x=>{if(x!==e)F.S.seen[x.id]=F.S.day;});F.fireEvent();e.cond=old;}")
+        await pg.evaluate("()=>{const F=window.__FUP;F.newGame('marco');F.S.speed=1;}")
+        await pg.evaluate(FIRE, 'cesto')
+        r = await pg.evaluate("()=>{const S=window.__FUP.S;return {speed:S.speed,modal:document.querySelector('#modal').innerHTML,card:!document.querySelector('#notecard').hidden,ev:S.notes.filter(n=>n.k==='ev').length}}")
+        assert r['speed'] == 0 and not r['modal'] and r['card'] and r['ev'] == 1, f'evento: niente finestra, tessera, cartellino e pausa {r}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_notifiche_evento.png'))
         cash0 = await pg.evaluate('()=>window.__FUP.S.cash')
+        await pg.click('#notes [data-act=note]')
         await pg.click('#modal [data-act=evopt][data-i="0"]')
         r = await pg.evaluate('()=>{const S=window.__FUP.S;return {cash:S.cash,pend:S.evPend.length,altro:S.cur.altro}}')
         assert r['cash'] == cash0 and r['pend'] == 1, r
+        assert await pg.evaluate("()=>window.__FUP.S.speed") == 1, 'dopo la scelta il tempo non riparte'
         altro0 = r['altro']
-        await pg.evaluate("()=>{const F=window.__FUP;F.step();}")
-        txt = await pg.inner_text('#modal')
+        await pg.evaluate("()=>{const F=window.__FUP;F.S.speed=0;F.step();}")
+        await pg.click('#notes .nt.blue')
+        txt = await pg.inner_text('#notepop')
         assert "Com'è andata" in txt and 'panettone' in txt, txt
         await pg.screenshot(path=os.path.join(OUT, 'shot_evento_risultato.png'))
         r = await pg.evaluate('()=>{const S=window.__FUP.S;return {altro:S.cur.altro,pend:S.evPend.length}}')
         assert r['altro'] - altro0 == 2500 and r['pend'] == 0, r
+        await pg.click('#notepop [data-act=notedel]')
+        assert not await pg.query_selector('#notes .nt.blue'), 'la notifica letta non se ne va'
+        # nelle Opzioni si toglie la pausa automatica; senza risposta, dopo due settimane decide il vice
+        await pg.click('#top [data-act=options]')
+        await pg.click('#modal [data-act=evpause]')
         await pg.click('#modal [data-act=closemodal]')
+        r = await pg.evaluate('''(fire)=>{const F=window.__FUP,S=F.S; S.speed=1; eval(fire)('cesto'); const sp=S.speed; S.speed=0;
+          for(let i=0;i<15;i++) F.step(); return {sp, ev:S.notes.filter(n=>n.k==='ev').length, vice:S.notes.filter(n=>n.g==='vice').length, pend:S.evPend.length};}''', FIRE)
+        assert r['sp'] == 1 and r['ev'] == 0 and r['vice'] == 1, f'pausa automatica o decisione del vice {r}'
+        await pg.evaluate("()=>{window.__FUP.HUM.cfg.noPause=false;}")
         # eventi personali: CEO, manager e dirigenti; tutte le scelte funzionano e cambiano abilità e talenti
         r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame('gino');const S=F.S,bad=[],w=S.warehouses[0];
           document.querySelector('#modal').innerHTML=''; S.researched.direzione=true; ['chiara','davide','rosa'].forEach(id=>F.ACT.hiremgr({id}));
@@ -407,22 +442,27 @@ async def main():
           return {n:evs.length,bad,up,back,max:p.tal.length};}''')
         assert r['n'] >= 20 and not r['bad'] and r['up'] == 2 and r['back'] and r['max'] == 5, r
         # il risultato di un evento personale mostra cosa è cambiato
-        await pg.evaluate("()=>{const F=window.__FUP,S=F.S;document.querySelector('#modal').innerHTML='';S.nextEvent=1e9;S.seen={};S.day=Math.max(S.day,800);const e=F.EVENTS.find(x=>x.id==='p_dogane');F.EVENTS.forEach(x=>{if(x!==e)S.seen[x.id]=S.day;});S.boss.tal=S.boss.tal.filter(t=>t!=='Esperto di dogane');F.fireEvent();}")
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S;S.day=Math.max(S.day,800);S.boss.tal=S.boss.tal.filter(t=>t!=='Esperto di dogane');}")
+        await pg.evaluate(FIRE, 'p_dogane')
+        await pg.click('#notes [data-act=note]')
         await pg.click('#modal [data-act=evopt][data-i="0"]')
         await pg.evaluate("()=>{window.__FUP.step();}")
-        assert await pg.query_selector('#modal .ev-chg .chg'), await pg.inner_text('#modal')
+        await pg.click('#notes .nt.blue')
+        assert await pg.query_selector('#notepop .ev-chg .chg'), await pg.inner_text('#notepop')
         await pg.screenshot(path=os.path.join(OUT, 'shot_evento_personale.png'))
-        await pg.click('#modal [data-act=closemodal]')
+        await pg.click('#notepop [data-act=notedel]')
         # pensione di un manager: al compleanno dei 66 anni annuncia la pensione, dopo il preavviso esce dalle liste
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; F.ACT.hiremgr({id:'toto'}); const t=S.managers.find(m=>m.id==='toto');
-          t.bd=S.day+1-66*365; S.nextEvent=1e9; F.step(); return {age:F.ageOf(t),modal:document.querySelector('#modal').innerText};}''')
-        assert r['age'] == 66 and 'pensione' in r['modal'], r
+          t.bd=S.day+1-66*365; S.nextEvent=1e9; F.step(); return {age:F.ageOf(t),ev:S.notes.filter(n=>n.k==='ev').map(n=>n.title).join()};}''')
+        assert r['age'] == 66 and 'pensione' in r['ev'], r
+        await pg.click('#notes [data-act=note]')
         await pg.screenshot(path=os.path.join(OUT, 'shot_pensione.png'))
         await pg.click('#modal [data-act=evopt][data-i="2"]')
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,t=S.managers.find(m=>m.id==='toto'); const q=!!(t.quit&&t.quit.ret); t.quit.day=S.day; F.step(); return {q,ret:t.retired,hired:t.hired};}''')
         assert r['q'] and r['ret'] and not r['hired'], r
         # il CEO compie 65 anni, lascia, e si sceglie il successore
         await pg.evaluate("()=>{const F=window.__FUP,S=F.S;document.querySelector('#modal').innerHTML='';S.boss.bd=S.day+1-65*365;F.step();}")
+        await pg.click('#notes [data-act=note]')
         assert 'pensione' in (await pg.inner_text('#modal')).lower()
         await pg.click('#modal [data-act=evopt][data-i="2"]')
         await pg.evaluate("()=>{window.__FUP.step();}")
@@ -467,6 +507,18 @@ async def main():
         await pg.screenshot(path=os.path.join(OUT, 'shot_riepilogo_mod_pieno.png'))
         await pg.evaluate("()=>{const b=document.querySelector('#win-riepilogo .win-b');b.scrollTop=b.scrollHeight;}")
         await pg.screenshot(path=os.path.join(OUT, 'shot_riepilogo_mod_pieno_sotto.png'))
+        # notifiche dopo tre mesi di gioco: la colonna sta tra la barra e le lenti, le varie si aprono in una schedina e si leggono aprendo la finestra
+        await pg.evaluate("()=>{const F=window.__FUP; document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.newGame('marco'); const S=F.S; S.cash+=300000; for(let i=0;i<90;i++) F.step(); S.speed=0; F.cardsOff();}")
+        await pg.click('#top [data-act=speed][data-v="0"]')
+        col = await pg.evaluate('''()=>{const n=document.querySelector('#notes'),r=n.getBoundingClientRect(),l=document.querySelector('#lenses').getBoundingClientRect();
+          return {n:n.querySelectorAll('.nt').length,ok:r.bottom<=l.top&&r.top>=document.querySelector('#top').getBoundingClientRect().bottom,g:[...n.querySelectorAll('[data-act=noteg]')].map(e=>e.dataset.id)}}''')
+        assert col['n'] >= 2 and col['ok'] and col['g'], f'colonna delle notifiche {col}'
+        await pg.click(f'#notes [data-act=noteg][data-id={col["g"][0]}]')
+        assert await pg.is_visible('#notepop .np-l'), 'la tessera delle notizie varie non apre l\'elenco'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_notifiche.png'))
+        await pg.click('#notepop [data-act=notegopen]')
+        assert not await pg.query_selector(f'#notes [data-act=noteg][data-id={col["g"][0]}]'), 'aprendo la finestra le notizie varie restano'
+        await pg.evaluate("()=>document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click())")
         # partita completa con 3 avversari: due anni senza errori, offerte vere nelle gare, magazzini rivali sulla mappa
         r = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino',null,{mode:'classica',win:{reputazione:true},reputazione:200});
           const H=F.HUM; H.bots=[['edoardo','espansione'],['valeria','qualita'],['marco','prezzo']].map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],'normale',i));
