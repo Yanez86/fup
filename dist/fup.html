@@ -48,6 +48,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 #map img{position:absolute;inset:0;width:1520px;height:800px}
 #map svg{position:absolute;inset:0;overflow:visible}
 .vign{position:fixed;left:0;right:0;top:0;height:100vh;height:100lvh;pointer-events:none;background:radial-gradient(ellipse at 50% 55%, rgba(8,20,40,0) 55%, rgba(8,20,40,.4) 100%)}
+/* velo sulla mappa quando il tempo è fermo: barre grigie oblique e scritta «Pausa» */
+#pauseovl{position:fixed;inset:0;z-index:15;pointer-events:none;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(-45deg, rgba(96,108,124,.34) 0 26px, rgba(96,108,124,.08) 26px 52px)}
+#pauseovl[hidden]{display:none}
+#pauseovl span{font-family:var(--f-disp);font-size:44px;letter-spacing:.12em;text-transform:uppercase;color:#fff;padding:8px 26px;background:rgba(22,32,46,.88);border:3px solid var(--ink2);box-shadow:inset 0 2px 0 var(--ink3), 5px 5px 0 rgba(12,19,29,.55)}
 .lbl{font-family:var(--f-disp);font-weight:600;fill:var(--ink);stroke:#f4f7fa;stroke-width:3px;paint-order:stroke}
 .mk{cursor:pointer}
 .plbl{font-family:var(--f-disp);font-weight:600;fill:#fff;stroke:var(--ink);stroke-width:3px;paint-order:stroke;pointer-events:none;letter-spacing:1px}
@@ -880,6 +884,7 @@ html,body{overscroll-behavior:none}
 .mob .modal{max-height:calc(100dvh - 16px)}
 /* sul telefono lo schermo è alto e stretto: l'alone scuro dei bordi copriva le Alpi sotto la barra e sembrava una sfocatura */
 .mob .vign{display:none}
+.mob #pauseovl span{font-size:30px;padding:6px 18px}
 .mob #start{padding:calc(10px + env(safe-area-inset-top, 0px) + var(--glass, 0px)) max(8px, env(safe-area-inset-right, 0px)) 16px max(8px, env(safe-area-inset-left, 0px))}
 .mob #start h1{font-size:34px}
 .mob .hm-hero{height:150px}.mob .hm-bar{font-size:13px;padding:5px 10px}.mob .hm-ttl{left:16px;top:36px;gap:4px}
@@ -930,6 +935,7 @@ html,body{overscroll-behavior:none}
   </div>
 </div>
 <div class="vign" aria-hidden="true"></div>
+<div id="pauseovl" aria-hidden="true" hidden><span>Pausa</span></div>
 
 <header id="top">
   <div class="logo"><span class="lt">FUP</span> <span id="cologo"></span><small id="coname"></small></div>
@@ -4414,6 +4420,7 @@ function renderTop(){
   $('#coname').textContent=S.company.name; $('#cologo').innerHTML=coLogoSvg(S.company.logo,S.company.color,24);
   document.querySelectorAll('.spd button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===S.speed)));
   $('#paused').hidden=S.speed!==0;
+  $('#pauseovl').hidden=S.speed!==0||!!S.over||cm;
   {const pb=$('#ppb'); pb.hidden=cm; pb.dataset.v=S.speed; pb.textContent=['II','›','››'][S.speed]||'›'; pb.setAttribute('aria-label',['In pausa: tocca per x1','Velocità x1: tocca per x2','Velocità x2: tocca per la pausa'][S.speed]||'Velocità');}
   const last=S.last?S.last.util:null;
   const mor=S.warehouses.reduce((a,w)=>a+w.morale,0)/S.warehouses.length, ot=otifNow(), om=otifGap();
@@ -5810,6 +5817,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.57',t:'Si vede quando è in pausa',x:['Quando il tempo è fermo la mappa si copre di barre grigie oblique con la scritta «Pausa» al centro: si capisce subito che il gioco è fermo. Le finestre e i pulsanti restano sopra e si usano come sempre.']},
  {v:'0.56',t:'Tre partite salvate',x:['Nuova schermata principale: in alto l\'insegna col camioncino, sotto le tue partite salvate e il pulsante giallo «Crea nuova partita». La scelta del CEO arriva dopo, toccando quel pulsante.','Puoi tenere fino a 3 partite. Ognuna ha la sua scheda con il ritratto del CEO, la data, la cassa, magazzini e clienti; l\'ultima giocata sta in cima, più grande, con Puntualità e Accuratezza. Il cestino cancella una partita, dopo la conferma.','La partita che avevi già salvato è al suo posto: la trovi nella prima scheda.','Le novità stanno in un menu a tendina in fondo alla schermata principale.']},
  {v:'0.55',t:'Barra più in alto',x:['Su iPhone la barra con logo e pulsanti risale un po\': resta fuori dalla zona sfocata senza lasciare troppo vuoto sopra.']},
  {v:'0.54',t:'Lavori in corso',x:['Nella schermata iniziale un cartello giallo avvisa che il gioco è in sviluppo: non tutto funziona come dovrebbe, proprio come nelle vere logistiche.']},
