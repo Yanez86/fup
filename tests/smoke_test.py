@@ -646,6 +646,29 @@ async def main():
         assert r == {'slot': 1, 's1': 'Prova 1 bis', 's2': 'Prova 2'}, r
         await pg.evaluate('()=>window.__FUP.ACT.quitgame()')
         assert await pg.inner_text('#start .sv.top .sv-co') == 'Prova 1 bis', 'la partita appena giocata deve andare in cima'
+        # salvataggio online: archivio finto al posto di Supabase (il test non usa la rete)
+        await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; for(let n=1;n<=F.SLOTS;n++) localStorage.removeItem(F.slotKey(n));
+          window.DB={}; const D=window.DB, cp=o=>JSON.parse(JSON.stringify(o));
+          Object.assign(F.CLOUD_IO,{list:async()=>Object.values(D).map(r=>({slot:r.slot,at:r.at,dev:r.dev,nome:r.nome,giorno:r.giorno})),
+            get:async n=>D[n]?{at:D[n].at,dati:cp(D[n].dati)}:null,
+            insert:async r=>{if(D[r.slot]){const e=new Error('doppia');e.code='23505';throw e;} D[r.slot]=cp(r);},
+            update:async(r,prev)=>{if(!D[r.slot]||D[r.slot].at!==prev) return []; D[r.slot]=cp(r); return [{slot:r.slot}];},
+            put:async r=>{D[r.slot]=cp(r);}, del:async(n,max)=>{if(D[n]&&D[n].at<=max) delete D[n];}, wipe:async()=>{for(const k in D) delete D[k];}});
+          F.slot=1; F.newGame('gino'); F.save(); F.ACT.quitgame();}''')
+        r = await pg.evaluate('''async()=>{const F=window.__FUP; F.cloudUser({id:'u1',email:'prova@example.com'}); await new Promise(r=>setTimeout(r,300));
+          const up=Object.keys(DB).join()==='1'&&F.cMeta(1).cat===F.load(1).at;
+          DB[1].at+=5000; DB[1].dati.at=DB[1].at; DB[1].dati.S.day=400; DB[1].giorno=400; DB[1].dev='telefono iOS'; await F.cloudSync();
+          const down=F.load(1).S.day===400;
+          const sv=F.load(1); sv.at+=100; sv.S.day=401; localStorage.setItem(F.slotKey(1),JSON.stringify(sv)); DB[1].at+=9000; DB[1].giorno=500; DB[1].dati.S.day=500; DB[1].dati.at=DB[1].at; await F.cloudSync();
+          const clash=!!F.CL.clash[1]&&!!document.querySelector('#start .cl-x [data-act=clkeep]');
+          return {up,down,clash};}''')
+        assert r == {'up': True, 'down': True, 'clash': True}, r
+        await pg.screenshot(path=os.path.join(OUT, 'shot_online_conflitto.png'))
+        await pg.click('#start [data-act=clkeep][data-w=cloud]'); await pg.wait_for_timeout(200)
+        assert await pg.evaluate('()=>window.__FUP.load(1).S.day===500 && !window.__FUP.CL.clash[1]'), 'conflitto: versione online non scaricata'
+        await pg.click('#start [data-act=delask][data-slot="1"]'); await pg.click('#start [data-act=delsave]'); await pg.wait_for_timeout(200)
+        assert await pg.evaluate('()=>!Object.keys(DB).length && !window.__FUP.load(1)'), 'partita cancellata ma rimasta online'
+        await pg.evaluate("()=>{window.__FUP.CL.user=null; window.__FUP.showStart();}")
         await b.close()
     if errs:
         print('ERRORI JS:', *errs, sep='\n  '); sys.exit(1)

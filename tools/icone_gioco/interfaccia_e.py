@@ -47,3 +47,45 @@ def u_giu():
     c.rect(6, 8, 9, 8, 'D'); c.rect(7, 9, 8, 9, 'D')
     return process(c.rows(), shade=False)
 UI['giu'] = ('Apri la tendina', u_giu)
+
+# salvataggio online: nuvola azzurra
+def u_nuvola():
+    c = Cv(16)
+    c.paste(0, 3, ['......LLLL', '.....LLLLLL', '..LL.LLLLLLL', '.LLLLLLLLLLLLL', '.LLLLLLLLLLLLLL', '.LLLLLLLLLLLLLL', '.LLLLLLLLLLLLLL', '..LLLLLLLLLLLL'])
+    return process(c.rows())
+UI['nuvola'] = ('Salvataggio online', u_nuvola)
+
+# ospite: persona col cappellino giallo da visitatore
+def u_ospite():
+    c = Cv(16)
+    c.rect(3, 11, 12, 14, 'D'); c.rect(4, 10, 11, 10, 'D')
+    c.rect(5, 4, 10, 9, 'F'); c.rect(5, 1, 10, 3, 'Y'); c.rect(4, 3, 13, 3, 'Y')
+    r = process(c.rows())
+    return ov(r, ['', '', '', '', '', '', '......K..K'])
+UI['ospite'] = ('Ospite', u_ospite)
+
+# accesso con un account: chiave gialla
+def u_chiave():
+    c = Cv(16)
+    c.disc(4.5, 7.5, 3.5, 'Y'); c.disc(4.5, 7.5, 1, '.')
+    c.rect(7, 6, 14, 8, 'Y'); c.rect(11, 9, 12, 11, 'Y'); c.rect(14, 9, 14, 10, 'Y')
+    return process(c.rows(), shade=False)
+UI['chiave'] = ('Entra con un account', u_chiave)
+
+# scarica su file: foglio bianco con la freccia blu verso il basso
+def u_scarica():
+    c = Cv(16)
+    c.rect(2, 1, 11, 14, 'W')
+    c.rect(9, 6, 12, 11, 'B'); c.rect(7, 11, 14, 12, 'B'); c.rect(8, 13, 13, 13, 'B'); c.rect(9, 14, 12, 14, 'B'); c.rect(10, 15, 11, 15, 'B')
+    r = process(c.rows(), keep='W')
+    return ov(r, ['', '', '...SSSSS', '', '...SSSSS', '', '...SSS', ''])
+UI['scarica'] = ('Scarica su file', u_scarica)
+
+# carica da file: foglio bianco con la freccia verde verso l'alto
+def u_carica():
+    c = Cv(16)
+    c.rect(2, 1, 11, 14, 'W')
+    c.rect(10, 5, 11, 5, 'G'); c.rect(9, 6, 12, 6, 'G'); c.rect(8, 7, 13, 7, 'G'); c.rect(7, 8, 14, 9, 'G'); c.rect(9, 10, 12, 14, 'G')
+    r = process(c.rows(), keep='W')
+    return ov(r, ['', '', '...SSSSS', '', '...SSSSS', '', '...SSS', ''])
+UI['carica'] = ('Carica da file', u_carica)

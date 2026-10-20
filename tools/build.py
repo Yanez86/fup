@@ -13,8 +13,11 @@ s = s.replace('{{PROV}}', open(A('assets', 'province.json'), encoding='utf-8').r
 s = s.replace('{{ICONE}}', open(A('assets', 'icone.json'), encoding='utf-8').read().strip())  # icone in pixel art, da tools/icone_gioco/genera.py
 s = re.sub(r'\{\{P_(\w+)\}\}', lambda m: b64(f'ritratto_{m.group(1)}.png'), s)  # CEO
 s = re.sub(r'\{\{Q_(\w+)\}\}', lambda m: b64(f'p_{m.group(1)}.png'), s)         # manager, dirigenti, staff
-left = re.findall(r'\{\{\w+\}\}', s)
+left = re.findall(r'\{\{\w+\}\}', s.replace('{{SUPABASE}}', ''))
 if left: sys.exit(f'Segnaposto senza immagine: {left}')
+# libreria ufficiale di Supabase (salvataggio online), copiata da npm in assets/: la versione è scritta qui sotto
+SB_VER = '2.117.2'
+s = s.replace('{{SUPABASE}}', f'/* @supabase/supabase-js {SB_VER}, licenza MIT (assets/supabase.LICENSE) */\n' + open(A('assets', 'supabase.js'), encoding='utf-8').read().strip())
 os.makedirs(A('dist'), exist_ok=True)
 open(A('dist', 'fup.html'), 'w', encoding='utf-8').write(s)
 # web app: manifest (controllato come JSON), icone e service worker con la versione della build
@@ -25,7 +28,7 @@ for f in os.listdir(A('assets')):
 ver = hashlib.sha1(s.encode()).hexdigest()[:10]
 open(A('dist', 'sw.js'), 'w', encoding='utf-8').write(open(A('src', 'sw.js'), encoding='utf-8').read().replace('{{VER}}', ver))
 # controllo sintassi del JavaScript (se node è installato)
-js = re.search(r'<script>(.*)</script>', s, re.S).group(1)
+js = re.findall(r'<script>(.*?)</script>', s, re.S)[-1]  # il gioco è l'ultimo script, prima c'è la libreria di Supabase
 open(A('tools', 'out', 'check.js'), 'w', encoding='utf-8').write(js)
 try:
     r = subprocess.run(['node', '--check', A('tools', 'out', 'check.js')], capture_output=True, text=True)

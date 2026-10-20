@@ -27,7 +27,7 @@
   color-scheme: light;
 }
 /* sfondo scuro come la barra e il menu: su iPhone si vede sotto la barra di stato e sotto il menu, dove la mappa non arriva */
-html{background:var(--ink)}
+html{background:var(--ink);font-variant-ligatures:none}  /* Pixelify Sans unisce «fi» in un solo segno: «file» diventava «Ale» */
 html,body{height:100%}
 /* web app installata su iPhone (iOS 26): lo schermo «utile» risulta più corto dell'altezza della barra di stato e in fondo resta una banda vuota; allungando la pagina gli elementi fissi tornano fino al bordo */
 @media (display-mode:standalone), (display-mode:fullscreen){html{min-height:calc(100% + env(safe-area-inset-top, 0px))}}
@@ -684,6 +684,14 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .nw-c{flex:1;min-width:0}#start .nw-c h4{margin:0;font-size:17px;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .nw-new{padding:0 5px;background:var(--ok-d);color:#fff;border:2px solid var(--ink);font-size:12px}
 #start .nw-c ul{margin:4px 0 0;padding-left:18px;font-size:15px}
+.cl{background:#fff;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2),3px 3px 0 var(--ink);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.cl.ask{background:#fff4f4;border-color:var(--bad-t)}
+.cl-h{display:flex;gap:12px;align-items:flex-start}.cl-h>svg{flex:none}
+.cl-t{display:flex;flex-direction:column;gap:3px;min-width:0;font-size:14px}.cl-t b{font-family:var(--f-disp);font-size:19px;font-weight:600;overflow-wrap:anywhere}.cl-t>span{color:var(--muted)}.cl-t .cl-st{color:var(--ink);font-weight:500}
+.cl-a{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.cl-a .btn{display:inline-flex;align-items:center;gap:8px;min-height:44px}
+.cl-p{margin-left:auto;font-size:14px;color:var(--muted)}.cl-p a{color:var(--ink)}
+.sv-cl{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:var(--muted)}.sv-cl.up svg{opacity:.4}.sv-cl.loc{padding:0 5px;border:2px solid var(--line)}
+.sv-ask.cl-x{background:#fff9e0;border-color:var(--warn-t)}
 .hm-cred{display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;color:var(--muted)}.hm-cred svg{width:24px;height:28px;flex:none}
 .ccbox{gap:10px}
 .lobby{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -899,6 +907,7 @@ html,body{overscroll-behavior:none}
 .mob .sv.top .sv-co{font-size:23px}.mob .sv-last{align-self:flex-start;font-size:12px;padding:1px 6px}
 .mob .sv-bd{grid-column:1/3}.mob .sv-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.mob .sv-tile b{font-size:17px}
 .mob .sv-kpi{grid-template-columns:minmax(0,1fr)}.mob #start .btn.pri.sv-go{font-size:21px;padding:8px 14px}
+.mob .cl-a .btn{flex:1 1 auto;justify-content:center;min-height:48px}.mob .cl-p{margin-left:0;flex-basis:100%}
 .mob .hm-new{min-height:72px;padding:10px 12px;gap:12px;font-size:13px}.mob .hm-new b{font-size:22px}.mob .hm-new .ar{font-size:28px}
 .mob #start .news summary{padding:10px 12px;gap:10px}.mob .nw-p{display:none}.mob .nw-l{max-height:none}
 .mob .nw-e{gap:10px;padding:8px 12px}.mob .nw-e .v{width:46px}.mob #start .nw-c ul{font-size:14px;padding-left:16px}
@@ -968,6 +977,7 @@ html,body{overscroll-behavior:none}
 <div id="start"></div>
 <div id="intro"></div>
 
+<script>{{SUPABASE}}</script>
 <script>
 (function(){
 'use strict';
@@ -1961,6 +1971,16 @@ wk('eventi','basi','Eventi',`Imprevisti con una scelta da fare: meteo, politica,
 Il risultato della scelta non arriva subito: passa un giorno, poi una notifica azzurra racconta com'è andata e applica gli effetti. Se nel frattempo salvi ed esci, la scelta resta in sospeso e arriva quando riprendi.
 
 Gli effetti possono essere immediati (soldi, [[reputazione]], [[soddisfazione]]) oppure durare qualche settimana ([[morale]], [[puntualita]], [[accuratezza]]). Lo stesso evento non torna prima di 240 giorni.`);
+wk('salvataggio_online','basi','Salvataggio online',`Entrando con Google o come ospite le partite si salvano anche online e le ritrovi sugli altri dispositivi. Senza accesso restano solo su questo dispositivo.`,
+`Nella schermata principale, sotto le partite salvate, c'è il riquadro **Salvataggio online**.
+
+• **Entra con Google**: le tre partite salvate vanno online, legate al tuo account. Sul telefono o su un altro computer entri con lo stesso account e le ritrovi. Funziona dal sito del gioco, non aprendo il file dal computer.
+• **Gioca come ospite**: niente account, le partite vanno online ma restano legate a questo browser. Con **Collega Google** l'ospite diventa un account vero, senza perdere niente. Se esci da ospite non puoi più rientrare.
+• **Quando si salva**: la partita si salva sempre prima su questo dispositivo, poi online al massimo una volta al minuto, e subito quando chiudi il gioco o lo metti in secondo piano. Senza rete si gioca lo stesso: le partite vanno online appena torna la connessione.
+• **Due versioni diverse**: se la stessa partita è andata avanti su due dispositivi, la scheda della partita chiede quale tenere. Il pulsante colorato indica la più recente.
+• **Bollini**: la nuvola piena vuol dire «salvata anche online», quella chiara «da caricare». «Solo qui» indica una partita di un altro account, che resta su questo dispositivo.
+• **Copia di sicurezza**: ogni partita si può scaricare su file (pulsante col foglio e la freccia blu, o dalle Opzioni durante il gioco) e ricaricare con **Carica da file**, anche senza account.
+• **Elimina dati online** cancella l'account e tutte le partite online; quelle su questo dispositivo restano.`);
 wk('notifiche','basi','Notifiche',`La colonna di tessere a destra della mappa: decisioni da prendere, notizie importanti, problemi aperti e notizie varie.`,
 `Il gioco non apre finestre da solo: quello che succede arriva come tessera nella colonna a destra, e la apri quando vuoi.
 
@@ -4212,11 +4232,135 @@ function chMigrate(){
 // tre posti di salvataggio: il primo usa la chiave di sempre, così la partita salvata prima della 0.56 resta al suo posto
 const SLOTS=3, slotKey=n=>n>1?`${KEY}-${n}`:KEY;
 let slot=1;  // il posto della partita in corso
-function save(){const H=HUM||S; if(!H||S.bot) return; try{localStorage.setItem(slotKey(slot),JSON.stringify({S:H,uid,at:Date.now()}));}catch(e){}}
+function save(){const H=HUM||S; if(!H||S.bot) return; try{localStorage.setItem(slotKey(slot),JSON.stringify({S:H,uid,at:Date.now()}));cloudLater(slot);}catch(e){}}
 // le partite della versione 3 (senza avversari) si caricano ancora nel primo posto: diventano partite classiche da soli
-function delSave(n=slot){try{localStorage.removeItem(slotKey(n));if(n===1)localStorage.removeItem(KEY_OLD);}catch(e){}}
+function delSave(n=slot){try{localStorage.removeItem(slotKey(n));localStorage.removeItem(slotKey(n)+'-cloud');if(n===1)localStorage.removeItem(KEY_OLD);}catch(e){}}
 function load(n=slot){try{const r=localStorage.getItem(slotKey(n))||(n===1&&localStorage.getItem(KEY_OLD));if(!r)return null;return JSON.parse(r);}catch(e){return null;}}
 const freeSlot=()=>{for(let n=1;n<=SLOTS;n++) if(!load(n)) return n; return 0;};
+
+/* ====================== SALVATAGGIO ONLINE ====================== */
+// copia dei tre posti su Supabase (accesso con Google o come ospite): si gioca sempre dalla copia locale, il cloud la tiene allineata tra i dispositivi.
+// Per ogni posto, accanto al salvataggio, c'è la scheda «-cloud»: {own: account che l'ha caricata, ownG: era un ospite, cat: versione (at) che c'è online}
+const SB_URL='https://bvadjomephbxqqaggavu.supabase.co', SB_KEY='sb_publishable_ZU3nwfv2Htgjc0_RlKaqeA_MIRj4MNH';
+const CL={sb:null,user:null,guest:false,busy:false,err:'',ask:'',clash:{},dirty:{},lastPush:0,timer:0,syncAt:0};
+const WEB=location.protocol.startsWith('http');  // l'accesso con Google funziona solo dal sito, non aprendo il file dal computer
+const DEV=(()=>{const u=navigator.userAgent, ios=/iPhone|iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1),
+  k=/iPad|Tablet/i.test(u)||(ios&&!/iPhone/.test(u))?'tablet':/Mobi|iPhone|Android/i.test(u)?'telefono':'computer';
+  return (k+' '+(ios?'iOS':/Android/.test(u)?'Android':/Windows/.test(u)?'Windows':/Mac/.test(u)?'Mac':/Linux/.test(u)?'Linux':'')).trim();})();
+const metaKey=n=>slotKey(n)+'-cloud', DELQ='fup-cloud-del';
+function cMeta(n){try{return JSON.parse(localStorage.getItem(metaKey(n)))||{};}catch(e){return {};}}
+function cMetaSet(n,m){try{localStorage.setItem(metaKey(n),JSON.stringify(m));}catch(e){}}
+const lsGet=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;}}, lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
+const playing=()=>!!(HUM&&!$('#start').innerHTML);
+// tutte le chiamate a Supabase passano da qui (i test la sostituiscono con un archivio finto)
+const sbOk=({data,error})=>{if(error)throw error;return data;};
+const CLOUD_IO={
+  list:()=>CL.sb.from('partite').select('slot,at,dev,nome,giorno').then(sbOk),
+  get:n=>CL.sb.from('partite').select('at,dati').eq('slot',n).maybeSingle().then(sbOk),
+  insert:r=>CL.sb.from('partite').insert(r).then(sbOk),
+  update:(r,prev)=>CL.sb.from('partite').update(r).eq('slot',r.slot).eq('at',prev).select('slot').then(sbOk),
+  put:r=>CL.sb.from('partite').upsert(r,{onConflict:'user_id,slot'}).then(sbOk),
+  del:(n,max)=>CL.sb.from('partite').delete().eq('slot',n).lte('at',max).then(sbOk),
+  wipe:()=>CL.sb.rpc('elimina_account').then(sbOk),
+};
+function cloudErr(e){const m=String(e&&(e.message||e)||'');
+  CL.err=!navigator.onLine||/fetch|network|Load failed/i.test(m)?'Senza rete: le partite restano su questo dispositivo e vanno online appena torna la connessione.':`Il salvataggio online non risponde (${m.slice(0,80)}). Le partite restano su questo dispositivo.`;}
+function homeRefresh(){if(!playing()&&$('#start').innerHTML&&startSel.step==='home') showStart();}
+function cloudInit(){
+  if(typeof supabase==='undefined'||!supabase.createClient) return;
+  // ritorno da Google con un errore (per esempio un account Google già usato da un altro profilo)
+  const q=new URLSearchParams(location.search+'&'+location.hash.slice(1)), ed=q.get('error_description')||q.get('error');
+  if(ed){CL.err=/already|exists|linked/i.test(ed)?'Questo account Google ha già le sue partite online. Esci dall\'ospite ed entra con Google: le partite di questo dispositivo passano all\'account, se ci sono posti liberi.':'Accesso con Google non riuscito: '+ed;
+    try{history.replaceState(null,'',location.pathname);}catch(e){}}
+  try{CL.sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:WEB}});}catch(e){CL.sb=null;return;}
+  // dentro il callback niente chiamate a Supabase: si aspetta il giro dopo
+  CL.sb.auth.onAuthStateChange((ev,ses)=>setTimeout(()=>cloudUser(ses&&ses.user),0));
+  addEventListener('online',()=>{CL.err='';cloudSync();});
+}
+function cloudUser(u){const was=CL.user&&CL.user.id; CL.user=u||null; CL.wait=false; CL.guest=!!(u&&u.is_anonymous);
+  if(u&&u.id!==was){CL.clash={}; cloudSync();} else homeRefresh();}
+// scarica dal cloud il posto n e lo mette su questo dispositivo
+async function cloudPull(n){const d=await CLOUD_IO.get(n); if(!d||!d.dati) return;
+  d.dati.at=d.at; try{localStorage.setItem(slotKey(n),JSON.stringify(d.dati));}catch(e){return;}
+  cMetaSet(n,{own:CL.user.id,ownG:CL.guest,cat:d.at});}
+// allinea i tre posti: chi è cambiato da una parte sola vince, se sono cambiati tutti e due si chiede a chi gioca
+async function cloudSync(){
+  if(!CL.user||CL.busy) return; CL.busy=true; homeRefresh();
+  try{
+    await cloudFlushDel();
+    const rows=await CLOUD_IO.list(), me=CL.user.id, by={}; rows.forEach(r=>by[r.slot]=r); CL.clash={};
+    for(let n=1;n<=SLOTS;n++){
+      if(playing()&&n===slot) continue;  // la partita aperta si allinea da sola quando salva
+      const L=load(n), C=by[n], m=cMeta(n), mine=m.own===me, adopt=!m.own||(m.ownG&&!mine);
+      if(!L&&!C) continue;
+      if(!L){await cloudPull(n);continue;}
+      if(!C){ if(mine&&m.cat&&m.cat===L.at) delSave(n);      // cancellata da un altro dispositivo
+        else if(mine||adopt) await cloudPush(n,true); continue; }  // mai caricata: va online (anche quella dell'ospite, se c'è posto)
+      if(mine){ if(C.at===m.cat){ if(L.at!==m.cat) await cloudPush(n,true); }
+        else if(L.at===m.cat) await cloudPull(n);
+        else CL.clash[n]=C; }
+      else if(C.at===L.at) cMetaSet(n,{own:me,ownG:CL.guest,cat:C.at});
+      else CL.clash[n]=C;
+    }
+    CL.err=''; CL.syncAt=Date.now();
+  }catch(e){cloudErr(e);}
+  CL.busy=false; homeRefresh();
+}
+// carica online il posto n; se intanto un altro dispositivo l'ha cambiato non sovrascrive e segna il conflitto
+async function cloudPush(n,inSync){
+  if(!CL.user||CL.clash[n]) return;
+  const sv=load(n); if(!sv||!sv.S||!sv.S.company) return;
+  const m=cMeta(n), me=CL.user.id; if(m.own&&m.own!==me&&!m.ownG) return;  // partita di un altro account
+  const at=sv.at||1; if(m.own===me&&m.cat===at) return;
+  sv.at=at; const row={user_id:me,slot:n,at,dev:DEV,nome:sv.S.company.name,giorno:sv.S.day|0,dati:sv};
+  try{
+    if(m.own===me&&m.cat){const r=await CLOUD_IO.update(row,m.cat); if(!r||!r.length) return await cloudClash(n,row);}
+    else await CLOUD_IO.insert(row);
+    cMetaSet(n,{own:me,ownG:CL.guest,cat:at}); delete CL.dirty[n]; if(!inSync) CL.err='';
+  }catch(e){ if(e&&e.code==='23505') return await cloudClash(n,row); if(inSync) throw e; cloudErr(e); }
+}
+async function cloudClash(n,row){
+  try{
+    const C=(await CLOUD_IO.list()).find(r=>r.slot===n);
+    if(!C){await CLOUD_IO.insert(row); cMetaSet(n,{own:CL.user.id,ownG:CL.guest,cat:row.at}); return;}  // online era stata cancellata: si ricarica
+    CL.clash[n]=C;
+    if(playing()&&n===slot) notify('yellow','nuvola','Salvataggio online','Partita cambiata su un altro dispositivo',`${C.nome} è andata avanti anche su ${C.dev||'un altro dispositivo'}. Qui la partita continua a salvarsi su questo dispositivo: quando torni alla schermata principale scegli quale versione tenere.`);
+  }catch(e){cloudErr(e);}
+}
+// salvataggi in partita: al massimo uno al minuto verso il cloud, subito quando il gioco va in secondo piano o si esce
+function cloudLater(n){CL.dirty[n]=1; if(!CL.user) return; clearTimeout(CL.timer);
+  CL.timer=setTimeout(cloudFlush,Math.max(0,60000-(Date.now()-CL.lastPush)));}
+function cloudFlush(){clearTimeout(CL.timer); if(!CL.user) return; CL.lastPush=Date.now();
+  return Promise.all(Object.keys(CL.dirty).map(n=>cloudPush(+n)));}
+// partita cancellata: sparisce anche online (se manca la rete, ci si riprova al prossimo allineamento)
+async function cloudDel(n,m,at){
+  if(!CL.user||m.own!==CL.user.id) return; const d={n,at:Math.max(at||0,m.cat||0),own:m.own};
+  try{await CLOUD_IO.del(d.n,d.at);}catch(e){lsSet(DELQ,[...lsGet(DELQ,[]),d]);}
+}
+async function cloudFlushDel(){const q=lsGet(DELQ,[]); if(!q.length) return; const keep=[];
+  for(const d of q){ if(d.own!==CL.user.id){keep.push(d);continue;} try{await CLOUD_IO.del(d.n,d.at);}catch(e){keep.push(d);} }
+  lsSet(DELQ,keep);}
+// scheda delle partite salvate: stato online del posto n (per il bollino)
+function cloudTag(n,sv){if(!CL.user) return null; const m=cMeta(n);
+  if(CL.clash[n]) return null;
+  if(m.own&&m.own!==CL.user.id&&!m.ownG) return ['loc','Solo su questo dispositivo: è di un altro account'];
+  return m.own===CL.user.id&&m.cat===sv.at?['on','Salvata anche online']:['up','Da caricare online'];}
+// scaricare e caricare una partita come file (copia di sicurezza, anche senza account)
+function svFile(n){const sv=load(n); if(!sv||!sv.S) return;
+  const nm=(sv.S.company.name||'partita').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-'), t=dateOf(sv.S.day);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify({fup:VER,...sv})],{type:'application/json'}));
+  a.download=`FUP-${nm}-${t.getUTCFullYear()}-${String(t.getUTCMonth()+1).padStart(2,'0')}.json`; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);}
+function svImport(){const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json';
+  inp.onchange=()=>{const f=inp.files&&inp.files[0]; if(!f) return;
+    if(f.size>20e6){toast('File troppo grande per essere una partita di FUP','bad');return;}
+    const r=new FileReader(); r.onload=()=>{let o=null; try{o=JSON.parse(r.result);}catch(e){}
+      if(!o||!o.S||!o.S.company||!Array.isArray(o.S.warehouses)){toast('Questo file non è una partita di FUP','bad');return;}
+      const n=freeSlot(); if(!n){toast(`Tutti e ${SLOTS} i posti sono occupati: cancella una partita per caricarne un'altra`,'warn');return;}
+      try{localStorage.setItem(slotKey(n),JSON.stringify({S:o.S,uid:o.uid,at:Date.now()}));}catch(e){toast('Spazio finito su questo dispositivo','bad');return;}
+      cMetaSet(n,{}); cloudLater(n); cloudFlush(); showStart(); toast(`Partita caricata: ${o.S.company.name}`,'ok');};
+    r.readAsText(f);};
+  inp.click();}
 
 /* ====================== MAPPA ====================== */
 const view={s:1,x:0,y:0}, MW=1520, MH=800; // mappa: 760x400 in pixel art mostrata a 2x (da Nizza a Trieste)
@@ -5568,13 +5712,14 @@ const ACT={
  save(){save();toast('Partita salvata','ok');},
  restart(){if(S&&!S.over)save();closeModal();Object.keys(UI.open).forEach(closeWin);startSel.step='home';startSel.del=0;startSel.stamp=false;showStart();},
  options(){if($('#modal').innerHTML)return;if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);}
-   showModal(`<div class="src"><span>Opzioni</span><span>${shortDate(S.day)}</span></div><div class="win-b"><button class="btn pri" data-act="closemodal">Riprendi</button><button class="btn" data-act="quitgame">Esci dal gioco</button><button class="btn" data-act="delgame">Cancella la partita</button>${contMode()?'':`<label class="optchk"><input type="checkbox" data-act="evpause" ${HUM&&HUM.cfg&&HUM.cfg.noPause?'':'checked'}>Metti in pausa quando arriva un evento da decidere</label>`}<p class="sm" style="margin:0">Uscendo la partita viene salvata: la ritrovi con «Continua la partita» nella schermata iniziale.</p></div>`);},
+   showModal(`<div class="src"><span>Opzioni</span><span>${shortDate(S.day)}</span></div><div class="win-b"><button class="btn pri" data-act="closemodal">Riprendi</button><button class="btn" data-act="quitgame">Esci dal gioco</button><button class="btn" data-act="svgame">Scarica la partita su file</button><button class="btn" data-act="delgame">Cancella la partita</button>${contMode()?'':`<label class="optchk"><input type="checkbox" data-act="evpause" ${HUM&&HUM.cfg&&HUM.cfg.noPause?'':'checked'}>Metti in pausa quando arriva un evento da decidere</label>`}<p class="sm" style="margin:0">Uscendo la partita viene salvata: la ritrovi con «Continua la partita» nella schermata iniziale.</p></div>`);},
  delask(d){startSel.del=+d.slot||1;showStart();},
  delno(){startSel.del=0;showStart();},
- delsave(d){delSave(+d.slot||startSel.del||1);startSel.del=0;showStart();toast('Partita cancellata','ok');},
+ delsave(d){const n=+d.slot||startSel.del||1,sv=load(n),m=cMeta(n);delSave(n);cloudDel(n,m,sv&&sv.at);startSel.del=0;showStart();toast('Partita cancellata','ok');},
  delgame(){showModal(`<div class="src"><span>Cancella la partita</span><span>${shortDate(S.day)}</span></div><div class="win-b"><p style="margin:0">Vuoi cancellare per sempre <b>${esc(HUM.company.name)}</b>? La partita sparisce e non si può recuperare.</p><div class="row"><button class="btn" data-act="closemodal">No, continuo</button><button class="btn del" data-act="delgameok">Sì, cancella</button></div></div>`);},
- delgameok(){UI.evSpeed=0;delSave();closeModal();Object.keys(UI.open).forEach(closeWin);startSel.del=0;startSel.step='home';showStart();toast('Partita cancellata','ok');},
- quitgame(){UI.evSpeed=0;if(!S.over)save();closeModal();Object.keys(UI.open).forEach(closeWin);startSel.step='home';startSel.del=0;showStart();}
+ delgameok(){UI.evSpeed=0;const sv=load(),m=cMeta(slot);delSave();cloudDel(slot,m,sv&&sv.at);closeModal();Object.keys(UI.open).forEach(closeWin);startSel.del=0;startSel.step='home';showStart();toast('Partita cancellata','ok');},
+ svgame(){if(!S.over)save();svFile(slot);},
+ quitgame(){UI.evSpeed=0;if(!S.over)save();cloudFlush();closeModal();Object.keys(UI.open).forEach(closeWin);startSel.step='home';startSel.del=0;showStart();}
 };
 function wikiShow(){
   const old=document.querySelector('#wiki-list'), ls=old?old.scrollTop:0;
@@ -5817,6 +5962,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.58',t:'Partite online',x:['Nella schermata principale c\'è il riquadro «Salvataggio online»: entra con Google e le tue partite si salvano anche online, così le ritrovi sul telefono e sul computer.','Puoi anche giocare come ospite, senza account: le partite vanno online legate al browser, e con «Collega Google» le porti sul tuo account senza perdere niente.','Se la stessa partita è andata avanti su due dispositivi, il gioco ti chiede quale versione tenere.','Ogni partita si può scaricare su file come copia di sicurezza e ricaricare con «Carica da file»; durante il gioco c\'è «Scarica la partita su file» nelle Opzioni.']},
  {v:'0.57',t:'Si vede quando è in pausa',x:['Quando il tempo è fermo la mappa si copre di barre grigie oblique con la scritta «Pausa» al centro: si capisce subito che il gioco è fermo. Le finestre e i pulsanti restano sopra e si usano come sempre.']},
  {v:'0.56',t:'Tre partite salvate',x:['Nuova schermata principale: in alto l\'insegna col camioncino, sotto le tue partite salvate e il pulsante giallo «Crea nuova partita». La scelta del CEO arriva dopo, toccando quel pulsante.','Puoi tenere fino a 3 partite. Ognuna ha la sua scheda con il ritratto del CEO, la data, la cassa, magazzini e clienti; l\'ultima giocata sta in cima, più grande, con Puntualità e Accuratezza. Il cestino cancella una partita, dopo la conferma.','La partita che avevi già salvato è al suo posto: la trovi nella prima scheda.','Le novità stanno in un menu a tendina in fondo alla schermata principale.']},
  {v:'0.55',t:'Barra più in alto',x:['Su iPhone la barra con logo e pulsanti risale un po\': resta fuori dalla zona sfocata senza lasciare troppo vuoto sopra.']},
@@ -5940,26 +6086,50 @@ function slotInfo(n,sv){const s=sv.S, B=s.boss||s.custom||CEOS.find(c=>c.id===s.
   return {n,s,B,at:sv.at||0,last:agoTxt(sv.at),img:IMG[B.img||B.id]||IMG.anon,tint:(COLORS.find(c=>c[0]===s.company.color)||[0,0,'#e6eef3'])[2],
     date:`${MESI[t.getUTCMonth()]} ${t.getUTCFullYear()}`,mode:(MODES[s.cfg&&s.cfg.mode]||MODES.classica).n+(nb?` · ${nb} ${nb===1?'avversario':'avversari'}`:''),
     wh:(s.warehouses||[]).length,cl:act.length,kpi:h?[['Puntualità',h.P,thr('sP')],['Accuratezza',h.A,thr('sA')]]:null,
-    tag:s.over?['bad','Fallita']:won==='me'?['ok','Partita vinta']:won?['warn','Ha vinto un avversario']:s.cash<0?['bad','Cassa in rosso']:null};}
+    tag:s.over?['bad','Fallita']:won==='me'?['ok','Partita vinta']:won?['warn','Ha vinto un avversario']:s.cash<0?['bad','Cassa in rosso']:null,cloud:cloudTag(n,sv)};}
 const svTile=(ic,lab,v,cls)=>`<div class="sv-tile"><span>${hmIc(ic,16)}${lab}</span><b class="${cls||''}">${v}</b></div>`;
 const svKpi=([n,v,t])=>`<div class="sv-k" data-tip="${n} media dell'ultimo mese${t?` · la soglia più alta dei tuoi clienti è ${f1(t)}%`:''}"><span>${n}</span><span class="t"><i style="width:${clamp(v,0,100)}%;background:var(--${v>=t?'ok':'bad'})"></i></span><b>${f1(v)}%</b></div>`;
-function slotCard(x,top){const {n,s}=x, nm=esc(s.company.name), go=`${s.over?'Rivedi':'Continua'} ›`, tag=x.tag?`<span class="sv-tag ${x.tag[0]}">${x.tag[1]}</span>`:'',
+function slotCard(x,top){const {n,s}=x, nm=esc(s.company.name), go=`${s.over?'Rivedi':'Continua'} ›`, ct=x.cloud, C=CL.clash[n],
+  tag=(x.tag?`<span class="sv-tag ${x.tag[0]}">${x.tag[1]}</span>`:'')+(ct?`<span class="sv-cl ${ct[0]}" data-tip="${ct[1]}" role="img" aria-label="${ct[1]}">${ct[0]==='loc'?'solo qui':hmIc('nuvola',16)}</span>`:''),
+  fileBt=top?`<button class="btn" data-act="svfile" data-slot="${n}">${hmIc('scarica',16)}Scarica</button>`:`<button class="btn sv-del" data-act="svfile" data-slot="${n}" aria-label="Scarica ${nm} su file" data-tip="Scarica su file">${hmIc('scarica',32)}</button>`,
   pic=`<div class="sv-pic"><img class="px" src="${x.img}" alt="Ritratto di ${esc(x.B.name)}" width="96" height="112"></div>`,
-  ask=startSel.del===n?`<div class="sv-ask" role="alert"><span><b>Cancellare per sempre ${nm}?</b> La partita sparisce e non si può recuperare.</span><span class="sv-act"><button class="btn" data-act="delno">No, tienila</button><button class="btn del" data-act="delsave" data-slot="${n}">Sì, cancella</button></span></div>`:'';
+  ask=C?(()=>{const ct=dateOf(C.giorno), cl=C.at>x.at;
+    return `<div class="sv-ask cl-x" role="alert"><span><b>Due versioni diverse di questa partita.</b> Su questo dispositivo: ${x.date}${x.last?`, giocata ${x.last}`:''}. Online: ${MESI[ct.getUTCMonth()]} ${ct.getUTCFullYear()}, salvata ${agoTxt(C.at)}${C.dev?` dal ${esc(C.dev)}`:''}.</span><span class="sv-act"><button class="btn${cl?'':' pri'}" data-act="clkeep" data-slot="${n}" data-w="here">Tieni questa</button><button class="btn${cl?' pri':''}" data-act="clkeep" data-slot="${n}" data-w="cloud">Tieni quella online</button></span></div>`;})()
+   :startSel.del===n?`<div class="sv-ask" role="alert"><span><b>Cancellare per sempre ${nm}?</b> La partita sparisce e non si può recuperare.</span><span class="sv-act"><button class="btn" data-act="delno">No, tienila</button><button class="btn del" data-act="delsave" data-slot="${n}">Sì, cancella</button></span></div>`:'';
   if(top) return `<div class="sv top" style="--tint:${x.tint}">${pic}
    <div class="sv-hd"><div class="sv-nm"><span class="sv-last">ULTIMA PARTITA</span>${tag}<span class="sv-sub">${x.last?`giocata ${x.last} · `:''}${esc(x.mode)}</span></div><span class="sv-co">${nm}</span><span class="sv-sub">CEO <b>${esc(x.B.name)}</b></span></div>
    <div class="sv-bd"><div class="sv-tiles">${svTile('calendario','Data',x.date)}${svTile('cassa','Cassa',eur(s.cash),s.cash<0?'bad':'ok')}${svTile('magazzini','Magazzini',x.wh)}${svTile('clienti','Clienti',x.cl)}</div>
     ${x.kpi?`<div class="sv-kpi">${x.kpi.map(svKpi).join('')}</div>`:''}
-    ${ask||`<div class="sv-act"><button class="btn" data-act="delask" data-slot="${n}">${hmIc('cestino',16)}Cancella</button><button class="btn pri sv-go" data-act="continue" data-slot="${n}">${go}</button></div>`}</div></div>`;
+    ${ask||`<div class="sv-act"><button class="btn" data-act="delask" data-slot="${n}">${hmIc('cestino',16)}Cancella</button>${fileBt}<button class="btn pri sv-go" data-act="continue" data-slot="${n}">${go}</button></div>`}</div></div>`;
   return `<div class="sv" style="--tint:${x.tint}">${pic}<div class="sv-m"><div class="sv-nm"><span class="sv-co">${nm}</span>${tag}</div><span class="sv-sub">${esc(x.B.name)} · ${esc(x.mode)}</span>
    <span class="sv-ln"><b>${x.date}</b><span>Cassa <b class="${s.cash<0?'bad':'ok'}">${eur(s.cash)}</b></span><span>${x.wh} ${x.wh===1?'magazzino':'magazzini'} · ${x.cl} ${x.cl===1?'cliente':'clienti'}</span>${x.last?`<span class="sv-sub">giocata ${x.last}</span>`:''}</span></div>
-   ${ask||`<div class="sv-act"><button class="btn sv-del" data-act="delask" data-slot="${n}" aria-label="Cancella la partita ${nm}">${hmIc('cestino',32)}</button><button class="btn sv-go2" data-act="continue" data-slot="${n}">${go}</button></div>`}</div>`;}
+   ${ask||`<div class="sv-act"><button class="btn sv-del" data-act="delask" data-slot="${n}" aria-label="Cancella la partita ${nm}">${hmIc('cestino',32)}</button>${fileBt}<button class="btn sv-go2" data-act="continue" data-slot="${n}">${go}</button></div>`}</div>`;}
+// riquadro «Salvataggio online»: accesso con Google o come ospite, stato dell'allineamento, file
+function cloudCard(){
+  const bt=(act,ic,t,cls,x)=>`<button class="btn${cls?' '+cls:''}" data-act="${act}"${x||''}>${ic?hmIc(ic,16):''}${t}</button>`,
+   U=CL.user, mail=U&&(U.email||(U.user_metadata||{}).email),
+   st=CL.wait?'Collegamento in corso…':CL.busy?'Allineo le partite…':CL.err?`<span class="bad">${esc(CL.err)}</span>`:U&&CL.syncAt?`Partite allineate ${agoTxt(CL.syncAt)}.`:'',
+   priv=`<a href="https://yanez86.github.io/fup/sito/privacy.html" target="_blank" rel="noopener">Privacy</a>`;
+  let h, t, a;
+  if(!CL.sb){h='Copia di sicurezza'; t='Scarica una partita su file per tenerla da parte, o ricaricala da un file.'; a='';}
+  else if(CL.ask==='out'){h='Uscire dall\'account?'; t=CL.guest?'Gli ospiti non hanno una password: se esci <b>non potrai più rientrare</b> in questo account. Le partite restano su questo dispositivo e vanno online al prossimo accesso.':'Le partite restano su questo dispositivo e online: le ritrovi entrando di nuovo con Google.';
+    a=bt('clno','','Annulla')+bt('cloutok','','Esci','del');}
+  else if(CL.ask==='wipe'){h='Eliminare i dati online?'; t='Cancelli l\'account e tutte le partite salvate online, su tutti i dispositivi. Le partite di questo dispositivo restano qui. Non si può tornare indietro.';
+    a=bt('clno','','Annulla')+bt('clwipeok','','Sì, elimina','del');}
+  else if(!U){h='Salvataggio online'; t=`Entra per salvare le partite online e ritrovarle sul computer e sul telefono.${WEB?'':' L\'accesso con Google funziona dal sito del gioco, yanez86.github.io/fup.'}`;
+    a=bt('clgoogle','chiave','Entra con Google','pri',WEB?'':' disabled')+bt('clguest','ospite','Gioca come ospite');}
+  else if(CL.guest){h='Online come ospite'; t='Le partite sono online ma legate a questo browser. Collega un account Google per ritrovarle anche sugli altri dispositivi.';
+    a=bt('cllink','chiave','Collega Google','pri',WEB?'':' disabled')+bt('clout','','Esci');}
+  else {h=`Online con ${esc(mail||'Google')}`; t='Le partite si salvano da sole anche online: entra con lo stesso account sugli altri dispositivi.';
+    a=bt('clout','','Esci')+bt('clwipe','','Elimina dati online');}
+  return `<div class="cl${CL.ask?' ask':''}"><div class="cl-h">${hmIc('nuvola',32)}<div class="cl-t"><b>${h}</b><span>${t}</span>${st?`<span class="cl-st">${st}</span>`:''}</div></div>
+   <div class="cl-a">${a}${CL.ask?'':bt('svimport','carica','Carica da file')}<span class="cl-p">${kw('salvataggio_online','Come funziona')} · ${priv}</span></div></div>`;}
 function stepHome(){const L=[]; for(let n=1;n<=SLOTS;n++){const sv=load(n); if(sv&&sv.S&&sv.S.company) L.push(slotInfo(n,sv));}
   L.sort((a,b)=>b.at-a.at); const full=L.length>=SLOTS;
   return `<div class="hm-h">${hmIc('salva',32)}<h2>Partite salvate</h2><span class="hm-n" aria-label="${L.length} posti occupati su ${SLOTS}">${L.length}/${SLOTS}</span></div>
    ${L.length?L.map((x,i)=>slotCard(x,!i)).join(''):'<div class="hm-empty"><b>Nessuna partita salvata</b><span>Il piazzale è vuoto: è il momento di scaricare il primo pallet.</span></div>'}
    <button class="hm-new" data-act="newgame" ${full?'disabled':''}><span class="hm-plus">${hmIc('nuova',32)}</span><span class="t"><b>Crea nuova partita</b><span>${full?`Tutti e ${SLOTS} i posti sono occupati: cancella una partita per iniziarne un'altra.`:'Scegli il CEO, dai un nome all\'azienda e apri il primo magazzino a gennaio 2002.'}</span></span><span class="ar" aria-hidden="true">›</span></button>
-   ${newsCard()}<div class="hm-cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></div>`;}
+   ${cloudCard()}${newsCard()}<div class="hm-cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></div>`;}
 function showStart(){
   setSpeedSafe(0); WIKI_ON=false; const k=startSel.step;
   if(k==='home'){
@@ -5992,8 +6162,8 @@ addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;if($(
 addEventListener('appinstalled',()=>{installEvt=null;if($('#start').innerHTML){startKeep();showStart();}});
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 // sul telefono il sistema può chiudere l'app in qualunque momento: si salva ogni volta che il gioco va in secondo piano
-addEventListener('visibilitychange',()=>{if(document.hidden&&S&&!$('#start').innerHTML)save();});
-addEventListener('pagehide',()=>{if(S&&!$('#start').innerHTML)save();});
+addEventListener('visibilitychange',()=>{if(document.hidden&&S&&!$('#start').innerHTML){save();cloudFlush();}});
+addEventListener('pagehide',()=>{if(S&&!$('#start').innerHTML){save();cloudFlush();}});
 function setSpeedSafe(v){if(S&&!contMode()){S.speed=v;renderTop();}}
 function stValid(k){const cc=startSel.cc;
   if(k==='cc1'&&(!cc.nome.trim()||!cc.cognome.trim())) return 'Scrivi nome e cognome del tuo CEO.';
@@ -6014,6 +6184,22 @@ Object.assign(ACT,{
    showStart();},
  stnext(){startKeep();const k=startSel.step,e=stValid(k);if(e){startSel.err=e;showStart();return;}const fl=stFlow();stGo(fl[fl.indexOf(k)+1]);},
  stback(){startKeep();const fl=stFlow(),i=fl.indexOf(startSel.step);stGo(i>0?fl[i-1]:'home');},
+ // salvataggio online
+ clgoogle(){if(!CL.sb||!WEB)return;CL.wait=true;CL.err='';showStart();CL.sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}}).then(r=>{if(r.error){CL.wait=false;cloudErr(r.error);homeRefresh();}});},
+ clguest(){if(!CL.sb)return;CL.wait=true;CL.err='';showStart();CL.sb.auth.signInAnonymously().then(r=>{CL.wait=false;if(r.error)cloudErr(r.error);homeRefresh();},e=>{CL.wait=false;cloudErr(e);homeRefresh();});},
+ cllink(){if(!CL.sb||!WEB)return;CL.wait=true;CL.err='';showStart();CL.sb.auth.linkIdentity({provider:'google',options:{redirectTo:location.origin+location.pathname}}).then(r=>{if(r.error){CL.wait=false;cloudErr(r.error);homeRefresh();}});},
+ clout(){CL.ask='out';showStart();},
+ clwipe(){CL.ask='wipe';showStart();},
+ clno(){CL.ask='';showStart();},
+ cloutok(){CL.ask='';CL.wait=true;showStart();Promise.resolve(cloudFlush()).catch(()=>{}).finally(()=>CL.sb.auth.signOut().catch(()=>{}).finally(()=>{CL.wait=false;homeRefresh();}));},
+ clwipeok(){CL.ask='';CL.wait=true;showStart();const me=CL.user.id;
+   CLOUD_IO.wipe().then(()=>{for(let n=1;n<=SLOTS;n++) if(cMeta(n).own===me) cMetaSet(n,{}); lsSet(DELQ,[]); return CL.sb.auth.signOut();})
+   .then(()=>{CL.err='';toast('Account e partite online eliminati','ok');},e=>cloudErr(e)).finally(()=>{CL.wait=false;homeRefresh();});},
+ clkeep(d){const n=+d.slot,C=CL.clash[n];if(!C||!CL.user)return;delete CL.clash[n];CL.busy=true;showStart();
+   const keep=()=>{const sv=load(n);sv.at=sv.at||1;return CLOUD_IO.put({user_id:CL.user.id,slot:n,at:sv.at,dev:DEV,nome:sv.S.company.name,giorno:sv.S.day|0,dati:sv}).then(()=>cMetaSet(n,{own:CL.user.id,ownG:CL.guest,cat:sv.at}));};
+   (d.w==='cloud'?cloudPull(n):keep()).then(()=>{CL.err='';},e=>{CL.clash[n]=C;cloudErr(e);}).finally(()=>{CL.busy=false;homeRefresh();});},
+ svfile(d){svFile(+d.slot);},
+ svimport(){svImport();},
  newgame(){const n=freeSlot();if(!n)return;startSel.slot=n;startSel.del=0;stGo('scelta');},
  stgo(d){startKeep();stGo(d.to);},
  stamp(){startSel.stamp=true;showStart();},
@@ -6022,7 +6208,7 @@ Object.assign(ACT,{
  cctal(d){startKeep();const cc=startSel.cc;if(cc.tal.includes(d.n))cc.tal=cc.tal.filter(n=>n!==d.n);else if(cc.tal.length<CC_TRAITS)cc.tal.push(d.n);startSel.err='';showStart();},
  ccimg(d){startKeep();const cc=startSel.cc,i=CC_IMGS.indexOf(cc.img);cc.img=CC_IMGS[(i+(+d.d)+CC_IMGS.length)%CC_IMGS.length];showStart();},
  ccbase(d){startKeep();startSel.cc.base=d.id;showStart();},
- startgame(){startKeep();const custom=startSel.ceo==='custom';slot=startSel.slot||freeSlot()||1;
+ startgame(){startKeep();const custom=startSel.ceo==='custom';slot=startSel.slot||freeSlot()||1;cMetaSet(slot,{});
    if(custom){const e=ccErr(startSel.cc);if(e){startSel.err=e;showStart();return;}}
    startSel.err='';uid=1;newGame(startSel.ceo,coName(),startSel.color,custom?ccCeo(startSel.cc):null,{logo:startSel.logo,claim:startSel.claim.trim()});
    const L=startSel.lb||lbDef(); HUM=S; S.cfg={mode:L.mode,win:{...L.win},fatturato:L.fatturato,reputazione:L.reputazione,traguardo:L.traguardo};
@@ -6100,11 +6286,11 @@ function autoEvent(ev){ UI.autoDec=(UI.autoDec||0)+1; const i=autoOpt(ev), o=ev.
   if(EVENTS.some(e=>e.id===ev.id)) evChoose(ev,i); else { UI.evMsg=[]; evApply(ev,o); m=UI.evMsg; UI.evMsg=null; news(ev.src,ev.title,`${ev.text} Ha deciso il tuo vice: «${o.t}».`); }
   return [o,m]; }
 let lastSync=0; function syncTrucksMaybe(){if(S.day-lastSync>=7){lastSync=S.day;syncTrucks();}}
-setMobile(); initMapControls(); if(document.fonts) document.fonts.ready.then(layoutVars);
+setMobile(); initMapControls(); cloudInit(); if(document.fonts) document.fonts.ready.then(layoutVars);
 const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,debt,loanLimit};
+window.__FUP={get S(){return S;},cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>

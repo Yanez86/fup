@@ -244,3 +244,9 @@ Regole per tutta l'azienda, accese o spente dalla finestra Policy (`POLICIES` in
 
 ## Idee aperte
 - Espansione al Centro e al Sud, concorrenti più attivi sulla mappa, flotta con tipi di mezzi diversi (motrici, bilici, frigo), contratti con i fornitori, uffici.
+
+## Salvataggio online
+- Tre posti di salvataggio per dispositivo; con un accesso (Google o ospite) ogni posto ha una copia online nella tabella `partite` di Supabase (una riga per account e posto, `docs/supabase.sql`). Senza accesso tutto resta in locale.
+- Si gioca sempre dalla copia locale. Allineamento (`cloudSync`, all'apertura, all'accesso e quando torna la rete): se la partita è cambiata solo da una parte vince quella; se è cambiata da entrambe la scheda chiede quale tenere (in evidenza la più recente). Una partita cancellata su un dispositivo sparisce anche dagli altri.
+- In partita: caricamento online al massimo una volta al minuto dopo un salvataggio, subito quando il gioco va in secondo piano o si esce. Se nel frattempo un altro dispositivo ha cambiato la stessa partita non si sovrascrive: arriva una notifica e si sceglie dalla schermata principale.
+- Le partite giocate come ospite passano all'account Google collegato (o, se il collegamento non riesce, al primo account che entra su quel dispositivo) se il posto è libero; quelle di un altro account Google restano solo sul dispositivo.

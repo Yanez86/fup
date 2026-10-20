@@ -18,13 +18,13 @@ Gli screenshot dei test finiscono in `tools/out/`, che è ignorata da git.
 
 ## Struttura
 ```
-src/game.html      UNICO file sorgente del gioco: CSS + HTML + JS vanilla, nessuna libreria
+src/game.html      UNICO file sorgente del gioco: CSS + HTML + JS vanilla; unica libreria esterna quella ufficiale di Supabase (salvataggio online, scelta di Davide), incorporata da build.py
 src/manifest.webmanifest, src/sw.js   web app (installazione e gioco senza rete), copiati in dist/ da build.py
-assets/            PNG in pixel art: mappa, ritratti CEO (192x224), manager/dirigenti/staff (96x112)
+assets/            supabase.js (@supabase/supabase-js, build UMD copiata da npm; versione in SB_VER dentro build.py) + licenza; PNG in pixel art: mappa, ritratti CEO (192x224), manager/dirigenti/staff (96x112)
 dist/              fup.html (build autonoma con le immagini in base64) + manifest, sw.js e icone della web app (tutto da committare dopo ogni build)
 tools/             build.py e generatori procedurali di asset e fogli (vedi sotto)
 tests/             smoke_test.py
-docs/              design.md (regole e formule), foglio KPI/bilanciamento, screenshot
+docs/              design.md (regole e formule), supabase.sql (tabella `partite` e regole di accesso, da incollare nell'editor SQL di Supabase), foglio KPI/bilanciamento, screenshot
 ```
 
 ### Dentro `src/game.html` (sezioni marcate con `/* ===== NOME ===== */`)
@@ -36,6 +36,7 @@ docs/              design.md (regole e formule), foglio KPI/bilanciamento, scree
 - **EVENTI**: array `EVENTS` con `{id, src, title, text, cond, once?, setup?, opts:[{t, d, e, r, f, req?, reqT?}]}` (`r` = testo di colore del risultato). `fireEvent()` sceglie un evento tra quelli validi; ogni evento ha un'attesa di 240 giorni prima di poter tornare. L'evento arriva come notifica (`showEvent()`, la finestra si apre dalla tessera con `openEv()`); la scelta va in `S.evPend` e il giorno dopo `evResolve()` applica gli effetti e crea la notifica «Com'è andata». Senza risposta, dopo `EV_WAIT` giorni decide il vice.
 - **NOTIFICHE**: colonna a destra della mappa (`renderNotes()`, stato in `S.notes`). Per un avviso nuovo del motore usa `notify(colore, icona, fonte, titolo, testo, finestra, sel, key)` (importanti: rosso, verde, giallo, azzurro) o `noteVar(gruppo, titolo)` (varie, gruppi in `NOTE_G`); i problemi aperti stanno in `noteAlerts()`. Non aprire finestre da sole con `modalInfo()` e non usare `toast()`, che resta solo per rispondere ai clic del giocatore. Cartellino temporaneo: `showCard()`.
 - **SALVATAGGIO**: `localStorage`, tre posti (`SLOTS`): `slotKey(n)` dà la chiave del posto (il primo è `KEY`), `slot` è il posto della partita in corso, `save()` / `load(n)` / `delSave(n)` / `freeSlot()`. Ogni salvataggio è `{S, uid, at}` (`at` = quando si è giocato l'ultima volta). **Se cambi la forma di `S`, aumenta la versione della chiave** (`fup-salvataggio-vN`) oppure aggiungi una migrazione in `ACT.continue`.
+- **SALVATAGGIO ONLINE**: Supabase (`SB_URL`, `SB_KEY` = chiave pubblica, si può tenere nel codice). Accesso con Google (`signInWithOAuth`, solo da `https`) o come ospite (`signInAnonymously`), ospite → Google con `linkIdentity`. Stato in `CL` (utente, conflitti `CL.clash`, errori). Si gioca sempre dalla copia locale: accanto a ogni posto la scheda `slotKey(n)+'-cloud'` (`cMeta`: `own` account, `ownG` era un ospite, `cat` versione online) e `cloudSync()` allinea i tre posti (cambiato da una parte sola → vince quella, da tutte e due → la scheda chiede quale tenere). `save()` chiama `cloudLater()` (al massimo un caricamento al minuto, subito con `cloudFlush()` quando il gioco va in secondo piano o si esce). Tutte le chiamate passano da `CLOUD_IO`, che il test sostituisce con un archivio finto. Riquadro `cloudCard()` nella schermata principale, file con `svFile()` / `svImport()`. Pagina della privacy: `sito/privacy.html`. Se cambi la tabella, aggiorna `docs/supabase.sql`.
 - **MAPPA**: proiezione `pt(lon,lat)`, pan/zoom, marker SVG, camion animati. Lenti della mappa in `LENSES` (`UI.lens`, tasto L): ogni lente ha `draw()` che restituisce uno strato SVG disegnato sotto città e magazzini; `PROV` contiene i confini delle province.
 - **INTERFACCIA**: `DOCK` (menu a sinistra), `TITLES`, `VIEWS.<finestra>()` restituisce l'HTML della finestra; `renderAll()` ridisegna tutto, saltando le finestre con un campo attivo.
 - **AZIONI**: tutti i click passano da `data-act="nome"` → `ACT.nome(dataset, element)`. Per aggiungere un pulsante: `data-act` + `data-*` nell'HTML e una funzione in `ACT`.
