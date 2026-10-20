@@ -159,6 +159,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .xl-dot{width:10px;height:10px;border:2px solid var(--ink);flex:none;background:#c3d0dc}.xl-dot.ok{background:var(--ok)}.xl-dot.warn{background:var(--warn)}.xl-dot.bad{background:var(--bad)}
 .xl-sum{margin-bottom:10px}
 .xl-cli button[aria-pressed="true"]{border-color:#2e9e48;box-shadow:inset 0 -3px 0 #2e9e48;font-weight:700}
+.cs-l .pr-q .wh-nm{white-space:normal;overflow:visible;text-overflow:clip}
 .cs-p{display:flex;gap:10px;align-items:flex-start}.cs-p .rp-pp{flex:1;min-width:0}.cs-p .mport{width:80px;height:94px}
 .rp-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.rp-tiles.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .rp-t{display:flex;flex-direction:column;gap:1px;padding:7px 10px;background:#fff;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2),2px 2px 0 var(--ink);min-width:0}
@@ -1285,6 +1286,7 @@ const TECH=[
  {id:'edi',tree:'mkt',tier:2,row:0,req:['commerciale'],name:'EDI con i clienti',cost:30000,wk:7,desc:'Ordini automatici: soddisfazione +1 al mese sopra soglia. Richiesto dalla grande distribuzione.',txt:'I sistemi dell\'azienda e quelli del cliente si parlano da soli. Ordini e bolle viaggiano senza fax.'},
  {id:'marketing',tree:'mkt',tier:2,row:1,req:['commerciale'],name:'Marketing e fiere',cost:25000,wk:6,desc:'Stand alle fiere di settore: reputazione +5 subito e +0,2 al mese.',txt:'Stand alle fiere, brochure e qualche cena con i buyer. Il nome dell\'azienda inizia a girare.'},
  {id:'kam',tree:'mkt',tier:3,row:0,req:['edi'],name:'Key account management',cost:40000,wk:9,desc:'Un referente per ogni grande cliente: soddisfazione +1 al mese, rinnovo da 40 invece di 50.',txt:'Ogni grande cliente ha una persona di riferimento. Se c\'è un problema, sa subito a chi telefonare.'},
+ {id:'portale',tree:'mkt',tier:3,row:1,req:['edi'],name:'Portale clienti',cost:35000,wk:8,desc:'Un sito dove i clienti seguono da soli pallet, bolle e consegne: qualità del servizio +10. Sblocca la policy «Rispondiamo entro 2 ore».',txt:'I clienti vedono da soli dove sono i loro pallet, scaricano le bolle e aprono le segnalazioni. Meno telefonate alle 23, più tempo per quelle che contano.'},
  {id:'accordi',tree:'mkt',tier:4,row:1,req:['kam'],name:'Accordi quadro nazionali',cost:60000,wk:13,desc:'Contratti nazionali con i grandi gruppi: sblocca le gare delle committenti S e A (servono anche 3 magazzini e reputazione 65).',txt:'Contratti firmati con le sedi centrali dei grandi gruppi. Si gioca nel campionato nazionale.'},
  {id:'ecom',tree:'mkt',tier:4,row:0,req:['kam','marketing'],name:'Logistica e-commerce',cost:70000,wk:13,desc:'Sblocca le gare dei negozi online: tanti ordini, volumi alti, KPI esigenti.',txt:'Tanti pacchi piccoli, resi e consegne a casa. Un mestiere diverso dal classico pallet.'},
  {id:'acqua',tree:'wel',tier:1,row:0,name:'Boccioni d\'acqua',cost:2000,wk:3,inst:600,mese:90,mor:1,att:1,weeks:0,desc:'Morale +1 e il magazzino attira un po\' di più chi cerca lavoro.',txt:'Erogatori di acqua fresca in reparto e in banchina. D\'estate, sotto il tetto del capannone, fanno la differenza.'},
@@ -1360,8 +1362,10 @@ const POLICIES=[
   txt:'Solo personale assunto da te, con il contratto della logistica. Costa di più, ma nessun ispettore del lavoro bussa alla porta.'},
  {id:'spending',name:'Spending review',tech:'controllo',fx:{fix:0.05,mor:-2},pro:'Costi fissi −5%',con:'Morale −2, non si installano nuovi servizi di welfare',
   txt:'Si tagliano carta, stampanti, utenze e trasferte. Le penne si chiedono in amministrazione, una alla volta, firmando.'},
- {id:'cliente',name:'Il cliente ha sempre ragione',tech:'kam',fx:{sat:1,mor:-3,gara:-2},pro:'Soddisfazione di ogni cliente +1 al mese',con:'Morale −3, punteggio nelle gare −2 (i buyer sanno che cedi)',
+ {id:'cliente',name:'Il cliente ha sempre ragione',tech:'kam',fx:{sat:1,mor:-3,gara:-2},pro:'Soddisfazione di ogni cliente +1 al mese',con:'Morale −3, punteggio nelle gare −2 (i buyer sanno che cedi); non si rifiutano picchi e overstock e non si chiedono supplementi',
   txt:'Ordini fuori orario, urgenze del venerdì sera, «solo per questa volta»: si dice sempre di sì. I buyer ti adorano, il turno di notte un po\' meno.'},
+ {id:'dueore',name:'Rispondiamo entro 2 ore',tech:'portale',fx:{csq:8,csNeed:1.25},pro:'Qualità del servizio +8',con:'Servono il 25% di addetti al customer service in più',
+  txt:'Ogni mail di un cliente ha una risposta entro due ore, anche il venerdì alle 17:55. I clienti si sentono coccolati, il customer service un po\' meno.'},
  {id:'limite80',name:'Limite 80 all\'ora per i bilici',tech:'gps',fx:{fuel:0.06,P:-0.5,rep:0.1},pro:'Gasolio −6%, reputazione +0,1 al mese',con:'Puntualità −0,5',
   txt:'Il limitatore dei camion scende a 80. Si consuma meno e si fanno meno multe, ma da Piacenza a Verona ci vuole un caffè in più.'},
  {id:'smart',name:'Smart working in sede',tech:'agile',fx:{mor:1,P:-0.3,planHire:0.7},pro:'Morale +1, pianificatori del traffico più facili da trovare (−30% di tempo)',con:'Puntualità −0,3: i giri si sistemano da casa, con qualche chiamata persa',
@@ -1377,7 +1381,7 @@ const POL=Object.fromEntries(POLICIES.map(p=>[p.id,p]));
 // pretese dei manager e dei dirigenti, legate ai talenti: want = la vogliono accesa, hate = la vogliono spenta
 const POL_TAL={'Ex sindacalista':{want:['zerostra','nocoop'],hate:['sabato']},'Stacanovista':{want:['sabato'],hate:['zerostra','corta']},'Sempre al telefono':{hate:['telefoni']},
  'Excel-dipendente':{want:['spunta']},'Braccino corto':{want:['spending']},'Mano larga':{hate:['spending']},'Cena col buyer':{want:['cliente']},'Insonne':{want:['smart']},
- 'Ha fatto il militare':{want:['sicurezza'],hate:['smart']},'Formato sulla sicurezza':{want:['sicurezza']},'Esaurito':{want:['smart'],hate:['sabato']},'Parla con i robot':{hate:['spunta']}};
+ 'Ha fatto il militare':{want:['sicurezza'],hate:['smart']},'Formato sulla sicurezza':{want:['sicurezza']},'Esaurito':{want:['smart'],hate:['sabato','dueore']},'Voce da call center':{want:['dueore']},'Risponde anche alle 23':{want:['dueore']},'Promette tutto':{want:['cliente']},'Parla con i robot':{hate:['spunta']}};
 const RAL={pick:18000,car:19500,capo:25000,autB:19000,autCE:23000,imp:22000,plan:26000,cs:24000,fm:30000}, COEF=1.42;
 const ROLES=['pick','car','capo','autB','autCE','imp','fm'];
 const ROLE={pick:'Magazzinieri',car:'Carrellisti',autB:'Autisti patente B',autCE:'Autisti patente CE',imp:'Impiegati di magazzino',capo:'Capiturno',plan:'Pianificatori del traffico',cs:'Addetti al customer service',fm:'Facility manager'};
@@ -1908,6 +1912,7 @@ function talentIcons(list,sz){sz=sz||36;return `<span style="display:flex;gap:6p
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const eur=v=>(v<0?'−':'')+'€ '+Math.round(Math.abs(v)).toLocaleString('it-IT');
+const eur2=v=>'€ '+v.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
 const n0=v=>Math.round(v).toLocaleString('it-IT');
 const f1=v=>(Math.round(v*10)/10).toLocaleString('it-IT',{minimumFractionDigits:1,maximumFractionDigits:1});
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -1935,7 +1940,9 @@ function seasMul(name,d){const p=seasProf(name), t=dateOf(d), dm=new Date(Date.U
 // intensità della stagionalità: differenza tra il mese più pieno e il più vuoto
 function seasLev(name){const p=seasProf(name), a=Math.max(...p)-Math.min(...p); return a<0.35?['lieve','ok']:a<1?['media','warn']:['forte','bad'];}
 // pallet al mese di oggi: le committenti sotto contratto seguono la stagione, le gare mostrano la media dell'anno
-const palOf=c=>c.status?Math.round(c.pal*seasMul(c.name,S.day)):c.pal;
+// picco di consegne (customer service): per qualche settimana i pallet del cliente si moltiplicano
+const peakOn=c=>!!(c.peak&&S&&S.day>=c.peak.from&&S.day<c.peak.to), peakMul=c=>peakOn(c)?c.peak.mul:1;
+const palOf=c=>c.status?Math.round(c.pal*seasMul(c.name,S.day)*peakMul(c)):c.pal;
 // numero della settimana nell'anno (1-53), contando dal 1° gennaio
 const weekOf=d=>{const t=dateOf(d); return Math.floor((t-Date.UTC(t.getUTCFullYear(),0,1))/604800000)+1;};
 // durata in settimane, per i testi: «3 settimane», «1 settimana»
@@ -2303,26 +2310,48 @@ wk('qualita_cs','cli','Qualità del servizio',`Quanto è bravo il customer servi
 • +1,5 per ogni punto di Precisione sopra 10 (−1,5 sotto);
 • −10 se non c'è un responsabile e se ne occupa il [[ceo|CEO]];
 • −10 per ogni [[addetti_cs|addetto]] che manca;
+• il [[tech_portale|Portale clienti]] +10 e la policy [[pol_dueore|Rispondiamo entro 2 ore]] +8;
 • i [[talenti]] di chi guida il servizio (Voce da call center +8, Risponde anche alle 23 +10) e gli [[eventi]].
 
 Il totale resta tra 0 e 100. A fine mese, con la qualità sopra 70 ogni cliente guadagna +1 di [[soddisfazione]], sotto 35 ne perde 1; il talento Promette tutto aggiunge +1 per tutti.
 
 La qualità è anche la probabilità che una [[richieste_clienti|richiesta]] piccola venga sistemata dal customer service senza disturbarti: con 70 succede sette volte su dieci.`);
+wk('picco','cli','Picco di consegne',`Per qualche settimana un cliente consegna molto più del solito: ricavi in più, ma servono persone in più.`,
+`Arriva come [[richieste_clienti|richiesta del cliente]], con una o due settimane di preavviso: per 2-4 settimane i pallet da consegnare salgono da ×1,5 a ×2 (fino a ×2,5 per chi vende tanto nella GDO o online). Si somma alla [[stagionalita]].
+
+Le risposte:
+• **accetto tutto**: tutti i pallet in più, con i ricavi pieni. Se [[puntualita]] e [[accuratezza]] del magazzino restano sopra le [[soglie]] almeno 8 giorni su 10, alla fine [[soddisfazione]] +5;
+• **accetto con un supplemento**: prova di Negoziazione di chi guida il [[customer_service|customer service]]: i pallet in più si pagano dal 15 al 30% in più; se va male il cliente paga lo stesso, ma soddisfazione −3;
+• **accetto la metà**: metà dei pallet in più, soddisfazione −2;
+• **rifiuto**: soddisfazione −8.
+
+Con la policy [[pol_cliente|Il cliente ha sempre ragione]] non si può rifiutare né chiedere il supplemento. Durante il picco guarda il [[carico]] dei reparti: magazzinieri, carrellisti e autisti potrebbero non bastare.`);
+wk('overstock','cli','Overstock',`Pallet che un cliente parcheggia da te per qualche mese: incassi lo stoccaggio, ma quei posti restano occupati.`,
+`Arriva come [[richieste_clienti|richiesta del cliente]]: da 80 pallet in su (circa il 20-60% dei suoi posti) per 2-6 mesi, in una zona precisa. Il cliente offre da 7 a 9 € a posto al mese (lo stoccaggio normale vale 5,5 €), più la movimentazione in entrata e in uscita, che si incassa subito.
+
+Proponi tu uno dei tuoi magazzini con abbastanza posti liberi. La distanza dalla zona richiesta, su strada, cambia la tariffa:
+• fino a 50 km: tariffa piena, soddisfazione +3;
+• fino a 100 km: tariffa −15%, soddisfazione +1;
+• da 100 a 200 km: tariffa −35%, e 3 volte su 10 il cliente rinuncia;
+• oltre 200 km: non lo vuole.
+La Negoziazione di chi guida il [[customer_service|customer service]] sposta la tariffa fino al 10% in più o in meno. Puoi anche prendere solo metà dei pallet (soddisfazione −2) o rifiutare (soddisfazione −5; con la policy [[pol_cliente|Il cliente ha sempre ragione]] non si può).
+
+L'overstock non si muove, ma occupa posti: sale l'[[saturazione|occupazione]] (sopra l'85% cala l'[[accuratezza]]) e per le [[gare]] resta meno spazio. Alla scadenza, 35 volte su 100 il cliente chiede una proroga di 2-4 mesi: con un aumento del 20% (prova di Negoziazione), alle stesse condizioni (soddisfazione +2) o «venite a prenderli» (soddisfazione −3).`);
 wk('addetti_cs','pers','Addetti al customer service',`In sede rispondono a mail e telefonate dei clienti. Fino a 3 clienti non servono; poi uno ogni 4 clienti.`,
 `Lavorano in sede, per tutti i magazzini. Servono da 4 clienti attivi in su: uno per i clienti dal 4° al 7°, due fino all'11°, e così via.
 
-Ognuno che manca toglie 10 punti alla [[qualita_cs|qualità del servizio]]. Si assumono e si licenziano dalla finestra [[customer_service|Customer service]] o da quella del [[personale]], come gli altri mestieri. Costano 24.000 € lordi l'anno.`);
+Con la policy [[pol_dueore|Rispondiamo entro 2 ore]] ne servono il 25% in più. Ognuno che manca toglie 10 punti alla [[qualita_cs|qualità del servizio]]. Si assumono e si licenziano dalla finestra [[customer_service|Customer service]] o da quella del [[personale]], come gli altri mestieri. Costano 24.000 € lordi l'anno.`);
 wk('richieste_clienti','cli','Richieste dei clienti',`Ogni cliente, ogni tanto, ha un problema enorme che a guardarlo bene è una sciocchezza. Il customer service lo sistema da solo, oppure decidi tu.`,
-`Ogni cliente fa in media una richiesta ogni 7-8 mesi. Hanno un ritmo tutto loro: non tolgono spazio agli altri [[eventi]].
+`Ogni cliente fa in media una richiesta ogni 7-8 mesi. Hanno un ritmo tutto loro: non tolgono spazio agli altri [[eventi]]. Metà sono drammi (qui sotto), un quarto [[picco|picchi di consegna]] e un quarto richieste di [[overstock]].
 
-Le piccole le sistema il [[customer_service|customer service]] da solo: la probabilità è la [[qualita_cs|qualità del servizio]] (con 70, sette volte su dieci). Il cliente è contento: [[soddisfazione]] +2, e te lo dice una notifica tra le varie.
+I drammi piccoli li sistema il [[customer_service|customer service]] da solo: la probabilità è la [[qualita_cs|qualità del servizio]] (con 70, sette volte su dieci). Il cliente è contento: [[soddisfazione]] +2, e te lo dice una notifica tra le varie.
 
 Le altre arrivano come tessera gialla nella colonna delle [[notifiche]], al massimo una ogni 12 giorni e mai insieme a un altro evento. Le risposte possibili:
 • **mandare il manager di persona**: soddisfazione +3, ma per una settimana il magazzino ha [[puntualita]] −1;
 • **una mail educata**: prova di Precisione di chi guida il customer service (50% con 10, ±5% per punto, tra 15% e 90%): +1 se va bene, −4 se va male;
 • **il CEO chiama il titolare**: prova di Negoziazione del CEO: +4 se va bene, −3 se va male. Con i talenti Cena col buyer, Conosce tutti al bar, Re del karaoke o Voce da call center va sempre bene.
 
-Se nessuno risponde per 30 giorni, il cliente si arrabbia da solo: soddisfazione −4. Con il talento Promette tutto le risposte che vanno male costano il doppio.`);
+Se nessuno risponde per 30 giorni, il cliente si arrabbia da solo: soddisfazione −4 per un dramma, −3 per un picco o un overstock. Con il talento Promette tutto le risposte che vanno male costano il doppio.`);
 wk('clienti','cli','Clienti',`Le aziende che ti affidano la merce: pagano per i posti occupati, i movimenti e le consegne.`,
 `Ogni cliente ha un volume (posti pallet occupati e pallet consegnati al mese), delle [[soglie]] di servizio, una [[zona]] di distribuzione e un modo di farti arrivare la merce ([[ritiro]] o consegna). È servito da un solo [[magazzino]].
 
@@ -2613,7 +2642,7 @@ function newGame(ceoId,coName,color,custom,co){
   const C=custom||CEOS.find(c=>c.id===ceoId); if(custom) ceoId='custom';
   if(!HUM||S===HUM){UI.mq=[]; UI.auto=null;}  // nuova partita: niente finestre rimaste in coda dalla precedente
   S={v:1,day:0,speed:0,ceoId,custom:custom||null,company:{name:coName||C.company,color,logo:(co&&co.logo)||'camion',claim:(co&&co.claim)||''},cash:C.cash,rep:C.rep,fuel:0.86,
-     warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0,cs:0},cs:{resp:null,q:[],last:-99,log:[]},managers:MANAGERS.map(newPerson),boss:{...JSON.parse(JSON.stringify(C)),bd:bdOf(C.age,hashN(C.name)),since:0,log:[]},alumni:[],
+     warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0,cs:0},cs:{resp:null,q:[],last:-99,log:[],ov:[]},managers:MANAGERS.map(newPerson),boss:{...JSON.parse(JSON.stringify(C)),bd:bdOf(C.age,hashN(C.name)),since:0,log:[]},alumni:[],
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextEvent:25,project:null,seen:{},over:false,uid:1,
      execs:EXECS.map(newPerson),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false,hist:[],tw:{win:0,lose:0,skip:0},pol:{},notes:[],noteId:0};
   const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,capo:0,autB:0,autCE:1,imp:1,fm:0};
@@ -2648,7 +2677,7 @@ function addWarehouse(site,own,fixed,motrici){
 const ceo=()=>S.boss;  // il CEO in carica: all'inizio quello scelto, dopo la pensione il suo successore
 const ceoImg=C=>IMG[C.img||C.id];
 const whById=id=>S.warehouses.find(w=>w.id===id);
-const clientRev=c=>{const w=S&&whById(c.wh); const t=w?clientLog(c,w):{oKm:240,in:0,iKm:0}; const pm=palOf(c); return (c.stock*T_ST+2*pm*T_MO+pm*(18+0.05*t.oKm)*chAvg(c,'price')+t.in*t.iKm*1.5)*c.mult*rankOf(c).rev;};
+const clientRev=c=>{const w=S&&whById(c.wh); const t=w?clientLog(c,w):{oKm:240,in:0,iKm:0}; const pm=palOf(c); return (c.stock*T_ST+2*pm*T_MO+pm*(18+0.05*t.oKm)*chAvg(c,'price')+t.in*t.iKm*1.5)*c.mult*rankOf(c).rev*(peakOn(c)&&c.peak.sup?1+c.peak.sup*(c.peak.mul-1)/c.peak.mul:1);};   // supplemento solo sui pallet in più del picco
 // rubriche del giornale, ricavate dal titolo: [filtro, etichetta, colore]
 const NEWS_F=[['all','Tutte'],['gare','Gare'],['cli','Clienti'],['az','Azienda'],['cro','Cronaca']];
 function newsTag(n){const t=n.title, gz=n.src==='La Gazzetta del Muletto';
@@ -2898,7 +2927,7 @@ const CS={free:3,per:4,ceo:-10,miss:-10,every:225,gap:12,wait:30,hi:70,lo:35};
 const OFFICE=['plan','cs'];   // mestieri della sede: non stanno in un magazzino
 const CS_CALL=['Cena col buyer','Conosce tutti al bar','Re del karaoke','Voce da call center'];   // con questi talenti la telefonata del CEO va sempre bene
 const csAct=()=>S.clients.filter(c=>c.status==='attivo');
-function csNeed(){const n=csAct().length; return n<=CS.free?0:Math.ceil((n-CS.free)/CS.per);}
+function csNeed(){const n=csAct().length; return n<=CS.free?0:Math.ceil((n-CS.free)/CS.per*polMul('csNeed'));}
 function csLoad(){const n=csNeed(); return n<=0?0:(S.office.cs>0?n/S.office.cs:9);}
 const csPers=()=>{const id=S.cs&&S.cs.resp; return id&&S.managers.find(m=>m.id===id&&m.hired)||null;};
 const csWho=()=>csPers()||ceo();
@@ -2908,6 +2937,8 @@ const csBad=()=>Math.max(1,csTal('bad'));
 function csQual(){ const p=csWho(), n=nm1(p), L=[['Base',50],['Negoziazione di '+n,2*(p.st.neg-10)],['Precisione di '+n,1.5*(p.st.prec-10)]];
   if(!csPers()) L.push(['Se ne occupa il CEO, tra mille altre cose',CS.ceo]);
   const t=csTal('q'); if(t) L.push(['Talenti di '+n,t]);
+  if(R('portale')) L.push(['Portale clienti',10]);
+  const pq=polSum('csq'); if(pq) L.push(['Policy aziendali',pq]);
   const em=S.mods.filter(m=>m.until>S.day&&m.csq).reduce((a,m)=>a+m.csq,0); if(em) L.push(['Eventi',em]);
   const miss=Math.max(0,csNeed()-S.office.cs); if(miss) L.push([miss===1?'1 addetto mancante':miss+' addetti mancanti',CS.miss*miss]);
   return {v:clamp(Math.round(L.reduce((a,x)=>a+x[1],0)),0,100),parts:L}; }
@@ -2920,21 +2951,76 @@ function csLog(c,n,ok,how){ const L=S.cs.log=S.cs.log||[]; L.unshift({d:S.day,c:
 // Dopo 30 giorni senza risposta il cliente si arrabbia da solo. Le aziende avversarie non hanno la coda: va male e basta.
 function csDaily(){
   const q=csQ();
-  csAct().forEach(c=>{ if(c.exit||Math.random()>=1/CS.every) return;
+  csAct().forEach(c=>{ peakDaily(c); if(c.exit||Math.random()>=1/CS.every) return;
+    // metà sono drammi, un quarto picchi di consegna, un quarto richieste di overstock
+    const r=Math.random();
+    if(r>=0.5&&r<0.75&&!c.peak){ csPeakReq(c); return; }
+    if(r>=0.75&&!S.cs.ov.some(o=>o.c===c.id)){ csOvReq(c); return; }
     const i=Math.floor(Math.random()*DRAMMI.length), D=DRAMMI[i];
     if(Math.random()<q/100){ c.sat=clamp(c.sat+2,0,100); csLog(c,D.n,true,'auto'); noteVar('cs',`${c.name}: «${D.n}», sistemato dal customer service`); return; }
     if(S.bot){ c.sat=clamp(c.sat-3*csBad(),0,100); csLog(c,D.n,false,'auto'); return; }
     if(!S.cs.q.some(x=>x.c===c.id)) S.cs.q.push({c:c.id,v:i,day:S.day});
   });
+  ovDaily();
   if(S.bot) return;
   S.cs.q=S.cs.q.filter(x=>{ const c=S.clients.find(y=>y.id===x.c); if(!c||c.status!=='attivo') return false;
     if(S.day-x.day<=CS.wait) return true;
-    const d=4*csBad(); c.sat=clamp(c.sat-d,0,100); csLog(c,DRAMMI[x.v].n,false,'nessuno');
-    noteVar('cs',`${c.name}: nessuno ha risposto al reclamo, soddisfazione −${d}`); return false; });
-  if(S.cs.q.length&&!S.over&&S.day-S.cs.last>=CS.gap&&!evBusy()){ const x=S.cs.q.shift(); S.cs.last=S.day; csEvent(x); }
+    if(x.k==='proroga'){ const o=S.cs.ov.find(y=>y.id===x.ov); if(o) ovEnd(o,'nessuno ha risposto alla richiesta di proroga'); return false; }
+    const d=x.k==='picco'||x.k==='over'?3:4*csBad(); c.sat=clamp(c.sat-d,0,100); csLog(c,x.k==='picco'?'picco di consegne':x.k==='over'?'overstock':DRAMMI[x.v].n,false,'nessuno');
+    noteVar('cs',`${c.name}: nessuno ha risposto ${x.k==='picco'||x.k==='over'?'alla richiesta':'al reclamo'}, soddisfazione −${d}`); return false; });
+  if(S.cs.q.length&&!S.over&&S.day-S.cs.last>=CS.gap&&!evBusy()){ const x=S.cs.q.shift(); if(csEvent(x)) S.cs.last=S.day; }
 }
-function csEvent(x){ const base=EVENTS.find(e=>e.id==='cs_dramma'), c=S.clients.find(y=>y.id===x.c); if(!base||!c) return;
-  const ev={...base,c,v:x.v}; base.restore(ev); showEvent(ev); }
+const CS_EV={dramma:'cs_dramma',picco:'cs_picco',over:'cs_over',proroga:'cs_proroga'};
+// prepara l'evento giallo di una richiesta in coda: i numeri (picco, overstock, proroga) si decidono adesso e si salvano con l'evento
+function csEvent(x){ const base=EVENTS.find(e=>e.id===CS_EV[x.k||'dramma']), c=S.clients.find(y=>y.id===x.c); if(!base||!c) return false;
+  const ev={...base,c};
+  if(base.id==='cs_dramma') ev.v=x.v;
+  else if(base.id==='cs_picco'){ const p=peakNew(c); ev.mul=p.mul; ev.wks=p.wks; ev.from=S.day+p.pre; }
+  else if(base.id==='cs_over'){ const p=ovNew(c); ev.n=p.n; ev.tar=p.tar; ev.mon=p.mon; ev.cand=ovCands(c,p.n);
+    if(!ev.cand){ c.sat=clamp(c.sat-2,0,100); csLog(c,`overstock di ${n0(p.n)} posti`,false,'pieno');
+      noteVar('cs',`${c.name} cercava ${n0(p.n)} posti di overstock in ${zoneName(c.zone)}: nessun magazzino abbastanza vicino e libero (soddisfazione −2)`); return false; } }
+  else { const o=S.cs.ov.find(y=>y.id===x.ov); if(!o) return false; ev.ov=o.id; ev.ext=2+Math.floor(Math.random()*3); }
+  base.restore(ev); showEvent(ev); return true; }
+// picchi di consegna: ×1,5-2 (fino a ×2,5 per chi vende molto in GDO o online), 2-4 settimane, con 1-2 settimane di preavviso
+function peakNew(c){ const hi=chMix(c).some(x=>(x.id==='gdo'||x.id==='ecom')&&x.s>=0.3);
+  return {mul:Math.round(rnd(1.5,hi?2.5:2)*10)/10,wks:2+Math.floor(Math.random()*3),pre:7+Math.floor(Math.random()*8)}; }
+function peakSet(c,from,wks,mul,sup,full){ c.peak={from,to:from+wks*7,mul,sup:sup||0,full:full?1:0,ok:0,n:0}; }
+// ogni giorno: inizio, KPI durante il picco e fine (con il premio se puntualità e accuratezza hanno retto almeno 8 giorni su 10)
+function peakDaily(c){ const p=c.peak; if(!p) return;
+  if(S.day===p.from) noteVar('cs',`${c.name}: comincia il picco, pallet ×${f1(p.mul)} fino al ${shortDate(p.to)}`);
+  if(S.day>=p.from&&S.day<p.to){ const w=whById(c.wh), k=w&&w.kpi; if(k){ p.n++; if(k.P>=c.sP&&(!c.sA||k.A>=c.sA)) p.ok++; } }
+  if(S.day>=p.to){ const good=p.full&&p.n&&p.ok/p.n>=0.8; if(good) c.sat=clamp(c.sat+5,0,100);
+    noteVar('cs',`${c.name}: finito il picco${good?', KPI rispettati: soddisfazione +5':''}`); c.peak=null; } }
+function csPeakReq(c){ if(!S.bot){ if(!S.cs.q.some(x=>x.c===c.id)) S.cs.q.push({c:c.id,k:'picco',day:S.day}); return; }
+  const p=peakNew(c); peakSet(c,S.day+p.pre,p.wks,p.mul,0,1); csLog(c,`picco ×${f1(p.mul)}`,true,'tutto'); }
+// overstock: il cliente parcheggia dei pallet per qualche mese in una zona precisa; tariffa più bassa se il magazzino è lontano
+const OV={min:80,tar:[7,9],mon:[2,6],near:50,far:[100,200],cut:[0.85,0.65],refuse:0.3,ext:0.35};
+const ovOf=w=>((S.cs&&S.cs.ov)||[]).filter(o=>o.wh===w.id);
+function ovNew(c){ return {n:Math.max(OV.min,Math.round(c.stock*rnd(0.2,0.6)/10)*10),tar:Math.round(rnd(...OV.tar)*10)/10,mon:OV.mon[0]+Math.floor(Math.random()*(OV.mon[1]-OV.mon[0]+1))}; }
+// km su strada dal magazzino al capoluogo più vicino della zona richiesta e condizioni: fattore della tariffa e possibilità che il cliente rifiuti
+function ovTerms(w,zone){ const s=SITES[w.site], z=ZONES[zone]||ZONES.nordovest;
+  const km=Math.round(Math.min(...z.cities.map(n=>{const x=CITIES.find(y=>y[0]===n); return x?distKm(s.lon,s.lat,x[1],x[2]):999;}))*1.3);
+  return km<=OV.near?{km,f:1,r:0}:km<=OV.far[0]?{km,f:OV.cut[0],r:0}:km<=OV.far[1]?{km,f:OV.cut[1],r:OV.refuse}:null; }
+const ovLab=km=>km<=OV.near?'Nella zona richiesta':km<=OV.far[0]?`Fuori zona, a ${km} km`:`Lontano, a ${km} km`;
+const ovFree=w=>capOf(w)-computeWH(w).stock;
+// magazzini da proporre (liberi almeno per metà dei pallet, entro 200 km), in una stringa che si salva con l'evento: id:fattore:rifiuto:km:ci sta tutto
+function ovCands(c,n){ const neg=1+clamp(0.01*(csWho().st.neg-10),-0.1,0.1);
+  return S.warehouses.map(w=>{ const t=ovTerms(w,c.zone), fr=ovFree(w); return t&&fr>=n/2?[w.id,Math.round(t.f*neg*100)/100,t.r,t.km,fr>=n?1:0].join(':'):null; }).filter(Boolean).join('|'); }
+const ovParse=s=>(s||'').split('|').filter(Boolean).map(x=>{const [wh,f,r,km,full]=x.split(':'); return {wh,f:+f,r:+r,km:+km,full:full==='1'};}).sort((a,b)=>b.f-a.f||a.km-b.km);
+function ovStart(c,w,n,tar,mon){ const o={id:`ov${S.day}_${c.id}`,c:c.id,cn:c.name,wh:w.id,n,tar,from:S.day,to:S.day+mon*30}; S.cs.ov.push(o);
+  const h=2*n*T_MO; S.cash+=h; S.cur.ric+=h; return o; }   // la movimentazione in entrata e in uscita si incassa subito
+function ovEnd(o,why){ S.cs.ov=S.cs.ov.filter(x=>x!==o); const w=whById(o.wh);
+  noteVar('cs',`${o.cn} riprende i ${n0(o.n)} pallet di overstock${w?' da '+w.name:''}${why?': '+why:''}`); }
+function ovDaily(){ S.cs.ov.slice().forEach(o=>{ const c=S.clients.find(x=>x.id===o.c);
+  if(!c||c.status!=='attivo'||!whById(o.wh)){ ovEnd(o,'il contratto è finito'); return; }
+  if(o.ask&&S.day>o.to+60) o.ask=false;   // una richiesta di proroga rimasta senza risposta
+  if(S.day<o.to||o.ask) return;
+  if(Math.random()<OV.ext){ if(S.bot) o.to+=30*(2+Math.floor(Math.random()*3)); else { o.ask=true; S.cs.q.push({c:c.id,k:'proroga',ov:o.id,day:S.day}); } return; }
+  ovEnd(o); }); }
+function csOvReq(c){ if(!S.bot){ if(!S.cs.q.some(x=>x.c===c.id)) S.cs.q.push({c:c.id,k:'over',day:S.day}); return; }
+  const p=ovNew(c), x=ovParse(ovCands(c,p.n)).find(x=>{const w=whById(x.wh); return x.full&&!x.r&&(computeWH(w).stock+p.n)/capOf(w)<=0.85;});
+  if(x){ ovStart(c,whById(x.wh),p.n,Math.round(p.tar*x.f*100)/100,p.mon); csLog(c,`overstock di ${n0(p.n)} posti`,true,'magazzino'); }
+  else { c.sat=clamp(c.sat-5,0,100); csLog(c,`overstock di ${n0(p.n)} posti`,false,'rifiuto'); } }
 // a fine mese: chi risponde anche alle 23 prima o poi si esaurisce
 function csMonth(){ if(!csTal('burn')||Math.random()>=1/30) return; const p=csWho();
   if(p.tal.includes('Esaurito')||!gainTal(p,'Esaurito','Troppe mail a mezzanotte')) return;
@@ -2966,7 +3052,7 @@ function satMezzi(wh,act,m,needImp,mixF){
 }
 function computeWH(wh,extra){
   const act=S.clients.filter(c=>c.wh===wh.id&&c.status==='attivo'); if(extra) act.push(extra);
-  const stock=act.reduce((a,c)=>a+c.stock,0), cons=act.reduce((a,c)=>a+palOf(c),0), mov=2*cons;
+  const ov=ovOf(wh), stock=act.reduce((a,c)=>a+c.stock,0)+ov.reduce((a,o)=>a+o.n,0), cons=act.reduce((a,c)=>a+palOf(c),0), mov=2*cons;   // l'overstock occupa posti ma non si muove
   // mix dei canali del magazzino, pesato sui pallet
   const chW=k=>cons?act.reduce((a,c)=>a+palOf(c)*chAvg(c,k),0)/cons:(k==='sat'||k==='pick'?1:0);
   const mixF=chW('sat'), pickF=chW('pick');
@@ -3016,7 +3102,7 @@ function computeWH(wh,extra){
     ['Magazzinieri insufficienti',-20*Math.max(0,uPick-1)],['Carrellisti insufficienti',-20*Math.max(0,uCar-1)],['Capiturno insufficienti',-4*capoShort],['Facchini in cooperativa',wh.coop?COOP.mor*fireMul(wh):0],
     ['Autisti insufficienti',-20*Math.max(0,Math.max(uB,uCE)-1)],['Personale che non sta dietro all\'obiettivo di carico',-0.5*sm.short]].filter((x,i)=>i===0||Math.abs(x[1])>0.05);
   const morT=clamp(pM.reduce((a,x)=>a+x[1],0),0,100);
-  const rev=act.reduce((a,c)=>a+clientRev(c),0)*(1+trSum(wh,'rev'));
+  const rev=act.reduce((a,c)=>a+clientRev(c),0)*(1+trSum(wh,'rev'))+ov.reduce((a,o)=>a+o.n*o.tar,0);
   const pers=ROLES.reduce((a,r)=>a+(st[r]||0)*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12*(1+polSum('pers'))+((st.autB||0)*RAL.autB+(st.autCE||0)*RAL.autCE)*COEF/12*trSum(wh,'drv')+['pick','car','capo'].reduce((a,r)=>a+(st[r]||0)*RAL[r]*(isCoop(wh,r)?COOP.cost:1),0)*COEF/12*trSum(wh,'wpers');
   // bilici: gasolio, manutenzione e pedaggi; furgoni: consumano e costano meno, sempre in leasing
   const kmM=giri*(1-trSum(wh,'km'));
@@ -3327,7 +3413,7 @@ function gameOver(){
 const BOT_STYLE={
  standard:{n:'Standard',d:'Equilibrato: prezzi giusti, un po\' di tutto nella ricerca, apre magazzini quando i conti tornano.',mult:0.99,keep:0.11,tech:['gestionale','barcode','commerciale','gps','wms','freddo','edi','formazione','rotte','controllo','kam','marketing','iso','accordi','ecom','direzione']},
  prezzo:{n:'Prezzo',d:'Offerte al ribasso per vincere tante gare, poca tecnologia.',mult:0.95,keep:0.08,tech:['gestionale','gps','commerciale','rotte','barcode','regolamento','controllo','freddo','wms','hr','edi','marketing','kam','sinergia']},
- qualita:{n:'Qualità',d:'Prezzi pieni, KPI alti e tecnologie: punta ai clienti esigenti.',mult:1.02,keep:0.14,tech:['barcode','formazione','gestionale','wms','freddo','commerciale','edi','gps','iso','rf','controllo','kam','ptl','accordi','ecom']},
+ qualita:{n:'Qualità',d:'Prezzi pieni, KPI alti e tecnologie: punta ai clienti esigenti.',mult:1.02,keep:0.14,tech:['barcode','formazione','gestionale','wms','freddo','commerciale','edi','gps','iso','rf','controllo','kam','portale','ptl','accordi','ecom']},
  espansione:{n:'Espansione',d:'Apre magazzini e chiede prestiti: cresce in fretta, ma rischia di più.',mult:0.97,keep:0.1,grow:true,tech:['commerciale','gestionale','gps','freddo','barcode','marketing','edi','wms','rotte','kam','accordi','ecom','direzione']}
 };
 // fire: quando licenzia chi resta senza lavoro. lo = carico del reparto sotto cui licenzia (oggi e fra un mese), to = carico massimo dopo il taglio,
@@ -3544,6 +3630,15 @@ const DRAMMI=[
  {n:'la conferma via fax',t:'vuole la conferma via fax',x:'Il cliente chiede la conferma di ogni consegna via fax, «come da procedura». In ufficio nessuno vede un fax dai tempi della lira. Qualcuno ricorda che ce n\'è uno in cantina, sotto il presepe.'}
 ];
 const csHas=n=>(csWho().tal||[]).includes(n);
+const PEAK_WHY=['una promozione sottocosto','il lancio di un prodotto nuovo','una campagna in televisione','il volantino delle feste','una svendita di fine stagione','un concorso a premi'];
+const OV_WHY=['merce comprata in anticipo, prima dell\'aumento dei prezzi','un loro magazzino in ristrutturazione','una produzione partita troppo presto','un container arrivato con due mesi di anticipo','una linea di prodotti che non si vende'];
+const ovById=id=>(S.cs.ov||[]).find(o=>o.id===id);
+// risposta a una richiesta di overstock: lo spazio si ricontrolla oggi, il cliente lontano può rinunciare
+function ovAccept(ev,x,n,dSat){ const c=ev.c, w=whById(x.wh); if(!c) return; const lab=`overstock di ${n0(n)} posti`;
+  if(!w||ovFree(w)<n){ c.sat=clamp(c.sat-2,0,100); csLog(c,lab,false,'pieno'); toast('Nel frattempo il magazzino si è riempito: il cliente trova posto altrove (soddisfazione −2).','bad'); return; }
+  if(x.r&&Math.random()<x.r){ csLog(c,lab,false,'lontano'); toast(`${w.name} è troppo lontano per il cliente: rinuncia e cerca un altro logistico.`,'warn'); return; }
+  const t=Math.round(ev.tar*x.f*100)/100; ovStart(c,w,n,t,ev.mon); c.sat=clamp(c.sat+(dSat!=null?dSat:x.km<=OV.near?3:1),0,100); csLog(c,lab,true,'magazzino');
+  toast(`${n0(n)} pallet di ${c.name} a ${w.name} per ${ev.mon} mesi, a ${eur2(t)} a posto.`,'ok'); }
 const EVENTS=[
  // dopo un licenziamento (non della cooperativa): chi è stato mandato via fa causa e chiede di tornare
  {id:'impugna',src:'Ufficio del personale',title:'Licenziamento impugnato',
@@ -3952,6 +4047,56 @@ const EVENTS=[
           r:'La telefonata è durata venti minuti, quindici dei quali sul campionato.',
           f:function(){ if(!this.c) return; const B=ceo(), sure=B.tal.some(n=>CS_CALL.includes(n)), ok=sure||Math.random()<csOdds(B.st.neg), d=ok?4:-3; this.c.sat=clamp(this.c.sat+d,0,100); csLog(this.c,DRAMMI[this.v].n,ok,'ceo');
             toast(ok?`${sure?'Il tuo talento fa il resto: ':''}il titolare ride, si scusa per il tono della mail e ti invita a pranzo (soddisfazione +4).`:'Il titolare era in riunione: ti ha richiamato il suo vice, che non sapeva niente (soddisfazione −3).',ok?'ok':'bad'); }}]},
+ {id:'cs_picco',cs:true,col:'yellow',ic:'customer',src:'Customer service',title:'Picco di consegne',auto:2,cond:()=>false,
+  text:'Un cliente annuncia un picco di consegne.',
+  restore:ev=>{ const c=ev.c, nm=c?c.name:'Un cliente', ex=c?Math.round(c.pal*(ev.mul-1)):0, why=PEAK_WHY[Math.round(ev.mul*10+ev.wks)%PEAK_WHY.length];
+    ev.title=`${nm}: picco di consegne in arrivo`;
+    ev.text=`Il buyer di ${nm} annuncia ${why}: dal ${shortDate(ev.from)}, per ${ev.wks} settimane, i pallet da consegnare saliranno a ×${f1(ev.mul)}, circa ${n0(ex)} in più al mese. Vuole sapere oggi se ce la fate.`; },
+  opts:[{t:'Accetto tutto',d:'Dici di sì a tutto. Per qualche settimana servirà gente in più: conviene muoversi subito con le assunzioni.',e:'Tutti i pallet in più, con ricavi pieni; se puntualità e accuratezza restano sopra soglia per il picco, alla fine soddisfazione +5',
+          r:'Il buyer ha risposto con un pollice alzato e tre punti esclamativi. In magazzino qualcuno ha già iniziato a spostare le scaffalature.',
+          f:function(){ if(!this.c) return; peakSet(this.c,this.from,this.wks,this.mul,0,1); csLog(this.c,`picco ×${f1(this.mul)}`,true,'tutto'); }},
+        {t:'Accetto con un supplemento',d:'Sì, ma i pallet in più costano di più: straordinari e agenzia non si pagano da soli. Il buyer storce il naso.',e:'Prova di Negoziazione di chi guida il customer service: i pallet in più si pagano dal 15 al 30% in più; se va male paga lo stesso, ma soddisfazione −3',
+          req:()=>!polOn('cliente'),reqT:'Policy «Il cliente ha sempre ragione» spenta',
+          r:'La trattativa è durata una mattina intera, tra fogli di calcolo e caffè ristretti.',
+          f:function(){ if(!this.c) return; const ok=Math.random()<csOdds(csWho().st.neg), sup=Math.round(rnd(0.15,0.3)*100)/100;
+            peakSet(this.c,this.from,this.wks,this.mul,sup,1); if(!ok) this.c.sat=clamp(this.c.sat-3,0,100); csLog(this.c,`picco ×${f1(this.mul)}`,ok,'supplemento');
+            toast(ok?`Il buyer accetta: i pallet in più si pagano il ${Math.round(sup*100)}% in più.`:`Il buyer paga il ${Math.round(sup*100)}% in più, ma se la lega al dito (soddisfazione −3).`,ok?'ok':'warn'); }},
+        {t:'Accetto la metà',d:'Prendi solo una parte del picco: il resto lo darà a qualcun altro, magari a un concorrente.',e:'Metà dei pallet in più, soddisfazione −2',
+          r:'Il buyer ha detto «capisco» e ha chiamato subito un altro logistico per il resto.',
+          f:function(){ if(!this.c) return; peakSet(this.c,this.from,this.wks,1+(this.mul-1)/2,0,0); this.c.sat=clamp(this.c.sat-2,0,100); csLog(this.c,`picco ×${f1(this.mul)}`,true,'meta'); }},
+        {t:'Rifiuto',d:'Con il personale di oggi non si può. Meglio dirlo subito che sbagliare dopo.',e:'Soddisfazione −8',req:()=>!polOn('cliente'),reqT:'Policy «Il cliente ha sempre ragione» spenta',
+          r:'Il buyer ha chiuso la telefonata senza salutare. La promozione la farà lo stesso, con qualcun altro.',
+          f:function(){ if(!this.c) return; this.c.sat=clamp(this.c.sat-8,0,100); csLog(this.c,`picco ×${f1(this.mul)}`,false,'rifiuto'); }}]},
+ {id:'cs_over',cs:true,col:'yellow',ic:'customer',src:'Customer service',title:'Richiesta di overstock',cond:()=>false,opts:[],
+  text:'Un cliente chiede di tenere dei pallet in più per qualche mese.',
+  restore:ev=>{ const c=ev.c, nm=c?c.name:'Un cliente', why=OV_WHY[ev.n%OV_WHY.length], C=ovParse(ev.cand), full=C.filter(x=>x.full).slice(0,3), half=C[0], mon=ev.mon, n=ev.n;
+    ev.title=`${nm}: ci tenete ${n0(n)} pallet?`;
+    ev.text=`${nm} deve parcheggiare ${n0(n)} pallet per ${mon} mesi (${why}) e li vuole in ${c?zoneName(c.zone):'zona'}. Offre ${eur2(ev.tar)} a posto al mese, più la movimentazione in entrata e in uscita. Puoi proporre uno dei tuoi magazzini.`;
+    const occ=(w,add)=>Math.round((computeWH(w).stock+add)/capOf(w)*100)+'%';
+    const O=full.map(x=>{ const w=whById(x.wh), t=Math.round(ev.tar*x.f*100)/100; return w?{t:`Proponi ${w.name}`,
+      d:`${ovLab(x.km)}. ${eur2(t)} a posto al mese: circa ${eur(n*t*mon+2*n*T_MO)} in ${mon} mesi. Quei posti restano occupati fino alla fine.`,
+      e:`${x.r?'3 volte su 10 il cliente rinuncia perché è troppo lontano. ':''}Occupazione di ${w.name} dal ${occ(w,0)} al ${occ(w,n)}; soddisfazione +${x.km<=OV.near?3:1}`,
+      r:'Il cliente ha mandato la conferma con l\'elenco dei pallet: tutti uguali, tutti senza etichetta.',
+      f:function(){ ovAccept(this,x,n); }}:null; }).filter(Boolean);
+    if(half&&whById(half.wh)) O.push({t:`Solo metà: ${n0(n/2)} posti a ${whById(half.wh).name}`,d:'Prendi metà dei pallet: per il resto il cliente si arrangia con un altro magazzino.',e:'Soddisfazione −2, metà dell\'incasso',
+      r:'Il cliente ha accettato a metà, con il tono di chi dovrà fare altre telefonate.',f:function(){ ovAccept(this,half,n/2,-2); }});
+    O.push({t:'Rifiuta',d:'Lo spazio ti serve per le gare. Glielo dici con gentilezza, ma glielo dici.',e:'Soddisfazione −5',req:full.length?()=>!polOn('cliente'):null,reqT:'Policy «Il cliente ha sempre ragione» spenta',
+      r:'Il cliente ha risposto «nessun problema». Poi ha messo in copia il suo direttore.',f:function(){ if(!this.c) return; this.c.sat=clamp(this.c.sat-5,0,100); csLog(this.c,`overstock di ${n0(n)} posti`,false,'rifiuto'); }});
+    ev.opts=O; ev.auto=0; }},
+ {id:'cs_proroga',cs:true,col:'yellow',ic:'customer',src:'Customer service',title:'Proroga dell\'overstock',auto:1,cond:()=>false,
+  text:'Il cliente chiede di tenere l\'overstock ancora per qualche mese.',
+  restore:ev=>{ const c=ev.c, o=ovById(ev.ov), w=o&&whById(o.wh), nm=c?c.name:'Un cliente';
+    ev.title=`${nm}: altri ${ev.ext} mesi di overstock?`;
+    ev.text=o?`I ${n0(o.n)} pallet di overstock a ${w?w.name:'magazzino'} dovevano ripartire il ${shortDate(o.to)}. ${nm} chiede altri ${ev.ext} mesi: «Il nostro magazzino non è ancora pronto». Come sempre.`:`${nm} chiede altri ${ev.ext} mesi di overstock.`; },
+  opts:[{t:'Proroga con un aumento del 20%',d:'Va bene, ma la tariffa sale. Chi parcheggia a lungo paga di più.',e:'Prova di Negoziazione di chi guida il customer service: tariffa +20%; se va male resta com\'era e soddisfazione −2',
+          req:()=>!polOn('cliente'),reqT:'Policy «Il cliente ha sempre ragione» spenta',r:'Il cliente ha chiesto due giorni per pensarci, poi ha risposto alle 23:30.',
+          f:function(){ const o=ovById(this.ov); if(!o||!this.c) return; const ok=Math.random()<csOdds(csWho().st.neg); o.to=Math.max(o.to,S.day)+this.ext*30; o.ask=false;
+            if(ok) o.tar=Math.round(o.tar*1.2*100)/100; else this.c.sat=clamp(this.c.sat-2,0,100); csLog(this.c,`proroga di ${this.ext} mesi`,ok,'proroga');
+            toast(ok?`Proroga firmata: ${eur2(o.tar)} a posto al mese.`:'Il cliente accetta la proroga, ma l\'aumento no (soddisfazione −2).',ok?'ok':'warn'); }},
+        {t:'Proroga alle stesse condizioni',d:'Altri mesi, stesso prezzo. Il cliente ringrazia, i tuoi posti restano occupati.',e:'Soddisfazione +2',r:'Il cliente ringrazia e promette che è l\'ultima volta. Lo diceva anche la volta scorsa.',
+          f:function(){ const o=ovById(this.ov); if(!o||!this.c) return; o.to=Math.max(o.to,S.day)+this.ext*30; o.ask=false; this.c.sat=clamp(this.c.sat+2,0,100); csLog(this.c,`proroga di ${this.ext} mesi`,true,'proroga'); }},
+        {t:'Venite a prenderli',d:'Il patto era quello. Si prenota il camion e si libera lo spazio.',e:'I posti si liberano subito, soddisfazione −3',r:'I camion del cliente sono arrivati il giorno dopo, con l\'autista che sbuffava.',
+          f:function(){ const o=ovById(this.ov); if(!this.c) return; if(o) ovEnd(o); this.c.sat=clamp(this.c.sat-3,0,100); csLog(this.c,'fine dell\'overstock',true,'ritiro'); }}]},
  {id:'t_gratta',src:'La Gazzetta del Muletto',title:'Gratta e vinci all\'autogrill',cond:()=>hasTal('Fortunato al gratta e vinci'),
   text:'All\'autogrill di Novara il resto del caffè è un gratta e vinci. Senti un formicolio nelle dita.',
   opts:[{t:'Gratta',d:'Prendi una moneta e gratti, lì al bancone.',e:'Chissà',r:'Hai grattato con una moneta da 20 centesimi, lì al bancone.',f:()=>{const r=Math.random();if(r<0.03){S.cash+=10000;toast('Hai vinto 10.000 €!','ok');}else if(r<0.33){S.cash+=100;toast('Hai vinto 100 €','ok');}else toast('Ritenta, sarai più fortunato','warn');}},
@@ -4359,7 +4504,7 @@ function migrateStaff(s){
 function fillSave(s){
   if(!s.office) s.office={plan:0};
   // customer service (dalla 0.61): addetti in sede e responsabile
-  if(s.office.cs==null) s.office.cs=0; if(!s.cs) s.cs={resp:null,q:[],last:-99,log:[]};
+  if(s.office.cs==null) s.office.cs=0; if(!s.cs) s.cs={resp:null,q:[],last:-99,log:[]}; if(!s.cs.ov) s.cs.ov=[];
   // personaggi che invecchiano (dalla 0.24): il CEO diventa una copia modificabile, tutti hanno un giorno di nascita e arrivano i nuovi candidati
   if(!s.boss){ const C=s.custom||CEOS.find(c=>c.id===s.ceoId); s.boss={...JSON.parse(JSON.stringify(C)),since:0,log:[]}; }
   if(s.boss.bd==null) s.boss.bd=bdOf(s.boss.age,hashN(s.boss.name));
@@ -4885,7 +5030,7 @@ function csRow(){ const n=csNeed(), l=csLoad(), q=S.queue.filter(x=>x.role==='cs
      ${n&&l<9?`<div class="wh-ld"><div class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></div><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b></div>`:`<div class="sm wh-nm">${n?'<span class="bad">nessuno: qualità del servizio in calo</span>':`fino a ${CS.free} clienti basta il responsabile`}</div>`}
      ${q?`<div class="sm wh-inq">+${q} in arrivo</div>`:''}</div>
     <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="cs" ${S.office.cs<=0?'disabled':''} aria-label="Licenzia: addetto al customer service" data-tip="<div class='tt'>Licenzia</div>Un mese di stipendio di buonuscita, reputazione −0,3. Dal 4° licenziamento in 4 settimane è un'ondata: finisce sul giornale.">−</button><b class="num ${l>1.02?'bad':''}">${S.office.cs}</b><button class="btn sm2 pri" data-act="hire" data-role="cs" aria-label="Assumi: addetto al customer service" data-tip="Assumi">+</button></div></div>`; }
-const CS_HOW={auto:'sistemato dal customer service',manager:'è andato il manager',mail:'risposta per mail',ceo:'ha chiamato il CEO',nessuno:'nessuno ha risposto'};
+const CS_HOW={auto:'sistemato dal customer service',manager:'è andato il manager',mail:'risposta per mail',ceo:'ha chiamato il CEO',nessuno:'nessuno ha risposto',tutto:'accettato tutto',supplemento:'con supplemento',meta:'accettato a metà',rifiuto:'rifiutato',magazzino:'accettato',lontano:'troppo lontano, rinuncia',pieno:'nessun magazzino libero',proroga:'prorogato',ritiro:'ritirato'};
 const VIEWS={
  azienda(){
   const C=ceo(), L=S.last;
@@ -5066,7 +5211,8 @@ const VIEWS={
   ${strutturaCard(w,k,staffRow)}
   <div class="card"><div class="row"><span class="h3">${kw('clienti')}</span><span class="sm">${kw('soddisfazione','soddisfazione')}</span></div>
    ${cl.length?cl.map(c=>{const sc=c.sat>=60?'var(--ok)':c.sat>=40?'var(--warn)':'var(--bad)';
-    return `<div class="wh-cl">${logoSvg(c.name,32)}<span class="wh-sm"><b class="wh-nm">${esc(c.name)}</b><span class="sm wh-nm">${c.status==='avvio'?`<span class="pill" style="background:var(--yellow);color:var(--ink)">dal ${shortDate(c.start)}</span> `:''}${n0(c.stock)} posti · ${n0(palOf(c))} pallet/mese</span></span>${c.status==='attivo'?`<span class="wh-sat"><span class="bar"><i style="width:${c.sat}%;background:${sc}"></i></span><b class="num">${Math.round(c.sat)}</b></span>`:''}</div>`;}).join(''):'<div class="sm">Nessun cliente: partecipa alle gare.</div>'}</div>
+    return `<div class="wh-cl">${logoSvg(c.name,32)}<span class="wh-sm"><b class="wh-nm">${esc(c.name)}</b><span class="sm wh-nm">${c.status==='avvio'?`<span class="pill" style="background:var(--yellow);color:var(--ink)">dal ${shortDate(c.start)}</span> `:''}${n0(c.stock)} posti · ${n0(palOf(c))} pallet/mese${c.peak?` <span class="pill" style="background:var(--yellow);color:var(--ink)">${kw('picco','picco')} ×${f1(c.peak.mul)} ${peakOn(c)?'fino al '+shortDate(c.peak.to):'dal '+shortDate(c.peak.from)}</span>`:''}</span></span>${c.status==='attivo'?`<span class="wh-sat"><span class="bar"><i style="width:${c.sat}%;background:${sc}"></i></span><b class="num">${Math.round(c.sat)}</b></span>`:''}</div>`;}).join(''):'<div class="sm">Nessun cliente: partecipa alle gare.</div>'}
+   ${ovOf(w).map(o=>`<div class="wh-cl">${logoSvg(o.cn,32)}<span class="wh-sm"><b class="wh-nm">${esc(o.cn)}</b><span class="sm wh-nm">${kw('overstock','Overstock')}: ${n0(o.n)} posti a ${eur2(o.tar)} fino al ${shortDate(o.to)}</span></span></div>`).join('')}</div>
   <div class="card"><div class="row"><span class="h3">${kw('costi','Conto del mese')}</span></div>
    <div class="wh-money">
     <div><span class="lab">${kw('ricavi','Ricavi')}</span><b class="ok">${eur(k.rev)}</b></div>
@@ -5191,7 +5337,7 @@ const VIEWS={
   const opts=`<option value="" ${m?'':'selected'}>${esc(ceo().name)} (CEO, con una penalità di ${-CS.ceo})</option>`+[...(m?[m]:[]),...free].map(x=>`<option value="${x.id}" ${m===x?'selected':''}>${esc(x.name)} (Negoziazione ${x.st.neg}, Precisione ${x.st.prec})</option>`).join('');
   const csScore=x=>2*x.st.neg+1.5*x.st.prec+((x.tal||[]).reduce((a,t)=>a+(((TALENTS[t]||{}).cs||{}).q||0),0));
   const mk=S.managers.filter(x=>!x.hired&&avail(x)).sort((a,b)=>csScore(b)-csScore(a)).slice(0,3);
-  const cli=c=>S.clients.find(x=>x.id===c);
+  const cli=c=>S.clients.find(x=>x.id===c), PK=act.filter(c=>c.peak), OVL=S.cs.ov||[];
   return `<div class="rp-tiles c4">
     ${rpTile('Qualità del servizio',q,q>=CS.hi?'clienti un po\' più contenti':q<CS.lo?'clienti un po\' più scontenti':'nella media','qualita_cs',qc)}
     ${rpTile('Clienti seguiti',act.length,n?`servono ${n} addett${n===1?'o':'i'}`:'basta il responsabile','customer_service')}
@@ -5204,10 +5350,14 @@ const VIEWS={
    ${rpParts('Qualità del servizio','qualita_cs',Q.parts,q,'',0,100)}
    <div class="card"><div class="row"><span class="h3">Addetti in sede</span><span class="sm">uno ogni ${CS.per} clienti dopo i primi ${CS.free}</span></div>${csRow()}
     <div class="sm">Ognuno che manca toglie ${-CS.miss} punti di qualità. A fine mese la qualità sposta la ${kw('soddisfazione')} di ogni cliente: <b class="${eff>0?'ok':eff<0?'bad':''}">${eff>0?'+':eff<0?'−':''}${Math.abs(eff)}</b> (sopra ${CS.hi} +1, sotto ${CS.lo} −1${csTal('sat')?', più i talenti':''}).</div></div>
-   <div class="card"><div class="row"><span class="h3">${kw('richieste_clienti','Richieste dei clienti')}</span><span class="sm">${L.length?'le più recenti':'ancora nessuna'}</span></div>
-    ${W.map(x=>{const c=cli(x.c); return c?`<div class="pr-q">${logoSvg(c.name,24)}<span class="wh-nm">${esc(c.name)} <span class="sm">${esc(DRAMMI[x.v].n)}</span></span><span class="pill" style="background:var(--yellow);color:var(--ink)">in attesa</span></div>`:'';}).join('')}
+   ${PK.length||OVL.length?`<div class="card cs-l"><div class="row"><span class="h3">In corso</span><span class="sm">${kw('picco','picchi')} e ${kw('overstock')}</span></div>
+    ${PK.map(c=>`<div class="pr-q">${logoSvg(c.name,24)}<span class="wh-nm">${esc(c.name)} <span class="sm">picco ×${f1(c.peak.mul)}${c.peak.sup?`, supplemento ${Math.round(c.peak.sup*100)}%`:''} · ${peakOn(c)?'fino al '+shortDate(c.peak.to):'dal '+shortDate(c.peak.from)}</span></span><span class="pill" style="background:var(--yellow);color:var(--ink)">${peakOn(c)?'in corso':'in arrivo'}</span></div>`).join('')}
+    ${OVL.map(o=>`<div class="pr-q">${logoSvg(o.cn,24)}<span class="wh-nm">${esc(o.cn)} <span class="sm">${n0(o.n)} posti a ${esc((whById(o.wh)||{}).name||'')} · ${eur2(o.tar)} a posto · fino al ${shortDate(o.to)}</span></span><b class="num ok">${eur(o.n*o.tar)}</b></div>`).join('')}
+    <div class="sm">Durante un picco servono più persone: guarda il carico dei reparti nel magazzino. L'overstock occupa posti fino alla scadenza, e il cliente può chiedere una proroga.</div></div>`:''}
+   <div class="card cs-l"><div class="row"><span class="h3">${kw('richieste_clienti','Richieste dei clienti')}</span><span class="sm">${L.length?'le più recenti':'ancora nessuna'}</span></div>
+    ${W.map(x=>{const c=cli(x.c); return c?`<div class="pr-q">${logoSvg(c.name,24)}<span class="wh-nm">${esc(c.name)} <span class="sm">${esc(x.k==='picco'?'picco di consegne':x.k==='over'?'richiesta di overstock':x.k==='proroga'?'proroga dell\'overstock':DRAMMI[x.v].n)}</span></span><span class="pill" style="background:var(--yellow);color:var(--ink)">in attesa</span></div>`:'';}).join('')}
     ${L.map(x=>`<div class="pr-q">${logoSvg(x.c,24)}<span class="wh-nm">${esc(x.c)} <span class="sm">${esc(x.n)} · ${CS_HOW[x.how]||''} · ${shortDate(x.d)}</span></span><span class="pill cl-st ${x.ok?'ok':'bad'}">${x.ok?'Risolto':'Male'}</span></div>`).join('')}
-    <div class="sm">Ogni cliente fa una richiesta ogni 7-8 mesi circa. Il customer service sistema da solo le piccole (più è alta la qualità, più spesso); le altre arrivano come notifica gialla e decidi tu. Dopo ${wks(CS.wait)} senza risposta il cliente si arrabbia da solo.</div></div>
+    <div class="sm">Ogni cliente fa una richiesta ogni 7-8 mesi circa: metà sono drammi, le altre picchi di consegna o overstock. Il customer service sistema da solo i drammi piccoli (più è alta la qualità, più spesso); il resto arriva come notifica gialla e decidi tu. Dopo ${wks(CS.wait)} senza risposta il cliente si arrabbia da solo.</div></div>
    ${mk.length?`<div class="lab">Sul mercato, adatti al customer service</div>${mk.map(x=>personCard(x,null,`<button class="btn pri" data-act="hirecs" data-id="${x.id}">Assumi come responsabile</button>`)).join('')}`:''}`;
  },
  tecnologia(){
@@ -6161,6 +6311,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.62',t:'Picchi di consegna e overstock',x:['I clienti non hanno solo drammi: a volte annunciano un picco di consegne (per 2-4 settimane i pallet salgono da ×1,5 fino a ×2,5) e scegli se accettare tutto, chiedere un supplemento, prenderne metà o rifiutare. Se accetti tutto e i KPI reggono, alla fine il cliente è più contento.','Overstock: un cliente chiede di parcheggiare da 80 pallet in su per qualche mese in una zona precisa. Proponi tu uno dei tuoi magazzini: più è lontano dalla zona, meno paga, e oltre i 100 km può rinunciare. I posti restano occupati fino alla fine, e alla scadenza il cliente può chiedere una proroga.','Picchi e overstock si vedono nella finestra Customer service e in quella del magazzino.','Nuova tecnologia «Portale clienti» nell\'albero Mercato (qualità del servizio +10) e nuova policy «Rispondiamo entro 2 ore» (qualità +8, ma servono più addetti). Con la policy «Il cliente ha sempre ragione» non si rifiutano picchi e overstock e non si chiedono supplementi.']},
  {v:'0.61',t:'Customer service',x:['Nuova finestra «Customer service» nel menu: un responsabile e, dal quarto cliente, gli addetti in sede rispondono ai clienti. Finché non nomini nessuno se ne occupa il CEO, ma con una penalità.','La qualità del servizio dipende da Negoziazione e Precisione di chi guida il reparto, dai suoi talenti e dagli addetti che mancano. Sopra 70 i clienti sono un po\' più contenti ogni mese, sotto 35 un po\' meno.','Ogni tanto un cliente ha un problema enorme che a guardarlo bene è una sciocchezza: il bancale dietro la macchinetta del caffè, l\'etichetta storta, l\'autista che non ha salutato. Il customer service sistema da solo le piccole; le altre arrivano come tessera gialla e scegli tu se mandare il manager, scrivere una mail o chiamare il titolare.','Tre nuovi manager adatti al customer service (Mirella Cattaneo, Gianfranco Lodigiani e, dal 2005, Kevin Sartori) e tre nuovi talenti con i loro eventi: Voce da call center, Risponde anche alle 23, Promette tutto.','Anche le aziende avversarie hanno il loro customer service, con le stesse regole.']},
  {v:'0.60',t:'Ricerche di almeno 3 settimane, tempi in settimane',x:['Ogni ricerca dura almeno 3 settimane, anche con un\'Innovazione altissima. Formazione strutturata, Boccioni d\'acqua, Macchinette del caffè, Sala pausa arredata, Spogliatoi e docce e Lavanderia delle divise ora partono da 3 settimane.','I tempi si leggono in settimane anche nell\'albero delle tecnologie, nel report, negli eventi e nell\'enciclopedia: non più «21 g» ma «3 settimane». Restano in giorni solo le cose che durano meno di una settimana.']},
  {v:'0.59',t:'Barra in alto più ordinata',x:['Il tempo ha una sola velocità: tolto il pulsante x2. Restano pausa e avanti (spazio o il tasto 1); sul telefono il pulsante accanto a «Menu» alterna pausa e avanti.','Il riquadro rosso «In pausa» sta in fondo a destra nella barra in alto, anche sul telefono, oltre alla scritta sulla mappa.','Settimana, data, pulsanti del tempo, opzioni e numeri dell\'azienda sono riquadri della stessa altezza, centrati nella barra; sul computer largo tutto sta su una riga sola.']},
@@ -6493,6 +6644,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>

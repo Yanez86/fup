@@ -497,6 +497,26 @@ async def main():
         await pg.click('#dock [data-id=customer]'); await pg.click('#dock [data-id=customer]')
         assert 'Risolto' in await pg.inner_text('#win-customer'), 'la richiesta non compare tra le recenti'
         await pg.click('#win-customer [data-act=close]')
+        # picco di consegne e overstock: si accettano dalla tessera gialla, il giorno dopo cambiano pallet e posti occupati
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.cardsOff(); S.notes=S.notes.filter(n=>n.k!=='ev'); F.csEvent({c:'cs2',k:'picco',day:S.day});}")
+        await pg.click('#notes .nt.yellow[data-act=note]')
+        assert 'picco di consegne' in await pg.inner_text('#modal'), 'testo del picco mancante'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_customer_picco.png'))
+        await pg.click('#modal [data-act=evopt][data-i="0"]')
+        await pg.evaluate("()=>{const F=window.__FUP;F.S.speed=0;F.step();}")
+        r = await pg.evaluate("()=>{const F=window.__FUP,S=F.S,c=S.clients.find(x=>x.id==='cs2'),p=c.peak,d0=S.day,a=F.computeWH(S.warehouses[0]).cons; S.day=p.from; const b=F.computeWH(S.warehouses[0]).cons; S.day=d0; return {mul:p.mul,full:p.full,a,b};}")
+        assert r['full'] == 1 and r['b'] > r['a'], r
+        st0 = await pg.evaluate("()=>{const F=window.__FUP,S=F.S; S.warehouses[0].cap=20000; F.cardsOff(); document.querySelector('#modal').innerHTML=''; S.notes=S.notes.filter(n=>n.k!=='ev'); F.csEvent({c:'cs3',k:'over',day:S.day}); return F.computeWH(S.warehouses[0]).stock;}")
+        await pg.click('#notes .nt.yellow[data-act=note]')
+        assert 'Proponi' in await pg.inner_text('#modal'), 'overstock: nessun magazzino da proporre'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_customer_overstock.png'))
+        await pg.click('#modal [data-act=evopt][data-i="0"]')
+        await pg.evaluate("()=>{const F=window.__FUP;F.S.speed=0;F.step();}")
+        r = await pg.evaluate("()=>{const F=window.__FUP,S=F.S; return {ov:S.cs.ov.length,st:F.computeWH(S.warehouses[0]).stock,n:(S.cs.ov[0]||{}).n};}")
+        assert r['ov'] == 1 and r['st'] == st0 + r['n'], r
+        await pg.click('#dock [data-id=customer]')
+        assert 'In corso' in await pg.inner_text('#win-customer'), 'picchi e overstock non compaiono nella finestra'
+        await pg.click('#win-customer [data-act=close]')
         # nelle Opzioni si toglie la pausa automatica; senza risposta, dopo due settimane decide il vice
         await pg.click('#top [data-act=options]')
         await pg.click('#modal [data-act=evpause]')
