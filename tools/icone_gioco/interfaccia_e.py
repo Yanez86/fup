@@ -89,3 +89,13 @@ def u_carica():
     r = process(c.rows(), keep='W')
     return ov(r, ['', '', '...SSSSS', '', '...SSSSS', '', '...SSS', ''])
 UI['carica'] = ('Carica da file', u_carica)
+
+# customer service (menu): cornetta del telefono rossa e fumetto con i tre puntini
+MENU = {}
+def m_customer():
+    c = Cv(16)
+    c.rect(5, 1, 14, 7, 'W'); c.set(5, 1, '.'); c.set(14, 1, '.'); c.set(5, 7, '.'); c.set(14, 7, '.'); c.rect(7, 8, 8, 8, 'W')
+    c.rect(1, 8, 4, 10, 'R'); c.rect(1, 11, 3, 13, 'R'); c.rect(2, 13, 7, 14, 'R'); c.rect(6, 12, 9, 13, 'R')
+    r = process(c.rows(), keep='W')
+    return ov(r, ['', '', '', '', '.......K.K.K', ''])
+MENU['customer'] = ('Customer service', m_customer)

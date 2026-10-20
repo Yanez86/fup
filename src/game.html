@@ -159,6 +159,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .xl-dot{width:10px;height:10px;border:2px solid var(--ink);flex:none;background:#c3d0dc}.xl-dot.ok{background:var(--ok)}.xl-dot.warn{background:var(--warn)}.xl-dot.bad{background:var(--bad)}
 .xl-sum{margin-bottom:10px}
 .xl-cli button[aria-pressed="true"]{border-color:#2e9e48;box-shadow:inset 0 -3px 0 #2e9e48;font-weight:700}
+.cs-p{display:flex;gap:10px;align-items:flex-start}.cs-p .rp-pp{flex:1;min-width:0}.cs-p .mport{width:80px;height:94px}
 .rp-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.rp-tiles.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .rp-t{display:flex;flex-direction:column;gap:1px;padding:7px 10px;background:#fff;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2),2px 2px 0 var(--ink);min-width:0}
 .rp-t[data-act]{cursor:pointer}.rp-t[data-act]:hover{background:#fff8dc}
@@ -994,7 +995,7 @@ html,body{overscroll-behavior:none}
 (function(){
 'use strict';
 /* ====================== DATI ====================== */
-const IMG={anon:'{{Q_anonimo}}',fm:'{{Q_facility}}',car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',m_giorgio:'{{Q_giorgio}}',m_aisha:'{{Q_aisha}}',m_ivan:'{{Q_ivan}}',m_sara:'{{Q_sara}}',m_nicola:'{{Q_nicola}}',m_elena:'{{Q_elena}}',m_matteo:'{{Q_matteo}}',m_beatrice:'{{Q_beatrice}}',m_paolo:'{{Q_paolo}}',m_federico:'{{Q_federico}}',m_andrew:'{{Q_andrew}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}'};
+const IMG={anon:'{{Q_anonimo}}',fm:'{{Q_facility}}',car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',cs:'{{Q_operatore}}',m_mirella:'{{Q_mirella}}',m_gianfranco:'{{Q_gianfranco}}',m_kevin:'{{Q_kevin}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',m_giorgio:'{{Q_giorgio}}',m_aisha:'{{Q_aisha}}',m_ivan:'{{Q_ivan}}',m_sara:'{{Q_sara}}',m_nicola:'{{Q_nicola}}',m_elena:'{{Q_elena}}',m_matteo:'{{Q_matteo}}',m_beatrice:'{{Q_beatrice}}',m_paolo:'{{Q_paolo}}',m_federico:'{{Q_federico}}',m_andrew:'{{Q_andrew}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}'};
 const LON0=4.81, LAT1=47.0, KX=78.29*2, KY=111.111*2;
 const pt=(lon,lat)=>[ (lon-LON0)*KX, (LAT1-lat)*KY ];
 const CITIES=[
@@ -1057,7 +1058,11 @@ const MANAGERS=[
  {id:'sara',name:'Sara Bonetti',sx:'f',age:30,from:2010,role:'Ha digitalizzato il magazzino di famiglia, contro il parere di tutta la famiglia',tal:['Ingegnere gestionale','Guru dei social'],st:{op:9,prec:15,neg:9,lead:7,amm:13,inn:15},ral:44000},
  {id:'nicola',name:'Nicola Ferrero',age:38,from:2012,role:'Vent\'anni di freddo: ortofrutta, latticini e celle a −25',tal:['Laureato in agraria','Cuoco provetto'],st:{op:13,prec:14,neg:9,lead:11,amm:8,inn:7},ral:47000},
  {id:'elena',name:'Elena Russo',sx:'f',age:29,from:2015,role:'Due anni in una multinazionale dell\'e-commerce, a contare i secondi',tal:['Master in supply chain','Ansia da prestazione'],st:{op:14,prec:15,neg:6,lead:7,amm:10,inn:13},ral:46000},
- {id:'matteo',name:'Matteo Galli',age:26,from:2018,role:'Ha scritto il WMS del suo ultimo magazzino. In una notte',tal:['Ingegnere informatico','Gatto in ufficio'],st:{op:8,prec:11,neg:5,lead:6,amm:9,inn:19},ral:41000}
+ {id:'matteo',name:'Matteo Galli',age:26,from:2018,role:'Ha scritto il WMS del suo ultimo magazzino. In una notte',tal:['Ingegnere informatico','Gatto in ufficio'],st:{op:8,prec:11,neg:5,lead:6,amm:9,inn:19},ral:41000},
+ // customer service: forti in Negoziazione e Precisione, costano meno dei capi magazzino
+ {id:'mirella',name:'Mirella Cattaneo',sx:'f',age:44,role:'Quindici anni al centralino di un corriere espresso: ha sentito tutte le scuse, due volte',tal:['Voce da call center','Calma olimpica'],st:{op:7,prec:12,neg:15,lead:9,amm:9,inn:6},ral:34000},
+ {id:'gianfranco',name:'Gianfranco Lodigiani',age:55,role:'Trent\'anni a vendere carrelli elevatori: non ha mai detto di no a un cliente',tal:['Promette tutto','Cena col buyer'],st:{op:8,prec:6,neg:17,lead:10,amm:7,inn:5},ral:36000},
+ {id:'kevin',name:'Kevin Sartori',age:27,from:2005,role:'Assistenza clienti di un operatore telefonico: chiudeva i reclami prima che finisse la musichetta',tal:['Risponde anche alle 23','Guru dei social'],st:{op:6,prec:14,neg:12,lead:6,amm:8,inn:12},ral:31000}
 ];
 const EXECS=[
  {id:'ottavio',name:'Ottavio Ferri',age:58,role:'Ex direttore finanziario di una banca di provincia',tal:['Calma olimpica','Braccino corto'],st:{op:8,prec:14,neg:9,lead:8,amm:18,inn:7},ral:85000},
@@ -1373,13 +1378,13 @@ const POL=Object.fromEntries(POLICIES.map(p=>[p.id,p]));
 const POL_TAL={'Ex sindacalista':{want:['zerostra','nocoop'],hate:['sabato']},'Stacanovista':{want:['sabato'],hate:['zerostra','corta']},'Sempre al telefono':{hate:['telefoni']},
  'Excel-dipendente':{want:['spunta']},'Braccino corto':{want:['spending']},'Mano larga':{hate:['spending']},'Cena col buyer':{want:['cliente']},'Insonne':{want:['smart']},
  'Ha fatto il militare':{want:['sicurezza'],hate:['smart']},'Formato sulla sicurezza':{want:['sicurezza']},'Esaurito':{want:['smart'],hate:['sabato']},'Parla con i robot':{hate:['spunta']}};
-const RAL={pick:18000,car:19500,capo:25000,autB:19000,autCE:23000,imp:22000,plan:26000,fm:30000}, COEF=1.42;
+const RAL={pick:18000,car:19500,capo:25000,autB:19000,autCE:23000,imp:22000,plan:26000,cs:24000,fm:30000}, COEF=1.42;
 const ROLES=['pick','car','capo','autB','autCE','imp','fm'];
-const ROLE={pick:'Magazzinieri',car:'Carrellisti',autB:'Autisti patente B',autCE:'Autisti patente CE',imp:'Impiegati di magazzino',capo:'Capiturno',plan:'Pianificatori del traffico',fm:'Facility manager'};
-const ROLE1={pick:'magazziniere',car:'carrellista',autB:'autista con patente B',autCE:'autista con patente CE',imp:'impiegato',capo:'capoturno',plan:'pianificatore del traffico',fm:'facility manager'};
-const ROLE_WK={pick:'magazzinieri',car:'carrellisti',autB:'autisti_b',autCE:'autisti_ce',imp:'impiegati',capo:'capoturno',plan:'pianificatori',fm:'facility'};
-const ROLE_D={pick:'Preparano gli ordini',car:'Scaricano, stoccano e caricano',autB:'Furgoni, consegne in città',autCE:'Bilici e motrici, tratte lunghe',imp:'Bolle, inventari, traffico',capo:'Uno ogni 10 operai',plan:'Giri dei camion, in sede',fm:'Manutenzione e cantieri'};
-const HIRE={pick:{ann:[20,250],age:[6,1000]},car:{ann:[25,300],age:[8,1300]},autB:{ann:[15,250],age:[6,1000]},autCE:{ann:[40,350],age:[16,2000]},imp:{ann:[20,300],age:[7,1200]},capo:{ann:[25,300],age:[8,1300]},plan:{ann:[25,300],age:[8,1300]},fm:{ann:[30,350],age:[10,1500]}};
+const ROLE={pick:'Magazzinieri',car:'Carrellisti',autB:'Autisti patente B',autCE:'Autisti patente CE',imp:'Impiegati di magazzino',capo:'Capiturno',plan:'Pianificatori del traffico',cs:'Addetti al customer service',fm:'Facility manager'};
+const ROLE1={pick:'magazziniere',car:'carrellista',autB:'autista con patente B',autCE:'autista con patente CE',imp:'impiegato',capo:'capoturno',plan:'pianificatore del traffico',cs:'addetto al customer service',fm:'facility manager'};
+const ROLE_WK={pick:'magazzinieri',car:'carrellisti',autB:'autisti_b',autCE:'autisti_ce',imp:'impiegati',capo:'capoturno',plan:'pianificatori',cs:'addetti_cs',fm:'facility'};
+const ROLE_D={pick:'Preparano gli ordini',car:'Scaricano, stoccano e caricano',autB:'Furgoni, consegne in città',autCE:'Bilici e motrici, tratte lunghe',imp:'Bolle, inventari, traffico',capo:'Uno ogni 10 operai',plan:'Giri dei camion, in sede',cs:'Rispondono ai clienti, in sede',fm:'Manutenzione e cantieri'};
+const HIRE={pick:{ann:[20,250],age:[6,1000]},car:{ann:[25,300],age:[8,1300]},autB:{ann:[15,250],age:[6,1000]},autCE:{ann:[40,350],age:[16,2000]},imp:{ann:[20,300],age:[7,1200]},capo:{ann:[25,300],age:[8,1300]},plan:{ann:[25,300],age:[8,1300]},cs:{ann:[20,250],age:[7,1000]},fm:{ann:[30,350],age:[10,1500]}};
 // facchinaggio in cooperativa: magazzinieri e carrellisti costano il 20% in meno, arrivano in 3 giorni e si mandano via gratis, ma lavorano peggio
 const COOP={roles:['pick','car'],cost:0.8,mor:-3,A:-1,days:3};
 const KM_B=4000, KM_CE=6500;
@@ -1490,7 +1495,11 @@ const TALENTS={
  'Pessimista cosmico':{t:'mix',fx:'Amministrazione +2 · Leadership −2',fl:'«Andrà male». Di solito ha ragione, e non sa se esserne contento.'},
  'Pignolo sulle virgole':{t:'mix',fx:'Precisione +3 · Negoziazione −2',fl:'Ha rimandato indietro un contratto da un milione per un punto e virgola.'},
  'Fortunato al gratta e vinci':{t:'pos',fx:'Nessun effetto sulle abilità',fl:'Ha vinto un muletto a una lotteria di paese. Lo usa ancora.'},
- 'Cuore d\'oro':{t:'pos',fx:'Leadership +2 · Amministrazione −1',fl:'Conosce i nomi dei figli di tutti i carrellisti. E i loro problemi con la caldaia.'}
+ 'Cuore d\'oro':{t:'pos',fx:'Leadership +2 · Amministrazione −1',fl:'Conosce i nomi dei figli di tutti i carrellisti. E i loro problemi con la caldaia.'},
+ /* talenti del customer service: contano per chi guida il servizio clienti (il responsabile, o il CEO se non c'è); ognuno ha il suo evento */
+ 'Voce da call center':{t:'pos',cs:{q:8},fx:'Negoziazione +1 · Da responsabile del customer service: qualità del servizio +8',fl:'Dice «la capisco perfettamente» con una voce che calmerebbe un vulcano.'},
+ 'Risponde anche alle 23':{t:'mix',cs:{q:10,burn:1},fx:'Precisione +1 · Da responsabile del customer service: qualità del servizio +10, ma rischia di esaurirsi',fl:'Ha una suoneria diversa per ogni cliente. Di notte le riconosce nel sonno.'},
+ 'Promette tutto':{t:'mix',cs:{sat:1,bad:2},fx:'Negoziazione +2 · Precisione −1 · Da responsabile del customer service: soddisfazione dei clienti +1 al mese, ma le risposte che vanno male costano il doppio',fl:'«Domani mattina? Ma certo!» Poi chiama il magazzino e chiede che giorno è domani.'}
 };
 const TTYPE={pos:['Positivo','#eaf6ec','#6fdc8c'],neg:['Negativo','#fbecec','#ff8a8d'],mix:['Misto','#fff6dc','#ffd23f']};
 const TFRAME={log:{c:'#ff7a3d',bg:'#ffe8d9',bg2:'#ffd6bd',cut:[0,0,0],shape:'Quadrato arancione'},org:{c:'#9b6bff',bg:'#ece3ff',bg2:'#dccdff',cut:[3,2,1],shape:'Ottagono viola'},mkt:{c:'#2e9e48',bg:'#dff3d6',bg2:'#c9e9bd',cut:[5,3,2,1,1],shape:'Tondo verde'},wel:{c:'#e0393e',bg:'#ffe1e1',bg2:'#ffcaca',cut:[2,1],shape:'Quadrato smussato rosso'}};
@@ -1982,7 +1991,9 @@ wk('eventi','basi','Eventi',`Imprevisti con una scelta da fare: meteo, politica,
 
 Il risultato della scelta non arriva subito: passa un giorno, poi una notifica azzurra racconta com'è andata e applica gli effetti. Se nel frattempo salvi ed esci, la scelta resta in sospeso e arriva quando riprendi.
 
-Gli effetti possono essere immediati (soldi, [[reputazione]], [[soddisfazione]]) oppure durare qualche settimana ([[morale]], [[puntualita]], [[accuratezza]]). Lo stesso evento non torna prima di 34 settimane.`);
+Gli effetti possono essere immediati (soldi, [[reputazione]], [[soddisfazione]]) oppure durare qualche settimana ([[morale]], [[puntualita]], [[accuratezza]]). Lo stesso evento non torna prima di 34 settimane.
+
+Le [[richieste_clienti|richieste dei clienti]] hanno un ritmo tutto loro e arrivano come tessere gialle: le gestisce il [[customer_service|customer service]].`);
 wk('salvataggio_online','basi','Salvataggio online',`Entrando con Google o come ospite le partite si salvano anche online e le ritrovi sugli altri dispositivi. Senza accesso restano solo su questo dispositivo.`,
 `Nella schermata principale, sotto le partite salvate, c'è il riquadro **Salvataggio online**.
 
@@ -2046,6 +2057,8 @@ wk('soddisfazione','kpi','Soddisfazione del cliente',`Quanto il cliente è conte
 • più di 2 punti sotto: −10.
 
 Se il contratto lo prevede, ogni punto sotto soglia costa anche una [[penali|penale]].
+
+Il [[customer_service|customer service]] aggiunge il suo effetto: con la [[qualita_cs|qualità del servizio]] sopra 70 +1 al mese, sotto 35 −1, più i talenti di chi lo guida. Anche le [[richieste_clienti|richieste dei clienti]] la fanno salire o scendere.
 
 Sotto 25 il cliente se ne va e perdi [[reputazione]] (da 1 a 10 punti secondo il [[rank]]). Alla scadenza del [[contratto]] rinnova solo se la soddisfazione è almeno 50 (40 con il [[tech_kam|Key account management]]).`);
 wk('penali','kpi','Penali',`Multa prevista da alcuni contratti quando i KPI del mese sono sotto la soglia: una percentuale del fatturato del cliente per ogni punto mancante.`,
@@ -2141,7 +2154,7 @@ Alla fine arriva la visura della Camera di Commercio, Industria, Artigianato e B
 const TAL_ID={}; Object.keys(TALENTS).forEach((n,i)=>{TAL_ID[n]='tal_'+i; const t=TALENTS[n];
   wk('tal_'+i,'tal',n,t.fx,`${t.fx.split(' · ').join('\n• ').replace(/^/,'• ')}\n\n*${t.fl}*\n\nTipo: ${TTYPE[t.t][0].toLowerCase()}.${t.edu?' È un [[titoli|titolo di studio]].':''} Vedi [[talenti]].`,sz=>talTile(n,sz));});
 // Personale
-wk('personale','pers','Personale',`Sette figure per ogni magazzino (magazzinieri, carrellisti, capiturno, impiegati, autisti B e CE, facility manager) più i pianificatori del traffico in sede.`,
+wk('personale','pers','Personale',`Sette figure per ogni magazzino (magazzinieri, carrellisti, capiturno, impiegati, autisti B e CE, facility manager) più pianificatori del traffico e addetti al customer service in sede.`,
 `Ogni magazzino ha il suo organico, e ogni mestiere fa un lavoro diverso:
 • [[magazzinieri]]: preparano gli ordini, pesano sull'[[accuratezza]];
 • [[carrellisti]]: muovono i pallet col muletto, pesano sulla [[puntualita]];
@@ -2151,7 +2164,7 @@ wk('personale','pers','Personale',`Sette figure per ogni magazzino (magazzinieri
 • [[autisti_b|autisti con patente B]]: furgoni, consegne in città e ultimo miglio;
 • [[facility|facility manager]]: uno per magazzino, manutenzione e cantieri.
 
-In sede lavorano i [[pianificatori]] del traffico, che servono a tutti i magazzini. Magazzinieri e carrellisti si possono anche prendere da una [[cooperativa]].
+In sede lavorano i [[pianificatori]] del traffico, che servono a tutti i magazzini, e gli [[addetti_cs|addetti al customer service]], che rispondono ai clienti. Magazzinieri e carrellisti si possono anche prendere da una [[cooperativa]].
 
 Ogni cliente ha i suoi [[canali]] di distribuzione, che decidono se servono bilici o furgoni, quindi vincere una [[gare|gara]] cambia chi devi [[assunzioni|assumere]]. La finestra Personale mostra l'organico di tutti i magazzini con il [[carico|carico di lavoro]] di ogni reparto.`);
 wk('produttivita','pers','Produttività',`Quanti pallet prepara al mese un magazziniere: 900 con il morale a 70 è il 100%. Più è alta, meno persone servono per lo stesso lavoro.`,
@@ -2276,6 +2289,40 @@ wk('motrici','pers','Motrici',`I camion. Quelli di proprietà sono già pagati, 
 wk('costo_azienda','pers','Costo aziendale',`Lo stipendio lordo annuo (RAL) moltiplicato per 1,42: contributi, TFR e tredicesima compresi.`,
 `Quando vedi una RAL, il costo vero per l'azienda è il 42% in più, diviso per 12 mesi. Vale per tutto il [[personale]], i [[manager]] e i dirigenti.`);
 // Clienti e gare
+wk('customer_service','cli','Customer service',`Il reparto che risponde ai clienti: un responsabile e, dal quarto cliente, gli addetti in sede. Più è bravo, più i clienti restano contenti.`,
+`Si apre dal menu a sinistra. Il **responsabile** è un [[manager]] che non guida un magazzino e non siede in [[direzione|Direzione]]: lo scegli dalla finestra, oppure assumi uno dei candidati che trovi in fondo. Finché non c'è, se ne occupa il [[ceo|CEO]], ma con 10 punti di penalità: ha mille altre cose da fare.
+
+Dal responsabile contano due abilità: Negoziazione, per calmare i clienti, e Precisione, per rispondere giusto. Contano anche i suoi [[talenti]]: alcuni sono fatti apposta per questo lavoro (Voce da call center, Risponde anche alle 23, Promette tutto).
+
+Fino a 3 clienti basta il responsabile; poi serve un [[addetti_cs|addetto]] ogni 4 clienti. Insieme decidono la [[qualita_cs|qualità del servizio]], che sposta un po' la [[soddisfazione]] a fine mese e decide come vanno le [[richieste_clienti|richieste dei clienti]].
+
+Anche le aziende avversarie hanno il loro customer service, con le stesse regole: chi lo trascura perde clienti più in fretta.`);
+wk('qualita_cs','cli','Qualità del servizio',`Quanto è bravo il customer service, da 0 a 100. Sopra 70 i clienti guadagnano +1 di soddisfazione al mese, sotto 35 ne perdono 1.`,
+`Si parte da 50, poi:
+• +2 per ogni punto di Negoziazione del responsabile sopra 10 (−2 per ogni punto sotto);
+• +1,5 per ogni punto di Precisione sopra 10 (−1,5 sotto);
+• −10 se non c'è un responsabile e se ne occupa il [[ceo|CEO]];
+• −10 per ogni [[addetti_cs|addetto]] che manca;
+• i [[talenti]] di chi guida il servizio (Voce da call center +8, Risponde anche alle 23 +10) e gli [[eventi]].
+
+Il totale resta tra 0 e 100. A fine mese, con la qualità sopra 70 ogni cliente guadagna +1 di [[soddisfazione]], sotto 35 ne perde 1; il talento Promette tutto aggiunge +1 per tutti.
+
+La qualità è anche la probabilità che una [[richieste_clienti|richiesta]] piccola venga sistemata dal customer service senza disturbarti: con 70 succede sette volte su dieci.`);
+wk('addetti_cs','pers','Addetti al customer service',`In sede rispondono a mail e telefonate dei clienti. Fino a 3 clienti non servono; poi uno ogni 4 clienti.`,
+`Lavorano in sede, per tutti i magazzini. Servono da 4 clienti attivi in su: uno per i clienti dal 4° al 7°, due fino all'11°, e così via.
+
+Ognuno che manca toglie 10 punti alla [[qualita_cs|qualità del servizio]]. Si assumono e si licenziano dalla finestra [[customer_service|Customer service]] o da quella del [[personale]], come gli altri mestieri. Costano 24.000 € lordi l'anno.`);
+wk('richieste_clienti','cli','Richieste dei clienti',`Ogni cliente, ogni tanto, ha un problema enorme che a guardarlo bene è una sciocchezza. Il customer service lo sistema da solo, oppure decidi tu.`,
+`Ogni cliente fa in media una richiesta ogni 7-8 mesi. Hanno un ritmo tutto loro: non tolgono spazio agli altri [[eventi]].
+
+Le piccole le sistema il [[customer_service|customer service]] da solo: la probabilità è la [[qualita_cs|qualità del servizio]] (con 70, sette volte su dieci). Il cliente è contento: [[soddisfazione]] +2, e te lo dice una notifica tra le varie.
+
+Le altre arrivano come tessera gialla nella colonna delle [[notifiche]], al massimo una ogni 12 giorni e mai insieme a un altro evento. Le risposte possibili:
+• **mandare il manager di persona**: soddisfazione +3, ma per una settimana il magazzino ha [[puntualita]] −1;
+• **una mail educata**: prova di Precisione di chi guida il customer service (50% con 10, ±5% per punto, tra 15% e 90%): +1 se va bene, −4 se va male;
+• **il CEO chiama il titolare**: prova di Negoziazione del CEO: +4 se va bene, −3 se va male. Con i talenti Cena col buyer, Conosce tutti al bar, Re del karaoke o Voce da call center va sempre bene.
+
+Se nessuno risponde per 30 giorni, il cliente si arrabbia da solo: soddisfazione −4. Con il talento Promette tutto le risposte che vanno male costano il doppio.`);
 wk('clienti','cli','Clienti',`Le aziende che ti affidano la merce: pagano per i posti occupati, i movimenti e le consegne.`,
 `Ogni cliente ha un volume (posti pallet occupati e pallet consegnati al mese), delle [[soglie]] di servizio, una [[zona]] di distribuzione e un modo di farti arrivare la merce ([[ritiro]] o consegna). È servito da un solo [[magazzino]].
 
@@ -2566,7 +2613,7 @@ function newGame(ceoId,coName,color,custom,co){
   const C=custom||CEOS.find(c=>c.id===ceoId); if(custom) ceoId='custom';
   if(!HUM||S===HUM){UI.mq=[]; UI.auto=null;}  // nuova partita: niente finestre rimaste in coda dalla precedente
   S={v:1,day:0,speed:0,ceoId,custom:custom||null,company:{name:coName||C.company,color,logo:(co&&co.logo)||'camion',claim:(co&&co.claim)||''},cash:C.cash,rep:C.rep,fuel:0.86,
-     warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0},managers:MANAGERS.map(newPerson),boss:{...JSON.parse(JSON.stringify(C)),bd:bdOf(C.age,hashN(C.name)),since:0,log:[]},alumni:[],
+     warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0,cs:0},cs:{resp:null,q:[],last:-99,log:[]},managers:MANAGERS.map(newPerson),boss:{...JSON.parse(JSON.stringify(C)),bd:bdOf(C.age,hashN(C.name)),since:0,log:[]},alumni:[],
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextEvent:25,project:null,seen:{},over:false,uid:1,
      execs:EXECS.map(newPerson),dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false,hist:[],tw:{win:0,lose:0,skip:0},pol:{},notes:[],noteId:0};
   const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,capo:0,autB:0,autCE:1,imp:1,fm:0};
@@ -2693,7 +2740,7 @@ function showSuccession(){
   if(!UI.evSpeed) UI.evSpeed=S.speed; setSpeed(0);
   const B=S.boss, L=L0, yrs=Math.max(1,Math.round((S.day-(B.since||0))/365)); UI.succ=L;
   const src=c=>c.k==='f'?IMG[c.p.id]:c.k==='x'?IMG.anon:IMG['m_'+c.p.id];
-  const what=c=>c.k==='in'?(seatOf(c.p.id)?DIR_ROLES.find(r=>r.id===seatOf(c.p.id)).name:c.p.wh?'Manager a '+whById(c.p.wh).name:'Nella tua squadra'):c.k==='mk'?'Sul mercato':c.k==='f'?`Ha fondato ${c.p.company}`:c.p.role;
+  const what=c=>c.k==='in'?(seatOf(c.p.id)?DIR_ROLES.find(r=>r.id===seatOf(c.p.id)).name:isCs(c.p.id)?'Responsabile del customer service':c.p.wh?'Manager a '+whById(c.p.wh).name:'Nella tua squadra'):c.k==='mk'?'Sul mercato':c.k==='f'?`Ha fondato ${c.p.company}`:c.p.role;
   showModal(`<div class="src"><span>La Gazzetta del Muletto</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:21px">Chi prende il tuo posto?</h3>
    <p class="ev-x">${esc(B.name)} lascia la guida di ${esc(S.company.name)} dopo ${yrs} ${yrs===1?'anno':'anni'}. Scegli il nuovo ${kw('successione','CEO')}: da domani giochi con lui o con lei, con le sue abilità e i suoi talenti. Se scegli un tuo manager, il suo magazzino o il suo posto in Direzione resta libero.</p>
    ${L.map((c,i)=>`<div class="card succ"><img class="px" src="${src(c)}" alt="" width="72" height="84"><div class="succ-b"><div class="row"><b>${esc(c.p.name)}, ${ageOf(c.p)}</b><span class="sm">${esc(what(c))}</span></div>${statChips(c.p.st,14)}${talentIcons(c.p.tal,24)}
@@ -2702,7 +2749,7 @@ function showSuccession(){
 }
 function newBoss(c){ const old=S.boss, p=c.p, nb={id:p.id,name:p.name,sx:p.sx,bd:p.bd,st:{...p.st},tal:[...p.tal],since:S.day,log:[...(p.log||[])]};
   S.cash-=c.cost; S.cur.altro+=c.cost;
-  if(c.k==='in'||c.k==='mk'){ S.warehouses.forEach(w=>{if(w.mgr===p.id) w.mgr=null;}); Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===p.id) S.dirs[k]=null;});
+  if(c.k==='in'||c.k==='mk'){ S.warehouses.forEach(w=>{if(w.mgr===p.id) w.mgr=null;}); Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===p.id) S.dirs[k]=null;}); if(isCs(p.id)) S.cs.resp=null;
     p.hired=false; p.wh=null; p.quit=null; p.retired=true; p.promoted=true; nb.img='m_'+p.id; nb.origin=c.k==='in'?`Promoss${oa(p)} dall'interno`:`Scelt${oa(p)} dall'head hunter`; nb.bio=`${p.role}. Diventa CEO di ${S.company.name} nel ${yearOf(S.day)}.`; }
   else if(c.k==='f'){ (S.usedF=S.usedF||[]).push(p.id); nb.img=p.id; nb.origin=p.origin; nb.bio=`${p.bio} Nel ${yearOf(S.day)} lascia ${p.company} per guidare ${S.company.name}.`; }
   else { nb.img='anon'; nb.origin='Nipote del fondatore'; nb.bio=`Laurea in Bocconi, due anni a Londra e un cognome che in magazzino conoscono tutti. Prende il posto dello zio nel ${yearOf(S.day)}.`; }
@@ -2735,7 +2782,7 @@ const FIRE={mor:-4,rep:-0.3,wave:4,waveRep:-0.8,waveMor:-2,days:30};
 const firesRecent=()=>(S.fires||[]).filter(d=>S.day-d<FIRE.days).length;
 function fireOne(w,r){
   const sal=RAL[r]*COEF/12;
-  if(r==='plan'){ if(S.office.plan<=0) return null; S.office.plan--; w=null; }
+  if(OFFICE.includes(r)){ if(S.office[r]<=0) return null; S.office[r]--; w=null; }
   else { if(!w||w.staff[r]<=0) return null; w.staff[r]--; if(isCoop(w,r)) return {coop:true}; }   // la cooperativa li riprende gratis
   S.cash-=sal; S.cur.altro+=sal;
   S.fires=(S.fires||[]).filter(d=>S.day-d<FIRE.days); S.fires.push(S.day); S.firedN=(S.firedN||0)+1; S.lastFired={day:S.day,wh:w?w.id:null,role:r};   // per l'evento del licenziamento impugnato
@@ -2781,7 +2828,7 @@ function grievances(p){ const d=polDem(p), tol=p.tol||{};
   return [...d.want.filter(id=>polOpen(id)&&!polOn(id)&&!tol[id]).map(id=>({id,want:true})),...d.hate.filter(id=>polOn(id)&&!tol[id]).map(id=>({id,want:false}))]; }
 const staffPeople=()=>[...S.managers,...S.execs].filter(p=>p.hired);
 function leaveCo(p,why){ const n=p.name, ret=p.quit&&p.quit.ret; if(ret){ p.retired=true; plog(p,'Va in pensione'); }
-  S.warehouses.forEach(w=>{if(w.mgr===p.id) w.mgr=null;}); Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===p.id) S.dirs[k]=null;});
+  S.warehouses.forEach(w=>{if(w.mgr===p.id) w.mgr=null;}); Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===p.id) S.dirs[k]=null;}); if(isCs(p.id)) S.cs.resp=null;
   p.hired=false; p.wh=null; p.quit=null; p.unh=0; p.tol={};
   notify(ret?'yellow':'red','personale','Ufficio del personale',ret?`${n} va in pensione`:`${n} lascia l'azienda`,why,'personale'); news('La Gazzetta del Muletto',ret?`${n} va in pensione`:`${n} lascia ${S.company.name}`,why); }
 // ogni giorno: chi ha una pretesa non rispettata si scontenta; dopo 30 giorni arriva l'ultimatum, dopo il preavviso se ne va
@@ -2845,6 +2892,53 @@ function techFactor(wh,t){
 // pianificatori del traffico, in sede: il CEO regge da solo fino a 150 viaggi al mese (PLAN_TRIPS)
 const PLAN_TRIPS=150;
 function planNeed(){return Math.floor(S.clients.filter(c=>c.status==='attivo').reduce((a,c)=>{const w=whById(c.wh),t=clientLog(c,w);return a+t.out+t.in;},0)/PLAN_TRIPS);}
+/* customer service, in sede: il responsabile (un manager, o il CEO finché non c'è) e gli addetti.
+   La qualità del servizio (0-100) sposta un po' la soddisfazione a fine mese e decide come vanno le richieste dei clienti */
+const CS={free:3,per:4,ceo:-10,miss:-10,every:225,gap:12,wait:30,hi:70,lo:35};
+const OFFICE=['plan','cs'];   // mestieri della sede: non stanno in un magazzino
+const CS_CALL=['Cena col buyer','Conosce tutti al bar','Re del karaoke','Voce da call center'];   // con questi talenti la telefonata del CEO va sempre bene
+const csAct=()=>S.clients.filter(c=>c.status==='attivo');
+function csNeed(){const n=csAct().length; return n<=CS.free?0:Math.ceil((n-CS.free)/CS.per);}
+function csLoad(){const n=csNeed(); return n<=0?0:(S.office.cs>0?n/S.office.cs:9);}
+const csPers=()=>{const id=S.cs&&S.cs.resp; return id&&S.managers.find(m=>m.id===id&&m.hired)||null;};
+const csWho=()=>csPers()||ceo();
+const isCs=id=>!!(S.cs&&id&&S.cs.resp===id);
+const csTal=k=>(csWho().tal||[]).reduce((a,n)=>a+(((TALENTS[n]||{}).cs||{})[k]||0),0);
+const csBad=()=>Math.max(1,csTal('bad'));
+function csQual(){ const p=csWho(), n=nm1(p), L=[['Base',50],['Negoziazione di '+n,2*(p.st.neg-10)],['Precisione di '+n,1.5*(p.st.prec-10)]];
+  if(!csPers()) L.push(['Se ne occupa il CEO, tra mille altre cose',CS.ceo]);
+  const t=csTal('q'); if(t) L.push(['Talenti di '+n,t]);
+  const em=S.mods.filter(m=>m.until>S.day&&m.csq).reduce((a,m)=>a+m.csq,0); if(em) L.push(['Eventi',em]);
+  const miss=Math.max(0,csNeed()-S.office.cs); if(miss) L.push([miss===1?'1 addetto mancante':miss+' addetti mancanti',CS.miss*miss]);
+  return {v:clamp(Math.round(L.reduce((a,x)=>a+x[1],0)),0,100),parts:L}; }
+const csQ=()=>csQual().v;
+const csSat=q=>(q>=CS.hi?1:q<CS.lo?-1:0)+csTal('sat');   // effetto di fine mese sulla soddisfazione di ogni cliente
+const csOdds=v=>clamp(0.5+0.05*(v-10),0.15,0.9);          // prova di un'abilità: 50% con 10, ±5% per punto
+function csLog(c,n,ok,how){ const L=S.cs.log=S.cs.log||[]; L.unshift({d:S.day,c:c.name,n,ok,how}); if(L.length>(S.bot?3:14)) L.pop(); }
+// ogni giorno: per ogni contratto una richiesta ogni 7-8 mesi circa. Le piccole le sistema il customer service (probabilità = qualità);
+// le altre aspettano in coda e arrivano come notifica gialla, al massimo una ogni 12 giorni e mai insieme a un altro evento.
+// Dopo 30 giorni senza risposta il cliente si arrabbia da solo. Le aziende avversarie non hanno la coda: va male e basta.
+function csDaily(){
+  const q=csQ();
+  csAct().forEach(c=>{ if(c.exit||Math.random()>=1/CS.every) return;
+    const i=Math.floor(Math.random()*DRAMMI.length), D=DRAMMI[i];
+    if(Math.random()<q/100){ c.sat=clamp(c.sat+2,0,100); csLog(c,D.n,true,'auto'); noteVar('cs',`${c.name}: «${D.n}», sistemato dal customer service`); return; }
+    if(S.bot){ c.sat=clamp(c.sat-3*csBad(),0,100); csLog(c,D.n,false,'auto'); return; }
+    if(!S.cs.q.some(x=>x.c===c.id)) S.cs.q.push({c:c.id,v:i,day:S.day});
+  });
+  if(S.bot) return;
+  S.cs.q=S.cs.q.filter(x=>{ const c=S.clients.find(y=>y.id===x.c); if(!c||c.status!=='attivo') return false;
+    if(S.day-x.day<=CS.wait) return true;
+    const d=4*csBad(); c.sat=clamp(c.sat-d,0,100); csLog(c,DRAMMI[x.v].n,false,'nessuno');
+    noteVar('cs',`${c.name}: nessuno ha risposto al reclamo, soddisfazione −${d}`); return false; });
+  if(S.cs.q.length&&!S.over&&S.day-S.cs.last>=CS.gap&&!evBusy()){ const x=S.cs.q.shift(); S.cs.last=S.day; csEvent(x); }
+}
+function csEvent(x){ const base=EVENTS.find(e=>e.id==='cs_dramma'), c=S.clients.find(y=>y.id===x.c); if(!base||!c) return;
+  const ev={...base,c,v:x.v}; base.restore(ev); showEvent(ev); }
+// a fine mese: chi risponde anche alle 23 prima o poi si esaurisce
+function csMonth(){ if(!csTal('burn')||Math.random()>=1/30) return; const p=csWho();
+  if(p.tal.includes('Esaurito')||!gainTal(p,'Esaurito','Troppe mail a mezzanotte')) return;
+  notify('yellow','customer','Customer service',`${p.name} è esaurit${oa(p)}`,'Rispondere ai clienti anche alle 23 ha il suo prezzo: nuovo talento «Esaurito» (Operazioni −2, Precisione −1, Leadership −1).','customer'); }
 function impNeed(cons){return Math.max(1,Math.ceil(cons/(R('gestionale')?2000:1500)));}
 function welfarePts(k){return WELFARE.filter(w=>S.welfare[w.id]).reduce((a,w)=>a+w[k],0);}
 function modSum(wh,k){return S.mods.filter(m=>m.until>S.day&&(m.scope==='all'||m.scope===wh.id)).reduce((a,m)=>a+(m[k]||0),0);}
@@ -2964,8 +3058,8 @@ function loadTxt(r,l,have){
 }
 function loadBar(l){return `<div class="bar" style="height:6px;margin-top:2px"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></div>`;}
 function globalCosts(){
-  const emp=S.warehouses.reduce((a,w)=>a+staffTot(w),0)+S.office.plan;
-  return {ceo:4000,plan:S.office.plan*RAL.plan*COEF/12,mgr:[...S.managers,...S.execs].filter(m=>m.hired).reduce((a,m)=>a+m.ral*COEF/12,0),welf:welfarePts('cost')*emp*(R('welfare2')?0.7:1)};
+  const emp=S.warehouses.reduce((a,w)=>a+staffTot(w),0)+S.office.plan+S.office.cs;
+  return {ceo:4000,plan:(S.office.plan*RAL.plan+S.office.cs*RAL.cs)*COEF/12,mgr:[...S.managers,...S.execs].filter(m=>m.hired).reduce((a,m)=>a+m.ral*COEF/12,0),welf:welfarePts('cost')*emp*(R('welfare2')?0.7:1)};
 }
 function step(){
   if(S.over) return;
@@ -2974,6 +3068,7 @@ function step(){
   S.queue.forEach(q=>q.days--);
   S.queue.filter(q=>q.days<=0).forEach(q=>{
     if(q.role==='plan'){S.office.plan++; noteVar('pers','Assunto: 1 pianificatore del traffico in sede'); return;}
+    if(q.role==='cs'){S.office.cs++; noteVar('pers','Assunto: 1 addetto al customer service in sede'); return;}
     const w=whById(q.wh); if(!w) return; w.staff[q.role]++;
     noteVar('pers',`${isCoop(w,q.role)?'Arrivato dalla cooperativa':'Assunto'}: 1 ${ROLE1[q.role]} a ${w.name}`);
   });
@@ -3001,7 +3096,7 @@ function step(){
   cur.pers+=g.plan/30; cur.fissi+=g.ceo/30; cur.mgr+=g.mgr/30; cur.welf+=g.welf/30;
   dCost+=(g.plan+g.ceo+g.mgr+g.welf)/30;
   S.cash+=dRic-dCost;
-  polDaily();
+  polDaily(); csDaily();
   // ricerca in corso
   if(S.project){ S.project.left--; if(S.project.left<=0){ const t=TECH.find(x=>x.id===S.project.tech); S.project=null; S.researched[t.id]=true; chron('tecnologia',`Ricerca completata: ${t.name}`);
     if(t.id==='iso'||t.id==='marketing') S.rep=clamp(S.rep+5,0,100);
@@ -3047,7 +3142,7 @@ function weekEnd(){
 function histPush(c){
   if(!S.hist) S.hist=[]; const H=S.hist, from=H.length?H[H.length-1].d:-1, ws=S.warehouses, wk=(S.weeks||[]).filter(x=>x.d>from);
   const avg=f=>ws.length?ws.reduce((a,w)=>a+f(w),0)/ws.length:0, kp=(w,k)=>w.acc.n?w.acc[k]/w.acc.n:w.kpi?w.kpi[k]:null;
-  const staff={plan:S.office.plan}; ROLES.forEach(r=>staff[r]=ws.reduce((a,w)=>a+w.staff[r],0));
+  const staff={plan:S.office.plan,cs:S.office.cs}; ROLES.forEach(r=>staff[r]=ws.reduce((a,w)=>a+w.staff[r],0));
   H.push({d:S.day,ric:c.ric,pers:c.pers,mezzi:c.mezzi,fissi:c.fissi,tech:c.tech,mgr:c.mgr,welf:c.welf,pen:c.pen,altro:c.altro,int:c.int||0,util:c.util,cash:S.cash,debt:debt(),rep:S.rep,
     P:avg(w=>kp(w,'P')||0),A:avg(w=>kp(w,'A')||0),sat:avg(w=>w.kpi?w.kpi.sat*100:0),mor:avg(w=>w.morale),
     mov:wk.reduce((a,x)=>a+Object.values(x.rows).reduce((b,r)=>b+r.mov,0),0),trips:wk.reduce((a,x)=>a+Object.values(x.rows).reduce((b,r)=>b+r.trips,0),0),
@@ -3086,11 +3181,11 @@ function monthEnd(){
     news('Il Sole 24 Pallet',`Sul mercato: ${p.name}, ${ageOf(p)} anni`,`${p.role}. ${S.managers.includes(p)?'Cerca un posto da manager di magazzino: lo trovi nella finestra Personale.':'Cerca un posto da dirigente: lo trovi nella finestra Direzione.'}`);});
   // carburante
   const y=yearOf(S.day); S.fuel=clamp(0.86+(y-2002)*0.05+rnd(-0.03,0.03),0.8,1.9);
-  let pen=0;
+  let pen=0; const csS=csSat(csQ());
   S.clients.filter(c=>c.status==='attivo').forEach(c=>{
     const w=whById(c.wh); const P=w.acc.n?w.acc.P/w.acc.n:w.kpi.P, A=w.acc.n?w.acc.A/w.acc.n:w.kpi.A;
     const wP=P-c.sP, wA=c.sA?A-c.sA:9, wv=Math.min(wP,wA);
-    c.lastP=P; c.lastA=A; c.sat+=polSum('sat')+trSum(w,'sat');
+    c.lastP=P; c.lastA=A; c.sat+=polSum('sat')+trSum(w,'sat')+csS;
     if(wv>=0){c.sat+=3+(R('edi')?1:0)+(R('kam')?1:0); repUp(0.15);}
     else if(wv>=-2){c.sat-=4;}
     else {c.sat-=10;}
@@ -3114,6 +3209,7 @@ function monthEnd(){
     notify('yellow','clienti','Il Sole 24 Pallet',`Il contratto con ${c.name} scade il ${shortDate(c.end)}`,c.noRenew?'Non verrà rinnovato.':`Rinnova da solo se la soddisfazione è almeno ${R('kam')?40:50}; altrimenti il cliente va via.`,'clienti');
     news('Il Sole 24 Pallet',`${c.name}: contratto in scadenza`,c.noRenew?`Scade il ${shortDate(c.end)} e non verrà rinnovato.`:`Scade il ${shortDate(c.end)}. Rinnova da solo se la soddisfazione è almeno ${R('kam')?40:50}; altrimenti il cliente va via.`);});
   if(R('marketing')) S.rep+=0.2;
+  csMonth();
   S.cash-=pen; S.cur.pen+=pen; S.rep=clamp(S.rep,0,100);
   loansMonth();
   const c=S.cur; c.util=c.ric-c.pers-c.mezzi-c.fissi-c.tech-c.mgr-c.welf-c.pen-c.altro-(c.int||0);
@@ -3269,7 +3365,7 @@ function botLife(){
 function botBust(b){
   b.over=true; b.overDay=b.day;
   b.clients.forEach(c=>{if(c.status!=='perso') c.status='perso';});
-  [...b.managers,...b.execs].forEach(p=>{p.hired=false; p.wh=null;});
+  [...b.managers,...b.execs].forEach(p=>{p.hired=false; p.wh=null;}); if(b.cs) b.cs.resp=null;
   withCo(HUM,()=>{ chron('classifica',`${b.company.name} di ${b.boss.name} fallisce`); news('Il Sole 24 Pallet',`${b.company.name} porta i libri in tribunale`,`La cassa è scesa sotto i −50.000 €. I suoi magazzini tornano in affitto, i suoi clienti cercano un nuovo logistico e ${b.boss.name} commenta: «Era meglio fare il padroncino».`);
     notify('yellow','classifica','Il Sole 24 Pallet',`${b.company.name} fallisce`,`${b.boss.name} chiude: i magazzini di ${b.warehouses.map(w=>w.name).join(', ')} tornano liberi e i suoi clienti presto cercheranno un nuovo logistico con delle gare. Restano in corsa ${liveCo().length} aziende.`,'classifica'); });
 }
@@ -3298,12 +3394,16 @@ function botStaff(df){
         fireOne(w,r); l[r]=l[r]*c/(c-1); ah[r]=ah[r]*c/(c-1); } }); }
   });
   while(S.office.plan+S.queue.filter(q=>q.role==='plan').length<planNeed()){ S.queue.push({role:'plan',wh:null,days:hireDays(HIRE.plan.ann[0],null,'plan')}); botPay(HIRE.plan.ann[1]); }
+  while(S.office.cs+S.queue.filter(q=>q.role==='cs').length<csNeed()){ S.queue.push({role:'cs',wh:null,days:hireDays(HIRE.cs.ann[0],null,'cs')}); botPay(HIRE.cs.ann[1]); }
 }
 function botMgr(){
   if(!S.warehouses.some(w=>w.mgr==='ceo')){ const w=S.warehouses.find(w=>!w.mgr); if(w) w.mgr='ceo'; }
   S.warehouses.filter(w=>!w.mgr).forEach(w=>{ if(S.cash<30000) return;
     const m=S.managers.filter(m=>!m.hired&&avail(m)&&ageOf(m)<63).sort((a,b)=>(b.st.op*2+b.st.prec+b.st.lead)-(a.st.op*2+a.st.prec+a.st.lead))[0];
     if(m){ m.hired=true; m.raiseDay=S.day; m.unh=0; m.quit=null; m.wh=w.id; w.mgr=m.id; } });
+  // customer service: dal quarto cliente prende chi tratta meglio con i clienti
+  if(csNeed()>0&&!csPers()&&S.cash>60000){ const m=S.managers.filter(m=>!m.hired&&avail(m)&&ageOf(m)<63).sort((a,b)=>(b.st.neg*2+b.st.prec)-(a.st.neg*2+a.st.prec))[0];
+    if(m){ m.hired=true; m.raiseDay=S.day; m.unh=0; m.quit=null; m.wh=null; S.cs.resp=m.id; } }
 }
 // gare: per ogni gara aperta prova i magazzini e qualche prezzo, e sceglie l'offerta col guadagno atteso più alto
 // (probabilità di vincere × margine in più al mese); il margine deve valere almeno una quota dei ricavi del contratto (keep)
@@ -3428,21 +3528,37 @@ const F_MASTER=m=>ageOf(m)<45&&!m.tal.includes('Master in supply chain'), F_CELL
   F_MENTORE=m=>ageOf(m)>=40&&!m.tal.includes('Mentore'), F_INGLESE=m=>!m.tal.includes('Laureato in lingue')&&!m.tal.includes('Parla per acronimi'),
   F_CUOCO=m=>!m.tal.includes('Cuoco provetto'), F_VIDEO=m=>m.wh&&!m.tal.includes('Guru dei social'), F_FIGLI=m=>ageOf(m)<46&&!m.tal.includes('Tre figli piccoli'),
   F_KARAOKE=m=>!m.tal.includes('Re del karaoke'), F_GOLF=e=>!e.tal.includes('Golfista'), F_POLITICA=e=>!e.tal.includes('Consigliere comunale');
+// i drammi dei clienti: un problema enorme, che a guardarlo bene è una sciocchezza (n = nome breve, t = titolo, x = racconto)
+const DRAMMI=[
+ {n:'il bancale fantasma',t:'manca un bancale!',x:'Mail tutta in maiuscolo alle 23:40, con quattordici persone in copia: «MANCA UN BANCALE, BLOCCHIAMO TUTTO». Nella foto allegata, per chi guarda bene, il bancale c\'è: dietro la loro macchinetta del caffè.'},
+ {n:'l\'autista che non saluta',t:'l\'autista non ha salutato',x:'Reclamo formale: il vostro autista non ha salutato la receptionist. Il cliente chiede un piano di azioni correttive entro venerdì, con un diagramma a lisca di pesce allegato.'},
+ {n:'il pallet inclinato',t:'pallet visibilmente inclinato',x:'Arrivano sei foto ad alta risoluzione di un pallet «visibilmente inclinato». Con il goniometro dell\'ufficio tecnico fa 2 gradi. Il cliente parla di danno d\'immagine.'},
+ {n:'l\'etichetta storta',t:'un\'etichetta storta',x:'Un\'etichetta è attaccata storta, di circa quindici gradi. Il loro lettore la legge lo stesso, ma il responsabile qualità «non può accettare questa sciatteria» e vuole parlarne con qualcuno di importante.'},
+ {n:'il camion del colore sbagliato',t:'il camion era del colore sbagliato',x:'«Il camion era bianco, nel contratto c\'era scritto blu». Nel contratto non c\'è scritto nessun colore. C\'è un logo azzurro, forse, sulla copertina.'},
+ {n:'la riunione d\'emergenza',t:'riunione d\'emergenza',x:'Il cliente convoca una videochiamata d\'emergenza con ventidue partecipanti, tre fusi orari e un ordine del giorno di due pagine. Motivo: un camion arrivato con quattro minuti di ritardo, di sabato.'},
+ {n:'lo scotch marrone',t:'lo scotch sbagliato',x:'«Avete usato lo scotch marrone invece di quello trasparente». Lo scotch marrone lo usate da undici anni, anche per loro. Oggi, però, se ne sono accorti.'},
+ {n:'il ritardo di tre ore',t:'tre ore di ritardo',x:'Il cliente segnala tre ore di ritardo su tutte le consegne della settimana. L\'orologio della loro banchina, da marzo, è ancora fermo all\'ora solare.'},
+ {n:'il collo scomparso',t:'un collo scomparso nel nulla',x:'Un collo «mai arrivato», e il cliente minaccia una penale. Dal tracciamento risulta consegnato: al cliente stesso, che lo aveva rispedito indietro per sbaglio a sé stesso.'},
+ {n:'la firma illeggibile',t:'firma illeggibile sul documento',x:'La firma sul documento di trasporto è «illeggibile» e il cliente vuole sapere chi l\'ha messa. È la firma del loro magazziniere. Lui stesso non la riconosce.'},
+ {n:'il cartone ammaccato',t:'DISASTRO (con le maiuscole)',x:'La mail si intitola «DISASTRO». Dentro c\'è la foto di un angolo di cartone un po\' ammaccato: uno su seicentoquaranta colli. Il contenuto è intatto.'},
+ {n:'la conferma via fax',t:'vuole la conferma via fax',x:'Il cliente chiede la conferma di ogni consegna via fax, «come da procedura». In ufficio nessuno vede un fax dai tempi della lira. Qualcuno ricorda che ce n\'è uno in cantina, sotto il presepe.'}
+];
+const csHas=n=>(csWho().tal||[]).includes(n);
 const EVENTS=[
  // dopo un licenziamento (non della cooperativa): chi è stato mandato via fa causa e chiede di tornare
  {id:'impugna',src:'Ufficio del personale',title:'Licenziamento impugnato',
-  cond:()=>!!S.lastFired&&S.day-S.lastFired.day>=10&&S.day-S.lastFired.day<=120&&(S.lastFired.role==='plan'||!!whById(S.lastFired.wh)),
+  cond:()=>!!S.lastFired&&S.day-S.lastFired.day>=10&&S.day-S.lastFired.day<=120&&(OFFICE.includes(S.lastFired.role)||!!whById(S.lastFired.wh)),
   setup:ev=>{const lf=S.lastFired; S.lastFired=null; const [nm,gf]=pick(IMP_NOMI), g=(m,f)=>gf?f:m;
     ev.role=lf.role; ev.w=whById(lf.wh)||null; ev.nm=nm; ev.title=`${nm} impugna il licenziamento`;
     ev.text=`È arrivata una raccomandata dello studio legale Cavillo & Associati: ${nm}, ${ROLE1[lf.role]} ${ev.w?'a '+ev.w.name:'in sede'} ${g('licenziato','licenziata')} ${wks(S.day-lf.day)} fa, impugna il licenziamento. Chiede il reintegro «con effetto immediato», gli stipendi arretrati e, già che c'è, le scuse scritte. In ${ev.w?'banchina':'ufficio'} non si parla d'altro: tutti vogliono vedere come va a finire.`;},
   opts:[{t:'Reintegro: torna al lavoro',d:'Ammetti che forse avevi esagerato e richiami la persona al suo posto. In squadra la notizia fa piacere.',e:'Torna al lavoro (lo stipendio riparte, la buonuscita è persa), morale +3 nel magazzino, reputazione +1',r:'Primo giorno di rientro: mezz\'ora di anticipo e una vaschetta di pasticcini per tutti. Qualcuno ha applaudito, il caporeparto ha fatto finta di niente.',
-         f:function(){ if(this.role==='plan') S.office.plan++; else if(this.w){ this.w.staff[this.role]++; mod(this.w.id,{mor:3},30); } repUp(1); }},
+         f:function(){ if(OFFICE.includes(this.role)) S.office[this.role]++; else if(this.w){ this.w.staff[this.role]++; mod(this.w.id,{mor:3},30); } repUp(1); }},
         {t:'Conciliazione in sede sindacale',d:'Ti siedi al tavolo con il sindacato e chiudi con una cifra. Niente reintegro, niente causa, nessuno ne parla più.',e:'Quattro mensilità di stipendio, nessun altro effetto',r:'Firma, stretta di mano, caffè della macchinetta offerto dal sindacalista. Pratica chiusa, conto più leggero.',
          f:function(){ S.cash-=Math.round(4*RAL[this.role]*COEF/12); }},
         {t:'Ci vediamo in tribunale',d:'Non tratti: l\'avvocato dice che hai buone carte. Speriamo abbia ragione.',e:'Avvocato 3.000 €. Probabilità di vincere 45%, più alta con l\'Amministrazione del CEO; se perdi: reintegro, dieci mensilità di risarcimento e reputazione −3',r:'Tre udienze, due rinvii e un giudice che sbadigliava. Alla fine è arrivata la sentenza.',
          f:function(){ S.cash-=3000; const p=clamp(0.45+(ceo().st.amm-10)*0.03,0.2,0.8);
            if(Math.random()<p) toast('Causa vinta: il licenziamento era regolare','ok');
-           else { S.cash-=Math.round(10*RAL[this.role]*COEF/12); repUp(-3); if(this.role==='plan') S.office.plan++; else if(this.w) this.w.staff[this.role]++;
+           else { S.cash-=Math.round(10*RAL[this.role]*COEF/12); repUp(-3); if(OFFICE.includes(this.role)) S.office[this.role]++; else if(this.w) this.w.staff[this.role]++;
              toast('Causa persa: torna al lavoro e incassa dieci mensilità di arretrati','bad'); } }},
         {t:'«Ti trovo io un posto migliore»',d:'Chiami un cliente che cerca personale e gli trovi un lavoro lì, con uno stipendio un po\' più alto. Ritira la causa e ti manda pure un messaggio di ringraziamento.',e:'Nessun costo, reputazione +1',req:()=>ceo().st.neg>=13||ceo().tal.includes('Ex sindacalista'),reqT:'Negoziazione 13 o Ex sindacalista',r:'Nel nuovo posto si trova benissimo, e il cliente pure: ti ha detto che, se hai altre persone così, le prende volentieri.',
          f:function(){ repUp(1); }}]},
@@ -3807,6 +3923,35 @@ const EVENTS=[
   setup:ev=>{ev.c=actC();ev.text=`Rileggendo per la quinta volta il contratto di ${ev.c.name} hai trovato una virgola fuori posto. Vale 6.000 € l'anno, a tuo favore.`;},
   opts:[{t:'Faglielo notare',d:'Telefoni al cliente e gli segnali l\'errore. Apprezza l\'onestà e lo racconta in giro.',e:'Soddisfazione +8, reputazione +2',r:'Il cliente ringrazia e lo racconta in giro. Una virgola onesta vale più di tanti spot.',f:function(){this.c.sat=clamp(this.c.sat+8,0,100);S.rep+=2;}},
         {t:'Taci e incassa',d:'Non dici niente e lasci il contratto com\'è. Speri che nessuno lo rilegga.',e:'+6.000 €; se se ne accorgono, soddisfazione −15',r:'La virgola resta dov\'è. Ogni volta che il cliente chiama, ti prende un piccolo spavento.',f:function(){S.cash+=6000;if(Math.random()<0.3){this.c.sat=clamp(this.c.sat-15,0,100);toast('Se ne sono accorti','bad');}}}]},
+ // talenti del customer service: contano quelli di chi guida il servizio clienti (il responsabile, o il CEO)
+ {id:'t_callcenter',src:'Customer service',title:'La telefonata registrata',cond:()=>csHas('Voce da call center')&&!!actC(),
+  setup:ev=>{ev.p=csWho(); ev.c=actC(); ev.text=`Il responsabile qualità di ${ev.c.name} ha chiamato urlando per un collo ammaccato. Dopo dieci minuti con ${ev.p.name} ha chiesto scusa, ha ringraziato e ha domandato se la telefonata era registrata: vuole farla sentire al suo terapeuta.`;},
+  opts:[{t:'Un corso per tutti gli addetti',d:'Organizzi un pomeriggio di formazione: tutti ad ascoltare come si fa. Qualcuno prende appunti, qualcuno imita la voce.',e:'−2.000 €, qualità del servizio +6 per 13 settimane',r:'Il corso è piaciuto. Per una settimana in ufficio tutti hanno parlato a bassa voce, anche alla macchinetta del caffè.',f:()=>{S.cash-=2000; mod('all',{csq:6},91);}},
+        {t:'Mandagli la registrazione, con i saluti',d:'Il cliente riceve la registrazione e una scatola di cioccolatini. Ci ride sopra con tutto il suo ufficio.',e:'Soddisfazione +5',r:'Il cliente ha usato la registrazione come suoneria. Dice che lo rilassa.',f:function(){ if(this.c) this.c.sat=clamp(this.c.sat+5,0,100); }}]},
+ {id:'t_ore23',src:'Customer service',title:'Mail di mezzanotte',cond:()=>csHas('Risponde anche alle 23')&&!!actC(),
+  setup:ev=>{ev.p=csWho(); ev.c=actC(); ev.text=`${ev.c.name} ha scritto alle 23:58 e ${ev.p.name} ha risposto alle 23:59. Il buyer lo racconta a tutti come esempio di servizio. Il medico aziendale lo racconta come esempio di qualcos'altro.`;},
+  opts:[{t:'Lascia fare: i clienti adorano',d:'Se funziona, non si tocca. Il telefono resta acceso anche a cena.',e:'Soddisfazione +6; c\'è il rischio che si esaurisca',r:'Il cliente è contentissimo. Le occhiaie, un po\' meno.',f:function(){ if(this.c) this.c.sat=clamp(this.c.sat+6,0,100); if(this.p&&Math.random()<0.35) gainTal(this.p,'Esaurito','Le notti passate sulle mail'); }},
+        {t:'Telefono spento dopo le 20',d:'Lo dici chiaro: dopo le 20 si stacca. Il cliente aspetterà fino a domattina, come tutti.',e:'Qualità del servizio −3 per 9 settimane, Leadership +1; chi era esaurito si riprende',r:'La prima sera è stata dura: il telefono spento sul tavolo, guardato come un gatto che dorme.',f:function(){ mod('all',{csq:-3},63); if(this.p){ addSt(this.p,'lead',1); loseTal(this.p,'Esaurito','Si riprende staccando la sera'); } }}]},
+ {id:'t_promette',src:'Customer service',title:'Promesso: domani mattina',cond:()=>csHas('Promette tutto')&&!!actC(),
+  setup:ev=>{ev.p=csWho(); ev.c=actC(); ev.w=whById(ev.c.wh); ev.text=`${ev.p.name} ha promesso a ${ev.c.name} quaranta pallet consegnati «domani mattina, prima delle 7». Il magazzino lo ha scoperto adesso, alle 18:30, da una mail in copia nascosta.`;},
+  opts:[{t:'Straordinario di notte',d:'Richiami il turno di notte e si carica tutto. La promessa è salva, il magazzino un po\' meno.',e:'−1.800 € di straordinari, morale −3 nel magazzino, soddisfazione +6',r:'Alle 6:40 l\'ultimo camion è partito. Alle 6:41 è partita anche la prima lamentela del turno di notte.',f:function(){ S.cash-=1800; if(this.w) mod(this.w.id,{mor:-3},30); if(this.c) this.c.sat=clamp(this.c.sat+6,0,100); }},
+        {t:'Richiami il cliente e spieghi',d:'Chiami tu il cliente: domani pomeriggio, non mattina. Si gioca tutto sul tono.',e:'Prova di Negoziazione del CEO: soddisfazione −2 se va bene, −8 se va male',r:'La telefonata è durata poco. Il silenzio dall\'altra parte, molto di più.',f:function(){ if(!this.c) return; const ok=Math.random()<csOdds(ceo().st.neg); this.c.sat=clamp(this.c.sat+(ok?-2:-8),0,100); toast(ok?'Il cliente brontola, ma capisce (soddisfazione −2)':'Il cliente non la prende bene (soddisfazione −8)',ok?'warn':'bad'); }},
+        {t:'Che sia lui o lei a spiegare',d:'Chi ha promesso, spiega. Davanti a tutti, in vivavoce.',e:'Soddisfazione −5; una volta su tre la lezione serve e perde «Promette tutto»',r:'La spiegazione in vivavoce è stata lunga e piena di «assolutamente». In ufficio nessuno respirava.',f:function(){ if(this.c) this.c.sat=clamp(this.c.sat-5,0,100); if(this.p&&Math.random()<0.34) loseTal(this.p,'Promette tutto','Ha imparato a non promettere tutto'); }}]},
+ // richieste dei clienti (customer service): hanno un ritmo loro (csDaily) e non entrano nell'estrazione degli altri eventi
+ {id:'cs_dramma',cs:true,col:'yellow',ic:'customer',src:'Customer service',title:'Un cliente in allarme',auto:1,cond:()=>false,
+  text:'Un cliente scrive in maiuscolo: secondo lui è successo un disastro.',
+  restore:ev=>{const D=DRAMMI[ev.v]||DRAMMI[0]; ev.title=`${ev.c?ev.c.name:'Un cliente'}: ${D.t}`; ev.text=D.x;},
+  opts:[{t:'Mando il manager di persona',d:'Il capo del magazzino molla tutto e va dal cliente con le bolle sotto il braccio. Il cliente si sente importante.',e:'Soddisfazione +3; puntualità −1 per una settimana nel magazzino del cliente',
+          r:'Il manager è tornato dopo tre ore, con un caffè offerto e la pratica chiusa. In magazzino, nel frattempo, si è arrangiato chi c\'era.',
+          f:function(){ if(!this.c) return; this.c.sat=clamp(this.c.sat+3,0,100); const w=whById(this.c.wh); if(w) mod(w.id,{P:-1},7); csLog(this.c,DRAMMI[this.v].n,true,'manager'); }},
+        {t:'Rispondo con una mail educata',d:'Il customer service scrive una risposta cortese e precisa: foto, numeri di bolla e i saluti più calorosi del vocabolario.',e:'Prova di Precisione di chi guida il customer service: se va bene soddisfazione +1, altrimenti −4',
+          r:'La mail è partita alle 9:02, con tre allegati e un «restiamo a disposizione».',
+          f:function(){ if(!this.c) return; const ok=Math.random()<csOdds(csWho().st.prec), d=ok?1:-4*csBad(); this.c.sat=clamp(this.c.sat+d,0,100); csLog(this.c,DRAMMI[this.v].n,ok,'mail');
+            toast(ok?'Ha funzionato: il cliente ringrazia e chiude la pratica (soddisfazione +1).':`Non è bastata: il cliente risponde mettendo in copia anche il suo avvocato (soddisfazione −${-d}).`,ok?'ok':'bad'); }},
+        {t:'Il CEO chiama il titolare',d:'Prendi il telefono e chiami direttamente il titolare. Tra capi ci si capisce, di solito.',e:'Prova di Negoziazione del CEO (con alcuni talenti va sempre bene): se va bene soddisfazione +4, altrimenti −3',
+          r:'La telefonata è durata venti minuti, quindici dei quali sul campionato.',
+          f:function(){ if(!this.c) return; const B=ceo(), sure=B.tal.some(n=>CS_CALL.includes(n)), ok=sure||Math.random()<csOdds(B.st.neg), d=ok?4:-3; this.c.sat=clamp(this.c.sat+d,0,100); csLog(this.c,DRAMMI[this.v].n,ok,'ceo');
+            toast(ok?`${sure?'Il tuo talento fa il resto: ':''}il titolare ride, si scusa per il tono della mail e ti invita a pranzo (soddisfazione +4).`:'Il titolare era in riunione: ti ha richiamato il suo vice, che non sapeva niente (soddisfazione −3).',ok?'ok':'bad'); }}]},
  {id:'t_gratta',src:'La Gazzetta del Muletto',title:'Gratta e vinci all\'autogrill',cond:()=>hasTal('Fortunato al gratta e vinci'),
   text:'All\'autogrill di Novara il resto del caffè è un gratta e vinci. Senti un formicolio nelle dita.',
   opts:[{t:'Gratta',d:'Prendi una moneta e gratti, lì al bancone.',e:'Chissà',r:'Hai grattato con una moneta da 20 centesimi, lì al bancone.',f:()=>{const r=Math.random();if(r<0.03){S.cash+=10000;toast('Hai vinto 10.000 €!','ok');}else if(r<0.33){S.cash+=100;toast('Hai vinto 100 €','ok');}else toast('Ritenta, sarai più fortunato','warn');}},
@@ -3981,7 +4126,7 @@ const EVENTS=[
           f:function(){const p=this.p; p.raiseDay=S.day; if(Math.random()<0.75){p.quit={day:S.day+30,why:'Job hopper: nessuno l\'ha trattenuto, e lui non aspettava altro.'}; toast(`${p.name} dà le dimissioni: un mese di preavviso`,'bad');} else toast(`${p.name} resta. Per ora`,'warn');}}]}
 ];
 function fireEvent(){
-  const el=EVENTS.filter(e=>(!e.once||!S.seen[e.id])&&(S.seen[e.id]===undefined||S.day-S.seen[e.id]>240)&&e.cond());
+  const el=EVENTS.filter(e=>!e.cs&&(!e.once||!S.seen[e.id])&&(S.seen[e.id]===undefined||S.day-S.seen[e.id]>240)&&e.cond());
   if(!el.length) return;
   const base=pick(el); const ev={...base}; if(ev.setup) ev.setup(ev);
   showEvent(ev);
@@ -3999,7 +4144,7 @@ function showEvent(ev){
   if(isBot()) return;
   S.seen[ev.id]=S.day;
   if(AUTO){ autoEvent(ev); return; }
-  const n=noteAdd({k:'ev',col:'red',ic:'evento',src:ev.src,title:ev.title,text:ev.text,due:S.day+EV_WAIT,ev:evPack(ev)});
+  const n=noteAdd({k:'ev',col:ev.col||'red',ic:ev.ic||'evento',src:ev.src,title:ev.title,text:ev.text,due:S.day+EV_WAIT,ev:evPack(ev)});
   if(!n) return; EVLIVE.set(n,ev);
   // in Classica il tempo si ferma finché non decidi (si può togliere nelle Opzioni), ma la finestra la apri tu dalla colonna
   if(!contMode()&&!(HUM&&HUM.cfg&&HUM.cfg.noPause)&&S.speed){UI.evResume=S.speed; setSpeed(0);}
@@ -4037,6 +4182,7 @@ function evUnpack(p,title,src){
   const ev={...base,title,src}, col={c:S.clients,w:S.warehouses,p:people()};
   Object.entries(p.vars||{}).forEach(([key,v])=>{ev[key]=v&&typeof v==='object'?col[v.k].find(x=>x.id===v.id)||null:v;});
   if(p.alt&&base.setup){const tmp={...base}; base.setup(tmp); ev.opts=tmp.opts;}
+  if(base.restore) base.restore(ev);   // titolo e racconto ricostruiti dalle variabili salvate (richieste dei clienti)
   return ev;
 }
 // la scelta resta in sospeso fino al giorno dopo, così la partita si può salvare nel frattempo
@@ -4050,8 +4196,8 @@ function evResolve(p){
   const ev=evUnpack(p,p.title,p.src); if(!ev) return;
   const o=ev.opts[p.i]; if(!o) return;
   UI.chg=[]; UI.evMsg=[]; evApply(ev,o); const ch=UI.chg, msg=UI.evMsg; UI.chg=null; UI.evMsg=null;
-  news(ev.src,`${ev.title}: com'è andata`,o.r||o.d||''); chron('evento',`${ev.title}: «${o.t}»`);
-  noteAdd({k:'res',col:'blue',ic:'evento',src:ev.src,title:ev.title,text:o.r||o.d||'',pick:o.t,eff:o.e,msg,ch:ch.map(c=>({...c,p:c.p.id}))});
+  news(ev.src,`${ev.title}: com'è andata`,o.r||o.d||''); if(!ev.cs) chron('evento',`${ev.title}: «${o.t}»`);
+  noteAdd({k:'res',col:'blue',ic:ev.ic||'evento',src:ev.src,title:ev.title,text:o.r||o.d||'',pick:o.t,eff:o.e,msg,ch:ch.map(c=>({...c,p:c.p.id}))});
 }
 function pinIcon(){const P=['..XXXX..','.XOOOOX.','XOOXXOOX','XOOXXOOX','.XOOOOX.','..XOOX..','...XX...'];let r='';P.forEach((row,y)=>[...row].forEach((c,x)=>{if(c!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${c==='X'?TPAL.K:TPAL.O}"/>`;}));return `<svg width="18" height="16" viewBox="-1 -1 10 9" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
 function modalInfo(src,title,text){
@@ -4070,7 +4216,7 @@ function modalInfo(src,title,text){
 const NOTE_C={red:'var(--bad)',green:'var(--ok)',yellow:'var(--yellow)',blue:'#5fb4f0'};
 const NOTE_G={gare:{ic:'gare',n:'Gare d\'appalto',win:'gare'},pers:{ic:'personale',n:'Personale',win:'personale'},cli:{ic:'clienti',n:'Clienti',win:'clienti'},
   wh:{ic:'magazzini',n:'Magazzini',win:'magazzini'},tech:{ic:'tecnologia',n:'Tecnologia',win:'tecnologia'},rep:{ic:'report',n:'Report KPI',win:'report'},
-  vice:{ic:'evento',n:'Decisioni del tuo vice',win:'giornale'}};
+  cs:{ic:'customer',n:'Customer service',win:'customer'},vice:{ic:'evento',n:'Decisioni del tuo vice',win:'giornale'}};
 const NOTE_WAIT={var:56,info:84,res:84};   // giorni dopo i quali una notizia, letta o no, se ne va da sola
 const CARD_MS=7000;                         // quanto resta il cartellino (si ferma col mouse sopra)
 const EVLIVE=new WeakMap();                 // notifica -> evento con le sue funzioni; dopo un caricamento si ricostruisce da EVENTS
@@ -4107,6 +4253,7 @@ function notesDaily(){
 function noteAlerts(){
   const a=[], sh=S.warehouses.filter(w=>w.kpi&&overloaded(w,w.kpi));
   if(sh.length) a.push({id:'short',col:'red',ic:'magazzini',title:sh.length===1?`Reparto in affanno a ${sh[0].name}`:`Reparti in affanno in ${sh.length} magazzini`,text:'Il personale non basta per il lavoro di oggi: puntualità e accuratezza scendono. Assumi dalla finestra del magazzino.',win:'magazzini',sel:{wh:sh[0].id}});
+  if(csLoad()>1.02) a.push({id:'cs',col:'yellow',ic:'customer',title:'Customer service sotto organico',text:'Gli addetti non bastano per i clienti di oggi: la qualità del servizio scende. Assumine uno dalla finestra Customer service.',win:'customer'});
   if(planLoad()>1.02) a.push({id:'plan',col:'red',ic:'traffico',title:'Pianificatori del traffico in affanno',text:'In sede non bastano per i viaggi di oggi: assumine uno dalla finestra Personale.',win:'personale'});
   const q=staffPeople().filter(p=>p.quit&&!p.quit.ret), u=staffPeople().filter(p=>!p.quit&&(p.unh||0)>=20);
   if(q.length) a.push({id:'quit',col:'red',ic:'personale',title:q.length===1?`${q[0].name} sta per andarsene`:`${q.length} persone stanno per andarsene`,text:q.length===1?`Ha dato le dimissioni: lascia l'azienda il ${shortDate(q[0].quit.day)}.`:'Hanno dato le dimissioni: trovi i nomi nella finestra Personale.',win:'personale'});
@@ -4211,6 +4358,8 @@ function migrateStaff(s){
 // campi aggiunti dopo: capoturno, cooperativa, pianificatori
 function fillSave(s){
   if(!s.office) s.office={plan:0};
+  // customer service (dalla 0.61): addetti in sede e responsabile
+  if(s.office.cs==null) s.office.cs=0; if(!s.cs) s.cs={resp:null,q:[],last:-99,log:[]};
   // personaggi che invecchiano (dalla 0.24): il CEO diventa una copia modificabile, tutti hanno un giorno di nascita e arrivano i nuovi candidati
   if(!s.boss){ const C=s.custom||CEOS.find(c=>c.id===s.ceoId); s.boss={...JSON.parse(JSON.stringify(C)),since:0,log:[]}; }
   if(s.boss.bd==null) s.boss.bd=bdOf(s.boss.age,hashN(s.boss.name));
@@ -4527,6 +4676,7 @@ const DOCK=[
  ['azienda','Azienda e CEO','<svg width="22" height="24" viewBox="0 0 11 12" shape-rendering="crispEdges"><rect x="3" y="0" width="5" height="5" fill="#f2c79b"/><rect x="3" y="0" width="5" height="2" fill="#6b4a2b"/><rect x="1" y="6" width="9" height="6" fill="#ffd23f"/><rect x="5" y="6" width="1" height="4" fill="#16202e"/></svg>'],
  ['magazzini','Magazzini','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="0" y="3" width="12" height="8" fill="#d8e3ee"/><rect x="1" y="0" width="10" height="3" fill="#8a96a6"/><rect x="4" y="6" width="4" height="5" fill="#3a4658"/></svg>'],
  ['clienti','Clienti','<svg width="24" height="22" viewBox="0 0 12 11" shape-rendering="crispEdges"><rect x="0" y="3" width="12" height="8" fill="#16202e"/><rect x="1" y="4" width="10" height="6" fill="#8a5f36"/><rect x="4" y="0" width="4" height="1" fill="#d8e3ee"/><rect x="3" y="1" width="1" height="2" fill="#d8e3ee"/><rect x="8" y="1" width="1" height="2" fill="#d8e3ee"/><rect x="5" y="6" width="2" height="2" fill="#ffd23f"/></svg>'],
+ ['customer','Customer service',''],
  ['traffico','Ufficio traffico','<svg width="26" height="20" viewBox="0 0 13 10" shape-rendering="crispEdges"><rect x="0" y="1" width="8" height="6" fill="#e8eef5"/><rect x="1" y="3" width="2" height="3" fill="#8ed15b"/><rect x="4" y="3" width="2" height="3" fill="#ffd23f"/><rect x="8" y="3" width="4" height="4" fill="#ff7a3d"/><rect x="9" y="4" width="2" height="1" fill="#bfe6ff"/><rect x="1" y="7" width="2" height="2" fill="#16202e"/><rect x="9" y="7" width="2" height="2" fill="#16202e"/></svg>'],
  ['gare','Gare d\'appalto','<svg width="18" height="22" viewBox="0 0 8 10" shape-rendering="crispEdges"><rect x="0" y="0" width="8" height="10" fill="#fff"/><rect x="1" y="2" width="6" height="1" fill="#16202e"/><rect x="1" y="4" width="6" height="1" fill="#16202e"/><rect x="1" y="6" width="4" height="1" fill="#16202e"/></svg>'],
  ['personale','Personale e manager','<svg width="26" height="22" viewBox="0 0 13 11" shape-rendering="crispEdges"><rect x="1" y="0" width="4" height="4" fill="#f2c79b"/><rect x="0" y="5" width="6" height="6" fill="#5fb4f0"/><rect x="8" y="0" width="4" height="4" fill="#c98762"/><rect x="7" y="5" width="6" height="6" fill="#8ed15b"/></svg>'],
@@ -4540,9 +4690,9 @@ const DOCK=[
  ['enciclopedia','Enciclopedia (tasto E)','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="1" y="0" width="9" height="10" fill="#9b6bff"/><rect x="1" y="0" width="2" height="10" fill="#6f43cf"/><rect x="3" y="9" width="7" height="2" fill="#fff"/><rect x="5" y="2" width="3" height="1" fill="#ffd23f"/><rect x="7" y="3" width="1" height="2" fill="#ffd23f"/><rect x="6" y="5" width="1" height="1" fill="#ffd23f"/><rect x="6" y="7" width="1" height="1" fill="#ffd23f"/></svg>'],
  ['giornale','Il giornale','<svg width="24" height="20" viewBox="0 0 12 10" shape-rendering="crispEdges"><rect x="0" y="0" width="12" height="10" fill="#f4f1ec"/><rect x="1" y="1" width="10" height="2" fill="#16202e"/><rect x="1" y="4" width="4" height="4" fill="#8a96a6"/><rect x="6" y="4" width="5" height="1" fill="#16202e"/><rect x="6" y="6" width="5" height="1" fill="#16202e"/></svg>']
 ];
-const TITLES={finale:'Report della partita',classifica:'Classifica',policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',traffico:'Ufficio traffico',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP',cassa:'Cassa e bilancio',mese:'Conti del mese scorso',morale:'Morale dei dipendenti',otif:'OTIF e livelli di servizio'};
+const TITLES={finale:'Report della partita',classifica:'Classifica',policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',traffico:'Ufficio traffico',customer:'Customer service',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP',cassa:'Cassa e bilancio',mese:'Conti del mese scorso',morale:'Morale dei dipendenti',otif:'OTIF e livelli di servizio'};
 // sul telefono il menu è raggruppato e ogni voce dice in una riga come sta il suo reparto
-const DOCK_G=[['Operazioni',['magazzini','traffico','personale','clienti','gare','espansione']],['Azienda',['azienda','riepilogo','direzione','policy','tecnologia']],['Informazioni',['classifica','report','enciclopedia','giornale']]];
+const DOCK_G=[['Operazioni',['magazzini','traffico','personale','clienti','customer','gare','espansione']],['Azienda',['azienda','riepilogo','direzione','policy','tecnologia']],['Informazioni',['classifica','report','enciclopedia','giornale']]];
 DOCK.forEach(d=>{if(ICONE.menu[d[0]])d[2]=pxSvg(ICONE.menu[d[0]],32);});  // icone 16x16 a 32 px (tools/icone_gioco)
 function setMenu(on){UI.menu=!!on&&MOB; document.documentElement.classList.toggle('menu',UI.menu); const b=$('#burger'); if(b){b.setAttribute('aria-expanded',String(UI.menu)); b.setAttribute('aria-label',UI.menu?'Chiudi il menu':'Apri il menu');}}
 function renderDock(){
@@ -4552,7 +4702,7 @@ function renderDock(){
   const B={gare:openT,magazzini:short,personale:planS,policy:staffPeople().filter(p=>p.quit||(p.unh||0)>=20).length};
   const dirFree=R('direzione')&&Object.values(S.dirs).some(v=>!v);
   document.documentElement.classList.toggle('haswin',Object.keys(UI.open).length>0);  // sul telefono le lenti si nascondono sotto le finestre
-  const note=id=>id==='magazzini'&&short?['bad','Un reparto è in affanno']:id==='personale'&&planS?['bad','Pianificatori del traffico in affanno']:id==='gare'&&openT?['bad',openT===1?'1 gara aperta':openT+' gare aperte']:
+  const note=id=>id==='magazzini'&&short?['bad','Un reparto è in affanno']:id==='personale'&&planS?['bad','Pianificatori del traffico in affanno']:id==='customer'?(csLoad()>1.02?['bad','Mancano addetti']:['acc','Qualità del servizio '+csQ()]):id==='gare'&&openT?['bad',openT===1?'1 gara aperta':openT+' gare aperte']:
     id==='tecnologia'&&S.project?['acc','Ricerca in corso: ancora '+wks(S.project.left)]:id==='direzione'&&!R('direzione')?['mut','Si sblocca con la ricerca Struttura direzionale']:id==='direzione'&&dirFree?['bad','Ci sono posti da dirigente liberi']:
     id==='policy'&&B.policy?['bad','Un manager sta per andarsene']:id==='policy'&&!R('regolamento')?['mut','Si sblocca con la ricerca Regolamento aziendale']:id==='report'&&S.repNew?['acc','Nuovo report del lunedì']:id==='classifica'&&rivals().length?['acc',HUM.won?'Partita finita':`Sei ${allCo().filter(c=>!c.over).sort((a,b)=>coValue(b)-coValue(a)).indexOf(HUM)+1}° su ${liveCo().length}`]:null;
   const btn=([id,t,ic])=>{const n=note(id);
@@ -4675,7 +4825,7 @@ function rpPerson(p,role,extra){
 // ---- report di fine partita ----
 const FIN_TABS=[['sint','Sintesi'],['cresc','Crescita'],['anni','Anno per anno'],['cron','Cronaca'],['avv','Avversari']];
 // persone per gruppo: magazzino (con capiturno, impiegati e facility manager), autisti, ufficio traffico
-const sGrp=st=>{st=st||{}; return {m:(st.pick||0)+(st.car||0)+(st.capo||0)+(st.imp||0)+(st.fm||0),a:(st.autB||0)+(st.autCE||0),u:st.plan||0};};
+const sGrp=st=>{st=st||{}; return {m:(st.pick||0)+(st.car||0)+(st.capo||0)+(st.imp||0)+(st.fm||0),a:(st.autB||0)+(st.autCE||0),u:(st.plan||0)+(st.cs||0)};};
 // il titolo di fine partita dipende dal fatturato migliore in 12 mesi
 const FIN_RANK=[[0,'Padroncino con ambizioni','Un magazzino, tanta buona volontà e un furgone che fa un rumore strano in quarta.'],
  [1e6,'Terzista di fiducia','I clienti ti chiamano quando il loro logistico non risponde al telefono.'],
@@ -4728,6 +4878,14 @@ function lensTrips(){ const L=[],R=[];
     }); });
   return [`<g aria-label="Viaggi" shape-rendering="auto">`,...L,...R,'</g>'];
 }
+// riga degli addetti al customer service: ritratto, carico, pulsanti per assumere e licenziare (Personale e Customer service)
+function csRow(){ const n=csNeed(), l=csLoad(), q=S.queue.filter(x=>x.role==='cs').length;
+  return `<div class="wh-st"><img class="px" src="${S.office.cs?IMG.cs:IMG.anon}" alt="" width="40" height="46">
+    <div class="wh-sm"><div class="wh-nm">${kw('addetti_cs',ROLE.cs)}</div>
+     ${n&&l<9?`<div class="wh-ld"><div class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></div><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b></div>`:`<div class="sm wh-nm">${n?'<span class="bad">nessuno: qualità del servizio in calo</span>':`fino a ${CS.free} clienti basta il responsabile`}</div>`}
+     ${q?`<div class="sm wh-inq">+${q} in arrivo</div>`:''}</div>
+    <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="cs" ${S.office.cs<=0?'disabled':''} aria-label="Licenzia: addetto al customer service" data-tip="<div class='tt'>Licenzia</div>Un mese di stipendio di buonuscita, reputazione −0,3. Dal 4° licenziamento in 4 settimane è un'ondata: finisce sul giornale.">−</button><b class="num ${l>1.02?'bad':''}">${S.office.cs}</b><button class="btn sm2 pri" data-act="hire" data-role="cs" aria-label="Assumi: addetto al customer service" data-tip="Assumi">+</button></div></div>`; }
+const CS_HOW={auto:'sistemato dal customer service',manager:'è andato il manager',mail:'risposta per mail',ceo:'ha chiamato il CEO',nessuno:'nessuno ha risposto'};
 const VIEWS={
  azienda(){
   const C=ceo(), L=S.last;
@@ -4861,7 +5019,7 @@ const VIEWS={
   const id=UI.sel.wh||S.warehouses[0].id; const w=whById(id)||S.warehouses[0]; UI.sel.wh=w.id; const k=w.kpi||computeWH(w);
   const tabs=S.warehouses.length>1?`<div class="tabs" role="tablist">${S.warehouses.map(x=>`<button role="tab" aria-selected="${x.id===w.id}" data-act="selwh" data-id="${x.id}">${esc(x.name)}</button>`).join('')}</div>`:'';
   const q=S.queue.filter(q=>q.wh===w.id);
-  const mgrOpts=[w.mgr==='ceo'||!S.warehouses.some(x=>x.mgr==='ceo')?`<option value="ceo" ${w.mgr==='ceo'?'selected':''}>${esc(ceo().name)} (CEO)</option>`:'',...S.managers.filter(m=>m.hired&&!seatOf(m.id)&&(!m.wh||m.wh===w.id)).map(m=>`<option value="${m.id}" ${w.mgr===m.id?'selected':''}>${esc(m.name)}</option>`)].join('');
+  const mgrOpts=[w.mgr==='ceo'||!S.warehouses.some(x=>x.mgr==='ceo')?`<option value="ceo" ${w.mgr==='ceo'?'selected':''}>${esc(ceo().name)} (CEO)</option>`:'',...S.managers.filter(m=>m.hired&&!seatOf(m.id)&&!isCs(m.id)&&(!m.wh||m.wh===w.id)).map(m=>`<option value="${m.id}" ${w.mgr===m.id?'selected':''}>${esc(m.name)}</option>`)].join('');
   const cl=S.clients.filter(c=>c.wh===w.id&&c.status!=='perso');
   const ld=staffLoad(w,k);
   if(UI.whProd) return tabs+prodView(w,k,ld);
@@ -4993,7 +5151,7 @@ const VIEWS={
  },
  personale(){
   const ks=S.warehouses.map(w=>[w,w.kpi||computeWH(w)]), pn=planNeed(), pl=planLoad(), pq=S.queue.filter(q=>q.role==='plan').length;
-  const tot=ks.reduce((a,[w])=>a+staffTot(w),0)+S.office.plan;
+  const tot=ks.reduce((a,[w])=>a+staffTot(w),0)+S.office.plan+S.office.cs;
   const hot=ks.reduce((a,[w,k])=>{const l=staffLoad(w,k);return a+LOAD_ROLES.filter(r=>l[r]>1.02).length+(l.fm>0?1:0);},0)+(pn&&pl>1.02?1:0);
   const hired=S.managers.filter(m=>m.hired), free=S.managers.filter(m=>!m.hired&&avail(m));
   const tile=(cls,lab,val,sub)=>`<div class="kpi wh-k ${cls}"><div class="lab">${lab}</div><b>${val}</b><div class="sm">${sub}</div></div>`;
@@ -5001,8 +5159,8 @@ const VIEWS={
   const roleRow=(w,k,r)=>{const l=staffLoad(w,k)[r], n=w.staff[r], bar=r!=='fm'&&!(r==='capo'&&l===0)&&l<9;
    const txt=r==='fm'?(l?'<span class="bad">manca</span>':'<span class="ok">ok</span>'):r==='capo'&&l===0?'<span class="sm">dal manager</span>':l>=9?'<span class="bad">fermo</span>':'';
    return `<div class="pr-r"><img class="px" src="${n?IMG[r]:IMG.anon}" alt="" width="24" height="28"><span class="wh-nm">${kw(ROLE_WK[r],ROLE[r])}</span><b class="num ${bar&&l>1.02?'bad':''}">${n}</b><span class="pr-l">${bar?`<span class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></span><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>`:txt}</span></div>`;};
-  const mgrCard=m=>personCard(m,m.hired?(seatOf(m.id)?esc(DIR_ROLES.find(r=>r.id===seatOf(m.id)).name):m.wh?'a '+esc(whById(m.wh).name):'senza incarico'):null,
-    m.hired?`<button class="btn sm2" data-act="firemgr" data-id="${m.id}">Licenzia · ${eur(m.ral/12*COEF)}</button>`:`<button class="btn pri" data-act="hiremgr" data-id="${m.id}">Assumi</button>`, m.hired&&(m.quit||(m.unh||0)>=20), !!(m.wh||seatOf(m.id)));
+  const mgrCard=m=>personCard(m,m.hired?(seatOf(m.id)?esc(DIR_ROLES.find(r=>r.id===seatOf(m.id)).name):isCs(m.id)?'Customer service':m.wh?'a '+esc(whById(m.wh).name):'senza incarico'):null,
+    m.hired?`<button class="btn sm2" data-act="firemgr" data-id="${m.id}">Licenzia · ${eur(m.ral/12*COEF)}</button>`:`<button class="btn pri" data-act="hiremgr" data-id="${m.id}">Assumi</button>`, m.hired&&(m.quit||(m.unh||0)>=20), !!(m.wh||seatOf(m.id)||isCs(m.id)));
   return `<div class="wh-kpis c2">
    ${tile('','Persone',tot,'in tutta l\'azienda')}
    ${tile(hot?'bad':'ok',kw('carico','In affanno'),hot,hot===1?'reparto':'reparti')}
@@ -5018,12 +5176,39 @@ const VIEWS={
      ${pn&&pl<9?`<div class="wh-ld"><div class="bar"><i style="width:${Math.min(100,pl*100/1.5)}%;background:${loadCol(pl)}"></i></div><b style="color:${loadCol(pl)}">${Math.round(pl*100)}%</b></div>`:`<div class="sm wh-nm">${pn?'<span class="bad">nessuno: giri non organizzati</span>':'i giri li organizzi tu'}</div>`}
      ${pq?`<div class="sm wh-inq">+${pq} in arrivo</div>`:''}</div>
     <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="plan" ${S.office.plan<=0?'disabled':''} aria-label="Licenzia: pianificatore del traffico" data-tip="<div class='tt'>Licenzia</div>Un mese di stipendio di buonuscita, morale del magazzino −4 per un mese, reputazione −0,3. Dal 4° licenziamento in 4 settimane è un'ondata: finisce sul giornale.">−</button><b class="num ${pl>1.02?'bad':''}">${S.office.plan}</b><button class="btn sm2 pri" data-act="hire" data-role="plan" aria-label="Assumi: pianificatore del traffico" data-tip="Assumi">+</button></div></div>
-   <div class="sm">${pn?`Organizzano i giri dei camion di tutti i magazzini: ognuno che manca toglie 2 punti di puntualità ovunque, con la squadra al completo i km costano il 4% in meno.`:`Fino a 150 viaggi al mese i giri li organizzi tu, poi serve un pianificatore ogni 150 viaggi.`}</div></div>
+   <div class="sm">${pn?`Organizzano i giri dei camion di tutti i magazzini: ognuno che manca toglie 2 punti di puntualità ovunque, con la squadra al completo i km costano il 4% in meno.`:`Fino a 150 viaggi al mese i giri li organizzi tu, poi serve un pianificatore ogni 150 viaggi.`}</div>
+   ${csRow()}<div class="sm">Rispondono alle richieste dei clienti: ne serve uno ogni ${CS.per} clienti dopo i primi ${CS.free}. Il responsabile si sceglie nella finestra ${kw('customer_service','Customer service')}.</div></div>
   <div class="card"><div class="row"><span class="h3">${kw('assunzioni')} in corso</span><span class="sm">${S.queue.length||'nessuna'}</span></div>
    ${S.queue.map(q=>`<div class="pr-q"><img class="px" src="${IMG[q.role]}" alt="" width="24" height="28"><span class="wh-nm">${ROLE1[q.role]||ROLE[q.role]} <span class="sm">${q.wh?esc(whById(q.wh).name):'sede'}</span></span><span class="pill">${wks(q.days)}</span></div>`).join('')}
    <div class="sm">Fanno prima benefit, welfare del magazzino e reputazione alta. Gli autisti CE sono i più difficili da trovare.</div></div>
   ${hired.length?`<div class="lab">${kw('manager','Manager')} in squadra</div>${hired.map(mgrCard).join('')}`:''}
   ${free.length?`<div class="lab">${kw('manager','Manager')} disponibili</div>${free.map(mgrCard).join('')}`:''}`;
+ },
+ customer(){
+  const Q=csQual(), q=Q.v, m=csPers(), p=csWho(), act=csAct(), n=csNeed(), L=S.cs.log||[], W=S.cs.q||[];
+  const qc=q>=CS.hi?'ok':q<CS.lo?'bad':'', eff=csSat(q);
+  const free=S.managers.filter(x=>x.hired&&!x.wh&&!seatOf(x.id)&&!isCs(x.id));
+  const opts=`<option value="" ${m?'':'selected'}>${esc(ceo().name)} (CEO, con una penalità di ${-CS.ceo})</option>`+[...(m?[m]:[]),...free].map(x=>`<option value="${x.id}" ${m===x?'selected':''}>${esc(x.name)} (Negoziazione ${x.st.neg}, Precisione ${x.st.prec})</option>`).join('');
+  const csScore=x=>2*x.st.neg+1.5*x.st.prec+((x.tal||[]).reduce((a,t)=>a+(((TALENTS[t]||{}).cs||{}).q||0),0));
+  const mk=S.managers.filter(x=>!x.hired&&avail(x)).sort((a,b)=>csScore(b)-csScore(a)).slice(0,3);
+  const cli=c=>S.clients.find(x=>x.id===c);
+  return `<div class="rp-tiles c4">
+    ${rpTile('Qualità del servizio',q,q>=CS.hi?'clienti un po\' più contenti':q<CS.lo?'clienti un po\' più scontenti':'nella media','qualita_cs',qc)}
+    ${rpTile('Clienti seguiti',act.length,n?`servono ${n} addett${n===1?'o':'i'}`:'basta il responsabile','customer_service')}
+    ${rpTile('Addetti',S.office.cs+' / '+n,S.office.cs<n?'mancano persone':'squadra al completo','addetti_cs',S.office.cs<n?'bad':'ok')}
+    ${rpTile('Richieste in attesa',W.length,W.length?'arrivano tra le notifiche':'nessuna','richieste_clienti',W.length?'':'ok')}</div>
+   <div class="card"><div class="row"><span class="h3">${kw('customer_service','Responsabile')}</span><span class="sm">${m?'in carica':'nessuno: se ne occupa il CEO'}</span></div>
+    <div class="cs-p"><img class="px mport" src="${pImg(p)}" alt="Ritratto di ${esc(p.name)}" width="80" height="94">${rpPerson(p,m?`${kw('customer_service','Responsabile del customer service')} · ${eur(m.ral)} l'anno`:'CEO, nel tempo che avanza')}</div>
+    <select data-act="setcs" aria-label="Responsabile del customer service">${opts}</select>
+    <div class="sm">Contano ${statBadge('neg',p.st.neg,14)} Negoziazione (calma i clienti) e ${statBadge('prec',p.st.prec,14)} Precisione (risponde giusto). Puoi nominare un manager che non guida un magazzino e non siede in Direzione.</div></div>
+   ${rpParts('Qualità del servizio','qualita_cs',Q.parts,q,'',0,100)}
+   <div class="card"><div class="row"><span class="h3">Addetti in sede</span><span class="sm">uno ogni ${CS.per} clienti dopo i primi ${CS.free}</span></div>${csRow()}
+    <div class="sm">Ognuno che manca toglie ${-CS.miss} punti di qualità. A fine mese la qualità sposta la ${kw('soddisfazione')} di ogni cliente: <b class="${eff>0?'ok':eff<0?'bad':''}">${eff>0?'+':eff<0?'−':''}${Math.abs(eff)}</b> (sopra ${CS.hi} +1, sotto ${CS.lo} −1${csTal('sat')?', più i talenti':''}).</div></div>
+   <div class="card"><div class="row"><span class="h3">${kw('richieste_clienti','Richieste dei clienti')}</span><span class="sm">${L.length?'le più recenti':'ancora nessuna'}</span></div>
+    ${W.map(x=>{const c=cli(x.c); return c?`<div class="pr-q">${logoSvg(c.name,24)}<span class="wh-nm">${esc(c.name)} <span class="sm">${esc(DRAMMI[x.v].n)}</span></span><span class="pill" style="background:var(--yellow);color:var(--ink)">in attesa</span></div>`:'';}).join('')}
+    ${L.map(x=>`<div class="pr-q">${logoSvg(x.c,24)}<span class="wh-nm">${esc(x.c)} <span class="sm">${esc(x.n)} · ${CS_HOW[x.how]||''} · ${shortDate(x.d)}</span></span><span class="pill cl-st ${x.ok?'ok':'bad'}">${x.ok?'Risolto':'Male'}</span></div>`).join('')}
+    <div class="sm">Ogni cliente fa una richiesta ogni 7-8 mesi circa. Il customer service sistema da solo le piccole (più è alta la qualità, più spesso); le altre arrivano come notifica gialla e decidi tu. Dopo ${wks(CS.wait)} senza risposta il cliente si arrabbia da solo.</div></div>
+   ${mk.length?`<div class="lab">Sul mercato, adatti al customer service</div>${mk.map(x=>personCard(x,null,`<button class="btn pri" data-act="hirecs" data-id="${x.id}">Assumi come responsabile</button>`)).join('')}`:''}`;
  },
  tecnologia(){
   const tree=UI.sel.tree||'log'; const pj=S.project;
@@ -5073,7 +5258,7 @@ const VIEWS={
  },
  direzione(){
   if(!R('direzione')) return `<div class="card pend"><span class="h3">Serve la Struttura direzionale</span><div>La squadra dei dirigenti arriva con la ricerca <b>Struttura direzionale</b> nell'albero Sviluppo aziendale (richiede il Gestionale amministrativo).</div><div><button class="btn sm2 pri" data-act="opentech" data-tree="org" data-id="direzione">Apri l'albero</button></div></div>`;
-  const pool=[...S.managers.filter(m=>m.hired&&!m.wh),...S.execs.filter(e=>e.hired)];
+  const pool=[...S.managers.filter(m=>m.hired&&!m.wh&&!isCs(m.id)),...S.execs.filter(e=>e.hired)];
   const seats=DIR_ROLES.map(r=>{const p=personById(S.dirs[r.id]);const v=p?p.st[r.stat]:null;
     const opts=pool.filter(x=>!seatOf(x.id)||S.dirs[r.id]===x.id).map(x=>`<option value="${x.id}" ${S.dirs[r.id]===x.id?'selected':''}>${esc(x.name)} (${r.statN} ${x.st[r.stat]})</option>`).join('');
     return `<div class="card dr-s ${p?(v>=10?'':'cl-bad'):'pend'}"><div class="wh-st" style="border:0;padding:0"><img class="px" src="${p?IMG['m_'+p.id]:IMG.anon}" alt="${p?'':'Posto vacante'}" width="40" height="46">
@@ -5423,7 +5608,7 @@ const VIEWS={
     const empty='I grafici compaiono dalla fine del secondo mese.', c2={w:440,h:230,maxLab:5,xl,empty};
     body=`<div class="sm">${byY?'Un punto per ogni anno (* = anno non completo): soldi e pallet sono la somma dell\'anno, persone, magazzini e clienti quelli di fine anno.':'Un punto per ogni mese.'}</div>
     <div class="lc-row">${lineChart('fn_ru',{...c2,title:`Fatturato e utile ${per}`,labels:lab,nice:1,min:-1e12,max:1e12,ml:62,mr:118,fmt:v=>eur(v),ax:euK,series:[{n:'Fatturato',c:SERIES_C[0],v:P.map(r=>r.ric)},{n:'Utile',c:SERIES_C[3],v:P.map(r=>r.util)}]})}
-     ${lineChart('fn_st',{...c2,title:'Dipendenti',labels:lab,nice:1,min:0,max:1e9,mr:118,fmt:n0,ax:n0,series:[{n:'Totale',c:SERIES_C[2],v:P.map(r=>byY?r.staff:histStaff(r))},{n:'Magazzino',c:SERIES_C[1],v:g.map(x=>x.m)},{n:'Autisti',c:SERIES_C[0],v:g.map(x=>x.a)},{n:'Ufficio traffico',short:'Ufficio',c:SERIES_C[4],v:g.map(x=>x.u)}]})}</div>
+     ${lineChart('fn_st',{...c2,title:'Dipendenti',labels:lab,nice:1,min:0,max:1e9,mr:118,fmt:n0,ax:n0,series:[{n:'Totale',c:SERIES_C[2],v:P.map(r=>byY?r.staff:histStaff(r))},{n:'Magazzino',c:SERIES_C[1],v:g.map(x=>x.m)},{n:'Autisti',c:SERIES_C[0],v:g.map(x=>x.a)},{n:'Sede (traffico e customer service)',short:'Sede',c:SERIES_C[4],v:g.map(x=>x.u)}]})}</div>
     <div class="lc-row">${lineChart('fn_wc',{...c2,title:'Magazzini e clienti attivi',labels:lab,nice:1,min:0,max:1e9,mr:118,fmt:n0,ax:n0,series:[{n:'Magazzini',c:SERIES_C[1],v:P.map(r=>r.wh||0)},{n:'Clienti attivi',short:'Clienti',c:SERIES_C[0],v:P.map(r=>r.cli||0)}]})}
      ${lineChart('fn_cd',{...c2,title:'Cassa e debito a fine periodo',labels:lab,nice:1,min:-1e12,max:1e12,ml:62,mr:118,fmt:v=>eur(v),ax:euK,series:[{n:'Cassa',c:SERIES_C[0],v:P.map(r=>r.cash)},{n:'Debito',c:SERIES_C[1],v:P.map(r=>r.debt||0)}]})}</div>
     <div class="lc-row">${lineChart('fn_pa',{...c2,title:'Puntualità e accuratezza (media)',labels:lab,unit:'%',mr:118,series:[{n:'Puntualità',c:KPI_C.P,v:P.map(r=>r.P)},{n:'Accuratezza',c:KPI_C.A,v:P.map(r=>r.A)}]})}
@@ -5606,7 +5791,7 @@ const ACT={
    {t:`Agenzia interinale · ${wks(hireDays(h.age[0],w,r))}`,e:`${eur(h.age[1])}`,f:()=>doHire(r,d.wh,hireDays(h.age[0],w,r),h.age[1])}]);
  },
  fire(d){
-  const r=d.role, x=fireOne(r==='plan'?null:whById(d.wh),r); if(!x) return;
+  const r=d.role, x=fireOne(OFFICE.includes(r)?null:whById(d.wh),r); if(!x) return;
   if(x.coop) toast(`La cooperativa riprende 1 ${ROLE1[r]}: nessuna buonuscita`,'ok');
   else toast(`Licenziamento: ${eur(x.sal)} di buonuscita, morale e reputazione in calo${x.wave?'. È un\'ondata di licenziamenti!':''}`,x.wave?'bad':'warn');
   renderAll();
@@ -5629,10 +5814,12 @@ const ACT={
   const w=whById(d.wh); const v=el.value;
   S.warehouses.forEach(x=>{ if(x.id!==w.id&&x.mgr===v) x.mgr=null; });
   S.managers.forEach(m=>{ if(m.wh===w.id) m.wh=null; });
-  w.mgr=v||null; const m=S.managers.find(x=>x.id===v); if(m) m.wh=w.id; renderAll();
+  w.mgr=v||null; const m=S.managers.find(x=>x.id===v); if(m){ m.wh=w.id; if(isCs(m.id)) S.cs.resp=null; } renderAll();
  },
  hiremgr(d){const m=S.managers.find(x=>x.id===d.id);m.hired=true;m.raiseDay=S.day;m.unh=0;m.quit=null;toast(`${m.name} entra in azienda: assegnalo a un magazzino o alla direzione`,'ok');const w=S.warehouses.find(w=>!w.mgr);if(w){w.mgr=m.id;m.wh=w.id;}renderAll();},
- firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});m.hired=false;m.wh=null;renderAll();},
+ firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});if(isCs(m.id))S.cs.resp=null;m.hired=false;m.wh=null;renderAll();},
+ hirecs(d){const m=S.managers.find(x=>x.id===d.id); if(!m) return; m.hired=true; m.raiseDay=S.day; m.unh=0; m.quit=null; m.wh=null; S.cs.resp=m.id; toast(`${m.name} entra in azienda e guida il customer service`,'ok'); renderAll();},
+ setcs(d,el){const v=el.value||null; if(v){S.warehouses.forEach(w=>{if(w.mgr===v)w.mgr=null;}); Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===v)S.dirs[k]=null;}); const m=S.managers.find(x=>x.id===v); if(m){m.wh=null; toast(`${m.name} guida il customer service`,'ok');}} S.cs.resp=v; renderAll();},
  selcli(d){UI.sel.cli=d.id;UI.sel.cell='A1';renderWin('report');},
  rpwh(d){UI.sel.rpwh=d.id;renderWin('riepilogo');},
  morwh(d){UI.sel.rpwh=d.id;renderWin('morale');renderWin('otif');},
@@ -5667,7 +5854,7 @@ const ACT={
  install(d){const t=TECH.find(x=>x.id===d.id), w=whById(d.wh); if(!R(t.id)||w.tech[t.id]||S.cash<t.inst||(t.tree==='wel'&&polOn('spending')))return; S.cash-=t.inst; S.cur[t.tree==='wel'?'welf':'tech']+=t.inst; w.tech[t.id]={day:S.day};
   toast(t.weeks?`${t.name} installato a ${w.name}: inizia l'apprendimento`:`${t.name} attivo a ${w.name}`,'ok'); renderAll();},
  canceltech(){ if(!S.project)return; const r=S.project.cost*0.5; S.cash+=r; S.cur.tech-=r; toast(`Ricerca annullata: rimborsati ${eur(r)}`,'warn'); S.project=null; renderAll(); },
- setdir(d,el){const v=el.value||null; Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===v)S.dirs[k]=null;}); S.dirs[d.role]=v; if(v){const p=personById(v); toast(`${p.name} è il nuovo ${DIR_ROLES.find(r=>r.id===d.role).name.toLowerCase()}`,'ok');} renderAll();},
+ setdir(d,el){const v=el.value||null; Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===v)S.dirs[k]=null;}); S.dirs[d.role]=v; if(isCs(v)) S.cs.resp=null; if(v){const p=personById(v); toast(`${p.name} è il nuovo ${DIR_ROLES.find(r=>r.id===d.role).name.toLowerCase()}`,'ok');} renderAll();},
  hireexec(d){const e=S.execs.find(x=>x.id===d.id); if(S.cash<15000)return; S.cash-=15000; S.cur.altro+=15000; e.hired=true; e.raiseDay=S.day; e.unh=0; e.quit=null; toast(`${e.name} entra in azienda: nominalo in Direzione`,'ok'); renderAll();},
  fireexec(d){const e=S.execs.find(x=>x.id===d.id); const c=e.ral/12*COEF; S.cash-=c; S.cur.altro+=c; e.hired=false; Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===e.id)S.dirs[k]=null;}); renderAll();},
  rent(d){
@@ -5740,7 +5927,7 @@ function wikiShow(){
   const l=el.querySelector('#wiki-list'); l.scrollTop=ls; const c=l.querySelector('[aria-current="true"]');
   if(c&&(c.offsetTop<l.scrollTop||c.offsetTop>l.scrollTop+l.clientHeight-30)) l.scrollTop=c.offsetTop-l.clientHeight/3;
 }
-function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh:r==='plan'?null:wh,days});toast(`Ricerca avviata: arriva tra ${wks(days)}`,'ok');}
+function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh:OFFICE.includes(r)?null:wh,days});toast(`Ricerca avviata: arriva tra ${wks(days)}`,'ok');}
 function setSpeed(v){if(contMode())v=1; S.speed=Math.min(v,1);renderTop();}
 function showModal(html){if(contMode()&&!AUTO)UI.auto={due:S.day+7,f:closeModal}; $('#modal').innerHTML=`<div class="ovl"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;const b=$('#modal button');if(b)b.focus();}
 function closeModal(){$('#modal').innerHTML='';UI.auto=null;if(UI.evSpeed){setSpeed(UI.evSpeed);UI.evSpeed=0;} if((UI.mq||[]).length&&S&&!S.over) modalInfo(...UI.mq.shift());}
@@ -5974,6 +6161,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.61',t:'Customer service',x:['Nuova finestra «Customer service» nel menu: un responsabile e, dal quarto cliente, gli addetti in sede rispondono ai clienti. Finché non nomini nessuno se ne occupa il CEO, ma con una penalità.','La qualità del servizio dipende da Negoziazione e Precisione di chi guida il reparto, dai suoi talenti e dagli addetti che mancano. Sopra 70 i clienti sono un po\' più contenti ogni mese, sotto 35 un po\' meno.','Ogni tanto un cliente ha un problema enorme che a guardarlo bene è una sciocchezza: il bancale dietro la macchinetta del caffè, l\'etichetta storta, l\'autista che non ha salutato. Il customer service sistema da solo le piccole; le altre arrivano come tessera gialla e scegli tu se mandare il manager, scrivere una mail o chiamare il titolare.','Tre nuovi manager adatti al customer service (Mirella Cattaneo, Gianfranco Lodigiani e, dal 2005, Kevin Sartori) e tre nuovi talenti con i loro eventi: Voce da call center, Risponde anche alle 23, Promette tutto.','Anche le aziende avversarie hanno il loro customer service, con le stesse regole.']},
  {v:'0.60',t:'Ricerche di almeno 3 settimane, tempi in settimane',x:['Ogni ricerca dura almeno 3 settimane, anche con un\'Innovazione altissima. Formazione strutturata, Boccioni d\'acqua, Macchinette del caffè, Sala pausa arredata, Spogliatoi e docce e Lavanderia delle divise ora partono da 3 settimane.','I tempi si leggono in settimane anche nell\'albero delle tecnologie, nel report, negli eventi e nell\'enciclopedia: non più «21 g» ma «3 settimane». Restano in giorni solo le cose che durano meno di una settimana.']},
  {v:'0.59',t:'Barra in alto più ordinata',x:['Il tempo ha una sola velocità: tolto il pulsante x2. Restano pausa e avanti (spazio o il tasto 1); sul telefono il pulsante accanto a «Menu» alterna pausa e avanti.','Il riquadro rosso «In pausa» sta in fondo a destra nella barra in alto, anche sul telefono, oltre alla scritta sulla mappa.','Settimana, data, pulsanti del tempo, opzioni e numeri dell\'azienda sono riquadri della stessa altezza, centrati nella barra; sul computer largo tutto sta su una riga sola.']},
  {v:'0.58',t:'Partite online',x:['Nella schermata principale c\'è il riquadro «Salvataggio online»: entra con Google e le tue partite si salvano anche online, così le ritrovi sul telefono e sul computer.','Puoi anche giocare come ospite, senza account: le partite vanno online legate al browser, e con «Collega Google» le porti sul tuo account senza perdere niente.','Se la stessa partita è andata avanti su due dispositivi, il gioco ti chiede quale versione tenere.','Ogni partita si può scaricare su file come copia di sicurezza e ricaricare con «Carica da file»; durante il gioco c\'è «Scarica la partita su file» nelle Opzioni.']},
@@ -6305,6 +6493,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>

@@ -151,7 +151,14 @@ def tshirt(col):   # maglietta girocollo: bordino scuro attorno al collo
 def sq_glasses(c):
     c.px(line_px(16,22,21)+line_px(26,32,21)+[(15,22),(15,23),(15,24),(33,22),(33,23),(33,24)],'#16202e')
 person('andrew',skin='chiara',hair='#e8c25a',hairl='#fbe39a',haird='#b08a2e',hairstyle='short',cloth='#2e9e48',clothd='#1f7a34',clothl='#5cc472',glasses='#16202e',collar=tshirt('#1f7a34'),extra=sq_glasses)
-NEW=['giorgio','aisha','ivan','sara','nicola','elena','matteo','beatrice','paolo','federico','andrew']
+# customer service: i responsabili (manager) e l'addetto in sede, con la cuffia del telefono
+def headset(c):
+    c.px(line_px(14,34,9)+[(13,10),(35,10),(13,11),(35,11)],'#16202e'); c.fill(rect(11,20,15,28),'#16202e'); c.px([(14,28),(15,29),(16,30),(17,31),(18,31)],'#16202e')
+person('mirella',skin='chiara',hair='#5a2430',hairl='#8a3a4a',hairstyle='bob',cloth='#e0393e',clothd='#a8262b',clothl='#ff6a6e',lips='#b8323a',earring='#e2b84a',collar=cc_col('#f4f5f7'),extra=headset)
+person('gianfranco',skin='media',hair='#9aa0a8',hairl='#c9ced4',hairstyle='short',cloth='#3a6db0',clothd='#264f86',clothl='#5a8bd0',mustache='#9aa0a8',collar=tie('#ffd23f'))
+person('kevin',skin='media',hair='#2c2420',hairl='#4a3c34',hairstyle='messy',cloth='#1f9e8f',clothd='#157366',clothl='#3dd6c4',glasses='#16202e',collar=tshirt('#157366'),extra=headset)
+person('operatore',skin='scura',hair='#1c1612',hairl='#3d2419',hairstyle='buzz',cloth='#ffd23f',clothd='#d9a514',clothl='#ffe88a',collar=polo('#d9a514'),extra=headset)
+NEW=['giorgio','aisha','ivan','sara','nicola','elena','matteo','beatrice','paolo','federico','andrew','mirella','gianfranco','kevin','operatore']
 
 # posto vacante: sagoma anonima in ombra (p_anonimo), con un punto di domanda sul petto
 def anonimo():

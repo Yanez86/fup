@@ -127,7 +127,7 @@ async def phone(b, w, h, name, errs):
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
     await pg.tap('#burger'); await pg.wait_for_timeout(250)
     assert await pg.evaluate(FITS, '#dock'), f'{name}: menu aperto fuori schermo'
-    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 15, f'{name}: mancano voci nel menu'
+    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 16, f'{name}: mancano voci nel menu'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_menu.png'))
     await pg.tap('#dock .dh [data-act=menu]'); await pg.wait_for_timeout(250)
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu non si chiude'
@@ -152,7 +152,7 @@ async def phone(b, w, h, name, errs):
     await pg.tap('#modal [data-act=closemodal]')
     assert await pg.evaluate("()=>window.__FUP.S.notes.some(n=>n.k==='ev')"), f'{name}: evento sparito con «Decidi più tardi»'
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
-    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','gare','report','personale','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
+    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','customer','gare','report','personale','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
         await menu(pg, wn)
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
         bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
@@ -441,7 +441,7 @@ async def main():
         # eventi dei talenti: ognuno compare con il suo talento e tutte le scelte funzionano
         r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame(null,F.ccCeo(Object.assign(F.ccNew(),{nome:'Prova',cognome:'Eventi',edu:'Autodidatta'})));
           const S=F.S,evs=F.EVENTS.filter(e=>e.id.startsWith('t_')),bad=[];S.boss.tal=[];
-          evs.forEach(e=>{const nm=(e.cond.toString().match(/hasTal[(]'(.+?)'[)]/)||[])[1];if(!nm||!F.TALENTS[nm.replace(/\\\\/g,'')])bad.push(e.id+': talento?');});
+          evs.forEach(e=>{const nm=(e.cond.toString().match(/(?:hasTal|csHas)[(]'(.+?)'[)]/)||[])[1];if(!nm||!F.TALENTS[nm.replace(/\\\\/g,'')])bad.push(e.id+': talento?');});
           if(evs.some(e=>{try{return e.cond();}catch(x){return true;}}))bad.push('evento senza talento');
           S.boss.tal=Object.keys(F.TALENTS);
           evs.forEach(e=>e.opts.forEach((o,i)=>{const ev={...e};try{if(ev.setup)ev.setup(ev);if(!ev.text)bad.push(e.id+': testo');o.f.call(ev);}catch(x){bad.push(e.id+'/'+i+': '+x);}}));
@@ -477,6 +477,26 @@ async def main():
         assert r['altro'] - altro0 == 2500 and r['pend'] == 0, r
         await pg.click('#notepop [data-act=notedel]')
         assert not await pg.query_selector('#notes .nt.blue'), 'la notifica letta non se ne va'
+        # customer service: responsabile, addetti, qualità; un dramma del cliente arriva come tessera gialla e si risolve il giorno dopo
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; S.cash+=200000;
+          const c0=S.clients[0]; for(let i=0;i<4;i++) S.clients.push({...c0,id:'cs'+i,name:F.TENDER_POOL[i].name});
+          const q0=F.csQual().v, n=F.csNeed(); F.ACT.hirecs({id:'mirella'}); S.office.cs=1; const q1=F.csQual().v;
+          F.ACT.open({id:'customer'}); return {q0,q1,n,resp:S.cs.resp};}''')
+        assert r['n'] == 1 and r['resp'] == 'mirella' and r['q1'] > r['q0'], r
+        await pg.screenshot(path=os.path.join(OUT, 'shot_customer.png'))
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.cardsOff(); F.csEvent({c:'cs1',v:0,day:S.day});}")
+        assert await pg.query_selector('#notes .nt.yellow[data-act=note]'), 'il dramma del cliente non arriva come tessera gialla'
+        await pg.click('#notes .nt.yellow[data-act=note]')
+        assert 'manca un bancale' in await pg.inner_text('#modal'), 'testo del dramma mancante'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_customer_evento.png'))
+        sat0 = await pg.evaluate("()=>window.__FUP.S.clients.find(c=>c.id==='cs1').sat")
+        await pg.click('#modal [data-act=evopt][data-i="0"]')
+        await pg.evaluate("()=>{const F=window.__FUP;F.S.speed=0;F.step();}")
+        r = await pg.evaluate("()=>{const S=window.__FUP.S;return {sat:S.clients.find(c=>c.id==='cs1').sat,log:S.cs.log[0],res:S.notes.some(n=>n.k==='res'&&/manca un bancale/.test(n.title))}}")
+        assert r['sat'] == min(100, sat0+3) and r['log']['how'] == 'manager' and r['res'], r
+        await pg.click('#dock [data-id=customer]'); await pg.click('#dock [data-id=customer]')
+        assert 'Risolto' in await pg.inner_text('#win-customer'), 'la richiesta non compare tra le recenti'
+        await pg.click('#win-customer [data-act=close]')
         # nelle Opzioni si toglie la pausa automatica; senza risposta, dopo due settimane decide il vice
         await pg.click('#top [data-act=options]')
         await pg.click('#modal [data-act=evpause]')
