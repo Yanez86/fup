@@ -40,6 +40,8 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Immobile: (costo fisso + 1.000) × moltiplicatore costi fissi (gestionale −3%, controllo di gestione −4%, direttore finanziario −0,5% per punto di Amministrazione sopra 10) + manutenzione, × talenti di chi guida il magazzino (Braccino corto −5%, Mano larga +5%).
 - Conto economico (`S.cur`): ricavi, personale, mezzi, immobili e fissi, tecnologie (ricerche, installazioni e canoni di Logistica), manager, welfare e benefit (benefit aziendali più installazione e canone dei servizi di welfare), penali, altro. In «Altro» vanno le spese una tantum (assunzioni, buonuscite, aperture, cantieri, head hunter) e tutti i soldi spesi o incassati negli eventi (`ACT.evopt` registra la differenza di cassa).
 - CEO 4.000 €/mese; manager e dirigenti a RAL × 1,42.
+- Prestiti (`S.loans`, `loanRate()`, `loanLimit()`, `loansMonth()`): si chiedono dalla finestra Cassa (50.000, 100.000, 200.000, 400.000 € o il fido residuo; 24, 48 o 72 mesi). Fido = max(60.000, 4 × ricavi mensili, media degli ultimi 3 mesi o ritmo di oggi se maggiore) − debito residuo, arrotondato per difetto a 10.000. Tasso annuo = 6,5 − 0,06·(reputazione − 40) − 0,1·(Amministrazione CEO − 10) − 0,1·(Amministrazione direttore finanziario − 10) + 0,5 oltre 36 mesi + 0,5 oltre 60 mesi, tra 2,5% e 12%. Rata costante alla francese pagata a fine mese prima della chiusura del conto: gli interessi vanno nella voce `int` del conto economico, la quota capitale (`rimb`) e il prestito incassato (`prest`) muovono solo la cassa. Estinzione anticipata: debito residuo + 2% (la penale va negli interessi).
+- Bilancio (finestra Cassa, solo lettura): attività = cassa positiva + magazzini di proprietà (posti pallet iniziali × 120 €) + motrici di proprietà × 30.000 €; debiti = scoperto (cassa negativa) + prestiti residui; patrimonio netto = differenza.
 - Gasolio: 0,86 €/l nel 2002, +0,05 l'anno, con oscillazioni.
 
 ## Clienti e contratti
@@ -81,6 +83,11 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - `S.tw` conta le gare vinte, perse e lasciate senza offerta. I salvataggi vecchi partono con storico vuoto (`fillSave`).
 - Puntualità e Accuratezza "medie" sono la media semplice dei magazzini, non pesata sui volumi. Il margine per magazzino è ricavi meno personale, mezzi e immobile (senza tecnologie, manager e sede).
 - Grafici: `lineChart()` con `nice` (scala libera con passi 1-2-5, per euro e pallet), `fmt`/`ax` per i formati e `maxLab` per le etichette dei mesi; l'utile mensile è un grafico a colonne verdi/rosse (`rpCols()`).
+
+## Numeri in alto
+- Cassa, Mese scorso, Morale e OTIF aprono una finestra di dettaglio ciascuno (`VIEWS.cassa/mese/morale/otif`, non sono nel menu). Gasolio e Reputazione aprono la voce dell'enciclopedia.
+- OTIF = Puntualità × Accuratezza / 100 di ogni magazzino, media pesata sui pallet movimentati (`otifNow()`). Colore: verde se tutti i clienti attivi sono sopra entrambe le soglie, giallo se il peggiore è sotto di al massimo 2 punti, rosso oltre (`otifGap()`). È solo informativo: contratti e penali continuano a usare i due KPI separati.
+- Mese scorso: voci del conto economico dell'ultimo mese, del mese prima e del mese in corso, più il margine stimato per magazzino al ritmo di oggi.
 
 ## Gare (tender)
 - Ci sono sempre almeno 3 gare aperte, 4 con l'Ufficio commerciale (`minTenders()`). La committente si estrae con un peso per rank (`TW_RANK`: S 0,7, A 0,8, B 1, C 1,4, D e F 1,7) e la zona con un peso per tipo (`TW_ZONE`: provincia 2,2, gruppo 1,5, regione 1, macroarea 0,6): quando una si chiude ne arriva subito un'altra, se ci sono committenti libere. Si hanno 45 giorni per l'offerta (circa 16 gare l'anno, 24 con l'Ufficio commerciale). Alcune richiedono tecnologie: catena del freddo, EDI, e-commerce.

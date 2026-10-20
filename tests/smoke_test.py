@@ -133,6 +133,22 @@ async def phone(b, w, h, name, errs):
         await pg.tap(f'#win-riepilogo [data-act=rptab][data-id={t}]')
         assert await pg.evaluate(FITS, '#win-riepilogo'), f'{name}: riepilogo {t} esce dallo schermo'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_riepilogo_{t}.png'))
+    await pg.tap('#win-riepilogo [data-act=close]')
+    # numeri in alto: ognuno apre la sua finestra di dettaglio; dalla cassa si chiede un prestito
+    for wn in ['cassa','mese','morale','otif']:
+        await pg.evaluate(f"document.querySelector('#stats [data-id={wn}]').scrollIntoView()")
+        await pg.tap(f'#stats [data-id={wn}]')
+        assert await pg.query_selector(f'#win-{wn}'), f'{name}: il numero {wn} non apre la finestra'
+        assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
+        bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
+        assert not bad, f'{name}: finestra {wn}: {bad}'
+        await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_dato_{wn}.png'), full_page=True)
+        if wn == 'cassa':
+            r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,c0=S.cash,d0=F.debt(); document.querySelector('#win-cassa [data-act=loantake]').click();
+              const l=(S.loans||[])[(S.loans||[]).length-1]; if(!l) return {got:false,d0}; const got=S.cash-c0>=l.amt-1, left=l.left; for(let i=0;i<32;i++){document.querySelector('#modal').innerHTML='';F.step();}
+              return {got, paid:l.left<left, d0, d1:F.debt()};}''')
+            assert r['got'] and r['paid'], f'{name}: prestito non funziona {r}'
+        await pg.tap(f'#win-{wn} [data-act=close]')
     await ctx.close()
 
 async def main():
