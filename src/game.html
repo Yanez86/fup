@@ -349,6 +349,13 @@ input.sw:disabled{opacity:.45;cursor:not-allowed}
 .az-ut{display:flex;justify-content:space-between;align-items:baseline;padding:6px 10px;border:2px solid var(--ink);border-left-width:8px;background:#fff}
 .az-ut.ok{border-left-color:var(--ok)}.az-ut.bad{border-left-color:var(--bad)}
 .az-ut b{font:700 24px var(--f-disp)}
+.bal2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bal{gap:3px;font-size:15px}.bal .az-r span{min-width:0}.bal .az-r b{white-space:nowrap}
+.loan{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line)}.loan:last-child{border-bottom:0}
+.loan-sum{display:flex;flex-wrap:wrap;gap:6px 16px;padding:6px 10px;background:#fff;border:2px solid var(--ink)}.loan-sum b{font-family:var(--f-disp);font-size:18px}
+.mor-r{display:grid;grid-template-columns:minmax(0,1fr) minmax(60px,1.2fr) auto;gap:10px;align-items:center;padding:4px 0;border-bottom:1px dashed var(--line)}.mor-r:last-child{border-bottom:0}.mor-r .bar{height:14px;width:auto}
+.rp-mod3.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+table.t td .sw{display:inline-block;width:10px;height:10px;margin-right:6px;border:1px solid var(--ink)}table.t tr.tot td{border-top:2px solid var(--ink)}
+.mob .bal2,.mob .rp-mod3.c2{grid-template-columns:minmax(0,1fr)}
 .az-r{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed var(--line);font-size:15px}
 .az-r:last-child{border-bottom:0}
 .dr-s{gap:8px}
@@ -1629,7 +1636,9 @@ Il CEO invecchia ([[eta|età]]) e vive i suoi eventi personali, che possono camb
 wk('cassa','basi','Cassa',`I soldi in banca. Se a fine mese sono sotto i −50.000 € l'azienda fallisce.`,
 `La cassa sale ogni giorno con i [[ricavi]] e scende con i [[costi]]. Le spese una tantum (assunzioni, ricerche, installazioni, apertura di un magazzino) si pagano subito.
 
-Andare sotto zero è permesso, ma il controllo arriva a fine mese: sotto i −50.000 € i libri vanno in tribunale e la partita finisce.`);
+Andare sotto zero è permesso, ma il controllo arriva a fine mese: sotto i −50.000 € i libri vanno in tribunale e la partita finisce. Per evitarlo puoi chiedere un [[prestiti|prestito]] alla banca.
+
+Il numero in alto si tocca: apre la finestra Cassa e bilancio, con il [[bilancio]], i prestiti in corso e la richiesta di un nuovo prestito.`);
 wk('reputazione','basi','Reputazione',`Quanto è stimata l'azienda nel settore, da 0 a 100. Aiuta a vincere le gare e ad assumere più in fretta.`,
 `Nelle [[gare]] ogni punto sopra 50 vale +0,25 al punteggio (e sotto 50 toglie). Nelle [[assunzioni]] una reputazione alta accorcia i tempi.
 
@@ -1713,6 +1722,10 @@ wk('obiettivo_sat','kpi','Obiettivo minimo di saturazione',`Il livello minimo di
 • se non basta, la saturazione si ferma alla capacità e il morale obiettivo cala di 0,5 per ogni punto che manca. La finestra ti dice quanti impiegati in più servirebbero.
 
 Un buon manager, un ufficio ben fornito e un morale alto possono portare i camion all'80-90%. Una squadra stanca e sotto organico no, e la direzione lo scopre a fine mese.`);
+wk('otif','kpi','OTIF',`On time, in full: la parte di ordini arrivati in orario e senza errori. È puntualità × accuratezza.`,
+`Il numero in alto è la media dei magazzini, pesata sui pallet movimentati: un magazzino che muove il doppio conta il doppio. Diventa verde quando tutte le soglie dei clienti sono rispettate, giallo se qualcuno è sotto di non più di 2 punti, rosso se è più indietro.
+
+È un riassunto comodo, ma i contratti non lo usano: ogni cliente ha soglie separate di [[puntualita]] e [[accuratezza]]. Toccando il numero si apre il dettaglio dei due KPI, dell'[[saturazione|occupazione]] e della [[saturazione_mezzi|saturazione dei mezzi]], magazzino per magazzino e cliente per cliente.`);
 wk('morale','kpi','Morale',`L'umore del personale di un magazzino, da 0 a 100. Cambia lentamente.`,
 `Ogni magazzino ha un morale che si avvicina piano piano a un valore obiettivo. L'obiettivo parte da 58 e sale con la [[st_lead|Leadership]] del [[manager]] (+0,6 per punto sopra 10), i [[welfare|benefit aziendali]], i [[welfare_mag|servizi di welfare]] del magazzino, alcune [[tecnologie]] e il [[dir_hr|direttore HR]]. Scende se il personale è sovraccarico e dopo i [[licenziamenti]].
 
@@ -2000,9 +2013,19 @@ Il totale si moltiplica per il [[prezzo]] offerto in gara.`);
 wk('costi','eco','Costi',`Personale, mezzi e gasolio, immobili, tecnologie, manager, welfare e benefit, penali.`,
 `Per ogni magazzino: stipendi del [[personale]], mezzi (gasolio, manutenzione, pedaggi, spese degli autisti, [[motrici]] e furgoni in leasing), affitto più 1.000 € di utenze, canoni delle [[installazione|tecnologie installate]].
 
-Per tutta l'azienda: [[pianificatori]] del traffico, [[manager]] e dirigenti, compenso del [[ceo|CEO]] (4.000 € al mese), [[welfare|benefit aziendali]] e [[penali]]. Nella voce Welfare ci sono i benefit e i [[welfare_mag|servizi di welfare]] dei magazzini (installazione e canone). Le spese una tantum (assunzioni, buonuscite, aperture, cantieri) e i soldi spesi o incassati negli [[eventi]] finiscono nella voce Altro.`);
+Per tutta l'azienda: interessi sui [[prestiti]], [[pianificatori]] del traffico, [[manager]] e dirigenti, compenso del [[ceo|CEO]] (4.000 € al mese), [[welfare|benefit aziendali]] e [[penali]]. Nella voce Welfare ci sono i benefit e i [[welfare_mag|servizi di welfare]] dei magazzini (installazione e canone). Le spese una tantum (assunzioni, buonuscite, aperture, cantieri) e i soldi spesi o incassati negli [[eventi]] finiscono nella voce Altro.`);
 wk('conto','eco','Conto economico',`Il riepilogo del mese scorso: ricavi meno costi, voce per voce. In fondo c'è l'utile.`,
-`Si chiude a fine mese ed è nella finestra Azienda; il numero in alto "Mese scorso" è il suo risultato. Se l'utile è negativo per troppi mesi la [[cassa]] finisce. Vedi [[ricavi]] e [[costi]].`);
+`Si chiude a fine mese ed è nella finestra Azienda; il numero in alto "Mese scorso" è il suo risultato e, toccandolo, mostra entrate e spese voce per voce, confrontate con il mese prima e con il mese in corso. Se l'utile è negativo per troppi mesi la [[cassa]] finisce. Vedi [[ricavi]] e [[costi]].`);
+wk('prestiti','eco','Prestiti',`Soldi dalla banca da restituire a rate mensili fisse, in 2, 4 o 6 anni.`,
+`Si chiedono dalla finestra Cassa e bilancio (tocca la cassa in alto). La banca concede al massimo quattro mesi di [[ricavi]] (almeno 60.000 €), meno i prestiti già aperti.
+
+Il tasso annuo parte dal 6,5%: scende di 0,6 punti ogni 10 punti di [[reputazione]] sopra 40, di 0,1 per ogni punto di Amministrazione del [[ceo|CEO]] sopra 10 e di 0,1 per ogni punto del direttore finanziario sopra 10; sale di mezzo punto oltre i 3 anni e di un altro mezzo oltre i 5. Resta tra il 2,5% e il 12%.
+
+La rata si paga a fine mese ed è sempre uguale (ammortamento alla francese): all'inizio è quasi tutta interessi, alla fine quasi tutta capitale. Nel [[conto|conto economico]] finiscono solo gli interessi; la quota di capitale abbassa il debito. Puoi estinguere un prestito in qualunque momento pagando il debito residuo più il 2% di penale.`);
+wk('bilancio','eco','Bilancio',`Cosa possiede l'azienda e cosa deve. La differenza è il patrimonio netto.`,
+`Attività: la [[cassa]] (se positiva), i magazzini di proprietà (circa 120 € a posto pallet) e le [[motrici]] di proprietà (circa 30.000 € l'una). Magazzini in affitto e mezzi in leasing non contano: sono costi del mese.
+
+Debiti: lo scoperto in banca (la cassa sotto zero) e i [[prestiti]] ancora da restituire. Un patrimonio netto che cresce vuol dire che l'azienda sta guadagnando davvero, non solo spostando soldi.`);
 wk('gasolio','eco','Gasolio',`Il prezzo al litro: parte da 0,86 € nel 2002 e sale di circa 5 centesimi l'anno.`,
 `Ogni motrice consuma un quarto di litro al km. Il prezzo si aggiorna a fine mese con piccole oscillazioni. La [[tech_rotte|pianificazione rotte]] riduce i consumi del 5%.`);
 // Tecnologie (concetti)
@@ -2143,7 +2166,7 @@ function newGame(ceoId,coName,color,custom,co){
 }
 // manager e dirigenti in partita: copie dei dati (abilità e talenti possono cambiare), con il giorno di nascita
 function newPerson(m){return {...m,st:{...m.st},tal:[...m.tal],bd:bdOf(m.age,hashN(m.id)),hired:false,wh:null,log:[],ann:!m.from||m.from<=2002};}
-function z(){return {ric:0,pers:0,mezzi:0,fissi:0,tech:0,mgr:0,welf:0,pen:0,altro:0}}
+function z(){return {ric:0,pers:0,mezzi:0,fissi:0,tech:0,mgr:0,welf:0,pen:0,altro:0,int:0,prest:0,rimb:0}}
 function addWarehouse(site,own,fixed,motrici){
   const s=SITES[site];
   const wh={id:nid('w'),site,name:s.name,prov:s.prov,cap:s.cap,own,fixed:own?fixed:s.rent,motrici:motrici||0,mgr:null,staff:noStaff(),coop:false,morale:62,tech:{},acc:{P:0,A:0,n:0},kpi:null,cond:100,exp:0,build:null};
@@ -2570,7 +2593,7 @@ function histPush(c){
   if(!S.hist) S.hist=[]; const H=S.hist, from=H.length?H[H.length-1].d:-1, ws=S.warehouses, wk=(S.weeks||[]).filter(x=>x.d>from);
   const avg=f=>ws.length?ws.reduce((a,w)=>a+f(w),0)/ws.length:0, kp=(w,k)=>w.acc.n?w.acc[k]/w.acc.n:w.kpi?w.kpi[k]:null;
   const staff={plan:S.office.plan}; ROLES.forEach(r=>staff[r]=ws.reduce((a,w)=>a+w.staff[r],0));
-  H.push({d:S.day,ric:c.ric,pers:c.pers,mezzi:c.mezzi,fissi:c.fissi,tech:c.tech,mgr:c.mgr,welf:c.welf,pen:c.pen,altro:c.altro,util:c.util,cash:S.cash,rep:S.rep,
+  H.push({d:S.day,ric:c.ric,pers:c.pers,mezzi:c.mezzi,fissi:c.fissi,tech:c.tech,mgr:c.mgr,welf:c.welf,pen:c.pen,altro:c.altro,int:c.int||0,util:c.util,cash:S.cash,debt:debt(),rep:S.rep,
     P:avg(w=>kp(w,'P')||0),A:avg(w=>kp(w,'A')||0),sat:avg(w=>w.kpi?w.kpi.sat*100:0),mor:avg(w=>w.morale),
     mov:wk.reduce((a,x)=>a+Object.values(x.rows).reduce((b,r)=>b+r.mov,0),0),trips:wk.reduce((a,x)=>a+Object.values(x.rows).reduce((b,r)=>b+r.trips,0),0),
     staff,cli:S.clients.filter(x=>x.status==='attivo').length,wh:ws.length,stock:ws.reduce((a,w)=>a+(w.kpi?w.kpi.stock:0),0),cap:ws.reduce((a,w)=>a+capOf(w),0)});
@@ -2616,13 +2639,32 @@ function monthEnd(){
     news('Il Sole 24 Pallet',`${c.name}: contratto in scadenza`,c.noRenew?`Scade il ${shortDate(c.end)} e non verrà rinnovato.`:`Scade il ${shortDate(c.end)}. Rinnova da solo se la soddisfazione è almeno ${R('kam')?40:50}; altrimenti il cliente va via.`);});
   if(R('marketing')) S.rep+=0.2;
   S.cash-=pen; S.cur.pen+=pen; S.rep=clamp(S.rep,0,100);
-  const c=S.cur; c.util=c.ric-c.pers-c.mezzi-c.fissi-c.tech-c.mgr-c.welf-c.pen-c.altro;
+  loansMonth();
+  const c=S.cur; c.util=c.ric-c.pers-c.mezzi-c.fissi-c.tech-c.mgr-c.welf-c.pen-c.altro-(c.int||0);
   histPush(c);
   S.warehouses.forEach(w=>w.acc={P:0,A:0,n:0});
   S.last=c; S.cur=z();
   if(S.cash<-50000){ gameOver(); return; }
   if(S.cash<0) toast('Cassa sotto zero: sotto i −50.000 € l\'azienda fallisce','bad');
   save();
+}
+// prestiti bancari: rata fissa a fine mese; gli interessi vanno nel conto economico, la quota di capitale abbassa il debito
+const LOAN_AMT=[50000,100000,200000,400000], LOAN_DUR=[24,48,72], LOAN_FEE=0.02;
+// bilancio: valore stimato dei beni di proprietà
+const BAL_PAL=120, BAL_MOT=30000;
+const debt=()=>(S.loans||[]).reduce((a,l)=>a+l.left,0);
+const loanRata=(amt,rate,n)=>{const i=rate/1200; return amt*i/(1-Math.pow(1+i,-n));};
+// tasso annuo: scende con la reputazione, l'Amministrazione del CEO e il direttore finanziario; sale con la durata
+function loanRate(n){ const fin=dirStat('fin');
+  return clamp(6.5-(S.rep-40)*0.06-(ceo().st.amm-10)*0.1-(fin!=null?0.1*(fin-10):0)+(n>36?0.5:0)+(n>60?0.5:0),2.5,12); }
+// fido: quattro mesi di ricavi (minimo 60.000 €) meno i prestiti già aperti
+function loanLimit(){ const H=(S.hist||[]).slice(-3), h=H.length?H.reduce((a,x)=>a+x.ric,0)/H.length:0, now=S.warehouses.reduce((a,w)=>a+(w.kpi?w.kpi.rev:0),0);
+  return Math.max(0,Math.floor((Math.max(60000,4*Math.max(h,now))-debt())/10000)*10000); }
+function loansMonth(){
+  if(!(S.loans||[]).length) return;
+  S.loans.forEach(l=>{const i=l.left*l.rate/1200, q=Math.min(l.left,l.rata-i); l.left-=q; l.n--; S.cash-=i+q; S.cur.int=(S.cur.int||0)+i; S.cur.rimb=(S.cur.rimb||0)+q;
+    if(l.n<=0||l.left<1){ l.left=0; news('Il Sole 24 Pallet',`${S.company.name} chiude un prestito`,`Pagata l'ultima rata del prestito da ${eur(l.amt)}. In banca, per una volta, sorridono.`); }});
+  S.loans=S.loans.filter(l=>l.left>0);
 }
 // zone in cui una committente può ancora aprire una gara: non devono sovrapporsi a un suo contratto attivo o a una sua gara aperta
 function freeZones(tpl){
@@ -3499,7 +3541,7 @@ const DOCK=[
  ['enciclopedia','Enciclopedia (tasto E)','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="1" y="0" width="9" height="10" fill="#9b6bff"/><rect x="1" y="0" width="2" height="10" fill="#6f43cf"/><rect x="3" y="9" width="7" height="2" fill="#fff"/><rect x="5" y="2" width="3" height="1" fill="#ffd23f"/><rect x="7" y="3" width="1" height="2" fill="#ffd23f"/><rect x="6" y="5" width="1" height="1" fill="#ffd23f"/><rect x="6" y="7" width="1" height="1" fill="#ffd23f"/></svg>'],
  ['giornale','Il giornale','<svg width="24" height="20" viewBox="0 0 12 10" shape-rendering="crispEdges"><rect x="0" y="0" width="12" height="10" fill="#f4f1ec"/><rect x="1" y="1" width="10" height="2" fill="#16202e"/><rect x="1" y="4" width="4" height="4" fill="#8a96a6"/><rect x="6" y="4" width="5" height="1" fill="#16202e"/><rect x="6" y="6" width="5" height="1" fill="#16202e"/></svg>']
 ];
-const TITLES={policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',traffico:'Ufficio traffico',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP'};
+const TITLES={policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',traffico:'Ufficio traffico',personale:'Personale e manager',tecnologia:'Tecnologia',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP',cassa:'Cassa e bilancio',mese:'Conti del mese scorso',morale:'Morale dei dipendenti',otif:'OTIF e livelli di servizio'};
 // sul telefono il menu è raggruppato e ogni voce dice in una riga come sta il suo reparto
 const DOCK_G=[['Operazioni',['magazzini','traffico','personale','clienti','gare','espansione']],['Azienda',['azienda','riepilogo','direzione','policy','tecnologia']],['Informazioni',['report','enciclopedia','giornale']]];
 DOCK.forEach(d=>{if(ICONE.menu[d[0]])d[2]=pxSvg(ICONE.menu[d[0]],32);});  // icone 16x16 a 32 px (tools/icone_gioco)
@@ -3522,25 +3564,34 @@ function renderDock(){
   const tot=DOCK.reduce((a,[id])=>a+(+red(id)||(red(id)?1:0)),0), bb=$('#burgerb');
   if(bb){bb.hidden=!tot; bb.textContent=tot;}
 }
+// OTIF: puntualità × accuratezza, media dei magazzini pesata sui pallet movimentati
+const otifOf=k=>k?k.P*k.A/100:0;
+function otifNow(){ const ws=S.warehouses.filter(w=>w.kpi), m=ws.reduce((a,w)=>a+w.kpi.mov,0);
+  return ws.length?ws.reduce((a,w)=>a+otifOf(w.kpi)*(m?w.kpi.mov/m:1/ws.length),0):0; }
+// margine peggiore sulle soglie dei clienti attivi (null se non ci sono clienti)
+function otifGap(){ let g=null; S.clients.filter(c=>c.status==='attivo').forEach(c=>{const k=(whById(c.wh)||{}).kpi; if(!k) return;
+  const v=Math.min(k.P-c.sP,c.sA?k.A-c.sA:99); g=g==null?v:Math.min(g,v);}); return g; }
 function renderTop(){
   $('#date').textContent=MOB?fmtDateS(S.day):fmtDate(S.day);
   $('#coname').textContent=S.company.name; $('#cologo').innerHTML=coLogoSvg(S.company.logo,S.company.color,24);
   document.querySelectorAll('.spd button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===S.speed)));
   $('#paused').hidden=S.speed!==0;
   const last=S.last?S.last.util:null;
-  const mor=S.warehouses.reduce((a,w)=>a+w.morale,0)/S.warehouses.length;
+  const mor=S.warehouses.reduce((a,w)=>a+w.morale,0)/S.warehouses.length, ot=otifNow(), om=otifGap();
+  const more=`<div class='sm' style='color:#c9d3dd;margin-top:4px'>${TOUCH?'Tocca':'Clic'} per i dettagli</div>`;
   $('#stats').innerHTML=`
-   <div class="chip" data-act="wiki" data-id="cassa" data-tip="${wikiTip('cassa')}"><span>Cassa</span><b class="${S.cash<0?'bad':''}" style="${S.cash<0?'color:#ff8a8d':''}">${eur(S.cash)}</b></div>
-   <div class="chip" data-act="wiki" data-id="conto" data-tip="<div class='tt'>Risultato del mese scorso</div>Utile o perdita del conto economico: il dettaglio è nella finestra Azienda.${wikiHint()}"><span>Mese scorso</span><b style="color:${last==null?'#fff':last>=0?'#6fdc8c':'#ff8a8d'}">${last==null?'—':(last>=0?'+':'')+eur(last)}</b></div>
+   <div class="chip" data-act="toggle" data-id="cassa" role="button" data-tip="<div class='tt'>Cassa</div>I soldi in banca${debt()?` · prestiti da restituire ${eur(debt())}`:''}. Sotto i −50.000 € a fine mese l'azienda fallisce.${more}"><span>Cassa</span><b class="${S.cash<0?'bad':''}" style="${S.cash<0?'color:#ff8a8d':''}">${eur(S.cash)}</b></div>
+   <div class="chip" data-act="toggle" data-id="mese" role="button" data-tip="<div class='tt'>Risultato del mese scorso</div>Utile o perdita del conto economico: entrate meno spese.${more}"><span>Mese scorso</span><b style="color:${last==null?'#fff':last>=0?'#6fdc8c':'#ff8a8d'}">${last==null?'—':(last>=0?'+':'')+eur(last)}</b></div>
+   <div class="chip" data-act="toggle" data-id="morale" role="button" data-tip="<div class='tt'>Morale medio</div>Dipende da manager, carichi di lavoro, welfare ed eventi.${more}"><span>Morale</span><b style="color:${mor>=60?'#6fdc8c':mor>=45?'#ffc53d':'#ff8a8d'}">${Math.round(mor)}</b></div>
+   <div class="chip" data-act="toggle" data-id="otif" role="button" data-tip="<div class='tt'>OTIF</div>Ordini consegnati in orario e senza errori: puntualità × accuratezza.${om==null?'':om>=0?' Tutte le soglie dei clienti sono rispettate.':' Qualche cliente è sotto soglia.'}${more}"><span>OTIF</span><b style="color:${om==null?'#fff':om>=0?'#6fdc8c':om>=-2?'#ffc53d':'#ff8a8d'}">${f1(ot)}%</b></div>
    <div class="chip opt2" data-act="wiki" data-id="gasolio" data-tip="${wikiTip('gasolio')}"><span>Gasolio</span><b>${S.fuel.toFixed(2).replace('.',',')} €/l</b></div>
-   <div class="chip opt2" data-act="wiki" data-id="morale" data-tip="<div class='tt'>Morale medio</div>Dipende da manager, carichi di lavoro, welfare ed eventi.${wikiHint()}"><span>Morale</span><b style="color:${mor>=60?'#6fdc8c':mor>=45?'#ffc53d':'#ff8a8d'}">${Math.round(mor)}</b></div>
    <div class="chip" data-act="wiki" data-id="reputazione" data-tip="${wikiTip('reputazione')}"><span>Reputazione</span><b>${Math.round(S.rep)} / 100</b></div>`;
 }
 function openWin(id,opts){
   UI.open[id]=true; if(opts) Object.assign(UI.sel,opts);
   let el=document.getElementById('win-'+id);
   if(!el){
-    el=document.createElement('section'); el.className='win'+(id==='enciclopedia'?' wkw':id==='tecnologia'||id==='report'||id==='riepilogo'?' xwide':['magazzini','gare','azienda','direzione'].includes(id)?' wide':''); el.id='win-'+id;
+    el=document.createElement('section'); el.className='win'+(id==='enciclopedia'?' wkw':id==='tecnologia'||id==='report'||id==='riepilogo'?' xwide':['magazzini','gare','azienda','direzione','cassa','mese','morale','otif'].includes(id)?' wide':''); el.id='win-'+id;
     el.setAttribute('aria-label',TITLES[id]);
     const i=Object.keys(UI.pos).length; const p=UI.pos[id]||{x:Math.min(innerWidth-420,90+((i*36)%240)),y:86+((i*30)%180)};
     if(id==='magazzini'||id==='gare'){p.x=Math.max(90,innerWidth-680);} if(id==='enciclopedia'){p.x=Math.max(90,innerWidth-900);p.y=86;} if(id==='tecnologia'){p.x=90;}
@@ -3617,7 +3668,7 @@ function rpPerson(p,role,extra){
   return `<div class="rp-pp"><div class="rp-ppn"><b>${esc(p.name)}</b><span class="sm">${role}</span></div>${statChips(p.st,14)}${(p.tal||[]).length?talentIcons(p.tal,22):''}
    ${(p.tal||[]).filter(n=>TALENTS[n]).map(n=>`<div class="sm rp-fx"><b>${esc(n)}</b>: ${esc(TALENTS[n].fx)}</div>`).join('')}${extra||''}</div>`;}
 const RP_TABS=[['gen','Panoramica'],['soldi','Conti'],['op','Operazioni'],['cli','Clienti'],['pers','Persone'],['mod','Modificatori']];
-const RP_COST=[['pers','Personale','#2f7fd6'],['mezzi','Mezzi e gasolio','#ff7a3d'],['fissi','Immobili e fissi','#7b4fe0'],['tech','Tecnologie','#1f9e8f'],['mgr','Manager','#c98a00'],['welf','Welfare e benefit','#c2185b'],['pen','Penali','#e0393e'],['altro','Altro (una tantum ed eventi)','#8a96a6']];
+const RP_COST=[['pers','Personale','#2f7fd6'],['mezzi','Mezzi e gasolio','#ff7a3d'],['fissi','Immobili e fissi','#7b4fe0'],['tech','Tecnologie','#1f9e8f'],['mgr','Manager','#c98a00'],['welf','Welfare e benefit','#c2185b'],['pen','Penali','#e0393e'],['altro','Altro (una tantum ed eventi)','#8a96a6'],['int','Interessi sui prestiti','#5a6b80']];
 const costOf=h=>RP_COST.reduce((a,[k])=>a+(h[k]||0),0);
 
 // Ufficio traffico: giri di un cliente con ricavo e costo del trasporto (costo pieno a km del magazzino: autisti, mezzi, gasolio)
@@ -3655,7 +3706,7 @@ function lensTrips(){ const L=[],R=[];
 const VIEWS={
  azienda(){
   const C=ceo(), L=S.last;
-    const pl=L?[[kw('ricavi','Ricavi'),L.ric],[kw('costi','Personale'),-L.pers],[kw('costi','Mezzi e gasolio'),-L.mezzi],[kw('costi','Immobili e fissi'),-L.fissi],[kw('costi','Tecnologie'),-L.tech],[kw('costi','Manager'),-L.mgr],[kw('costi','Welfare e benefit'),-L.welf],[kw('penali','Penali'),-L.pen],[kw('costi','Altro (una tantum ed eventi)'),-L.altro]].filter(x=>Math.abs(x[1])>0.5):[];
+    const pl=L?[[kw('ricavi','Ricavi'),L.ric],[kw('costi','Personale'),-L.pers],[kw('costi','Mezzi e gasolio'),-L.mezzi],[kw('costi','Immobili e fissi'),-L.fissi],[kw('costi','Tecnologie'),-L.tech],[kw('costi','Manager'),-L.mgr],[kw('costi','Welfare e benefit'),-L.welf],[kw('penali','Penali'),-L.pen],[kw('costi','Altro (una tantum ed eventi)'),-L.altro],[kw('prestiti','Interessi sui prestiti'),-(L.int||0)]].filter(x=>Math.abs(x[1])>0.5):[];
   return `<div class="insegna" style="border-color:${S.company.color}">${coLogoSvg(S.company.logo,S.company.color,48)}<div style="min-width:0"><b class="disp">${esc(S.company.name)}</b>${S.company.claim?`<i>${esc(S.company.claim)}</i>`:''}</div></div>
    <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
    <div class="portrait" style="width:120px;height:140px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none"><img class="px" src="${ceoImg(C)}" alt="Ritratto di ${esc(C.name)}" width="120" height="140"></div>
@@ -3674,6 +3725,112 @@ const VIEWS={
    <div class="sm">Valgono per tutti i dipendenti: alzano il morale ovunque e accorciano i tempi di assunzione.${R('welfare2')?' Costano il 30% in meno con la Piattaforma welfare.':''}</div>
    <div class="row" style="align-items:center"><span class="sm">Mensa, palestra, asilo e gli altri ${kw('welfare_mag','servizi di welfare')} si installano magazzino per magazzino.</span><button class="btn sm2" data-act="opentech" data-tree="wel" data-id="acqua">Albero Welfare</button></div></div>
    <div class="row"><button class="btn" data-act="save">Salva partita</button><button class="btn" data-act="restart">Nuova partita</button></div>`;
+ },
+ // ---- finestre dei numeri in alto: Cassa, Mese scorso, Morale, OTIF ----
+ cassa(){
+  const H=S.hist||[], lab=H.map(h=>monLab(h.d)), ws=S.warehouses, D=debt(), loans=S.loans||[];
+  const own=ws.filter(w=>w.own), vWh=own.reduce((a,w)=>a+SITES[w.site].cap*BAL_PAL,0), mot=ws.reduce((a,w)=>a+w.motrici,0), vMot=mot*BAL_MOT;
+  const att=[[kw('cassa','Cassa in banca'),Math.max(0,S.cash)],[`Magazzini di proprietà <span class="sm">(${own.length?own.map(w=>esc(w.name)).join(', '):'nessuno'})</span>`,vWh],[`${kw('motrici','Motrici')} di proprietà <span class="sm">(${mot})</span>`,vMot]];
+  const pas=[[`Scoperto in banca`,Math.max(0,-S.cash)],[kw('prestiti','Prestiti da restituire'),D]];
+  const tA=att.reduce((a,x)=>a+x[1],0), tP=pas.reduce((a,x)=>a+x[1],0), pn=tA-tP, rate=loans.reduce((a,l)=>a+l.rata,0);
+  const lim=loanLimit(), amts=LOAN_AMT.filter(a=>a<=lim); if(lim>0&&!amts.includes(lim)&&lim<LOAN_AMT[LOAN_AMT.length-1]) amts.push(lim); amts.sort((a,b)=>a-b);
+  let A=+UI.sel.loanA||0; if(!amts.includes(A)) A=amts.length?amts[Math.min(1,amts.length-1)]:0; UI.sel.loanA=A;
+  const N=LOAN_DUR.includes(+UI.sel.loanN)?+UI.sel.loanN:48; UI.sel.loanN=N;
+  const r=loanRate(N), q=A?loanRata(A,r,N):0;
+  const col=(t,rows,tot,tl)=>`<div class="card bal"><span class="h3">${t}</span>${rows.map(([n,v])=>`<div class="az-r"><span>${n}</span><b class="num">${eur(v)}</b></div>`).join('')}<div class="az-r rp-tot"><span>${tl}</span><b class="num">${eur(tot)}</b></div></div>`;
+  return `<div class="rp-tiles c4">
+    ${rpTile('Cassa',eur(S.cash),S.cash<0?'sotto i −50.000 € a fine mese si fallisce':'soldi disponibili oggi','cassa',S.cash<0?'bad':'')}
+    ${rpTile('Debito',eur(D),loans.length?`${loans.length} ${loans.length>1?'prestiti':'prestito'} in corso`:'nessun prestito','prestiti',D?'':'ok')}
+    ${rpTile('Rate al mese',eur(rate),rate?'pagate a fine mese':'—','prestiti')}
+    ${rpTile('Patrimonio netto',eur(pn),'quanto vale l\'azienda, al netto dei debiti','bilancio',pn>=0?'ok':'bad')}</div>
+   <div class="card"><div class="row"><span class="h3">${kw('bilancio','Bilancio')}</span><span class="sm">oggi, valori stimati</span></div>
+    <div class="bal2">${col('Cosa possiedi',att,tA,'Totale attività')}${col('Cosa devi',pas,tP,'Totale debiti')}</div>
+    <div class="az-ut ${pn>=0?'ok':'bad'}"><span class="lab">Patrimonio netto</span><b>${eur(pn)}</b></div>
+    <div class="sm">I magazzini di proprietà valgono circa ${eur(BAL_PAL)} a posto pallet, le motrici ${eur(BAL_MOT)} l'una. Quelli in affitto e i mezzi in leasing non sono tuoi: stanno nei costi del mese.</div></div>
+   ${loans.length?`<div class="card"><span class="h3">Prestiti in corso</span>${loans.map((l,i)=>{const ex=Math.round(l.left*(1+LOAN_FEE));
+     return `<div class="loan"><div class="wh-sm"><b>${eur(l.amt)} al ${f1(l.rate)}%</b><span class="sm">rata ${eur(l.rata)} · ancora ${l.n} ${l.n===1?'mese':'mesi'} · da restituire ${eur(l.left)}</span></div>
+      <button class="btn sm2" data-act="loanpay" data-i="${i}" ${S.cash<ex?'disabled':''} data-tip="<div class='tt'>Estingui il prestito</div>Paghi subito il debito residuo più il ${Math.round(LOAN_FEE*100)}% di penale: ${eur(ex)}.">Estingui · ${euK(ex)}</button></div>`;}).join('')}</div>`:''}
+   <div class="card"><div class="row"><span class="h3">Chiedi un ${kw('prestiti','prestito')}</span><span class="sm">la banca ti concede fino a ${eur(lim)}</span></div>
+    ${lim>0?`<div class="lab">Quanto</div><div class="xl-cli rp-whs">${amts.map(a=>`<button data-act="loanamt" data-v="${a}" aria-pressed="${a===A}">${euK(a)}</button>`).join('')}</div>
+    <div class="lab">In quanto tempo</div><div class="xl-cli rp-whs">${LOAN_DUR.map(n=>`<button data-act="loandur" data-v="${n}" aria-pressed="${n===N}">${n/12} anni</button>`).join('')}</div>
+    <div class="loan-sum"><span>Tasso <b>${f1(r)}%</b> all'anno</span><span>Rata <b>${eur(q)}</b> al mese</span><span>Interessi in tutto <b>${eur(q*N-A)}</b></span></div>
+    <div class="row" style="align-items:center"><span class="sm">Il tasso scende con la ${kw('reputazione')}, l'Amministrazione del CEO e il direttore finanziario.</span><button class="btn pri" data-act="loantake">Firma il prestito</button></div>`
+    :'<div class="sm bad">La banca non concede altro credito: il fido è di quattro mesi di ricavi e lo stai già usando tutto. Restituisci una parte dei prestiti o fai crescere i ricavi.</div>'}</div>
+   ${lineChart('cs_cash',{title:'Cassa e debito a fine mese',labels:lab,xl:'',nice:1,min:-1e12,max:1e12,ml:62,mr:140,maxLab:4,fmt:v=>eur(v),ax:euK,empty:'Il grafico compare dalla fine del secondo mese.',series:[{n:'Cassa',c:SERIES_C[0],v:H.map(h=>h.cash)},{n:'Debito',c:SERIES_C[1],v:H.map(h=>h.debt||0)}],w:620,h:220})}`;
+ },
+ mese(){
+  const H=S.hist||[], L=H[H.length-1], P2=H[H.length-2], C=S.cur, ws=S.warehouses, dd=dateOf(S.day).getUTCDate();
+  if(!L) return `<div class="sm">Il primo mese si chiude il 1° del mese prossimo: qui vedrai entrate e spese voce per voce.</div>
+   <div class="card"><span class="h3">Questo mese, finora</span><div class="az-r"><span>${kw('ricavi','Entrate')}</span><b class="num ok">${eur(C.ric)}</b></div><div class="az-r"><span>${kw('costi','Spese')}</span><b class="num bad">${eur(-costOf(C))}</b></div></div>`;
+  const cl=RP_COST.map(([k,n,c])=>({k,n,c,v:L[k]||0})), cT=cl.reduce((a,x)=>a+x.v,0), sh=cl.filter(x=>x.v>0.5||(P2&&(P2[x.k]||0)>0.5)||(C[x.k]||0)>0.5);
+  const cell=(v,neg)=>v==null?'<td class="r sm">—</td>':`<td class="r ${neg?'bad':'ok'}">${eur(neg?-v:v)}</td>`;
+  const out=(L.int||0)+(S.last&&S.last.rimb||0), pr=S.last&&S.last.prest||0, rb=S.last&&S.last.rimb||0;
+  return `<div class="rp-tiles c4">
+    ${rpTile('Entrate',eur(L.ric),P2?rpDelta(L.ric,P2.ric,euK,true):'','ricavi')}
+    ${rpTile('Spese',eur(cT),P2?rpDelta(cT,costOf(P2),euK,false):'','costi')}
+    ${rpTile(L.util>=0?'Utile':'Perdita',eur(L.util),P2?rpDelta(L.util,P2.util,euK,true):'','conto',L.util>=0?'ok':'bad')}
+    ${rpTile('Margine',L.ric?f1(L.util/L.ric*100)+'%':'—','utile diviso entrate','conto',L.util>=0?'ok':'bad')}</div>
+   <div class="card"><span class="h3">${kw('conto','Conto economico')} voce per voce</span><div class="rp-scroll"><table class="t num"><tr><th>Voce</th><th class="r">${monLab(L.d)}</th><th class="r">${P2?monLab(P2.d):'Mese prima'}</th><th class="r">Questo mese<br><span class="sm">${dd-1} giorni</span></th></tr>
+    <tr><td><b>${kw('ricavi','Entrate dai clienti')}</b></td>${cell(L.ric)}${cell(P2?P2.ric:null)}${cell(C.ric)}</tr>
+    ${sh.map(x=>`<tr><td><span class="sw" style="background:${x.c}"></span>${x.n}</td>${cell(x.v,1)}${cell(P2?P2[x.k]||0:null,1)}${cell(C[x.k]||0,1)}</tr>`).join('')}
+    <tr class="tot"><td><b>Utile</b></td>${[L.util,P2?P2.util:null,C.ric-costOf(C)].map(v=>v==null?'<td class="r sm">—</td>':`<td class="r ${v>=0?'ok':'bad'}"><b>${eur(v)}</b></td>`).join('')}</tr></table></div>
+    <div class="sm">Nella colonna «Questo mese» le penali arrivano solo a fine mese, quando si controllano i KPI.</div></div>
+   <div class="card"><div class="row"><span class="h3">Dove vanno i soldi</span><span class="sm">spese del mese scorso: ${eur(cT)}</span></div>
+    <div class="rp-stack">${cl.filter(x=>x.v>0.5).map(x=>`<i style="width:${(x.v/cT*100).toFixed(2)}%;background:${x.c}" data-tip="<div class='tt'>${x.n}</div>${eur(x.v)} · ${Math.round(x.v/cT*100)}%"></i>`).join('')}</div>
+    ${rpBars(cl.filter(x=>x.v>0.5).sort((a,b)=>b.v-a.v).map(x=>({...x,tip:`<div class='tt'>${x.n}</div>${Math.round(x.v/cT*100)}% delle spese`})),v=>eur(v))}</div>
+   ${pr||rb?`<div class="card"><span class="h3">Fuori dal conto economico</span>${pr?`<div class="az-r"><span>${kw('prestiti','Prestiti incassati')}</span><b class="num ok">${eur(pr)}</b></div>`:''}${rb?`<div class="az-r"><span>Quote di prestito restituite</span><b class="num bad">${eur(-rb)}</b></div>`:''}
+    <div class="sm">Prestiti e restituzioni muovono la cassa ma non sono né entrate né spese: nel conto economico ci sono solo gli interessi.</div></div>`:''}
+   <div class="card"><div class="row"><span class="h3">Magazzino per magazzino</span><span class="sm">al ritmo di oggi, al mese</span></div><div class="rp-scroll"><table class="t num"><tr><th>Magazzino</th><th class="r">Entrate</th><th class="r">Spese</th><th class="r">Margine</th></tr>
+    ${ws.map(w=>{const k=w.kpi||computeWH(w), mg=k.rev-k.pers-k.mezzi-k.fissi-k.tCan-k.wCan;
+      return `<tr><td><button class="lnk" data-act="openwh" data-id="${w.id}">${esc(w.name)}</button></td><td class="r ok">${euK(k.rev)}</td><td class="r" data-tip="<div class='tt'>Spese di ${esc(w.name)}</div>Personale ${eur(k.pers)}<br>Mezzi e gasolio ${eur(k.mezzi)}<br>Immobile ${eur(k.fissi)}<br>Tecnologie e welfare ${eur(k.tCan+k.wCan)}">${euK(k.pers+k.mezzi+k.fissi+k.tCan+k.wCan)}</td><td class="r ${mg>=0?'ok':'bad'}"><b>${euK(mg)}</b></td></tr>`;}).join('')}</table></div>
+    <div class="sm">Senza manager, CEO, pianificatori e benefit aziendali, che sono costi di tutta l'azienda.</div></div>
+   <div class="row"><span class="sm">Grafici e anni passati sono nel Riepilogo.</span><button class="btn sm2" data-act="openrp" data-id="soldi">Riepilogo: Conti</button></div>`;
+ },
+ morale(){
+  const ws=S.warehouses, H=S.hist||[], lab=H.map(h=>monLab(h.d)), avg=ws.reduce((a,w)=>a+w.morale,0)/ws.length;
+  const w=whById(UI.sel.rpwh)||ws[0]; UI.sel.rpwh=w.id; const k=computeWH(w);
+  const low=ws.filter(x=>x.morale<45).length, wf=WELFARE.filter(x=>S.welfare[x.id]), unh=staffPeople().filter(p=>p.quit||(p.unh||0)>=20);
+  const mc=v=>v>=60?'var(--ok)':v>=45?'var(--warn)':'var(--bad)';
+  const chips=ws.length>1?`<div class="xl-cli rp-whs">${ws.map(x=>`<button data-act="morwh" data-id="${x.id}" aria-pressed="${x.id===w.id}">${esc(x.name)}</button>`).join('')}</div>`:'';
+  return `<div class="rp-tiles c4">
+    ${rpTile('Morale medio',Math.round(avg),avg>=60?'si lavora volentieri':avg>=45?'qualche mugugno':'aria pesante','morale',avg>=60?'ok':avg<45?'bad':'')}
+    ${rpTile('Magazzini sotto 45',low,low?'KPI e assunzioni ne risentono':'nessuno','morale',low?'bad':'ok')}
+    ${rpTile('Benefit attivi',wf.length,wf.length?wf.map(x=>esc(x.name)).join(', '):'nessuno','welfare')}
+    ${rpTile('Manager scontenti',unh.length,unh.length?'guarda le Policy':'nessuno','pretese',unh.length?'bad':'ok')}</div>
+   <div class="card"><div class="row"><span class="h3">Magazzino per magazzino</span><span class="sm">oggi → dove sta andando</span></div>
+    ${ws.map(x=>{const kx=x.kpi||computeWH(x), t=kx.morT, d=t-x.morale, m=x.mgr==='ceo'?ceo().name+' (CEO)':x.mgr?(personById(x.mgr)||{name:'—'}).name:'nessun manager';
+      return `<div class="mor-r"><div class="wh-sm"><button class="lnk" data-act="morwh" data-id="${x.id}"><b>${esc(x.name)}</b></button><span class="sm">${esc(m)} · ${ROLES.reduce((a,r)=>a+x.staff[r],0)} persone</span></div>
+       <span class="bar" data-tip="<div class='tt'>Morale ${Math.round(x.morale)}</div>Obiettivo ${Math.round(t)}: il morale ci si avvicina un po' ogni giorno."><i style="width:${clamp(x.morale,0,100)}%;background:${mc(x.morale)}"></i></span>
+       <b class="num" style="min-width:74px;text-align:right">${Math.round(x.morale)} <span class="${Math.abs(d)<0.5?'sm':d>0?'ok':'bad'}">${Math.abs(d)<0.5?'=':d>0?'↑':'↓'} ${Math.round(t)}</span></b></div>`;}).join('')}</div>
+   <div class="card"><div class="row"><span class="h3">Da cosa dipende</span><span class="sm">valori di oggi</span></div>${chips}
+    ${rpParts('Morale (obiettivo) a '+w.name,'morale',k.pM,k.morT,'',0,100)}
+    <div class="sm">Il morale non salta subito al valore obiettivo: ci si avvicina un po' ogni giorno (oggi a ${esc(w.name)} è ${Math.round(w.morale)}). Sotto 45 calano puntualità e accuratezza e le persone se ne vanno.</div></div>
+   ${lineChart('mo_h',{title:'Morale medio a fine mese',labels:lab,xl:'',nice:1,min:0,max:100,ml:46,mr:14,labels2:false,empty:'Il grafico compare dalla fine del secondo mese.',fmt:v=>Math.round(v),series:[{n:'Morale',c:SERIES_C[5],v:H.map(h=>h.mor)}],w:620,h:200})}
+   <div class="row"><span class="sm">Il morale sale con un buon ${kw('manager')}, carichi di lavoro giusti e i ${kw('welfare','benefit')}.</span><button class="btn sm2" data-act="toggle" data-id="azienda">Benefit aziendali</button></div>`;
+ },
+ otif(){
+  const ws=S.warehouses, H=S.hist||[], lab=H.map(h=>monLab(h.d)), act=S.clients.filter(c=>c.status==='attivo');
+  const w=whById(UI.sel.rpwh)||ws[0]; UI.sel.rpwh=w.id; const k=computeWH(w), fP=v=>f1(v)+'%';
+  const mv=ws.reduce((a,x)=>a+(x.kpi?x.kpi.mov:0),0), wav=f=>{const v=ws.filter(x=>x.kpi); return v.length?v.reduce((a,x)=>a+f(x.kpi)*(mv?x.kpi.mov/mv:1/v.length),0):0;};
+  const P=wav(k=>k.P), A=wav(k=>k.A), O=otifNow(), sat=wav(k=>k.sat*100), sM=wav(k=>k.satM), g=otifGap();
+  const thr=(x,key)=>{const v=act.filter(c=>c.wh===x.id&&c[key]!=null).map(c=>c[key]); return v.length?Math.max(...v):null;};
+  const chips=ws.length>1?`<div class="xl-cli rp-whs">${ws.map(x=>`<button data-act="morwh" data-id="${x.id}" aria-pressed="${x.id===w.id}">${esc(x.name)}</button>`).join('')}</div>`:'';
+  return `<div class="rp-tiles c4">
+    ${rpTile('OTIF',fP(O),g==null?'nessun cliente ancora':g>=0?'tutte le soglie rispettate':'qualche cliente sotto soglia','otif',g==null?'':g>=0?'ok':'bad')}
+    ${rpTile('Puntualità',fP(P),'consegne in orario','puntualita')}
+    ${rpTile('Accuratezza',fP(A),'ordini senza errori','accuratezza')}
+    ${rpTile('Occupazione',fP(sat),sat>85?'oltre l\'85%: errori in aumento':`mezzi pieni al ${Math.round(sM)}%`,'saturazione',sat>85?'bad':'')}</div>
+   <div class="sm">L'${kw('otif','OTIF')} (on time, in full) è la parte di ordini arrivati in orario <b>e</b> senza errori: puntualità × accuratezza. I contratti però guardano i due KPI separati, ognuno con la sua soglia.</div>
+   <div class="card"><span class="h3">Magazzino per magazzino</span><div class="rp-scroll"><table class="t num"><tr><th>Magazzino</th><th class="r">${kw('puntualita','Punt.')} / soglia</th><th class="r">${kw('accuratezza','Accur.')} / soglia</th><th class="r">OTIF</th><th class="r">${kw('saturazione','Occup.')}</th></tr>
+    ${ws.map(x=>{const kx=x.kpi||computeWH(x), sP=thr(x,'sP'), sA=thr(x,'sA');
+      return `<tr><td><button class="lnk" data-act="openwh" data-id="${x.id}">${esc(x.name)}</button></td><td class="r ${kpiCls(kx.P,sP)}">${f1(kx.P)} / ${sP?f1(sP):'—'}</td><td class="r ${kpiCls(kx.A,sA)}">${f1(kx.A)} / ${sA?f1(sA):'—'}</td><td class="r"><b>${fP(otifOf(kx))}</b></td>
+       <td class="r ${kx.sat>0.85?'bad':kx.sat>0.7?'warn':''}" data-tip="<div class='tt'>${esc(x.name)}</div>Occupazione ${Math.round(kx.sat*100)}% · mezzi pieni al ${Math.round(kx.satM)}%">${Math.round(kx.sat*100)}%</td></tr>`;}).join('')}</table></div></div>
+   <div class="card"><span class="h3">Clienti e soglie</span><div class="rp-scroll"><table class="t num"><tr><th>Cliente</th><th class="r">Punt. / soglia</th><th class="r">Accur. / soglia</th><th class="r">${kw('penali','Penale')}</th></tr>
+    ${act.map(c=>{const kx=(whById(c.wh)||{}).kpi; if(!kx) return ''; return `<tr><td><span style="display:inline-flex;gap:6px;align-items:center">${logoSvg(c.name,18)}${esc(cname(c))}</span></td><td class="r ${kpiCls(kx.P,c.sP)}">${f1(kx.P)} / ${f1(c.sP)}</td><td class="r ${c.sA?kpiCls(kx.A,c.sA):''}">${f1(kx.A)} / ${c.sA?f1(c.sA):'—'}</td><td class="r sm">${penPct(c)?penPct(c)+'% a punto':'—'}</td></tr>`;}).join('')||'<tr><td colspan="4" class="sm">Nessun cliente attivo.</td></tr>'}</table></div>
+    <div class="sm">Le soglie si controllano a fine mese sulla media del mese: sotto soglia la soddisfazione scende e, se il contratto lo prevede, arriva la penale.</div></div>
+   <div class="card"><div class="row"><span class="h3">Da cosa dipendono</span><span class="sm">valori di oggi</span></div>${chips}
+    <div class="rp-mod3 c2">${rpParts('Puntualità','puntualita',k.pP,k.P,'%',50,99.9)}${rpParts('Accuratezza','accuratezza',k.pA,k.A,'%',50,99.9)}</div></div>
+   ${lineChart('ot_h',{title:'Puntualità, accuratezza e OTIF (media dei magazzini)',labels:lab,xl:'',unit:'%',empty:'Il grafico compare dalla fine del secondo mese.',series:[{n:'Puntualità',c:KPI_C.P,v:H.map(h=>h.P)},{n:'Accuratezza',c:KPI_C.A,v:H.map(h=>h.A)},{n:'OTIF',c:SERIES_C[3],v:H.map(h=>h.P*h.A/100)}],w:620,h:230,mr:118,maxLab:4})}`;
  },
  magazzini(){
   const id=UI.sel.wh||S.warehouses[0].id; const w=whById(id)||S.warehouses[0]; UI.sel.wh=w.id; const k=w.kpi||computeWH(w);
@@ -4341,6 +4498,17 @@ const ACT={
  firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});m.hired=false;m.wh=null;renderAll();},
  selcli(d){UI.sel.cli=d.id;UI.sel.cell='A1';renderWin('report');},
  rpwh(d){UI.sel.rpwh=d.id;renderWin('riepilogo');},
+ morwh(d){UI.sel.rpwh=d.id;renderWin('morale');renderWin('otif');},
+ openrp(d){UI.tab.rp=d.id;openWin('riepilogo');},
+ loanamt(d){UI.sel.loanA=+d.v;renderWin('cassa');},
+ loandur(d){UI.sel.loanN=+d.v;renderWin('cassa');},
+ loantake(){const A=+UI.sel.loanA, N=LOAN_DUR.includes(+UI.sel.loanN)?+UI.sel.loanN:48; if(!(A>0)||A>loanLimit()) return; const r=loanRate(N);
+  (S.loans=S.loans||[]).push({amt:A,left:A,rate:r,n:N,rata:loanRata(A,r,N),day:S.day}); S.cash+=A; S.cur.prest=(S.cur.prest||0)+A;
+  toast(`Prestito firmato: ${eur(A)} in cassa, rata ${eur(loanRata(A,r,N))} al mese per ${N/12} anni`,'ok');
+  news('Il Sole 24 Pallet',`${S.company.name} ottiene un finanziamento`,`La banca concede ${eur(A)} al ${f1(r)}% in ${N/12} anni. Il direttore di filiale assicura che «è un investimento sul territorio».`); renderAll();},
+ loanpay(d){const l=(S.loans||[])[+d.i]; if(!l) return; const ex=Math.round(l.left*(1+LOAN_FEE)); if(S.cash<ex) return;
+  S.cash-=ex; S.cur.int=(S.cur.int||0)+ex-l.left; S.cur.rimb=(S.cur.rimb||0)+l.left; S.loans.splice(+d.i,1);
+  toast(`Prestito estinto: pagati ${eur(ex)}`,'ok'); renderAll();},
  rptab(d){UI.tab.rp=d.id;renderWin('riepilogo');},
  sheet(d){UI.sel.sheet=d.id;UI.sel.cell='A1';renderWin('report');},
  cell(d){UI.sel.cell=d.ref;renderWin('report');},
@@ -4604,6 +4772,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.34',t:'Numeri da toccare',x:['In alto c\'è un nuovo numero: l\'OTIF, cioè gli ordini arrivati in orario e senza errori. Diventa rosso se un cliente è sotto soglia.','Tutti i numeri in alto si toccano: Cassa apre il bilancio, Mese scorso le entrate e le spese voce per voce, Morale lo stato d\'animo di ogni magazzino, OTIF puntualità, accuratezza e occupazione nel dettaglio.','Dalla finestra della cassa puoi chiedere un prestito alla banca, in 2, 4 o 6 anni: il tasso migliora con la reputazione. Le rate si pagano a fine mese e il prestito si può estinguere prima.']},
  {v:'0.33',t:'Icone nuove',x:['Tutte le icone ridisegnate in pixel art più grande e più chiara: i 94 talenti, le 45 tecnologie, le policy, le sei abilità, il menu a sinistra, le lenti della mappa e il pulsante delle opzioni.','Stile unico e piatto, come i pulsanti del gioco: bordo scuro, una fascia più scura in basso e un\'ombra netta, senza riflessi. Le tessere dei talenti hanno il filetto verde, rosso o giallo a seconda che il talento sia positivo, negativo o misto.','Le icone hanno sempre misure piene (2 o 3 pixel dello schermo per ogni pixel del disegno), così restano nitide anche sul telefono.']},
  {v:'0.32',t:'Ordine e valigia pronta',x:['Nuovo manager sul mercato dal 2009: Andrew Goodheart, 23 anni, biondo con gli occhiali squadrati e la maglietta verde. Precisione e Leadership altissime, ma è stacanovista, maniaco dell\'ordine e job hopper: tienilo contento o te lo porta via la concorrenza.']},
  {v:'0.31',t:'Quanto rende il magazzino',x:['Nella finestra del magazzino c\'è il nuovo pulsante Produttività: mostra quanti pallet prepara al mese ogni magazziniere e quanti movimenti fa ogni carrellista.','Un grafico segue la produttività settimana per settimana, insieme al carico di lavoro dei magazzinieri: si vede subito se una tecnologia o un calo di morale ha cambiato le cose.','Il dettaglio elenca tutto quello che la muove: morale, tecnologie, welfare, policy, regole del traffico, stato del magazzino, cantiere e manager.','Nuova voce dell\'enciclopedia: Produttività.']},
@@ -4758,6 +4927,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},step,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW};
+window.__FUP={get S(){return S;},step,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc)=>{uid=1;newGame(c,'',COLORS[0][0],cc);},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,planNeed,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,debt,loanLimit};
 })();
 </script>
