@@ -568,14 +568,18 @@ async def main():
         await pg.click('#top [data-act=options]')
         await pg.click('#modal [data-act=evpause]')
         await pg.click('#modal [data-act=closemodal]')
+        # (richieste dei clienti in coda e controfferte dei manager restano ferme, così conta solo l'evento di prova)
         r = await pg.evaluate('''(fire)=>{const F=window.__FUP,S=F.S; S.speed=1; eval(fire)('cesto'); const sp=S.speed; S.speed=0;
-          for(let i=0;i<15;i++) F.step(); return {sp, ev:S.notes.filter(n=>n.k==='ev').length, vice:S.notes.filter(n=>n.g==='vice').length, pend:S.evPend.length};}''', FIRE)
+          S.cs.q=[]; S.cs.last=S.day+60; S.managers.forEach(m=>{delete m.cof;});
+          for(let i=0;i<15;i++) F.step(); return {sp, ev:S.notes.filter(n=>n.k==='ev').length, evs:S.notes.filter(n=>n.k==='ev').map(n=>n.ev.id), vice:S.notes.filter(n=>n.g==='vice').length, pend:S.evPend.length};}''', FIRE)
         assert r['sp'] == 1 and r['ev'] == 0 and r['vice'] == 1, f'pausa automatica o decisione del vice {r}'
         await pg.evaluate("()=>{window.__FUP.HUM.cfg.noPause=false;}")
         # eventi personali: CEO, manager e dirigenti; tutte le scelte funzionano e cambiano abilità e talenti
         r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame('gino');const S=F.S,bad=[],w=S.warehouses[0];
           document.querySelector('#modal').innerHTML=''; S.researched.direzione=true; ['chiara','davide','rosa'].forEach(id=>F.ACT.hiremgr({id}));
           const c=S.managers.find(m=>m.id==='chiara'); w.mgr='chiara'; c.wh=w.id; ['ottavio','giulia'].forEach(id=>{S.managers.find(m=>m.id===id).hired=true;}); S.dirs.fin='ottavio';
+          // un secondo magazzino guidato da Rosa: alcuni eventi riguardano solo chi guida un magazzino
+          S.cash+=1e6; F.ACT.rent({id:Object.keys(F.SITES).find(k=>!S.warehouses.some(x=>x.site===k))}); const w2=S.warehouses[1]; w2.mgr='rosa'; S.managers.find(m=>m.id==='rosa').wh=w2.id;
           S.boss.tal.push('Fumatore incallito','Stacanovista');
           const evs=F.EVENTS.filter(e=>/^(p|m|d|x)_/.test(e.id));
           evs.forEach(e=>{try{e.cond();}catch(x){bad.push(e.id+': cond '+x);} e.opts.forEach((o,i)=>{const ev={...e}, T=F.people().map(p=>[p,[...p.tal],{...p.st},p.quit]);try{if(ev.setup)ev.setup(ev);if(!ev.text)bad.push(e.id+': testo');if(!ev.p)bad.push(e.id+': persona');o.f.call(ev);}catch(x){bad.push(e.id+'/'+i+': '+x);}
