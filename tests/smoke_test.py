@@ -94,6 +94,18 @@ async def phone(b, w, h, name, errs):
     await pg.wait_for_timeout(100)
     # menu: un solo pulsante sulla mappa; aperto, l'elenco sta nello schermo e ha tutte le voci
     assert await pg.evaluate(FITS, '#burger'), f'{name}: pulsante Menu fuori schermo'
+    # pulsante della velocità accanto al Menu: pausa -> x1 -> x2 -> pausa
+    assert await pg.evaluate(FITS, '#ppb'), f'{name}: pulsante pausa fuori schermo'
+    pr = await pg.evaluate("[document.querySelector('#ppb').getBoundingClientRect(),document.querySelector('#burger').getBoundingClientRect()].map(r=>[r.left,r.right,r.height])")
+    assert pr[0][1] <= pr[1][0] and pr[0][2] == pr[1][2], f'{name}: pulsante pausa sovrapposto o di altezza diversa {pr}'
+    v0 = await pg.evaluate('window.__FUP.S.speed'); seen = []
+    for i in range(3):
+        await pg.tap('#ppb'); seen.append(await pg.evaluate('window.__FUP.S.speed'))
+    assert sorted(seen) == [0, 1, 2] and seen[2] == v0, f'{name}: il pulsante pausa non cicla {v0} {seen}'
+    await pg.tap('#lenses [data-act=lensmenu]'); await pg.wait_for_timeout(100)
+    assert await pg.evaluate(FITS, '#lenses'), f'{name}: lenti aperte fuori schermo'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_lenti.png'))
+    await pg.tap('#lenses [data-act=lensmenu]')
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
     await pg.tap('#burger'); await pg.wait_for_timeout(250)
     assert await pg.evaluate(FITS, '#dock'), f'{name}: menu aperto fuori schermo'
@@ -267,7 +279,11 @@ async def main():
         await pg.screenshot(path=os.path.join(OUT, 'shot_azienda_ceo_creato.png'))
         await pg.click('#dock [data-id=azienda]')
         # lente delle province
+        assert not await pg.is_visible('#lenses [data-act=lens][data-id=prov]'), 'le lenti devono partire chiuse'
+        await pg.click('#lenses [data-act=lensmenu]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_lenti_aperte.png'))
         await pg.click('#lenses [data-act=lens][data-id=prov]')
+        assert not await pg.is_visible('#lenses [data-act=lens][data-id=prov]'), 'scelta la lente, il menu delle lenti resta aperto'
         n = await pg.evaluate("document.querySelectorAll('#ov path.prov').length")
         assert n == 47, f'province disegnate: {n}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_lente_province.png'))
