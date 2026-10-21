@@ -1,6 +1,6 @@
 # Certificazioni e audit (progetto)
 
-**Stato: fase 1 costruita nella versione 0.67; fasi 2-4 da fare.**
+**Stato: fase 1 costruita nella 0.67, fase 2 (audit) nella 0.68; fasi 3-4 da fare.**
 I numeri sono una prima proposta, da ritoccare in fase di bilanciamento.
 
 ## Decisioni prese con Davide

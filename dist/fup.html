@@ -261,6 +261,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .ce-r .wh-sm{flex:1;min-width:0}
 .ce-r>.btn,.ce-r>.pill{flex:none;align-self:center}
 .ce-r.bad{background:#fbecec}
+.ce-cf{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:1px 6px;border:2px solid var(--ink);background:#fff;font-size:13px;font-weight:400;white-space:nowrap}
+.ce-cf b{font-family:var(--f-disp);font-size:16px}.ce-cf.ok b{color:var(--ok-t)}.ce-cf.warn b{color:var(--warn-t)}.ce-cf.bad b{color:var(--bad-t)}
+.ce-t tbody th .ce-cf{display:flex;width:max-content}
 table.t{width:100%;border-collapse:collapse;font-size:15px}
 table.t td,table.t th{padding:3px 4px;border-bottom:1px dashed var(--line);text-align:left;vertical-align:top}
 table.t th{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);font-weight:500}
@@ -1372,9 +1375,9 @@ const TECH=[
  {id:'portale',tree:'mkt',tier:3,row:1,req:['edi'],name:'Portale clienti',cost:35000,wk:8,desc:'Un sito dove i clienti seguono da soli pallet, bolle e consegne: qualità del servizio +10. Sblocca la policy «Rispondiamo entro 2 ore».',txt:'I clienti vedono da soli dove sono i loro pallet, scaricano le bolle e aprono le segnalazioni. Meno telefonate alle 23, più tempo per quelle che contano.'},
  {id:'accordi',tree:'mkt',tier:4,row:1,req:['kam'],name:'Accordi quadro nazionali',cost:60000,wk:13,desc:'Contratti nazionali con i grandi gruppi: sblocca le gare delle committenti S e A (servono anche 3 magazzini e reputazione 65).',txt:'Contratti firmati con le sedi centrali dei grandi gruppi. Si gioca nel campionato nazionale.'},
  {id:'ecom',tree:'mkt',tier:4,row:0,req:['kam','marketing'],name:'Logistica e-commerce',cost:70000,wk:13,desc:'Sblocca le gare dei negozi online: tanti ordini, volumi alti, KPI esigenti.',txt:'Tanti pacchi piccoli, resi e consegne a casa. Un mestiere diverso dal classico pallet.'},
- {id:'haccp',tree:'cert',tier:1,row:0,site:1,name:'HACCP',cost:5000,wk:3,inst:3000,mese:100,weeks:2,desc:'Igiene alimentare: senza, niente clienti che trattano cibo o mangimi (anche secchi: pasta, caffè, vino, crocchette).',txt:'Il piano di autocontrollo per chi tocca alimenti: pulizie registrate, trappole per gli insetti, merce sollevata da terra e un registro per ogni cosa. Ogni magazzino ha il suo.'},
- {id:'freddo',tree:'cert',tier:2,row:0,req:['haccp'],site:1,name:'Catena del freddo',cost:30000,wk:6,inst:40000,mese:600,weeks:3,desc:'Celle e sonde nel magazzino: sblocca i clienti dei freschi, dei surgelati e dei farmaci.',txt:'Celle refrigerate, sonde e registri delle temperature. Servono per latticini, surgelati e farmaci. Si installano magazzino per magazzino.'},
- {id:'iso',tree:'cert',tier:2,row:1,req:['controllo'],name:'Certificazione ISO 9001',cost:45000,wk:17,desc:'Accuratezza +0,5 ovunque, reputazione +5, punteggio nelle gare +3.',txt:'Procedure scritte, controlli e un ente esterno che verifica. I clienti si fidano di più.'},
+ {id:'haccp',tree:'cert',tier:1,row:0,site:1,name:'HACCP',cost:5000,wk:3,inst:3000,mese:100,weeks:2,aud:1500,desc:'Igiene alimentare: senza, niente clienti che trattano cibo o mangimi (anche secchi: pasta, caffè, vino, crocchette).',txt:'Il piano di autocontrollo per chi tocca alimenti: pulizie registrate, trappole per gli insetti, merce sollevata da terra e un registro per ogni cosa. Ogni magazzino ha il suo.'},
+ {id:'freddo',tree:'cert',tier:2,row:0,req:['haccp'],site:1,name:'Catena del freddo',cost:30000,wk:6,inst:40000,mese:600,weeks:3,aud:2500,desc:'Celle e sonde nel magazzino: sblocca i clienti dei freschi, dei surgelati e dei farmaci.',txt:'Celle refrigerate, sonde e registri delle temperature. Servono per latticini, surgelati e farmaci. Si installano magazzino per magazzino.'},
+ {id:'iso',tree:'cert',tier:2,row:1,req:['controllo'],name:'Certificazione ISO 9001',cost:45000,wk:17,aud:8000,desc:'Accuratezza +0,5 ovunque, reputazione +5, punteggio nelle gare +3.',txt:'Procedure scritte, controlli e un ente esterno che verifica. I clienti si fidano di più.'},
  {id:'acqua',tree:'wel',tier:1,row:0,name:'Boccioni d\'acqua',cost:2000,wk:3,inst:600,mese:90,mor:1,att:1,weeks:0,desc:'Morale +1 e il magazzino attira un po\' di più chi cerca lavoro.',txt:'Erogatori di acqua fresca in reparto e in banchina. D\'estate, sotto il tetto del capannone, fanno la differenza.'},
  {id:'frutta',tree:'wel',tier:2,row:0,req:['acqua'],name:'Servizio frutta',cost:5000,wk:3,inst:300,mese:250,mor:2,att:2,weeks:0,desc:'Morale +2, attrattività +2.',txt:'Una cassetta di frutta fresca ogni mattina in sala pausa. Mele, banane e qualche mandarino molto conteso.'},
  {id:'mensa',tree:'wel',tier:3,row:0,req:['frutta'],name:'Mensa aziendale',cost:15000,wk:6,inst:60000,mese:2500,mor:4,att:4,prod:0.03,weeks:0,desc:'Morale +4, attrattività +4, produttività +3%.',txt:'Un pasto caldo a metà turno, cucinato sul posto. Si mangia insieme e si torna in reparto con più energia.'},
@@ -2740,13 +2743,32 @@ wk('classifica','basi','Classifica',`Le aziende in gara in ordine di valore, con
 `Si apre dal menu (Informazioni) o toccando un magazzino avversario sulla mappa. Per ogni azienda: CEO, stile e difficoltà, [[valore]], cassa, [[ricavi|fatturato]] degli ultimi 12 mesi, clienti attivi, magazzini, [[reputazione]] e una barra per ogni [[vittoria|condizione di vittoria]] accesa. Le aziende fallite restano in fondo con la data del fallimento.`);
 wk('tech_richieste','cli','Tecnologie e certificazioni richieste',`Alcuni clienti partecipano solo se hai già una certa ricerca o certificazione: HACCP, catena del freddo, EDI, e-commerce.`,
 `Chi tratta cibo o mangimi (anche secchi: pasta, caffè, vino, crocchette) chiede l'[[tech_haccp|HACCP]]; freschi, surgelati e farmaci la [[tech_freddo|catena del freddo]]; la grande distribuzione l'[[tech_edi|EDI]]; i negozi online la [[tech_ecom|logistica e-commerce]]. Le [[certificazioni]] di magazzino devono essere valide proprio nel magazzino che scegli per l'offerta. Senza, il pulsante dell'offerta resta spento; le gare dei negozi online non arrivano nemmeno finché non hai la logistica e-commerce.`);
+wk('audit','tech','Audit',`L'ente di certificazione controlla un magazzino (o l'azienda): passa, trova rilievi o sospende il certificato.`,
+`Il punteggio dell'audit è la [[conformita|conformità]] più o meno 12 punti di fortuna, +15 se l'hai **preparato** (consulente e pulizie straordinarie, costa quanto un audit; si può fare nell'ultimo mese prima).
+• da 60 in su: superato;
+• da 40 a 60: **rilievi**. Il certificato resta, ma entro 30 giorni la conformità deve tornare a 60, oppure paghi un'**azione correttiva**; altrimenti viene sospeso;
+• sotto 40: **sospeso** (al primo audit: non concesso).
+
+Un certificato vale 3 anni, con un audit ogni anno: quello annuale costa la tariffa della certificazione (HACCP 1.500 €, catena del freddo 2.500 €, ISO 9001 8.000 €), quello di rinnovo il doppio. Due settimane prima arriva l'avviso. Con il certificato sospeso i clienti che lo chiedono perdono 6 punti di [[soddisfazione]] al mese e le gare che lo chiedono restano chiuse; per riaverlo si chiede un **audit straordinario** (il doppio della tariffa, dopo 2 settimane). Per la [[tech_iso|ISO 9001]] sospesa spariscono anche i suoi bonus.`);
+wk('conformita','tech','Conformità',`Quanto un magazzino è in ordine agli occhi dell'ente: da 0 a 100. Decide gli audit.`,
+`Si parte da 70, poi:
+• stato del magazzino sotto il 70%: −0,6 per ogni punto sotto; dal 90% in su +5 ([[manutenzione]]);
+• nessun facility manager: −10;
+• reparti in affanno ([[carico]] oltre il 100%): −10;
+• [[tech_formazione|Formazione strutturata]] e [[tech_wms|WMS]] installati e appresi: +5 ciascuno;
+• facchini in cooperativa o da un fornitore: −5;
+• [[st_prec|Precisione]] di chi guida il magazzino (manager o CEO): +1,5 per ogni punto sopra 10, −1,5 sotto;
+• [[tech_iso|ISO 9001]] valida: +5.
+Per le certificazioni aziendali conta la media di tutti i magazzini. Il numero si vede nella finestra Certificazioni: toccalo per l'elenco delle voci.`);
 wk('certificazioni','tech','Certificazioni',`Il quinto albero: certificazioni per magazzino (HACCP, catena del freddo) e per tutta l'azienda (ISO 9001).`,
 `Le certificazioni stanno in un albero tutto loro, con la cornice a scudo azzurro, e si seguono dalla finestra **Certificazioni** del menu.
 
-• **Per magazzino**: la ricerca si fa una volta, poi ogni capannone va certificato a parte. Paghi l'audit (per la [[tech_freddo|catena del freddo]] anche celle e sonde) e dopo qualche settimana l'ente dà il certificato. Da lì si paga un canone mensile. Sono l'[[tech_haccp|HACCP]] (igiene alimentare, per chi tratta cibo o mangimi) e la [[tech_freddo|catena del freddo]] (freschi, surgelati e farmaci; richiede l'HACCP nello stesso magazzino).
-• **Per l'azienda**: valgono ovunque appena finisce la ricerca, come la [[tech_iso|ISO 9001]].
+• **Per magazzino**: la ricerca si fa una volta, poi ogni capannone va certificato a parte. Paghi la richiesta (per la [[tech_freddo|catena del freddo]] anche celle e sonde) e dopo qualche settimana arriva il primo [[audit]]: se passa, l'ente dà il certificato. Da lì si paga un canone mensile. Sono l'[[tech_haccp|HACCP]] (igiene alimentare, per chi tratta cibo o mangimi) e la [[tech_freddo|catena del freddo]] (freschi, surgelati e farmaci; richiede l'HACCP nello stesso magazzino).
+• **Per l'azienda**: valgono ovunque appena finisce la ricerca, come la [[tech_iso|ISO 9001]]; poi passano anche loro un audit all'anno.
 
-Nelle [[gare]] il magazzino che scegli deve avere le certificazioni che la committente chiede ([[tech_richieste]]). I CEO che partono con un cliente storico alimentare hanno già l'HACCP nel primo magazzino.`);
+Ogni certificato vale 3 anni e passa un [[audit]] all'anno: l'esito dipende dalla [[conformita|conformità]]. Con rilievi va sistemato in fretta; se viene sospeso, i clienti che lo chiedono si scontentano.
+
+Nelle [[gare]] il magazzino che scegli deve avere le certificazioni valide che la committente chiede ([[tech_richieste]]). I CEO che partono con un cliente storico alimentare hanno già l'HACCP nel primo magazzino.`);
 wk('rank','cli','Rank delle committenti',`Il voto di una committente, da S (le migliori) a F (le peggiori): la medaglia colorata accanto al nome.`,
 `Il rank è la media di quattro voti da 0 a 100: ricavi promessi (quanti pallet e posti porta), desiderabilità (margini, pignoleria, pagamenti), pubblicità (quanto fa curriculum averla) e solidità (quanto è stabile come azienda). Sono solo voti per la media: la probabilità di rinnovo dipende dalla [[soddisfazione]]. Passa il mouse sulla medaglia per vederli.
 
@@ -2909,10 +2931,10 @@ function newGame(ceoId,coName,color,custom,co){
   S={v:1,day:0,speed:0,ceoId,custom:custom||null,company:{name:coName||C.company,color,logo:(co&&co.logo)||'camion',claim:(co&&co.claim)||''},cash:C.cash,rep:C.rep,fuel:0.86,
      warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0,cs:0},cs:{resp:null,q:[],last:-99,log:[],ov:[]},managers:[...MANAGERS,...EXECS].map(newPerson),hh:[],cands:[],negs:{},boss:{...JSON.parse(JSON.stringify(C)),bd:bdOf(C.age,hashN(C.name)),since:0,log:[]},alumni:[],
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextEvent:25,project:null,seen:{},over:false,uid:1,
-     execs:[],dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false,hist:[],tw:{win:0,lose:0,skip:0},pol:{},notes:[],noteId:0,certMig:1};
+     execs:[],dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false,hist:[],tw:{win:0,lose:0,skip:0},pol:{},notes:[],noteId:0,certMig:2,certCo:{}};
   const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,capo:0,autB:0,autCE:1,imp:1,fm:0};
   // tecnologie di partenza, più le certificazioni che chiede il cliente storico (l'HACCP per chi ha un cliente alimentare)
-  [...new Set([...(C.startTech||[]),...(C.client.req||[])])].forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true;});
+  [...new Set([...(C.startTech||[]),...(C.client.req||[])])].forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true; if((TECH.find(x=>x.id===t)||{}).tree==='cert') certNew(0,wh.tech[t]);});
   S.log=[{d:0,ic:'azienda',t:`Nasce ${S.company.name}: ${C.name} apre il primo magazzino a ${wh.name}`}]; S.yrs=[];
   S.clients.push({id:nid('c'),...C.client,zone:cinfo(C.client).zones[0],src:cinfo(C.client).src,mode:cinfo(C.client).mode,wh:wh.id,mult:1,sat:70,status:'attivo',start:0,end:24*30,storico:true});
   chMigrate(); // autisti B per la parte di merce che va con i furgoni
@@ -3361,14 +3383,96 @@ function capOf(w){const t=TECH.find(x=>x.id==='verticale'); return Math.round(w.
 function perWh(t){return (t.tree==='log'||t.tree==='wel'||!!t.site)&&!t.pol;}
 // ricerche e certificazioni che una committente chiede (i contratti vinti non le copiano: si guarda il modello della gara o il cliente storico)
 const cliReq=c=>c.req||(TENDER_POOL.find(x=>x.name===c.name)||(CEOS.find(x=>x.client.name===c.name)||{}).client||{}).req||[];
+/* --- audit delle certificazioni (dalla 0.68) ---
+   Ogni certificato ha un registro: w.tech[id] per quelle di magazzino, S.certCo[id] per quelle aziendali.
+   {day: richiesta, iss: rilasciato il (null finché il primo audit non passa), exp: scadenza (3 anni), next: prossimo audit,
+    nc: giorno entro cui chiudere i rilievi, susp: sospeso dal, pend: audit straordinario fissato per, prep: audit preparato} */
+const AUD={ok:60,nc:40,luck:12,prep:15,ncDays:30,extraDays:14,valid:1095,year:365,warn:14};
+const certNew=(d,o)=>Object.assign(o||{},{iss:d,exp:d+AUD.valid,next:d+AUD.year,nc:null,susp:null,pend:null,prep:false});
+const crec=(w,t)=>w?w.tech[t.id]:(S.certCo||{})[t.id];
+// conformità di un magazzino (0-100): quanto è in ordine per l'ente che fa l'audit. Senza magazzino: la media di tutti (per le aziendali)
+function confOf(w){
+  if(!w){ const ws=S.warehouses; return {v:ws.length?ws.reduce((a,x)=>a+confOf(x).v,0)/ws.length:70,L:[]}; }
+  const L=[['Base',70]], c=w.cond==null?100:w.cond, m=mgrStats(w);
+  if(c<70) L.push(['Stato del magazzino sotto il 70%',-(70-c)*0.6]); else if(c>=90) L.push(['Magazzino tenuto bene',5]);
+  if(!(w.staff.fm>0)) L.push(['Nessun facility manager',-10]);
+  if(w.kpi&&overloaded(w,w.kpi)) L.push(['Reparti in affanno',-10]);
+  if(w.tech.formazione&&techFactor(w,TECH.find(x=>x.id==='formazione'))>0) L.push(['Formazione strutturata',5]);
+  if(w.tech.wms&&techFactor(w,TECH.find(x=>x.id==='wms'))>0) L.push(['WMS: tutto tracciato',5]);
+  if(w.coop) L.push(['Facchini esterni',-5]);
+  if(m&&m.prec!=null) L.push([`Precisione di ${(m.name||'').split(' ')[0]||'chi guida'}`,1.5*(m.prec-10)]);
+  if(coCertOk('iso')) L.push(['Certificazione ISO 9001',5]);
+  return {v:clamp(L.reduce((a,x)=>a+x[1],0),0,100),L};
+}
+const confTip=w=>{const C=confOf(w); return `<div class='tt'>Conformità ${Math.round(C.v)}</div>`+C.L.map(([n,v])=>`<div>${esc(n)}: <b>${v>=0?'+':'−'}${f1(Math.abs(v))}</b></div>`).join('')+`<div class='sm'>Agli audit: da ${AUD.ok} in su passa, da ${AUD.nc} rilievi, sotto ${AUD.nc} sospeso (più o meno ${AUD.luck} di fortuna).</div>`;};
+// certificato valido: rilasciato e non sospeso (i rilievi aperti non lo tolgono)
+function certOk(w,id){const it=w&&w.tech[id]; return !!it&&it.iss!=null&&it.susp==null;}
+function coCertOk(id){const it=(S.certCo||{})[id]; return R(id)&&!!it&&it.iss!=null&&it.susp==null;}
+// stato di una certificazione (w = magazzino, null = aziendale): no da ricercare, res in ricerca, lock manca quella prima, open si può chiedere,
+// init primo audit in attesa, ok valida, nc rilievi da chiudere, susp sospesa (o primo audit non passato)
+function certState(w,t){
+  const it=crec(w,t), pj=S.project;
+  if(!it) return !R(t.id)?(pj&&pj.tech===t.id?'res':'no'):w&&!(t.req||[]).every(r=>w.tech[r])?'lock':w?'open':'no';
+  return it.susp!=null?'susp':it.iss==null?'init':it.nc!=null?'nc':'ok';
+}
+const certFee=t=>t.aud||2000;
+const certKey=(w,t)=>'aud_'+(w?w.id:'co')+t.id;
+// un audit: punteggio = conformità + preparazione ± fortuna. kind: init (primo), year (annuale), renew (rinnovo dei 3 anni), extra (straordinario, già pagato)
+function certAudit(w,t,kind,roll){
+  const it=crec(w,t), C=confOf(w).v, sc=C+(it.prep?AUD.prep:0)+(roll!=null?roll:rnd(-AUD.luck,AUD.luck));
+  const fee=kind==='renew'?certFee(t)*2:kind==='year'?certFee(t):0; S.cash-=fee; S.cur.tech+=fee;
+  const where=w?` a ${w.name}`:'', why=w?'':' (conformità media dei magazzini)', sel={ctab:w?'mag':'az'};
+  it.prep=false; it.pend=null;
+  if(sc>=AUD.nc){
+    const iss=it.iss, exp=it.exp; certNew(S.day,it);
+    if(kind==='year'||kind==='extra'&&iss!=null&&exp>S.day){ it.iss=iss; it.exp=exp; }   // l'annuale e lo straordinario non allungano i 3 anni
+    if(it.next>it.exp) it.next=it.exp;
+    if(sc<AUD.ok) it.nc=S.day+AUD.ncDays;
+    notify(sc>=AUD.ok?'green':'yellow','certificazioni','Ente di certificazione',sc>=AUD.ok?`${t.name}: audit superato${where}`:`${t.name}: audit con rilievi${where}`,
+      sc>=AUD.ok?`L'ispettore se ne va soddisfatto${why}. Certificato valido fino al ${shortDate(it.exp)}, prossimo controllo il ${shortDate(it.next)}.`
+        :`Il certificato resta, ma l'ispettore ha trovato cose da sistemare${why}. Entro il ${shortDate(it.nc)} la conformità deve arrivare a ${AUD.ok} (oppure paghi un'azione correttiva), altrimenti il certificato viene sospeso.`,'certificazioni',sel,certKey(w,t));
+    if(kind==='init'||kind==='extra') chron('certificazioni',`${t.name}${where}: certificato`);
+  } else {
+    it.susp=S.day; it.nc=null;
+    notify('red','certificazioni','Ente di certificazione',kind==='init'&&it.iss==null?`${t.name}: primo audit non superato${where}`:`${t.name} sospeso${where}`,
+      `Troppe cose fuori posto${why}: conformità ${Math.round(C)}. ${it.iss==null?'Il certificato non viene rilasciato.':'Finché è sospeso, i clienti che lo chiedono perdono soddisfazione ogni mese.'} Sistema il magazzino e chiedi un audit straordinario dalla finestra Certificazioni.`,'certificazioni',sel,certKey(w,t));
+    if(it.iss!=null) news('Il Sole 24 Pallet',`${S.company.name}: sospesa la certificazione ${t.name}`,`L'ente ha sospeso il certificato${where} dopo un audit andato male.`);
+  }
+  return sc;
+}
+// ogni giorno: audit in scadenza, rilievi da chiudere, avvisi due settimane prima; le avversarie si arrangiano da sole
+function certDaily(){
+  if(!S.certCo) S.certCo={};
+  const one=(w,t)=>{ const it=crec(w,t); if(!it) return;
+    const where=w?' a '+w.name:'', sel={ctab:w?'mag':'az'};
+    if(it.pend!=null){ if(S.day>=it.pend) certAudit(w,t,'extra'); return; }
+    if(it.iss==null&&it.susp==null){ if(S.day>=it.day+t.weeks*7) certAudit(w,t,'init'); return; }
+    if(it.susp!=null){ if(S.bot&&S.cash>certFee(t)*2+60000){ S.cash-=certFee(t)*2; S.cur.tech+=certFee(t)*2; it.pend=S.day+AUD.extraDays; } return; }
+    if(it.nc!=null&&S.bot&&S.cash>certFee(t)+60000){ S.cash-=certFee(t); S.cur.tech+=certFee(t); it.nc=null; }
+    if(it.nc!=null&&S.day>=it.nc){
+      if(confOf(w).v>=AUD.ok){ it.nc=null; notify('green','certificazioni','Ente di certificazione',`${t.name}: rilievi chiusi${where}`,'La conformità è tornata a posto: l\'ente chiude i rilievi.','certificazioni',sel,certKey(w,t)); }
+      else { it.susp=S.day; it.nc=null; notify('red','certificazioni','Ente di certificazione',`${t.name} sospeso${where}`,'I rilievi non sono stati chiusi in tempo. Finché è sospeso, i clienti che lo chiedono perdono soddisfazione ogni mese: chiedi un audit straordinario dalla finestra Certificazioni.','certificazioni',sel,certKey(w,t)); }
+      return; }
+    if(S.day>=it.next){ certAudit(w,t,it.next>=it.exp?'renew':'year'); return; }
+    if(S.bot&&!it.prep&&it.next-S.day<=AUD.warn&&S.cash>certFee(t)+100000){ S.cash-=certFee(t); S.cur.tech+=certFee(t); it.prep=true; }
+    if(it.next-S.day===AUD.warn) notify('yellow','certificazioni','Ente di certificazione',`${t.name}: audit ${it.next>=it.exp?'di rinnovo':'annuale'} tra 2 settimane${where}`,
+      `Conformità di oggi: ${Math.round(confOf(w).v)}. Puoi prepararlo (consulente e pulizie straordinarie: +${AUD.prep} al punteggio) dalla finestra Certificazioni.`,'certificazioni',sel,certKey(w,t));
+  };
+  TECH.forEach(t=>{ if(t.tree!=='cert') return; if(t.site) S.warehouses.forEach(w=>one(w,t)); else if(R(t.id)) one(null,t); });
+}
+// certificazioni che un cliente chiede e che il suo magazzino (o l'azienda) non ha valide
+const certMiss=c=>cliReq(c).filter(r=>{const t=TECH.find(x=>x.id===r); return t&&t.tree==='cert'&&R(r)&&!(t.site?certOk(whById(c.wh),r):coCertOk(r));});
 // riga di stato della voce Certificazioni nel menu
-function certNote(){ const site=TECH.filter(t=>t.tree==='cert'&&t.site);
-  if(S.warehouses.some(w=>site.some(t=>!certOk(w,t.id)&&S.clients.some(c=>c.status!=='perso'&&c.wh===w.id&&cliReq(c).includes(t.id))))) return ['bad','Un cliente chiede un certificato che manca'];
-  const r=S.warehouses.reduce((a,w)=>a+site.filter(t=>w.tech[t.id]&&!certOk(w,t.id)).length,0); return r?['acc',r===1?'Un audit in corso':r+' audit in corso']:null; }
+function certNote(){
+  const site=TECH.filter(t=>t.tree==='cert'&&t.site), all=[...S.warehouses.flatMap(w=>site.map(t=>[w,t])),...TECH.filter(t=>t.tree==='cert'&&!t.site&&R(t.id)).map(t=>[null,t])];
+  const st=all.map(([w,t])=>[certState(w,t),crec(w,t)]);
+  if(st.some(x=>x[0]==='susp')) return ['bad','Un certificato è sospeso'];
+  if(st.some(x=>x[0]==='nc')) return ['bad','Rilievi da sistemare'];
+  if(S.clients.some(c=>c.status!=='perso'&&certMiss(c).length)) return ['bad','Un cliente chiede un certificato che manca'];
+  if(st.some(x=>x[0]==='ok'&&x[1].next-S.day<=AUD.warn)) return ['acc','Audit in arrivo'];
+  const r=st.filter(x=>x[0]==='init').length; return r?['acc',r===1?'Un primo audit in attesa':r+' primi audit in attesa']:null; }
 // pulsante per ottenere una certificazione di magazzino: chi ha attrezzatura da montare (le celle del freddo) la installa, le altre chiedono solo l'audit
 const certBtn=t=>t.id==='freddo'?'Installa e certifica':'Richiedi l\'audit';
-// certificazione di magazzino valida: richiesta e audit iniziale passato (t.weeks settimane dopo la richiesta)
-function certOk(w,id){const it=w&&w.tech[id], t=TECH.find(x=>x.id===id); return !!it&&(!t.weeks||S.day-it.day>=t.weeks*7);}
 // servizi di welfare installati in un magazzino: canone scontato dalla Piattaforma welfare
 function welMese(t){return t.tree==='wel'&&R('welfare2')?t.mese*0.7:t.mese;}
 function whAtt(wh){return wh?TECH.filter(t=>t.tree==='wel'&&wh.tech[t.id]).reduce((a,t)=>a+(t.att||0),0):0;}
@@ -3555,7 +3659,7 @@ function computeWH(wh,extra){
   if(planShort) pP.push(['Pianificatori del traffico insufficienti',-2*planShort]); pP.push(...rf.P);
   if(sm.push>0.5) pP.push(['Camion che aspettano il carico completo',-0.06*sm.push]);
   const pA=[['Base',96],['Precisione di '+m.name.split(' ')[0],0.3*(m.prec-10)],['Morale',0.04*(wh.morale-60)]];
-  if(tA) pA.push(['Tecnologie',tA]); if(wA) pA.push(['Servizi di welfare',wA]); if(mA) pA.push(['Eventi',mA]); if(Math.abs(chA)>0.05) pA.push(['Canali di distribuzione',chA]); if(R('iso')) pA.push(['Certificazione ISO',0.5]);
+  if(tA) pA.push(['Tecnologie',tA]); if(wA) pA.push(['Servizi di welfare',wA]); if(mA) pA.push(['Eventi',mA]); if(Math.abs(chA)>0.05) pA.push(['Canali di distribuzione',chA]); if(coCertOk('iso')) pA.push(['Certificazione ISO',0.5]);
   if(sat>0.85) pA.push(['Magazzino pieno oltre l\'85%',-25*(sat-0.85)]); if(uPick>1) pA.push(['Magazzinieri insufficienti',-8*(uPick-1)*sk]); if(uCar>1) pA.push(['Carrellisti insufficienti',-3*(uCar-1)*sk]);
   if(impShort) pA.push(['Impiegati insufficienti',-1*impShort*sk]); if(poA) pA.push(['Policy aziendali',poA]); if(trA) pA.push(['Regole del traffico',trA]);
   const exN=act.filter(c=>c.exit).length; if(exN) pA.push(['Inventario di uscita',-1*exN]);
@@ -3655,13 +3759,13 @@ function step(){
   // ricerca in corso
   if(S.project){ S.project.left--; if(S.project.left<=0){ const t=TECH.find(x=>x.id===S.project.tech); S.project=null; S.researched[t.id]=true; chron('tecnologia',`Ricerca completata: ${t.name}`);
     if(t.id==='iso'||t.id==='marketing') S.rep=clamp(S.rep+5,0,100);
+    if(t.tree==='cert'&&!t.site){ if(!S.certCo) S.certCo={}; S.certCo[t.id]=certNew(S.day); }
     news('La Gazzetta del Muletto',`Ricerca completata: ${t.name}`,t.tree==='cert'&&t.site?'Ora si può ottenere nei magazzini dalla finestra Certificazioni.':perWh(t)?'Ora si può installare nei magazzini dalla finestra Tecnologia.':t.desc);
     if(t.id==='direzione') notify('green','direzione','La Gazzetta del Muletto','Nasce la squadra dei dirigenti','La struttura direzionale è pronta. Dal menu Direzione nomina fino a cinque direttori: ognuno guida un\'area di tutta l\'azienda con la sua abilità principale.','direzione');
     else if(t.tree==='cert'&&t.site) notify('green','certificazioni','Ufficio ricerca',`Ricerca completata: ${t.name}`,'Ora va ottenuta in ogni magazzino che serve i clienti che la chiedono: scegli dove nella finestra Certificazioni.','certificazioni',{ctab:'mag'},'techdone');
     else notify('green','tecnologia','Ufficio ricerca',`Ricerca completata: ${t.name}`,perWh(t)?'Ora va installata nei magazzini: apri la tecnologia e scegli dove.':t.desc,'tecnologia',{tree:t.tree,tech:t.id},'techdone'); } }
-  // certificazioni di magazzino: il giorno in cui finisce l'audit iniziale arriva l'avviso
-  TECH.forEach(t=>{ if(t.tree!=='cert'||!t.site||!t.weeks) return; S.warehouses.forEach(w=>{ const it=w.tech[t.id];
-    if(it&&S.day-it.day===t.weeks*7) notify('green','certificazioni','Ente di certificazione',`${t.name}: audit superato a ${w.name}`,'Il magazzino è certificato: ora può servire i clienti che la chiedono.','certificazioni',{ctab:'mag'}); }); });
+  // certificazioni: audit, rilievi e scadenze
+  certDaily();
   // gare
   // clienti in uscita dopo il recesso
   S.clients.filter(c=>c.exit&&c.status==='attivo'&&S.day>=c.exit.day).forEach(exitClient);
@@ -3752,6 +3856,7 @@ function monthEnd(){
     // penale da contratto: per ogni punto sotto soglia, se il cliente la prevede
     const miss=Math.max(0,-wP)+(c.sA?Math.max(0,-wA):0), p=clientRev(c)*Math.min(PEN_MAX,penPct(c)*miss)/100; c.lastPen=p; pen+=p;
     if(p>=1) news('Il Sole 24 Pallet',`Penale da ${c.name}`,`KPI sotto soglia di ${f1(miss)} punti: il contratto prevede ${eur(p)} di penale.`);
+    if(certMiss(c).length) c.sat-=6;   // certificato sospeso (o mancante) nel magazzino che lo serve
     c.sat=clamp(c.sat,0,100);
     if(c.sat<25){c.status='perso';S.rep-=rankOf(c).lost;chron('clienti',`${c.name} disdice il contratto: ritardi ed errori di troppo`);notify('red','clienti','Il Sole 24 Pallet',`${c.name} ha disdetto il contratto`,'«Ritardi ed errori non sono più accettabili», fa sapere il cliente: la soddisfazione era scesa sotto il 25%.','clienti');news('Il Sole 24 Pallet',`${c.name} lascia ${S.company.name}`,`"Ritardi ed errori non sono più accettabili", fa sapere il cliente.`);}
     else if(c.exit){ /* in uscita: niente rinnovo */ }
@@ -3845,7 +3950,7 @@ function bidEstimate(t,whId,mult){
   const certW=(t.req||[]).filter(r=>R(r)&&perWh(TECH.find(x=>x.id===r))&&!certOk(w,r)).map(r=>TECH.find(x=>x.id===r).name);
   const fits=k.stock<=k.cap&&!missing.length&&!certW.length&&!naz.length;
   const gP=k2.P-t.sP, gA=t.sA?k2.A-t.sA:3; const dC=dirStat('comm');
-  const score=50+(1-mult)*150+clamp(gP*4,-20,6)+clamp(gA*4,-20,6)+(S.rep-50)*0.25+(ceo().st.neg-10)+(dC!=null?0.8*(dC-10):0)+(R('iso')?3:0)+(riEtico(t)&&w.hdl&&hdlBase(w.hdl).cert?hdlBase(w.hdl).cert:0)+talGara(t)+polSum('gara')+(S.bot?(BOT_DIFF[S.bot.diff]||{}).gara||0:0);
+  const score=50+(1-mult)*150+clamp(gP*4,-20,6)+clamp(gA*4,-20,6)+(S.rep-50)*0.25+(ceo().st.neg-10)+(dC!=null?0.8*(dC-10):0)+(coCertOk('iso')?3:0)+(riEtico(t)&&w.hdl&&hdlBase(w.hdl).cert?hdlBase(w.hdl).cert:0)+talGara(t)+polSum('gara')+(S.bot?(BOT_DIFF[S.bot.diff]||{}).gara||0:0);
   const comp=55+t.diff+rankOf(t).comp;
   const chance=fits?1/(1+Math.exp(-(score-comp)/6)):0;
   return {P:k2.P,A:k2.A,sat:k.stock/k.cap,cap:k.cap,missing,certW,naz,fits,chance,score,comp,prof:k2.rev-k2.pers-k2.mezzi-k2.fissi-k2.tCan-k2.wCan,stock:k.stock,rev:clientRev(extra),need,staff:w.staff,ld,P0:k.P,A0:k.A};
@@ -5570,6 +5675,12 @@ function fillSave(s){
         if(s.researched.freddo){ s.researched.haccp=true; s.warehouses.forEach(w=>{ if(!w.tech.haccp) w.tech.haccp={day:-999}; if(!w.tech.freddo) w.tech.freddo={day:-999}; }); }
     s.clients.filter(c=>c.status!=='perso'&&cliReq(c).includes('haccp')).forEach(c=>{ const w=s.warehouses.find(x=>x.id===c.wh); s.researched.haccp=true; if(w&&!w.tech.haccp) w.tech.haccp={day:-999}; });
   }
+  // audit (dalla 0.68): chi aveva già il certificato lo tiene per 3 anni da oggi, con il primo controllo tra 2 e 12 mesi
+  if(s.certMig<2){ s.certMig=2; if(!s.certCo) s.certCo={}; let k=0; const spread=()=>s.day+60+((k++*97)%300);
+    s.warehouses.forEach(w=>TECH.filter(t=>t.tree==='cert'&&t.site&&w.tech[t.id]).forEach(t=>{ const it=w.tech[t.id]; if(it.iss!==undefined) return;
+      if(s.day-it.day>=t.weeks*7){ Object.assign(it,{iss:s.day,exp:s.day+AUD.valid,next:spread(),nc:null,susp:null,pend:null,prep:false}); } else Object.assign(it,{iss:null,nc:null,susp:null,pend:null,prep:false}); }));
+    TECH.filter(t=>t.tree==='cert'&&!t.site&&s.researched[t.id]&&!s.certCo[t.id]).forEach(t=>{ s.certCo[t.id]={iss:s.day,exp:s.day+AUD.valid,next:spread(),nc:null,susp:null,pend:null,prep:false}; });
+  }
   return s;
 }
 // dopo la conversione: gli autisti che servono sui furgoni passano alla patente B
@@ -6488,8 +6599,8 @@ const VIEWS={
     const eff=[sel.A?`${kw('accuratezza')} +${f1(sel.A)}`:'',sel.P?`${kw('puntualita')} +${f1(sel.P)}`:'',sel.att?`${kw('attrattivita','attrattività')} +${sel.att}`:'',perWh(sel)&&sel.tree==='cert'?`${kw('certificazioni','audit e attrezzatura')} ${eur(sel.inst)} per magazzino, canone ${eur(sel.mese)}/mese, certificato dopo ${wks(sel.weeks*7)}`:perWh(sel)?`${kw('installazione','installazione')} ${eur(sel.inst)} per magazzino, canone ${eur(welMese(sel))}/mese${sel.weeks?`, ${kw('apprendimento','apprendimento')} ${sel.weeks} ${sel.weeks===1?'settimana':'settimane'}`:', subito attivo'}`:''].filter(Boolean).join(' · ');
     let act='';
     if(s2==='open') act=`<button class="btn pri" data-act="research" data-id="${sel.id}" ${!pj&&S.cash>=sel.cost?'':'disabled'}>Avvia la ricerca · ${eur(sel.cost)} · ${wks(techDays(sel))}</button>${pj?'<span class="sm">C\'è già una ricerca in corso.</span>':''}`;
-    if(s2==='done'&&perWh(sel)) act=S.warehouses.map(w=>{const it=w.tech[sel.id], ce=sel.tree==='cert', learn=it&&(ce?!certOk(w,sel.id):techFactor(w,sel)<0);
-      return `<div class="row"><span>${esc(w.name)}</span>${it?`<span class="sm ${learn?'warn':'ok'}">${learn?(ce?'audit in corso':'in apprendimento'):(ce?'certificato':'attiva')}</span>`:`<button class="btn sm2 pri" data-act="install" data-id="${sel.id}" data-wh="${w.id}" ${S.cash>=sel.inst&&!(sel.tree==='wel'&&polOn('spending'))&&(sel.req||[]).every(r=>w.tech[r])?'':'disabled'}>${ce?certBtn(sel):'Installa'} · ${eur(sel.inst)}</button>`}</div>`;}).join('')+(sel.tree==='wel'&&polOn('spending')?`<div class="sm warn">La policy ${kw('pol_spending','Spending review')} blocca i nuovi servizi di welfare.</div>`:'')+((sel.req||[]).length?`<div class="sm">Si installa nei magazzini che hanno già ${reqs.map(r=>esc(r.name)).join(' e ')}.</div>`:'');
+    if(s2==='done'&&perWh(sel)) act=S.warehouses.map(w=>{const it=w.tech[sel.id], ce=sel.tree==='cert', learn=it&&(ce?!certOk(w,sel.id):techFactor(w,sel)<0), cs=ce&&it?certState(w,sel):'';
+      return `<div class="row"><span>${esc(w.name)}</span>${it?`<span class="sm ${learn?'warn':'ok'}">${learn?(ce?(cs==='susp'?'sospeso':'primo audit in attesa'):'in apprendimento'):(ce?(cs==='nc'?'certificato, con rilievi':'certificato'):'attiva')}</span>`:`<button class="btn sm2 pri" data-act="install" data-id="${sel.id}" data-wh="${w.id}" ${S.cash>=sel.inst&&!(sel.tree==='wel'&&polOn('spending'))&&(sel.req||[]).every(r=>w.tech[r])?'':'disabled'}>${ce?certBtn(sel):'Installa'} · ${eur(sel.inst)}</button>`}</div>`;}).join('')+(sel.tree==='wel'&&polOn('spending')?`<div class="sm warn">La policy ${kw('pol_spending','Spending review')} blocca i nuovi servizi di welfare.</div>`:'')+((sel.req||[]).length?`<div class="sm">Si installa nei magazzini che hanno già ${reqs.map(r=>esc(r.name)).join(' e ')}.</div>`:'');
     det=`<div class="card"><div style="display:flex;gap:12px;align-items:center">${techIcon(sel,64,s2==='lock')}<div style="flex:1;display:flex;flex-direction:column;gap:3px"><div class="row"><span class="h3">${esc(sel.name)}</span><span class="sm">${s2==='done'?'Ricercata':''}</span></div><span class="sm">${kw('alberi',TREES.find(x=>x[0]===sel.tree)[1])} · ${perWh(sel)?(sel.tree==='cert'?'da ottenere magazzino per magazzino':'da installare in ogni magazzino'):'vale per tutta l\'azienda'}</span></div></div>
       ${sel.txt?`<div class="ttxt">${esc(sel.txt)}</div>`:''}<div><b>Effetto:</b> ${esc(sel.desc)}</div>${eff?`<div class="sm">${eff}</div>`:''}
       ${reqs.length?`<div class="sm">Richiede: ${reqs.map(r=>`<span class="${R(r.id)?'ok':'bad'}">${esc(r.name)}</span>`).join(', ')}</div>`:''}
@@ -6502,49 +6613,53 @@ const VIEWS={
   return tiles+tabs+pjHtml+`<div class="sm">${desc}</div><div class="treebox"><div style="position:relative;width:${W}px;height:${H}px"><svg width="${W}" height="${H}" style="position:absolute;inset:0" aria-hidden="true">${lines}</svg>${nodes.map(nodeBtn).join('')}</div></div>`+det;
  },
  certificazioni(){
-  const tab=UI.sel.ctab||'mag', pj=S.project;
+  const tab=UI.sel.ctab||'mag';
   const site=TECH.filter(t=>t.tree==='cert'&&t.site), comp=TECH.filter(t=>t.tree==='cert'&&!t.site);
-  // stato di una certificazione in un magazzino: ok certificato, run audit in corso, open si può chiedere, lock manca quella prima, res in ricerca, no da ricercare
-  const cst=(t,w)=>w.tech[t.id]?(certOk(w,t.id)?'ok':'run'):!R(t.id)?(pj&&pj.tech===t.id?'res':'no'):(t.req||[]).every(r=>w.tech[r])?'open':'lock';
   const need=(t,w)=>S.clients.filter(c=>c.status!=='perso'&&c.wh===w.id&&cliReq(c).includes(t.id));
-  const nOk=S.warehouses.reduce((a,w)=>a+site.filter(t=>cst(t,w)==='ok').length,0), nRun=S.warehouses.reduce((a,w)=>a+site.filter(t=>cst(t,w)==='run').length,0);
-  const holes=S.warehouses.flatMap(w=>site.filter(t=>cst(t,w)!=='ok'&&need(t,w).length).map(t=>({t,w})));
+  const all=[...S.warehouses.flatMap(w=>site.map(t=>[w,t])),...comp.map(t=>[null,t])].map(([w,t])=>({w,t,st:certState(w,t),it:crec(w,t)}));
+  const nOk=all.filter(x=>x.w&&(x.st==='ok'||x.st==='nc')).length, nCo=all.filter(x=>!x.w&&(x.st==='ok'||x.st==='nc')).length;
+  const holes=S.warehouses.flatMap(w=>site.filter(t=>!certOk(w,t.id)&&need(t,w).length).map(t=>({t,w})));
+  const bad=all.filter(x=>x.st==='nc'||x.st==='susp').length+holes.filter(h=>certState(h.w,h.t)!=='susp').length;
+  const nx=all.filter(x=>x.st==='ok'||x.st==='nc').sort((a,b)=>a.it.next-b.it.next)[0];
   const G=S.tenders.filter(g=>!g.done&&(g.req||[]).some(r=>TECH.find(x=>x.id===r).tree==='cert'));
-  const gOk=g=>S.warehouses.filter(w=>(g.req||[]).every(r=>{const q=TECH.find(x=>x.id===r); return q.site?certOk(w,r):R(r);}));
+  const gOk=g=>S.warehouses.filter(w=>(g.req||[]).every(r=>{const q=TECH.find(x=>x.id===r); return q.site?certOk(w,r):q.tree==='cert'?coCertOk(r):R(r);}));
   const tile=(cls,lab,val,sub)=>`<div class="kpi wh-k ${cls}"><div class="lab">${lab}</div><b>${val}</b><div class="sm">${sub}</div></div>`;
   const tiles=`<div class="wh-kpis">
-   ${tile(comp.some(t=>R(t.id))?'ok':'',kw('certificazioni','Aziendali'),`${comp.filter(t=>R(t.id)).length} / ${comp.length}`,'valgono per tutta l\'azienda')}
+   ${tile(nCo?'ok':'',kw('certificazioni','Aziendali'),`${nCo} / ${comp.length}`,'valgono per tutta l\'azienda')}
    ${tile(nOk?'ok':'',kw('certificazioni','Nei magazzini'),nOk,nOk===1?'certificato valido':'certificati validi')}
-   ${tile(nRun?'warn':'',kw('certificazioni','Audit in corso'),nRun,nRun?'certificati in arrivo':'nessuno in attesa')}
-   ${tile(holes.length?'bad':'ok',kw('tech_richieste','Da sistemare'),holes.length,holes.length?'clienti senza certificato':'tutto in regola')}
+   ${tile(nx&&nx.it.next-S.day<=AUD.warn?'warn':'',kw('audit','Prossimo audit'),nx?shortDate(nx.it.next):'—',nx?esc(nx.t.name)+(nx.w?' · '+esc(nx.w.name):''):'nessun certificato')}
+   ${tile(bad?'bad':'ok',kw('audit','Da sistemare'),bad,bad?'rilievi, sospensioni, clienti scoperti':'tutto in regola')}
   </div>`;
   const tabs=`<div class="tabs" role="tablist">${[['mag','Magazzini'],['az','Azienda']].map(([id,n])=>`<button role="tab" aria-selected="${id===tab}" data-act="ctab" data-id="${id}">${n}</button>`).join('')}</div>`;
-  // cosa mostrare in una casella: lo stato o il pulsante per ottenerla
-  const cell=(t,w)=>{const st=cst(t,w), nd=need(t,w), it=w.tech[t.id];
-    const who=nd.length&&st!=='ok'?`<span class="sm bad">la chiede ${esc(nd.map(c=>c.name).join(', '))}</span>`:'';
-    const el=st==='ok'?`<span class="pill cl-st ok">Certificato</span>`:st==='run'?`<span class="pill cl-st warn">Audit · ${wks(Math.max(1,t.weeks*7-(S.day-it.day)))}</span>`
-      :st==='open'?`<button class="btn sm2 pri" data-act="install" data-id="${t.id}" data-wh="${w.id}" ${S.cash>=t.inst?'':'disabled'}>${certBtn(t)} · ${eur(t.inst)}</button>`
-      :st==='lock'?`<span class="sm">Prima serve ${esc((t.req||[]).filter(r=>!w.tech[r]).map(r=>TECH.find(x=>x.id===r).name).join(', '))}</span>`
-      :st==='res'?`<span class="sm">Ricerca in corso</span>`:`<button class="btn sm2" data-act="opentech" data-tree="cert" data-id="${t.id}">Da ricercare</button>`;
-    return {el,who,st};};
+  // stato e pulsanti di un certificato (w = magazzino, null = aziendale)
+  const ctl=(w,t)=>{const st=certState(w,t), it=crec(w,t), fee=certFee(t), a=(k,lab,f,pri)=>`<button class="btn sm2${pri?' pri':''}" data-act="certact" data-k="${k}" data-id="${t.id}"${w?` data-wh="${w.id}"`:''} ${S.cash>=f?'':'disabled'}>${lab} · ${eur(f)}</button>`;
+    if(st==='init') return {st,el:`<span class="pill cl-st warn">Primo audit</span>`,sub:`il ${shortDate(it.day+t.weeks*7)}`};
+    if(st==='ok'){const soon=it.next-S.day<=30;
+      return {st,el:soon&&!it.prep?a('prep','Prepara l\'audit',fee):`<span class="pill cl-st ok">Valido</span>`,sub:`fino al ${shortDate(it.exp)} · ${it.next>=it.exp?'rinnovo':'audit'} il ${shortDate(it.next)}${it.prep?' (preparato)':''}`};}
+    if(st==='nc') return {st,el:a('fix','Azione correttiva',fee,1),sub:`<span class="warn">Rilievi da chiudere entro il ${shortDate(it.nc)}</span>`};
+    if(st==='susp') return {st,el:it.pend!=null?`<span class="pill cl-st bad">${it.iss==null?'Non concesso':'Sospeso'}</span>`:a('extra','Audit straordinario',fee*2,1),sub:`<span class="bad">${it.iss==null?'Primo audit non superato':'Sospeso dal '+shortDate(it.susp)}${it.pend!=null?` · nuovo audit il ${shortDate(it.pend)}`:''}</span>`};
+    if(st==='open') return {st,el:`<button class="btn sm2 pri" data-act="install" data-id="${t.id}" data-wh="${w.id}" ${S.cash>=t.inst?'':'disabled'}>${certBtn(t)} · ${eur(t.inst)}</button>`,sub:''};
+    if(st==='lock') return {st,el:`<span class="sm">Prima serve ${esc((t.req||[]).filter(r=>!(w?w.tech[r]:R(r))).map(r=>TECH.find(x=>x.id===r).name).join(', '))}</span>`,sub:''};
+    if(st==='res') return {st,el:`<span class="sm">Ricerca in corso</span>`,sub:''};
+    return {st,el:`<button class="btn sm2" data-act="opentech" data-tree="cert" data-id="${t.id}">Da ricercare</button>`,sub:''};};
+  const conf=w=>{const v=Math.round(confOf(w).v);return `<span class="ce-cf ${v>=AUD.ok?'ok':v>=AUD.nc?'warn':'bad'}" data-tip="${confTip(w)}">${kw('conformita','Conformità')} <b>${v}</b></span>`;};
   let body='';
   if(tab==='mag'){
-    const alert=holes.length?`<div class="card pend"><span class="h3">Clienti senza il certificato che chiedono</span>${holes.map(({t,w})=>`<div class="row"><span style="display:flex;gap:6px;align-items:center">${techIcon(t,20)}<span>${esc(t.name)} a <b>${esc(w.name)}</b></span></span><span class="sm bad">${esc(need(t,w).map(c=>c.name).join(', '))}</span></div>`).join('')}</div>`:'';
+    const alert=holes.length?`<div class="card pend"><span class="h3">Clienti senza il certificato che chiedono</span>${holes.map(({t,w})=>`<div class="row"><span style="display:flex;gap:6px;align-items:center">${techIcon(t,20)}<span>${esc(t.name)} a <b>${esc(w.name)}</b></span></span><span class="sm bad">${esc(need(t,w).map(c=>c.name).join(', '))}</span></div>`).join('')}<div class="sm">Ogni mese senza il certificato valido la loro soddisfazione scende di 6 punti.</div></div>`:'';
     const gare=G.length?`<div class="card"><span class="h3">${kw('gare','Gare aperte')} che chiedono certificazioni</span>${G.map(g=>{const ok=gOk(g);
       return `<div class="pr-q">${logoSvg(g.name,24)}<span class="wh-nm">${esc(cname(g))} <span class="sm">${g.req.filter(r=>TECH.find(x=>x.id===r).tree==='cert').map(r=>esc(TECH.find(x=>x.id===r).name)).join(' + ')}</span></span><span class="sm ${ok.length?'ok':'bad'}">${ok.length?'Pronto: '+esc(ok.map(w=>w.name).join(', ')):'Nessun magazzino pronto'}</span></div>`;}).join('')}</div>`:'';
-    const grid=MOB?S.warehouses.map(w=>`<div class="card ce-w"><span class="h3">${esc(w.name)}</span>${site.map(t=>{const c=cell(t,w);
-        return `<div class="ce-r ${c.who?'bad':''}">${techIcon(t,32,c.st==='no'||c.st==='lock')}<span class="wh-sm"><b class="wh-nm">${kw('tech_'+t.id,esc(t.name))}</b>${c.who}</span>${c.el}</div>`;}).join('')}</div>`).join('')
+    const who=(t,w,st)=>{const nd=need(t,w); return nd.length&&st!=='ok'&&st!=='nc'?`<span class="sm bad">la chiede ${esc(nd.map(c=>c.name).join(', '))}</span>`:'';};
+    const grid=MOB?S.warehouses.map(w=>`<div class="card ce-w"><div class="row"><span class="h3">${esc(w.name)}</span>${conf(w)}</div>${site.map(t=>{const c=ctl(w,t), wh=who(t,w,c.st);
+        return `<div class="ce-r ${wh||c.st==='susp'?'bad':''}">${techIcon(t,32,c.st==='no'||c.st==='lock')}<span class="wh-sm"><b class="wh-nm">${kw('tech_'+t.id,esc(t.name))}</b>${c.sub?`<span class="sm">${c.sub}</span>`:''}${wh}</span>${c.el}</div>`;}).join('')}</div>`).join('')
       :`<div class="card ce-box"><table class="ce-t"><thead><tr><th>Magazzino</th>${site.map(t=>`<th><span class="ce-th">${techIcon(t,32,!R(t.id))}${kw('tech_'+t.id,esc(t.name))}</span></th>`).join('')}</tr></thead><tbody>
-        ${S.warehouses.map(w=>`<tr><th>${esc(w.name)}<span class="sm">${S.clients.filter(c=>c.wh===w.id&&c.status!=='perso').length} clienti</span></th>${site.map(t=>{const c=cell(t,w);return `<td class="ce-${c.st}${c.who?' ce-need':''}">${c.el}${c.who}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>`;
-    body=alert+grid+gare+`<div class="sm">Le ${kw('certificazioni')} di magazzino si ricercano una volta nell'albero Certificazioni, poi si ottengono capannone per capannone: paghi l'audit (per la Catena del freddo anche le celle), aspetti qualche settimana e il magazzino può servire i clienti che le chiedono. Ognuna ha un canone mensile.</div>`;
+        ${S.warehouses.map(w=>`<tr><th>${esc(w.name)}<span class="sm">${S.clients.filter(c=>c.wh===w.id&&c.status!=='perso').length} clienti</span>${conf(w)}</th>${site.map(t=>{const c=ctl(w,t), wh=who(t,w,c.st);return `<td class="ce-${c.st}${wh?' ce-need':''}">${c.el}${c.sub?`<span class="sm">${c.sub}</span>`:''}${wh}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>`;
+    body=alert+grid+gare+`<div class="sm">Le ${kw('certificazioni')} di magazzino si ricercano una volta nell'albero Certificazioni, poi si ottengono capannone per capannone con un primo ${kw('audit')}. Valgono 3 anni, con un controllo ogni anno: l'esito dipende dalla ${kw('conformita','conformità')} del magazzino (tocca il numero per vedere da cosa dipende). Un audit preparato vale +${AUD.prep}.</div>`;
   } else {
-    body=comp.map(t=>{const st=R(t.id)?'ok':pj&&pj.tech===t.id?'res':(t.req||[]).every(R)?'no':'lock';
-      return `<div class="card ce-a"><div class="cl-h">${techIcon(t,48,st!=='ok')}<div class="wh-sm"><b class="cl-n">${kw('tech_'+t.id,esc(t.name))}</b><span class="sm">${esc(t.desc)}</span></div>
-        ${st==='ok'?'<span class="pill cl-st ok">Valida</span>':st==='res'?`<span class="pill cl-st warn">Ricerca · ${wks(pj.left)}</span>`:''}</div>
+    body=comp.map(t=>{const c=ctl(null,t), on=R(t.id);
+      return `<div class="card ce-a"><div class="cl-h">${techIcon(t,48,!on)}<div class="wh-sm"><b class="cl-n">${kw('tech_'+t.id,esc(t.name))}</b><span class="sm">${esc(t.desc)}</span></div></div>
         ${t.txt?`<div class="ttxt">${esc(t.txt)}</div>`:''}
-        ${st==='lock'?`<div class="sm">Prima serve ${esc((t.req||[]).filter(r=>!R(r)).map(r=>TECH.find(x=>x.id===r).name).join(', '))}.</div>`:''}
-        ${st==='ok'||st==='res'?'':`<div><button class="btn sm2 ${st==='no'?'pri':''}" data-act="opentech" data-tree="cert" data-id="${t.id}">Apri l'albero</button></div>`}</div>`;}).join('')
-      +`<div class="sm">Le ${kw('certificazioni')} aziendali valgono per tutti i magazzini: si ottengono con la ricerca nell'albero Certificazioni.</div>`;
+        ${on?`<div class="ce-r">${conf(null)}<span class="wh-sm">${c.sub?`<span class="sm">${c.sub}</span>`:''}</span>${c.el}</div>`:c.st==='lock'||(t.req||[]).some(r=>!R(r))?`<div class="sm">Prima serve ${esc((t.req||[]).filter(r=>!R(r)).map(r=>TECH.find(x=>x.id===r).name).join(', '))}.</div><div><button class="btn sm2" data-act="opentech" data-tree="cert" data-id="${t.id}">Apri l'albero</button></div>`:S.project&&S.project.tech===t.id?`<span class="pill cl-st warn">Ricerca · ${wks(S.project.left)}</span>`:`<div><button class="btn sm2 pri" data-act="opentech" data-tree="cert" data-id="${t.id}">Apri l'albero</button></div>`}</div>`;}).join('')
+      +`<div class="sm">Le ${kw('certificazioni')} aziendali valgono per tutti i magazzini appena finisce la ricerca; poi c'è un ${kw('audit')} ogni anno, che guarda la ${kw('conformita','conformità')} media dei magazzini.</div>`;
   }
   return tiles+tabs+body+`<div class="row" style="justify-content:flex-start"><button class="btn sm2" data-act="opentech" data-tree="cert" data-id="${(site.find(t=>!R(t.id))||comp.find(t=>!R(t.id))||site[0]).id}">Albero delle certificazioni</button></div>`;
  },
@@ -7130,6 +7245,14 @@ const ACT={
  firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});if(isCs(m.id))S.cs.resp=null;m.hired=false;m.wh=null;if(m.gen)S.managers=S.managers.filter(x=>x!==m);kpiNow();renderAll();},
  mtab(d){UI.sel.mtab=d.id; renderWin('manager');},
  ctab(d){UI.sel.ctab=d.id; renderWin('certificazioni');},
+ certact(d){const t=TECH.find(x=>x.id===d.id), w=d.wh?whById(d.wh):null, it=crec(w,t), st=certState(w,t); if(!it) return;
+   const fee=d.k==='extra'?certFee(t)*2:certFee(t); if(S.cash<fee) return;
+   if(d.k==='prep'&&st!=='ok'&&st!=='nc'||d.k==='prep'&&it.prep||d.k==='fix'&&st!=='nc'||d.k==='extra'&&(st!=='susp'||it.pend!=null)) return;
+   S.cash-=fee; S.cur.tech+=fee;
+   if(d.k==='prep'){ it.prep=true; toast(`${t.name}: audit preparato, +${AUD.prep} al punteggio`,'ok'); }
+   if(d.k==='fix'){ it.nc=null; toast(`${t.name}: azione correttiva fatta, rilievi chiusi`,'ok'); }
+   if(d.k==='extra'){ it.pend=S.day+AUD.extraDays; toast(`${t.name}: audit straordinario il ${shortDate(it.pend)}`,'ok'); }
+   renderAll();},
  opencert(d){UI.sel.ctab=d.tab||'mag'; openWin('certificazioni');},
  gomgr(d){ if(d.k) UI.hh={...(UI.hh||{min:14}),k:d.k}; if(MOB) setMenu(false); openWin('manager',{mtab:d.tab||'cand'}); },
  offstep(d){ const x=candById(d.id); if(!x) return; const n=negs()[d.id], ask=x.p.ral; UI.offer=UI.offer||{};
@@ -7502,6 +7625,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.68',t:'Audit',x:['Le certificazioni ora vanno difese: valgono 3 anni, con un audit dell\'ente ogni anno. Il primo audit arriva qualche settimana dopo la richiesta, e se va male il certificato non viene rilasciato.','Ogni magazzino ha la sua «conformità», da 0 a 100: sale con il magazzino tenuto bene, il facility manager, la formazione, il WMS, un manager preciso e la ISO 9001; scende con i reparti in affanno e i facchini esterni. Nella finestra Certificazioni toccala per vedere da cosa dipende.','Audit superato, audit con rilievi (hai 30 giorni per sistemare, oppure paghi un\'azione correttiva) o certificato sospeso: con un certificato sospeso i clienti che lo chiedono perdono soddisfazione ogni mese, finché un audit straordinario non lo riattiva.','Due settimane prima di ogni audit arriva l\'avviso, e nell\'ultimo mese puoi prepararlo: +15 al punteggio.','Se la ISO 9001 viene sospesa, spariscono anche i suoi bonus su accuratezza e gare.','Nelle partite salvate i certificati che avevi restano validi per 3 anni da oggi, con il primo controllo nei prossimi mesi.']},
  {v:'0.67',t:'Certificazioni',x:['Nuovo albero di ricerca «Certificazioni», con la cornice a scudo azzurro: dentro ci sono l\'HACCP, la Catena del freddo e la ISO 9001 (spostata qui da Sviluppo aziendale).','Nuova voce «Certificazioni» nel menu: una tabella con ogni magazzino e i suoi certificati, da cui si chiede l\'audit (sul telefono una scheda per magazzino), e una scheda con le certificazioni di tutta l\'azienda.','L\'HACCP serve per tutti i clienti che trattano cibo o mangimi, anche secchi: pasta, caffè, vino, crocchette. Si ricerca una volta, poi ogni magazzino lo ottiene con un audit che dura due settimane.','La Catena del freddo ora si installa magazzino per magazzino: celle, sonde e un canone mensile. Nelle gare conta il magazzino che scegli per l\'offerta, e la scheda della gara mostra le certificazioni richieste in verde (ci sono) o in rosso (mancano).','Gino Bertolotti e Marco Pellegrino, che partono con un cliente storico alimentare, hanno già l\'HACCP nel primo magazzino.','Nelle partite salvate chi aveva la Catena del freddo la ritrova in tutti i magazzini, e i magazzini che servono clienti alimentari sono già in regola con l\'HACCP.','Anche le aziende avversarie imparano a certificarsi.']},
  {v:'0.66',t:'Relazioni industriali',x:['Nuovo pacchetto di espansione «Relazioni industriali», da accendere nella lobby prima di iniziare: vale per tutta la partita, e chi non lo accende gioca come prima.','Ogni magazzino ha la sua agitazione sindacale da 0 a 100, un delegato e un sindacato (CUP, SAM o CoBaBa). Sale col morale basso, i licenziamenti, i reparti in affanno e i fornitori; scende col welfare, un buon manager e gli accordi. Si sente anche dai magazzini vicini, pure quelli della concorrenza.','Sopra certe soglie arrivano il mugugno, lo stato di agitazione (niente straordinari), gli scioperi e il presidio ai cancelli, che blocca il magazzino finché non firmi.','Tavolo delle trattative: il sindacato porta le sue richieste e ogni settimana c\'è una seduta. Concedi, tratti o rifiuti, offri una contropartita, e firmi un accordo integrativo prima che finisca la pazienza.','Contratto nazionale: ogni tre anni il rinnovo, con le trattative a Roma, a volte uno sciopero nazionale, gli arretrati e sei rate di aumento per tutti. L\'associazione Confpallet rende le rate un po\' più leggere.','Al posto della cooperativa arrivano 11 fornitori di handling, 8 locali e 3 globali, con prezzi, qualità e rischi diversi: cambio d\'appalto con la clausola sociale, contratto a ora o a pallet, responsabilità solidale se qualcosa va storto.','Nell\'albero Sviluppo aziendale un ramo nuovo con due strade, il dialogo e il contenimento, fino alla talpa nel sindacato. Quattro policy nuove (Linea dura, Porte aperte, Premio di presenza, Crumiri in appalto), tre talenti, dodici eventi e la lente della mappa «Clima sindacale».','Nuova condizione di vittoria: «L\'azienda dove tutti vogliono lavorare». Alcune committenti, poi, vogliono un logistico in pace sociale.']},
  {v:'0.65',t:'Meno gare, quando capita',x:['Quando il tempo scorre, il riquadro rosso «In pausa» in alto a destra diventa verde e ci passa sopra, piano, un camioncino in pixel art.','Sul telefono la barra in alto è più ordinata: la data si allarga e i riquadri riempiono la riga, «In pausa» sta accanto agli altri e la settimana si scrive «Wk».','Sul telefono il pulsante del tempo in basso mostra cosa fa: in pausa è del colore dell\'azienda col simbolo play, mentre il tempo scorre è rosso col simbolo pausa.','Sul telefono le cifre in euro non vanno più a capo a metà (prima «−€» finiva su una riga e il numero sotto): se manca spazio va a capo il nome della voce.','Nel «Com\'è andata» le abilità guadagnate o perse si leggono per intero (es. «Operazioni 12 +1») e i talenti nuovi mostrano solo il nome; via il bordo giallo sulle notifiche a destra.','Sul telefono la visura della Camera di Commercio non scorre più di lato quando cade il timbro.','Sul telefono, nella creazione dell\'azienda, si può di nuovo scegliere il colore (quello scelto ha un segno di spunta); i pulsanti «Indietro» e «Avanti» in fondo stanno sulla stessa riga.','Le gare d\'appalto non sono più sempre lì tutte insieme: arrivano una alla volta, quando capita, ognuna con la sua scadenza. Da solo ne arrivano circa 15 l\'anno (prima 25), con tre avversari circa 24 (prima 50). Di solito ne trovi aperte 2 o 3; a volte nessuna per qualche settimana.','L\'Ufficio commerciale porta un terzo di gare in più, ogni azienda avversaria il 20% in più.']},
@@ -7843,6 +7967,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},renderAll,riOn,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},renderAll,riOn,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>

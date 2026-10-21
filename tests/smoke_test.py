@@ -379,9 +379,20 @@ async def main():
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; S.researched.haccp=true; delete w.tech.haccp; delete w.tech.freddo;
           const tpl=F.TENDER_POOL.find(t=>t.name==='Riseria La Mondina'), ci=F.CINFO[tpl.name], t={...tpl,zone:ci.zones[0],src:ci.src,mode:ci.mode,dur:24};
           const a=F.bidEstimate(t,w.id,1).certW.length, c0=S.cash; F.ACT.install({id:'haccp',wh:w.id}); const paid=c0-S.cash, b=F.bidEstimate(t,w.id,1).certW.length;
-          F.ACT.install({id:'freddo',wh:w.id}); const fr0=!!w.tech.freddo; w.tech.haccp.day-=14; const c=F.bidEstimate(t,w.id,1).certW.length;
+          F.ACT.install({id:'freddo',wh:w.id}); const fr0=!!w.tech.freddo; F.certAudit(w,F.TECH.find(x=>x.id==='haccp'),'init',50); const c=F.bidEstimate(t,w.id,1).certW.length;
           F.ACT.opencert({tab:'mag'}); return {a,b,c,paid,fr0,ok:F.certOk(w,'haccp'),win:!!document.querySelector('#win-certificazioni .ce-t')};}''')
         assert r['a'] == 1 and r['b'] == 1 and r['c'] == 0 and r['ok'] and r['paid'] == 3000 and r['win'], f'HACCP nel magazzino: {r}'
+        # audit (0.68): rilievi e azione correttiva, sospensione (il cliente se ne accorge, la gara si chiude), audit straordinario
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0],T=F.TECH.find(x=>x.id==='haccp'),it=w.tech.haccp,o={};
+          const C=F.confOf(w).v; o.conf=C>=0&&C<=100; o.exp0=it.exp;
+          F.certAudit(w,T,'year',50-C); o.nc=F.certState(w,T)==='nc'&&F.certOk(w,'haccp');
+          const c0=S.cash; F.ACT.certact({k:'fix',id:'haccp',wh:w.id}); o.fix=it.nc===null&&c0-S.cash===1500;
+          F.certAudit(w,T,'year',-500); o.susp=F.certState(w,T)==='susp'&&!F.certOk(w,'haccp');
+          const tpl=F.TENDER_POOL.find(t=>t.name==='Riseria La Mondina'), ci=F.CINFO[tpl.name]; o.gara=F.bidEstimate({...tpl,zone:ci.zones[0],src:ci.src,mode:ci.mode,dur:24},w.id,1).certW.length===1;
+          F.ACT.certact({k:'extra',id:'haccp',wh:w.id}); o.pend=it.pend===S.day+14;
+          F.certAudit(w,T,'extra',50); o.back=F.certOk(w,'haccp')&&it.exp===o.exp0&&it.pend===null;
+          F.certAudit(w,T,'year',50-C); return o;}''')
+        assert all(r.values()), f'audit delle certificazioni: {r}'
         await pg.evaluate(CLEAR)
         await pg.screenshot(path=os.path.join(OUT, 'shot_certificazioni.png'))
         await pg.click('#win-certificazioni [data-act=ctab][data-id=az]')
@@ -517,7 +528,7 @@ async def main():
         assert st['imp'] is None and sum(st['st'].values()) == 8+3 and st['st']['autB'] > 0, st
         assert st['q'] == ['imp:true', 'autCE:true'], st
         assert await pg.evaluate('()=>window.__FUP.S.office.plan===0 && window.__FUP.S.warehouses[0].coop===false')
-        # certificazioni (0.67): chi aveva la Catena del freddo la ritrova nei magazzini, con l'HACCP; un cliente alimentare porta l'HACCP nel suo magazzino
+        # certificazioni (0.67-0.68): chi aveva la Catena del freddo la ritrova nei magazzini, valida, con l'HACCP; un cliente alimentare porta l'HACCP nel suo magazzino
         ce = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0];
           const o=JSON.parse(JSON.stringify(S)); delete o.certMig; o.researched={}; o.warehouses.forEach(x=>{delete x.tech.haccp;}); F.fillSave(o);
           return {fr:!!w.tech.freddo&&F.certOk(w,'freddo'),ha:!!w.tech.haccp&&!!S.researched.haccp,cli:!!o.researched.haccp&&!!o.warehouses[0].tech.haccp&&!o.researched.freddo};}''')
