@@ -380,7 +380,7 @@ async def main():
           const tpl=F.TENDER_POOL.find(t=>t.name==='Riseria La Mondina'), ci=F.CINFO[tpl.name], t={...tpl,zone:ci.zones[0],src:ci.src,mode:ci.mode,dur:24};
           const a=F.bidEstimate(t,w.id,1).certW.length, c0=S.cash; F.ACT.install({id:'haccp',wh:w.id}); const paid=c0-S.cash, b=F.bidEstimate(t,w.id,1).certW.length;
           F.ACT.install({id:'freddo',wh:w.id}); const fr0=!!w.tech.freddo; F.certAudit(w,F.TECH.find(x=>x.id==='haccp'),'init',50); const c=F.bidEstimate(t,w.id,1).certW.length;
-          F.ACT.opencert({tab:'mag'}); return {a,b,c,paid,fr0,ok:F.certOk(w,'haccp'),win:!!document.querySelector('#win-certificazioni .ce-t')};}''')
+          F.ACT.opencert({tab:'mag'}); return {a,b,c,paid,fr0,ok:F.certOk(w,'haccp'),win:!!document.querySelector('#win-certificazioni .ce-w')};}''')
         assert r['a'] == 1 and r['b'] == 1 and r['c'] == 0 and r['ok'] and r['paid'] == 3000 and r['win'], f'HACCP nel magazzino: {r}'
         # audit (0.68): rilievi e azione correttiva, sospensione (il cliente se ne accorge, la gara si chiude), audit straordinario
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0],T=F.TECH.find(x=>x.id==='haccp'),it=w.tech.haccp,o={};
@@ -393,6 +393,22 @@ async def main():
           F.certAudit(w,T,'extra',50); o.back=F.certOk(w,'haccp')&&it.exp===o.exp0&&it.pend===null;
           F.certAudit(w,T,'year',50-C); return o;}''')
         assert all(r.values()), f'audit delle certificazioni: {r}'
+        # fasi 3 e 4 (0.69): certificazioni nuove, nuova linea di un cliente, ufficio qualità e audit interno, eventi a tema, ispezioni
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0],o={},err=[];
+          o.tech=['gdp','adr','banchina','aeo','doganale','iso14001','iso45001','parita'].every(id=>F.TECH.some(x=>x.id===id&&x.tree==='cert'));
+          const c={...S.clients[0],id:'cl1',name:'Spedizioni Tricolore',req:[],line:null,lineDone:0,grace:null,wh:w.id,status:'attivo',pal:400,stock:300,sat:60}; S.clients.push(c);
+          o.lf=!!F.lineFor(c); F.lineStart(c,S.day+10,0); o.req=c.req.includes('adr')&&F.certMiss(c).length===0;
+          S.researched.adr=true; w.tech.adr={day:S.day-20}; F.certAudit(w,F.TECH.find(x=>x.id==='adr'),'init',50); c.line.due=S.day;
+          const p0=c.pal; F.lineDaily(c); o.line=c.pal>p0&&!c.line&&c.lineDone===1;
+          const c0=F.confOf(w).v; F.ACT.qualhire(); const c1=F.confOf(w).v; F.ACT.iaudit({wh:w.id}); const c2=F.confOf(w).v; o.qual=c1>c0&&c2>c1&&S.qual.n===1;
+          let ran=0; ['isp_asl','isp_nas','isp_lavoro','aud_registro','aud_muletto','aud_buyer'].forEach(id=>{ const b=F.EVENTS.find(e=>e.id===id); if(!b){err.push(id);return;}
+            try{ if(!b.cond()) return; b.opts.forEach(op=>{ const ev={...b}; if(b.setup) b.setup(ev); if(!op.req||op.req()) op.f.call(ev); }); ran++; }catch(e){err.push(id+': '+e.message);} });
+          o.ev=!err.length; o.ran=ran>0;
+          const w2=S.warehouses[0]; w2.tech.haccp=w2.tech.haccp||{day:0}; Object.assign(w2.tech.haccp,{iss:S.day,exp:S.day+900,next:S.day+300,nc:null,susp:null,pend:null});
+          const k0=S.cash; F.ispezione(w2,'haccp',200,'ASL',2000,6000); o.isp=S.cash===k0;
+          F.ispezione(w2,'haccp',-300,'ASL',2000,6000); o.multa=S.cash<k0&&!F.certOk(w2,'haccp');
+          S.clients=S.clients.filter(x=>x.id!=='cl1'); o.err=err.join(' | ')||true; return o;}''')
+        assert all(r.values()) and r['err'] is True, f'certificazioni, fasi 3 e 4: {r}'
         await pg.evaluate(CLEAR)
         await pg.screenshot(path=os.path.join(OUT, 'shot_certificazioni.png'))
         await pg.click('#win-certificazioni [data-act=ctab][data-id=az]')

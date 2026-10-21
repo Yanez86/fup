@@ -1,6 +1,6 @@
 # Certificazioni e audit (progetto)
 
-**Stato: fase 1 costruita nella 0.67, fase 2 (audit) nella 0.68; fasi 3-4 da fare.**
+**Stato: costruito. Fase 1 nella 0.67, fase 2 (audit) nella 0.68, fasi 3 e 4 nella 0.69.** Differenze dal progetto: il responsabile qualità è un ufficio in sede (addetti), non un manager; le GDP richiedono la catena del freddo nel magazzino.
 I numeri sono una prima proposta, da ritoccare in fase di bilanciamento.
 
 ## Decisioni prese con Davide
