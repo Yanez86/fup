@@ -817,6 +817,10 @@ button.pk{cursor:pointer}.pk[aria-pressed="true"]{border-color:var(--accent);box
 .ri-h.off{opacity:.6}.ri-h .row .h3,.ri-w .row .h3{min-width:0;overflow-wrap:anywhere}.ri-h .row .pill{flex:none}.ri-sel{outline:3px solid var(--accent);outline-offset:-3px}
 .ri-whb{display:flex;flex-direction:column;gap:6px;padding:8px 10px;margin:4px 0;background:var(--panel);border:2px solid var(--ink)}
 .ri-whb select{max-width:100%;min-height:40px}
+.ri-ht{display:flex;flex-direction:column;gap:6px;padding:6px 8px;background:#fff;border:2px dashed var(--ink3,#8a96a6)}
+.ri-off{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line)}.ri-off:last-of-type{border-bottom:0}.ri-off .btn{flex:none;min-height:40px}
+.ri-btns{flex-wrap:wrap;justify-content:flex-start}.ri-tavs{margin-bottom:6px}
+.mob .ri-off{flex-direction:column;align-items:stretch}
 .mob .ri-req{flex-direction:column;align-items:stretch}.mob .ri-tav-who{grid-template-columns:1fr}.mob .ri-meter{grid-template-columns:90px minmax(40px,1fr) auto}
 .lb-opts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .lb-opt{display:flex;flex-direction:column;gap:4px;text-align:left;padding:8px;background:#fff;border:3px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2);cursor:pointer}
@@ -2721,7 +2725,7 @@ wk('presidio','ri','Presidio ai cancelli',`Tende, bandiere e un bidone col fuoco
 
 Finisce con un [[accordo_integrativo|accordo]] o quando l'agitazione scende di 12 punti sotto la soglia. Un presidio negli ultimi 12 mesi toglie la [[pace_sociale|pace sociale]].`);
 wk('tavolo','ri','Tavolo delle trattative',`Una seduta a settimana: concedi, tratti o rifiuti ogni richiesta, finché si firma o il sindacato perde la pazienza.`,
-`Si apre quando l'[[agitazione]] di un magazzino arriva allo stato di agitazione, oppure quando lo convochi tu. Una trattativa alla volta.
+`Si apre da solo quando un magazzino entra nello stato di agitazione (con i CoBaBa, che lo saltano, allo sciopero). Ogni magazzino ha il suo tavolo, quindi si può trattare in più magazzini insieme. Non si convoca a comando: se la trattativa salta (o ti alzi tu) non si riapre per tre mesi, un mese se c'è un [[presidio]]; se si firma, non si riapre finché dura l'[[accordo_integrativo|accordo]].
 
 Il sindacato porta da 3 a 5 richieste, ognuna con un peso: aumento in busta paga, buoni pasto, indennità per i carrellisti, niente turni nel weekend, manutenzione per la sicurezza, stabilizzazione (solo con un fornitore), premio di risultato, ferie. Per ognuna scegli **Concedo**, **Tratto** (vale la metà) o **Rifiuto**.
 
@@ -2731,7 +2735,7 @@ Tratta il direttore delle risorse umane, se c'è, altrimenti il CEO (Ex sindacal
 wk('pazienza','ri','Pazienza del sindacato',`Parte da 100 e cala a ogni seduta: a zero il tavolo salta e parte uno sciopero.`,
 `A ogni seduta senza firma la pazienza cala di 22 punti, meno 1,5 per ogni punto di Negoziazione di chi tratta sopra 10 (tra 8 e 35), diviso per la pazienza del sindacato: CUP 1,25, SAM 1, CoBaBa 0,75 (il Delegato storico aggiunge il 20%).
 
-Quando arriva a zero, o quando ti alzi dal [[tavolo]], la trattativa salta: [[sciopero]] tra tre giorni e agitazione +10 per due mesi.`);
+Quando arriva a zero, o quando ti alzi dal [[tavolo]], la trattativa salta: [[sciopero]] tra tre giorni, agitazione +10 per due mesi e niente tavolo per tre mesi.`);
 wk('contropartita','ri','Contropartita',`Qualcosa in cambio, una per seduta: abbassa le pretese del sindacato.`,
 `• **Una tantum di 200 € a testa**: pretese −8%.
 • **Impegno scritto: niente licenziamenti**: pretese −6%, ma se licenzi qualcuno nel magazzino finché dura l'accordo, l'accordo salta.
@@ -2761,16 +2765,24 @@ wk('confpallet','ri','Confpallet',`L'associazione delle aziende della logistica:
 
 In cambio: ogni [[rate_ccnl|rata]] del contratto costa 0,2 punti in meno, [[agitazione]] −5 in tutti i magazzini, e un avviso un mese prima dello sciopero nazionale. Ci si iscrive e si esce quando si vuole, dalla finestra Relazioni industriali.`);
 wk('fornitori','ri','Fornitori di handling',`Cooperative e multinazionali che fanno il lavoro di magazzinieri e carrellisti di un intero magazzino.`,
-`Si sceglie nella finestra del magazzino: o personale tuo, o un fornitore, mai insieme. Capiturno, impiegati, facility manager e autisti restano tuoi.
+`Si sceglie con una [[gara_handling|gara]] dalla finestra del magazzino: o personale tuo, o un fornitore, mai insieme. Capiturno, impiegati, facility manager e autisti restano tuoi.
 
 **Locali** (8): costano dal 72% all'85% del personale interno e mandano le persone in pochi giorni, ma lavorano solo in tre province, sbagliano di più, portano più [[agitazione]] (sono il terreno dei CoBaBa) e più guai legali. Possono fallire, cambiare nome o essere comprati da un globale.
 **Globali** (3): dall'87% al 95%, ovunque, qualità costante, rischi bassi, ma penali per uscire e qualche requisito.
 
-Il contratto può essere **a ora lavorata** (le persone le chiedi tu) o **a pallet movimentato** (+12%: il fornitore adegua le persone da solo ogni lunedì).
+Il contratto, deciso dall'offerta, può essere **a ora lavorata** (le persone le chiedi tu) o **a pallet movimentato** (circa +12%: il fornitore adegua le persone da solo ogni lunedì).
 
 Passare a un fornitore: morale −5 per un mese e agitazione +8 per due. **Cambio d'appalto**: 30 giorni di preavviso, penale con i globali (un quarto del conto mensile per ogni mese di penale) e **clausola sociale**: passa il 70% delle persone, con metà dell'agitazione. **Internalizzare**: 600 € a persona, agitazione −25, morale +5.
 
 **Responsabilità solidale**: se il fornitore fallisce o non paga, paghi tu da uno a tre mesi di stipendi. Con la ricerca Vendor management il rischio legale scende del 40% e vedi i rischi veri di ciascuno.`);
+wk('gara_handling','ri','Gara per l\'handling',`Per affidare magazzinieri e carrellisti a un fornitore si bandisce una gara: tre settimane di offerte, due per scegliere.`,
+`Dalla finestra del magazzino si bandisce la gara. Per tre settimane le offerte arrivano una alla volta, come notizie; poi la gara si chiude e hai due settimane per sceglierne una, o nessuna. Dopo, le offerte scadono.
+
+Rispondono solo i [[fornitori]] che possono lavorare nel magazzino, e non tutti: rispondono più volentieri ai magazzini grandi (almeno 4.000 posti) e alle aziende con buona [[reputazione]]; i locali evitano i magazzini in [[agitazione]] (da 45 in su). Il fornitore che lavora già lì risponde quasi sempre.
+
+Ogni offerta ha una **tariffa** (il prezzo del fornitore da −6% a +8%, un po' più bassa con la Negoziazione del CEO o del direttore commerciale), il **tipo di contratto** (a ora o a pallet) e la **durata** (12, 24 o 36 mesi). La tariffa resta quella per tutto il contratto, salvo le [[rate_ccnl|rate]] del contratto nazionale.
+
+Se il magazzino ha personale tuo, il fornitore scelto arriva subito; se c'è già un altro fornitore, arriva dopo 30 giorni di preavviso (cambio d'appalto). Due mesi prima della scadenza arriva un avviso: senza una nuova gara il contratto si rinnova da solo per 12 mesi con la tariffa +5%.`);
 wk('talpa','ri','Talpa nel sindacato',`Un delegato che riferisce tutto: sai degli scioperi prima e al tavolo vedi il limite vero. Finché non ti scoprono.`,
 `Con la talpa:
 • sai di ogni [[sciopero]] appena viene deciso, due settimane prima;
@@ -4349,7 +4361,7 @@ function showWin(w,why){
 }
 /* ====================== RELAZIONI INDUSTRIALI ====================== */
 /* Pacchetto di espansione «Relazioni industriali», scelto nel passo Pacchetti della creazione (PACKS, S.cfg.ri, letto da riOn()): agitazione sindacale per magazzino
-   (w.ag, con contagio tra magazzini vicini anche delle altre aziende), scioperi e presidi, tavolo delle trattative (S.ri.tav),
+   (w.ag, con contagio tra magazzini vicini anche delle altre aziende), scioperi e presidi, tavolo delle trattative (w.tav, uno per magazzino),
    contratto nazionale con le rate (mondo: HUM.riw; azienda: S.ri.wage), associazione Confpallet, talpa, fornitori di handling (w.hdl, HDL)
    al posto della cooperativa. Senza il pacchetto la partita resta com'era: cooperativa, niente sindacati. */
 const riOn=()=>{const H=HUM||S; return !!(H&&H.cfg&&H.cfg.ri);};
@@ -4430,14 +4442,15 @@ const hdlAvail=w=>HDL.filter(x=>!hdlWhy(w,x));
 // moltiplicatore dello stipendio di un ruolo nel magazzino: contratto nazionale, accordi, fornitore
 function wageK(w,r){
   if(!riOn()) return isCoop(w,r)?COOP.cost:1;
-  if(isCoop(w,r)){ const d=w.hdl&&hdlD(w.hdl); return d?d.cost*hdlIdx(w.hdl)*(w.hc==='pal'?1.12:1):COOP.cost; }
+  if(isCoop(w,r)){ const d=w.hdl&&hdlD(w.hdl); return d?(w.hp||d.cost*(w.hc==='pal'?1.12:1))*hdlIdx(w.hdl):COOP.cost; }
   return (S.ri?S.ri.wage:1)*(w.wageX||1)*(r==='car'&&w.indCar?1+0.08*w.indCar:1);
 }
 const coopA=w=>riOn()&&w.hdl?hdlD(w.hdl).q:COOP.A;
 const coopMor=w=>riOn()&&w.hdl?hdlD(w.hdl).mor:COOP.mor;
 const coopLab=w=>riOn()&&w.hdl?'Fornitore '+hdlName(w.hdl):'Facchini in cooperativa';
 // ---- stato dell'azienda e del magazzino ----
-function riCo(){ if(!S.ri) S.ri={wage:1,conf:false,tav:null,talpa:{used:0,from:null},ban:0,lastStrike:0,lastPres:-9999,lastCond:-9999,strikes:0,deals:0,hist:[]}; return S.ri; }
+function riCo(){ if(S.ri&&S.ri.tav){ const w=whById(S.ri.tav.wh); if(w&&!w.tav) w.tav=S.ri.tav; delete S.ri.tav; }
+  if(!S.ri) S.ri={wage:1,conf:false,talpa:{used:0,from:null},ban:0,lastStrike:0,lastPres:-9999,lastCond:-9999,strikes:0,deals:0,hist:[]}; return S.ri; }
 const DEL_N=['Rocco','Vanda','Saverio','Loredana','Nino','Gemma','Ettore','Rosaria','Fausto','Mara','Aldo','Tiziana','Elio','Graziella','Brahim','Ionela'];
 function riW(w){ if(w.ag==null){ w.ag=RI.ag0; w.ranc=0; w.agT=RI.ag0; }
   if(!w.rsu){ const i=Math.floor(Math.random()*DEL_N.length), f=i%2===1, age=rint(30,60), b=age<36?0:age<52?1:2;
@@ -4504,14 +4517,15 @@ function riDaily(){
     else if(!w.pres&&fascia(w)>=3&&d>=(w.nextOk||0)){ if((w.ranc||0)>50){ w.ranc=0; w.ag=Math.max(w.ag,th[3]); riPresidio(w,true); }
       else { const len=Math.max(1,rint(1,3)-(R('contenim')?1:0)+(unionOf(w)==='coba'?1:0)); w.strike={day:d+rint(8,16),len};
         if(R('talpa')) riNote('yellow','sindacato',`La talpa avvisa: sciopero a ${w.name}`,`Il ${shortDate(w.strike.day)} ${UNIONS[unionOf(w)].n} proclamerà ${len===1?'un giorno':len+' giorni'} di sciopero. Hai due settimane: un accordo, un aumento o le Porte aperte possono ancora fermarlo.`,{wh:w.id},'talpa'+w.id); } }
-    // il sindacato chiede di trattare
-    if(!R0.tav&&!w.deal&&w.ag>=th[1]&&d>=(w.tavCd||0)) riTavOpen(w,false);
+    // il sindacato chiede di trattare: solo in stato di agitazione (o oltre), un tavolo per magazzino
+    if(!w.tav&&!w.deal&&fascia(w)>=2&&riTavReady(w)) riTavOpen(w);
+    if(w.tav&&d>=w.tav.next) riSession(w);
     // contratto a pallet: il fornitore adegua le persone ogni lunedì
     if(mon&&w.hdl&&w.hc==='pal'&&w.kpi){ const n=w.kpi.need; ['pick','car'].forEach(r=>{ w.staff[r]=Math.max(n[r],w.staff[r]>n[r]+1?n[r]:w.staff[r]); }); }
-    // cambio di fornitore dopo il preavviso
+    // cambio di fornitore dopo il preavviso; gara per l'handling in corso
     if(w.hNext&&d>=w.hNext.day) hdlSwitch(w);
+    if(w.ht) htDaily(w);
   });
-  if(R0.tav&&d>=R0.tav.next) riSession();
 }
 function riPresidio(w,ranc){ w.pres=true; w.strike=null; w.strikeOn=0; const R0=riCo(), first=R0.lastPres<0; R0.lastPres=S.day;
   const U=UNIONS[unionOf(w)];
@@ -4519,7 +4533,7 @@ function riPresidio(w,ranc){ w.pres=true; w.strike=null; w.strikeOn=0; const R0=
     news('La Gazzetta del Muletto',`Presidio davanti a ${S.company.name} a ${w.name}`,`Tende, bandiere di ${U.n} e un bidone col fuoco acceso. I camion girano al largo.`);
     if(first) chron('sindacato',`Primo presidio ai cancelli, a ${w.name}`); }
   else { const co=S; withCo(HUM,()=>news('La Gazzetta del Muletto',`Presidio ai cancelli di ${co.company.name}`,`A ${w.name} i lavoratori di ${co.company.name} hanno piantato le tende davanti al cancello.`)); }
-  if(!R0.tav&&!w.deal) riTavOpen(w,false);
+  if(!w.tav&&!w.deal&&riTavReady(w)) riTavOpen(w);
 }
 function riStrike(w){ const s=w.strike; w.strike=null; const R0=riCo();
   const fail=polOn('lineadura')?(mgrTal(w).includes('Pugno di ferro')?0.67:0.5):0;
@@ -4531,18 +4545,21 @@ function riStrike(w){ const s=w.strike; w.strike=null; const R0=riCo();
   if(!isBot()){ news('La Gazzetta del Muletto',`Sciopero a ${w.name}`,`${UNIONS[unionOf(w)].n} incrocia le braccia per ${s.len===1?'un giorno':s.len+' giorni'}. Aderisce il ${Math.round(adhesion(w)*100)}% del personale.`);
     if(R0.strikes===1) chron('sindacato',`Primo sciopero in azienda, a ${w.name}`); }
 }
-// ---- tavolo delle trattative: una seduta a settimana, una trattativa alla volta ----
+// ---- tavolo delle trattative: uno per magazzino (w.tav), si apre da solo in stato di agitazione, una seduta a settimana ----
+// dopo un tavolo saltato non si riapre per 90 giorni (30 se c'è un presidio); dopo una firma non si riapre finché dura l'accordo
+const riTavReady=w=>S.day>=(w.pres?Math.min(w.tavCd||0,(w.tavFail||-1e9)+30):(w.tavCd||0));
+const tavList=()=>S.warehouses.filter(w=>w.tav);
 function riNegotiator(){ const hr=R('direzione')&&S.dirs.hr?personById(S.dirs.hr):null, p=hr||S.boss;
   const ex=(p.tal||[]).includes('Ex sindacalista')?3:0; return {p,neg:p.st.neg+ex,med:(p.tal||[]).includes('Mediatore nato'),hr:!!hr}; }
-function riTavOpen(w,mine){ const R0=riCo(); if(R0.tav) return false; riW(w); const un=unionOf(w), U=UNIONS[un];
+function riTavOpen(w){ const R0=riCo(); if(w.tav) return false; riW(w); const un=unionOf(w), U=UNIONS[un];
   const pool=Object.keys(RI_REQ).filter(id=>(id!=='stab'||w.hdl)&&(id!=='indcar'||un==='sam'||w.staff.car>=2)&&(id!=='aumento'||true));
   const n=clamp(Math.round(2+w.ag/30),3,5), reqs=[{id:'aumento',lv:clamp(Math.round(2+w.ag/30),2,5),c:'no'}];
   if(un==='sam'&&!pool.includes('indcar')) pool.push('indcar'); if(un==='sam') reqs.push({id:'indcar',c:'no'}); if(w.hdl&&un==='coba') reqs.push({id:'stab',c:'no'});
   const rest=pool.filter(id=>!reqs.some(r=>r.id===id)).sort(()=>Math.random()-0.5); while(reqs.length<n&&rest.length) reqs.push({id:rest.shift(),c:'no'});
   const del=w.rsu, min=clamp(U.min+rnd(-0.05,0.1)+(w.pres?0.1:0)-(del.tal==='trattabile'?0.05:0),0.3,0.9);
-  R0.tav={wh:w.id,un,reqs,min,min0:min,pat:100,n:0,next:S.day+7,cp:null,log:[],mine:!!mine,day:S.day};
+  w.tav={wh:w.id,un,reqs,min,min0:min,pat:100,n:0,next:S.day+7,cp:null,log:[],day:S.day};
   if(R('talpa')) R0.talpa.used=(R0.talpa.used||0)+1;
-  riNote('yellow','sindacato',mine?`Tavolo convocato a ${w.name}`:`${U.n} chiede un tavolo a ${w.name}`,`${del.name}, delegato ${U.n}, porta ${reqs.length} richieste. Scegli cosa concedere: la prima seduta è il ${shortDate(S.day+7)}, poi una a settimana finché il sindacato ha pazienza.`,{ritab:'tav'},'tav');
+  riNote('yellow','sindacato',`${U.n} chiede un tavolo a ${w.name}`,`Il magazzino è in stato di agitazione. ${del.name}, delegato ${U.n}, porta ${reqs.length} richieste. Scegli cosa concedere: la prima seduta è il ${shortDate(S.day+7)}, poi una a settimana finché il sindacato ha pazienza.`,{ritab:'tav',tavwh:w.id},'tav'+w.id);
   return true; }
 const reqVal=c=>c==='si'?1:c==='tratto'?0.5:0;
 function tavValue(T){ const tw=T.reqs.reduce((a,r)=>a+RI_REQ[r.id].w,0); return T.reqs.reduce((a,r)=>a+RI_REQ[r.id].w*reqVal(r.c),0)/tw; }
@@ -4552,7 +4569,7 @@ function tavCost(T){ const w=whById(T.wh); if(!w) return {m:0,u:0}; const st=w.s
     if(r.id==='aumento') m+=base*r.lv/100*v; if(r.id==='buoni') m+=110*v*(st.pick+st.car+st.capo+st.imp); if(r.id==='indcar') m+=st.car*RAL.car*wageK(w,'car')*COEF/12*0.08*v;
     if(r.id==='premio') m+=base*0.015*v; if(r.id==='sicurezza') u+=15000*v; if(r.id==='stab') u+=600*(st.pick+st.car); });
   return {m,u}; }
-function riSession(){ const T=S.ri.tav, w=whById(T.wh); if(!w){ S.ri.tav=null; return; }
+function riSession(w){ const T=w.tav;
   const U=UNIONS[T.un], N=riNegotiator(), del=w.rsu, dl=del.lead+(del.tal==='megafono'?3:0);
   T.n++; T.next=S.day+7;
   if(T.cp){ const cp=RI_CP.find(x=>x.id===T.cp), c=cp.cost(w); S.cash-=c; S.cur.altro+=c; T.min-=cp.m; if(cp.id==='nofire') T.nofire=true; T.log.push(`Seduta ${T.n}: hai messo sul tavolo «${cp.n}».`); T.cp=null; }
@@ -4565,26 +4582,26 @@ function riSession(){ const T=S.ri.tav, w=whById(T.wh); if(!w){ S.ri.tav=null; r
   T.log.push(`Seduta ${T.n}: ${gap<0.08?'«Ci siamo quasi, manca poco»':gap<0.25?'«Così non basta, serve di più»':'«È una provocazione»'}. ${N.p===S.boss?'Hai trattato tu':'Ha trattato '+N.p.name}${N.med?' (Mediatore nato: la seduta conta doppio)':''}.`);
   if(T.pat<=0) return riTavFail(w);
   if(T.min<=V) return riSign(w);
-  riNote('blue','sindacato',`Seduta ${T.n} a ${w.name}: niente firma`,T.log[T.log.length-1]+` Prossima seduta il ${shortDate(T.next)}.`,{ritab:'tav'},'tav');
+  riNote('blue','sindacato',`Seduta ${T.n} a ${w.name}: niente firma`,T.log[T.log.length-1]+` Prossima seduta il ${shortDate(T.next)}.`,{ritab:'tav',tavwh:w.id},'tav'+w.id);
 }
-function riSign(w){ const R0=S.ri, T=R0.tav, c=tavCost(T);
+function riSign(w){ const R0=S.ri, T=w.tav, c=tavCost(T);
   T.reqs.forEach(r=>{ const v=reqVal(r.c); if(!v) return;
     if(r.id==='aumento') w.wageX=(w.wageX||1)*(1+r.lv*v/100);
     if(r.id==='buoni') w.buoni=Math.min(1,(w.buoni||0)+v); if(r.id==='indcar') w.indCar=Math.min(1,(w.indCar||0)+v);
     if(r.id==='turni') w.noWk=Math.min(1,(w.noWk||0)+v); if(r.id==='ferie') w.ferie=Math.min(2,(w.ferie||0)+v); if(r.id==='premio') w.premio=Math.min(1,(w.premio||0)+v);
     if(r.id==='sicurezza'){ w.cond=clamp((w.cond==null?100:w.cond)+15*v,0,100); S.cash-=15000*v; S.cur.altro+=15000*v; }
     if(r.id==='stab') hdlInternal(w,true); });
-  const mo=R('secondo')?RI.dealM2:RI.dealM; w.deal={day:S.day,until:S.day+mo*30,un:T.un,nofire:!!T.nofire}; w.tavCd=S.day+60;
+  const mo=R('secondo')?RI.dealM2:RI.dealM; w.deal={day:S.day,until:S.day+mo*30,un:T.un,nofire:!!T.nofire}; w.tavCd=w.deal.until;
   w.ag=Math.max(0,w.ag-15); w.strike=null; if(w.pres) w.pres=false;
-  R0.tav=null; R0.deals=(R0.deals||0)+1; R0.hist=(R0.hist||[]).concat({d:S.day,wh:w.name,ok:true,n:T.n}).slice(-30);
+  w.tav=null; R0.deals=(R0.deals||0)+1; R0.hist=(R0.hist||[]).concat({d:S.day,wh:w.name,ok:true,n:T.n}).slice(-30);
   if(!isBot()){ riNote('green','sindacato',`Accordo firmato a ${w.name}`,`Dopo ${T.n} ${T.n===1?'seduta':'sedute'} ${UNIONS[T.un].n} firma l'accordo integrativo: vale ${mo} mesi e tiene bassa l'agitazione. Costa ${eur(c.m)} al mese${c.u?` più ${eur(c.u)} subito`:''}.`,{wh:w.id});
     news('Il Sole 24 Pallet',`Accordo integrativo a ${w.name}`,`${S.company.name} e ${UNIONS[T.un].n} firmano dopo ${T.n} ${T.n===1?'seduta':'sedute'}. Stretta di mano e foto con il delegato ${w.rsu.name}.`);
     if(R0.deals===1) chron('sindacato',`Primo accordo integrativo, a ${w.name}`); }
 }
-function riTavFail(w){ const R0=S.ri, T=R0.tav; R0.tav=null; w.tavCd=S.day+45; S.mods.push({scope:w.id,ag:10,until:S.day+60,src:'Tavolo saltato'});
+function riTavFail(w){ const R0=S.ri, T=w.tav; w.tav=null; w.tavCd=S.day+90; w.tavFail=S.day; S.mods.push({scope:w.id,ag:10,until:S.day+60,src:'Tavolo saltato'});
   R0.hist=(R0.hist||[]).concat({d:S.day,wh:w.name,ok:false,n:T.n}).slice(-30);
   if(!w.strike&&!w.pres&&!(w.strikeOn>0)){ w.strike={day:S.day+3,len:Math.max(1,rint(1,3)-(R('contenim')?1:0))}; w.nextOk=0; }
-  riNote('red','sindacato',`Il tavolo salta a ${w.name}`,`${UNIONS[T.un].n} ha finito la pazienza e si alza dal tavolo: sciopero proclamato tra tre giorni e agitazione +10 per due mesi.`,{wh:w.id},'tav'); }
+  riNote('red','sindacato',`Il tavolo salta a ${w.name}`,`${UNIONS[T.un].n} ha finito la pazienza e si alza dal tavolo: sciopero proclamato tra tre giorni e agitazione +10 per due mesi. Il tavolo non si riapre per tre mesi.`,{wh:w.id},'tav'+w.id); }
 // un accordo non rispettato: agitazione +30 per tre mesi e reputazione −2
 function riBreak(w,why){ if(!w.deal) return; w.deal=null; S.mods.push({scope:w.id,ag:30,until:S.day+90,src:'Accordo non rispettato'}); repUp(-2);
   riNote('red','sindacato',`Accordo rotto a ${w.name}`,`${why} Il sindacato considera l'accordo integrativo non rispettato: agitazione +30 per tre mesi, reputazione −2.`,{wh:w.id}); }
@@ -4598,11 +4615,36 @@ function hdlSet(w,id,hc){
 const hdlBill=w=>w.hdl?(w.staff.pick*RAL.pick*wageK(w,'pick')+w.staff.car*RAL.car*wageK(w,'car'))*COEF/12:0;
 function hdlPenalty(w){ const d=w.hdl&&hdlD(w.hdl); return d&&d.pen?Math.round(d.pen*0.25*hdlBill(w)/100)*100:0; }
 function hdlSwitch(w){ const x=w.hNext; w.hNext=null; const pen=hdlPenalty(w); S.cash-=pen; S.cur.altro+=pen;
-  ['pick','car'].forEach(r=>w.staff[r]=Math.round(w.staff[r]*0.7)); w.ag=w.ag*0.5; w.hdl=x.id; w.hc=x.hc; w.coop=true;
+  ['pick','car'].forEach(r=>w.staff[r]=Math.round(w.staff[r]*0.7)); w.ag=w.ag*0.5; w.hdl=x.id; w.hc=x.hc; w.coop=true; w.hp=x.price||null; w.hEnd=x.mo?S.day+x.mo*30:null;
   riNote('blue','magazzini',`${w.name}: arriva ${hdlName(x.id)}`,`Cambio d'appalto fatto. Con la clausola sociale il 70% delle persone passa al nuovo fornitore, e si porta dietro metà dell'agitazione.${pen?` Penale al vecchio fornitore: ${eur(pen)}.`:''} Controlla i reparti: qualcuno va richiesto.`,{wh:w.id}); }
 function hdlInternal(w,silent){ const n=w.staff.pick+w.staff.car, c=600*n, pen=hdlPenalty(w); S.cash-=c+pen; S.cur.altro+=c+pen;
-  w.hdl=null; w.hc=null; w.hNext=null; w.coop=false; w.ag=Math.max(0,(w.ag||0)-25); mod(w.id,{mor:5},60);
+  w.hdl=null; w.hc=null; w.hNext=null; w.coop=false; w.hp=null; w.hEnd=null; w.ag=Math.max(0,(w.ag||0)-25); mod(w.id,{mor:5},60);
   if(!silent&&!isBot()) toast(`${w.name}: ${n} persone assunte direttamente, ${eur(c)} di pratiche${pen?` e ${eur(pen)} di penale`:''}`,'ok'); }
+// ---- gara per l'handling: il giocatore la bandisce, le offerte arrivano in 3 settimane, poi 2 settimane per scegliere ----
+const HT={open:21,choose:14};
+const htNeg=()=>{const dc=dirStat('comm'); return Math.max(S.boss.st.neg,dc!=null?dc:0);};
+// chi risponde e con che tariffa: rispondono più volentieri ai magazzini grandi e alle aziende con buona reputazione;
+// i locali non si presentano volentieri dove c'è agitazione; la tariffa scende un po' con la Negoziazione di chi tratta
+function hdlTender(w){ if(w.ht) return false; riW(w); const av=hdlAvail(w); if(!av.length) return false; const d=S.day, neg=htNeg();
+  const L=av.filter(x=>Math.random()<clamp(0.55+(w.cap>=4000?0.1:0)+(S.rep-50)/200-(x.loc&&w.ag>=45?0.25:0)+(w.hdl===x.id?0.3:0),0.15,0.95));
+  if(!L.length) L.push(pick(av));
+  w.ht={day:d,end:d+HT.open,until:d+HT.open+HT.choose,offers:[],pend:L.map(x=>{ const D=hdlD(x.id), hc=Math.random()<(x.loc?0.7:0.5)?'ora':'pal';
+    return {id:x.id,hc,mo:pick(x.loc?[12,24,24,36]:[24,36,36]),price:Math.round(D.cost*rnd(0.94,1.08)*clamp(1-0.005*(neg-10),0.95,1.05)*(hc==='pal'?1.12:1)*100)/100,day:d+rint(2,HT.open-1)}; })};
+  return true; }
+const htRel=(price,id)=>(price*hdlIdx(id)/((S.ri&&S.ri.wage)||1)-1)*100;   // tariffa rispetto al personale interno, in %
+function htDaily(w){ const T=w.ht, d=S.day;
+  T.pend.filter(o=>o.day<=d).forEach(o=>{ T.offers.push(o); if(!isBot()) noteVar('wh',`Gara per l'handling a ${w.name}: offerta di ${hdlName(o.id)} (${sgnp(htRel(o.price,o.id))})`); });
+  T.pend=T.pend.filter(o=>o.day>d);
+  if(d===T.end){ if(isBot()) return htBot(w);
+    if(!T.offers.length){ w.ht=null; return riNote('yellow','magazzini',`Gara per l'handling deserta a ${w.name}`,'Nessun fornitore ha risposto. Puoi riprovare più avanti.',{wh:w.id},'ht'+w.id); }
+    riNote('yellow','magazzini',`Gara per l'handling chiusa a ${w.name}`,`${T.offers.length===1?'È arrivata un\'offerta':`Sono arrivate ${T.offers.length} offerte`}. Hai tempo fino al ${shortDate(T.until)} per scegliere nella finestra del magazzino; poi le offerte scadono.`,{wh:w.id},'ht'+w.id); }
+  if(d>=T.until){ w.ht=null; riNote('yellow','magazzini',`Scadute le offerte per l'handling a ${w.name}`,'Nessuna offerta scelta in tempo: i fornitori ritirano le proposte. Per cambiare serve una nuova gara.',{wh:w.id},'ht'+w.id); } }
+// si sceglie un'offerta: subito se il magazzino ha personale tuo, con 30 giorni di preavviso se cambia fornitore, rinnovo se è lo stesso
+function htPick(w,i){ const T=w.ht, o=T&&T.offers[i]; if(!o||S.day<T.end) return null; w.ht=null;
+  if(w.hdl===o.id){ w.hp=o.price; w.hc=o.hc; w.hEnd=S.day+o.mo*30; return 'renew'; }
+  if(w.hdl){ w.hNext={id:o.id,hc:o.hc,price:o.price,mo:o.mo,day:S.day+30}; return 'next'; }
+  hdlSet(w,o.id,o.hc); w.hp=o.price; w.hEnd=S.day+o.mo*30; return 'now'; }
+function htBot(w){ const T=w.ht; if(!T.offers.length){ w.ht=null; return; } let b=0; T.offers.forEach((o,i)=>{ if(o.price<T.offers[b].price) b=i; }); htPick(w,b); }
 // ---- contratto nazionale, Confpallet, fornitori: il mondo, una volta al giorno (prima delle aziende) ----
 const payroll=()=>S.warehouses.reduce((a,w)=>a+(w.kpi?w.kpi.pers:0),0)+globalCosts().plan;
 function riWorldDay(){ if(!riOn()) return; const W=riWorld(), H=HUM, d=H.day; if(W.last===d) return; W.last=d;
@@ -4635,7 +4677,7 @@ function riWorldDay(){ if(!riOn()) return; const W=riWorld(), H=HUM, d=H.day; if
 // un fornitore locale fallisce: chi lo usava paga con la responsabilità solidale e riassume le persone rimaste
 function hdlFail(id){ const W=riWorld(), st=W.h[id], nm=st.n; st.dead=HUM.day+365; st.own=null; st.n=hdlBase(id).n;
   liveCo().forEach(c=>withCo(c,()=>{ riCo(); S.warehouses.filter(w=>w.hdl===id).forEach(w=>{ const mo=rint(1,3), bill=Math.round(hdlBill(w)*mo/100)*100;
-    S.cash-=bill; S.cur.altro+=bill; ['pick','car'].forEach(r=>w.staff[r]=Math.floor(w.staff[r]*0.75)); w.hdl=null; w.hc=null; w.hNext=null; w.coop=false; S.ri.lastCond=S.day;
+    S.cash-=bill; S.cur.altro+=bill; ['pick','car'].forEach(r=>w.staff[r]=Math.floor(w.staff[r]*0.75)); w.hdl=null; w.hc=null; w.hNext=null; w.coop=false; w.hp=null; w.hEnd=null; S.ri.lastCond=S.day;
     mod(w.id,{mor:-5},30);
     riNote('red','magazzini',`${nm} è fallito`,`Partita IVA chiusa, telefoni muti. Per la responsabilità solidale paghi tu ${mo} ${mo===1?'mese':'mesi'} di stipendi arretrati: ${eur(bill)}. Un quarto dei facchini non torna; gli altri da oggi sono assunti da te a ${w.name}.`,{wh:w.id}); }); }));
   if(HUM) withCo(HUM,()=>news('La Gazzetta del Muletto',`Fallisce ${nm}`,'Sede legale in un garage, conti in rosso e stipendi non pagati: chi usava i suoi facchini dovrà pagare gli arretrati.'));
@@ -4643,6 +4685,10 @@ function hdlFail(id){ const W=riWorld(), st=W.h[id], nm=st.n; st.dead=HUM.day+36
 // ---- fine mese dell'azienda: talpa, accordi che scadono, rancore, traguardi ----
 function riMonth(){ if(!riOn()) return; const R0=riCo(), d=S.day;
   S.warehouses.forEach(w=>{ riW(w); w.ranc=Math.max(0,(w.ranc||0)-1);
+    // contratto di handling: avviso due mesi prima; senza una nuova gara si rinnova da solo per 12 mesi con la tariffa +5%
+    if(w.hdl&&w.hEnd){ const nm=hdlName(w.hdl);
+      if(d>=w.hEnd){ w.hp=Math.round((w.hp||hdlD(w.hdl).cost)*1.05*100)/100; w.hEnd=d+360; riNote('yellow','magazzini',`${w.name}: il contratto con ${nm} si rinnova da solo`,'Il contratto di handling è scaduto senza una nuova gara: si rinnova per 12 mesi con la tariffa +5%.',{wh:w.id}); }
+      else if(w.hEnd-d<=60&&w.hWarn!==w.hEnd&&!w.ht){ w.hWarn=w.hEnd; riNote('yellow','magazzini',`${w.name}: il contratto con ${nm} scade il ${shortDate(w.hEnd)}`,'Bandisci una gara per confrontare le offerte (anche lui può rispondere), altrimenti si rinnova da solo per 12 mesi con la tariffa +5%.',{wh:w.id}); } }
     if(w.deal&&d>=w.deal.until){ w.deal=null; riNote('yellow','sindacato',`Scade l'accordo integrativo a ${w.name}`,'Quello che hai concesso resta in busta paga, ma da domani il sindacato può tornare a chiedere.',{wh:w.id}); }
     // fornitore che non paga l'aumento: ogni tanto i lavoratori fanno causa, e paghi tu
     if(w.hdl&&riWorld().h[w.hdl].skip&&Math.random()<0.03){ const b=Math.round(hdlBill(w)/100)*100; S.cash-=b; S.cur.altro+=b; R0.lastCond=d;
@@ -4673,12 +4719,12 @@ function riNext(){ const W=riWorld(), y=yearOf((HUM||S).day), m=monthOf((HUM||S)
   let ry=y; while(!renYear(ry)||(ry===y&&m>=5)) ry++; return {ren:ry}; }
 // avversari: tavolo, policy, fornitori e Confpallet secondo lo stile
 function botRI(st){ if(!riOn()) return; const R0=riCo(), sty=S.bot.style, hard=S.bot.diff==='spietato'||sty==='prezzo';
-  if(R0.tav){ R0.tav.reqs.forEach(r=>{ r.c=hard?(r.id==='buoni'?'tratto':'no'):sty==='qualita'?(r.id==='stab'?'no':'si'):(r.id==='aumento'||r.id==='stab'?'tratto':RI_REQ[r.id].half?'tratto':'no'); }); }
+  tavList().forEach(w=>{ w.tav.reqs.forEach(r=>{ r.c=hard?(r.id==='buoni'?'tratto':'no'):sty==='qualita'?(r.id==='stab'?'no':'si'):(r.id==='aumento'||r.id==='stab'?'tratto':RI_REQ[r.id].half?'tratto':'no'); }); });
   if(hard&&R('contenim')&&!polOn('lineadura')) polSet('lineadura',true);
   if(sty==='qualita'&&R('relsind')&&!polOn('porte')) polSet('porte',true);
   if(!R0.conf&&sty!=='prezzo'&&S.warehouses.reduce((a,w)=>a+staffTot(w),0)>40) R0.conf=true;
   S.warehouses.forEach(w=>{ if(w.hNext) return;
-    if((sty==='prezzo'||sty==='espansione')&&!w.hdl&&w.staff.pick+w.staff.car>=6){ const x=hdlAvail(w).sort((a,b)=>a.cost-b.cost)[0]; if(x) hdlSet(w,x.id,'ora'); }
+    if((sty==='prezzo'||sty==='espansione')&&!w.ht&&(!w.hdl&&w.staff.pick+w.staff.car>=6||w.hdl&&w.hEnd&&w.hEnd-S.day<=45)) hdlTender(w);
     if(sty==='qualita'&&w.hdl&&hdlLocal(w)&&S.cash>80000) hdlInternal(w,true); });
 }
 // ---- interfaccia del pacchetto: finestra Relazioni industriali e riquadro nella finestra del magazzino ----
@@ -4695,7 +4741,8 @@ function riStatus(w){ riCo(); const L=[];
   else if((w.strikeOn||0)>0) L.push(`<span class="bad">${kw('sciopero','Sciopero')} in corso: ancora ${w.strikeOn} ${w.strikeOn===1?'giorno':'giorni'}</span>`);
   else if(w.strike&&(w.strike.warned||R('talpa'))) L.push(`<span class="warn">${kw('sciopero','Sciopero')} il ${shortDate(w.strike.day)}${R('talpa')&&!w.strike.warned?' (lo sai dalla talpa)':''}</span>`);
   if(w.deal) L.push(`<span class="ok">${kw('accordo_integrativo','Accordo integrativo')} fino al ${shortDate(w.deal.until)}${w.deal.nofire?' · niente licenziamenti':''}</span>`);
-  if(S.ri.tav&&S.ri.tav.wh===w.id) L.push(`<span class="warn">${kw('tavolo','Tavolo')} aperto: prossima seduta il ${shortDate(S.ri.tav.next)}</span>`);
+  if(w.tav) L.push(`<span class="warn">${kw('tavolo','Tavolo')} aperto: prossima seduta il ${shortDate(w.tav.next)}</span>`);
+  else if(!w.deal&&w.tavFail&&S.day<(w.tavCd||0)) L.push(`<span class="bad">${kw('tavolo','Tavolo')} saltato: il sindacato non torna a trattare prima del ${shortDate(w.tavCd)}</span>`);
   return L.length?`<div class="sm ri-st">${L.join('')}</div>`:''; }
 function riDelegate(w,sz){ const d=w.rsu, t=d.tal&&RSU_TAL[d.tal];
   return `<div class="ri-del"><img class="px" src="${IMG['v'+d.face]}" alt="" width="${sz||32}" height="${Math.round((sz||32)*7/6)}"><div class="wh-sm"><span>${kw('delegato','Delegato')}: <b>${esc(d.name)}</b></span><span class="ri-chips">${statBadge('lead',d.lead+(d.tal==='megafono'?3:0),12)}${statBadge('neg',d.neg,12)}${t?`<span class="pill" data-tip="<div class='tt'>${esc(t[0])}</div>${esc(t[1])}">${esc(t[0])}</span>`:''}</span></div></div>`; }
@@ -4704,18 +4751,19 @@ function riClima(){ const R0=S.ri, ws=S.warehouses;
     return `<div class="card ri-w${w.pres?' cl-bad':''}${sel?' ri-sel':''}"><div class="row"><span class="h3">${esc(w.name)} <span class="wh-prov">${w.prov}</span></span><span class="ri-tags">${fasciaPill(w)}${unionTag(un)}</span></div>
      ${agBar(w)}${riStatus(w)}${riDelegate(w)}
      <div class="sm">${w.hdl?`${kw('fornitori','Fornitore')}: <b>${esc(hdlName(w.hdl))}</b>${riWorld().h[w.hdl].skip?' <span class="bad">· non paga l\'ultimo aumento</span>':''}`:'Magazzinieri e carrellisti assunti da te'}${w.wageX>1.0001?` · aumenti dell'accordo ${sgn((w.wageX-1)*100)}%`:''}</div>
-     <div class="row"><button class="btn sm2" data-act="ritav" data-id="${w.id}" ${R0.tav||w.deal?'disabled':''}>Convoca il tavolo</button><button class="btn sm2" data-act="openwh" data-id="${w.id}">Apri il magazzino</button></div></div>`; };
+     <div class="row">${w.tav?`<button class="btn sm2 pri" data-act="ritavgo" data-id="${w.id}">Al tavolo</button>`:''}<button class="btn sm2" data-act="openwh" data-id="${w.id}">Apri il magazzino</button></div></div>`; };
   const uni=Object.entries(UNIONS).map(([k,U])=>`<div class="ri-un"><img class="px" src="${IMG[U.img]}" alt="Ritratto di ${esc(U.lead)}" width="48" height="56"><div class="wh-sm"><b>${unionTag(k)} ${esc(U.full)}</b><span class="sm">Segretario: ${esc(U.lead)}. ${esc(U.d)}</span></div></div>`).join('');
   return `<div class="sm">Ogni magazzino ha la sua ${kw('agitazione','agitazione sindacale')} da 0 a 100: sale con il morale basso, i licenziamenti e i fornitori, scende con il welfare, un buon manager e gli accordi. Si sente anche dai magazzini vicini, pure quelli della concorrenza (${kw('contagio','contagio')}). Oltre certe soglie arrivano ${kw('sciopero','scioperi')} e ${kw('presidio','presidi')}.</div>
    ${ws.map(card).join('')}<div class="card"><span class="h3">${kw('sindacati','I sindacati')}</span>${uni}</div>`; }
-function riTavView(){ const R0=S.ri, T=R0.tav;
-  if(!T) return `<div class="card pend"><span class="h3">Nessun tavolo aperto</span><div>Il ${kw('tavolo','tavolo delle trattative')} si apre quando il sindacato di un magazzino arriva allo ${kw('agitazione','stato di agitazione')}, oppure quando lo convochi tu dalla scheda Clima. Una trattativa alla volta, una seduta a settimana.</div></div>
-   ${(R0.hist||[]).length?`<div class="card"><span class="h3">Trattative passate</span>${R0.hist.slice().reverse().slice(0,8).map(h=>`<div class="row"><span>${esc(h.wh)} · ${shortDate(h.d)}</span><b class="${h.ok?'ok':'bad'}">${h.ok?'firmato':'saltato'} dopo ${h.n} ${h.n===1?'seduta':'sedute'}</b></div>`).join('')}</div>`:''}`;
-  const w=whById(T.wh), U=UNIONS[T.un], N=riNegotiator(), V=tavValue(T), c=tavCost(T), seePat=R('relsind'), seeMin=R('talpa');
+function riTavView(){ const R0=S.ri, L=tavList();
+  const past=(R0.hist||[]).length?`<div class="card"><span class="h3">Trattative passate</span>${R0.hist.slice().reverse().slice(0,8).map(h=>`<div class="row"><span>${esc(h.wh)} · ${shortDate(h.d)}</span><b class="${h.ok?'ok':'bad'}">${h.ok?'firmato':'saltato'} dopo ${h.n} ${h.n===1?'seduta':'sedute'}</b></div>`).join('')}</div>`:'';
+  if(!L.length) return `<div class="card pend"><span class="h3">Nessun tavolo aperto</span><div>Il ${kw('tavolo','tavolo delle trattative')} si apre da solo quando un magazzino entra nello ${kw('agitazione','stato di agitazione')}: uno per magazzino, una seduta a settimana. Se la trattativa salta non si riapre per tre mesi; se si firma, non si riapre finché dura l'accordo.</div></div>${past}`;
+  const w=L.find(x=>x.id===UI.sel.tavwh)||L[0], T=w.tav, U=UNIONS[T.un], N=riNegotiator(), V=tavValue(T), c=tavCost(T), seePat=R('relsind'), seeMin=R('talpa');
+  const pick=L.length>1?`<div class="seg ri-tavs" role="group">${L.map(x=>`<button class="btn sm2" data-act="ritavgo" data-id="${x.id}" aria-pressed="${x===w}">${esc(x.name)}</button>`).join('')}</div>`:'';
   const reqRow=(r,i)=>{ const Q=RI_REQ[r.id];
-    return `<div class="ri-req"><div class="wh-sm"><b>${esc(Q.n(r.lv))}</b><span class="sm">${esc(Q.d)} · peso ${'●'.repeat(Q.w)}</span></div><div class="seg" role="group">${[['si','Concedo'],['tratto','Tratto'],['no','Rifiuto']].map(([v,n])=>`<button class="btn sm2" data-act="rireq" data-i="${i}" data-v="${v}" aria-pressed="${r.c===v}" ${v==='tratto'&&!Q.half?'disabled':''}>${n}</button>`).join('')}</div></div>`; };
-  return `<div class="card"><div class="row"><span class="h3">${kw('tavolo','Tavolo')} a ${esc(w?w.name:'')}</span>${unionTag(T.un)}</div>
-    <div class="ri-tav-who"><div class="ri-del"><img class="px" src="${pImg(N.p)}" alt="" width="40" height="46"><div class="wh-sm"><span class="sm">Tratta per te</span><b>${esc(N.p.name)}</b><span class="ri-chips">${statBadge('neg',N.neg,12)}${N.med?talentIcons(['Mediatore nato'],18):''}${(N.p.tal||[]).includes('Ex sindacalista')?talentIcons(['Ex sindacalista'],18):''}</span></div></div>${w?riDelegate(w,40):''}</div>
+    return `<div class="ri-req"><div class="wh-sm"><b>${esc(Q.n(r.lv))}</b><span class="sm">${esc(Q.d)} · peso ${'●'.repeat(Q.w)}</span></div><div class="seg" role="group">${[['si','Concedo'],['tratto','Tratto'],['no','Rifiuto']].map(([v,n])=>`<button class="btn sm2" data-act="rireq" data-wh="${w.id}" data-i="${i}" data-v="${v}" aria-pressed="${r.c===v}" ${v==='tratto'&&!Q.half?'disabled':''}>${n}</button>`).join('')}</div></div>`; };
+  return `${pick}<div class="card"><div class="row"><span class="h3">${kw('tavolo','Tavolo')} a ${esc(w.name)}</span>${unionTag(T.un)}</div>
+    <div class="ri-tav-who"><div class="ri-del"><img class="px" src="${pImg(N.p)}" alt="" width="40" height="46"><div class="wh-sm"><span class="sm">Tratta per te</span><b>${esc(N.p.name)}</b><span class="ri-chips">${statBadge('neg',N.neg,12)}${N.med?talentIcons(['Mediatore nato'],18):''}${(N.p.tal||[]).includes('Ex sindacalista')?talentIcons(['Ex sindacalista'],18):''}</span></div></div>${riDelegate(w,40)}</div>
     <div class="sm">${N.hr?'Tratta il direttore delle risorse umane.':'Tratti tu: con la Struttura direzionale può farlo il direttore delle risorse umane.'} Ogni seduta il sindacato abbassa un po' le pretese (conta la Negoziazione di chi tratta contro la Leadership del delegato) e perde un po' di pazienza.</div>
     <div class="ri-meter"><span class="lab">Quanto concedi</span><div class="bar"><i style="width:${Math.round(V*100)}%;background:var(--accent)"></i>${seeMin?`<s style="left:${Math.round(T.min*100)}%"></s>`:''}</div><b class="num">${Math.round(V*100)}%</b></div>
     <div class="sm">${seeMin?`La ${kw('talpa','talpa')} dice che firmano dal <b>${Math.round(T.min*100)}%</b>.`:'Quanto basta per firmare lo sa solo il sindacato: con la ricerca Talpa nel sindacato lo sapresti anche tu.'}</div>
@@ -4723,9 +4771,9 @@ function riTavView(){ const R0=S.ri, T=R0.tav;
     <div class="row"><span class="sm">Prossima seduta: <b>${shortDate(T.next)}</b> (seduta ${T.n+1})</span><span class="sm">Costo: <b>${eur(c.m)}</b> al mese${c.u?` + ${eur(c.u)} subito`:''}</span></div></div>
    <div class="card"><span class="h3">Le richieste</span>${T.reqs.map(reqRow).join('')}</div>
    <div class="card"><span class="h3">${kw('contropartita','Contropartita')} per la prossima seduta</span><div class="sm">Una sola per seduta: abbassa le pretese del sindacato.</div>
-    ${RI_CP.map(cp=>`<button class="lb-opt" data-act="ricp" data-id="${cp.id}" aria-pressed="${T.cp===cp.id}"><b>${esc(cp.n)}</b><span class="sm">${esc(cp.d)}${w&&cp.cost(w)?' Costo: '+eur(cp.cost(w))+'.':''}</span></button>`).join('')}</div>
+    ${RI_CP.map(cp=>`<button class="lb-opt" data-act="ricp" data-wh="${w.id}" data-id="${cp.id}" aria-pressed="${T.cp===cp.id}"><b>${esc(cp.n)}</b><span class="sm">${esc(cp.d)}${cp.cost(w)?' Costo: '+eur(cp.cost(w))+'.':''}</span></button>`).join('')}</div>
    ${T.log.length?`<div class="card"><span class="h3">Verbale</span>${T.log.slice().reverse().map(x=>`<div class="sm">${esc(x)}</div>`).join('')}</div>`:''}
-   <div class="row"><button class="btn" data-act="riquit">Alzati dal tavolo</button><span class="sm bad">Se ti alzi, o se il sindacato finisce la pazienza, parte uno sciopero.</span></div>`; }
+   <div class="row"><button class="btn" data-act="riquit" data-wh="${w.id}">Alzati dal tavolo</button><span class="sm bad">Se ti alzi, o se il sindacato finisce la pazienza, parte uno sciopero e il tavolo non si riapre per tre mesi.</span></div>${past}`; }
 function riCcnl(){ const R0=S.ri, W=riWorld(), nx=riNext(), y=yearOf(S.day), staff=S.warehouses.reduce((a,w)=>a+staffTot(w),0), q=RI.conf+RI.confPer*staff;
   const ren=W.ren?`Rinnovo ${W.ren.y}-${W.ren.y+3}: +${f1(W.ren.total)}% in sei rate${W.ren.left?`, ne restano ${W.ren.left}`:', tutte pagate'}.`:'Il primo rinnovo si tratta nel 2003.';
   return `<div class="card"><span class="h3">${kw('contratto_nazionale','Contratto nazionale della logistica')}</span>
@@ -4750,18 +4798,25 @@ function riHdlView(){ const ws=S.warehouses, W=riWorld(), see=R('vendor');
      <div class="sm">${mine.length?`Lavora per te a <b>${mine.map(w=>esc(w.name)).join(', ')}</b>.`:ok.length?`Può lavorare a ${ok.map(esc).join(', ')}.`:'Non può lavorare in nessuno dei tuoi magazzini.'}</div></div>`; };
   return `<div class="sm">I ${kw('fornitori','fornitori di handling')} prendono il posto di magazzinieri e carrellisti di un intero magazzino: costano meno e mandano le persone in pochi giorni, ma lavorano peggio e portano più agitazione. Si sceglie dalla finestra del magazzino. ${see?'':'Con la ricerca Vendor management vedi i rischi veri di ciascuno.'}</div>
    <div class="lab">Locali</div>${HDL.filter(x=>x.loc).map(card).join('')}<div class="lab">Globali</div>${HDL.filter(x=>!x.loc).map(card).join('')}`; }
-// riquadro nella finestra del magazzino: chi fa il lavoro, tipo di contratto, clima sindacale
-function riWhBox(w){ riCo(); riW(w); const av=hdlAvail(w), cur=w.hdl&&!av.some(x=>x.id===w.hdl)?[hdlBase(w.hdl)]:[], next=w.hNext;
-  const opt=x=>{const d=hdlD(x.id); return `<option value="${x.id}" ${w.hdl===x.id?'selected':''}>${esc(d.n)} · ${sgnp((d.cost*hdlIdx(x.id)/(S.ri.wage||1)-1)*100)}</option>`;};
-  return `<div class="ri-whb"><label class="row"><span class="lab">${kw('fornitori','Chi fa il lavoro')}</span><select data-act="sethdl" data-wh="${w.id}" aria-label="Magazzinieri e carrellisti: interni o di un fornitore"><option value="">Personale assunto da te</option>${[...cur,...av].map(opt).join('')}</select></label>
-   ${w.hdl?`<label class="row"><span class="lab">${kw('fornitori','Contratto')}</span><select data-act="sethc" data-wh="${w.id}" aria-label="Tipo di contratto col fornitore"><option value="ora" ${w.hc!=='pal'?'selected':''}>a ora lavorata</option><option value="pal" ${w.hc==='pal'?'selected':''}>a pallet movimentato (+12%)</option></select></label>
-    <div class="sm">${w.hc==='pal'?'Il fornitore adegua da solo le persone ogni lunedì: nei mesi morti costa meno, nei picchi un po\' di più.':'Le persone le chiedi tu con + e −: arrivano in '+hdlD(w.hdl).flex+' giorni e si mandano via gratis.'} Passare a personale tuo costa 600 € a persona${hdlD(w.hdl).pen?` più la penale (${eur(hdlPenalty(w))})`:''}.</div>`:`<div class="sm">${av.length?`${av.length} ${av.length===1?'fornitore può':'fornitori possono'} lavorare qui. Passare a un fornitore: morale −5 per un mese e agitazione in più.`:'Nessun fornitore può lavorare in questo magazzino.'}</div>`}
-   ${next?`<div class="row sm warn"><span>Cambio d'appalto: arriva ${esc(hdlName(next.id))} il ${shortDate(next.day)}</span><button class="btn sm2" data-act="hdlundo" data-wh="${w.id}">Annulla</button></div>`:''}
+// riquadro nella finestra del magazzino: chi fa il lavoro, gara per l'handling, clima sindacale
+function riWhBox(w){ riCo(); riW(w); const av=hdlAvail(w), T=w.ht, next=w.hNext, d=w.hdl&&hdlD(w.hdl);
+  const cur=d?`<div class="row"><span class="lab">${kw('fornitori','Chi fa il lavoro')}</span><b>${esc(d.n)}</b></div>
+    <div class="sm">Tariffa <b>${sgnp(htRel(w.hp||d.cost*(w.hc==='pal'?1.12:1),w.hdl))}</b> rispetto al personale tuo · contratto ${w.hc==='pal'?'a pallet movimentato':'a ora lavorata'}${w.hEnd?` fino al ${shortDate(w.hEnd)}`:''}. ${w.hc==='pal'?'Il fornitore adegua da solo le persone ogni lunedì.':`Le persone le chiedi con + e −: arrivano in ${d.flex} giorni e si mandano via gratis.`}</div>`
+   :`<div class="row"><span class="lab">${kw('fornitori','Chi fa il lavoro')}</span><b>Personale assunto da te</b></div>`;
+  const offer=(o,i)=>{ const x=hdlD(o.id);
+    return `<div class="ri-off"><div class="wh-sm"><b>${esc(x.n)}${w.hdl===o.id?' (rinnovo)':''}</b><span class="sm">Tariffa <b>${sgnp(htRel(o.price,o.id))}</b> · ${o.hc==='pal'?'a pallet':'a ora'} · ${o.mo} mesi · accuratezza ${sgn(x.q)} · persone in ${x.flex} giorni${x.loc?' · locale':' · globale'}</span></div>${S.day>=T.end?`<button class="btn sm2 pri" data-act="htpick" data-wh="${w.id}" data-i="${i}">Scegli</button>`:''}</div>`; };
+  const gara=T?`<div class="ri-ht"><div class="row"><span class="lab">${kw('gara_handling','Gara per l\'handling')}</span><span class="sm">${S.day<T.end?`offerte fino al ${shortDate(T.end)}`:`scegli entro il ${shortDate(T.until)}`}</span></div>
+     ${T.offers.length?T.offers.map(offer).join(''):'<div class="sm">Nessuna offerta, per ora.</div>'}
+     ${S.day<T.end?'<div class="sm">Le offerte arrivano una alla volta: si sceglie quando la gara si chiude.</div>':''}
+     <div><button class="btn sm2" data-act="htcancel" data-wh="${w.id}">${S.day<T.end?'Annulla la gara':'Non scelgo nessuno'}</button></div></div>`
+   :`<div class="row ri-btns">${av.length?`<button class="btn sm2 pri" data-act="httender" data-wh="${w.id}">${w.hdl?'Bandisci una nuova gara':'Bandisci una gara per l\'handling'}</button>`:''}${w.hdl?`<button class="btn sm2" data-act="hdlhome" data-wh="${w.id}">Riporta il personale in casa · ${eur(600*(w.staff.pick+w.staff.car)+hdlPenalty(w))}</button>`:''}</div>
+     <div class="sm">${av.length?`${av.length} ${av.length===1?'fornitore può':'fornitori possono'} lavorare qui: la gara dura ${wks(HT.open)}, poi hai ${wks(HT.choose)} per scegliere l'offerta.`:'Nessun fornitore può lavorare in questo magazzino.'}</div>`;
+  return `<div class="ri-whb">${cur}${next?`<div class="row sm warn"><span>Cambio d'appalto: arriva ${esc(hdlName(next.id))} il ${shortDate(next.day)}</span><button class="btn sm2" data-act="hdlundo" data-wh="${w.id}">Annulla</button></div>`:gara}
    <div class="row"><span class="lab">${kw('agitazione','Clima sindacale')}</span>${fasciaPill(w)}</div>${agBar(w)}${riStatus(w)}
    <div><button class="btn sm2" data-act="riopen" data-wh="${w.id}">Relazioni industriali ›</button></div></div>`; }
 // riga di stato nel menu del telefono
-function riDockNote(){ const ws=S.warehouses, p=ws.find(w=>w.pres), k=ws.find(w=>(w.strikeOn||0)>0), T=S.ri&&S.ri.tav, nx=riNext();
-  return p?['bad','Presidio a '+p.name]:k?['bad','Sciopero a '+k.name]:T?['acc','Tavolo aperto a '+(whById(T.wh)||{}).name]:nx.d?['acc',`Prossima rata: ${MESI[new Date(nx.d).getUTCMonth()].toLowerCase()}, +${f1(nx.r)}%`]:['mut','Rinnovo del contratto nel '+nx.ren]; }
+function riDockNote(){ const ws=S.warehouses, p=ws.find(w=>w.pres), k=ws.find(w=>(w.strikeOn||0)>0), T=ws.filter(w=>w.tav), nx=riNext();
+  return p?['bad','Presidio a '+p.name]:k?['bad','Sciopero a '+k.name]:T.length?['acc',T.length===1?'Tavolo aperto a '+T[0].name:T.length+' tavoli aperti']:nx.d?['acc',`Prossima rata: ${MESI[new Date(nx.d).getUTCMonth()].toLowerCase()}, +${f1(nx.r)}%`]:['mut','Rinnovo del contratto nel '+nx.ren]; }
 // lente della mappa: province colorate secondo l'agitazione dei magazzini (di tutte le aziende)
 function lensClima(){ const fill=[],line=[];
   const all=liveCo().flatMap(c=>c.warehouses.map(w=>({w,c})));
@@ -5541,8 +5596,8 @@ const EVENTS=[
   setup:ev=>{const w=pick(S.warehouses.filter(w=>w.ag>=45&&!w.deal&&!w.pres)); ev.w=w;
     ev.text=`A ${w.name} il sindacato ha inventato lo sciopero a rate: due ore per turno, a orari che cambiano ogni giorno, per due settimane. Il capoturno ha disegnato una tabella con i pennarelli colorati per capire chi c'è e quando. Non l'ha capita neanche lui.`;},
   opts:[{t:'Lo sopporti',d:'Due settimane passano. I camion partiranno quando partiranno.',e:'Puntualità −3 per due settimane in quel magazzino',r:'Due settimane di camion che partono a orari creativi. I clienti hanno imparato a chiamare prima di mezzogiorno.',f:function(){mod(this.w.id,{P:-3},14);}},
-        {t:'Convochi il tavolo',d:'Chiami il delegato e apri subito una trattativa: le richieste le metti sul tavolo tu.',e:'Si apre il tavolo delle trattative (se non ce n\'è già uno), agitazione −5 per un mese, puntualità −1 per una settimana',r:'Il delegato è arrivato con una cartellina gonfia. Per ora lo sciopero a rate è sospeso.',
-         f:function(){mod(this.w.id,{P:-1},7); S.mods.push({scope:this.w.id,ag:-5,until:S.day+30,src:this.title}); if(!S.ri.tav&&!this.w.deal) riTavOpen(this.w,true);}},
+        {t:'Un caffè con il delegato',d:'Lo inviti al bar e gli prometti che al tavolo lo ascolterai davvero. Sospende lo sciopero a rate, per ora.',e:'Agitazione −5 per un mese, puntualità −1 per una settimana; se c\'è un tavolo aperto, la pazienza del sindacato +20',r:'Due caffè e un cornetto a testa. Per ora lo sciopero a rate è sospeso.',
+         f:function(){mod(this.w.id,{P:-1},7); S.mods.push({scope:this.w.id,ag:-5,until:S.day+30,src:this.title}); if(this.w.tav) this.w.tav.pat=Math.min(100,this.w.tav.pat+20);}},
         {t:'Turni rimescolati',d:'Rifai i turni ogni sera in base a chi sciopera domani: i buchi li coprono i più esperti.',e:'Puntualità −1 per due settimane',req:()=>ceo().st.op>=13,reqT:'Operazioni 13',r:'Il capoturno ha buttato la tabella colorata. Con i turni rifatti ogni sera, quasi nessuno se n\'è accorto.',f:function(){mod(this.w.id,{P:-1},14);}}]},
  {id:'ri_comune',src:'Il Mattinale del Ministero',title:'Il delegato si candida in comune',cond:()=>riOn()&&S.warehouses.some(w=>w.rsu&&w.ag>=15)&&Math.random()<0.5,
   setup:ev=>{const w=pick(S.warehouses.filter(w=>w.rsu&&w.ag>=15)); ev.w=w;
@@ -5745,9 +5800,9 @@ function noteAlerts(){
   if(u.length) a.push({id:'unh',col:'yellow',ic:'policy',title:u.length===1?`${u[0].name} è scontento delle policy`:`${u.length} persone scontente delle policy`,text:'Una pretesa sulle policy aziendali non è rispettata: se va avanti così arriva un ultimatum.',win:'policy'});
   const cp=Object.values(negs()).filter(n=>n.counter&&n.day==null);
   if(cp.length) a.push({id:'neg',col:'yellow',ic:'manager',title:cp.length===1?`${cp[0].nm} aspetta una risposta`:`${cp.length} controproposte da valutare`,text:'Un candidato ha fatto una controproposta sullo stipendio: accettala o rilancia dalla finestra Manager, prima che firmi altrove.',win:'manager',sel:{mtab:'cand'}});
-  if(riOn()){ const p=S.warehouses.find(w=>w.pres), T=S.ri&&S.ri.tav;
+  if(riOn()){ const p=S.warehouses.find(w=>w.pres), T=S.warehouses.find(w=>w.tav)&&S.warehouses.find(w=>w.tav).tav;
     if(p) a.push({id:'pres',col:'red',ic:'sindacato',title:`Presidio ai cancelli di ${p.name}`,text:'Il magazzino lavora al 20% e ogni settimana perdi reputazione. Firma un accordo al tavolo delle trattative o abbassa l\'agitazione.',win:'sindacato',sel:{ritab:'tav'}});
-    if(T) a.push({id:'tav',col:'yellow',ic:'sindacato',title:`Tavolo aperto a ${(whById(T.wh)||{}).name}`,text:`Il sindacato aspetta le tue concessioni: prossima seduta il ${shortDate(T.next)}.`,win:'sindacato',sel:{ritab:'tav'}}); }
+    if(T) a.push({id:'tav',col:'yellow',ic:'sindacato',title:`Tavolo aperto a ${(whById(T.wh)||{}).name}`,text:`Il sindacato aspetta le tue concessioni: prossima seduta il ${shortDate(T.next)}.`,win:'sindacato',sel:{ritab:'tav',tavwh:T.wh}}); }
   if(!S.project&&TECH.some(techOpen)) a.push({id:'research',col:'yellow',ic:'tecnologia',title:'Nessuna ricerca in corso',text:'L\'ufficio ricerca è fermo: scegli la prossima tecnologia da studiare.',win:'tecnologia'});
   // posti liberi in Direzione: l'avviso compare solo se c'è un manager senza incarico da nominare
   if(R('direzione')&&Object.values(S.dirs).some(v=>!v)&&S.managers.some(m=>m.hired&&!m.wh&&!seatOf(m.id)&&!isCs(m.id))) a.push({id:'dir',col:'yellow',ic:'direzione',title:'Posti da dirigente liberi',text:'Hai un manager senza incarico: nella scheda Direzione della finestra Manager puoi nominarlo direttore.',win:'direzione'});
@@ -6958,11 +7013,11 @@ const VIEWS={
  sindacato(){
   if(!riOn()) return '<div class="card"><span class="sm">Questa partita non ha il pacchetto Relazioni industriali.</span></div>';
   const R0=riCo(), tab=UI.sel.ritab||'clima', ws=S.warehouses; ws.forEach(riW);
-  const hot=ws.filter(w=>fascia(w)>=2).length, T=R0.tav, nx=riNext(), yr=S.ri.wage;
+  const hot=ws.filter(w=>fascia(w)>=2).length, TL=ws.filter(w=>w.tav), T=TL[0]&&TL[0].tav, nx=riNext(), yr=S.ri.wage;
   const tabs=`<div class="tabs" role="tablist">${[['clima','Clima'],['tav','Tavolo'+(T?' ●':'')],['ccnl','Contratto'],['hdl','Fornitori']].map(([id,n])=>`<button role="tab" aria-selected="${id===tab}" data-act="ritab" data-id="${id}">${n}</button>`).join('')}</div>`;
   const head=`<div class="wh-kpis">
     <div class="kpi wh-k ${hot?'bad':'ok'}"><div class="lab">${kw('agitazione','Agitati')}</div><b>${hot} / ${ws.length}</b><div class="sm">magazzini</div></div>
-    <div class="kpi wh-k ${T?'warn':''}"><div class="lab">${kw('tavolo','Tavolo')}</div><b>${T?'sì':'no'}</b><div class="sm">${T?esc(whById(T.wh)?whById(T.wh).name:''):`${R0.deals||0} accordi firmati`}</div></div>
+    <div class="kpi wh-k ${T?'warn':''}"><div class="lab">${kw('tavolo','Tavolo')}</div><b>${TL.length}</b><div class="sm">${TL.length?(TL.length===1?'aperto':'aperti'):`${R0.deals||0} accordi firmati`}</div></div>
     <div class="kpi wh-k"><div class="lab">${kw('contratto_nazionale','Stipendi')}</div><b>+${f1((yr-1)*100)}%</b><div class="sm">dal 2002</div></div>
     <div class="kpi wh-k"><div class="lab">${kw('rate_ccnl','Rata')}</div><b>${nx.d?shortDate((nx.d-DAY0)/86400000).replace(/^\d+ /,''):'—'}</b><div class="sm">${nx.d?'+'+f1(nx.r)+'%':'rinnovo nel '+nx.ren}</div></div></div>`;
   return head+tabs+({clima:riClima,tav:riTavView,ccnl:riCcnl,hdl:riHdlView}[tab]||riClima)();
@@ -7603,18 +7658,16 @@ const ACT={
  // pacchetto Relazioni industriali
  ritab(d){UI.sel.ritab=d.id; renderWin('sindacato');},
  riwh(d){UI.sel.wh=d.id; renderWin('sindacato');},
- sethdl(d,el){ const w=whById(d.wh), id=el.value||null; if(!w) return;
-  if(id&&!w.hdl&&polOn('nocoop')&&hdlBase(id).loc){ el.value=''; toast('La policy Niente appalti locali vieta i fornitori locali','warn'); return; }
-  const r=hdlSet(w,id,w.hc||'ora');
-  if(!id) {} else if(r==='next') toast(`Cambio d'appalto: ${hdlName(id)} arriva tra 30 giorni (preavviso al vecchio fornitore)`,'warn');
-  else toast(`${w.name}: magazzinieri e carrellisti passano a ${hdlName(id)}. I sindacati non sono contenti.`,'warn');
-  kpiNow(); renderAll(); },
- sethc(d,el){ const w=whById(d.wh); if(!w||!w.hdl) return; w.hc=el.value==='pal'?'pal':'ora'; kpiNow(); renderAll(); },
+ httender(d){ const w=whById(d.wh); if(!w) return; if(hdlTender(w)) toast(`Gara per l'handling aperta a ${w.name}: offerte fino al ${shortDate(w.ht.end)}`,'ok'); renderAll(); },
+ htpick(d){ const w=whById(d.wh); if(!w) return; const o=w.ht&&w.ht.offers[+d.i], r=htPick(w,+d.i); if(!r) return;
+  toast(r==='now'?`${w.name}: magazzinieri e carrellisti passano a ${hdlName(o.id)}. I sindacati non sono contenti.`:r==='next'?`Cambio d'appalto: ${hdlName(o.id)} arriva tra 30 giorni (preavviso al vecchio fornitore)`:`Contratto con ${hdlName(o.id)} rinnovato per ${o.mo} mesi`,r==='now'?'warn':'ok'); kpiNow(); renderAll(); },
+ htcancel(d){ const w=whById(d.wh); if(w){ w.ht=null; renderAll(); } },
+ hdlhome(d){ const w=whById(d.wh); if(!w||!w.hdl) return; hdlInternal(w); kpiNow(); renderAll(); },
  hdlundo(d){ const w=whById(d.wh); if(w){ w.hNext=null; renderAll(); } },
- ritav(d){ const w=whById(d.id); if(!w||S.ri.tav) return; if(w.deal) return toast('C\'è già un accordo in corso in questo magazzino','warn'); if(riTavOpen(w,true)){ UI.sel.ritab='tav'; renderAll(); } },
- rireq(d){ const T=S.ri.tav; if(!T) return; const r=T.reqs[+d.i]; if(!r) return; if(d.v==='tratto'&&!RI_REQ[r.id].half) return; r.c=d.v; renderWin('sindacato'); },
- ricp(d){ const T=S.ri.tav; if(!T) return; T.cp=T.cp===d.id?null:d.id; renderWin('sindacato'); },
- riquit(){ const T=S.ri.tav; if(!T) return; const w=whById(T.wh); if(w) riTavFail(w); else S.ri.tav=null; renderAll(); },
+ ritavgo(d){ UI.sel.ritab='tav'; UI.sel.tavwh=d.id; openWin('sindacato'); renderWin('sindacato'); },
+ rireq(d){ const w=whById(d.wh), T=w&&w.tav; if(!T) return; const r=T.reqs[+d.i]; if(!r) return; if(d.v==='tratto'&&!RI_REQ[r.id].half) return; r.c=d.v; renderWin('sindacato'); },
+ ricp(d){ const w=whById(d.wh), T=w&&w.tav; if(!T) return; T.cp=T.cp===d.id?null:d.id; renderWin('sindacato'); },
+ riquit(d){ const w=whById(d.wh); if(!w||!w.tav) return; riTavFail(w); renderAll(); },
  riconf(){ const R0=riCo(); R0.conf=!R0.conf; toast(R0.conf?'Iscritto a Confpallet: quota ogni mese, rate più leggere e agitazione −5':'Esci da Confpallet: niente quota, ma niente sconti sulle rate','ok'); renderAll(); },
  straord(d){const w=whById(d.wh), c=straordCost(w); if(!w.staff.fm||S.cash<c||w.cond>=95)return; S.cash-=c; S.cur.altro+=c; w.cond=100; kpiNow(); toast(`${w.name}: manutenzione straordinaria fatta, stato al 100%`,'ok'); renderAll();},
  amplia(d){const w=whById(d.wh), c=expCost(w); if(!w.staff.fm||w.build||(w.exp||0)>=MAINT.expMax||S.cash<c)return; S.cash-=c; S.cur.altro+=c;
@@ -7921,6 +7974,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.73',t:'Gare per l\'handling e un tavolo per magazzino',x:['I fornitori di handling non si scelgono più da un elenco: dalla finestra del magazzino si bandisce una gara. Per tre settimane arrivano le offerte, con tariffa, tipo di contratto e durata; poi hai due settimane per scegliere quella che preferisci.','I contratti con i fornitori hanno una scadenza: due mesi prima arriva l\'avviso, e senza una nuova gara si rinnovano da soli con la tariffa +5%.','Il tavolo delle trattative non si convoca più a comando: si apre da solo quando un magazzino entra in stato di agitazione. Ogni magazzino ha il suo, quindi si tratta in più posti insieme.','Se il tavolo salta (o ti alzi tu) il sindacato non torna a trattare per tre mesi; se si firma, il tavolo non si riapre finché dura l\'accordo.']},
  {v:'0.72',t:'Ricerca in ordine',x:['La scheda Ricerca della finestra Tecnologia è rifatta: in cima una sola barra con la ricerca in corso (rossa se è ferma), poi una riga con le tecnologie ricercate, l\'Innovazione e quelle da installare.','Sul computer la finestra è più larga e, quando c\'è posto, la scheda della tecnologia scelta sta a destra dell\'albero: non serve più scorrere fino in fondo per leggerla.','La scheda dice cosa serve e cosa apre dopo: un clic su una di quelle tecnologie ci porta, anche se è in un altro albero. Le linee della tecnologia scelta si colorano di arancione e un cartellino come «+Sviluppo» avvisa quando serve una ricerca di un altro albero.','I nomi lunghi non escono più dai riquadri, le linee non passano più dietro le altre tecnologie e l\'albero delle Certificazioni è più compatto. Al posto del pulsante grigio, un avviso spiega perché non si può avviare: ricerca già in corso, soldi che mancano o cosa serve prima.','Sul telefono le schede degli alberi stanno in una riga sola e l\'albero comincia subito.','La scheda con i certificati dei magazzini si chiama ora «Certificati e audit», per non confondersi con l\'albero Certificazioni.']},
  {v:'0.71',t:'I pacchetti della partita',x:['Quando crei una partita c\'è un passo nuovo, l\'ultimo: «Pacchetti». Il gioco base c\'è sempre, le espansioni si accendono o si spengono con un tocco.','Di base tutte le espansioni sono accese: per ora c\'è «Relazioni industriali». Chi vuole la partita classica la spegne lì.']},
  {v:'0.70',t:'Certificazioni per tutti i gusti',x:['Sette certificazioni nuove nell\'albero Certificazioni. Per magazzino: buone pratiche per i farmaci (GDP), merci pericolose (ADR), Bollino Banchina Sicura contro i furti e deposito fiscale e doganale. Per l\'azienda: ISO 14001 (ambiente), ISO 45001 (sicurezza), operatore doganale autorizzato e parità di genere.','Nuovi clienti esigenti: FarmaSpa e le parafarmacie chiedono le GDP, elettronica, occhiali e cosmetica l\'antifurto, distillerie e birrifici il deposito fiscale, aerei e nautica le merci pericolose.','I contratti già firmati chiedono solo quello che chiedevano allora. Al rinnovo il buyer aggiorna il capitolato e ti dà 6 mesi per metterti in regola.','Nuove linee di business: ogni tanto un cliente allarga il giro (il mobilificio che vende polpette surgelate, il supermercato con i vini d\'importazione…) e chiede una certificazione in più. Se accetti e ti certifichi in tempo, più pallet; se rinunci, la linea va in gara e magari la prende un concorrente.','Ufficio qualità: addetti in sede che alzano la conformità dei magazzini e fanno gli audit interni.','Ispezioni a sorpresa di ASL, NAS e Ispettorato del lavoro, più qualche guaio a tema prima degli audit. Due talenti nuovi: «Maniaco delle procedure» e «Vive di raccoglitori».']},
@@ -8268,6 +8322,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},renderAll,riOn,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},renderAll,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>
