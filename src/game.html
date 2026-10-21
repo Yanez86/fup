@@ -113,6 +113,24 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 #dock .di{display:flex;align-items:center;justify-content:center}
 #dock .dl,#burger,#dockshade,#ppb{display:none}
 #dock .badge{position:absolute;right:-7px;top:-7px;min-width:20px;height:20px;padding:0 4px;background:var(--bad);color:#fff;border:2px solid #fff;font:700 12px/16px var(--f-body)}
+/* computer: gruppi separati da una riga; pulsante in cima per allargare il menu con nomi e righe di stato */
+#dock .dot,.win-t .dot{position:absolute;right:-6px;top:-6px;width:12px;height:12px;box-sizing:border-box;background:var(--bad);border:2px solid #fff}
+.win-t .dot{right:4px;top:4px}
+html:not(.mob) #dock{box-sizing:border-box}
+html:not(.mob) #dock .dg{flex:none;height:0;margin:2px 3px;border-top:2px solid var(--ink4);overflow:hidden;font-size:0}
+html:not(.mob) #dock .dtog{height:32px;flex:none;min-height:32px;color:var(--hi);gap:8px}
+html:not(.mob) #dock .dtog span{font:600 12px var(--f-body);letter-spacing:1px;text-transform:uppercase}
+#dock.wide{width:232px;overflow-y:auto;overscroll-behavior:contain;gap:3px}
+#dock.wide button{width:auto;flex:none;height:auto;min-height:42px;justify-content:flex-start;gap:10px;padding:2px 8px;text-align:left;color:#fff}
+#dock.wide button.on{color:var(--ink)}
+#dock.wide .dtog{justify-content:center;min-height:32px}
+#dock.wide .di{position:relative;width:32px;flex:none}
+#dock.wide .dl{display:flex;flex-direction:column;min-width:0}
+#dock.wide .dl b{font:500 15px/1.15 var(--f-body)}
+#dock.wide .dl small{font:12px/1.2 var(--f-body)}
+#dock.wide .dl small.bad{color:#ff8a8d}#dock.wide .dl small.acc{color:var(--accent-l)}#dock.wide .dl small.mut{color:var(--hi)}
+#dock.wide button.on .dl small{color:var(--ink)}
+html:not(.mob) #dock.wide .dg{height:auto;border:0;overflow:visible;margin:5px 2px 1px;font:600 11px/1.3 var(--f-body);letter-spacing:1.5px;text-transform:uppercase;color:var(--hi)}
 
 /* Finestre */
 /* le finestre si ordinano tra loro dentro #wins, senza mai salire sopra barra, modali e tooltip */
@@ -225,6 +243,12 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .grip{width:10px;height:14px;background:radial-gradient(circle, #6b7a8e 1px, transparent 1.5px) 0 0/5px 5px}
 .xbtn{width:30px;height:30px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font-family:var(--f-disp);font-size:13px;line-height:1;box-shadow:inset 0 -2px 0 #1d2a3b}
 .win-b{padding:14px;overflow:auto;min-height:0;display:flex;flex-direction:column;gap:10px}
+/* finestre unite: schede a cartellina sotto il titolo, con l'icona della voce di menu di una volta */
+.win-t{display:flex;gap:6px;padding:6px 8px 0;background:var(--ink);flex:none}
+.win-t button{flex:1;min-width:0;display:flex;align-items:center;gap:8px;min-height:44px;padding:3px 10px;border:2px solid var(--ink4);border-bottom:0;background:var(--ink3);color:#fff;font:600 15px var(--f-disp);text-align:left;position:relative;box-shadow:inset 0 2px 0 #3b4f6a}
+.win-t button span{min-width:0;overflow-wrap:break-word}
+.win-t button[aria-selected="true"]{background:var(--panel);color:var(--ink);border-color:var(--panel);box-shadow:inset 0 3px 0 var(--accent)}
+.win-t button.lk:not([aria-selected="true"]){color:var(--hi)}.win-t button.lk svg{opacity:.55}
 .tabs{display:flex;border-bottom:2px solid var(--ink);background:#dfe7ee;flex-wrap:wrap}
 .tabs button{flex:1;padding:7px 9px;border:0;border-right:2px solid var(--ink);background:#dfe7ee;color:var(--muted);font-family:var(--f-disp);font-size:15px;max-width:100%;overflow-wrap:break-word}
 .tabs button:last-child{border-right:0}
@@ -905,8 +929,8 @@ html,body{overscroll-behavior:none}
 .mob #dock .dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;color:#fff}
 .mob #dock .dh b{font:700 22px var(--f-disp)}
 .mob #dock .dh .xbtn{width:44px;height:42px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font:700 16px var(--f-disp);box-shadow:inset 0 -3px 0 #1d2a3b}
-.mob #dock .dg{font:600 12px var(--f-body);letter-spacing:1.5px;text-transform:uppercase;color:var(--hi);margin:12px 0 6px}
-.mob #dock button[data-act=toggle]{width:100%;height:auto;min-height:50px;justify-content:flex-start;gap:12px;padding:5px 10px;margin-bottom:5px;text-align:left;color:#fff}
+.mob #dock .dg{font:600 12px var(--f-body);letter-spacing:1.5px;text-transform:uppercase;color:var(--hi);margin:10px 0 5px}
+.mob #dock button[data-act=toggle]{width:100%;height:auto;min-height:46px;justify-content:flex-start;gap:12px;padding:3px 10px;margin-bottom:4px;text-align:left;color:#fff}
 .mob #dock button.on{color:var(--ink)}
 .mob #dock .di{position:relative;width:34px;flex:none}
 .mob #dock .di .badge{box-sizing:border-box;right:-9px;top:-11px;min-width:18px;height:18px;padding:0 3px;font-size:11px;line-height:14px}
@@ -1344,7 +1368,7 @@ const TECH=[
  {id:'ptl',tree:'log',tier:4,row:0,req:['rf'],name:'Pick-to-light',cost:40000,wk:9,inst:80000,mese:600,A:2,P:0.5,prod:0.15,weeks:4,desc:'Picking guidato dalle luci: produttività +15%.',txt:'Una luce si accende sulla casella da cui prelevare e indica quanti pezzi prendere. Si va veloci e si sbaglia poco.'},
  {id:'amr',tree:'log',tier:5,row:0,req:['ptl','verticale'],name:'Robot mobili (AMR)',cost:150000,wk:21,inst:300000,mese:3000,A:1,P:1,prod:0.4,weeks:12,desc:'Robot che portano gli scaffali agli operatori: produttività +40%.',txt:'Piccoli robot girano per il magazzino e portano gli scaffali a chi prepara gli ordini. Nessuno cammina più per chilometri.'},
  {id:'gestionale',tree:'org',tier:1,row:0,name:'Gestionale amministrativo',cost:15000,wk:4,desc:'Fatture e paghe informatizzate: costi fissi −3%, ogni impiegato regge più volume.',txt:'Un unico programma per fatture, paghe e contabilità. Addio fogli Excel sparsi sulle scrivanie.'},
- {id:'regolamento',tree:'org',tier:1,row:1,name:'Regolamento aziendale',cost:8000,wk:3,desc:'Apre la finestra Policy e sblocca le prime tre: Zero straordinario, Sabato obbligatorio e Telefoni nell\'armadietto.',txt:'Un fascicolo di regole scritte e firmate, appeso in bacheca accanto alla macchinetta del caffè. Finalmente si sa chi decide cosa.'},
+ {id:'regolamento',tree:'org',tier:1,row:1,name:'Regolamento aziendale',cost:8000,wk:3,desc:'Apre le Policy (scheda della finestra Azienda e CEO) e sblocca le prime tre: Zero straordinario, Sabato obbligatorio e Telefoni nell\'armadietto.',txt:'Un fascicolo di regole scritte e firmate, appeso in bacheca accanto alla macchinetta del caffè. Finalmente si sa chi decide cosa.'},
  {id:'hr',tree:'org',tier:2,row:0,req:['gestionale'],name:'Ufficio del personale',cost:20000,wk:6,desc:'Selezione più rapida: tempi di assunzione −20%. Sblocca la policy «Niente cooperative».',txt:'Un ufficio che si occupa solo di cercare, assumere e seguire le persone.'},
  {id:'direzione',tree:'org',tier:2,row:1,req:['gestionale'],name:'Struttura direzionale',cost:50000,wk:13,desc:'Sblocca la squadra dei dirigenti: cinque direttori che guidano tutta l\'azienda.',txt:'L\'azienda smette di essere solo il CEO e qualche fedelissimo. Arrivano i direttori, ognuno con la sua area.'},
  {id:'welfare2',tree:'org',tier:3,row:0,req:['hr'],name:'Piattaforma welfare',cost:25000,wk:6,desc:'Convenzioni e acquisti in blocco: benefit aziendali −30% e canone dei servizi di welfare dei magazzini −30%.',txt:'Un portale con convenzioni e servizi per i dipendenti. Comprando in blocco si spende meno.'},
@@ -1387,7 +1411,7 @@ const TECH=[
  {id:'agile',tree:'wel',tier:2,row:2,req:['pulmino'],pol:1,name:'Lavoro agile',cost:6000,wk:3,desc:'Sblocca la policy Smart working in sede.',txt:'Portatili, VPN e un regolamento per lavorare da casa. Serve a chi in magazzino non deve toccare i pallet.'},
  {id:'corta',tree:'wel',tier:3,row:5,req:['ascolto'],pol:1,name:'Settimana corta',cost:30000,wk:9,desc:'Sblocca la policy Settimana corta.',txt:'Uno studio con lo psicologo e i sindacati su come lavorare quattro giorni senza perdere i clienti. Il risultato è una policy da accendere quando sei pronto.'}
 ];
-const TREES=[['log','Logistica','Tecnologie da installare in ogni magazzino.'],['org','Sviluppo aziendale','Organizzazione, persone e controllo: valgono per tutta l\'azienda.'],['mkt','Mercato','Accesso a nuovi clienti e gare: valgono per tutta l\'azienda.'],['wel','Welfare','Servizi per chi lavora: si ricercano una volta e poi si installano magazzino per magazzino. Alzano il morale e aiutano ad assumere.'],['cert','Certificazioni','Per magazzino (si ottengono capannone per capannone) o per tutta l\'azienda. Chiedono i clienti più esigenti: si gestiscono dalla finestra Certificazioni.']];
+const TREES=[['log','Logistica','Tecnologie da installare in ogni magazzino.'],['org','Sviluppo aziendale','Organizzazione, persone e controllo: valgono per tutta l\'azienda.'],['mkt','Mercato','Accesso a nuovi clienti e gare: valgono per tutta l\'azienda.'],['wel','Welfare','Servizi per chi lavora: si ricercano una volta e poi si installano magazzino per magazzino. Alzano il morale e aiutano ad assumere.'],['cert','Certificazioni','Per magazzino (si ottengono capannone per capannone) o per tutta l\'azienda. Chiedono i clienti più esigenti: si gestiscono dalla scheda Certificazioni della finestra Tecnologia.']];
 // benefit aziendali: valgono per tutti i dipendenti e si pagano a testa (le navette per arrivare al lavoro sono i Pulmini dell'albero Welfare)
 const WELFARE=[
  {id:'buoni',name:'Buoni pasto',cost:110,mor:5,att:6},
@@ -2057,7 +2081,7 @@ wk('fup','basi','Come si gioca',`Sei il CEO di un'azienda di logistica: tieni la
 
 Il ciclo è sempre lo stesso: vinci una [[gare|gara d'appalto]], guarda il [[carico|carico di lavoro]] dei reparti e [[assunzioni|assumi]] per tempo, tieni [[puntualita]] e [[accuratezza]] sopra le [[soglie]] del cliente e incassa. Se la [[cassa]] scende sotto i −50.000 € l'azienda fallisce.
 
-Le parole sottolineate a puntini, come [[morale]], si spiegano passandoci sopra con il mouse: cliccale per aprire la voce completa. Questa enciclopedia si apre anche con il tasto E.
+Le finestre si aprono dal [[menu]] a sinistra. Le parole sottolineate a puntini, come [[morale]], si spiegano passandoci sopra con il mouse: cliccale per aprire la voce completa. Questa enciclopedia si apre anche con il tasto E.
 
 Sul telefono: il primo tocco su una parola sottolineata mostra la spiegazione, il secondo apre la voce; tenendo premuto un pulsante si scopre a cosa serve. FUP si può installare come app dalla schermata iniziale.`);
 wk('riepilogo','basi','Riepilogo dell\'azienda',`La finestra con tutti i numeri dell'azienda in un colpo d'occhio: conti, operazioni, clienti, persone e ricerca.`,
@@ -2120,6 +2144,12 @@ wk('notifiche','basi','Notifiche',`La colonna di tessere a destra della mappa: d
 • **Sotto la riga le notizie varie**, tessere piccole raggruppate per tipo con il numero: nuove gare, assunzioni arrivate, ricerche finite, clienti, il [[report]] del lunedì. Si leggono anche aprendo la finestra di cui parlano.
 
 Quando arriva qualcosa di importante, accanto alla colonna compare per qualche secondo un cartellino con «Apri» e «Dopo»; poi resta solo la tessera, che lampeggia finché non la guardi. La X in alto a destra della schedina toglie una notizia; le notizie varie se ne vanno da sole dopo 8 settimane, le importanti dopo 12. Se le tessere non ci stanno tutte, le ultime finiscono in «+N». Tutto resta anche nel [[giornale]].`);
+wk('menu','basi','Menu',`Le voci a sinistra della mappa, divise in quattro gruppi: Operazioni, Commerciale, Azienda e Informazioni.`,
+`Ogni voce apre una finestra e dice in una riga come sta il suo reparto: in rosso i problemi (un reparto in affanno, gare aperte, clienti a rischio), in arancione le cose da sapere.
+
+Sul computer il pulsante in cima alla colonna sceglie tra il **menu largo**, con nomi e righe di stato, e **solo icone**, che lascia più spazio alla mappa: lì un quadratino rosso sull'icona segnala un problema e passandoci sopra si legge la riga. Sul telefono il menu si apre con il pulsante Menu in basso a destra.
+
+Alcune finestre hanno più **schede** in cima, ognuna con la sua icona: Magazzini e Nuovo magazzino ([[espansione]]), Clienti e [[customer_service|Customer service]], Manager e [[direzione|Direzione]], Azienda e CEO e [[policy|Policy]], Tecnologia e [[certificazioni|Certificazioni]]. Un quadratino rosso su una scheda dice che lì c'è un problema, e dal menu si apre direttamente quella. La [[classifica|Classifica]] c'è solo nelle partite con avversari.`);
 wk('giornale','basi','Il giornale',`L'archivio delle notizie: gare, contratti, ricerche concluse, scelte fatte negli eventi.`,
 `La Gazzetta del Muletto e Il Sole 24 Pallet raccontano cosa succede alla tua azienda e al mercato. Utile per ricordare chi ha vinto una [[gare|gara]] che hai perso e cosa hai deciso negli [[eventi]].`);
 wk('mappa','basi','Mappa',`Il Nord Italia in pixel art, da Nizza a Trieste: magazzini, città servite e camion in viaggio.`,
@@ -2127,7 +2157,7 @@ wk('mappa','basi','Mappa',`Il Nord Italia in pixel art, da Nizza a Trieste: maga
 
 Clicca un [[magazzino]] per aprirlo. Dalla finestra Clienti puoi mostrare sulla mappa la [[zona]] di distribuzione di un cliente e il percorso del [[ritiro]].`);
 wk('espansione','basi','Espansione',`Affittare un nuovo magazzino: due mesi di affitto anticipati più 15.000 € di allestimento.`,
-`Un nuovo [[magazzino]] parte vuoto: servono il suo [[personale]] (magazzinieri, carrellisti, impiegati, autisti e un [[facility|facility manager]]), un [[manager]] e soprattutto clienti dalle [[gare]]. Aprirlo dà +3 di [[reputazione]]. Puoi anche [[ampliamento|ampliare]] un magazzino che hai già.
+`Un nuovo [[magazzino]] parte vuoto: servono il suo [[personale]] (magazzinieri, carrellisti, impiegati, autisti e un [[facility|facility manager]]), un [[manager]] e soprattutto clienti dalle [[gare]]. Aprirlo dà +3 di [[reputazione]]. Si sceglie nella scheda Nuovo magazzino della finestra Magazzini, o toccando sulla mappa un magazzino libero. Puoi anche [[ampliamento|ampliare]] un magazzino che hai già.
 
 Conviene espandersi quando il magazzino attuale supera l'85% di [[saturazione|occupazione]] o quando una gara importante è in una zona lontana.`);
 wk('magazzino','basi','Magazzino',`Il capannone dove stanno i pallet dei clienti. Ognuno ha i suoi posti, il suo personale e le sue tecnologie.`,
@@ -2432,7 +2462,7 @@ wk('costo_azienda','pers','Costo aziendale',`Lo stipendio lordo annuo (RAL) molt
 `Quando vedi una RAL, il costo vero per l'azienda è il 42% in più, diviso per 12 mesi. Vale per tutto il [[personale]], i [[manager]] e i dirigenti.`);
 // Clienti e gare
 wk('customer_service','cli','Customer service',`Il reparto che risponde ai clienti: un responsabile e, dal quarto cliente, gli addetti in sede. Più è bravo, più i clienti restano contenti.`,
-`Si apre dal menu a sinistra. Il **responsabile** è un [[manager]] che non guida un magazzino e non siede in [[direzione|Direzione]]: lo scegli dalla finestra tra i manager senza incarico, oppure lo cerchi dalla finestra [[manager|Manager]] (pulsanti in fondo). Finché non c'è, se ne occupa il [[ceo|CEO]], ma con 10 punti di penalità: ha mille altre cose da fare.
+`È una scheda della finestra Clienti. Il **responsabile** è un [[manager]] che non guida un magazzino e non siede in [[direzione|Direzione]]: lo scegli dalla finestra tra i manager senza incarico, oppure lo cerchi dalla finestra [[manager|Manager]] (pulsanti in fondo). Finché non c'è, se ne occupa il [[ceo|CEO]], ma con 10 punti di penalità: ha mille altre cose da fare.
 
 Dal responsabile contano due abilità: Negoziazione, per calmare i clienti, e Precisione, per rispondere giusto. Contano anche i suoi [[talenti]]: alcuni sono fatti apposta per questo lavoro (Voce da call center, Risponde anche alle 23, Promette tutto).
 
@@ -2475,7 +2505,7 @@ L'overstock non si muove, ma occupa posti: sale l'[[saturazione|occupazione]] (s
 wk('addetti_cs','pers','Addetti al customer service',`In sede rispondono a mail e telefonate dei clienti. Fino a 3 clienti non servono; poi uno ogni 4 clienti.`,
 `Lavorano in sede, per tutti i magazzini. Servono da 4 clienti attivi in su: uno per i clienti dal 4° al 7°, due fino all'11°, e così via.
 
-Con la policy [[pol_dueore|Rispondiamo entro 2 ore]] ne servono il 25% in più. Ognuno che manca toglie 10 punti alla [[qualita_cs|qualità del servizio]]. Si assumono e si licenziano dalla finestra [[customer_service|Customer service]] o da quella del [[personale]], come gli altri mestieri. Costano 24.000 € lordi l'anno.`);
+Con la policy [[pol_dueore|Rispondiamo entro 2 ore]] ne servono il 25% in più. Ognuno che manca toglie 10 punti alla [[qualita_cs|qualità del servizio]]. Si assumono e si licenziano dalla scheda [[customer_service|Customer service]] della finestra Clienti o da quella del [[personale]], come gli altri mestieri. Costano 24.000 € lordi l'anno.`);
 wk('richieste_clienti','cli','Richieste dei clienti',`Ogni cliente, ogni tanto, ha un problema enorme che a guardarlo bene è una sciocchezza. Il customer service lo sistema da solo, oppure decidi tu.`,
 `Ogni cliente fa in media una richiesta ogni 7-8 mesi. Hanno un ritmo tutto loro: non tolgono spazio agli altri [[eventi]]. Metà sono drammi (qui sotto), un quarto [[picco|picchi di consegna]] e un quarto richieste di [[overstock]].
 
@@ -2729,7 +2759,7 @@ wk('report_finale','basi','Report della partita',`Il resoconto di tutta la parti
 wk('valore','eco','Valore dell\'azienda',`Cassa meno prestiti, più magazzini di proprietà e motrici, più due volte l'utile degli ultimi 12 mesi (se positivo).`,
 `È il numero che ordina la [[classifica]] e decide la [[vittoria]] «Al traguardo». I magazzini di proprietà valgono 120 € a posto pallet e le motrici 30.000 € l'una, come nel [[bilancio]]; i [[prestiti]] ancora da restituire si tolgono. L'utile conta perché chi compra un'azienda paga anche quello che guadagnerà.`);
 wk('classifica','basi','Classifica',`Le aziende in gara in ordine di valore, con cassa, fatturato, clienti, magazzini, reputazione e i progressi verso la vittoria.`,
-`Si apre dal menu (Informazioni) o toccando un magazzino avversario sulla mappa. Per ogni azienda: CEO, stile e difficoltà, [[valore]], cassa, [[ricavi|fatturato]] degli ultimi 12 mesi, clienti attivi, magazzini, [[reputazione]] e una barra per ogni [[vittoria|condizione di vittoria]] accesa. Le aziende fallite restano in fondo con la data del fallimento.`);
+`Si apre dal [[menu]] (Informazioni, solo nelle partite con avversari) o toccando un magazzino avversario sulla mappa. Per ogni azienda: CEO, stile e difficoltà, [[valore]], cassa, [[ricavi|fatturato]] degli ultimi 12 mesi, clienti attivi, magazzini, [[reputazione]] e una barra per ogni [[vittoria|condizione di vittoria]] accesa. Le aziende fallite restano in fondo con la data del fallimento.`);
 wk('tech_richieste','cli','Tecnologie e certificazioni richieste',`Alcuni clienti partecipano solo se hai già una certa ricerca o certificazione: HACCP, catena del freddo, EDI, e-commerce.`,
 `Chi tratta cibo o mangimi (anche secchi: pasta, caffè, vino, crocchette) chiede l'[[tech_haccp|HACCP]]; freschi, surgelati e farmaci la [[tech_freddo|catena del freddo]]; la grande distribuzione l'[[tech_edi|EDI]]; i negozi online la [[tech_ecom|logistica e-commerce]]. Le [[certificazioni]] di magazzino devono essere valide proprio nel magazzino che scegli per l'offerta. Senza, il pulsante dell'offerta resta spento; le gare dei negozi online non arrivano nemmeno finché non hai la logistica e-commerce.`);
 wk('audit','tech','Audit',`L'ente di certificazione controlla un magazzino (o l'azienda): passa, trova rilievi o sospende il certificato.`,
@@ -2748,9 +2778,9 @@ wk('conformita','tech','Conformità',`Quanto un magazzino è in ordine agli occh
 • facchini in cooperativa o da un fornitore: −5;
 • [[st_prec|Precisione]] di chi guida il magazzino (manager o CEO): +1,5 per ogni punto sopra 10, −1,5 sotto;
 • [[tech_iso|ISO 9001]] valida: +5.
-Per le certificazioni aziendali conta la media di tutti i magazzini. Il numero si vede nella finestra Certificazioni: toccalo per l'elenco delle voci.`);
+Per le certificazioni aziendali conta la media di tutti i magazzini. Il numero si vede nella scheda Certificazioni della finestra Tecnologia: toccalo per l'elenco delle voci.`);
 wk('certificazioni','tech','Certificazioni',`Il quinto albero: certificazioni per magazzino (HACCP, catena del freddo) e per tutta l'azienda (ISO 9001).`,
-`Le certificazioni stanno in un albero tutto loro, con la cornice a scudo azzurro, e si seguono dalla finestra **Certificazioni** del menu.
+`Le certificazioni stanno in un albero tutto loro, con la cornice a scudo azzurro, e si seguono dalla scheda **Certificazioni** della finestra Tecnologia.
 
 • **Per magazzino**: la ricerca si fa una volta, poi ogni capannone va certificato a parte. Paghi la richiesta (per la [[tech_freddo|catena del freddo]] anche celle e sonde) e dopo qualche settimana arriva il primo [[audit]]: se passa, l'ente dà il certificato. Da lì si paga un canone mensile. Sono l'[[tech_haccp|HACCP]] (igiene alimentare, per chi tratta cibo o mangimi) e la [[tech_freddo|catena del freddo]] (freschi, surgelati e farmaci; richiede l'HACCP nello stesso magazzino).
 • **Per l'azienda**: valgono ovunque appena finisce la ricerca, come la [[tech_iso|ISO 9001]]; poi passano anche loro un audit all'anno.
@@ -2780,7 +2810,7 @@ wk('costi','eco','Costi',`Personale, mezzi e gasolio, immobili, tecnologie, mana
 
 Per tutta l'azienda: interessi sui [[prestiti]], [[pianificatori]] del traffico, [[manager]] e dirigenti, compenso del [[ceo|CEO]] (4.000 € al mese), [[welfare|benefit aziendali]] e [[penali]]. Nella voce Welfare ci sono i benefit e i [[welfare_mag|servizi di welfare]] dei magazzini (installazione e canone). Le spese una tantum (assunzioni, buonuscite, aperture, cantieri) e i soldi spesi o incassati negli [[eventi]] finiscono nella voce Altro.`);
 wk('conto','eco','Conto economico',`Il riepilogo del mese scorso: ricavi meno costi, voce per voce. In fondo c'è l'utile.`,
-`Si chiude a fine mese ed è nella finestra Azienda; il numero in alto "Mese scorso" è il suo risultato e, toccandolo, mostra entrate e spese voce per voce, confrontate con il mese prima e con il mese in corso. Se l'utile è negativo per troppi mesi la [[cassa]] finisce. Vedi [[ricavi]] e [[costi]].`);
+`Si chiude a fine mese: il numero in alto "Mese scorso" è il suo risultato e, toccandolo, mostra entrate e spese voce per voce, confrontate con il mese prima e con il mese in corso. Se l'utile è negativo per troppi mesi la [[cassa]] finisce. Vedi [[ricavi]] e [[costi]].`);
 wk('prestiti','eco','Prestiti',`Soldi dalla banca da restituire a rate mensili fisse, in 2, 4 o 6 anni.`,
 `Si chiedono dalla finestra Cassa e bilancio (tocca la cassa in alto). La banca concede al massimo quattro mesi di [[ricavi]] (almeno 60.000 €), meno i prestiti già aperti.
 
@@ -2848,7 +2878,7 @@ Le tappe restano nella storia, sotto il ritratto. Vedi anche [[eta|età]] e [[pe
 wk('direzione','dir','Direzione',`Cinque posti da direttore che guidano tutta l'azienda. Si sbloccano con la ricerca Struttura direzionale.`,
 `Dopo la [[tech_direzione|Struttura direzionale]] puoi nominare un direttore per ogni area: [[dir_op|operativo]], [[dir_comm|commerciale]], [[dir_hr|risorse umane]], [[dir_fin|finanziario]] e [[dir_tech|tecnologia]]. Ognuno usa una sola [[abilita|abilità]]: sopra 10 aiuta, sotto 10 fa danni.
 
-Puoi nominare un [[manager]] già assunto che non guida un magazzino né il customer service. Manager e dirigenti sono la stessa cosa: se ti manca qualcuno forte nell'abilità giusta, chiedilo all'[[head_hunter|head hunter]].`);
+Puoi nominare un [[manager]] già assunto che non guida un magazzino né il customer service. Si nominano dalla scheda Direzione della finestra [[manager|Manager]]. Manager e dirigenti sono la stessa cosa: se ti manca qualcuno forte nell'abilità giusta, chiedilo all'[[head_hunter|head hunter]].`);
 const wikiPlain=t=>t.replace(/\[\[([^|\]]+)(?:\|([^\]]+))?\]\]/g,(m,id,l)=>l||(WIKI[id]?WIKI[id].n.toLowerCase():id));
 const DIR_TXT={op:`+0,15 di [[puntualita]] in tutti i magazzini per ogni punto di Operazioni sopra 10.`,comm:`+0,8 al punteggio di ogni [[gare|gara]] per ogni punto di Negoziazione sopra 10.`,
  hr:`+0,3 di [[morale]] obiettivo ovunque e −2% sui tempi di [[assunzioni|assunzione]] e dell'[[head_hunter|head hunter]] per ogni punto di Leadership sopra 10. Con lui l'head hunter può fare due ricerche insieme e nella [[trattativa]] conta la sua Negoziazione, se è più alta di quella del CEO.`,fin:`−0,5% sui [[costi]] fissi dei magazzini e −0,1 punti sul tasso dei [[prestiti]] per ogni punto di Amministrazione sopra 10.`,
@@ -2856,7 +2886,7 @@ const DIR_TXT={op:`+0,15 di [[puntualita]] in tutti i magazzini per ogni punto d
 DIR_ROLES.forEach(r=>wk('dir_'+r.id,'dir',r.name,`Usa ${r.statN}. ${wikiPlain(DIR_TXT[r.id])}`,`${DIR_TXT[r.id]}\n\nSotto 10 l'effetto è al contrario. Fa parte della [[direzione]].`,sz=>statIcon(r.stat,sz)));
 // Policy aziendali
 wk('policy','pol','Policy aziendali',`Regole che accendi o spegni per tutta l'azienda: ognuna ha un lato buono e uno cattivo.`,
-`Le policy si gestiscono dalla finestra Policy, che si apre con la ricerca [[tech_regolamento|Regolamento aziendale]] (Sviluppo aziendale). Le prime tre arrivano subito; le altre si sbloccano con altre tecnologie, comprese due dell'albero Welfare: [[tech_agile|Lavoro agile]] e [[tech_corta|Settimana corta]].
+`Le policy si gestiscono dalla scheda Policy della finestra Azienda e CEO, che si apre con la ricerca [[tech_regolamento|Regolamento aziendale]] (Sviluppo aziendale). Le prime tre arrivano subito; le altre si sbloccano con altre tecnologie, comprese due dell'albero Welfare: [[tech_agile|Lavoro agile]] e [[tech_corta|Settimana corta]].
 
 Si possono accendere tutte quelle sbloccate, ma alcune sono opposte: [[pol_zerostra|Zero straordinario]] e [[pol_sabato|Sabato obbligatorio]] non stanno accese insieme. Dopo ogni cambio servono ${wks(POL_CD)} prima di cambiare di nuovo la stessa policy: niente regole accese il lunedì e spente il venerdì.
 
@@ -3424,7 +3454,7 @@ function certAudit(w,t,kind,roll){
   } else {
     it.susp=S.day; it.nc=null;
     notify('red','certificazioni','Ente di certificazione',kind==='init'&&it.iss==null?`${t.name}: primo audit non superato${where}`:`${t.name} sospeso${where}`,
-      `Troppe cose fuori posto${why}: conformità ${Math.round(C)}. ${it.iss==null?'Il certificato non viene rilasciato.':'Finché è sospeso, i clienti che lo chiedono perdono soddisfazione ogni mese.'} Sistema il magazzino e chiedi un audit straordinario dalla finestra Certificazioni.`,'certificazioni',sel,certKey(w,t));
+      `Troppe cose fuori posto${why}: conformità ${Math.round(C)}. ${it.iss==null?'Il certificato non viene rilasciato.':'Finché è sospeso, i clienti che lo chiedono perdono soddisfazione ogni mese.'} Sistema il magazzino e chiedi un audit straordinario dalla scheda Certificazioni.`,'certificazioni',sel,certKey(w,t));
     if(it.iss!=null) news('Il Sole 24 Pallet',`${S.company.name}: sospesa la certificazione ${t.name}`,`L'ente ha sospeso il certificato${where} dopo un audit andato male.`);
   }
   return sc;
@@ -3440,12 +3470,12 @@ function certDaily(){
     if(it.nc!=null&&S.bot&&S.cash>certFee(t)+60000){ S.cash-=certFee(t); S.cur.tech+=certFee(t); it.nc=null; }
     if(it.nc!=null&&S.day>=it.nc){
       if(confOf(w).v>=AUD.ok){ it.nc=null; notify('green','certificazioni','Ente di certificazione',`${t.name}: rilievi chiusi${where}`,'La conformità è tornata a posto: l\'ente chiude i rilievi.','certificazioni',sel,certKey(w,t)); }
-      else { it.susp=S.day; it.nc=null; notify('red','certificazioni','Ente di certificazione',`${t.name} sospeso${where}`,'I rilievi non sono stati chiusi in tempo. Finché è sospeso, i clienti che lo chiedono perdono soddisfazione ogni mese: chiedi un audit straordinario dalla finestra Certificazioni.','certificazioni',sel,certKey(w,t)); }
+      else { it.susp=S.day; it.nc=null; notify('red','certificazioni','Ente di certificazione',`${t.name} sospeso${where}`,'I rilievi non sono stati chiusi in tempo. Finché è sospeso, i clienti che lo chiedono perdono soddisfazione ogni mese: chiedi un audit straordinario dalla scheda Certificazioni.','certificazioni',sel,certKey(w,t)); }
       return; }
     if(S.day>=it.next){ certAudit(w,t,it.next>=it.exp?'renew':'year'); return; }
     if(S.bot&&!it.prep&&it.next-S.day<=AUD.warn&&S.cash>certFee(t)+100000){ S.cash-=certFee(t); S.cur.tech+=certFee(t); it.prep=true; }
     if(it.next-S.day===AUD.warn) notify('yellow','certificazioni','Ente di certificazione',`${t.name}: audit ${it.next>=it.exp?'di rinnovo':'annuale'} tra 2 settimane${where}`,
-      `Conformità di oggi: ${Math.round(confOf(w).v)}. Puoi prepararlo (consulente e pulizie straordinarie: +${AUD.prep} al punteggio) dalla finestra Certificazioni.`,'certificazioni',sel,certKey(w,t));
+      `Conformità di oggi: ${Math.round(confOf(w).v)}. Puoi prepararlo (consulente e pulizie straordinarie: +${AUD.prep} al punteggio) dalla scheda Certificazioni della finestra Tecnologia.`,'certificazioni',sel,certKey(w,t));
   };
   TECH.forEach(t=>{ if(t.tree!=='cert') return; if(t.site) S.warehouses.forEach(w=>one(w,t)); else if(R(t.id)) one(null,t); });
 }
@@ -3749,9 +3779,9 @@ function step(){
   if(S.project){ S.project.left--; if(S.project.left<=0){ const t=TECH.find(x=>x.id===S.project.tech); S.project=null; S.researched[t.id]=true; chron('tecnologia',`Ricerca completata: ${t.name}`);
     if(t.id==='iso'||t.id==='marketing') S.rep=clamp(S.rep+5,0,100);
     if(t.tree==='cert'&&!t.site){ if(!S.certCo) S.certCo={}; S.certCo[t.id]=certNew(S.day); }
-    news('La Gazzetta del Muletto',`Ricerca completata: ${t.name}`,t.tree==='cert'&&t.site?'Ora si può ottenere nei magazzini dalla finestra Certificazioni.':perWh(t)?'Ora si può installare nei magazzini dalla finestra Tecnologia.':t.desc);
-    if(t.id==='direzione') notify('green','direzione','La Gazzetta del Muletto','Nasce la squadra dei dirigenti','La struttura direzionale è pronta. Dal menu Direzione nomina fino a cinque direttori: ognuno guida un\'area di tutta l\'azienda con la sua abilità principale.','direzione');
-    else if(t.tree==='cert'&&t.site) notify('green','certificazioni','Ufficio ricerca',`Ricerca completata: ${t.name}`,'Ora va ottenuta in ogni magazzino che serve i clienti che la chiedono: scegli dove nella finestra Certificazioni.','certificazioni',{ctab:'mag'},'techdone');
+    news('La Gazzetta del Muletto',`Ricerca completata: ${t.name}`,t.tree==='cert'&&t.site?'Ora si può ottenere nei magazzini dalla scheda Certificazioni.':perWh(t)?'Ora si può installare nei magazzini dalla finestra Tecnologia.':t.desc);
+    if(t.id==='direzione') notify('green','direzione','La Gazzetta del Muletto','Nasce la squadra dei dirigenti','La struttura direzionale è pronta. Nella scheda Direzione della finestra Manager nomina fino a cinque direttori: ognuno guida un\'area di tutta l\'azienda con la sua abilità principale.','direzione');
+    else if(t.tree==='cert'&&t.site) notify('green','certificazioni','Ufficio ricerca',`Ricerca completata: ${t.name}`,'Ora va ottenuta in ogni magazzino che serve i clienti che la chiedono: scegli dove nella scheda Certificazioni.','certificazioni',{ctab:'mag'},'techdone');
     else notify('green','tecnologia','Ufficio ricerca',`Ricerca completata: ${t.name}`,perWh(t)?'Ora va installata nei magazzini: apri la tecnologia e scegli dove.':t.desc,'tecnologia',{tree:t.tree,tech:t.id},'techdone'); } }
   // certificazioni: audit, rilievi e scadenze
   certDaily();
@@ -5525,7 +5555,7 @@ function noteAlerts(){
   if(shL.length) a.push({id:'short',col:'red',ic:'magazzini',title:shL.length===1?`Reparto in affanno a ${shL[0].name}`:`Reparti in affanno in ${shL.length} magazzini`,text:'Il personale non basta per il lavoro di oggi: puntualità e accuratezza scendono. Assumi dalla finestra del magazzino.',win:'magazzini',sel:{wh:shL[0].id}});
   const noFm=sh.filter(w=>!shL.includes(w));
   if(noFm.length) a.push({id:'fm',col:'red',ic:'magazzini',title:noFm.length===1?`Manca il facility manager a ${noFm[0].name}`:`Manca il facility manager in ${noFm.length} magazzini`,text:'Senza facility manager nessuno fa manutenzione: lo stato dell\'immobile scende e prima o poi arriva un guasto. Assumilo dalla finestra del magazzino.',win:'magazzini',sel:{wh:noFm[0].id}});
-  if(csLoad()>1.02) a.push({id:'cs',col:'yellow',ic:'customer',title:'Customer service sotto organico',text:'Gli addetti non bastano per i clienti di oggi: la qualità del servizio scende. Assumine uno dalla finestra Customer service.',win:'customer'});
+  if(csLoad()>1.02) a.push({id:'cs',col:'yellow',ic:'customer',title:'Customer service sotto organico',text:'Gli addetti non bastano per i clienti di oggi: la qualità del servizio scende. Assumine uno dalla scheda Customer service della finestra Clienti.',win:'customer'});
   if(planLoad()>1.02) a.push({id:'plan',col:'red',ic:'traffico',title:'Pianificatori del traffico in affanno',text:'In sede non bastano per i viaggi di oggi: assumine uno dalla finestra Personale.',win:'personale'});
   const q=staffPeople().filter(p=>p.quit&&!p.quit.ret), u=staffPeople().filter(p=>!p.quit&&(p.unh||0)>=20);
   if(q.length) a.push({id:'quit',col:'red',ic:'personale',title:q.length===1?`${q[0].name} sta per andarsene`:`${q.length} persone stanno per andarsene`,text:q.length===1?`Ha dato le dimissioni: lascia l'azienda il ${shortDate(q[0].quit.day)}.`:'Hanno dato le dimissioni: trovi i nomi nella finestra Personale.',win:'personale'});
@@ -5537,7 +5567,7 @@ function noteAlerts(){
     if(T) a.push({id:'tav',col:'yellow',ic:'sindacato',title:`Tavolo aperto a ${(whById(T.wh)||{}).name}`,text:`Il sindacato aspetta le tue concessioni: prossima seduta il ${shortDate(T.next)}.`,win:'sindacato',sel:{ritab:'tav'}}); }
   if(!S.project&&TECH.some(techOpen)) a.push({id:'research',col:'yellow',ic:'tecnologia',title:'Nessuna ricerca in corso',text:'L\'ufficio ricerca è fermo: scegli la prossima tecnologia da studiare.',win:'tecnologia'});
   // posti liberi in Direzione: l'avviso compare solo se c'è un manager senza incarico da nominare
-  if(R('direzione')&&Object.values(S.dirs).some(v=>!v)&&S.managers.some(m=>m.hired&&!m.wh&&!seatOf(m.id)&&!isCs(m.id))) a.push({id:'dir',col:'yellow',ic:'direzione',title:'Posti da dirigente liberi',text:'Hai un manager senza incarico: nella finestra Direzione puoi nominarlo direttore.',win:'direzione'});
+  if(R('direzione')&&Object.values(S.dirs).some(v=>!v)&&S.managers.some(m=>m.hired&&!m.wh&&!seatOf(m.id)&&!isCs(m.id))) a.push({id:'dir',col:'yellow',ic:'direzione',title:'Posti da dirigente liberi',text:'Hai un manager senza incarico: nella scheda Direzione della finestra Manager puoi nominarlo direttore.',win:'direzione'});
   return a;
 }
 const winLbl=w=>`Apri «${TITLES[w]||w}»`;
@@ -5989,29 +6019,68 @@ const DOCK=[
  ['enciclopedia','Enciclopedia (tasto E)','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="1" y="0" width="9" height="10" fill="#9b6bff"/><rect x="1" y="0" width="2" height="10" fill="#6f43cf"/><rect x="3" y="9" width="7" height="2" fill="#fff"/><rect x="5" y="2" width="3" height="1" fill="#ffd23f"/><rect x="7" y="3" width="1" height="2" fill="#ffd23f"/><rect x="6" y="5" width="1" height="1" fill="#ffd23f"/><rect x="6" y="7" width="1" height="1" fill="#ffd23f"/></svg>'],
  ['giornale','Il giornale','<svg width="24" height="20" viewBox="0 0 12 10" shape-rendering="crispEdges"><rect x="0" y="0" width="12" height="10" fill="#f4f1ec"/><rect x="1" y="1" width="10" height="2" fill="#16202e"/><rect x="1" y="4" width="4" height="4" fill="#8a96a6"/><rect x="6" y="4" width="5" height="1" fill="#16202e"/><rect x="6" y="6" width="5" height="1" fill="#16202e"/></svg>']
 ];
-const TITLES={sindacato:'Relazioni industriali',finale:'Report della partita',classifica:'Classifica',policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',traffico:'Ufficio traffico',customer:'Customer service',personale:'Personale',manager:'Manager e head hunter',tecnologia:'Tecnologia',certificazioni:'Certificazioni',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP',cassa:'Cassa e bilancio',mese:'Conti del mese scorso',morale:'Morale dei dipendenti',otif:'OTIF e livelli di servizio'};
-// sul telefono il menu è raggruppato e ogni voce dice in una riga come sta il suo reparto
-const DOCK_G=[['Operazioni',['magazzini','traffico','personale','manager','clienti','customer','gare','espansione']],['Azienda',['azienda','riepilogo','direzione','sindacato','policy','tecnologia','certificazioni']],['Informazioni',['classifica','report','enciclopedia','giornale']]];
+const TITLES={sindacato:'Relazioni industriali',finale:'Report della partita',classifica:'Classifica',policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',traffico:'Ufficio traffico',customer:'Customer service',personale:'Personale',manager:'Manager e direzione',tecnologia:'Tecnologia',certificazioni:'Certificazioni',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP',cassa:'Cassa e bilancio',mese:'Conti del mese scorso',morale:'Morale dei dipendenti',otif:'OTIF e livelli di servizio'};
+// menu a gruppi, uguale su computer e telefono: ogni voce dice in una riga come sta il suo reparto
+const DOCK_G=[['Operazioni',['magazzini','traffico','personale']],['Commerciale',['clienti','gare']],['Azienda',['azienda','manager','tecnologia','sindacato']],['Informazioni',['report','riepilogo','classifica','giornale','enciclopedia']]];
+// finestre unite: le voci di una volta sono schede della finestra madre, con la loro icona del menu
+const WTABS={magazzini:[['magazzini','Magazzini'],['espansione','Nuovo magazzino']],clienti:[['clienti','Clienti'],['customer','Customer service']],
+  manager:[['manager','Manager'],['direzione','Direzione']],azienda:[['azienda','CEO e benefit'],['policy','Policy']],tecnologia:[['tecnologia','Ricerca'],['certificazioni','Certificazioni']]};
+const WIN_IN=Object.fromEntries(Object.entries(WTABS).flatMap(([p,l])=>l.slice(1).map(([c])=>[c,p])));
+const winOf=id=>WIN_IN[id]||id;
+const wtabOf=p=>{const l=WTABS[p], c=(UI.sel.wt||{})[p]; return l&&l.some(x=>x[0]===c)?c:p;};
+const WLOCK={direzione:()=>!R('direzione'),policy:()=>!R('regolamento')};   // schede chiuse finché manca la ricerca
 DOCK.forEach(d=>{if(ICONE.menu[d[0]])d[2]=pxSvg(ICONE.menu[d[0]],32);});  // icone 16x16 a 32 px (tools/icone_gioco)
 const PPB_PAUSE=`<svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="1" width="2" height="6" fill="currentColor"/><rect x="5" y="1" width="2" height="6" fill="currentColor"/></svg>`,
   PPB_PLAY=`<svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path d="M2 0h1v1h1v1h1v1h1v2h-1v1h-1v1h-1v1h-1z" fill="currentColor"/></svg>`;
 function setMenu(on){UI.menu=!!on&&MOB; document.documentElement.classList.toggle('menu',UI.menu); const b=$('#burger'); if(b){b.setAttribute('aria-expanded',String(UI.menu)); b.setAttribute('aria-label',UI.menu?'Chiudi il menu':'Apri il menu');}}
+// riga di stato di una voce del menu o di una scheda: [colore, testo]; bad = c'è un problema
+const DNOTE={
+  magazzini:()=>S.warehouses.some(w=>w.kpi&&overloaded(w,w.kpi))?['bad','Un reparto è in affanno']:['mut',S.warehouses.length===1?'1 magazzino':S.warehouses.length+' magazzini'],
+  traffico:()=>{const k=S.warehouses.map(w=>w.kpi).filter(Boolean); return k.length?['mut',`Camion pieni al ${Math.round(k.reduce((a,x)=>a+x.satM,0)/k.length)}%`]:null;},
+  personale:()=>planLoad()>1.02?['bad','Pianificatori del traffico in affanno']:['mut',S.warehouses.reduce((a,w)=>a+staffTot(w),0)+S.office.plan+S.office.cs+' dipendenti'],
+  clienti:()=>{const on=S.clients.filter(c=>c.status==='attivo'), r=on.filter(cliAtRisk).length;
+    return r?['bad',r===1?'1 cliente a rischio':r+' clienti a rischio']:['mut',!on.length?'Nessun cliente, per ora':on.length===1?'1 cliente attivo':on.length+' clienti attivi'];},
+  customer:()=>csLoad()>1.02?['bad','Mancano addetti']:['acc','Qualità del servizio '+csQ()],
+  gare:()=>{const n=S.tenders.filter(t=>!t.done&&!t.bid).length; return n?['bad',n===1?'1 gara aperta':n+' gare aperte']:null;},
+  azienda:()=>{const C=ceo(); return C.retDay!=null?['acc','Il CEO va in pensione il '+shortDate(C.retDay)]:['mut',C.name];},
+  policy:()=>{const P=staffPeople(); return P.some(p=>p.quit&&!p.quit.ret)?['bad','Un manager ha dato le dimissioni']:P.some(p=>!p.quit&&(p.unh||0)>=20)?['acc','Un manager è scontento delle policy']:!R('regolamento')?['mut','Si sblocca con la ricerca Regolamento aziendale']:null;},
+  manager:()=>mgrNote(),
+  direzione:()=>!R('direzione')?['mut','Si sblocca con la ricerca Struttura direzionale']:Object.values(S.dirs).some(v=>!v)?['bad','Ci sono posti da dirigente liberi']:null,
+  tecnologia:()=>S.project?['acc','Ricerca in corso: ancora '+wks(S.project.left)]:['acc','Nessuna ricerca in corso'],
+  certificazioni:()=>certNote(),
+  sindacato:()=>riDockNote(),
+  report:()=>S.repNew?['acc','Nuovo report del lunedì']:['mut','Arriva ogni lunedì'],
+  classifica:()=>rivals().length?['acc',HUM.won?'Partita finita':`Sei ${allCo().filter(c=>!c.over).sort((a,b)=>coValue(b)-coValue(a)).indexOf(HUM)+1}° su ${liveCo().length}`]:null,
+  enciclopedia:()=>TOUCH?null:['mut','Si apre anche con il tasto E']};
+const dockNote1=id=>DNOTE[id]?DNOTE[id]():null;
+// voce con più schede: prima un problema di una scheda qualsiasi, poi la riga della voce, poi quella di una scheda ([..., scheda])
+function dockNote(id){ const ns=(WTABS[id]||[[id]]).map(([c])=>{const n=dockNote1(c); return n&&[n[0],n[1],c];}).filter(Boolean);
+  return ns.find(n=>n[0]==='bad')||ns.find(n=>n[2]===id)||ns.find(n=>n[0]!=='mut')||null; }
+// dal menu si apre la scheda con il problema, se ce n'è uno
+const dockGo=id=>{const n=dockNote(id); return n&&n[0]==='bad'?n[2]:id;};
+// sul computer il menu può essere largo (nomi e righe di stato) o solo icone; la scelta resta in questo browser
+let DOCKW=null;
+function dockWide(){ if(DOCKW==null){ let v=null; try{v=localStorage.getItem('fup-menu-largo');}catch(e){} DOCKW=v==null?innerWidth>=1280&&innerHeight>=760:v==='1'; } return DOCKW; }
+const chevSvg=d=>`<svg width="14" height="10" viewBox="0 0 7 5" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor">${[1,2,3,2,1].map((w,y)=>[0,4].map(x=>`<rect x="${d>0?x:x+3-w}" y="${y}" width="${w}" height="1"/>`).join('')).join('')}</svg>`;
 function renderDock(){
-  const openT=S.tenders.filter(t=>!t.done&&!t.bid).length;
-  const short=S.warehouses.filter(w=>w.kpi&&overloaded(w,w.kpi)).length;
-  const planS=planLoad()>1.02?1:0;
-  const B={gare:openT,magazzini:short,personale:planS,policy:staffPeople().filter(p=>p.quit&&!p.quit.ret).length,polU:staffPeople().filter(p=>!p.quit&&(p.unh||0)>=20).length};
-  const dirFree=R('direzione')&&Object.values(S.dirs).some(v=>!v);
   document.documentElement.classList.toggle('haswin',Object.keys(UI.open).length>0);  // sul telefono le lenti si nascondono sotto le finestre
-  const note=id=>id==='sindacato'?riDockNote():id==='magazzini'&&short?['bad','Un reparto è in affanno']:id==='personale'&&planS?['bad','Pianificatori del traffico in affanno']:id==='customer'?(csLoad()>1.02?['bad','Mancano addetti']:['acc','Qualità del servizio '+csQ()]):id==='manager'?mgrNote():id==='gare'&&openT?['bad',openT===1?'1 gara aperta':openT+' gare aperte']:
-    id==='tecnologia'&&S.project?['acc','Ricerca in corso: ancora '+wks(S.project.left)]:id==='certificazioni'?certNote():id==='direzione'&&!R('direzione')?['mut','Si sblocca con la ricerca Struttura direzionale']:id==='direzione'&&dirFree?['bad','Ci sono posti da dirigente liberi']:
-    id==='policy'&&B.policy?['bad','Un manager ha dato le dimissioni']:id==='policy'&&B.polU?['acc','Un manager è scontento delle policy']:id==='policy'&&!R('regolamento')?['mut','Si sblocca con la ricerca Regolamento aziendale']:id==='report'&&S.repNew?['acc','Nuovo report del lunedì']:id==='classifica'&&rivals().length?['acc',HUM.won?'Partita finita':`Sei ${allCo().filter(c=>!c.over).sort((a,b)=>coValue(b)-coValue(a)).indexOf(HUM)+1}° su ${liveCo().length}`]:null;
-  const btn=([id,t,ic])=>{const n=note(id);
-    return `<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(t)}" data-tip="<div class='tt'>${esc(t)}</div>${n?esc(n[1]):''}"><span class="di">${ic}${id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${Math.ceil(S.project.left/7)}</span>`:''}</span><span class="dl"><b>${esc(t.replace(' (tasto E)',''))}</b>${n?`<small class="${n[0]}">${esc(n[1])}</small>`:''}</span></button>`;};
-  const D=Object.fromEntries(DOCK.map(x=>[x[0],x]));
-  const vis=id=>id!=='sindacato'||riOn();   // la voce del pacchetto c'è solo nelle partite che lo hanno
-  $('#dock').innerHTML=MOB?`<div class="dh"><b>Menu</b><button class="xbtn" data-act="menu" aria-label="Chiudi il menu">x</button></div>`+DOCK_G.map(([g,ids])=>`<div class="dg">${g}</div>`+ids.filter(vis).map(id=>btn(D[id])).join('')).join(''):DOCK.filter(d=>vis(d[0])).map(btn).join('');
+  const D=Object.fromEntries(DOCK.map(x=>[x[0],x])), wide=!MOB&&dockWide();
+  const vis=id=>id==='sindacato'?riOn():id==='classifica'?rivals().length>0:true;   // pacchetto e classifica solo nelle partite che li hanno
+  const btn=id=>{const [,t,ic]=D[id], n=dockNote(id), tn=t.replace(' (tasto E)','');
+    const mark=id==='tecnologia'&&S.project?`<span class="badge" style="background:var(--accent);color:var(--ink)">${Math.ceil(S.project.left/7)}</span>`:!MOB&&!wide&&n&&n[0]==='bad'?'<i class="dot"></i>':'';
+    return `<button class="${UI.open[id]?'on':''}" data-act="toggle" data-id="${id}" aria-label="${esc(tn)}"${wide?'':` data-tip="<div class='tt'>${esc(t)}</div>${n?esc(n[1]):''}"`}><span class="di">${ic}${mark}</span><span class="dl"><b>${esc(tn)}</b>${n?`<small class="${n[0]}">${esc(n[1])}</small>`:''}</span></button>`;};
+  const groups=DOCK_G.map(([g,ids])=>`<div class="dg">${g}</div>`+ids.filter(vis).map(btn).join('')).join('');
+  const dk=$('#dock'); dk.classList.toggle('wide',wide);
+  dk.innerHTML=MOB?`<div class="dh"><b>Menu</b><button class="xbtn" data-act="menu" aria-label="Chiudi il menu">x</button></div>`+groups
+    :`<button class="dtog" data-act="dockw" aria-pressed="${wide}" aria-label="${wide?'Menu solo a icone':'Menu con nomi e stato dei reparti'}"${wide?'':` data-tip="<div class='tt'>Allarga il menu</div>Mostra i nomi delle voci e come sta ogni reparto."`}>${wide?chevSvg(-1)+'<span>Solo icone</span>':chevSvg(1)}</button>`+groups;
 }
+// allargando il menu le finestre che finirebbero sotto si spostano a destra
+function dockMoveWins(){ if(MOB) return; const r=Math.round($('#dock').getBoundingClientRect().right+12);
+  Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id); if(el&&el.offsetLeft<r){const x=Math.max(0,Math.min(r,innerWidth-el.offsetWidth-16)); el.style.left=x+'px'; UI.pos[id]={x,y:el.offsetTop};}}); }
+// schede in cima a una finestra unita: icona della vecchia voce, pallino rosso se lì c'è un problema
+function wtabsHtml(p){ const cur=wtabOf(p);
+  return WTABS[p].map(([c,n])=>{const nt=dockNote1(c), lk=WLOCK[c]&&WLOCK[c]();
+    return `<button role="tab" aria-selected="${c===cur}" data-act="wtab" data-p="${p}" data-id="${c}"${lk?' class="lk"':''}${nt?` data-tip="<div class='tt'>${esc(n)}</div>${esc(nt[1])}"`:''}>${pxSvg(ICONE.menu[c],32)}<span>${esc(n)}</span>${nt&&nt[0]==='bad'&&c!==cur?'<i class="dot"></i>':''}</button>`;}).join(''); }
 // riga di stato della finestra Manager: controproposte, ricerche dell'head hunter, profili, arrivi
 function mgrNote(){ const N=Object.values(negs()), h=hhList(), c=cands().length, a=S.managers.filter(p=>p.arr!=null).length;
   return N.some(n=>n.counter&&n.day==null)?['bad','Una controproposta aspetta']:h.length?['acc','Head hunter al lavoro: ancora '+wks(Math.min(...h.map(x=>x.end))-S.day)]:c?['acc',c===1?'1 profilo dell\'head hunter':c+' profili dell\'head hunter']:a?['acc',a===1?'1 manager in arrivo':a+' manager in arrivo']:['mut','3 candidati in cerca di lavoro']; }
@@ -6046,15 +6115,18 @@ function renderTop(){
   renderNotes();
 }
 function openWin(id,opts){
-  UI.open[id]=true; if(opts) Object.assign(UI.sel,opts); noteSeenWin(id);
+  noteSeenWin(id);
+  if(WTABS[winOf(id)]){ (UI.sel.wt=UI.sel.wt||{})[winOf(id)]=id; id=winOf(id); }   // una vecchia voce apre la sua scheda
+  UI.open[id]=true; if(opts) Object.assign(UI.sel,opts);
   let el=document.getElementById('win-'+id);
   if(!el){
     el=document.createElement('section'); el.className='win'+(id==='enciclopedia'?' wkw':id==='tecnologia'||id==='report'||id==='riepilogo'||id==='finale'?' xwide':['magazzini','gare','azienda','direzione','manager','certificazioni','cassa','mese','morale','otif','classifica','sindacato'].includes(id)?' wide':''); el.id='win-'+id;
     el.setAttribute('aria-label',TITLES[id]);
-    const i=Object.keys(UI.pos).length; const p=UI.pos[id]||{x:Math.min(innerWidth-420,90+((i*36)%240)),y:86+((i*30)%180)};
-    if(id==='magazzini'||id==='gare'){p.x=Math.max(90,innerWidth-680);} if(id==='enciclopedia'){p.x=Math.max(90,innerWidth-900);p.y=86;} if(id==='tecnologia'){p.x=90;}
+    const i=Object.keys(UI.pos).length, L=MOB?90:Math.round(($('#dock').getBoundingClientRect().right||78)+12);   // a destra del menu
+    const p=UI.pos[id]||{x:Math.min(innerWidth-420,L+((i*36)%240)),y:86+((i*30)%180)};
+    if(id==='magazzini'||id==='gare'){p.x=Math.max(L,innerWidth-680);} if(id==='enciclopedia'){p.x=Math.max(L,innerWidth-900);p.y=86;} if(id==='tecnologia'){p.x=L;}
     UI.pos[id]=p; el.style.left=p.x+'px'; el.style.top=p.y+'px';
-    el.innerHTML=`<header class="win-h"><span class="grip"></span><h2>${TITLES[id]}</h2><button class="xbtn" data-act="close" data-id="${id}" aria-label="Chiudi">x</button></header><div class="win-b"></div>`;
+    el.innerHTML=`<header class="win-h"><span class="grip"></span><h2>${TITLES[id]}</h2><button class="xbtn" data-act="close" data-id="${id}" aria-label="Chiudi">x</button></header>${WTABS[id]?'<nav class="win-t" role="tablist" aria-label="Schede"></nav>':''}<div class="win-b"></div>`;
     $('#wins').appendChild(el); makeDraggable(el,id);
     const mx=Math.max(0,innerWidth-el.offsetWidth-16); if(p.x>mx){p.x=mx;el.style.left=p.x+'px';}
     el.style.zIndex=++UI.z; renderWin(id); renderDock(); fitWin(el,id,true); return;
@@ -6066,13 +6138,13 @@ function openWin(id,opts){
 function fitWin(el,id,move){
   if(MOB){el.style.maxHeight='';return;}
   const TOP=64, GAP=12;
-  if(move){const nat=el.querySelector('.win-h').offsetHeight+el.querySelector('.win-b').scrollHeight+8;
+  if(move){const nat=el.querySelector('.win-h').offsetHeight+((el.querySelector('.win-t')||{}).offsetHeight||0)+el.querySelector('.win-b').scrollHeight+8;
     const y=Math.max(TOP,Math.min(el.offsetTop,innerHeight-GAP-nat)); el.style.top=y+'px'; UI.pos[id]={x:el.offsetLeft,y};}
   if(el.offsetTop>innerHeight-180){const y=Math.max(TOP,innerHeight-180); el.style.top=y+'px'; UI.pos[id]={x:el.offsetLeft,y};}
   el.style.maxHeight=Math.max(160,innerHeight-el.offsetTop-GAP)+'px';
 }
 function fitAllWins(){Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id);if(el)fitWin(el,id);});}
-function closeWin(id){delete UI.open[id];const el=document.getElementById('win-'+id);if(el)el.remove();renderDock();}
+function closeWin(id){id=winOf(id);delete UI.open[id];const el=document.getElementById('win-'+id);if(el)el.remove();renderDock();}
 function makeDraggable(el,id){
   const h=el.querySelector('.win-h'); let d=null;
   el.addEventListener('pointerdown',()=>{el.style.zIndex=++UI.z;});
@@ -6080,7 +6152,8 @@ function makeDraggable(el,id){
   h.addEventListener('pointermove',e=>{if(!d)return;const x=clamp(d.l+e.clientX-d.x,0,innerWidth-80),y=clamp(d.t+e.clientY-d.y,56,innerHeight-180);el.style.left=x+'px';el.style.top=y+'px';UI.pos[id]={x,y};fitWin(el,id);});
   h.addEventListener('pointerup',()=>d=null);
 }
-function renderWin(id){const el=document.getElementById('win-'+id);if(!el)return;const b=el.querySelector('.win-b');const st=b.scrollTop;b.innerHTML=(VIEWS[id]||(()=>''))();b.scrollTop=st;}
+function renderWin(id){id=winOf(id);const el=document.getElementById('win-'+id);if(!el)return;const t=el.querySelector('.win-t');if(t)t.innerHTML=wtabsHtml(id);
+  const b=el.querySelector('.win-b');const st=b.scrollTop;b.innerHTML=(VIEWS[wtabOf(id)]||(()=>''))();b.scrollTop=st;}
 // ricalcola subito i KPI dei magazzini (cambio di manager, dirigenti, personale): senza, in pausa resterebbero quelli di ieri
 function kpiNow(){ if(S&&S.warehouses) S.warehouses.forEach(w=>w.kpi=computeWH(w)); }
 function renderAll(){renderTop();const ae=document.activeElement;Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id);if(el&&ae&&el.contains(ae)&&ae.matches('select,input'))return;if(id==='enciclopedia')return;if(id!=='gare'||!UI.bidEditing)renderWin(id);});renderDock();layoutVars();}
@@ -6092,6 +6165,8 @@ function satObjTxt(sm){
   return `<div class="sm ok" data-tip="${tip}">Obiettivo raggiunto: camion pieni al ${Math.round(sm.val)}%${sm.val>sm.obj+1?', il personale fa anche meglio':''}. In cambio la ${kw('puntualita','puntualità')} perde ${f1(0.06*sm.push)}.</div>`;
 }
 const kpiCls=(v,s)=>s==null?'ok':v>=s?'ok':v>=s-2?'warn':'bad';
+// cliente attivo a rischio: puntualità o accuratezza sotto soglia, o soddisfazione da rinnovo a rischio
+function cliAtRisk(c){ const w=whById(c.wh), k=w.kpi||computeWH(w); return kpiCls(k.P,c.sP)==='bad'||(!!c.sA&&kpiCls(k.A,c.sA)==='bad')||c.sat<(R('kam')?40:50); }
 const barColor=v=>v>=0.85?'var(--bad)':v>=0.7?'var(--warn)':'var(--ok)';
 function tipParts(title,parts,unit){return `<div class='tt'>${esc(title)}</div>`+parts.map(([n,v])=>`<div class='tr'><span>${esc(n)}</span><span>${n==='Base'?f1(v):(v>=0?'+':'')+f1(v)}${unit||''}</span></div>`).join('');}
 
@@ -6195,8 +6270,7 @@ function csRow(){ const n=csNeed(), l=csLoad(), q=S.queue.filter(x=>x.role==='cs
 const CS_HOW={auto:'sistemato dal customer service',manager:'è andato il manager',mail:'risposta per mail',ceo:'ha chiamato il CEO',nessuno:'nessuno ha risposto',tutto:'accettato tutto',supplemento:'con supplemento',meta:'accettato a metà',rifiuto:'rifiutato',magazzino:'accettato',lontano:'troppo lontano, rinuncia',pieno:'nessun magazzino libero',proroga:'prorogato',ritiro:'ritirato'};
 const VIEWS={
  azienda(){
-  const C=ceo(), L=S.last;
-    const pl=L?[[kw('ricavi','Ricavi'),L.ric],[kw('costi','Personale'),-L.pers],[kw('costi','Mezzi e gasolio'),-L.mezzi],[kw('costi','Immobili e fissi'),-L.fissi],[kw('costi','Tecnologie'),-L.tech],[kw('costi','Manager'),-L.mgr],[kw('costi','Welfare e benefit'),-L.welf],[kw('penali','Penali'),-L.pen],[kw('costi','Altro (una tantum ed eventi)'),-L.altro],[kw('prestiti','Interessi sui prestiti'),-(L.int||0)]].filter(x=>Math.abs(x[1])>0.5):[];
+  const C=ceo();
   return `<div class="insegna" style="border-color:${S.company.color}">${coLogoSvg(S.company.logo,S.company.color,48)}<div style="min-width:0"><b class="disp">${esc(S.company.name)}</b>${S.company.claim?`<i>${esc(S.company.claim)}</i>`:''}</div></div>
    <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
    <div class="portrait" style="width:120px;height:140px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;flex:none"><img class="px" src="${ceoImg(C)}" alt="Ritratto di ${esc(C.name)}" width="120" height="140"></div>
@@ -6207,9 +6281,6 @@ const VIEWS={
      ${storiaHtml(C,4)}${(S.alumni||[]).length?`<div class="sm">CEO precedenti: ${S.alumni.map(a=>`${esc(a.name)} (${yearOf(a.from)}–${yearOf(a.to)})`).join(', ')}</div>`:''}
    </div></div>
    <div class="card"><div class="row"><span class="h3">${kw('abilita','Abilità')}</span><span class="sm">media 10 · ottimo da 15</span></div><div class="pf-st">${statRadar(C.st,124)}${statBars(C.st)}</div>${C.tal.length?`<div class="lab">${kw('talenti','Talenti')}</div>${talentRows(C.tal)}`:''}</div>
-   <div class="card"><div class="row"><span class="h3">${kw('conto','Conto economico')}</span><span class="sm">mese scorso</span></div>
-   ${L?`<div class="az-ut ${L.util>=0?'ok':'bad'}"><span class="lab">${L.util>=0?'Utile':'Perdita'}</span><b>${eur(L.util)}</b></div>
-    ${pl.map(([n,v])=>`<div class="az-r"><span>${n}</span><b class="num ${v<0?'bad':'ok'}">${eur(v)}</b></div>`).join('')}`:'<div class="sm">Disponibile dalla fine del primo mese.</div>'}</div>
    <div class="card"><div class="row"><span class="h3">${kw('welfare','Benefit aziendali')}</span><span class="sm">per dipendente al mese</span></div>
    ${WELFARE.map(w=>`<label class="wh-sw"><span class="wh-sm"><span>${w.name}</span><span class="sm">${eur(w.cost*(R('welfare2')?0.7:1))} · morale +${w.mor}</span></span><input type="checkbox" class="sw" data-act="welfare" data-id="${w.id}" ${S.welfare[w.id]?'checked':''} aria-label="${esc(w.name)}"></label>`).join('')}
    <div class="sm">Valgono per tutti i dipendenti: alzano il morale ovunque e accorciano i tempi di assunzione.${R('welfare2')?' Costano il 30% in meno con la Piattaforma welfare.':''}</div>
@@ -6389,7 +6460,7 @@ const VIEWS={
   const act=S.clients.filter(c=>c.status!=='perso'); const lost=S.clients.filter(c=>c.status==='perso');
   const on=act.filter(c=>c.status==='attivo');
   const kp=c=>{const k=whById(c.wh).kpi||computeWH(whById(c.wh));return {P:k.P,A:k.A,cP:kpiCls(k.P,c.sP),cA:c.sA?kpiCls(k.A,c.sA):'ok'};};
-  const risk=on.filter(c=>{const x=kp(c);return x.cP==='bad'||x.cA==='bad'||c.sat<(R('kam')?40:50);}).length;
+  const risk=on.filter(cliAtRisk).length;
   const rev=on.reduce((a,c)=>a+clientRev(c),0), sat=on.length?Math.round(on.reduce((a,c)=>a+c.sat,0)/on.length):0;
   const satC=v=>v>=60?'ok':v>=40?'warn':'bad';
   const tile=(cls,lab,val,sub)=>`<div class="kpi wh-k ${cls}"><div class="lab">${lab}</div><b>${val}</b><div class="sm">${sub}</div></div>`;
@@ -7180,7 +7251,9 @@ function hireDays(base,wh,r){const att=45+welfarePts('att')+polSum('att')+(S.rep
 const ACT={
  speed(d){setSpeed(+d.v);},
  menu(){setMenu(!UI.menu);},
- toggle(d){const el=document.getElementById('win-'+d.id); if(MOB){setMenu(false); if(el) return openWin(d.id);} UI.open[d.id]?closeWin(d.id):openWin(d.id);},
+ toggle(d){const id=winOf(d.id), el=document.getElementById('win-'+id); if(MOB){setMenu(false); if(el) return openWin(dockGo(id));} UI.open[id]?closeWin(id):openWin(dockGo(id));},
+ wtab(d){ (UI.sel.wt=UI.sel.wt||{})[d.p]=d.id; noteSeenWin(d.id); renderWin(d.p); const el=document.getElementById('win-'+d.p); if(el){el.querySelector('.win-b').scrollTop=0; fitWin(el,d.p);} renderDock(); },
+ dockw(){ DOCKW=!dockWide(); try{localStorage.setItem('fup-menu-largo',DOCKW?'1':'0');}catch(e){} renderDock(); dockMoveWins(); },
  open(d){openWin(d.id);},
  close(d){closeWin(d.id);},
  openwh(d){openWin('magazzini',{wh:d.id});},
@@ -7614,6 +7687,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.69',t:'Menu in ordine',x:['Il menu ha 4 gruppi, uguali su computer e telefono: Operazioni, Commerciale, Azienda e Informazioni. Le voci passano da 19 a 12.','Le voci gemelle sono diventate schede in cima alla finestra, con la loro icona: Nuovo magazzino sta in Magazzini, Customer service in Clienti, Direzione in Manager, Policy in Azienda e CEO, Certificazioni in Tecnologia. Un quadratino rosso sulla scheda dice dove c\'è un problema, e dal menu si apre direttamente quella scheda.','Sul computer il menu si può allargare con il pulsante in cima: mostra il nome di ogni voce e una riga su come sta il reparto (gare aperte, clienti a rischio, ricerca in corso…). Con le sole icone, un quadratino rosso segnala i problemi. La scelta resta salvata.','La Classifica compare solo nelle partite con avversari, e il conto del mese non è più ripetuto in Azienda e CEO: si apre dal numero «Mese scorso» in alto.']},
  {v:'0.68',t:'Audit',x:['Le certificazioni ora vanno difese: valgono 3 anni, con un audit dell\'ente ogni anno. Il primo audit arriva qualche settimana dopo la richiesta, e se va male il certificato non viene rilasciato.','Ogni magazzino ha la sua «conformità», da 0 a 100: sale con il magazzino tenuto bene, il facility manager, la formazione, il WMS, un manager preciso e la ISO 9001; scende con i reparti in affanno e i facchini esterni. Nella finestra Certificazioni toccala per vedere da cosa dipende.','Audit superato, audit con rilievi (hai 30 giorni per sistemare, oppure paghi un\'azione correttiva) o certificato sospeso: con un certificato sospeso i clienti che lo chiedono perdono soddisfazione ogni mese, finché un audit straordinario non lo riattiva.','Due settimane prima di ogni audit arriva l\'avviso, e nell\'ultimo mese puoi prepararlo: +15 al punteggio.','Se la ISO 9001 viene sospesa, spariscono anche i suoi bonus su accuratezza e gare.','Nelle partite salvate i certificati che avevi restano validi per 3 anni da oggi, con il primo controllo nei prossimi mesi.']},
  {v:'0.67',t:'Certificazioni',x:['Nuovo albero di ricerca «Certificazioni», con la cornice a scudo azzurro: dentro ci sono l\'HACCP, la Catena del freddo e la ISO 9001 (spostata qui da Sviluppo aziendale).','Nuova voce «Certificazioni» nel menu: una tabella con ogni magazzino e i suoi certificati, da cui si chiede l\'audit (sul telefono una scheda per magazzino), e una scheda con le certificazioni di tutta l\'azienda.','L\'HACCP serve per tutti i clienti che trattano cibo o mangimi, anche secchi: pasta, caffè, vino, crocchette. Si ricerca una volta, poi ogni magazzino lo ottiene con un audit che dura due settimane.','La Catena del freddo ora si installa magazzino per magazzino: celle, sonde e un canone mensile. Nelle gare conta il magazzino che scegli per l\'offerta, e la scheda della gara mostra le certificazioni richieste in verde (ci sono) o in rosso (mancano).','Gino Bertolotti e Marco Pellegrino, che partono con un cliente storico alimentare, hanno già l\'HACCP nel primo magazzino.','Nelle partite salvate chi aveva la Catena del freddo la ritrova in tutti i magazzini, e i magazzini che servono clienti alimentari sono già in regola con l\'HACCP.','Anche le aziende avversarie imparano a certificarsi.']},
  {v:'0.66',t:'Relazioni industriali',x:['Nuovo pacchetto di espansione «Relazioni industriali», da accendere nella lobby prima di iniziare: vale per tutta la partita, e chi non lo accende gioca come prima.','Ogni magazzino ha la sua agitazione sindacale da 0 a 100, un delegato e un sindacato (CUP, SAM o CoBaBa). Sale col morale basso, i licenziamenti, i reparti in affanno e i fornitori; scende col welfare, un buon manager e gli accordi. Si sente anche dai magazzini vicini, pure quelli della concorrenza.','Sopra certe soglie arrivano il mugugno, lo stato di agitazione (niente straordinari), gli scioperi e il presidio ai cancelli, che blocca il magazzino finché non firmi.','Tavolo delle trattative: il sindacato porta le sue richieste e ogni settimana c\'è una seduta. Concedi, tratti o rifiuti, offri una contropartita, e firmi un accordo integrativo prima che finisca la pazienza.','Contratto nazionale: ogni tre anni il rinnovo, con le trattative a Roma, a volte uno sciopero nazionale, gli arretrati e sei rate di aumento per tutti. L\'associazione Confpallet rende le rate un po\' più leggere.','Al posto della cooperativa arrivano 11 fornitori di handling, 8 locali e 3 globali, con prezzi, qualità e rischi diversi: cambio d\'appalto con la clausola sociale, contratto a ora o a pallet, responsabilità solidale se qualcosa va storto.','Nell\'albero Sviluppo aziendale un ramo nuovo con due strade, il dialogo e il contenimento, fino alla talpa nel sindacato. Quattro policy nuove (Linea dura, Porte aperte, Premio di presenza, Crumiri in appalto), tre talenti, dodici eventi e la lente della mappa «Clima sindacale».','Nuova condizione di vittoria: «L\'azienda dove tutti vogliono lavorare». Alcune committenti, poi, vogliono un logistico in pace sociale.']},
