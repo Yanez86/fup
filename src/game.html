@@ -223,9 +223,32 @@ html:not(.mob) #dock.wide .dg{height:auto;border:0;overflow:visible;margin:5px 2
 .mob .rp-hr{grid-template-columns:minmax(0,120px) minmax(30px,1fr) auto}
 .mob .rp-t b{font-size:21px}
 .mob .rp-tabs button{flex:1 0 30%;font-size:14px;padding:10px 6px;border-bottom:2px solid var(--ink)}
-.treebox{overflow-x:auto;padding:10px 8px 8px 2px;flex:none}
+.treebox{overflow-x:auto;padding:10px 8px 8px 2px;flex:none;min-width:0}
 .tnode .tn>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tnode{position:absolute;display:flex;align-items:center;gap:7px;padding:4px 6px;text-align:left;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 rgba(22,32,46,.12),2px 2px 0 var(--ink);font-size:13px;line-height:1.2}
+.tnode{position:absolute;display:flex;align-items:center;gap:7px;padding:4px 6px;text-align:left;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 rgba(22,32,46,.12),2px 2px 0 var(--ink);font-size:13px;line-height:1.2;background:#fff}
+.tnode.s-done{background:#eaf6ec}.tnode.s-run{background:var(--accent)}.tnode.s-lock{background:#dfe7ee;color:var(--muted)}
+.tnode b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.txr{position:absolute;left:8px;top:-20px;display:flex;align-items:center;gap:3px;padding:1px 5px 1px 2px;background:#fff;border:2px solid var(--ink);font:600 11px/14px var(--f-body);color:var(--ink)}.txr.ok{background:#eaf6ec}
+/* scheda Ricerca: barra della ricerca in corso, numeri in una riga, albero e scheda della tecnologia */
+.rbar{display:flex;align-items:center;gap:12px;padding:8px 10px;background:#fff4c7;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.rbar.idle{background:#ffe1d6;border-left:8px solid var(--bad)}
+.rb-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.rbar .num{flex:none;white-space:nowrap}
+.rbar .btn{flex:none;display:flex;flex-direction:column;align-items:center;line-height:1.15}.rbar .btn small,.tdet .btn small{font:500 12px var(--f-body)}
+.tstats{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;font-size:14px}.tstats>span{display:inline-flex;align-items:center;gap:6px}
+.tdesc{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between}.tdesc .btn{flex:none}
+.ttabs button{display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.tmain{display:flex;flex-direction:column;gap:10px}
+.tmain.side{display:grid;grid-template-columns:minmax(0,1fr) var(--dw,300px);gap:16px;align-items:start}
+.tmain.side .tdet{position:sticky;top:0;max-height:calc(100vh - 230px);overflow-y:auto}
+.tdet{gap:8px}
+.tdh{display:flex;gap:12px;align-items:center}.tdh .h3{font-size:19px}.tdh .pill{align-self:flex-start;margin-top:2px}
+.pill.ok{background:#e3f4d9}.pill.acc{background:var(--accent)}.pill.mut{background:#dfe7ee;color:var(--muted)}
+.tlnk{display:flex;flex-wrap:wrap;gap:5px;align-items:center}.tlnk .lab{width:100%}
+.tchip{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:2px 7px 2px 3px;border:2px solid var(--ink);background:#fff;font:500 13px var(--f-body);text-align:left;box-shadow:1px 1px 0 var(--ink)}
+.tchip.ok{background:#eaf6ec}.tchip small{color:var(--muted);font-size:11px}.tchip span{min-width:0;overflow-wrap:anywhere}
+.tnote{padding:7px 9px;background:var(--panel2);border-left:4px solid var(--ink4);font-size:14px}.tnote.bad{border-left-color:var(--bad)}
+.tdet .btn.pri{display:flex;flex-direction:column;align-items:center;line-height:1.15}
 .tlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .tlist .tnode{position:relative;min-height:64px;min-width:0}
 .tlist .tnode b{hyphens:auto;overflow-wrap:anywhere}
@@ -952,10 +975,9 @@ html,body{overscroll-behavior:none}
 .mob .win-b{padding:10px max(10px, env(safe-area-inset-right, 0px)) 16px 10px;overscroll-behavior:contain}
 .mob .win .win-b{padding-bottom:84px}  /* in fondo il contenuto scorre oltre il pulsante «Menu» */
 .mob .tabs button{padding:10px 6px}
-.mob .ttabs{display:grid;grid-template-columns:1fr 1fr}
-.mob .ttabs button{border-bottom:2px solid var(--ink)}
-.mob .ttabs button:nth-child(2n){border-right:0}
-.mob .ttabs button:nth-child(n+3){border-bottom:0}
+.mob .ttabs{flex-wrap:nowrap}.mob .ttabs button{flex-direction:column;gap:2px;padding:6px 2px;min-width:0}.mob .ttabs .tl{display:none}
+.mob .tdesc{display:block}.mob .tdesc .btn{display:block;margin-top:6px}
+.mob .rbar{gap:8px;padding:7px 8px;flex-wrap:wrap}.mob .rb-m{flex-basis:calc(100% - 56px)}.mob .tnode b{-webkit-line-clamp:3}.mob .tnode.hasx{padding-top:14px}.mob .txr{top:-10px}.mob .tlist{row-gap:12px}.mob .rbar .btn{padding:6px 8px;flex-direction:row;gap:6px;margin-left:auto}.mob .tstats{font-size:13px;gap:2px 14px}
 .mob .win-b > *{flex-shrink:0}
 .mob .skills{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media (max-width:400px){.mob .skills{grid-template-columns:minmax(0,1fr)}}
@@ -1387,11 +1409,11 @@ const TECH=[
  {id:'gdp',tree:'cert',tier:3,row:0,req:['freddo'],site:1,name:'Buone pratiche per i farmaci (GDP)',cost:25000,wk:6,inst:15000,mese:400,weeks:3,aud:3000,desc:'Lotti tracciati e temperature controllate: sblocca i clienti dei farmaci e del parafarmaco.',txt:'Le regole europee per chi conserva e distribuisce medicinali: ogni lotto tracciato, temperature registrate, un responsabile che firma tutto. Ogni magazzino ha la sua, e servono le celle della catena del freddo.'},
  {id:'iso14001',tree:'cert',tier:3,row:1,req:['iso'],name:'Ambiente ISO 14001',cost:35000,wk:9,aud:6000,desc:'Reputazione +3; nelle gare delle committenti S e A punteggio +2.',txt:'Rifiuti separati, consumi misurati e un piano per inquinare meno. I grandi gruppi lo scrivono nel capitolato.'},
  {id:'iso45001',tree:'cert',tier:3,row:2,req:['iso'],name:'Sicurezza ISO 45001',cost:30000,wk:8,aud:5000,desc:'Morale +2 e conformità +3 in tutti i magazzini; multe dell\'Ispettorato del lavoro dimezzate.',txt:'Valutazione dei rischi, corsi, dispositivi di protezione e nessuno che guida il muletto in infradito.'},
- {id:'adr',tree:'cert',tier:1,row:3,site:1,name:'Merci pericolose (ADR)',cost:15000,wk:4,inst:8000,mese:300,weeks:2,aud:2000,desc:'Area dedicata e personale formato: sblocca i clienti con vernici, solventi, batterie e bombole.',txt:'Le regole per stoccare e trasportare merce che brucia, corrode o esplode: area separata, kit antisversamento, cartelli arancioni sui camion e un consulente che firma.'},
- {id:'banchina',tree:'cert',tier:1,row:4,site:1,name:'Bollino Banchina Sicura',cost:12000,wk:4,inst:20000,mese:500,weeks:2,aud:2000,desc:'Telecamere, gabbie e accessi controllati: sblocca i clienti di elettronica, occhiali e cosmetica.',txt:'Il bollino antifurto che chiedono i marchi di merce piccola e preziosa: gabbie chiuse a chiave, telecamere su ogni baia, badge e un registro di chi entra.'},
- {id:'aeo',tree:'cert',tier:2,row:5,req:['gestionale'],name:'Operatore doganale autorizzato',cost:30000,wk:9,aud:5000,desc:'Meno fermi in dogana: puntualità +0,3 in tutti i magazzini. Apre il Deposito fiscale e doganale.',txt:'Lo status che la dogana dà alle aziende affidabili: meno controlli, pratiche più rapide, una corsia preferenziale al porto.'},
- {id:'doganale',tree:'cert',tier:3,row:5,req:['aeo'],site:1,name:'Deposito fiscale e doganale',cost:20000,wk:5,inst:15000,mese:500,weeks:4,aud:3000,desc:'La merce sotto accisa o in attesa di sdoganamento può stare in magazzino: sblocca distillati, birra e merce d\'importazione.',txt:'Un magazzino sorvegliato dalla dogana: la merce entra senza pagare dazi e accise, che si pagano solo quando esce. Registri, sigilli e un funzionario che passa a controllare.'},
- {id:'parita',tree:'cert',tier:2,row:6,req:['hr'],name:'Parità di genere',cost:20000,wk:6,aud:3000,desc:'Attrattività +3 in tutti i magazzini; nelle gare delle committenti S e A punteggio +2.',txt:'Stessa paga a parità di ruolo, carriere aperte a tutte e a tutti, orari compatibili con la famiglia. Un ente lo verifica ogni anno.'},
+ {id:'adr',tree:'cert',tier:1,row:1,site:1,name:'Merci pericolose (ADR)',cost:15000,wk:4,inst:8000,mese:300,weeks:2,aud:2000,desc:'Area dedicata e personale formato: sblocca i clienti con vernici, solventi, batterie e bombole.',txt:'Le regole per stoccare e trasportare merce che brucia, corrode o esplode: area separata, kit antisversamento, cartelli arancioni sui camion e un consulente che firma.'},
+ {id:'banchina',tree:'cert',tier:1,row:2,site:1,name:'Bollino Banchina Sicura',cost:12000,wk:4,inst:20000,mese:500,weeks:2,aud:2000,desc:'Telecamere, gabbie e accessi controllati: sblocca i clienti di elettronica, occhiali e cosmetica.',txt:'Il bollino antifurto che chiedono i marchi di merce piccola e preziosa: gabbie chiuse a chiave, telecamere su ogni baia, badge e un registro di chi entra.'},
+ {id:'aeo',tree:'cert',tier:2,row:3,req:['gestionale'],name:'Operatore doganale autorizzato',cost:30000,wk:9,aud:5000,desc:'Meno fermi in dogana: puntualità +0,3 in tutti i magazzini. Apre il Deposito fiscale e doganale.',txt:'Lo status che la dogana dà alle aziende affidabili: meno controlli, pratiche più rapide, una corsia preferenziale al porto.'},
+ {id:'doganale',tree:'cert',tier:3,row:3,req:['aeo'],site:1,name:'Deposito fiscale e doganale',cost:20000,wk:5,inst:15000,mese:500,weeks:4,aud:3000,desc:'La merce sotto accisa o in attesa di sdoganamento può stare in magazzino: sblocca distillati, birra e merce d\'importazione.',txt:'Un magazzino sorvegliato dalla dogana: la merce entra senza pagare dazi e accise, che si pagano solo quando esce. Registri, sigilli e un funzionario che passa a controllare.'},
+ {id:'parita',tree:'cert',tier:2,row:2,req:['hr'],name:'Parità di genere',cost:20000,wk:6,aud:3000,desc:'Attrattività +3 in tutti i magazzini; nelle gare delle committenti S e A punteggio +2.',txt:'Stessa paga a parità di ruolo, carriere aperte a tutte e a tutti, orari compatibili con la famiglia. Un ente lo verifica ogni anno.'},
  {id:'acqua',tree:'wel',tier:1,row:0,name:'Boccioni d\'acqua',cost:2000,wk:3,inst:600,mese:90,mor:1,att:1,weeks:0,desc:'Morale +1 e il magazzino attira un po\' di più chi cerca lavoro.',txt:'Erogatori di acqua fresca in reparto e in banchina. D\'estate, sotto il tetto del capannone, fanno la differenza.'},
  {id:'frutta',tree:'wel',tier:2,row:0,req:['acqua'],name:'Servizio frutta',cost:5000,wk:3,inst:300,mese:250,mor:2,att:2,weeks:0,desc:'Morale +2, attrattività +2.',txt:'Una cassetta di frutta fresca ogni mattina in sala pausa. Mele, banane e qualche mandarino molto conteso.'},
  {id:'mensa',tree:'wel',tier:3,row:0,req:['frutta'],name:'Mensa aziendale',cost:15000,wk:6,inst:60000,mese:2500,mor:4,att:4,prod:0.03,weeks:0,desc:'Morale +4, attrattività +4, produttività +3%.',txt:'Un pasto caldo a metà turno, cucinato sul posto. Si mangia insieme e si torna in reparto con più energia.'},
@@ -1412,7 +1434,7 @@ const TECH=[
  {id:'agile',tree:'wel',tier:2,row:2,req:['pulmino'],pol:1,name:'Lavoro agile',cost:6000,wk:3,desc:'Sblocca la policy Smart working in sede.',txt:'Portatili, VPN e un regolamento per lavorare da casa. Serve a chi in magazzino non deve toccare i pallet.'},
  {id:'corta',tree:'wel',tier:3,row:5,req:['ascolto'],pol:1,name:'Settimana corta',cost:30000,wk:9,desc:'Sblocca la policy Settimana corta.',txt:'Uno studio con lo psicologo e i sindacati su come lavorare quattro giorni senza perdere i clienti. Il risultato è una policy da accendere quando sei pronto.'}
 ];
-const TREES=[['log','Logistica','Tecnologie da installare in ogni magazzino.'],['org','Sviluppo aziendale','Organizzazione, persone e controllo: valgono per tutta l\'azienda.'],['mkt','Mercato','Accesso a nuovi clienti e gare: valgono per tutta l\'azienda.'],['wel','Welfare','Servizi per chi lavora: si ricercano una volta e poi si installano magazzino per magazzino. Alzano il morale e aiutano ad assumere.'],['cert','Certificazioni','Per magazzino (si ottengono capannone per capannone) o per tutta l\'azienda. Chiedono i clienti più esigenti: si gestiscono dalla scheda Certificazioni della finestra Tecnologia.']];
+const TREES=[['log','Logistica','Tecnologie da installare in ogni magazzino.'],['org','Sviluppo aziendale','Organizzazione, persone e controllo: valgono per tutta l\'azienda.'],['mkt','Mercato','Accesso a nuovi clienti e gare: valgono per tutta l\'azienda.'],['wel','Welfare','Servizi per chi lavora: si ricercano una volta e poi si installano magazzino per magazzino. Alzano il morale e aiutano ad assumere.'],['cert','Certificazioni','Per magazzino (si ottengono capannone per capannone) o per tutta l\'azienda. Le chiedono i clienti più esigenti; certificati, audit e conformità si seguono nell\'altra scheda di questa finestra.']];
 // benefit aziendali: valgono per tutti i dipendenti e si pagano a testa (le navette per arrivare al lavoro sono i Pulmini dell'albero Welfare)
 const WELFARE=[
  {id:'buoni',name:'Buoni pasto',cost:110,mor:5,att:6},
@@ -2153,7 +2175,7 @@ wk('menu','basi','Menu',`Le voci a sinistra della mappa, divise in quattro grupp
 
 Sul computer il pulsante in cima alla colonna sceglie tra il **menu largo**, con nomi e righe di stato, e **solo icone**, che lascia più spazio alla mappa: lì un quadratino rosso sull'icona segnala un problema e passandoci sopra si legge la riga. Sul telefono il menu si apre con il pulsante Menu in basso a destra.
 
-Alcune finestre hanno più **schede** in cima, ognuna con la sua icona: Magazzini e Nuovo magazzino ([[espansione]]), Clienti e [[customer_service|Customer service]], Manager e [[direzione|Direzione]], Azienda e CEO e [[policy|Policy]], Tecnologia e [[certificazioni|Certificazioni]]. Un quadratino rosso su una scheda dice che lì c'è un problema, e dal menu si apre direttamente quella. La [[classifica|Classifica]] c'è solo nelle partite con avversari.`);
+Alcune finestre hanno più **schede** in cima, ognuna con la sua icona: Magazzini e Nuovo magazzino ([[espansione]]), Clienti e [[customer_service|Customer service]], Manager e [[direzione|Direzione]], Azienda e CEO e [[policy|Policy]], Tecnologia e [[certificazioni|Certificati e audit]]. Un quadratino rosso su una scheda dice che lì c'è un problema, e dal menu si apre direttamente quella. La [[classifica|Classifica]] c'è solo nelle partite con avversari.`);
 wk('giornale','basi','Il giornale',`L'archivio delle notizie: gare, contratti, ricerche concluse, scelte fatte negli eventi.`,
 `La Gazzetta del Muletto e Il Sole 24 Pallet raccontano cosa succede alla tua azienda e al mercato. Utile per ricordare chi ha vinto una [[gare|gara]] che hai perso e cosa hai deciso negli [[eventi]].`);
 wk('mappa','basi','Mappa',`Il Nord Italia in pixel art, da Nizza a Trieste: magazzini, città servite e camion in viaggio.`,
@@ -2774,7 +2796,7 @@ wk('audit','tech','Audit',`L'ente di certificazione controlla un magazzino (o l'
 
 Un certificato vale 3 anni, con un audit ogni anno: quello annuale costa la tariffa della certificazione (HACCP 1.500 €, catena del freddo 2.500 €, ISO 9001 8.000 €), quello di rinnovo il doppio. Due settimane prima arriva l'avviso. Con il certificato sospeso i clienti che lo chiedono perdono 6 punti di [[soddisfazione]] al mese e le gare che lo chiedono restano chiuse; per riaverlo si chiede un **audit straordinario** (il doppio della tariffa, dopo 2 settimane). Per la [[tech_iso|ISO 9001]] sospesa spariscono anche i suoi bonus.`);
 wk('ufficio_qualita','tech','Ufficio qualità',`Addetti in sede che curano procedure e registri: più conformità nei magazzini e gli audit interni.`,
-`Si assumono dalla scheda Certificazioni della finestra Tecnologia, parte Azienda (40.000 € di RAL, 3.000 € di assunzione, fino a 5). Ogni addetto segue fino a 3 magazzini: dove arriva la [[conformita|conformità]] sale di 6 (con meno addetti del necessario, in proporzione).
+`Si assumono dalla scheda Certificati e audit della finestra Tecnologia, parte Azienda (40.000 € di RAL, 3.000 € di assunzione, fino a 5). Ogni addetto segue fino a 3 magazzini: dove arriva la [[conformita|conformità]] sale di 6 (con meno addetti del necessario, in proporzione).
 
 Con almeno un addetto puoi fare un **audit interno** in un magazzino (800 €): conformità +8 per 4 mesi, e ti dice qual è il punto debole. Conviene farlo un mese prima di un [[audit]] o quando arrivano le [[ispezioni]].`);
 wk('ispezioni','tech','Ispezioni a sorpresa',`ASL, NAS e Ispettorato del lavoro arrivano senza preavviso: conta la conformità del magazzino.`,
@@ -2787,7 +2809,7 @@ wk('nuove_linee','cli','Nuove linee di business',`Un cliente allarga il giro: pi
 • **ci certifichiamo noi**: alla data, se il magazzino ha le [[certificazioni]] richieste, i pallet al mese salgono del 15-25% e la soddisfazione di 4. Ogni settimana di ritardo costa 2 punti; dopo 8 settimane la linea salta (−8);
 • **sì, ma il prezzo sale**: come sopra, con il prezzo del contratto +3% e soddisfazione −4;
 • **non fa per noi**: la linea va in gara. Se la vince un concorrente, al rinnovo il cliente chiede 15 punti di soddisfazione in più.
-Le linee in arrivo si vedono nella scheda Certificazioni della finestra Tecnologia.`);
+Le linee in arrivo si vedono nella scheda Certificati e audit della finestra Tecnologia.`);
 wk('conformita','tech','Conformità',`Quanto un magazzino è in ordine agli occhi dell'ente: da 0 a 100. Decide gli audit.`,
 `Si parte da 70, poi:
 • stato del magazzino sotto il 70%: −0,6 per ogni punto sotto; dal 90% in su +5 ([[manutenzione]]);
@@ -2799,9 +2821,9 @@ wk('conformita','tech','Conformità',`Quanto un magazzino è in ordine agli occh
 • [[tech_iso|ISO 9001]] valida: +5; [[tech_iso45001|ISO 45001]] valida: +3;
 • [[ufficio_qualita|Ufficio qualità]]: +6 nei magazzini che riesce a seguire (3 per addetto); un audit interno negli ultimi 4 mesi: +8;
 • talenti di chi guida il magazzino: «Maniaco delle procedure» +6, «Vive di raccoglitori» +4.
-Per le certificazioni aziendali conta la media di tutti i magazzini. Conta anche nelle [[ispezioni]] a sorpresa. Il numero si vede nella scheda Certificazioni della finestra Tecnologia: toccalo per l'elenco delle voci.`);
+Per le certificazioni aziendali conta la media di tutti i magazzini. Conta anche nelle [[ispezioni]] a sorpresa. Il numero si vede nella scheda Certificati e audit della finestra Tecnologia: toccalo per l'elenco delle voci.`);
 wk('certificazioni','tech','Certificazioni',`Il quinto albero: certificazioni per magazzino (HACCP, catena del freddo, GDP, ADR, antifurto, deposito doganale) e per tutta l'azienda (ISO 9001, 14001, 45001, operatore doganale, parità di genere).`,
-`Le certificazioni stanno in un albero tutto loro, con la cornice a scudo azzurro, e si seguono dalla scheda **Certificazioni** della finestra Tecnologia.
+`Le certificazioni stanno in un albero tutto loro, con la cornice a scudo azzurro, e si seguono dalla scheda **Certificati e audit** della finestra Tecnologia.
 
 • **Per magazzino**: la ricerca si fa una volta, poi ogni capannone va certificato a parte. Paghi la richiesta (per la [[tech_freddo|catena del freddo]] anche celle e sonde) e dopo qualche settimana arriva il primo [[audit]]: se passa, l'ente dà il certificato. Da lì si paga un canone mensile. Sono l'[[tech_haccp|HACCP]] (igiene alimentare, per chi tratta cibo o mangimi), la [[tech_freddo|catena del freddo]] (freschi, surgelati e farmaci; richiede l'HACCP nello stesso magazzino), le [[tech_gdp|buone pratiche per i farmaci]] (richiedono la catena del freddo), le [[tech_adr|merci pericolose]], il [[tech_banchina|Bollino Banchina Sicura]] (antifurto) e il [[tech_doganale|deposito fiscale e doganale]] (richiede l'[[tech_aeo|operatore doganale autorizzato]]).
 • **Per l'azienda**: valgono ovunque appena finisce la ricerca, come la [[tech_iso|ISO 9001]], la [[tech_iso14001|ISO 14001]], la [[tech_iso45001|ISO 45001]], l'[[tech_aeo|operatore doganale autorizzato]] e la [[tech_parita|parità di genere]]; poi passano anche loro un audit all'anno.
@@ -2858,7 +2880,7 @@ wk('alberi','tech','Alberi tecnologici',`Logistica (quadrato arancione), Svilupp
 
 La forma della cornice dell'icona ti dice sempre a quale albero appartiene.`);
 wk('ricerca','tech','Ricerca',`Si paga all'avvio e dura un certo numero di settimane. Una sola alla volta; l'Innovazione la accorcia.`,
-`In cima alla finestra Tecnologia trovi la ricerca in corso, quante tecnologie hai, quanto l'Innovazione accorcia le ricerche e quante tecnologie ricercate aspettano ancora di essere installate in qualche magazzino. Nell'albero, le caselle bloccate dicono cosa serve prima, quelle gialle «Da installare» indicano in quanti magazzini manca la tecnologia e l'etichetta «gara» segna quelle che una gara aperta richiede. La durata, sempre a settimane intere, scende del 3% per ogni punto di [[st_inn|Innovazione]] sopra 10 e sale del 3% per ogni punto sotto (al massimo −40% e +50%; si usa il valore più alto tra [[ceo|CEO]] e [[dir_tech|direttore tecnologia]]). Nessuna ricerca dura meno di 3 settimane. Puoi annullarla e riavere metà dei soldi.`);
+`In cima alla scheda Ricerca della finestra Tecnologia c'è la ricerca in corso, con le settimane che mancano e il pulsante per annullarla; se è ferma, la barra diventa rossa. Sotto: quante tecnologie hai, quanto l'Innovazione accorcia le ricerche e quante tecnologie ricercate aspettano ancora di essere installate in qualche magazzino. Nell'albero le caselle bianche si possono ricercare subito, quelle grigie aspettano la tecnologia collegata dalla linea, quelle verdi sono fatte («Da installare» dice in quanti magazzini manca) e l'etichetta «gara» segna quelle che una gara aperta richiede; un cartellino come «+Sviluppo» avvisa che serve anche una ricerca di un altro albero. Toccando una casella si apre la sua scheda (sul computer a destra dell'albero): cos'è, cosa fa, cosa serve, cosa apre dopo e il pulsante per avviarla o installarla. La durata, sempre a settimane intere, scende del 3% per ogni punto di [[st_inn|Innovazione]] sopra 10 e sale del 3% per ogni punto sotto (al massimo −40% e +50%; si usa il valore più alto tra [[ceo|CEO]] e [[dir_tech|direttore tecnologia]]). Nessuna ricerca dura meno di 3 settimane. Puoi annullarla e riavere metà dei soldi.`);
 wk('installazione','tech','Installazione',`Le tecnologie di Logistica e i servizi di Welfare, una volta ricercati, vanno comprate per ogni magazzino. Poi c'è un canone mensile.`,
 `L'installazione costa una volta, il canone si paga ogni mese. Dopo l'installazione di una tecnologia di Logistica c'è un periodo di [[apprendimento]]; i servizi di [[welfare_mag|Welfare]] funzionano da subito. Alcune tecnologie si installano solo dove c'è già quella precedente (per esempio il WMS richiede i lettori barcode).`);
 wk('apprendimento','tech','Apprendimento',`Le prime settimane dopo un'installazione il personale si abitua: i KPI peggiorano invece di migliorare.`,
@@ -3483,7 +3505,7 @@ function certAudit(w,t,kind,roll){
   } else {
     it.susp=S.day; it.nc=null;
     notify('red','certificazioni','Ente di certificazione',kind==='init'&&it.iss==null?`${t.name}: primo audit non superato${where}`:`${t.name} sospeso${where}`,
-      `Troppe cose fuori posto${why}: conformità ${Math.round(C)}. ${it.iss==null?'Il certificato non viene rilasciato.':'Finché è sospeso, i clienti che lo chiedono perdono soddisfazione ogni mese.'} Sistema il magazzino e chiedi un audit straordinario dalla scheda Certificazioni.`,'certificazioni',sel,certKey(w,t));
+      `Troppe cose fuori posto${why}: conformità ${Math.round(C)}. ${it.iss==null?'Il certificato non viene rilasciato.':'Finché è sospeso, i clienti che lo chiedono perdono soddisfazione ogni mese.'} Sistema il magazzino e chiedi un audit straordinario dalla scheda Certificati e audit.`,'certificazioni',sel,certKey(w,t));
     if(it.iss!=null) news('Il Sole 24 Pallet',`${S.company.name}: sospesa la certificazione ${t.name}`,`L'ente ha sospeso il certificato${where} dopo un audit andato male.`);
   }
   return sc;
@@ -3499,12 +3521,12 @@ function certDaily(){
     if(it.nc!=null&&S.bot&&S.cash>certFee(t)+60000){ S.cash-=certFee(t); S.cur.tech+=certFee(t); it.nc=null; }
     if(it.nc!=null&&S.day>=it.nc){
       if(confOf(w).v>=AUD.ok){ it.nc=null; notify('green','certificazioni','Ente di certificazione',`${t.name}: rilievi chiusi${where}`,'La conformità è tornata a posto: l\'ente chiude i rilievi.','certificazioni',sel,certKey(w,t)); }
-      else { it.susp=S.day; it.nc=null; notify('red','certificazioni','Ente di certificazione',`${t.name} sospeso${where}`,'I rilievi non sono stati chiusi in tempo. Finché è sospeso, i clienti che lo chiedono perdono soddisfazione ogni mese: chiedi un audit straordinario dalla scheda Certificazioni.','certificazioni',sel,certKey(w,t)); }
+      else { it.susp=S.day; it.nc=null; notify('red','certificazioni','Ente di certificazione',`${t.name} sospeso${where}`,'I rilievi non sono stati chiusi in tempo. Finché è sospeso, i clienti che lo chiedono perdono soddisfazione ogni mese: chiedi un audit straordinario dalla scheda Certificati e audit.','certificazioni',sel,certKey(w,t)); }
       return; }
     if(S.day>=it.next){ certAudit(w,t,it.next>=it.exp?'renew':'year'); return; }
     if(S.bot&&!it.prep&&it.next-S.day<=AUD.warn&&S.cash>certFee(t)+100000){ S.cash-=certFee(t); S.cur.tech+=certFee(t); it.prep=true; }
     if(it.next-S.day===AUD.warn) notify('yellow','certificazioni','Ente di certificazione',`${t.name}: audit ${it.next>=it.exp?'di rinnovo':'annuale'} tra 2 settimane${where}`,
-      `Conformità di oggi: ${Math.round(confOf(w).v)}. Puoi prepararlo (consulente e pulizie straordinarie: +${AUD.prep} al punteggio) dalla scheda Certificazioni della finestra Tecnologia.`,'certificazioni',sel,certKey(w,t));
+      `Conformità di oggi: ${Math.round(confOf(w).v)}. Puoi prepararlo (consulente e pulizie straordinarie: +${AUD.prep} al punteggio) dalla scheda Certificati e audit della finestra Tecnologia.`,'certificazioni',sel,certKey(w,t));
   };
   TECH.forEach(t=>{ if(t.tree!=='cert') return; if(t.site) S.warehouses.forEach(w=>one(w,t)); else if(R(t.id)) one(null,t); });
 }
@@ -3855,9 +3877,9 @@ function step(){
     if(t.id==='iso'||t.id==='marketing') S.rep=clamp(S.rep+5,0,100);
     if(t.tree==='cert'&&!t.site){ if(!S.certCo) S.certCo={}; S.certCo[t.id]=certNew(S.day); }
     if(t.id==='iso14001') S.rep=clamp(S.rep+3,0,100);
-    news('La Gazzetta del Muletto',`Ricerca completata: ${t.name}`,t.tree==='cert'&&t.site?'Ora si può ottenere nei magazzini dalla scheda Certificazioni.':perWh(t)?'Ora si può installare nei magazzini dalla finestra Tecnologia.':t.desc);
+    news('La Gazzetta del Muletto',`Ricerca completata: ${t.name}`,t.tree==='cert'&&t.site?'Ora si può ottenere nei magazzini dalla scheda Certificati e audit.':perWh(t)?'Ora si può installare nei magazzini dalla finestra Tecnologia.':t.desc);
     if(t.id==='direzione') notify('green','direzione','La Gazzetta del Muletto','Nasce la squadra dei dirigenti','La struttura direzionale è pronta. Nella scheda Direzione della finestra Manager nomina fino a cinque direttori: ognuno guida un\'area di tutta l\'azienda con la sua abilità principale.','direzione');
-    else if(t.tree==='cert'&&t.site) notify('green','certificazioni','Ufficio ricerca',`Ricerca completata: ${t.name}`,'Ora va ottenuta in ogni magazzino che serve i clienti che la chiedono: scegli dove nella scheda Certificazioni.','certificazioni',{ctab:'mag'},'techdone');
+    else if(t.tree==='cert'&&t.site) notify('green','certificazioni','Ufficio ricerca',`Ricerca completata: ${t.name}`,'Ora va ottenuta in ogni magazzino che serve i clienti che la chiedono: scegli dove nella scheda Certificati e audit.','certificazioni',{ctab:'mag'},'techdone');
     else notify('green','tecnologia','Ufficio ricerca',`Ricerca completata: ${t.name}`,perWh(t)?'Ora va installata nei magazzini: apri la tecnologia e scegli dove.':t.desc,'tecnologia',{tree:t.tree,tech:t.id},'techdone'); } }
   // certificazioni: audit, rilievi e scadenze
   certDaily();
@@ -6171,7 +6193,7 @@ const TITLES={sindacato:'Relazioni industriali',finale:'Report della partita',cl
 const DOCK_G=[['Operazioni',['magazzini','traffico','personale']],['Commerciale',['clienti','gare']],['Azienda',['azienda','manager','tecnologia','sindacato']],['Informazioni',['report','riepilogo','classifica','giornale','enciclopedia']]];
 // finestre unite: le voci di una volta sono schede della finestra madre, con la loro icona del menu
 const WTABS={magazzini:[['magazzini','Magazzini'],['espansione','Nuovo magazzino']],clienti:[['clienti','Clienti'],['customer','Customer service']],
-  manager:[['manager','Manager'],['direzione','Direzione']],azienda:[['azienda','CEO e benefit'],['policy','Policy']],tecnologia:[['tecnologia','Ricerca'],['certificazioni','Certificazioni']]};
+  manager:[['manager','Manager'],['direzione','Direzione']],azienda:[['azienda','CEO e benefit'],['policy','Policy']],tecnologia:[['tecnologia','Ricerca'],['certificazioni','Certificati e audit']]};
 const WIN_IN=Object.fromEntries(Object.entries(WTABS).flatMap(([p,l])=>l.slice(1).map(([c])=>[c,p])));
 const winOf=id=>WIN_IN[id]||id;
 const wtabOf=p=>{const l=WTABS[p], c=(UI.sel.wt||{})[p]; return l&&l.some(x=>x[0]===c)?c:p;};
@@ -6272,6 +6294,7 @@ function openWin(id,opts){
     const i=Object.keys(UI.pos).length, L=MOB?90:Math.round(($('#dock').getBoundingClientRect().right||78)+12);   // a destra del menu
     const p=UI.pos[id]||{x:Math.min(innerWidth-420,L+((i*36)%240)),y:86+((i*30)%180)};
     if(id==='magazzini'||id==='gare'){p.x=Math.max(L,innerWidth-680);} if(id==='enciclopedia'){p.x=Math.max(L,innerWidth-900);p.y=86;} if(id==='tecnologia'){p.x=L;}
+    if(id==='tecnologia'&&!MOB) el.style.width=Math.max(640,Math.min(1240,innerWidth-p.x-96))+'px';   // fino alla colonna delle notifiche
     UI.pos[id]=p; el.style.left=p.x+'px'; el.style.top=p.y+'px';
     el.innerHTML=`<header class="win-h"><span class="grip"></span><h2>${TITLES[id]}</h2><button class="xbtn" data-act="close" data-id="${id}" aria-label="Chiudi">x</button></header>${WTABS[id]?'<nav class="win-t" role="tablist" aria-label="Schede"></nav>':''}<div class="win-b"></div>`;
     $('#wins').appendChild(el); makeDraggable(el,id);
@@ -6774,50 +6797,68 @@ const VIEWS={
     <div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><button class="btn sm2 pri" data-act="gomgr" data-tab="cand">Vedi i candidati</button><button class="btn sm2" data-act="gomgr" data-tab="hh" data-k="neg">Chiedi all'head hunter</button></div></div>`;
  },
  tecnologia(){
-  const tree=UI.sel.tree||'log'; const pj=S.project;
+  const tree=UI.sel.tree||'log', pj=S.project, trN=id=>TREES.find(x=>x[0]===id)[1];
   // dove manca una tecnologia già ricercata (solo dove si può già installare)
   const toInst=t=>R(t.id)&&perWh(t)?S.warehouses.filter(w=>!w.tech[t.id]&&instReq(t,w)):[];
   const gare=t=>S.tenders.filter(g=>!g.done&&(g.req||[]).includes(t.id));
-  const nInst=TECH.filter(t=>toInst(t).length).length, nDone=TECH.filter(t=>R(t.id)).length, inn=innUsed(), dur=Math.round((clamp(1-0.03*(inn-10),0.6,1.5)-1)*100);
-  const tile=(cls,lab,val,sub)=>`<div class="kpi wh-k ${cls}"><div class="lab">${lab}</div><b>${val}</b><div class="sm">${sub}</div></div>`;
-  const tiles=`<div class="wh-kpis">
-   ${tile(pj?'ok':'warn',kw('ricerca','Ricerca'),pj?`${Math.ceil(pj.left/7)} sett.`:'ferma',pj?esc(TECH.find(x=>x.id===pj.tech).name):'nessuna in corso')}
-   ${tile('',kw('alberi','Ricercate'),`${nDone} / ${TECH.length}`,'in tutti gli alberi')}
-   ${tile(dur<0?'ok':dur>0?'bad':'',kw('st_inn','Innovazione'),statBadge('inn',inn,18),dur?`ricerche ${dur<0?'−':'+'}${Math.abs(dur)}% di durata`:'durata normale')}
-   ${tile(nInst?'warn':'ok',kw('installazione','Da installare'),nInst,nInst===1?'tecnologia ricercata':'tecnologie ricercate')}
-  </div>`;
-  const tabs=`<div class="tabs ttabs" role="tablist">${TREES.map(([id,n])=>{const tt=TECH.filter(t=>t.tree===id);return `<button role="tab" aria-selected="${id===tree}" data-act="seltree" data-id="${id}" style="display:flex;align-items:center;justify-content:center;gap:8px">${techIcon({id:'_',tree:id},22)}${n}<span class="tcount${tt.some(t=>toInst(t).length)?' warn':''}">${tt.filter(t=>R(t.id)).length}/${tt.length}</span></button>`;}).join('')}</div>`;
-  const pjHtml=pj?(()=>{const t=TECH.find(x=>x.id===pj.tech);const done=1-pj.left/pj.total;return `<div class="card pend"><div class="row"><span class="h3">${kw('ricerca','Ricerca')} in corso: ${esc(t.name)}</span><b class="num">${wks(pj.left)}</b></div>
-   <div class="bar"><i style="width:${Math.round(done*100)}%;background:var(--accent)"></i></div>
-   <div class="row"><span class="sm">Fine prevista: ${shortDate(S.day+pj.left)}. Una ricerca alla volta.</span><button class="btn sm2" data-act="canceltech">Annulla (rimborso 50%)</button></div></div>`;})():`<div class="sm">Nessuna ${kw('ricerca','ricerca')} in corso. Si ricerca una tecnologia alla volta; la durata dipende dall'Innovazione (${innUsed()}).</div>`;
-  const nodes=TECH.filter(t=>t.tree===tree); const maxT=Math.max(...nodes.map(t=>t.tier)), maxR=Math.max(...nodes.map(t=>t.row));
-  const NW=170,NH=64,GX=188,GY=82, W=maxT*GX-34, H=(maxR+1)*GY-18;
+  const st=t=>R(t.id)?'done':(pj&&pj.tech===t.id)?'run':techOpen(t)?'open':'lock';
+  const inst=TECH.filter(t=>toInst(t).length), nDone=TECH.filter(t=>R(t.id)).length, inn=innUsed(), dur=Math.round((clamp(1-0.03*(inn-10),0.6,1.5)-1)*100);
+  // in cima: la ricerca in corso (o l'avviso che è ferma) e tre numeri in una riga
+  const pt=pj&&TECH.find(x=>x.id===pj.tech);
+  const rbar=pt?`<div class="rbar">${techIcon(pt,40)}<div class="rb-m"><div class="row"><span>${kw('ricerca','In corso')}: <button class="lnk" data-act="seltech" data-id="${pt.id}"><b>${esc(pt.name)}</b></button></span><b class="num">${wks(pj.left)}</b></div>
+     <div class="bar"><i style="width:${Math.round((1-pj.left/pj.total)*100)}%;background:var(--accent)"></i></div><span class="sm">${esc(trN(pt.tree))} · fine prevista il ${shortDate(S.day+pj.left)}</span></div>
+     <button class="btn sm2" data-act="canceltech">Annulla<small>rimborso 50%</small></button></div>`
+   :`<div class="rbar idle"><div class="rb-m"><b>Nessuna ${kw('ricerca','ricerca')} in corso</b><span class="sm">Scegli una tecnologia con il riquadro bianco e avviala: se ne ricerca una alla volta.</span></div></div>`;
+  const stats=`<div class="tstats"><span>${kw('alberi','Ricercate')} <b>${nDone} / ${TECH.length}</b></span>
+    <span>${kw('st_inn','Innovazione')} ${statBadge('inn',inn,20)} <span class="${dur<0?'ok':dur>0?'bad':''}">${dur?`ricerche ${dur<0?'più brevi':'più lunghe'} del ${Math.abs(dur)}%`:'durata normale'}</span></span>
+    ${inst.length?`<span>${kw('installazione','Da installare')} <button class="lnk" data-act="seltech" data-id="${inst[0].id}"><b>${inst.length}</b> ${inst.length===1?'tecnologia':'tecnologie'}</button></span>`:''}</div>`;
+  const tabs=`<div class="tabs ttabs" role="tablist">${TREES.map(([id,n,d])=>{const tt=TECH.filter(t=>t.tree===id);
+    return `<button role="tab" aria-selected="${id===tree}" aria-label="${esc(n)}" data-act="seltree" data-id="${id}" data-tip="<div class='tt'>${esc(n)}</div>${esc(d)}">${techIcon({id:'_',tree:id},22)}<span class="tl">${id==='org'?'Sviluppo<span class="tl2"> aziendale</span>':esc(n)}</span><span class="tcount${tt.some(t=>toInst(t).length)?' warn':''}">${tt.filter(t=>R(t.id)).length}/${tt.length}</span></button>`;}).join('')}</div>`;
+  const desc=`<div class="tdesc">${MOB?`<b>${esc(trN(tree))}</b> `:''}<span class="sm">${TREES.find(x=>x[0]===tree)[2]}</span>${tree==='cert'?`<button class="btn sm2" data-act="wtab" data-p="tecnologia" data-id="certificazioni">Certificati e audit dei magazzini</button>`:''}</div>`;
+  // albero: i riquadri si allargano fin dove c'è posto; sul computer largo la scheda della tecnologia sta a destra
+  const nodes=TECH.filter(t=>t.tree===tree), maxT=Math.max(...nodes.map(t=>t.tier)), maxR=Math.max(...nodes.map(t=>t.row));
+  const sel=TECH.find(t=>t.id===UI.sel.tech&&t.tree===tree)||pt&&pt.tree===tree&&pt||nodes.find(t=>st(t)==='open')||nodes[0];
+  const wb=document.querySelector('#win-tecnologia .win-b'), inner=(wb?wb.clientWidth:960)-28, GAP=16, DW=clamp(inner-26-(maxT*180+(maxT-1)*GAP),0,320);   // 180 px: ci sta «amministrativo» accanto all'icona
+  const side=!MOB&&DW>=240, avail=(side?inner-DW-16:inner)-10;
+  const NW=clamp(Math.floor((avail-(maxT-1)*GAP)/maxT),180,210), NH=64, GX=NW+GAP, GY=NH+22, W=maxT*GX-GAP, H=(maxR+1)*GY;
   const pos=t=>({x:(t.tier-1)*GX,y:t.row*GY});
-  const st=t=>R(t.id)?'done':(pj&&pj.tech===t.id)?'run':(t.req||[]).some(r=>!R(r))?'lock':'open';
-  const lines=nodes.flatMap(t=>(t.req||[]).map(r=>{const a=TECH.find(x=>x.id===r); if(a.tree!==tree) return ''; const p1=pos(a),p2=pos(t); const x1=p1.x+NW,y1=p1.y+NH/2,x2=p2.x,y2=p2.y+NH/2,mx=x1+(x2-x1)/2;
-    return `<path d="M${x1} ${y1}H${mx}V${y2}H${x2}" fill="none" stroke="${R(r)?'#2e9e48':'#8a96a6'}" stroke-width="3"/>`;})).join('');
-  const sel=TECH.find(t=>t.id===UI.sel.tech&&t.tree===tree)||nodes.find(t=>st(t)==='open')||nodes[0];
-  const nodeBtn=t=>{const p=pos(t),s2=st(t);const bg={done:'#eaf6ec',run:'var(--accent)',lock:'#dfe7ee',open:'#ffffff'}[s2];
-    const ni=toInst(t).length, miss=(t.req||[]).filter(r=>!R(r)).map(r=>TECH.find(x=>x.id===r).name), ng=gare(t).length;
-    const sub=s2==='done'?(ni?`<span class="warn">${t.tree==='cert'?'Da ottenere':'Da installare'} (${ni})</span>`:'<span class="ok">Ricercata</span>'):s2==='run'?`In corso · ${Math.ceil(pj.left/7)} sett.`:s2==='lock'?`Serve: ${esc(miss.join(', '))}`:`${eur(t.cost)} · ${techWeeks(t)} sett.`;
-    return `<button class="tnode" data-act="seltech" data-id="${t.id}" data-tip="<div class='tt'>${esc(t.name)}</div><div>${esc(t.txt||'')}</div><div class='sm'>${esc(t.desc)}</div>" aria-pressed="${sel&&sel.id===t.id}" style="${MOB?'':`left:${p.x}px;top:${p.y}px;width:${NW}px;height:${NH}px;`}background:${bg};${s2==='lock'?'color:var(--muted)':''}">${techIcon(t,40,s2==='lock')}<span class="tn"><b>${esc(t.name)}</b><span>${sub}</span></span>${ng&&s2!=='done'?`<span class="tgara" title="Richiesta da ${ng} ${ng>1?'gare aperte':'gara aperta'}">gara</span>`:''}</button>`;};
+  // linee: nel varco prima della colonna di arrivo; se sulla riga di partenza c'è qualcosa in mezzo, passano nel canale tra le righe
+  const link=(a,t)=>{const p1=pos(a),p2=pos(t),x1=p1.x+NW,y1=p1.y+NH/2,x2=p2.x,y2=p2.y+NH/2,g2=x2-GAP/2;
+    const busy=nodes.some(n=>n.row===a.row&&n.tier>a.tier&&n.tier<t.tier);
+    if(!busy) return `M${x1} ${y1}H${g2}V${y2}H${x2}`;
+    const cy=t.row<a.row?p1.y-(GY-NH)/2:p1.y+NH+(GY-NH)/2;
+    return `M${x1} ${y1}H${x1+GAP/2}V${cy}H${g2}V${y2}H${x2}`;};
+  const L=nodes.flatMap(t=>(t.req||[]).map(r=>TECH.find(x=>x.id===r)).filter(a=>a&&a.tree===tree).map(a=>({a,t,on:sel&&(sel.id===a.id||sel.id===t.id)})));
+  const lines=[...L.filter(l=>!l.on),...L.filter(l=>l.on)].map(({a,t,on})=>`<path d="${link(a,t)}" fill="none" stroke="${on?'#ff7a3d':R(a.id)?'#2e9e48':'#8a96a6'}" stroke-width="${on?4:3}"/>`).join('');
+  const nodeBtn=t=>{const p=pos(t),s2=st(t), ni=toInst(t).length, ng=gare(t).length, rq=(t.req||[]).map(r=>TECH.find(x=>x.id===r)).filter(Boolean), xr=rq.filter(r=>r.tree!==t.tree);
+    const sub=s2==='done'?(ni?`<span class="warn">${t.tree==='cert'?'Da ottenere':'Da installare'} (${ni})</span>`:'<span class="ok">Ricercata</span>'):s2==='run'?`<span>In corso · ${Math.ceil(pj.left/7)} sett.</span>`:`<span>${eur(t.cost)} · ${techWeeks(t)} sett.</span>`;
+    const tip=`<div class='tt'>${esc(t.name)}</div><div>${esc(t.txt||'')}</div><div class='sm'>${esc(t.desc)}</div>${s2==='lock'?`<div class='sm'>Serve: ${esc(rq.filter(r=>!R(r.id)).map(r=>r.name).join(', '))}</div>`:''}`;
+    return `<button class="tnode s-${s2}${xr.length?' hasx':''}" data-act="seltech" data-id="${t.id}" data-tip="${tip}" aria-pressed="${!!sel&&sel.id===t.id}" style="${MOB?'':`left:${p.x}px;top:${p.y}px;width:${NW}px;height:${NH}px`}">${techIcon(t,40,s2==='lock')}<span class="tn"><b>${esc(t.name)}</b>${sub}</span>${ng&&s2!=='done'?`<span class="tgara">gara</span>`:''}${xr.length?`<span class="txr${xr.every(r=>R(r.id))?' ok':''}" data-tip="<div class='tt'>Serve anche dall'albero ${esc(trN(xr[0].tree))}</div>${esc(xr.map(r=>r.name+(R(r.id)?' (ricercata)':'')).join(', '))}">${techIcon({id:'_',tree:xr[0].tree},16)}<span>+${esc(trN(xr[0].tree).split(' ')[0])}</span></span>`:''}</button>`;};
+  // scheda della tecnologia scelta: cos'è, cosa fa, cosa serve, cosa apre e il pulsante giusto
   let det='';
-  if(sel){const s2=st(sel);const reqs=(sel.req||[]).map(r=>TECH.find(x=>x.id===r));
+  if(sel){const s2=st(sel), reqs=(sel.req||[]).map(r=>TECH.find(x=>x.id===r)).filter(Boolean), next=TECH.filter(x=>(x.req||[]).includes(sel.id));
+    const chip=r=>`<button class="tchip${R(r.id)?' ok':''}" data-act="seltech" data-id="${r.id}">${techIcon(r,16,!R(r.id))}<span>${esc(r.name)}</span>${r.tree!==sel.tree?`<small>${esc(trN(r.tree))}</small>`:''}</button>`;
     const eff=[sel.A?`${kw('accuratezza')} +${f1(sel.A)}`:'',sel.P?`${kw('puntualita')} +${f1(sel.P)}`:'',sel.att?`${kw('attrattivita','attrattività')} +${sel.att}`:'',perWh(sel)&&sel.tree==='cert'?`${kw('certificazioni','audit e attrezzatura')} ${eur(sel.inst)} per magazzino, canone ${eur(sel.mese)}/mese, certificato dopo ${wks(sel.weeks*7)}`:perWh(sel)?`${kw('installazione','installazione')} ${eur(sel.inst)} per magazzino, canone ${eur(welMese(sel))}/mese${sel.weeks?`, ${kw('apprendimento','apprendimento')} ${sel.weeks} ${sel.weeks===1?'settimana':'settimane'}`:', subito attivo'}`:''].filter(Boolean).join(' · ');
+    const pill={done:['ok','Ricercata'],run:['acc','In corso'],open:['','Da ricercare'],lock:['mut','Bloccata']}[s2];
     let act='';
-    if(s2==='open') act=`<button class="btn pri" data-act="research" data-id="${sel.id}" ${!pj&&S.cash>=sel.cost?'':'disabled'}>Avvia la ricerca · ${eur(sel.cost)} · ${wks(techDays(sel))}</button>${pj?'<span class="sm">C\'è già una ricerca in corso.</span>':''}`;
-    if(s2==='done'&&perWh(sel)) act=S.warehouses.map(w=>{const it=w.tech[sel.id], ce=sel.tree==='cert', learn=it&&(ce?!certOk(w,sel.id):techFactor(w,sel)<0), cs=ce&&it?certState(w,sel):'';
-      return `<div class="row"><span>${esc(w.name)}</span>${it?`<span class="sm ${learn?'warn':'ok'}">${learn?(ce?(cs==='susp'?'sospeso':'primo audit in attesa'):'in apprendimento'):(ce?(cs==='nc'?'certificato, con rilievi':'certificato'):'attiva')}</span>`:`<button class="btn sm2 pri" data-act="install" data-id="${sel.id}" data-wh="${w.id}" ${S.cash>=sel.inst&&!(sel.tree==='wel'&&polOn('spending'))&&instReq(sel,w)?'':'disabled'}>${ce?certBtn(sel):'Installa'} · ${eur(sel.inst)}</button>`}</div>`;}).join('')+(sel.tree==='wel'&&polOn('spending')?`<div class="sm warn">La policy ${kw('pol_spending','Spending review')} blocca i nuovi servizi di welfare.</div>`:'')+((sel.req||[]).length?`<div class="sm">Si installa nei magazzini che hanno già ${reqs.map(r=>esc(r.name)).join(' e ')}.</div>`:'');
-    det=`<div class="card"><div style="display:flex;gap:12px;align-items:center">${techIcon(sel,64,s2==='lock')}<div style="flex:1;display:flex;flex-direction:column;gap:3px"><div class="row"><span class="h3">${esc(sel.name)}</span><span class="sm">${s2==='done'?'Ricercata':''}</span></div><span class="sm">${kw('alberi',TREES.find(x=>x[0]===sel.tree)[1])} · ${perWh(sel)?(sel.tree==='cert'?'da ottenere magazzino per magazzino':'da installare in ogni magazzino'):'vale per tutta l\'azienda'}</span></div></div>
+    if(s2==='open') act=pj?`<div class="tnote">Si ricerca una cosa alla volta: prima deve finire <b>${esc(pt.name)}</b> (${wks(pj.left)}). Poi costa ${eur(sel.cost)} e dura ${wks(techDays(sel))}.</div>`
+      :S.cash<sel.cost?`<div class="tnote bad">Costa ${eur(sel.cost)}: in cassa ce ne sono ${eur(S.cash)}.</div>`
+      :`<button class="btn pri" data-act="research" data-id="${sel.id}">Avvia la ricerca<small>${eur(sel.cost)} · ${wks(techDays(sel))}</small></button>`;
+    if(s2==='lock') act=`<div class="tnote">Si sblocca dopo ${reqs.filter(r=>!R(r.id)).map(r=>`<b>${esc(r.name)}</b>`).join(' e ')||'un divieto temporaneo'}. Poi costa ${eur(sel.cost)} e dura ${wks(techDays(sel))}.</div>`;
+    if(s2==='run') act=`<div class="bar"><i style="width:${Math.round((1-pj.left/pj.total)*100)}%;background:var(--accent)"></i></div><div class="sm">Finisce il ${shortDate(S.day+pj.left)}, tra ${wks(pj.left)}.</div>`;
+    if(s2==='done'&&!perWh(sel)) act=`<div class="sm ok">Vale già per tutta l'azienda.</div>`;
+    if(s2==='done'&&perWh(sel)) act=`<div class="lab">${sel.tree==='cert'?'Nei magazzini':'Installazione nei magazzini'}</div>`+S.warehouses.map(w=>{const it=w.tech[sel.id], ce=sel.tree==='cert', learn=it&&(ce?!certOk(w,sel.id):techFactor(w,sel)<0), cs=ce&&it?certState(w,sel):'';
+      return `<div class="row"><span>${esc(w.name)}</span>${it?`<span class="sm ${learn?'warn':'ok'}">${learn?(ce?(cs==='susp'?'sospeso':'primo audit in attesa'):'in apprendimento'):(ce?(cs==='nc'?'certificato, con rilievi':'certificato'):'attiva')}</span>`:`<button class="btn sm2 pri" data-act="install" data-id="${sel.id}" data-wh="${w.id}" ${S.cash>=sel.inst&&!(sel.tree==='wel'&&polOn('spending'))&&instReq(sel,w)?'':'disabled'}>${ce?certBtn(sel):'Installa'} · ${eur(sel.inst)}</button>`}</div>`;}).join('')+(sel.tree==='wel'&&polOn('spending')?`<div class="sm warn">La policy ${kw('pol_spending','Spending review')} blocca i nuovi servizi di welfare.</div>`:'')+(reqs.length?`<div class="sm">Si installa nei magazzini che hanno già ${reqs.map(r=>esc(r.name)).join(' e ')}.</div>`:'');
+    det=`<div class="tdh">${techIcon(sel,side&&DW<280?48:64,s2==='lock')}<div class="wh-sm"><span class="h3">${esc(sel.name)}</span><span class="sm">${kw('alberi',trN(sel.tree))} · ${perWh(sel)?(sel.tree==='cert'?'da ottenere magazzino per magazzino':'da installare in ogni magazzino'):'vale per tutta l\'azienda'}</span><span class="pill ${pill[0]}">${pill[1]}</span></div></div>
       ${sel.txt?`<div class="ttxt">${esc(sel.txt)}</div>`:''}<div><b>Effetto:</b> ${esc(sel.desc)}</div>${eff?`<div class="sm">${eff}</div>`:''}
-      ${reqs.length?`<div class="sm">Richiede: ${reqs.map(r=>`<span class="${R(r.id)?'ok':'bad'}">${esc(r.name)}</span>`).join(', ')}</div>`:''}
+      ${reqs.length?`<div class="tlnk"><span class="lab">Serve</span>${reqs.map(chip).join('')}</div>`:''}
+      ${next.length?`<div class="tlnk"><span class="lab">Apre</span>${next.map(chip).join('')}</div>`:''}
       ${gare(sel).length?`<div class="sm">${kw('tech_richieste','Richiesta dalle gare')}: ${gare(sel).map(g=>esc(cname(g))).join(', ')}</div>`:''}
-      ${act}</div>`;}
-  const desc=TREES.find(x=>x[0]===tree)[2];
+      ${act}`;}
   // sul telefono l'albero diventa un elenco per livelli (niente scorrimento di lato); la scheda segue il livello scelto
-  if(MOB) return tiles+tabs+pjHtml+`<div class="sm">${desc}</div>`+[...Array(maxT)].map((_,i)=>{const tn=nodes.filter(t=>t.tier===i+1).sort((a,b)=>a.row-b.row);
-    return tn.length?`<div class="lab">Livello ${i+1}</div><div class="tlist">${tn.map(nodeBtn).join('')}</div>${sel&&sel.tier===i+1?det:''}`:'';}).join('');
-  return tiles+tabs+pjHtml+`<div class="sm">${desc}</div><div class="treebox"><div style="position:relative;width:${W}px;height:${H}px"><svg width="${W}" height="${H}" style="position:absolute;inset:0" aria-hidden="true">${lines}</svg>${nodes.map(nodeBtn).join('')}</div></div>`+det;
+  if(MOB) return rbar+stats+tabs+desc+[...Array(maxT)].map((_,i)=>{const tn=nodes.filter(t=>t.tier===i+1).sort((a,b)=>a.row-b.row);
+    return tn.length?`<div class="lab">Livello ${i+1}</div><div class="tlist">${tn.map(nodeBtn).join('')}</div>${sel&&sel.tier===i+1?`<div class="card tdet">${det}</div>`:''}`:'';}).join('');
+  return rbar+stats+tabs+desc+`<div class="tmain${side?' side':''}" style="--dw:${DW}px"><div class="treebox"><div style="position:relative;width:${W}px;height:${H}px"><svg width="${W}" height="${H}" style="position:absolute;inset:0" aria-hidden="true">${lines}</svg>${nodes.map(nodeBtn).join('')}</div></div><div class="card tdet">${det}</div></div>`;
  },
  certificazioni(){
   const tab=UI.sel.ctab||'mag';
@@ -7518,7 +7559,8 @@ const ACT={
  clidet(d){UI.cliOpen=UI.cliOpen||{}; UI.cliOpen[d.id]=!UI.cliOpen[d.id]; renderWin('clienti');},
  mapcli(d){UI.mapCli=UI.mapCli===d.id?null:d.id;renderMap();syncTrucks();renderAll();},
  seltree(d){UI.sel.tree=d.id;UI.sel.tech=null;renderWin('tecnologia');},
- seltech(d){UI.sel.tech=d.id;renderWin('tecnologia');},
+ seltech(d){const t=TECH.find(x=>x.id===d.id); if(t) UI.sel.tree=t.tree; UI.sel.tech=d.id; renderWin('tecnologia');
+   const det=document.querySelector('#win-tecnologia .tmain:not(.side) .tdet, .mob #win-tecnologia .tdet'); if(det) det.scrollIntoView({block:'nearest'});},
  poltog(d){const on=!polOn(d.id); if(polBlock(d.id,on)) return; polSet(d.id,on); toast(`Policy ${on?'accesa':'spenta'}: ${POL[d.id].name}`,on?'ok':'warn'); renderAll();},
  opentech(d){UI.sel.tree=d.tree;UI.sel.tech=d.id;openWin('tecnologia');},
  research(d){const t=TECH.find(x=>x.id===d.id); if(S.project||S.cash<t.cost||R(t.id)||!techOpen(t))return; S.cash-=t.cost; S.cur.tech+=t.cost;
@@ -7849,6 +7891,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.71',t:'Ricerca in ordine',x:['La scheda Ricerca della finestra Tecnologia è rifatta: in cima una sola barra con la ricerca in corso (rossa se è ferma), poi una riga con le tecnologie ricercate, l\'Innovazione e quelle da installare.','Sul computer la finestra è più larga e, quando c\'è posto, la scheda della tecnologia scelta sta a destra dell\'albero: non serve più scorrere fino in fondo per leggerla.','La scheda dice cosa serve e cosa apre dopo: un clic su una di quelle tecnologie ci porta, anche se è in un altro albero. Le linee della tecnologia scelta si colorano di arancione e un cartellino come «+Sviluppo» avvisa quando serve una ricerca di un altro albero.','I nomi lunghi non escono più dai riquadri, le linee non passano più dietro le altre tecnologie e l\'albero delle Certificazioni è più compatto. Al posto del pulsante grigio, un avviso spiega perché non si può avviare: ricerca già in corso, soldi che mancano o cosa serve prima.','Sul telefono le schede degli alberi stanno in una riga sola e l\'albero comincia subito.','La scheda con i certificati dei magazzini si chiama ora «Certificati e audit», per non confondersi con l\'albero Certificazioni.']},
  {v:'0.70',t:'Certificazioni per tutti i gusti',x:['Sette certificazioni nuove nell\'albero Certificazioni. Per magazzino: buone pratiche per i farmaci (GDP), merci pericolose (ADR), Bollino Banchina Sicura contro i furti e deposito fiscale e doganale. Per l\'azienda: ISO 14001 (ambiente), ISO 45001 (sicurezza), operatore doganale autorizzato e parità di genere.','Nuovi clienti esigenti: FarmaSpa e le parafarmacie chiedono le GDP, elettronica, occhiali e cosmetica l\'antifurto, distillerie e birrifici il deposito fiscale, aerei e nautica le merci pericolose.','I contratti già firmati chiedono solo quello che chiedevano allora. Al rinnovo il buyer aggiorna il capitolato e ti dà 6 mesi per metterti in regola.','Nuove linee di business: ogni tanto un cliente allarga il giro (il mobilificio che vende polpette surgelate, il supermercato con i vini d\'importazione…) e chiede una certificazione in più. Se accetti e ti certifichi in tempo, più pallet; se rinunci, la linea va in gara e magari la prende un concorrente.','Ufficio qualità: addetti in sede che alzano la conformità dei magazzini e fanno gli audit interni.','Ispezioni a sorpresa di ASL, NAS e Ispettorato del lavoro, più qualche guaio a tema prima degli audit. Due talenti nuovi: «Maniaco delle procedure» e «Vive di raccoglitori».']},
  {v:'0.69',t:'Menu in ordine',x:['Il menu ha 4 gruppi, uguali su computer e telefono: Operazioni, Commerciale, Azienda e Informazioni. Le voci passano da 19 a 12.','Le voci gemelle sono diventate schede in cima alla finestra, con la loro icona: Nuovo magazzino sta in Magazzini, Customer service in Clienti, Direzione in Manager, Policy in Azienda e CEO, Certificazioni in Tecnologia. Un quadratino rosso sulla scheda dice dove c\'è un problema, e dal menu si apre direttamente quella scheda.','Sul computer il menu si può allargare con il pulsante in cima: mostra il nome di ogni voce e una riga su come sta il reparto (gare aperte, clienti a rischio, ricerca in corso…). Con le sole icone, un quadratino rosso segnala i problemi. La scelta resta salvata.','La Classifica compare solo nelle partite con avversari, e il conto del mese non è più ripetuto in Azienda e CEO: si apre dal numero «Mese scorso» in alto.']},
  {v:'0.68',t:'Audit',x:['Le certificazioni ora vanno difese: valgono 3 anni, con un audit dell\'ente ogni anno. Il primo audit arriva qualche settimana dopo la richiesta, e se va male il certificato non viene rilasciato.','Ogni magazzino ha la sua «conformità», da 0 a 100: sale con il magazzino tenuto bene, il facility manager, la formazione, il WMS, un manager preciso e la ISO 9001; scende con i reparti in affanno e i facchini esterni. Nella finestra Certificazioni toccala per vedere da cosa dipende.','Audit superato, audit con rilievi (hai 30 giorni per sistemare, oppure paghi un\'azione correttiva) o certificato sospeso: con un certificato sospeso i clienti che lo chiedono perdono soddisfazione ogni mese, finché un audit straordinario non lo riattiva.','Due settimane prima di ogni audit arriva l\'avviso, e nell\'ultimo mese puoi prepararlo: +15 al punteggio.','Se la ISO 9001 viene sospesa, spariscono anche i suoi bonus su accuratezza e gare.','Nelle partite salvate i certificati che avevi restano validi per 3 anni da oggi, con il primo controllo nei prossimi mesi.']},
