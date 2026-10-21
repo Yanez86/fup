@@ -72,6 +72,18 @@ async def intro(pg, shot):
     await pg.tap('#intro') if await pg.evaluate("navigator.maxTouchPoints>0") else await pg.click('#intro')
     await pg.wait_for_selector('#intro:empty', state='attached')
 
+# finestre unite (0.69): le vecchie voci del menu sono schede della finestra madre
+TABS = {'magazzini': ['espansione'], 'clienti': ['customer'], 'manager': ['direzione'], 'azienda': ['policy'], 'tecnologia': ['certificazioni']}
+PARENT = {t: p for p, l in TABS.items() for t in l}
+
+async def win(pg, w):
+    # computer: apre dal menu la finestra di w in primo piano e, se w è una scheda, la sceglie; restituisce il selettore della finestra
+    p = PARENT.get(w, w)
+    await pg.click(f'#dock [data-id={p}]')
+    if not await pg.query_selector(f'#win-{p}'): await pg.click(f'#dock [data-id={p}]')
+    if p in TABS: await pg.click(f'#win-{p} [data-act=wtab][data-id={w}]')
+    return f'#win-{p}'
+
 async def menu(pg, wid):
     # telefono: le finestre si aprono dal menu che entra da sinistra
     await pg.tap('#burger'); await pg.wait_for_timeout(220)
@@ -136,7 +148,9 @@ async def phone(b, w, h, name, errs):
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
     await pg.tap('#burger'); await pg.wait_for_timeout(250)
     assert await pg.evaluate(FITS, '#dock'), f'{name}: menu aperto fuori schermo'
-    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == (19 if ri else 18), f'{name}: mancano voci nel menu'
+    nv = 12 + (1 if ri else 0) + (1 if await pg.evaluate('window.__FUP.HUM.bots.length') else 0)   # la Classifica c'è solo con gli avversari
+    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == nv, f'{name}: mancano voci nel menu'
+    assert len(await pg.query_selector_all('#dock .dg')) == 4, f'{name}: il menu non ha i 4 gruppi'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_menu.png'))
     await pg.tap('#dock .dh [data-act=menu]'); await pg.wait_for_timeout(250)
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu non si chiude'
@@ -161,8 +175,9 @@ async def phone(b, w, h, name, errs):
     await pg.tap('#modal [data-act=closemodal]')
     assert await pg.evaluate("()=>window.__FUP.S.notes.some(n=>n.k==='ev')"), f'{name}: evento sparito con «Decidi più tardi»'
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
-    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','customer','gare','report','personale','manager','direzione','policy','espansione','giornale','tecnologia','certificazioni','enciclopedia']+(['sindacato'] if ri else []):
+    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','gare','report','personale','manager','giornale','tecnologia','enciclopedia']+(['sindacato'] if ri else []):
         await menu(pg, wn)
+        if wn in TABS: await pg.tap(f'#win-{wn} [data-act=wtab][data-id={wn}]')   # dal menu si apre la scheda con un problema: si riparte dalla prima
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
         bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
         assert not bad, f'{name}: finestra {wn}: {bad}'
@@ -186,6 +201,12 @@ async def phone(b, w, h, name, errs):
             await pg.tap('#win-sindacato [data-act=rireq][data-i="0"][data-v=si]')
             assert await pg.evaluate("window.__FUP.S.ri.tav.reqs[0].c==='si'"), f'{name}: il pulsante Concedo non funziona'
             await pg.evaluate("()=>{const S=window.__FUP.S; S.ri.tav=null; S.warehouses[0].ag=20;}")
+        for tb in TABS.get(wn, []):   # le altre schede della finestra
+            await pg.tap(f'#win-{wn} [data-act=wtab][data-id={tb}]')
+            assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn}, scheda {tb}, esce dallo schermo'
+            bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
+            assert not bad, f'{name}: finestra {wn}, scheda {tb}: {bad}'
+            await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{tb}.png'))
         await pg.tap(f'#win-{wn} [data-act=close]')
     # parola chiave: primo tocco = tooltip, secondo tocco = enciclopedia
     await menu(pg, 'magazzini')
@@ -334,6 +355,15 @@ async def main():
         bar = await pg.evaluate(BAR)
         assert bar['eq'] and bar['right'] and await pg.evaluate("document.querySelectorAll('#top .spd button').length") == 2, f'barra in alto {bar}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_barra_pausa.png'), clip={'x': 0, 'y': 0, 'width': 1440, 'height': 120})
+        # menu (0.69): 4 gruppi; su uno schermo grande parte largo, il pulsante in cima lo riduce a icone e la scelta resta
+        m = await pg.evaluate("()=>{const d=document.querySelector('#dock'); return {wide:d.classList.contains('wide'), g:d.querySelectorAll('.dg').length, fit:d.getBoundingClientRect().bottom<=innerHeight, rows:[...d.querySelectorAll('[data-act=toggle] .dl small')].length};}")
+        assert m['wide'] and m['g'] == 4 and m['fit'] and m['rows'] >= 10, f'menu largo: {m}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_menu_largo.png'))
+        await pg.click('#dock [data-act=dockw]')
+        m = await pg.evaluate("()=>({wide:document.querySelector('#dock').classList.contains('wide'), ls:localStorage.getItem('fup-menu-largo'), w:document.querySelector('#dock').offsetWidth})")
+        assert not m['wide'] and m['ls'] == '0' and m['w'] < 80, f'menu a icone: {m}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_menu_icone.png'))
+        await pg.click('#dock [data-act=dockw]')
         # lente delle province
         assert not await pg.is_visible('#lenses [data-act=lens][data-id=prov]'), 'le lenti devono partire chiuse'
         await pg.click('#lenses [data-act=lensmenu]')
@@ -348,8 +378,11 @@ async def main():
         assert await pg.evaluate("document.querySelector('#ov [aria-label=Viaggi]')!==null"), 'lente Viaggi non disegnata'
         await pg.screenshot(path=os.path.join(OUT, 'shot_lente_viaggi.png'))
         await pg.keyboard.press('KeyL')  # torna alla mappa normale
-        for w in ['azienda','magazzini','traffico','clienti','gare','report','personale','manager','direzione','policy','espansione','giornale','classifica','certificazioni','tecnologia']:
+        for w in ['azienda','magazzini','traffico','clienti','gare','report','personale','manager','giornale','classifica','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
+            for t in TABS.get(w, []) + ([w] if w in TABS else []):   # ogni scheda, poi di nuovo la prima
+                await pg.click(f'#win-{w} [data-act=wtab][data-id={t}]')
+                assert await pg.evaluate(FITS, f'#win-{w}'), f'finestra {w}, scheda {t}, esce dal fondo dello schermo'
             assert await pg.evaluate(FITS, f'#win-{w}'), f'finestra {w} esce dal fondo dello schermo'
             if w == 'classifica':
                 assert await pg.eval_on_selector_all('#win-classifica .cls', 'e=>e.length') == 3, 'classifica senza le 3 aziende'
@@ -380,7 +413,7 @@ async def main():
           const tpl=F.TENDER_POOL.find(t=>t.name==='Riseria La Mondina'), ci=F.CINFO[tpl.name], t={...tpl,zone:ci.zones[0],src:ci.src,mode:ci.mode,dur:24};
           const a=F.bidEstimate(t,w.id,1).certW.length, c0=S.cash; F.ACT.install({id:'haccp',wh:w.id}); const paid=c0-S.cash, b=F.bidEstimate(t,w.id,1).certW.length;
           F.ACT.install({id:'freddo',wh:w.id}); const fr0=!!w.tech.freddo; F.certAudit(w,F.TECH.find(x=>x.id==='haccp'),'init',50); const c=F.bidEstimate(t,w.id,1).certW.length;
-          F.ACT.opencert({tab:'mag'}); return {a,b,c,paid,fr0,ok:F.certOk(w,'haccp'),win:!!document.querySelector('#win-certificazioni .ce-w')};}''')
+          F.ACT.opencert({tab:'mag'}); return {a,b,c,paid,fr0,ok:F.certOk(w,'haccp'),win:!!document.querySelector('#win-tecnologia .ce-w')};}''')
         assert r['a'] == 1 and r['b'] == 1 and r['c'] == 0 and r['ok'] and r['paid'] == 3000 and r['win'], f'HACCP nel magazzino: {r}'
         # audit (0.68): rilievi e azione correttiva, sospensione (il cliente se ne accorge, la gara si chiude), audit straordinario
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0],T=F.TECH.find(x=>x.id==='haccp'),it=w.tech.haccp,o={};
@@ -411,26 +444,23 @@ async def main():
         assert all(r.values()) and r['err'] is True, f'certificazioni, fasi 3 e 4: {r}'
         await pg.evaluate(CLEAR)
         await pg.screenshot(path=os.path.join(OUT, 'shot_certificazioni.png'))
-        await pg.click('#win-certificazioni [data-act=ctab][data-id=az]')
+        await pg.click('#win-tecnologia [data-act=ctab][data-id=az]')
         await pg.screenshot(path=os.path.join(OUT, 'shot_certificazioni_azienda.png'))
-        await pg.click('#win-certificazioni [data-act=close]')
-        await pg.click('#dock [data-id=direzione]')  # chiude la finestra aperta prima...
-        if not await pg.query_selector('#win-direzione'): await pg.click('#dock [data-id=direzione]')  # ...e la riapre in primo piano
+        await pg.click('#win-tecnologia [data-act=close]')
+        await win(pg, 'direzione')
         await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.ACT.hiremgr({id:'ottavio'}); const o=S.managers.find(m=>m.id==='ottavio'); S.warehouses.forEach(w=>{if(w.mgr==='ottavio')w.mgr=null;}); o.wh=null;}")
-        await pg.click('#dock [data-id=direzione]')
-        if not await pg.query_selector('#win-direzione'): await pg.click('#dock [data-id=direzione]')
-        await pg.select_option('#win-direzione select[data-role=fin]', 'ottavio')
+        await win(pg, 'direzione')
+        await pg.select_option('#win-manager select[data-role=fin]', 'ottavio')
         await pg.screenshot(path=os.path.join(OUT, 'shot_direzione.png'))
         st = await pg.evaluate('()=>({barcode:!!window.__FUP.S.warehouses[0].tech.barcode, fin:window.__FUP.S.dirs.fin})')
         assert st['barcode'] and st['fin'] == 'ottavio', st
         # policy: accensione, attesa di 90 giorni, pretese dei manager, ultimatum con aumento e dimissioni
         await pg.evaluate(CLEAR)
         await pg.evaluate("()=>{const S=window.__FUP.S; ['regolamento','barcode','hr'].forEach(t=>S.researched[t]=true);}")
-        await pg.click('#dock [data-id=policy]')
-        if not await pg.query_selector('#win-policy'): await pg.click('#dock [data-id=policy]')
-        await pg.click('#win-policy [data-act=poltog][data-id=zerostra]')
+        await win(pg, 'policy')
+        await pg.click('#win-azienda [data-act=poltog][data-id=zerostra]')
         assert await pg.evaluate("()=>window.__FUP.polOn('zerostra')"), 'zero straordinario non acceso'
-        assert await pg.eval_on_selector('#win-policy [data-act=poltog][data-id=zerostra]', 'e=>e.disabled'), 'la policy si può cambiare subito'
+        assert await pg.eval_on_selector('#win-azienda [data-act=poltog][data-id=zerostra]', 'e=>e.disabled'), 'la policy si può cambiare subito'
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; F.ACT.hiremgr({id:'davide'}); F.ACT.hiremgr({id:'rosa'});
           const d=S.managers.find(x=>x.id==='davide'), r0=d.ral; let ult=0;
           for(let i=0;i<40;i++){ F.step(); const n=S.notes.find(x=>x.k==='ev'); if(n) F.ACT.note({id:n.id}); const m=document.querySelector('#modal');
@@ -438,8 +468,7 @@ async def main():
           const rosa=S.managers.find(x=>x.id==='rosa');
           return {ult, tol:!!(d.tol||{}).zerostra, raise:d.ral>r0, g:F.grievances(d).length, rosa:F.grievances(rosa).map(x=>x.id)};}''')
         assert r['ult'] >= 1 and r['tol'] and r['raise'] and r['g'] == 0, r
-        await pg.click('#dock [data-id=policy]')
-        if not await pg.query_selector('#win-policy'): await pg.click('#dock [data-id=policy]')
+        await win(pg, 'policy')
         await pg.screenshot(path=os.path.join(OUT, 'shot_policy.png'))
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; F.ACT.hiremgr({id:'chiara'}); const c=S.managers.find(x=>x.id==='chiara'); c.unh=29;
           F.step(); const n=S.notes.find(x=>x.k==='ev'); if(n) F.ACT.note({id:n.id}); const m=document.querySelector('#modal'); const ok=!!n&&m.textContent.includes('minaccia'); m.querySelectorAll('[data-act=evopt]')[2].click();
@@ -600,6 +629,7 @@ async def main():
           const q0=F.csQual().v, n=F.csNeed(); F.ACT.hirecs({id:'mirella'}); S.office.cs=1; const q1=F.csQual().v;
           F.ACT.open({id:'customer'}); return {q0,q1,n,resp:S.cs.resp};}''')
         assert r['n'] == 1 and r['resp'] == 'mirella' and r['q1'] > r['q0'], r
+        assert await pg.query_selector('#win-clienti [data-act=wtab][data-id=customer][aria-selected=true]'), 'la vecchia voce Customer service non apre la sua scheda'
         await pg.screenshot(path=os.path.join(OUT, 'shot_customer.png'))
         await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.cardsOff(); F.csEvent({c:'cs1',v:0,day:S.day});}")
         assert await pg.query_selector('#notes .nt.yellow[data-act=note]'), 'il dramma del cliente non arriva come tessera gialla'
@@ -611,9 +641,9 @@ async def main():
         await pg.evaluate("()=>{const F=window.__FUP;F.S.speed=0;F.step();}")
         r = await pg.evaluate("()=>{const S=window.__FUP.S;return {sat:S.clients.find(c=>c.id==='cs1').sat,log:S.cs.log[0],res:S.notes.some(n=>n.k==='res'&&/manca un bancale/.test(n.title))}}")
         assert r['sat'] == min(100, sat0+3) and r['log']['how'] == 'manager' and r['res'], r
-        await pg.click('#dock [data-id=customer]'); await pg.click('#dock [data-id=customer]')
-        assert 'Risolto' in await pg.inner_text('#win-customer'), 'la richiesta non compare tra le recenti'
-        await pg.click('#win-customer [data-act=close]')
+        await win(pg, 'customer')
+        assert 'Risolto' in await pg.inner_text('#win-clienti'), 'la richiesta non compare tra le recenti'
+        await pg.click('#win-clienti [data-act=close]')
         # picco di consegne e overstock: si accettano dalla tessera gialla, il giorno dopo cambiano pallet e posti occupati
         await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.cardsOff(); S.notes=S.notes.filter(n=>n.k!=='ev'); F.csEvent({c:'cs2',k:'picco',day:S.day});}")
         await pg.click('#notes .nt.yellow[data-act=note]')
@@ -631,9 +661,9 @@ async def main():
         await pg.evaluate("()=>{const F=window.__FUP;F.S.speed=0;F.step();}")
         r = await pg.evaluate("()=>{const F=window.__FUP,S=F.S; return {ov:S.cs.ov.length,st:F.computeWH(S.warehouses[0]).stock,n:(S.cs.ov[0]||{}).n};}")
         assert r['ov'] == 1 and r['st'] == st0 + r['n'], r
-        await pg.click('#dock [data-id=customer]')
-        assert 'In corso' in await pg.inner_text('#win-customer'), 'picchi e overstock non compaiono nella finestra'
-        await pg.click('#win-customer [data-act=close]')
+        await win(pg, 'customer')
+        assert 'In corso' in await pg.inner_text('#win-clienti'), 'picchi e overstock non compaiono nella finestra'
+        await pg.click('#win-clienti [data-act=close]')
         # nelle Opzioni si toglie la pausa automatica; senza risposta, dopo due settimane decide il vice
         await pg.click('#top [data-act=options]')
         await pg.click('#modal [data-act=evpause]')
