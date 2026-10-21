@@ -1,0 +1,72 @@
+{
+  "name": "pxl-pixelart",
+  "version": "0.1.0",
+  "description": "A compact pixel-art DSL for AI agents and humans: sprites, layers, scenes, sheets, with a live painting viewer.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "pxl": "./bin/pxl.js"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./core": "./dist/core/index.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "dist",
+    "scripts",
+    "types",
+    "examples/*.px.js",
+    "examples/sidescroller/*.{px.js,hex,png}",
+    "examples/tropical/*.{px.js,hex}",
+    "examples/tropical/refs/*.{png,txt,md}",
+    "examples/halloween/*.{px.js,hex}",
+    "examples/sunset/*.px.js",
+    "examples/perspective/*.px.js",
+    "examples/parallax/*.px.js",
+    "examples/rig/*.px.js",
+    "examples/cyberpunk/*.px.js",
+    "examples/cyberpunk/pipeline/*.{px.js,md}",
+    "examples/motion/*.{json,md}",
+    "examples/fonts/*.px.js",
+    "SKILL.md",
+    "characters.md",
+    "scenes.md",
+    "reference.md",
+    "lighting.md",
+    "rotation.md"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "prepare": "node scripts/build.js",
+    "test": "node --test --disable-warning=ExperimentalWarning \"test/**/*.test.ts\"",
+    "typecheck": "tsc -p tsconfig.json",
+    "check": "npm run typecheck && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^7.0.0"
+  },
+  "keywords": [
+    "pixel-art",
+    "sprites",
+    "dsl",
+    "gamedev",
+    "sprite-sheet",
+    "ai-agent",
+    "claude-code",
+    "skill"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/augusto-scarvalho/claude-pxl.git"
+  },
+  "homepage": "https://github.com/augusto-scarvalho/claude-pxl#readme",
+  "bugs": {
+    "url": "https://github.com/augusto-scarvalho/claude-pxl/issues"
+  }
+}
