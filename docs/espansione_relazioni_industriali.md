@@ -1,6 +1,13 @@
 # Pacchetto «Relazioni industriali» (progetto)
 
-Espansione da rilasciare in un'unica soluzione. **Stato: progetto, non ancora costruito.**
+Espansione da rilasciare in un'unica soluzione. **Stato: costruito nella versione 0.66** (le formule esatte sono in `docs/design.md`, sezione «Pacchetto Relazioni industriali»).
+
+Differenze rispetto al progetto, decise durante la costruzione:
+- «Porte aperte»: invece di «abilità del CEO −1» costa −2 nel punteggio delle gare (il CEO passa le mattine in mensa invece che dai buyer).
+- «Province confinanti» nel contagio: magazzini entro 70 km.
+- Contratto «a pallet»: +12% sul prezzo, e il fornitore adegua da solo le persone ogni lunedì.
+- La prossima rata del contratto si vede nella finestra Relazioni industriali e nel menu del telefono, non nella barra in alto (sul telefono non c'è spazio).
+- Il pacchetto vale solo per le partite nuove: i salvataggi di prima restano senza pacchetto, quindi non serve convertire la cooperativa.
 Si attiva nella lobby come opzione della partita: chi non la attiva gioca come oggi, i vecchi salvataggi restano validi.
 I numeri sono una prima proposta, da ritoccare in fase di bilanciamento; sono stati tarati su quelli già in uso (morale, stipendi, cooperativa attuale, vedi `design.md`).
 

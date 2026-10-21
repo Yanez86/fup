@@ -219,3 +219,16 @@ bg=Image.new('RGBA',(10*104,4*120),(42,58,80,255))
 for i,n in enumerate(VOLTI):
     im=Image.open(OUT+f'p_{n}.png'); bg.alpha_composite(im,(4+(i%10)*104,4+(i//10)*120))
 bg.save(ROOT+'/tools/out/volti_preview.png')
+
+# leader dei tre sindacati del pacchetto Relazioni industriali (u_cup, u_sam, u_coba): una spilla col colore della sigla
+def spilla(col):
+    def f(c): c.px([(16,47),(17,47),(16,48),(17,48)],col); c.px([(16,49),(17,49)],'#16202e')
+    return f
+def _uni(c,col,collar):
+    collar(c); spilla(col)(c)
+def u_cup(c): _uni(c,'#e0393e',cc_col('#f4f5f7'))
+def u_sam(c): _uni(c,'#ff7a3d',polo('#3a2a1c'))
+def u_coba(c): _uni(c,'#9b6bff',tshirt('#1b2238'))
+person('u_cup',skin='chiara',hair='#b9bec5',hairl='#dfe3e8',hairstyle='bob',cloth='#e0393e',clothd='#a8262b',clothl='#ff6a6e',glasses='#16202e',lips='#a83a3a',earring='#c3d0dc',extra=u_cup)
+person('u_sam',skin='media',hair='#2c2420',hairl='#463830',hairstyle='buzz',cloth='#5a3e2b',clothd='#3e2a1c',clothl='#7a5a40',mustache='#2c2420',extra=u_sam)
+person('u_coba',skin='scura',hair='#1c1612',hairl='#3d2419',hairstyle='messy',cloth='#26365c',clothd='#1b2238',clothl='#3a4f80',beard='#1c1612',extra=u_coba)

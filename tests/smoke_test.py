@@ -1,6 +1,7 @@
 """Test automatico: apre il gioco in Chromium headless, clicca tutti i menu, prova alberi tecnologici e direzione,
 crea un CEO personalizzato, prova il gioco su un telefono (verticale e orizzontale: finestre, tocchi, zoom con due dita),
-poi fa giocare un bot semplice 3 anni con ognuno dei 4 CEO e con uno creato. Fallisce se ci sono errori JavaScript.
+poi fa giocare un bot semplice 3 anni con ognuno dei 4 CEO e con uno creato, e una partita col pacchetto Relazioni industriali.
+Fallisce se ci sono errori JavaScript.
 Uso: python3 tools/build.py && python3 tests/smoke_test.py   (richiede: pip install playwright && playwright install chromium)"""
 import asyncio, os, sys
 from playwright.async_api import async_playwright
@@ -111,6 +112,8 @@ async def phone(b, w, h, name, errs):
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_visura.png'), full_page=True)
     # lobby: le quattro aziende, il ritmo del tempo e le condizioni di vittoria
     await pg.tap('[data-act=stnext]'); await pg.wait_for_timeout(200)
+    ri = name == 'verticale'   # in verticale si gioca col pacchetto Relazioni industriali
+    if ri: await pg.tap('[data-act=lbri]')
     assert await pg.evaluate("document.querySelectorAll('#start .lb-slot').length") == 4, f'{name}: lobby senza i 4 posti'
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: la lobby scorre di lato'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_lobby.png'), full_page=True)
@@ -133,7 +136,7 @@ async def phone(b, w, h, name, errs):
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
     await pg.tap('#burger'); await pg.wait_for_timeout(250)
     assert await pg.evaluate(FITS, '#dock'), f'{name}: menu aperto fuori schermo'
-    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 17, f'{name}: mancano voci nel menu'
+    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == (18 if ri else 17), f'{name}: mancano voci nel menu'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_menu.png'))
     await pg.tap('#dock .dh [data-act=menu]'); await pg.wait_for_timeout(250)
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu non si chiude'
@@ -158,7 +161,7 @@ async def phone(b, w, h, name, errs):
     await pg.tap('#modal [data-act=closemodal]')
     assert await pg.evaluate("()=>window.__FUP.S.notes.some(n=>n.k==='ev')"), f'{name}: evento sparito con «Decidi più tardi»'
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
-    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','customer','gare','report','personale','manager','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
+    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','customer','gare','report','personale','manager','direzione','policy','espansione','giornale','tecnologia','enciclopedia']+(['sindacato'] if ri else []):
         await menu(pg, wn)
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
         bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
@@ -172,6 +175,17 @@ async def phone(b, w, h, name, errs):
                 await pg.evaluate("()=>{const e=document.querySelector('#win-manager .ng'); if(e) e.scrollIntoView({block:'center'});}")
                 await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_manager_{tb}.png'))
             await pg.tap('#win-manager [data-act=mtab][data-id=team]')
+        if wn == 'sindacato':   # le schede del pacchetto, con un tavolo aperto
+            await pg.evaluate("()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; ['relsind','talpa','vendor'].forEach(t=>S.researched[t]=true); F.riW(w); w.ag=60; F.riTavOpen(w,true); F.ACT.ritab({id:'clima'});}")
+            for tb in ['clima', 'tav', 'ccnl', 'hdl']:
+                await pg.tap(f'#win-sindacato [data-act=ritab][data-id={tb}]')
+                bad = await pg.evaluate(NOSIDE, '#win-sindacato')
+                assert not bad, f'{name}: relazioni industriali, scheda {tb}: {bad}'
+                await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_sindacato_{tb}.png'))
+            await pg.tap('#win-sindacato [data-act=ritab][data-id=tav]')
+            await pg.tap('#win-sindacato [data-act=rireq][data-i="0"][data-v=si]')
+            assert await pg.evaluate("window.__FUP.S.ri.tav.reqs[0].c==='si'"), f'{name}: il pulsante Concedo non funziona'
+            await pg.evaluate("()=>{const S=window.__FUP.S; S.ri.tav=null; S.warehouses[0].ag=20;}")
         await pg.tap(f'#win-{wn} [data-act=close]')
     # parola chiave: primo tocco = tooltip, secondo tocco = enciclopedia
     await menu(pg, 'magazzini')
@@ -714,6 +728,39 @@ async def main():
         assert 'Fallimento' in await pg.inner_text('#win-finale .fin-esito'), 'report dopo il fallimento'
         await pg.screenshot(path=os.path.join(OUT, 'shot_finale_fallimento.png'))
         await pg.evaluate("()=>document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click())")
+        # pacchetto Relazioni industriali: tre anni con tre avversari, rate del contratto, tavolo, fornitori, talpa e la finestra
+        r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click());
+          F.newGame('gino',null,{mode:'classica',win:{clima:true},ri:true}); const H=F.HUM; H.nextEvent=40;
+          H.bots=[['edoardo','espansione'],['valeria','qualita'],['marco','prezzo']].map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],'normale',i));
+          for(let d=0;d<1095&&!H.over;d++){ const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}
+            const n=(H.notes||[]).find(x=>x.k==='ev'); if(n&&!m.innerHTML) F.ACT.note({id:n.id});
+            H.cash=Math.max(H.cash,300000); H.tenders.filter(t=>!t.done&&!t.bid).forEach(t=>{const e=F.bidEstimate(t,H.warehouses[0].id,0.95); if(e&&e.fits&&e.sat<0.85) t.bid={wh:H.warehouses[0].id,mult:0.95};}); F.step(); }
+          document.querySelector('#modal').innerHTML='';
+          const w=H.warehouses[0], out={day:H.day,wage:H.ri.wage,idx:H.riw.idx,ag:w.ag!=null,bots:H.bots.map(b=>!!b.ri&&b.warehouses.every(x=>x.ag!=null)),
+            tech:F.TECH.some(t=>t.id==='talpa'),strikes:H.ri.strikes,clima:F.climaProg(H)};
+          // tavolo forzato: concedendo tutto si firma alla prima seduta
+          H.ri.tav=null; w.deal=null; w.ag=70; F.riTavOpen(w,true); H.ri.tav.reqs.forEach(r=>r.c='si'); H.ri.tav.next=H.day; F.step(); out.deal=!!w.deal;
+          // fornitore e ritorno al personale interno
+          w.deal=null; const av=F.hdlAvail(w); out.av=av.length; if(av.length){ F.hdlSet(w,av[0].id,'ora'); out.hdl=w.hdl===av[0].id&&w.coop; F.hdlInternal(w,true); out.back=!w.hdl&&!w.coop; }
+          // la talpa scoperta: multa, reputazione, agitazione alle stelle, ricerca bloccata
+          H.researched.talpa=true; const rep0=H.rep; F.riTalpaFound(); out.talpa=!H.researched.talpa&&H.rep<rep0&&w.ag>=90&&H.ri.ban>H.day;
+          F.renderAll(); out.dock=!!document.querySelector('#dock [data-id=sindacato]'); return out;}''')
+        assert r['wage'] > 1.01 and r['idx'] > 1.01 and r['ag'] and all(r['bots']) and r['tech'], f'pacchetto Relazioni industriali: {r}'
+        assert r['deal'] and r['talpa'] and r['dock'] and (not r['av'] or (r['hdl'] and r['back'])), f'pacchetto Relazioni industriali: {r}'
+        print('relazioni industriali dopo 3 anni:', r)
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; S.ri.ban=0; ['relsind','talpa','vendor','paritetico'].forEach(t=>S.researched[t]=true); w.ag=62; F.riTavOpen(w,true); F.ACT.toggle({id:'sindacato'});}")
+        for t in ['clima','tav','ccnl','hdl']:
+            await pg.click(f'#win-sindacato [data-act=ritab][data-id={t}]')
+            await pg.screenshot(path=os.path.join(OUT, f'shot_ri_{t}.png'))
+        await pg.evaluate("()=>{const F=window.__FUP; document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.ACT.openwh({id:F.S.warehouses[0].id}); document.querySelector('#win-magazzini .ri-whb').scrollIntoView();}")
+        await pg.screenshot(path=os.path.join(OUT, 'shot_ri_magazzino.png'))
+        await pg.evaluate("()=>{document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); window.__FUP.ACT.lens({id:'clima'});}")
+        assert await pg.query_selector('#ov [aria-label="Clima sindacale"]'), 'lente del clima sindacale mancante'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_ri_lente.png'))
+        await pg.evaluate("()=>window.__FUP.ACT.lens({id:'base'})")
+        # senza il pacchetto la partita resta com'era: niente ricerche, voce di menu e lente del pacchetto
+        off = await pg.evaluate("()=>{const F=window.__FUP; F.newGame('gino'); F.renderAll(); return {tech:F.TECH.some(t=>t.ri),pol:F.POLICIES.some(p=>p.ri),dock:!!document.querySelector('#dock [data-id=sindacato]'),lens:F.lensL().some(l=>l.ri)};}")
+        assert not any(off.values()), f'senza pacchetto restano pezzi del pacchetto: {off}'
         # tempo senza pausa: in modalità Veloce i giorni passano anche con una finestra aperta
         d0 = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('valeria',null,{mode:'veloce',win:{}}); F.S.speed=1; F.ACT.options(); return F.S.day;}''')
         await pg.wait_for_timeout(3500)
