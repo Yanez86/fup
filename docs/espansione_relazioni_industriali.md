@@ -8,7 +8,7 @@ Differenze rispetto al progetto, decise durante la costruzione:
 - Contratto «a pallet»: +12% sul prezzo, e il fornitore adegua da solo le persone ogni lunedì.
 - La prossima rata del contratto si vede nella finestra Relazioni industriali e nel menu del telefono, non nella barra in alto (sul telefono non c'è spazio).
 - Il pacchetto vale solo per le partite nuove: i salvataggi di prima restano senza pacchetto, quindi non serve convertire la cooperativa.
-Si attiva nella lobby come opzione della partita: chi non la attiva gioca come oggi, i vecchi salvataggi restano validi.
+Si sceglie nel passo «Pacchetti», l'ultimo della creazione della partita (di base è acceso): chi lo spegne gioca come prima, i vecchi salvataggi restano validi.
 I numeri sono una prima proposta, da ritoccare in fase di bilanciamento; sono stati tarati su quelli già in uso (morale, stipendi, cooperativa attuale, vedi `design.md`).
 
 ## Decisioni prese con Davide

@@ -770,7 +770,13 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .co-tag{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--ink);overflow-wrap:anywhere}.co-tag svg{flex:none}
 .seg{display:flex;flex-wrap:wrap;gap:4px}
 /* pacchetto Relazioni industriali */
-.lb-pack{max-width:560px}.lb-pack[aria-pressed="true"] b{color:var(--ok-t,#1f7a34)}
+.pks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pk{display:flex;flex-direction:column;gap:6px;text-align:left;padding:10px;background:#fff;border:3px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2);font:inherit;color:var(--ink)}
+button.pk{cursor:pointer}.pk[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 3px var(--accent), 3px 3px 0 var(--ink);background:#fff9ef}.pk[aria-pressed="false"]{opacity:.75}
+.pk-base{background:var(--panel)}.pk-h{display:flex;gap:10px;align-items:center}.pk-h svg{flex:none}.pk-h .disp{font-size:18px}
+.pk-st{margin-left:auto;flex:none;padding:2px 8px;border:2px solid var(--ink);font-weight:700;background:var(--panel2)}.pk-st.on{background:var(--ok);color:#fff}
+.pk-x{margin:0;padding-left:18px;font-size:14px;line-height:1.4}.pk-t{color:var(--muted)}
+.mob .pks{grid-template-columns:1fr}
 .ri-ag{display:grid;grid-template-columns:minmax(60px,1fr) auto auto;gap:8px;align-items:center}
 .ri-ag .bar,.ri-meter .bar{position:relative;height:12px}.ri-ag .bar i,.ri-meter .bar i{display:block;height:100%}
 .ri-ag .bar s,.ri-meter .bar s{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1px;background:var(--ink);text-decoration:none}
@@ -2630,14 +2636,14 @@ Le difficoltà: **Facile** parte con il 15% di cassa in meno, decide ogni due se
 
 Magazzini e persone sono uno solo per tutti: un sito preso da un'avversaria non si può affittare finché non lo lascia, un manager assunto da lei non è sul mercato. Se un'avversaria fallisce (cassa sotto −50.000 € a fine mese) i suoi magazzini tornano liberi e i suoi clienti, prima o poi, tornano in gara. I magazzini delle avversarie si vedono sulla mappa nel loro colore.`);
 /* voci del pacchetto Relazioni industriali */
-wk('relazioni_industriali','ri','Relazioni industriali',`Pacchetto di espansione che si accende nella lobby: sindacati, scioperi, contratto nazionale e fornitori di handling.`,
+wk('relazioni_industriali','ri','Relazioni industriali',`Pacchetto di espansione che si sceglie nel passo «Pacchetti», quando crei la partita (di base è acceso): sindacati, scioperi, contratto nazionale e fornitori di handling.`,
 `Con il pacchetto ogni magazzino ha la sua [[agitazione]] sindacale, un [[delegato]] e un sindacato di riferimento ([[sindacati]]). Se l'agitazione sale arrivano lo stato di agitazione, gli [[sciopero|scioperi]] e il [[presidio]]; per fermarli c'è il [[tavolo]] delle trattative, dove si firma un [[accordo_integrativo|accordo integrativo]].
 
 Ogni tre anni si rinnova il [[contratto_nazionale|contratto nazionale]], con gli aumenti a [[rate_ccnl|rate]] per tutti; l'associazione [[confpallet|Confpallet]] li rende un po' più leggeri.
 
 La cooperativa sparisce: al suo posto ci sono i [[fornitori]] di handling, locali e globali. Nell'albero Sviluppo aziendale arriva un ramo nuovo, con la strada del dialogo e quella del contenimento (fino alla [[talpa]]), e quattro policy: Linea dura, Porte aperte, Premio di presenza e Crumiri in appalto.
 
-Tutto si segue dalla finestra Relazioni industriali e dalla lente della mappa Clima sindacale. Il pacchetto si sceglie all'inizio e vale per tutta la partita.`);
+Tutto si segue dalla finestra Relazioni industriali e dalla lente della mappa Clima sindacale. Il pacchetto si sceglie nel passo «Pacchetti», l'ultimo prima di iniziare: di base è acceso e vale per tutta la partita.`);
 wk('agitazione','ri','Agitazione sindacale',`Da 0 a 100, una per magazzino: quanto il personale è pronto a incrociare le braccia.`,
 `Ogni giorno l'agitazione si avvicina del 2% alla sua tensione, che si calcola così:
 • base 12;
@@ -4309,7 +4315,7 @@ function showWin(w,why){
    <div class="row"><button class="btn" data-act="finale">Report della partita</button><button class="btn" data-act="openclass">Classifica</button><button class="btn" data-act="closemodal">Continua a giocare</button><button class="btn pri" data-act="restart">Nuova partita</button></div></div>`);
 }
 /* ====================== RELAZIONI INDUSTRIALI ====================== */
-/* Pacchetto di espansione «Relazioni industriali», acceso nella lobby (S.cfg.ri, letto da riOn()): agitazione sindacale per magazzino
+/* Pacchetto di espansione «Relazioni industriali», scelto nel passo Pacchetti della creazione (PACKS, S.cfg.ri, letto da riOn()): agitazione sindacale per magazzino
    (w.ag, con contagio tra magazzini vicini anche delle altre aziende), scioperi e presidi, tavolo delle trattative (S.ri.tav),
    contratto nazionale con le rate (mondo: HUM.riw; azienda: S.ri.wage), associazione Confpallet, talpa, fornitori di handling (w.hdl, HDL)
    al posto della cooperativa. Senza il pacchetto la partita resta com'era: cooperativa, niente sindacati. */
@@ -6080,10 +6086,10 @@ const LENSES=[
   ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="11" height="10" fill="#5fb4f0"/><rect x="0" y="3" width="7" height="7" fill="#8ed15b"/><rect x="2" y="1" width="6" height="3" fill="#8ed15b"/><rect x="5" y="4" width="2" height="2" fill="#16202e"/><rect x="2" y="7" width="2" height="2" fill="#fff"/></svg>'},
  {id:'prov',n:'Province',d:'Le 47 province del Nord, dalla Valle d\'Aosta al Friuli e all\'Emilia-Romagna. Passa sopra a una provincia per i dettagli.',draw:lensProv,
   ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="5" height="5" fill="#ff7a3d"/><rect x="5" y="0" width="6" height="4" fill="#5fb4f0"/><rect x="0" y="5" width="4" height="5" fill="#ffd23f"/><rect x="4" y="5" width="7" height="5" fill="#2e9e48"/><rect x="5" y="4" width="6" height="1" fill="#2e9e48"/><rect x="4" y="0" width="1" height="10" fill="#16202e"/><rect x="0" y="4" width="11" height="1" fill="#16202e"/></svg>'},
- {id:'clima',n:'Clima sindacale',d:'Province colorate secondo l\'agitazione sindacale dei magazzini, tuoi e della concorrenza: verde calma, giallo stato di agitazione, rosso presidio. Solo con il pacchetto Relazioni industriali.',ri:1,draw:()=>lensClima(),
-  ic:''},
  {id:'trips',n:'Viaggi',d:'I giri dei camion: una linea per cliente, spessa quanto i viaggi del mese. Verde = camion pieni, giallo = a metà, rosso = quasi vuoti; tratteggiata se il trasporto è in perdita. In arancione i ritiri dai fornitori.',draw:lensTrips,
-  ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="11" height="10" fill="#2a3a50"/><rect x="1" y="7" width="3" height="2" fill="#ff7a3d"/><rect x="3" y="5" width="2" height="2" fill="#6fdc8c"/><rect x="5" y="3" width="2" height="2" fill="#6fdc8c"/><rect x="7" y="1" width="3" height="2" fill="#6fdc8c"/><rect x="4" y="8" width="6" height="1" fill="#ffc53d"/></svg>'}
+  ic:'<svg width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges"><rect x="0" y="0" width="11" height="10" fill="#2a3a50"/><rect x="1" y="7" width="3" height="2" fill="#ff7a3d"/><rect x="3" y="5" width="2" height="2" fill="#6fdc8c"/><rect x="5" y="3" width="2" height="2" fill="#6fdc8c"/><rect x="7" y="1" width="3" height="2" fill="#6fdc8c"/><rect x="4" y="8" width="6" height="1" fill="#ffc53d"/></svg>'},
+ {id:'clima',n:'Clima sindacale',d:'Province colorate secondo l\'agitazione sindacale dei magazzini, tuoi e della concorrenza: verde calma, giallo stato di agitazione, rosso presidio. Solo con il pacchetto Relazioni industriali.',ri:1,draw:()=>lensClima(),
+  ic:''}
 ];
 LENSES.forEach(l=>{if(ICONE.lens[l.id])l.ic=pxSvg(ICONE.lens[l.id],32);});
 const lensL=()=>LENSES.filter(l=>!l.ri||riOn());   // la lente del clima sindacale solo col pacchetto
@@ -7707,8 +7713,8 @@ const startCeo=()=>startSel.ceo==='custom'?CEOS.find(c=>c.id===startSel.cc.base)
 const defCo=()=>startSel.ceo==='custom'?ccCompany(startSel.cc):CEOS.find(c=>c.id===startSel.ceo).company;
 const coName=()=>(startSel.name||defCo()).trim()||defCo();
 // passaggi della schermata iniziale: per il CEO creato ci sono anche identità, abilità, talenti e curriculum
-const ST_N={scelta:'CEO',cc1:'Identità',cc2:'Abilità',cc3:'Studi e carattere',cv:'Curriculum',az:'Azienda',visura:'Iscrizione',lobby:'Partita'};
-const stFlow=()=>startSel.ceo==='custom'?['scelta','cc1','cc2','cc3','cv','az','visura','lobby']:['scelta','az','visura','lobby'];
+const ST_N={scelta:'CEO',cc1:'Identità',cc2:'Abilità',cc3:'Studi e carattere',cv:'Curriculum',az:'Azienda',visura:'Iscrizione',lobby:'Partita',pacchetti:'Pacchetti'};
+const stFlow=()=>startSel.ceo==='custom'?['scelta','cc1','cc2','cc3','cv','az','visura','lobby','pacchetti']:['scelta','az','visura','lobby','pacchetti'];
 // salva quello che è scritto nei campi prima di ridisegnare la schermata
 function startKeep(){const inp=$('#coname-in'); if(inp){const t=inp.value; startSel.name=(!t||t===defCo())?'':t;}
   if($('#co-claim')) startSel.claim=$('#co-claim').value;
@@ -7784,7 +7790,7 @@ function stepAz(){
    ${cus?`<div class="cc-base">${CEOS.map(c=>{const st=SITES[c.site];return `<button class="btn sm2" data-act="ccbase" data-id="${c.id}" aria-pressed="${startSel.cc.base===c.id}" style="display:flex;align-items:center;gap:6px">${logoSvg(c.client.name,18)}<span>${esc(st.name)} · ${eur(c.cash)}</span></button>`;}).join('')}</div>`:''}
    <div class="sm" style="display:flex;align-items:center;gap:6px">${logoSvg(B.client.name,20)}<span>Magazzino di ${esc(s.name)} (${s.prov}) da ${n0(s.cap)} posti, cassa di ${eur(B.cash)} e il cliente storico ${esc(B.client.name)}.</span></div></div>`;}
 /* --- lobby: le quattro aziende della partita, il ritmo del tempo e le condizioni di vittoria --- */
-const lbDef=()=>({bots:{},ri:false,mode:'classica',win:{ultimo:true,fatturato:true,reputazione:false,traguardo:false},fatturato:6000000,reputazione:90,traguardo:2012});
+const lbDef=()=>({bots:{},ri:true,mode:'classica',win:{ultimo:true,fatturato:true,reputazione:false,traguardo:false},fatturato:6000000,reputazione:90,traguardo:2012});
 const myBase=()=>startSel.ceo==='custom'?startSel.cc.base:startSel.ceo;
 // le aziende avversarie: i CEO giocabili che non hai scelto, ognuno con un colore e un logo diversi dai tuoi
 function lbRivals(){ const L=startSel.lb, cols=COLORS.map(c=>c[0]).filter(c=>c!==startSel.color), logos=Object.keys(CO_LOGOS).filter(l=>l!==startSel.logo);
@@ -7814,7 +7820,6 @@ function stepLobby(){
   const rule=(n,t,sub,body)=>`<div class="lb-rule"><div class="lb-rh"><span class="lb-num">${n}</span><b>${t}</b>${sub?`<span class="sm">${sub}</span>`:''}</div>${body}</div>`;
   const sum=!nOn?'Partita in solitaria: niente avversari e niente vittoria, si gioca finché la cassa regge.'
     :`Tu contro ${nOn} ${nOn===1?'azienda':'aziende'} CPU. ${wOn.length?`Vince chi per prima ottiene: ${wOn.map(k=>`<b>${esc(WINS[k].n)}</b>`).join(' oppure ')}.`:'<b>Nessuna condizione di vittoria scelta</b>: si gioca senza un vincitore.'}`;
-  const sumRi=L.ri?' Con il pacchetto <b>Relazioni industriali</b>.':'';
   return `<div class="card ccbox"><div class="row"><span class="h3">${kw('lobby','La partita')}</span><span class="sm">${1+nOn} ${nOn?'aziende in gara':'azienda: giochi da solo'}</span></div>
    <div class="lb-sec"><span class="lb-num">1</span><b class="disp">Le aziende in gara</b><span class="sm">${nOn?`tu + ${nOn} CPU`:'solo tu'} · ${TOUCH?'tocca':'clicca'} «Fuori» per lasciare a casa un avversario</span></div>
    <div class="lobby">${you}${R0.map(slot).join('')}</div>
@@ -7822,10 +7827,24 @@ function stepLobby(){
    <div class="lb-rules">
     ${rule('A',kw('tempo','Ritmo del tempo'),'',modeRow)}
     ${rule('B',kw('vittoria','Condizioni di vittoria'),nOn?'scegline una o più: vince chi ne soddisfa per prima una (controllo a inizio mese)':'',nOn?`<div class="lb-wins">${wins}</div>`:'<div class="sm">Senza avversari non c\'è una vittoria: si gioca finché la cassa regge.</div>')}
-    ${rule('C',kw('relazioni_industriali','Pacchetto Relazioni industriali'),'espansione: si sceglie adesso e vale per tutta la partita',`<button class="lb-opt lb-pack" data-act="lbri" aria-pressed="${!!L.ri}"><b>${L.ri?'✓ Attivo':'Spento'}</b><span class="sm">Sindacati e agitazione in ogni magazzino, scioperi e presidi, tavolo delle trattative, rinnovi del contratto nazionale con gli aumenti a rate, talpa e Linea dura, fornitori di handling locali e globali al posto della cooperativa. ${L.ri?'Tocca per spegnerlo.':'Tocca per attivarlo.'}</span></button>`)}
-    ${rule('D','Sconfitta','', `<div class="sm">Se a fine mese la ${kw('cassa')} è sotto i −50.000 € l'azienda fallisce: per te la partita finisce, un'azienda CPU esce di scena e lascia liberi magazzini e clienti.</div>`)}
+    ${rule('C','Sconfitta','', `<div class="sm">Se a fine mese la ${kw('cassa')} è sotto i −50.000 € l'azienda fallisce: per te la partita finisce, un'azienda CPU esce di scena e lascia liberi magazzini e clienti.</div>`)}
    </div>
-   <div class="lb-sum"><span class="lb-num">✓</span><div>${sum}${sumRi}</div></div></div>`;}
+   <div class="lb-sum"><span class="lb-num">✓</span><div>${sum}</div></div></div>`;}
+// pacchetti della partita: il gioco base c'è sempre, le espansioni si accendono o si spengono (di base tutte accese)
+const PACKS=[
+ {id:'ri',n:'Relazioni industriali',ic:'sindacato',wk:'relazioni_industriali',v:'0.66',d:'Sindacati, scioperi e contratto nazionale: il personale non è più solo un numero in busta paga.',
+  x:['Agitazione sindacale in ogni magazzino, che si sente anche dai vicini','Scioperi, presidi ai cancelli e tavolo delle trattative','Rinnovi del contratto nazionale con gli aumenti a rate, e Confpallet','11 fornitori di handling al posto della cooperativa','Ricerche del dialogo e del contenimento, fino alla talpa','4 policy, 3 talenti, 12 eventi, la lente «Clima sindacale» e una vittoria nuova']}
+];
+function stepPacchetti(){ const L=startSel.lb, on=PACKS.filter(p=>L[p.id]);
+  const ic=k=>ICONE.menu[k]?pxSvg(ICONE.menu[k],32):'';
+  const base=`<div class="pk pk-base"><div class="pk-h">${ic('magazzini')}<div class="wh-sm"><b class="disp">Gioco base</b><span class="sm">Sempre incluso</span></div><span class="pk-st on">✓ Incluso</span></div>
+    <div class="sm">Magazzini, clienti e gare d'appalto, personale e manager, traffico e customer service, tecnologie e certificazioni, policy, eventi, aziende avversarie.</div></div>`;
+  const card=p=>`<button class="pk" data-act="lbpack" data-id="${p.id}" aria-pressed="${!!L[p.id]}"><div class="pk-h">${ic(p.ic)}<div class="wh-sm"><b class="disp">${esc(p.n)}</b><span class="sm">Espansione · dalla versione ${p.v}</span></div><span class="pk-st${L[p.id]?' on':''}">${L[p.id]?'✓ Attivo':'Spento'}</span></div>
+    <span class="sm pk-d">${esc(p.d)}</span><ul class="pk-x">${p.x.map(t=>`<li>${esc(t)}</li>`).join('')}</ul><span class="sm pk-t">${TOUCH?'Tocca':'Clicca'} per ${L[p.id]?'spegnerlo':'accenderlo'}.</span></button>`;
+  return `<div class="card ccbox"><div class="row"><span class="h3">I pacchetti della partita</span><span class="sm">${1+on.length} su ${1+PACKS.length}</span></div>
+   <div class="sm">Il gioco base c'è sempre. Le espansioni aggiungono meccaniche nuove: si scelgono adesso e valgono per tutta la partita. Per saperne di più, ${kw('relazioni_industriali','l\'enciclopedia')}.</div>
+   <div class="pks">${base}${PACKS.map(card).join('')}</div>
+   <div class="lb-sum"><span class="lb-num">✓</span><div>Si gioca con: <b>Gioco base</b>${on.map(p=>` + <b>${esc(p.n)}</b>`).join('')}.</div></div></div>`;}
 // visura della Camera di Commercio (fittizia) con il timbro di iscrizione
 function stepVisura(){
   const B=startCeo(), s=SITES[B.site], C=startSel.ceo==='custom'?ccCeo(startSel.cc):B, nm=coName();
@@ -7849,6 +7868,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.71',t:'I pacchetti della partita',x:['Quando crei una partita c\'è un passo nuovo, l\'ultimo: «Pacchetti». Il gioco base c\'è sempre, le espansioni si accendono o si spengono con un tocco.','Di base tutte le espansioni sono accese: per ora c\'è «Relazioni industriali». Chi vuole la partita classica la spegne lì.']},
  {v:'0.70',t:'Certificazioni per tutti i gusti',x:['Sette certificazioni nuove nell\'albero Certificazioni. Per magazzino: buone pratiche per i farmaci (GDP), merci pericolose (ADR), Bollino Banchina Sicura contro i furti e deposito fiscale e doganale. Per l\'azienda: ISO 14001 (ambiente), ISO 45001 (sicurezza), operatore doganale autorizzato e parità di genere.','Nuovi clienti esigenti: FarmaSpa e le parafarmacie chiedono le GDP, elettronica, occhiali e cosmetica l\'antifurto, distillerie e birrifici il deposito fiscale, aerei e nautica le merci pericolose.','I contratti già firmati chiedono solo quello che chiedevano allora. Al rinnovo il buyer aggiorna il capitolato e ti dà 6 mesi per metterti in regola.','Nuove linee di business: ogni tanto un cliente allarga il giro (il mobilificio che vende polpette surgelate, il supermercato con i vini d\'importazione…) e chiede una certificazione in più. Se accetti e ti certifichi in tempo, più pallet; se rinunci, la linea va in gara e magari la prende un concorrente.','Ufficio qualità: addetti in sede che alzano la conformità dei magazzini e fanno gli audit interni.','Ispezioni a sorpresa di ASL, NAS e Ispettorato del lavoro, più qualche guaio a tema prima degli audit. Due talenti nuovi: «Maniaco delle procedure» e «Vive di raccoglitori».']},
  {v:'0.69',t:'Menu in ordine',x:['Il menu ha 4 gruppi, uguali su computer e telefono: Operazioni, Commerciale, Azienda e Informazioni. Le voci passano da 19 a 12.','Le voci gemelle sono diventate schede in cima alla finestra, con la loro icona: Nuovo magazzino sta in Magazzini, Customer service in Clienti, Direzione in Manager, Policy in Azienda e CEO, Certificazioni in Tecnologia. Un quadratino rosso sulla scheda dice dove c\'è un problema, e dal menu si apre direttamente quella scheda.','Sul computer il menu si può allargare con il pulsante in cima: mostra il nome di ogni voce e una riga su come sta il reparto (gare aperte, clienti a rischio, ricerca in corso…). Con le sole icone, un quadratino rosso segnala i problemi. La scelta resta salvata.','La Classifica compare solo nelle partite con avversari, e il conto del mese non è più ripetuto in Azienda e CEO: si apre dal numero «Mese scorso» in alto.']},
  {v:'0.68',t:'Audit',x:['Le certificazioni ora vanno difese: valgono 3 anni, con un audit dell\'ente ogni anno. Il primo audit arriva qualche settimana dopo la richiesta, e se va male il certificato non viene rilasciato.','Ogni magazzino ha la sua «conformità», da 0 a 100: sale con il magazzino tenuto bene, il facility manager, la formazione, il WMS, un manager preciso e la ISO 9001; scende con i reparti in affanno e i facchini esterni. Nella finestra Certificazioni toccala per vedere da cosa dipende.','Audit superato, audit con rilievi (hai 30 giorni per sistemare, oppure paghi un\'azione correttiva) o certificato sospeso: con un certificato sospeso i clienti che lo chiedono perdono soddisfazione ogni mese, finché un audit straordinario non lo riattiva.','Due settimane prima di ogni audit arriva l\'avviso, e nell\'ultimo mese puoi prepararlo: +15 al punteggio.','Se la ISO 9001 viene sospesa, spariscono anche i suoi bonus su accuratezza e gare.','Nelle partite salvate i certificati che avevi restano validi per 3 anni da oggi, con il primo controllo nei prossimi mesi.']},
@@ -8037,10 +8057,11 @@ function showStart(){
     if(lastStep!==k){$('#start').scrollTop=0;lastStep=k;} return;
   }
   if(!startSel.lb) startSel.lb=lbDef();
-  const body={scelta:stepScelta,cc1:stepCC1,cc2:stepCC2,cc3:stepCC3,cv:stepCV,az:stepAz,visura:stepVisura,lobby:stepLobby}[k]();
+  const body={scelta:stepScelta,cc1:stepCC1,cc2:stepCC2,cc3:stepCC3,cv:stepCV,az:stepAz,visura:stepVisura,lobby:stepLobby,pacchetti:stepPacchetti}[k]();
   const next={scelta:nextBtn(startSel.ceo==='custom'?'Crea il CEO':'Avanti: l\'azienda'),cc1:nextBtn('Avanti: abilità'),cc2:nextBtn('Avanti: studi e carattere'),cc3:nextBtn('Vedi il curriculum'),cv:nextBtn('Confermo, è tutto vero'),az:nextBtn('Iscrivi alla Camera di Commercio'),
     visura:startSel.stamp?nextBtn('Avanti: la partita'):`<button class="btn pri" data-act="stamp" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Timbra la visura</button>`,
-    lobby:`<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Inizia la partita ›</button>`}[k];
+    lobby:nextBtn('Avanti: i pacchetti'),
+    pacchetti:`<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Inizia la partita ›</button>`}[k];
   $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP · versione ${VER}</span><span>Nord Italia, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
    ${k!=='scelta'?stepper():''}${body}${stNav(next)}</div></div>`;
   if(k==='scelta'){const r=$('#start .ceos'),e=r&&r.querySelector('[aria-pressed=true]');if(e&&r.scrollWidth>r.clientWidth)r.scrollLeft=e.offsetLeft-(r.clientWidth-e.offsetWidth)/2;}
@@ -8122,7 +8143,7 @@ Object.assign(ACT,{
  lbmode(d){startSel.lb.mode=d.v; showStart();},
  lbwin(d){const w=startSel.lb.win; w[d.id]=!w[d.id]; showStart();},
  lbwt(d){startSel.lb[d.id]=+d.v; showStart();},
- lbri(){const L=startSel.lb; L.ri=!L.ri; if(!L.ri) delete L.win.clima; showStart();},
+ lbpack(d){startKeep();const L=startSel.lb; L[d.id]=!L[d.id]; if(d.id==='ri'&&!L.ri) delete L.win.clima; showStart();},
  continue(d){startSel.del=0;const n=+(d&&d.slot)||1,sv=load(n);if(!sv)return;slot=n;S=fillSave(migrateStaff(renameClients(sv.S)));HUM=S;if(!S.cfg)S.cfg={mode:'classica',win:{}};if(MODES[S.cfg.mode]&&MODES[S.cfg.mode].off){S.cfg.mode='classica';delete S.clock;}S.bots=(S.bots||[]).map(b=>fillSave(b));if(contMode())S.speed=1;S.managers.forEach(m=>{const d=MANAGERS.find(x=>x.id===m.id);if(d){if(!m.log.length)m.tal=[...d.tal];m.role=d.role;}});if(S.project===undefined)S.project=null;if(S.speed>1)S.speed=1;uid=sv.uid||S.uid||100;rebalanceDrivers();chMigrate();boot();if(S.over)ACT.finale();}
 });
 function boot(){

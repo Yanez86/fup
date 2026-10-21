@@ -124,12 +124,18 @@ async def phone(b, w, h, name, errs):
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_visura.png'), full_page=True)
     # lobby: le quattro aziende, il ritmo del tempo e le condizioni di vittoria
     await pg.tap('[data-act=stnext]'); await pg.wait_for_timeout(200)
-    ri = name == 'verticale'   # in verticale si gioca col pacchetto Relazioni industriali
-    if ri: await pg.tap('[data-act=lbri]')
+    ri = name == 'verticale'   # in verticale si gioca col pacchetto Relazioni industriali (acceso di base), in orizzontale senza
     assert await pg.evaluate("document.querySelectorAll('#start .lb-slot').length") == 4, f'{name}: lobby senza i 4 posti'
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: la lobby scorre di lato'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_lobby.png'), full_page=True)
+    # pacchetti: il gioco base sempre incluso, le espansioni accese di base
+    await pg.tap('[data-act=stnext]'); await pg.wait_for_timeout(200)
+    assert await pg.evaluate("document.querySelector('#start [data-act=lbpack][data-id=ri]').getAttribute('aria-pressed')") == 'true', f'{name}: il pacchetto deve partire acceso'
+    if not ri: await pg.tap('[data-act=lbpack][data-id=ri]')
+    assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: i pacchetti scorrono di lato'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_pacchetti.png'), full_page=True)
     await pg.tap('[data-act=startgame]'); await pg.tap('[data-act=closemodal]')
+    assert await pg.evaluate('!!window.__FUP.HUM.cfg.ri') == ri, f'{name}: pacchetto Relazioni industriali sbagliato'
     await pg.wait_for_timeout(100)
     # menu: un solo pulsante sulla mappa; aperto, l'elenco sta nello schermo e ha tutte le voci
     assert await pg.evaluate(FITS, '#burger'), f'{name}: pulsante Menu fuori schermo'
@@ -338,6 +344,9 @@ async def main():
         await pg.click('[data-act=lbfold][data-id=valeria]'); await pg.click('[data-act=lbbot][data-id=valeria][data-k=style][data-v=prezzo]')
         await pg.click('[data-act=lbwin][data-id=reputazione]')
         await pg.screenshot(path=os.path.join(OUT, 'shot_crea_7_lobby.png'), full_page=True)
+        await pg.click('[data-act=stnext]')
+        assert await pg.evaluate("document.querySelectorAll('#start .pk').length") == 2, 'passo Pacchetti: gioco base più le espansioni'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_crea_8_pacchetti.png'), full_page=True)
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
         lb = await pg.evaluate('()=>{const F=window.__FUP,H=F.HUM;return {n:H.bots.length,ids:H.bots.map(b=>b.bot.id),diff:H.bots.find(b=>b.bot.id==="edoardo").bot.diff,sty:Object.fromEntries(H.bots.map(b=>[b.bot.id,b.bot.style])),win:H.cfg.win,mode:H.cfg.mode,cols:[H.company.color,...H.bots.map(b=>b.company.color)]}}')
         assert lb['n'] == 2 and 'gino' not in lb['ids'] and 'marco' not in lb['ids'] and lb['diff'] == 'spietato' and lb['sty'] == {'edoardo': 'standard', 'valeria': 'prezzo'}, lb
