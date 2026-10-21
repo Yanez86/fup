@@ -197,7 +197,7 @@ async def phone(b, w, h, name, errs):
                 await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_manager_{tb}.png'))
             await pg.tap('#win-manager [data-act=mtab][data-id=team]')
         if wn == 'sindacato':   # le schede del pacchetto, con un tavolo aperto
-            await pg.evaluate("()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; ['relsind','talpa','vendor'].forEach(t=>S.researched[t]=true); F.riW(w); w.ag=60; w.tavCd=0; F.riTavOpen(w); F.hdlTender(w); F.ACT.ritab({id:'clima'});}")
+            await pg.evaluate("()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; ['relsind','talpa','vendor'].forEach(t=>S.researched[t]=true); F.riW(w); F.riUnionize(w); w.ag=60; w.tavCd=0; F.riTavOpen(w); F.hdlTender(w); F.ACT.ritab({id:'clima'});}")
             for tb in ['clima', 'tav', 'ccnl', 'hdl']:
                 await pg.tap(f'#win-sindacato [data-act=ritab][data-id={tb}]')
                 bad = await pg.evaluate(NOSIDE, '#win-sindacato')
@@ -825,6 +825,10 @@ async def main():
           const w=H.warehouses[0], out={day:H.day,wage:H.ri.wage,idx:H.riw.idx,ag:w.ag!=null,bots:H.bots.map(b=>!!b.ri&&b.warehouses.every(x=>x.ag!=null)),
             tech:F.TECH.some(t=>t.id==='talpa'),strikes:H.ri.strikes,clima:F.climaProg(H)};
           // tavolo forzato: concedendo tutto si firma alla prima seduta
+          // il magazzino nasce senza sindacato: senza, niente tavolo; col morale a terra il sindacato arriva
+          const w2=H.warehouses[H.warehouses.length-1]; out.nosind=w2.sind===false||w2.sind===true;
+          w.sind=false; w.rsu=null; w.sindP=0; w.ag=70; w.tav=null; w.deal=null; out.notav=!F.riTavOpen(w)&&F.fascia(w)<=1;
+          for(let i=0;i<20;i++){ w.morale=30; F.step(); } out.sind=w.sind&&!!w.rsu;
           w.tav=null; w.deal=null; w.tavCd=0; w.ag=70; F.riTavOpen(w); w.tav.reqs.forEach(r=>r.c='si'); w.tav.next=H.day; F.step(); out.deal=!!w.deal&&!w.tav;
           // il tavolo non si riapre a comando: dopo un tavolo saltato si aspettano tre mesi
           w.deal=null; w.ag=70; F.riTavOpen(w); F.ACT.riquit({wh:w.id}); F.step(); out.cool=!w.tav&&w.tavCd>H.day+80;
@@ -836,9 +840,9 @@ async def main():
           H.researched.talpa=true; const rep0=H.rep; F.riTalpaFound(); out.talpa=!H.researched.talpa&&H.rep<rep0&&w.ag>=90&&H.ri.ban>H.day;
           F.renderAll(); out.dock=!!document.querySelector('#dock [data-id=sindacato]'); return out;}''')
         assert r['wage'] > 1.01 and r['idx'] > 1.01 and r['ag'] and all(r['bots']) and r['tech'], f'pacchetto Relazioni industriali: {r}'
-        assert r['deal'] and r['cool'] and r['talpa'] and r['dock'] and (not r['av'] or (r['early'] and r['offers'] >= 1 and r['hdl'] and r['back'])), f'pacchetto Relazioni industriali: {r}'
+        assert r['notav'] and r['sind'] and r['deal'] and r['cool'] and r['talpa'] and r['dock'] and (not r['av'] or (r['early'] and r['offers'] >= 1 and r['hdl'] and r['back'])), f'pacchetto Relazioni industriali: {r}'
         print('relazioni industriali dopo 3 anni:', r)
-        await pg.evaluate("()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; S.ri.ban=0; ['relsind','talpa','vendor','paritetico'].forEach(t=>S.researched[t]=true); w.ag=62; w.tavCd=0; F.riTavOpen(w); F.hdlTender(w); F.ACT.toggle({id:'sindacato'});}")
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; S.ri.ban=0; ['relsind','talpa','vendor','paritetico'].forEach(t=>S.researched[t]=true); F.riUnionize(w); w.ag=62; w.tavCd=0; F.riTavOpen(w); F.hdlTender(w); F.ACT.toggle({id:'sindacato'});}")
         for t in ['clima','tav','ccnl','hdl']:
             await pg.click(f'#win-sindacato [data-act=ritab][data-id={t}]')
             await pg.screenshot(path=os.path.join(OUT, f'shot_ri_{t}.png'))

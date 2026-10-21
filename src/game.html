@@ -2695,7 +2695,13 @@ wk('sindacati','ri','I sindacati',`Tre sigle, ognuna col suo carattere: CUP, SAM
 • **SAM, Sindacato Autonomo Mulettisti**: piccolo e corporativo, forte dove i carrellisti sono almeno 3 e almeno il 60% dei magazzinieri. Chiede sempre l'indennità per i carrellisti.
 • **CoBaBa, Comitati di Base della Banchina**: radicali, forti dove lavora un [[fornitori|fornitore]] locale. Saltano lo stato di agitazione, hanno poca pazienza, vogliono il 65% delle richieste e chiedono la stabilizzazione.
 
-Il sindacato di un magazzino dipende da chi ci lavora, quindi può cambiare. Le soglie delle fasce sono nella voce [[agitazione]].`);
+I magazzini nascono senza sindacato: arriva solo se il morale resta basso a lungo ([[sindacalizzazione|nascita del sindacato]]). Una volta arrivato resta, e la sigla dipende da chi ci lavora, quindi può cambiare. Le soglie delle fasce sono nella voce [[agitazione]].`);
+wk('sindacalizzazione','ri','Nascita del sindacato',`I magazzini nascono senza sindacato: arriva se il morale resta troppo basso per troppo tempo.`,
+`Finché un magazzino non ha un sindacato, l'[[agitazione]] può arrivare al massimo al mugugno: niente stato di agitazione, [[sciopero|scioperi]], [[presidio|presidi]] né [[tavolo]].
+
+Ogni giorno con il [[morale]] sotto 45 la spinta verso il sindacato sale di 1 (di 2 sotto 35); con il morale più alto scende di 0,5. A 30 i lavoratori si organizzano: arriva il sindacato giusto per quel magazzino (vedi [[sindacati]]) con il suo [[delegato]], e da lì in poi resta. In pratica: un mese di morale sotto 45, due settimane sotto 35.
+
+Se scoprono la [[talpa]], il sindacato arriva in tutti i magazzini insieme.`);
 wk('delegato','ri','Delegato sindacale',`In ogni magazzino c'è un delegato, con la sua Leadership e la sua Negoziazione.`,
 `Il delegato porta le richieste al [[tavolo]]. La sua Leadership si scontra con la Negoziazione di chi tratta per te: più è alta, meno il sindacato abbassa le pretese a ogni seduta.
 
@@ -4441,13 +4447,21 @@ const coopLab=w=>riOn()&&w.hdl?'Fornitore '+hdlName(w.hdl):'Facchini in cooperat
 function riCo(){ if(S.ri&&S.ri.tav){ const w=whById(S.ri.tav.wh); if(w&&!w.tav) w.tav=S.ri.tav; delete S.ri.tav; }
   if(!S.ri) S.ri={wage:1,conf:false,talpa:{used:0,from:null},ban:0,lastStrike:0,lastPres:-9999,lastCond:-9999,strikes:0,deals:0,hist:[]}; return S.ri; }
 const DEL_N=['Rocco','Vanda','Saverio','Loredana','Nino','Gemma','Ettore','Rosaria','Fausto','Mara','Aldo','Tiziana','Elio','Graziella','Brahim','Ionela'];
+// i magazzini nascono senza sindacato (w.sind): arriva se il morale resta basso troppo a lungo (w.sindP, vedi riUnionize)
+const SIND={mor:45,mor2:35,need:30,down:0.5};
 function riW(w){ if(w.ag==null){ w.ag=RI.ag0; w.ranc=0; w.agT=RI.ag0; }
-  if(!w.rsu){ const i=Math.floor(Math.random()*DEL_N.length), f=i%2===1, age=rint(30,60), b=age<36?0:age<52?1:2;
-    w.rsu={name:DEL_N[i]+' '+pick(GEN_S),sx:f?'f':'m',face:(f?20:0)+b*7+rint(0,b===2?5:6),lead:rint(7,15),neg:rint(6,14),tal:pick([null,null,'storico','megafono','trattabile'])}; }
+  if(w.sind===undefined) w.sind=!!w.rsu;   // partite di prima: chi aveva già un delegato resta sindacalizzato
   return w; }
+// nasce il sindacato: elezione del delegato
+function riUnionize(w){ w.sind=true; w.sindP=0; w.sindDay=S.day; riRsu(w); const U=UNIONS[unionOf(w)];
+  if(!isBot()){ riNote('yellow','sindacato',`Nasce il sindacato a ${w.name}`,`Dopo settimane di morale a terra i lavoratori si sono organizzati: ${U.n} ha un iscritto su due e ${w.rsu.name} è il nuovo delegato. Da oggi, se l'agitazione sale, arrivano lo stato di agitazione, il tavolo delle trattative e gli scioperi.`,{wh:w.id},'sind'+w.id);
+    news('La Gazzetta del Muletto',`${U.n} entra a ${w.name}`,`Assemblea in mensa, schede nella scatola delle scarpe antinfortunistiche e un delegato eletto per alzata di mano: ${w.rsu.name}.`);
+    chron('sindacato',`Nasce il sindacato a ${w.name}`); } }
+function riRsu(w){ if(!w.rsu){ const i=Math.floor(Math.random()*DEL_N.length), f=i%2===1, age=rint(30,60), b=age<36?0:age<52?1:2;
+    w.rsu={name:DEL_N[i]+' '+pick(GEN_S),sx:f?'f':'m',face:(f?20:0)+b*7+rint(0,b===2?5:6),lead:rint(7,15),neg:rint(6,14),tal:pick([null,null,'storico','megafono','trattabile'])}; } }
 const RSU_TAL={storico:['Delegato storico','Al tavolo da vent\'anni: il sindacato è più paziente (+20%).'],megafono:['Megafono','Leadership +3 al tavolo: trascina tutti.'],trattabile:['Trattabile','Si accontenta di un po\' meno (−5% da concedere).']};
 const unionOf=w=>w.hdl&&hdlBase(w.hdl).loc?'coba':(w.staff.car>=3&&w.staff.car>=w.staff.pick*0.6?'sam':'cup');
-function fascia(w){ if(w.pres) return 4; const th=UNIONS[unionOf(w)].th, a=w.ag||0; return a<th[0]?0:a<th[1]?1:a<th[2]?2:a<th[3]?3:4; }
+function fascia(w){ if(w.pres) return 4; const th=UNIONS[unionOf(w)].th, a=w.ag||0, f=a<th[0]?0:a<th[1]?1:a<th[2]?2:a<th[3]?3:4; return w.sind?f:Math.min(f,1); }   // senza sindacato al massimo il mugugno
 const adhesion=w=>clamp(RI.adh*(R('contenim')?0.7:1)*(polOn('presenza')?0.6:1)*(unionOf(w)==='coba'?1.15:1),0.1,0.95);
 // km tra due siti (circa): servono al contagio tra magazzini vicini
 const siteKm=(a,b)=>Math.hypot((a.lon-b.lon)*78,(a.lat-b.lat)*111);
@@ -4493,9 +4507,10 @@ function riDaily(){
   S.warehouses.forEach(w=>{ riW(w);
     const L=riTens(w); w.agL=L; w.agT=clamp(L.reduce((a,x)=>a+x[1],0),0,100);
     w.ag=clamp(w.ag+(w.agT-w.ag)*RI.k,0,100);
+    if(!w.sind){ w.sindP=Math.max(0,(w.sindP||0)+(w.morale<SIND.mor2?2:w.morale<SIND.mor?1:-SIND.down)); if(w.sindP>=SIND.need) riUnionize(w); }
     const U=UNIONS[unionOf(w)], th=U.th;
     // presidio: comincia sopra la soglia e finisce quando l'agitazione scende parecchio (o si firma un accordo)
-    if(!w.pres&&w.ag>=th[3]) riPresidio(w);
+    if(!w.pres&&w.sind&&w.ag>=th[3]) riPresidio(w);
     else if(w.pres&&w.ag<th[3]-12){ w.pres=false; riNote('green','sindacato',`Finito il presidio a ${w.name}`,'Le tende sono smontate e i camion tornano a passare dal cancello. L\'agitazione resta da tenere d\'occhio.',{wh:w.id}); news('La Gazzetta del Muletto',`Finisce il presidio a ${w.name}`,'I lavoratori tornano in banchina dopo giorni di tende e bandiere.'); }
     if(w.pres&&mon) S.rep=clamp(S.rep-0.5,0,100);
     // scioperi: annunciati qualche giorno prima (con la talpa lo sai due settimane prima)
@@ -4540,7 +4555,7 @@ const riTavReady=w=>S.day>=(w.pres?Math.min(w.tavCd||0,(w.tavFail||-1e9)+30):(w.
 const tavList=()=>S.warehouses.filter(w=>w.tav);
 function riNegotiator(){ const hr=R('direzione')&&S.dirs.hr?personById(S.dirs.hr):null, p=hr||S.boss;
   const ex=(p.tal||[]).includes('Ex sindacalista')?3:0; return {p,neg:p.st.neg+ex,med:(p.tal||[]).includes('Mediatore nato'),hr:!!hr}; }
-function riTavOpen(w){ const R0=riCo(); if(w.tav) return false; riW(w); const un=unionOf(w), U=UNIONS[un];
+function riTavOpen(w){ const R0=riCo(); riW(w); if(w.tav||!w.sind) return false; const un=unionOf(w), U=UNIONS[un];
   const pool=Object.keys(RI_REQ).filter(id=>(id!=='stab'||w.hdl)&&(id!=='indcar'||un==='sam'||w.staff.car>=2)&&(id!=='aumento'||true));
   const n=clamp(Math.round(2+w.ag/30),3,5), reqs=[{id:'aumento',lv:clamp(Math.round(2+w.ag/30),2,5),c:'no'}];
   if(un==='sam'&&!pool.includes('indcar')) pool.push('indcar'); if(un==='sam') reqs.push({id:'indcar',c:'no'}); if(w.hdl&&un==='coba') reqs.push({id:'stab',c:'no'});
@@ -4692,7 +4707,7 @@ function riMonth(){ if(!riOn()) return; const R0=riCo(), d=S.day;
 function riTalpaFound(){ const R0=S.ri, dia=R('paritetico')||R('secondo'), k=dia?2:1;
   S.researched.talpa=false; R0.ban=S.day+1825; R0.talpa={used:0,from:null}; R0.lastCond=S.day;
   const fine=RI.fine*k*(polOn('presenza')?1.25:1); S.cash-=fine; S.cur.altro+=fine; S.rep=clamp(S.rep-8*k,0,100);
-  S.warehouses.forEach(w=>{ riW(w); w.ag=Math.max(w.ag,90); }); if(dia) S.mods.push({scope:'all',ag:20,until:S.day+180,src:'Scandalo della talpa'});
+  S.warehouses.forEach(w=>{ riW(w); w.ag=Math.max(w.ag,90); if(!w.sind){ w.sind=true; w.sindP=0; riRsu(w); } });   // lo scandalo porta il sindacato in tutti i magazzini if(dia) S.mods.push({scope:'all',ag:20,until:S.day+180,src:'Scandalo della talpa'});
   S.clients.filter(c=>c.status==='attivo'&&RI_ETICI.includes(c.name)).forEach(c=>c.sat=clamp(c.sat-30,0,100));
   if(!isBot()){ riNote('red','sindacato','Scoperta la talpa nel sindacato',`Il delegato pagato per parlare è stato scoperto, con le ricevute dei «rimborsi spese». Condanna per condotta antisindacale: ${eur(fine)} di multa, reputazione −${8*k}, agitazione a 90 in tutti i magazzini. Le committenti che chiedono pace sociale ci ripensano.${dia?' E siccome predicavi il dialogo, lo scandalo pesa il doppio.':''} La ricerca è bloccata per cinque anni.`);
     news('La Gazzetta del Muletto',`Scandalo: ${S.company.name} spiava il sindacato`,`Un delegato pagato per riferire le assemblee. ${S.boss.name} non commenta; i sindacati annunciano mobilitazione in tutti i magazzini.`);
@@ -4721,6 +4736,11 @@ const agHex=a=>a<25?'#2e9e48':a<45?'#8ed15b':a<65?'#ffc53d':a<85?'#ff7a3d':'#e03
 const agCol=a=>a<25?'var(--ok)':a<45?'#8ed15b':a<65?'var(--warn)':a<85?'#ff7a3d':'var(--bad)';
 const fasciaPill=w=>{const f=fascia(w), F=FASCE[f]; return `<span class="pill ri-f" style="background:${F[1]};color:${f===1||f===2?'var(--ink)':'#fff'}">${esc(F[0])}</span>`;};
 const unionTag=un=>{const U=UNIONS[un]; return `<span class="pill ri-u" style="background:${U.col};color:#fff" data-tip="<div class='tt'>${esc(U.full)}</div>${esc(U.d)}">${esc(U.n)}</span>`;};
+// magazzino senza sindacato: etichetta e barra di quanto manca perché arrivi (morale sotto 45 per circa un mese)
+const noUnionTag=()=>`<span class="pill ri-u" style="background:var(--panel2);color:var(--ink)" data-tip="<div class='tt'>Nessun sindacato</div>I lavoratori non sono organizzati: niente stato di agitazione, scioperi, presidi né tavolo. Il sindacato arriva se il morale resta sotto ${SIND.mor} per circa un mese.">Nessun sindacato</span>`;
+function sindBar(w){ const p=clamp((w.sindP||0)/SIND.need,0,1);
+  return `<div class="ri-meter"><span class="lab">${kw('sindacalizzazione','Verso il sindacato')}</span><div class="bar"><i style="width:${Math.round(p*100)}%;background:${p>0.66?'var(--bad)':p>0.33?'var(--warn)':'var(--ok)'}"></i></div><b class="num">${Math.round(p*100)}%</b></div>
+   <div class="sm">${w.morale<SIND.mor?`Morale ${Math.round(w.morale)}: sotto ${SIND.mor} i lavoratori cominciano a organizzarsi${w.morale<SIND.mor2?', e sotto '+SIND.mor2+' vanno di corsa':''}.`:`Morale ${Math.round(w.morale)}: finché resta sopra ${SIND.mor} nessuno pensa al sindacato.`}</div>`; }
 // barra dell'agitazione con la tensione (dove sta andando) e le voci nel tooltip
 function agBar(w){ const L=w.agL||riTens(w), t=w.agT==null?w.ag:w.agT, tip=tipParts(`Agitazione ${Math.round(w.ag)} · va verso ${Math.round(t)}`,L,'');
   return `<div class="ri-ag" data-tip="${tip}"><div class="bar"><i style="width:${Math.round(w.ag)}%;background:${agCol(w.ag)}"></i><s style="left:${Math.round(t)}%"></s></div><b class="num" style="color:${agCol(w.ag)}">${Math.round(w.ag)}</b><span class="sm">${t>w.ag+2?'▲ sale':t<w.ag-2?'▼ scende':'stabile'}</span></div>`; }
@@ -4737,8 +4757,8 @@ function riDelegate(w,sz){ const d=w.rsu, t=d.tal&&RSU_TAL[d.tal];
   return `<div class="ri-del"><img class="px" src="${IMG['v'+d.face]}" alt="" width="${sz||32}" height="${Math.round((sz||32)*7/6)}"><div class="wh-sm"><span>${kw('delegato','Delegato')}: <b>${esc(d.name)}</b></span><span class="ri-chips">${statBadge('lead',d.lead+(d.tal==='megafono'?3:0),12)}${statBadge('neg',d.neg,12)}${t?`<span class="pill" data-tip="<div class='tt'>${esc(t[0])}</div>${esc(t[1])}">${esc(t[0])}</span>`:''}</span></div></div>`; }
 function riClima(){ const R0=S.ri, ws=S.warehouses;
   const card=w=>{ const un=unionOf(w), sel=UI.sel.wh===w.id;
-    return `<div class="card ri-w${w.pres?' cl-bad':''}${sel?' ri-sel':''}"><div class="row"><span class="h3">${esc(w.name)} <span class="wh-prov">${w.prov}</span></span><span class="ri-tags">${fasciaPill(w)}${unionTag(un)}</span></div>
-     ${agBar(w)}${riStatus(w)}${riDelegate(w)}
+    return `<div class="card ri-w${w.pres?' cl-bad':''}${sel?' ri-sel':''}"><div class="row"><span class="h3">${esc(w.name)} <span class="wh-prov">${w.prov}</span></span><span class="ri-tags">${fasciaPill(w)}${w.sind?unionTag(un):noUnionTag()}</span></div>
+     ${agBar(w)}${riStatus(w)}${w.sind?riDelegate(w):sindBar(w)}
      <div class="sm">${w.hdl?`${kw('fornitori','Fornitore')}: <b>${esc(hdlName(w.hdl))}</b>${riWorld().h[w.hdl].skip?' <span class="bad">· non paga l\'ultimo aumento</span>':''}`:'Magazzinieri e carrellisti assunti da te'}${w.wageX>1.0001?` · aumenti dell'accordo ${sgn((w.wageX-1)*100)}%`:''}</div>
      <div class="row">${w.tav?`<button class="btn sm2 pri" data-act="ritavgo" data-id="${w.id}">Al tavolo</button>`:''}<button class="btn sm2" data-act="openwh" data-id="${w.id}">Apri il magazzino</button></div></div>`; };
   const uni=Object.entries(UNIONS).map(([k,U])=>`<div class="ri-un"><img class="px" src="${IMG[U.img]}" alt="Ritratto di ${esc(U.lead)}" width="48" height="56"><div class="wh-sm"><b>${unionTag(k)} ${esc(U.full)}</b><span class="sm">Segretario: ${esc(U.lead)}. ${esc(U.d)}</span></div></div>`).join('');
@@ -4801,7 +4821,7 @@ function riWhBox(w){ riCo(); riW(w); const av=hdlAvail(w), T=w.ht, next=w.hNext,
    :`<div class="row ri-btns">${av.length?`<button class="btn sm2 pri" data-act="httender" data-wh="${w.id}">${w.hdl?'Bandisci una nuova gara':'Bandisci una gara per l\'handling'}</button>`:''}${w.hdl?`<button class="btn sm2" data-act="hdlhome" data-wh="${w.id}">Riporta il personale in casa · ${eur(600*(w.staff.pick+w.staff.car)+hdlPenalty(w))}</button>`:''}</div>
      <div class="sm">${av.length?`${av.length} ${av.length===1?'fornitore può':'fornitori possono'} lavorare qui: la gara dura ${wks(HT.open)}, poi hai ${wks(HT.choose)} per scegliere l'offerta.`:'Nessun fornitore può lavorare in questo magazzino.'}</div>`;
   return `<div class="ri-whb">${cur}${next?`<div class="row sm warn"><span>Cambio d'appalto: arriva ${esc(hdlName(next.id))} il ${shortDate(next.day)}</span><button class="btn sm2" data-act="hdlundo" data-wh="${w.id}">Annulla</button></div>`:gara}
-   <div class="row"><span class="lab">${kw('agitazione','Clima sindacale')}</span>${fasciaPill(w)}</div>${agBar(w)}${riStatus(w)}
+   <div class="row"><span class="lab">${kw('agitazione','Clima sindacale')}</span><span class="ri-tags">${fasciaPill(w)}${w.sind?unionTag(unionOf(w)):noUnionTag()}</span></div>${agBar(w)}${riStatus(w)}${w.sind?'':sindBar(w)}
    <div><button class="btn sm2" data-act="riopen" data-wh="${w.id}">Relazioni industriali ›</button></div></div>`; }
 // riga di stato nel menu del telefono
 function riDockNote(){ const ws=S.warehouses, p=ws.find(w=>w.pres), k=ws.find(w=>(w.strikeOn||0)>0), T=ws.filter(w=>w.tav), nx=riNext();
@@ -5572,8 +5592,8 @@ const EVENTS=[
         {t:'Fai finta di niente',d:'Non dici nulla. Magari è solo una fase.',e:'Tre volte su quattro lascia l\'azienda tra un mese',r:'Tu fai finta di niente. Anche dall\'altra parte, per un po\'.',
           f:function(){const p=this.p; p.raiseDay=S.day; if(Math.random()<0.75){p.quit={day:S.day+30,why:'Job hopper: nessuno ha provato a trattenere chi aveva già la valigia pronta.'}; toast(`${p.name} dà le dimissioni: un mese di preavviso`,'bad');} else toast(`${p.name} resta. Per ora`,'warn');}}]},
  /* pacchetto Relazioni industriali: eventi che arrivano solo nelle partite col pacchetto */
- {id:'ri_bf',src:'La Gazzetta del Muletto',title:'Sciopero a sorpresa prima del Black Friday',cond:()=>riOn()&&monthOf(S.day)===10&&S.warehouses.some(w=>w.ag>=35&&!w.deal&&!w.pres),
-  setup:ev=>{const w=pick(S.warehouses.filter(w=>w.ag>=35&&!w.deal&&!w.pres)); ev.w=w; ev.n=Math.max(1,w.staff.pick+w.staff.car+w.staff.capo+w.staff.imp);
+ {id:'ri_bf',src:'La Gazzetta del Muletto',title:'Sciopero a sorpresa prima del Black Friday',cond:()=>riOn()&&monthOf(S.day)===10&&S.warehouses.some(w=>w.sind&&w.ag>=35&&!w.deal&&!w.pres),
+  setup:ev=>{const w=pick(S.warehouses.filter(w=>w.sind&&w.ag>=35&&!w.deal&&!w.pres)); ev.w=w; ev.n=Math.max(1,w.staff.pick+w.staff.car+w.staff.capo+w.staff.imp);
     ev.text=`Mancano dieci giorni al Black Friday e a ${w.name} il delegato ${w.rsu.name} gira per la banchina con un foglio da firmare: «Senza un premio per il picco, venerdì si sta a casa». I clienti hanno già mandato le previsioni: volumi doppi, e nessuno ha voglia di scoprire cosa succede con il magazzino fermo.`;},
   opts:[{t:'Premio picco: 150 € a testa',d:'Paghi un premio a tutto il magazzino per le settimane del picco. Il foglio sparisce dalla banchina.',e:'150 € a persona, agitazione −15 per due mesi, morale +3',r:'Il foglio è finito nel cestino e venerdì c\'erano tutti, anche chi era in ferie. Qualcuno ha portato le brioche.',
          f:function(){S.cash-=150*this.n; S.mods.push({scope:this.w.id,ag:-15,until:S.day+60,src:this.title}); mod(this.w.id,{mor:3},30);}},
@@ -5581,15 +5601,15 @@ const EVENTS=[
          f:function(){const w=this.w; if(!w.pres&&!(w.strikeOn>0)) w.strike={day:S.day+5,len:2}; S.mods.push({scope:w.id,ag:10,until:S.day+60,src:this.title});}},
         {t:'Parli tu in assemblea',d:'Ti presenti in mensa alle sei del mattino e spieghi i numeri, uno per uno. Senza slide.',e:'Agitazione −10 per due mesi, nessun costo',req:()=>ceo().st.lead>=13||ceo().tal.includes('Ex sindacalista'),reqT:'Leadership 13 o Ex sindacalista',r:'Hai parlato venti minuti. Alla fine il delegato ti ha stretto la mano davanti a tutti: per quest\'anno, niente sciopero.',
          f:function(){S.mods.push({scope:this.w.id,ag:-10,until:S.day+60,src:this.title});}}]},
- {id:'ri_singhiozzo',src:'Ufficio del personale',title:'Sciopero a singhiozzo',cond:()=>riOn()&&S.warehouses.some(w=>w.ag>=45&&!w.deal&&!w.pres),
-  setup:ev=>{const w=pick(S.warehouses.filter(w=>w.ag>=45&&!w.deal&&!w.pres)); ev.w=w;
+ {id:'ri_singhiozzo',src:'Ufficio del personale',title:'Sciopero a singhiozzo',cond:()=>riOn()&&S.warehouses.some(w=>w.sind&&w.ag>=45&&!w.deal&&!w.pres),
+  setup:ev=>{const w=pick(S.warehouses.filter(w=>w.sind&&w.ag>=45&&!w.deal&&!w.pres)); ev.w=w;
     ev.text=`A ${w.name} il sindacato ha inventato lo sciopero a rate: due ore per turno, a orari che cambiano ogni giorno, per due settimane. Il capoturno ha disegnato una tabella con i pennarelli colorati per capire chi c'è e quando. Non l'ha capita neanche lui.`;},
   opts:[{t:'Lo sopporti',d:'Due settimane passano. I camion partiranno quando partiranno.',e:'Puntualità −3 per due settimane in quel magazzino',r:'Due settimane di camion che partono a orari creativi. I clienti hanno imparato a chiamare prima di mezzogiorno.',f:function(){mod(this.w.id,{P:-3},14);}},
         {t:'Un caffè con il delegato',d:'Lo inviti al bar e gli prometti che al tavolo lo ascolterai davvero. Sospende lo sciopero a rate, per ora.',e:'Agitazione −5 per un mese, puntualità −1 per una settimana; se c\'è un tavolo aperto, la pazienza del sindacato +20',r:'Due caffè e un cornetto a testa. Per ora lo sciopero a rate è sospeso.',
          f:function(){mod(this.w.id,{P:-1},7); S.mods.push({scope:this.w.id,ag:-5,until:S.day+30,src:this.title}); if(this.w.tav) this.w.tav.pat=Math.min(100,this.w.tav.pat+20);}},
         {t:'Turni rimescolati',d:'Rifai i turni ogni sera in base a chi sciopera domani: i buchi li coprono i più esperti.',e:'Puntualità −1 per due settimane',req:()=>ceo().st.op>=13,reqT:'Operazioni 13',r:'Il capoturno ha buttato la tabella colorata. Con i turni rifatti ogni sera, quasi nessuno se n\'è accorto.',f:function(){mod(this.w.id,{P:-1},14);}}]},
- {id:'ri_comune',src:'Il Mattinale del Ministero',title:'Il delegato si candida in comune',cond:()=>riOn()&&S.warehouses.some(w=>w.rsu&&w.ag>=15)&&Math.random()<0.5,
-  setup:ev=>{const w=pick(S.warehouses.filter(w=>w.rsu&&w.ag>=15)); ev.w=w;
+ {id:'ri_comune',src:'Il Mattinale del Ministero',title:'Il delegato si candida in comune',cond:()=>riOn()&&S.warehouses.some(w=>w.sind&&w.rsu&&w.ag>=15)&&Math.random()<0.5,
+  setup:ev=>{const w=pick(S.warehouses.filter(w=>w.sind&&w.rsu&&w.ag>=15)); ev.w=w;
     ev.text=`${w.rsu.name}, delegato sindacale a ${w.name}, si candida al consiglio comunale con una lista civica: «Più parcheggi per i camion e meno buche in zona industriale». I manifesti sono già sulla rotonda davanti al magazzino, a fianco del tuo cartello «Cercasi carrellisti».`;},
   opts:[{t:'Complimenti in pubblico',d:'Gli stringi la mano davanti a tutti e gli auguri buona fortuna. Costa poco e fa bella figura.',e:'Agitazione −5 per tre mesi, reputazione +1',r:'La foto della stretta di mano è finita sul giornale locale. Lui ha vinto, e ora in comune ha un amico in zona industriale.',f:function(){S.mods.push({scope:this.w.id,ag:-5,until:S.day+90,src:this.title}); repUp(1);}},
         {t:'Fai finta di niente',d:'Le elezioni sono affar suo. Tu pensi ai pallet.',e:'Nessun effetto',r:'Ha preso un buon numero di voti, quasi tutti dalla zona industriale. Di te non ha parlato, né bene né male.',f:()=>{}},
@@ -5600,8 +5620,8 @@ const EVENTS=[
   opts:[{t:'Paghi',d:'Cinquemila euro in una busta, al solito bar, al solito orario.',e:'−5.000 €, la talpa resta',r:'La busta è sparita sotto un giornale piegato. L\'SMS successivo diceva solo «grazie», con un\'altra faccina.',f:()=>{S.cash-=5000;}},
         {t:'«Non un euro di più»',d:'Fai sapere che il prezzo resta quello. Un informatore scontento, però, parla di più. E con le persone sbagliate.',e:'Il rischio che scoprano la talpa sale',r:'Nessuna risposta. Al bar, però, l\'informatore è stato visto chiacchierare a lungo con un giornalista.',f:()=>{S.ri.talpa.used=(S.ri.talpa.used||0)+4;}},
         {t:'Chiudi il rapporto',d:'Basta talpe: si torna a lavorare alla luce del sole. Nessuno saprà mai niente.',e:'Perdi la talpa (si può ricercare di nuovo), nessuno scandalo',r:'Il numero senza nome è stato bloccato. Al tavolo delle trattative, da oggi, si va alla cieca come tutti.',f:()=>{S.researched.talpa=false; S.ri.talpa={used:0,from:null};}}]},
- {id:'ri_caffe',src:'La Gazzetta del Muletto',title:'Il caffè della macchinetta diventa una questione politica',cond:()=>riOn()&&S.warehouses.some(w=>w.ag>=15),
-  setup:ev=>{const w=pick(S.warehouses.filter(w=>w.ag>=15)); ev.w=w;
+ {id:'ri_caffe',src:'La Gazzetta del Muletto',title:'Il caffè della macchinetta diventa una questione politica',cond:()=>riOn()&&S.warehouses.some(w=>w.sind&&w.ag>=15),
+  setup:ev=>{const w=pick(S.warehouses.filter(w=>w.sind&&w.ag>=15)); ev.w=w;
     ev.text=`A ${w.name} il caffè della macchinetta è passato da 40 a 45 centesimi. In bacheca è comparso un volantino: «Oggi il caffè, domani il TFR». Il delegato chiede un incontro urgente, ordine del giorno: «la tazzina». In ufficio nessuno riesce a capire se sia una battuta.`;},
   opts:[{t:'Paghi tu la differenza',d:'I cinque centesimi li mette l\'azienda, per un anno intero.',e:'−600 €, agitazione −4 per quattro mesi',r:'Il volantino è stato staccato dalla bacheca. Al suo posto qualcuno ha attaccato una tazzina disegnata con la scritta «vittoria».',f:function(){S.cash-=600; S.mods.push({scope:this.w.id,ag:-4,until:S.day+120,src:this.title});}},
         {t:'Cambi il gestore delle macchinette',d:'Nuove macchinette, caffè migliore e a 35 centesimi. Il vecchio gestore non la prende bene.',e:'−1.500 €, morale +2 per due mesi',r:'Il nuovo caffè è più buono e costa meno. Il delegato ha ammesso, a bassa voce, che non è male.',f:function(){S.cash-=1500; mod(this.w.id,{mor:2},60);}},
@@ -7963,6 +7983,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.74',t:'Il sindacato si conquista',x:['I magazzini nascono senza sindacato. Se il morale resta sotto 45 per circa un mese (due settimane sotto 35) i lavoratori si organizzano: arriva il sindacato con il suo delegato, e da lì in poi resta.','Senza sindacato al massimo c\'è il mugugno: niente stato di agitazione, scioperi, presidi né tavolo. Nella finestra Relazioni industriali e in quella del magazzino si vede quanto manca.']},
  {v:'0.73',t:'Gare per l\'handling e un tavolo per magazzino',x:['I fornitori di handling non si scelgono più da un elenco: dalla finestra del magazzino si bandisce una gara. Per tre settimane arrivano le offerte, con tariffa, tipo di contratto e durata; poi hai due settimane per scegliere quella che preferisci.','I contratti con i fornitori hanno una scadenza: due mesi prima arriva l\'avviso, e senza una nuova gara si rinnovano da soli con la tariffa +5%.','Il tavolo delle trattative non si convoca più a comando: si apre da solo quando un magazzino entra in stato di agitazione. Ogni magazzino ha il suo, quindi si tratta in più posti insieme.','Se il tavolo salta (o ti alzi tu) il sindacato non torna a trattare per tre mesi; se si firma, il tavolo non si riapre finché dura l\'accordo.']},
  {v:'0.72',t:'Ricerca in ordine',x:['La scheda Ricerca della finestra Tecnologia è rifatta: in cima una sola barra con la ricerca in corso (rossa se è ferma), poi una riga con le tecnologie ricercate, l\'Innovazione e quelle da installare.','Sul computer la finestra è più larga e, quando c\'è posto, la scheda della tecnologia scelta sta a destra dell\'albero: non serve più scorrere fino in fondo per leggerla.','La scheda dice cosa serve e cosa apre dopo: un clic su una di quelle tecnologie ci porta, anche se è in un altro albero. Le linee della tecnologia scelta si colorano di arancione e un cartellino come «+Sviluppo» avvisa quando serve una ricerca di un altro albero.','I nomi lunghi non escono più dai riquadri, le linee non passano più dietro le altre tecnologie e l\'albero delle Certificazioni è più compatto. Al posto del pulsante grigio, un avviso spiega perché non si può avviare: ricerca già in corso, soldi che mancano o cosa serve prima.','Sul telefono le schede degli alberi stanno in una riga sola e l\'albero comincia subito.','La scheda con i certificati dei magazzini si chiama ora «Certificati e audit», per non confondersi con l\'albero Certificazioni.']},
  {v:'0.71',t:'I pacchetti della partita',x:['Quando crei una partita c\'è un passo nuovo, l\'ultimo: «Pacchetti». Il gioco base c\'è sempre, le espansioni si accendono o si spengono con un tocco.','Di base tutte le espansioni sono accese: per ora c\'è «Relazioni industriali». Chi vuole la partita classica la spegne lì.']},
@@ -8311,6 +8332,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},renderAll,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},renderAll,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>
