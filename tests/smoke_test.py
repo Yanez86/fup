@@ -133,7 +133,7 @@ async def phone(b, w, h, name, errs):
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
     await pg.tap('#burger'); await pg.wait_for_timeout(250)
     assert await pg.evaluate(FITS, '#dock'), f'{name}: menu aperto fuori schermo'
-    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 17, f'{name}: mancano voci nel menu'
+    assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == 18, f'{name}: mancano voci nel menu'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_menu.png'))
     await pg.tap('#dock .dh [data-act=menu]'); await pg.wait_for_timeout(250)
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu non si chiude'
@@ -158,7 +158,7 @@ async def phone(b, w, h, name, errs):
     await pg.tap('#modal [data-act=closemodal]')
     assert await pg.evaluate("()=>window.__FUP.S.notes.some(n=>n.k==='ev')"), f'{name}: evento sparito con «Decidi più tardi»'
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
-    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','customer','gare','report','personale','manager','direzione','policy','espansione','giornale','tecnologia','enciclopedia']:
+    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','customer','gare','report','personale','manager','direzione','policy','espansione','giornale','tecnologia','certificazioni','enciclopedia']:
         await menu(pg, wn)
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
         bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
@@ -334,13 +334,13 @@ async def main():
         assert await pg.evaluate("document.querySelector('#ov [aria-label=Viaggi]')!==null"), 'lente Viaggi non disegnata'
         await pg.screenshot(path=os.path.join(OUT, 'shot_lente_viaggi.png'))
         await pg.keyboard.press('KeyL')  # torna alla mappa normale
-        for w in ['azienda','magazzini','traffico','clienti','gare','report','personale','manager','direzione','policy','espansione','giornale','classifica','tecnologia']:
+        for w in ['azienda','magazzini','traffico','clienti','gare','report','personale','manager','direzione','policy','espansione','giornale','classifica','certificazioni','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
             assert await pg.evaluate(FITS, f'#win-{w}'), f'finestra {w} esce dal fondo dello schermo'
             if w == 'classifica':
                 assert await pg.eval_on_selector_all('#win-classifica .cls', 'e=>e.length') == 3, 'classifica senza le 3 aziende'
                 await pg.screenshot(path=os.path.join(OUT, 'shot_classifica.png'))
-        for t in ['log','org','mkt','wel']:
+        for t in ['log','org','mkt','wel','cert']:
             await pg.click(f'#win-tecnologia [data-act=seltree][data-id={t}]')
             await pg.screenshot(path=os.path.join(OUT, f'shot_tree_{t}.png'))
         # ricerca + installazione + direzione
@@ -361,6 +361,18 @@ async def main():
         ok = await pg.evaluate("()=>{const F=window.__FUP,w=F.S.warehouses[0];return !!w.tech.acqua;}")
         assert ok, 'boccioni d\'acqua non installati'
         await pg.screenshot(path=os.path.join(OUT, 'shot_tree_wel_inst.png'))
+        # certificazioni: una gara alimentare chiede l'HACCP nel magazzino scelto; audit di due settimane, poi si può fare l'offerta
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; S.researched.haccp=true; delete w.tech.haccp; delete w.tech.freddo;
+          const tpl=F.TENDER_POOL.find(t=>t.name==='Riseria La Mondina'), ci=F.CINFO[tpl.name], t={...tpl,zone:ci.zones[0],src:ci.src,mode:ci.mode,dur:24};
+          const a=F.bidEstimate(t,w.id,1).certW.length, c0=S.cash; F.ACT.install({id:'haccp',wh:w.id}); const paid=c0-S.cash, b=F.bidEstimate(t,w.id,1).certW.length;
+          F.ACT.install({id:'freddo',wh:w.id}); const fr0=!!w.tech.freddo; w.tech.haccp.day-=14; const c=F.bidEstimate(t,w.id,1).certW.length;
+          F.ACT.opencert({tab:'mag'}); return {a,b,c,paid,fr0,ok:F.certOk(w,'haccp'),win:!!document.querySelector('#win-certificazioni .ce-t')};}''')
+        assert r['a'] == 1 and r['b'] == 1 and r['c'] == 0 and r['ok'] and r['paid'] == 3000 and r['win'], f'HACCP nel magazzino: {r}'
+        await pg.evaluate(CLEAR)
+        await pg.screenshot(path=os.path.join(OUT, 'shot_certificazioni.png'))
+        await pg.click('#win-certificazioni [data-act=ctab][data-id=az]')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_certificazioni_azienda.png'))
+        await pg.click('#win-certificazioni [data-act=close]')
         await pg.click('#dock [data-id=direzione]')  # chiude la finestra aperta prima...
         if not await pg.query_selector('#win-direzione'): await pg.click('#dock [data-id=direzione]')  # ...e la riapre in primo piano
         await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.ACT.hiremgr({id:'ottavio'}); const o=S.managers.find(m=>m.id==='ottavio'); S.warehouses.forEach(w=>{if(w.mgr==='ottavio')w.mgr=null;}); o.wh=null;}")
@@ -483,6 +495,7 @@ async def main():
           S.clients.push({...S.clients[0],id:'cx',name:'Tuttosubito Italia',zone:'nordovest',pal:400});
           delete S.boss; delete S.alumni; const EX=['ottavio','giulia','roberto']; S.execs=S.managers.filter(m=>EX.includes(m.id)).map(e=>{const x={...e}; delete x.bd; delete x.log; return x;}); S.execs[0].hired=true;
           S.managers=S.managers.filter(m=>!m.from&&!EX.includes(m.id)).map(m=>{const x={...m}; delete x.bd; delete x.log; delete x.ann; return x;}); delete S.hh; delete S.cands; delete S.negs; delete S.mkt;
+          delete S.certMig; S.researched.freddo=true; delete S.researched.haccp; delete w.tech.haccp; delete w.tech.freddo;
           F.save(); return true;}''')
         await pg.evaluate('()=>location.reload()'); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached'); await pg.wait_for_selector('[data-act=continue]')
         await pg.click('[data-act=continue]'); await pg.evaluate(CLEAR)
@@ -490,10 +503,17 @@ async def main():
         assert st['imp'] is None and sum(st['st'].values()) == 8+3 and st['st']['autB'] > 0, st
         assert st['q'] == ['imp:true', 'autCE:true'], st
         assert await pg.evaluate('()=>window.__FUP.S.office.plan===0 && window.__FUP.S.warehouses[0].coop===false')
+        # certificazioni (0.66): chi aveva la Catena del freddo la ritrova nei magazzini, con l'HACCP; un cliente alimentare porta l'HACCP nel suo magazzino
+        ce = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0];
+          const o=JSON.parse(JSON.stringify(S)); delete o.certMig; o.researched={}; o.warehouses.forEach(x=>{delete x.tech.haccp;}); F.fillSave(o);
+          return {fr:!!w.tech.freddo&&F.certOk(w,'freddo'),ha:!!w.tech.haccp&&!!S.researched.haccp,cli:!!o.researched.haccp&&!!o.warehouses[0].tech.haccp&&!o.researched.freddo};}''')
+        assert ce['fr'] and ce['ha'] and ce['cli'], f'conversione delle certificazioni: {ce}'
         st = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S;return {boss:S.boss.name,age:F.ageOf(S.boss),m:S.managers.length,bd:F.people().every(p=>p.bd!=null&&Array.isArray(p.log)),
           ex:S.execs.length,ott:(S.managers.find(m=>m.id==='ottavio')||{}).hired,hh:Array.isArray(S.hh)&&Array.isArray(S.cands)&&!!S.negs,board:F.mktList().length}}''')
         assert st['boss'] == 'Marco Pellegrino' and st['age'] == 36 and st['m'] >= 23 and st['bd'], st
         assert st['ex'] == 0 and st['ott'] and st['hh'] and st['board'] == 3, f'dirigenti convertiti in manager: {st}'
+        st = await pg.evaluate('''()=>{const F=window.__FUP,o={}; ['gino','marco','edoardo','valeria'].forEach(c=>{F.newGame(c); o[c]=F.certOk(F.S.warehouses[0],'haccp');}); return o;}''')
+        assert st == {'gino': True, 'marco': True, 'edoardo': False, 'valeria': False}, f'HACCP alla partenza: {st}'
         # eventi dei talenti: ognuno compare con il suo talento e tutte le scelte funzionano
         r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame(null,F.ccCeo(Object.assign(F.ccNew(),{nome:'Prova',cognome:'Eventi',edu:'Autodidatta'})));
           const S=F.S,evs=F.EVENTS.filter(e=>e.id.startsWith('t_')),bad=[];S.boss.tal=[];

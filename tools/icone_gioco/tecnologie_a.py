@@ -176,7 +176,7 @@ def t_iso():
     c.disc(5.5, 4.5, 3.9, 'Y')
     r = process(c.rows())
     return ov(r, ['', '', '.......G', '......G', '..G..G', '...GG', '', '', '', '', '...B....B', ''])
-TE['iso'] = ('org', 'Certificazione ISO 9001', t_iso)
+TE['iso'] = ('cert', 'Certificazione ISO 9001', t_iso)
 
 # ---------------- Mercato ----------------
 def t_commerciale():

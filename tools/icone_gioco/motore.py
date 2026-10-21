@@ -98,7 +98,9 @@ def drop(rows, ch='Q'):
 TAL_T = {'pos': ('#eaf6ec', '#d5ecda', '#2e9e48', '#c4e2cb'), 'neg': ('#fbecec', '#f2d4d4', '#e0393e', '#eccaca'), 'mix': ('#fff6dc', '#f6e6b5', '#e0a800', '#efdca3')}
 # alberi delle tecnologie: filetto, fondo, fascia in basso, angoli tagliati riga per riga
 TEC_T = {'log': ('#ff7a3d', '#ffe8d9', '#ffd6bd', [0, 0, 0]), 'org': ('#9b6bff', '#ece3ff', '#dccdff', [3, 2, 1]),
-         'mkt': ('#2e9e48', '#dff3d6', '#c9e9bd', [5, 3, 2, 1, 1]), 'wel': ('#e0393e', '#ffe1e1', '#ffcaca', [2, 1])}
+         'mkt': ('#2e9e48', '#dff3d6', '#c9e9bd', [5, 3, 2, 1, 1]), 'wel': ('#e0393e', '#ffe1e1', '#ffcaca', [2, 1]),
+         # certificazioni: scudo a punta, il rientro è dato riga per riga (come rows di TFRAME.cert in game.html)
+         'cert': ('#2f7fd6', '#e1f1fc', '#c8e4f8', {'rows': [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 3, 4, 5, 6]})}
 POL_T = ('#fff3c4', '#e8d9a0')   # foglio del regolamento: fondo e fascia in basso
 
 def _tile(n, inside, rim, bg, bg2, art, off, sh):
@@ -123,7 +125,8 @@ def tal_tile(art, typ):
 
 def tec_tile(art, tree):
     rim, bg, bg2, cut = TEC_T[tree]; n = 16
-    cu = lambda r: cut[min(r, n-1-r)] if min(r, n-1-r) < len(cut) else 0
+    if isinstance(cut, dict): cu = lambda r: cut['rows'][r]
+    else: cu = lambda r: cut[min(r, n-1-r)] if min(r, n-1-r) < len(cut) else 0
     return _tile(n, lambda x, y: 0 <= y < n and cu(y) <= x < n-cu(y), rim, bg, bg2, art, 2, bg2)
 
 def pol_tile(art):
