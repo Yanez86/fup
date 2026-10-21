@@ -3,3 +3,4 @@ tools/out/*
 __pycache__/
 *.pyc
 .DS_Store
+tools/ritratti_pxl/out/
