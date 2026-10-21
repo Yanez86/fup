@@ -11,3 +11,12 @@ def m_manager():
     r = process(c.rows())
     return ov(r, ['', '', '', '', '', '', '', '', '', '.....W', '....WRW', '.....R', '.....R', '.....r'])
 MENU['manager'] = ('Manager e head hunter', m_manager)
+
+def m_certificazioni():
+    # scudo azzurro con la spunta, come la cornice delle certificazioni
+    c = Cv(16)
+    for y, (a, b) in enumerate([(3, 12), (2, 13), (2, 13), (2, 13), (2, 13), (2, 13), (2, 13), (2, 13), (3, 12), (3, 12), (4, 11), (5, 10), (6, 9), (7, 8)]):
+        c.rect(a, 1+y, b, 1+y, 'B')
+    r = process(c.rows())
+    return ov(r, ['', '', '', '', '', '...........W', '..........WW', '.....W...WW', '.....WW.WW', '......WWW', '.......W'])
+MENU['certificazioni'] = ('Certificazioni', m_certificazioni)

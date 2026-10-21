@@ -23,14 +23,21 @@ TE['gps'] = ('log', 'Telematica GPS', t_gps)
 def t_freddo():
     c = Cv(12)
     for i in range(11):
-        c.set(5, i, 'B'); c.set(i, 5, 'B')
+        c.set(5, i, 'b'); c.set(i, 5, 'b')
     for i in range(1, 10):
-        c.set(i, i, 'B'); c.set(10-i, i, 'B')
+        c.set(i, i, 'b'); c.set(10-i, i, 'b')
     for (x, y) in [(4, 1), (6, 1), (4, 9), (6, 9), (1, 4), (1, 6), (9, 4), (9, 6)]:
-        c.set(x, y, 'B')
+        c.set(x, y, 'b')
     c.rect(4, 4, 6, 6, 'W'); c.set(5, 5, 'L')
     return process(c.rows(), shade=False)
-TE['freddo'] = ('mkt', 'Catena del freddo', t_freddo)
+TE['freddo'] = ('cert', 'Catena del freddo', t_freddo)
+def t_haccp():
+    # registro dell'autocontrollo sulla tavoletta, con la mela: igiene alimentare
+    c = Cv(12); c.rect(0, 1, 8, 11, 'N'); c.rect(1, 2, 7, 10, 'W'); c.rect(3, 0, 5, 1, 'S')
+    c.disc(8.5, 8.5, 2.9, 'R'); c.set(9, 5, 'G'); c.set(10, 4, 'G')
+    r = process(c.rows(), keep='W')
+    return ov(r, ['', '', '', '..K.KKK', '', '..K.KK', '', '..K.K'])
+TE['haccp'] = ('cert', 'HACCP', t_haccp)
 def t_mensa():
     c = Cv(12); c.rect(0, 6, 11, 7, 'W'); c.rect(1, 8, 10, 8, 'W'); c.rect(3, 9, 8, 9, 'W')
     c.rect(2, 4, 9, 5, 'O')
