@@ -158,7 +158,63 @@ person('mirella',skin='chiara',hair='#5a2430',hairl='#8a3a4a',hairstyle='bob',cl
 person('gianfranco',skin='media',hair='#9aa0a8',hairl='#c9ced4',hairstyle='short',cloth='#3a6db0',clothd='#264f86',clothl='#5a8bd0',mustache='#9aa0a8',collar=tie('#ffd23f'))
 person('kevin',skin='media',hair='#2c2420',hairl='#4a3c34',hairstyle='messy',cloth='#1f9e8f',clothd='#157366',clothl='#3dd6c4',glasses='#16202e',collar=tshirt('#157366'),extra=headset)
 person('operatore',skin='scura',hair='#1c1612',hairl='#3d2419',hairstyle='buzz',cloth='#ffd23f',clothd='#d9a514',clothl='#ffe88a',collar=polo('#d9a514'),extra=headset)
-NEW=['giorgio','aisha','ivan','sara','nicola','elena','matteo','beatrice','paolo','federico','andrew','mirella','gianfranco','kevin','operatore']
+# Luca "Non il calciatore" Del Sasso: giovane, ricci folti e scuri, spalle da palestra in maglietta aderente
+HEADM=ell(24,23,9.8,12)|ell(24,27,9.3,8.5)
+# trama dei ricci: piccoli anelli sfalsati (riflesso in alto a sinistra, ombra in basso a destra)
+_X=xx.astype(int); _Y=yy.astype(int); _U=(_X+2*((_Y//3)%2))%4; _V=_Y%3
+RL=((_U==0)&(_V==0))|((_U==1)&(_V==0)); RD=((_U==2)&(_V==1))|((_U==1)&(_V==2))
+def ricci(col,cold,coll,top=13,ry=8.5):
+    def f(c):
+        m=(ell(24,top,13.5,ry)&(yy<18.5))|(rect(12.5,13,16,23)&ell(24,20,14,13))|(rect(32,13,35.5,23)&ell(24,20,14,13))
+        for cx,cy in [(12,11),(15,7),(19,5),(24,4.5),(29,5),(33,7),(36,11),(11,16),(37,16),(12,21),(36,21)]: m=m|ell(cx,cy+(top-13),2.6,2.6)
+        m=m&~(HEADM&(yy>=18))
+        c.fill(m,col)
+        c.img[m&RL]=hexc(coll); c.img[m&RD]=hexc(cold)
+    return f
+def muscoli(c):
+    s,sd,sl,sdd=SKINS['media']
+    c.shaded(rect(18,32,30,41)&~HEADM,s,sd,sl,24,37,6,4,td=0.25,tl=-0.6)
+    c.px(line_px(19,29,40),sdd)
+    for cx in (9,39): c.shaded(ell(cx,47,7,5.5)&ell(24,58,24,18)&(yy<56),'#26365c','#1b2238','#3a4f80',cx-2,45,7,5)
+    c.fill(ell(24,41,6,3.2)&~ell(24,40.5,4.6,2.2)&(yy>40),'#1b2238')
+    c.px(line_px(15,22,49)+line_px(26,33,49)+[(14,48),(34,48),(23,50),(25,50),(24,50)],'#1b2238')
+def luca_col(c): muscoli(c); ricci('#2c2420','#16120f','#4a3c34')(c)
+person('delsasso',skin='media',hair='#2c2420',hairl='#4a3c34',hairstyle='buzz',cloth='#26365c',clothd='#1b2238',clothl='#3a4f80',extra=luca_col)
+# Giuseppe "O' Mariuolo" Sorrentino: grigio e stempiato, occhiali stretti, naso importante
+def mariuolo(c):
+    s,sd,sl,sdd=SKINS['media']
+    # mento più lungo: la faccia scende di tre pixel, la bocca resta dov'è
+    chin=ell(24,31,8.2,7.2)&(yy>=33)
+    c.shaded(chin,s,sd,sl,22,30,9,7); c.px(line_px(20,28,38),sd)
+    c.px([(23,35),(24,35),(25,35)],sd)
+    # stempiato e brizzolato: capelli corti in cima e ai lati, fronte alta
+    top=(ell(24,12.5,9.5,4.2)&(yy<14.5))|(rect(13.5,14,17,25)&HEADM)|(rect(31,14,34.5,25)&HEADM)
+    c.shaded(top,'#4a4644','#2c2a28','#6b6f75',22,10,10,5)
+    c.img[top&(((_X+_Y)%3)==0)]=hexc('#9aa0a8')
+    c.px(line_px(17,21,20)+line_px(27,31,20),'#4a4644')
+    c.px(line_px(16,22,22)+line_px(26,32,22)+line_px(16,22,24)+line_px(26,32,24)+[(16,23),(22,23),(26,23),(32,23),(23,22),(24,22),(25,22)],'#16202e')
+    c.px([(17,23),(18,23),(21,23),(27,23),(28,23),(31,23)],'#bfe6ff'); c.px([(19,23),(20,23),(29,23),(30,23)],'#2a1d1d')
+    c.px([(24,25),(25,25),(24,26),(25,26),(25,27),(26,27),(22,27),(26,28),(22,28),(26,29),(22,29)],sd)
+    c.px([(23,27),(24,27),(23,28),(24,28),(25,28)],s); c.px([(23,25),(23,26)],sl)
+    c.px([(23,29),(25,29),(26,27),(26,28)],sdd); c.px([(24,29)],sd)
+person('sorrentino',skin='media',hair='#4a4644',hairl='#6b6f75',hairstyle='bald',cloth='#3a4658',clothd='#2a3442',clothl='#4f5d72',collar=tie('#e0393e'),extra=mariuolo)
+# Greta Brambilla: ricci biondi, occhi grandi e tondi
+def occhioni(c):
+    for x0 in (17,27):
+        c.px([(x0+1,21),(x0+2,21),(x0,22),(x0+1,22),(x0+2,22),(x0+3,22),(x0,23),(x0+1,23),(x0+2,23),(x0+3,23),(x0+1,24),(x0+2,24)],'#f4f1ec')
+        c.px([(x0+1,22),(x0+2,23),(x0+1,23)],'#2a1d1d')
+        c.px([(x0+1,20),(x0+2,20),(x0,21),(x0+3,21)],'#16202e')
+    c.px(line_px(17,21,19)+line_px(27,31,19),'#b08a2e')
+def greta_x(c):
+    m=c.obj&~HEADM&(yy<38)&~(ell(14,24,2,3)|ell(34,24,2,3))
+    m=m|(ell(24,21,18,17)&(yy<40)&~HEADM&~(ell(14,24,2,3)|ell(34,24,2,3)))|(ell(24,12,14,9)&(yy<18))
+    for cx,cy in [(10,11),(14,6),(19,3.5),(24,3),(29,3.5),(34,6),(38,11),(7,17),(41,17),(7,24),(41,24),(8,31),(40,31),(10,37),(38,37),(9,34),(39,34),(12,34),(36,34)]: m=m|ell(cx,cy,3.2,3.2)
+    m=m&~(rect(17,32,31,56)&~HEADM&(yy>=34))
+    m=m|(HEADM&(yy<18))
+    c.fill(m,'#e8c25a'); c.img[m&RL]=hexc('#fbe39a'); c.img[m&RD]=hexc('#b08a2e')
+    occhioni(c)
+person('greta',skin='chiara',hair='#e8c25a',hairl='#fbe39a',hairstyle='curly',cloth='#ff7a3d',clothd='#c8551f',clothl='#ffb07a',lips='#c85a62',earring='#ffd23f',collar=polo('#c8551f'),extra=greta_x)
+NEW=['delsasso','sorrentino','greta','giorgio','aisha','ivan','sara','nicola','elena','matteo','beatrice','paolo','federico','andrew','mirella','gianfranco','kevin','operatore']
 
 # posto vacante: sagoma anonima in ombra (p_anonimo), con un punto di domanda sul petto
 def anonimo():
