@@ -10,7 +10,7 @@ def b64(f):
 s = s.replace('{{MAP}}', b64('mappa_nw.png'))
 s = s.replace('{{ICON}}', b64('icona_32.png'))
 s = s.replace('{{PROV}}', open(A('assets', 'province.json'), encoding='utf-8').read().strip())  # confini, da tools/province.py
-s = s.replace('{{ICONE}}', open(A('assets', 'icone.json'), encoding='utf-8').read().strip())  # icone in pixel art, da tools/icone_gioco/genera.py
+s = s.replace('{{ICONE}}', open(A('assets', 'icone.json'), encoding='utf-8').read().strip())  # icone in pixel art, da tools/icone_pxl/esporta.py
 # scenette degli eventi, strisce di fotogrammi da tools/scene_pxl/esporta.py
 SC = A('assets', 'scene')
 s = s.replace('{{SCENE}}', json.dumps({f[:-4]: 'data:image/png;base64,' + base64.b64encode(open(os.path.join(SC, f), 'rb').read()).decode()
