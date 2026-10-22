@@ -167,14 +167,14 @@ talento("Ingegnere informatico", "mix", { fascia: false }, `
   SSSSSSSSSSSSSS
   ssssssssssssss
   ..............`)
-// Ingegnere dei trasporti: il cartello col percorso ottimo per il bar
+// Ingegnere dei trasporti: il cartello delle direzioni
 talento("Ingegnere dei trasporti", "pos", { dopo: [grid(1, 1, `
-  .........W..
-  WWWWW....WW.
-  WWWW.W.WWWWW
-  WWWW.W.WWWWW
-  WWWWW....WW.
-  .WWW.....W..`)] }, `
+  ..WW.....W..
+  .WWWW....WW.
+  WWWWWW.WWWWW
+  ..WW...WWWWW
+  ..WW.....WW.
+  ..WW.....W..`)] }, `
   .GGGGGGGGGGGG.
   GGGGGGGGGGGGGG
   GGGGGGGGGGGGGG
@@ -367,7 +367,7 @@ talento("Laureato in chimica", "pos", { mx: true, tieni: "L", dopo: [grid(6, 9, 
   GGGGGGG
   GGGGGGG`)
 // Laureato in architettura: compasso sul progetto
-talento("Laureato in architettura", "mix", { tieni: "S" }, `
+talento("Laureato in architettura", "mix", { tieni: "SB" }, `
   ..............
   ..............
   ..............
@@ -381,7 +381,7 @@ talento("Laureato in architettura", "mix", { tieni: "S" }, `
   BBBBBBBBBBBBBB
   BLLLLLLLLLLLLB
   BBBBBBBBBBBBBB
-  BBBBBBBBBBBBBB`,
+  bbbbbbbbbbbbbb`,
   stamp("_t2compasso", 1, -1), t2netto)
 // Laureato in agraria: la pesca matura
 talento("Laureato in agraria", "pos", {}, `
@@ -400,16 +400,22 @@ talento("Laureato in agraria", "pos", {}, `
   ..OOOOOOOOO...
   ....OOOOO.....`)
 // Laureato in scienze della comunicazione: tavolozza e pennello (il logo, versione 3)
-talento("Laureato in scienze della comunicazione", "mix", {}, `
+talento("Laureato in scienze della comunicazione", "mix", { dopo: [grid(1, 3, `
+  .RR..YY......
+  .RR..YY..GG..
+  .........GG..
+  .............
+  PP...........
+  PP...........`)] }, `
   ..............
   ...NNNNNNNN...
   .NNNNNNNNNNNN.
-  NNRRNNYYNNNNNN
-  NNRRNNYYNNGGNN
-  NNNNNNNNNNGGNN
+  NNNNNNNNNNNNNN
+  NNNNNNNNNNNNNN
+  NNNNNNNNNNNNNN
   NNNNNNNNNNNNN.
-  NPPN..NNNNNN..
-  NPPN..NNNNN...
+  NNNN..NNNNNN..
+  NNNN..NNNNN...
   NNNNNNNNNN....
   .NNNNNNNN.....
   ...NNNNN......
@@ -522,21 +528,21 @@ talento("Autodidatta", "mix", { fascia: false }, `
   rrrrrrrrrrrrr.
   ..............`)
 // Pendolare della Torino-Milano: il regionale col pantografo
-talento("Pendolare della Torino-Milano", "mix", { mx: true, fascia: false }, `
-  ...SSSS
-  .....S.
-  ......S
-  ..WWWWW
-  .WWWWWW
-  .WWWWWW
-  .Wddddd
-  .Wddddd
-  .WWWWWW
-  .GGGGGG
-  .WYYWWW
-  .WWWWWW
-  .SSSSSS
-  ..DD...`)
+talento("Pendolare della Torino-Milano", "mix", { fascia: false }, `
+  ....SSSSS.....
+  .....S.S......
+  ......S.......
+  WWWWWWWWWWW...
+  WWWWWWWWWWWW..
+  WLLWLLWLLWWdd.
+  WLLWLLWLLWWddd
+  WWWWWWWWWWWWWW
+  GGGGGGGGGGGGGG
+  WWWWWWWWWWWWWY
+  SSSSSSSSSSSSSS
+  .DDDD....DDDD.
+  SSSSSSSSSSSSSS
+  ..............`)
 // Vegano convinto: la carota
 talento("Vegano convinto", "mix", { dopo: [grid(8, 5, "o.\n.o"), grid(5, 8, "o.\n.o"), grid(3, 10, "o.\n.o")] }, `
   .........GG.GG
@@ -593,21 +599,21 @@ talento("Fumatore incallito", "mix", {}, `
   ..............
   ..............
   ..............
-  ..............
-  .....OOWWWWWsR
-  .O.O.OOWWWWWsR
-  .OOO..........
-  SSSSSSSSSSSSSS
-  SSSSSSSSSSSSSS
-  .SSSSSSSSSSSS.
-  ..SSSSSSSSSS..`,
+  .O..OOWWWWWRs.
+  .OO.OOWWWWWRs.
+  DDDDDDDDDDDDDD
+  DDDDDDDDDDDDDD
+  DDDDDDDDDDDDDD
+  .DDDDDDDDDDDD.
+  ..DDDDDDDDDD..`,
   layer("fumo", { outline: false }, grid(10, 0, `
+  .s..
+  ..s.
   ..s.
   .s..
   .s..
   ..s.
-  ..s.
-  .s..`)))
+  ..s.`)))
 // Maratoneta: la scarpa da corsa
 talento("Maratoneta", "pos", {}, `
   ..............
@@ -632,20 +638,20 @@ talento("Maratoneta", "pos", {}, `
   ss`)))
 // Superstizioso: il cornetto rosso
 talento("Superstizioso", "mix", {}, `
-  .YY...........
-  Y..Y..........
-  .YYYY.........
-  .YYYYY........
-  ..YYYRR.......
-  ...YRRRRR.....
-  ....RRRRRR....
-  .....RRRRRR...
-  ......RRRRR...
-  .......RRRRR..
-  ........RRRR..
-  .........RRR..
-  ..........RRR.
-  ............R.`)
+  .....YY.......
+  ....Y..Y......
+  .....YY.......
+  ...YYYYYY.....
+  ...yyyyyy.....
+  ...RRRRRR.....
+  ...RRRRRR.....
+  ....RRRRR.....
+  ....RRRRR.....
+  .....RRRR...R.
+  .....RRRRR.RR.
+  ......RRRRRR..
+  .......RRRR...
+  ..............`)
 // Divorziato due volte: il cuore rotto in tre pezzi
 talento("Divorziato due volte", "mix", {}, `
   ..............
@@ -687,8 +693,8 @@ talento("Guru dei social", "mix", {}, `
 talento("Cuoco provetto", "pos", { mx: true }, `
   ....WWW
   .WW.WWW
-  WWWSWWW
-  WWWSWWW
+  WWWWWWW
+  WWWWWWW
   WWWWWWW
   WWWWWWW
   .WWWWWW

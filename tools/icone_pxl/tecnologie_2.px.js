@@ -21,8 +21,8 @@ tecnologia("freddo", "cert", { fascia: false }, `
   ....BB....
   .B..BB..B.
   ..B.BB.B..
-  .BBBBBBBB.
-  .BBBBBBBB.
+  .BBBLLBBB.
+  .BBBLLBBB.
   ..B.BB.B..
   .B..BB..B.
   ....BB....
@@ -31,8 +31,8 @@ tecnologia("freddo", "cert", { fascia: false }, `
 // ISO 9001: medaglia d'oro col nastro e la spunta
 tecnologia("iso", "cert", { fascia: false, dopo: [grid(3, 4, `
   ...y
-  y.y.
-  .y..`)] }, `
+  y.yy
+  yyy.`)] }, `
   RRR....RRR
   .RRR..RRR.
   ..RRRRRR..
@@ -55,24 +55,24 @@ tecnologia("gdp", "cert", { fascia: false }, `
   ...gggg...
   ..........
   ..........`)
-// Ambiente ISO 14001: germoglio con due foglie
+// Ambiente ISO 14001: albero con la chioma tonda
 tecnologia("iso14001", "cert", { fascia: false }, `
-  .......GGG
-  .....GGGGG
-  GG...GGGG.
-  GGGG.GGG..
-  .GGGGGG...
-  ...GGG....
-  ....GG....
-  ....GG....
-  ....gg....
+  ...GGGG...
+  .GGGGGGGG.
+  GGGgGGGGGG
+  GGGGgGGgGG
+  GGGGGGgGGG
+  .gGGGGGGg.
+  ..ggNNgg..
+  ....NN....
+  ....nn....
   ..........`)
-// Sicurezza ISO 45001: testa d'operaio col casco arancione
+// Sicurezza ISO 45001: testa d'operaio col casco giallo
 tecnologia("iso45001", "cert", { fascia: false }, `
-  ...OOOO...
-  ..OOOOOO..
-  .OOOOOOOO.
-  oooooooooo
+  ...YyyY...
+  ..YYyyYY..
+  .YYYyyYYY.
+  yyyyyyyyyy
   .FFFFFFFF.
   .FFKFFKFF.
   .FFKFFKFF.
@@ -111,17 +111,20 @@ tecnologia("banchina", "cert", { dopo: [grid(4, 4, `
   ..SSSSSS..
   ..........
   ..........`)
-// Operatore doganale autorizzato: timbro di approvazione
-tecnologia("aeo", "cert", { fascia: false }, `
-  ....RR....
-  ...RRRR...
-  ...RRRR...
-  ....rr....
-  .NNNNNNNN.
-  .NNNNNNNN.
-  .nnnnnnnn.
-  ..DDDDDD..
-  ..........
+// Operatore doganale autorizzato: container col bollino verde dell'approvazione
+tecnologia("aeo", "cert", { fascia: false, dopo: [grid(3, 5, `
+  ...W
+  W.WW
+  WWW.`)] }, `
+  OOOOOOOOOO
+  OoOoOOoOoO
+  OoOoOOoOoO
+  OoOKKKKOoO
+  ooKGGGGKoo
+  ..GGGGGG..
+  ..GGGGGG..
+  ..gGGGGg..
+  ...gggg...
   ..........`)
 // Deposito fiscale e doganale: botte cerchiata col sigillo di ceralacca
 tecnologia("doganale", "cert", { fascia: false }, `
@@ -155,10 +158,10 @@ tecnologia("parita", "cert", { dopo: [grid(3, 2, `
 // Boccioni d'acqua: erogatore col boccione rovesciato e i rubinetti caldo e freddo
 tecnologia("acqua", "wel", { dopo: [grid(2, 6, `
   RR..BB`)] }, `
-  ..LLLLLL..
-  ..LLLLLL..
-  ..LLLLLL..
   ...LLLL...
+  ..LLLLLL..
+  ..LLLLLL..
+  ..LLLLLL..
   ....LL....
   .WWWWWWWW.
   .WWWWWWWW.

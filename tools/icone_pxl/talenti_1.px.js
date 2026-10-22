@@ -357,12 +357,11 @@ talento("Mano larga", "mix", { dopo: [grid(2, 2, `
   ....YYYYYY....`)
 
 // Ansia da prestazione: faccia preoccupata con la goccia di sudore
-talento("Ansia da prestazione", "mix", { dopo: [grid(2, 4, `
+talento("Ansia da prestazione", "mix", { tieni: "N", dopo: [grid(2, 4, `
   .K..K.
   K....K
   .K..K.
   .K..K.
-  ......
   ......
   .K.K..
   K.K.K.`)] }, `
@@ -400,19 +399,19 @@ talento("Insonne", "neg", {}, `
 
 // Tifo sfegatato: il pallone del derby
 talento("Tifo sfegatato", "mix", { dopo: [grid(0, 0, `
-  .....DDDD.....
-  ......DD......
+  ..............
+  .....KKKK.....
+  ......KK......
   ..............
   ..............
+  .K....KK....K.
+  .KK..KKKK..KK.
+  .KK..KKKK..KK.
+  .K....KK....K.
   ..............
-  D.....DD.....D
-  DD...DDDD...DD
-  DD...DDDD...DD
-  D.....DD.....D
   ..............
-  ..............
-  ..DD......DD..
-  .DDD......DDD.
+  ...KK....KK...
+  ...KKK..KKK...
   ..............`)] }, `
   ....WWWWWW....
   ..WWWWWWWWWW..
@@ -433,16 +432,16 @@ talento("Tifo sfegatato", "mix", { dopo: [grid(0, 0, `
 talento("Ex fumatore", "pos", { fascia: false }, `
   ....RRRRRR....
   ..RRRRRRRRRR..
-  .RRRR....RRRR.
-  .RRRR.......R.
-  RR..RR......RR
-  RR...RR.....RR
-  RR.OOWRRWWa.RR
-  RR.OOWWRRWa.RR
-  RR......RR..RR
-  RR.......RR.RR
-  .R........RRR.
-  .RRRR....RRRR.
+  .RRRRWWWWRRRR.
+  .RRRRWWWWWWRR.
+  RRWRRRWWWWWWRR
+  RRWWRRRWWWWWRR
+  RRWKKRRRKKKWRR
+  RRWKKKRRRKKWRR
+  RRWWWWWRRRWWRR
+  RRWWWWWWRRRWRR
+  .RRWWWWWWRRRR.
+  .RRRRWWWWRRRR.
   ..RRRRRRRRRR..
   ....rrrrrr....`)
 
@@ -481,21 +480,21 @@ talento("Mentore", "pos", { mx: true }, `
   ...OO..`)
 
 // Meditazione quotidiana: seduto a gambe incrociate, occhi chiusi
-talento("Meditazione quotidiana", "pos", { mx: true }, `
+talento("Meditazione quotidiana", "pos", { mx: true, dopo: [grid(4, 4, "KK")] }, `
   ....NNN
   ...NNNN
   ...NFFF
   ...FFFF
-  ...FKKF
+  ...FFFF
   ...FFFF
   ....FFF
+  ....PPP
   ...PPPP
-  ..PPPPP
-  .PP.PPP
-  FF..PPP
-  FDDDDDD
-  DDDDDDD
-  .DDDDDD`)
+  ..PP.PP
+  .PP..PP
+  FF.DDDD
+  .DDDDDD
+  DDDDDDD`)
 
 // Mal di schiena cronico: la colonna vertebrale con la vertebra dolorante
 talento("Mal di schiena cronico", "neg", {}, `
@@ -503,16 +502,24 @@ talento("Mal di schiena cronico", "neg", {}, `
   .....CCCC.....
   ..............
   ....CCCCCC....
-  .R...CCCC...R.
-  ..R.........R.
-  RR..RRRRRR..RR
+  .....CCCC.....
+  ..............
+  ....RRRRRR....
   .....RRRR.....
-  ..R.........R.
-  .R..CCCCCC...R
+  ..............
+  ....CCCCCC....
   .....CCCC.....
   ..............
   ....CCCCCC....
-  .....CCCC.....`)
+  .....CCCC.....`,
+  layer("linee", { outline: false }, grid(0, 3, `
+  .R..........R.
+  ..R........R..
+  ..............
+  RR..........RR
+  ..............
+  ..R........R..
+  .R..........R.`)))
 
 // Formato sulla sicurezza: il gilet ad alta visibilità con le bande riflettenti
 talento("Formato sulla sicurezza", "pos", { mx: true, dopo: [grid(0, 0, `
@@ -656,16 +663,16 @@ talento("Diplomato perito industriale", "pos", {}, `
   .S.......SSS.S
   ..S......SS.SS
   ...S.....SSSSS
-  ....S...SSSSS.
+  ....S....SSSS.
   .....S..SS....
   ......SSS.....
-  ......SSS.....
-  .....SSRR.....
-  ....SS.RRR....
-  ...SS...RRR...
-  ..SS.....RRR..
-  .SS.......RRR.
-  SS.........RR.`)
+  ......SS......
+  .....SS.RR....
+  ....SS..RRR...
+  ...SS....RRR..
+  ..SS......RRR.
+  .SS........RRR
+  SS..........RR`)
 
 // Diplomato perito informatico: il mouse col filo
 talento("Diplomato perito informatico", "pos", { dopo: [grid(3, 3, `
@@ -721,20 +728,20 @@ talento("Maturità classica", "mix", { mx: true, dopo: [grid(1, 2, "K")] }, `
   WWWWWWW
   WWWWWWW
   WWWSSSS
-  ...WWSW
-  ...WWSW
-  ...WWSW
-  ...WWSW
-  ...WWSW
-  ...WWSW
-  ...WWSW
+  ....WSW
+  ....WSW
+  ....WSW
+  ....WSW
+  ....WSW
+  ....WSW
+  ....WSW
+  ...WWWW
   ..WWWWW
-  .WWWWWW
-  WWWWWWW`)
+  .WWWWWW`)
 
 // Maturità scientifica: la beuta col liquido verde che fa le bolle
 talento("Maturità scientifica", "pos", { tieni: "L", dopo: [grid(4, 3, `
-  ....L
+  .....
   .....
   .L...
   .....
@@ -759,20 +766,20 @@ talento("Maturità scientifica", "pos", { tieni: "L", dopo: [grid(4, 3, `
   GGGGGGGGGGGGGG`)
 
 // Diplomato all'alberghiero: il cappello da cuoco
-talento("Diplomato all'alberghiero", "mix", { mx: true, dopo: [grid(2, 6, "SSSSS")] }, `
-  ..WW.WW
-  .WWWWWW
+talento("Diplomato all'alberghiero", "mix", { mx: true, dopo: [grid(4, 1, "S\nS"), grid(3, 8, "SSSS")] }, `
+  .WWW.WW
+  WWWWWWW
+  WWWWWWW
   WWWWWWW
   WWWWWWW
   WWWWWWW
   .WWWWWW
   ..WWWWW
-  ..WWWWW
-  ..WWSWW
-  ..WWSWW
-  ..WWSWW
-  ..WWSWW
-  ..WWSWW
-  ..WWWWW`)
+  ...WWWW
+  ...WWSW
+  ...WWSW
+  ...WWSW
+  ...WWSW
+  ...WWWW`)
 
 foglio("foglio")

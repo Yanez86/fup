@@ -31,19 +31,19 @@ tecnologia("formazione", "log", { dopo: [grid(2, 2, `
   .N......N.
   .N......N.
   .N......N.`)
-// Telematica GPS: il segnaposto rosso
+// Telematica GPS: il segnaposto rosso piantato sulla mappa
 tecnologia("gps", "log", { mx: true, dopo: [grid(4, 3, `
   W
   W`)] }, `
   ...RR
   .RRRR
-  RRRRR
-  RRRRR
+  .RRRR
   RRRRR
   RRRRR
   .RRRR
   ..RRR
   ...RR
+  ....R
   ....R`)
 // WMS di base: monitor con la pianta del magazzino, un posto pallet acceso
 tecnologia("wms", "log", {}, `
@@ -139,18 +139,18 @@ tecnologia("ptl", "log", {}, `
   DssDssDssD
   DDDDDDDDDD
   D........D`)
-// Robot mobili (AMR): robottino arancione che porta lo scaffale
-tecnologia("amr", "log", { mx: true }, `
-  ..NNN
-  ..NNC
-  ..NNN
-  .OOOO
-  OOddd
-  OOdud
-  OOdud
-  OOOOO
-  .DD..
-  .DD..`)
+// Robot mobili (AMR): robottino arancione che solleva lo scaffale e lo porta in giro
+tecnologia("amr", "log", {}, `
+  NNNN.BBBB.
+  NNNN.BBBB.
+  SSSSSSSSSS
+  S.OOOOOO.S
+  S.OuOOuO.S
+  S.OuOOuO.S
+  ..OOOOOO..
+  ..DD..DD..
+  ..DD..DD..
+  ..........`)
 
 // ================================================================ Sviluppo aziendale (ottagono viola)
 // Gestionale amministrativo: portatile con l'euro sullo schermo
@@ -206,21 +206,22 @@ tecnologia("hr", "org", { dopo: [grid(4, 5, `
   BBBBBB....
   BBBBBB....
   .BBBBB....`)
-// Struttura direzionale: la poltrona da direttore
-tecnologia("direzione", "org", { mx: true, dopo: [grid(3, 1, `
-  r
-  r
-  r`)] }, `
+// Struttura direzionale: la poltrona (rossa) da direttore
+tecnologia("direzione", "org", { mx: true, dopo: [grid(2, 4, `
+  rrr
+  r..
+  r..
+  r..`)] }, `
   ..RRR
   .RRRR
   .RRRR
-  .RRRR
-  DRRRR
-  DRRRR
-  DDDDD
-  ....S
-  ....S
-  .SSSS`)
+  RRRRR
+  RRRRR
+  RRRRR
+  RRRRR
+  RRRRR
+  RRRRR
+  .N...`)
 // Piattaforma welfare: cartellino della convenzione col cuore
 tecnologia("welfare2", "org", { dopo: [grid(4, 3, `
   RR.RR
@@ -453,37 +454,4 @@ tecnologia("ecom", "mkt", { dopo: [grid(4, 3, `
   ..........
   ..........`)
 
-sprite("prova_d", { w: 10, h: 10, outline: "K" }, `
-  NNNN.BBBB.
-  NNNN.BBBB.
-  SSSSSSSSSS
-  S........S
-  S........S
-  S.OOOOOO.S
-  S.OuOOuO.S
-  S.OuOOuO.S
-  S.OOOOOO.S
-  S.DD..DD.S`)
-sprite("prova_e", { w: 10, h: 10, outline: "K", mx: true }, `
-  ....Y
-  ....S
-  .OOOO
-  OOddd
-  OOdud
-  OOdud
-  OOOOO
-  .OOOO
-  .DD..
-  .DD..`)
-sprite("prova_f", { w: 10, h: 10, outline: "K" }, `
-  ..NNNNNN..
-  .SNNCCNNS.
-  .SNNNNNNS.
-  .SOOOOOOS.
-  ..OddddO..
-  ..OuddudO.
-  ..OuddudO.
-  ..OOOOOO..
-  ..DD..DD..
-  ..DD..DD..`)
 foglio("foglio")
