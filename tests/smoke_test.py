@@ -55,6 +55,10 @@ NOSIDE = '''(sel)=>{const el=document.querySelector(sel), out=[];
   el.querySelectorAll('button').forEach(b=>{if(b.offsetParent&&b.scrollWidth>b.clientWidth+1) out.push('testo fuori dal pulsante: '+b.innerText.slice(0,30));});
   return out;}'''
 
+# finestrella di scelta di un manager: prima tutte le righe che si possono scegliere, poi quelle in grigio
+MPORD = '''()=>{const r=[...document.querySelectorAll('#modal .mp-r')], i=r.findIndex(e=>e.classList.contains('off'));
+  return r.length>1&&(i<0||r.slice(i).every(e=>e.classList.contains('off')))&&r.slice(0,i<0?r.length:i).every(e=>e.dataset.act==='mpick');}'''
+
 SEED = '''()=>{const F=window.__FUP; [['gino',1],['marco',2],['valeria',3]].forEach(([c,n])=>{F.slot=n; F.newGame(c); F.S.company.name='Prova '+n;
   for(let d=0;d<35;d++){document.querySelector('#modal').innerHTML=''; F.step();} document.querySelector('#modal').innerHTML=''; if(n===3) F.S.cash=-12000; F.save();
   const k=F.slotKey(n), v=JSON.parse(localStorage.getItem(k)); v.at=Date.now()-(n===2?0:86400000*n); localStorage.setItem(k,JSON.stringify(v));}); F.slot=1;}'''
@@ -199,6 +203,16 @@ async def phone(b, w, h, name, errs):
         bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
         assert not bad, f'{name}: finestra {wn}: {bad}'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{wn}.png'))
+        if wn == 'magazzini':   # scelta del manager: i liberi sopra, chi ha già un incarico in grigio sotto
+            await pg.evaluate("()=>{const F=window.__FUP; F.ACT.hirecs({id:'rosa'}); F.ACT.hiremgr({id:'toto'}); F.renderAll();}")
+            await pg.tap('#win-magazzini [data-act=mpopen][data-k=wh]')
+            assert await pg.evaluate(MPORD), f'{name}: scelta del manager, i disponibili devono stare sopra'
+            assert 'customer service' in await pg.inner_text('#modal .mp-r.off'), f'{name}: il responsabile del customer service non è in grigio col suo ruolo'
+            assert await pg.evaluate(FITS, '#modal .modal'), f'{name}: la scelta del manager esce dallo schermo'
+            bad = await pg.evaluate(NOSIDE, '#modal .modal')
+            assert not bad, f'{name}: scelta del manager: {bad}'
+            await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_scelta_manager.png'))
+            await pg.tap('#modal [data-act=closemodal]')
         if wn == 'manager':   # le altre due schede: candidati con la trattativa e head hunter
             for tb in ['cand', 'hh']:
                 await pg.tap(f'#win-manager [data-act=mtab][data-id={tb}]')
@@ -470,8 +484,26 @@ async def main():
         await win(pg, 'direzione')
         await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.ACT.hiremgr({id:'ottavio'}); const o=S.managers.find(m=>m.id==='ottavio'); S.warehouses.forEach(w=>{if(w.mgr==='ottavio')w.mgr=null;}); o.wh=null;}")
         await win(pg, 'direzione')
-        await pg.select_option('#win-manager select[data-role=fin]', 'ottavio')
+        await pg.click('#win-manager [data-act=mpopen][data-k=dir][data-id=fin]')
+        assert await pg.evaluate(MPORD), 'scelta del manager: i disponibili devono stare sopra quelli già impegnati'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_scelta_direttore.png'))
+        await pg.click('#modal [data-act=mpick][data-v=ottavio]')
+        assert not await pg.query_selector('#modal .mp'), 'la finestrella di scelta resta aperta'
         await pg.screenshot(path=os.path.join(OUT, 'shot_direzione.png'))
+        # nel magazzino il nuovo direttore finanziario è in grigio, col suo ruolo
+        await win(pg, 'magazzini')
+        await pg.click('#win-magazzini [data-act=mpopen][data-k=wh]')
+        assert 'Direttore finanziario' in await pg.inner_text('#modal .mp-r.off'), 'nella scelta del manager il direttore non è in grigio col suo ruolo'
+        assert not await pg.query_selector('#modal [data-act=mpick][data-v=ottavio]'), 'un direttore si può scegliere come manager di magazzino'
+        assert await pg.evaluate(MPORD), 'scelta del manager: i disponibili devono stare sopra quelli già impegnati'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_scelta_manager.png'))
+        await pg.click('#modal [data-act=closemodal]')
+        await win(pg, 'customer')
+        await pg.click('#win-clienti [data-act=mpopen][data-k=cs]')
+        assert await pg.evaluate(MPORD), 'scelta del responsabile: i disponibili devono stare sopra quelli già impegnati'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_scelta_cs.png'))
+        await pg.click('#modal [data-act=closemodal]')
+        await win(pg, 'direzione')
         st = await pg.evaluate('()=>({barcode:!!window.__FUP.S.warehouses[0].tech.barcode, fin:window.__FUP.S.dirs.fin})')
         assert st['barcode'] and st['fin'] == 'ottavio', st
         # policy: accensione, attesa di 90 giorni, pretese dei manager, ultimatum con aumento e dimissioni

@@ -635,6 +635,26 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .opt{text-align:left;padding:9px 12px;border:2px solid var(--ink);background:#fff;box-shadow:inset 0 -3px 0 #c9d3dd, 2px 2px 0 var(--ink);font-size:15px}
 .opt small{display:block;color:var(--muted);font-size:14px}
 .opt:disabled{opacity:.55;cursor:not-allowed;background:var(--panel2)}
+/* scelta di un manager (mgrPick): un pulsante col nome apre la finestrella; sopra chi si può nominare, sotto in grigio chi ha già un incarico */
+.mp-b{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;text-align:left;color:var(--ink)}
+.mp-b>span:first-child{min-width:0;overflow-wrap:anywhere}
+.mp-b .mp-c{flex:none;font:600 13px var(--f-body);color:var(--muted)}
+.wh-mgr .mp-b{flex:0 1 auto}
+.cs-p+.mp-b,.dr-s .mp-b{width:100%}
+.mp .lab{margin-top:4px}
+.mp-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.mp-r{box-sizing:border-box;display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;border:2px solid var(--ink);background:#fff;box-shadow:inset 0 -3px 0 #c9d3dd, 2px 2px 0 var(--ink);font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
+.mp-r:not(.off):hover{background:#fff8e0}
+.mp-r.on{background:#fff6d6;box-shadow:inset 0 0 0 2px var(--yellow), inset 0 -3px 0 #e8d48a, 2px 2px 0 var(--ink)}
+.mp-r.none{border-style:dashed;box-shadow:none}
+.mp-r.off{cursor:default;background:var(--panel2);border-color:var(--line);box-shadow:none;color:var(--muted)}
+.mp-r.off .pf,.mp-r.off .rank,.mp-r.off .stats{filter:grayscale(1);opacity:.55}
+.mp-r.off .mp-n b{color:var(--muted)}.mp-u{color:var(--ink)}
+.mp-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.mp-n{font-size:16px}
+.mp-n .rank{vertical-align:-3px;margin-right:6px}
+.mp-n .pill{margin-left:6px;vertical-align:2px;background:var(--yellow)}
+.mp-r .stc{cursor:inherit}.mp-r .stc.mp-lo{opacity:.4}
 /* finestra evento: scena, chi è coinvolto, risposte raccontate */
 .ev-who{display:flex;flex-wrap:wrap;gap:6px}
 .ev-who span{display:inline-flex;align-items:center;gap:6px;padding:2px 8px 2px 3px;background:#fff;border:2px solid var(--ink);font-size:14px;font-weight:600}
@@ -2456,7 +2476,7 @@ wk('manager','pers','Manager',`Manager e dirigenti sono la stessa cosa: guidano 
 • [[st_inn|Innovazione]]: apprendimento delle [[tecnologie]] −3%.
 Un buon manager operativo fa risparmiare persone e camion; uno scarso li fa costare. Nella finestra del magazzino il riquadro «Effetto del manager» mostra i numeri. Anche i suoi [[talenti]] con l'effetto «nel magazzino che guida» contano lì. Senza manager il magazzino va avanti alla meno peggio, come se lo guidasse qualcuno con Operazioni 5, Precisione 6, Leadership 5, Amministrazione 6 e Innovazione 5.
 
-All'inizio il manager è il [[ceo|CEO]]. Gli altri si assumono dalla finestra Manager, con una [[trattativa]]: tra le [[candidature|candidature spontanee]] oppure tra i profili trovati da un [[head_hunter|head hunter]]. Chi arriva prende il primo magazzino senza manager; poi lo sposti dal menu a tendina del magazzino. Un manager senza magazzino può diventare un [[direzione|direttore]] o il responsabile del [[customer_service|customer service]].
+All'inizio il manager è il [[ceo|CEO]]. Gli altri si assumono dalla finestra Manager, con una [[trattativa]]: tra le [[candidature|candidature spontanee]] oppure tra i profili trovati da un [[head_hunter|head hunter]]. Chi arriva prende il primo magazzino senza manager; poi lo sposti con il pulsante «Cambia» accanto al manager nella finestra del magazzino: si apre l'elenco di tutta la squadra, sopra chi è libero (dal più adatto) e sotto, in grigio, chi ha già un incarico, con il suo ruolo. Un manager senza magazzino può diventare un [[direzione|direttore]] o il responsabile del [[customer_service|customer service]]: anche lì si sceglie con «Cambia».
 
 Ogni manager ha un [[rango_manager|rango]] da S a F, come le committenti: più è alto, più chiede di stipendio. I manager invecchiano ([[eta|età]]) e prima o poi vanno in [[pensione]]; negli anni arrivano sul mercato personaggi nuovi, che si trovano con l'head hunter. Licenziare un manager costa un mese del suo stipendio (con gli oneri, il prezzo è scritto sul pulsante) e libera il suo posto.`);
 wk('rango_manager','pers','Rango dei manager',`Il voto di un manager o di un candidato, da S a F: più è alto, più è bravo e più costa.`,
@@ -3473,6 +3493,42 @@ function personCard(m,where,btn,bad,busy){
     ${(m.tal||[]).length?`<div class="lab">${kw('talenti','Talenti')}</div>${talentRows(m.tal)}`:''}
     ${demHtml(m)}${storiaHtml(m,2)}
     <div class="pr-ma">${btn}</div></div>`;
+}
+// scelta di chi guida un magazzino (k:'wh'), il customer service (k:'cs') o un posto in Direzione (k:'dir'): finestrella con tutti i manager della squadra,
+// sopra quelli che si possono nominare (prima chi è già al posto, poi dal più adatto), sotto in grigio quelli che hanno già un incarico, col loro ruolo
+const mpTask=m=>{const r=seatOf(m.id), w=m.wh&&whById(m.wh); return r?DIR_ROLES.find(x=>x.id===r).name:isCs(m.id)?'Responsabile del customer service':w?'Manager di '+w.name:m.arr!=null&&!m.hired?'In arrivo: entra il '+shortDate(m.arr):'';};
+const mpBtn=(k,id,name,lab)=>`<button class="btn mp-b" data-act="mpopen" data-k="${k}" data-id="${id}" aria-label="${esc(lab)}"><span>${esc(name)}</span><span class="mp-c">Cambia ›</span></button>`;
+const mpQuiet=h=>h.replace(/ data-(act|id|tip)="[^"]*"/g,'');  // dentro una riga ogni tocco sceglie: niente tooltip né enciclopedia
+function mgrPick(k,id){
+  const w=k==='wh'&&whById(id), r=k==='dir'&&DIR_ROLES.find(x=>x.id===id), B=ceo();
+  const cur=(k==='wh'?w.mgr:k==='cs'?(csPers()||{}).id:S.dirs[id])||'';
+  const score=k==='dir'?m=>m.st[r.stat]:k==='cs'?m=>2*m.st.neg+1.5*m.st.prec:mScore;
+  const ks=k==='wh'?['op','prec','lead']:k==='cs'?['neg','prec']:[r.stat];
+  // le abilità di ognuno; per il customer service e la Direzione quelle che non contano restano sbiadite
+  const chips=st=>`<span class="stats">${STATS.map(x=>mpQuiet(statBadge(x.k,st[x.k],14)).replace('class="stc"',`class="stc${k!=='wh'&&!ks.includes(x.k)?' mp-lo':''}"`)).join('')}</span>`;
+  const row=(o)=>{const on=o.v===cur, inner=`${pFace(o.img,'m')}<span class="mp-t"><span class="mp-n">${o.medal||''}<b>${esc(o.name)}</b>${on?`<span class="pill">${o.none&&k!=='cs'?'adesso':'in carica'}</span>`:''}</span><span class="sm">${o.sub}</span>${o.st?chips(o.st):''}</span>`;
+    return o.off?`<div class="mp-r off" aria-disabled="true">${inner}</div>`:`<button class="mp-r${on?' on':''}${o.none?' none':''}" data-act="mpick" data-k="${k}" data-id="${id}" data-v="${o.v}" ${on?'aria-current="true"':''}>${inner}</button>`;};
+  const man=(m,off)=>({v:m.id,img:mImg(m),name:m.name,medal:mpQuiet(mRankIcon(m,20)),st:m.st,off,
+    sub:off?`<b class="mp-u">${esc(mpTask(m))}</b>`:k==='dir'?esc(r.eff(m.st[r.stat])):`${ageOf(m)} anni · ${esc(m.role)}`});
+  const all=S.managers.filter(m=>m.hired||m.arr!=null), free=m=>m.hired&&(m.id===cur||!m.wh&&!seatOf(m.id)&&!isCs(m.id));
+  const ok=all.filter(free).sort((a,b)=>score(b)-score(a)).map(m=>man(m,false)), no=all.filter(m=>!free(m)).sort((a,b)=>!a.hired-!b.hired).map(m=>man(m,true));
+  // il CEO può guidare un solo magazzino; il customer service, senza responsabile, lo segue lui con la penalità
+  if(k==='wh'){ const cw=S.warehouses.find(x=>x.mgr==='ceo'), c={v:'ceo',img:ceoImg(B),name:B.name,st:B.st,sub:'CEO: può guidare un magazzino'};
+    if(!cw||cw===w) ok.push(c); else no.unshift({...c,off:true,sub:`<b class="mp-u">CEO · Manager di ${esc(cw.name)}</b>`}); }
+  ok.push(k==='cs'?{v:'',img:ceoImg(B),name:B.name,st:B.st,none:true,sub:`Nessun responsabile: se ne occupa il CEO, con una penalità di ${-CS.ceo}`}
+    :{v:'',img:IMG.anon,name:k==='wh'?'Nessuno':'Posto vacante',none:true,sub:k==='wh'?'Senza manager le prestazioni del magazzino calano':'Nessun effetto finché non nomini qualcuno'});
+  const i=ok.findIndex(o=>o.v===cur); if(i>0&&!ok[i].none) ok.unshift(...ok.splice(i,1));   // «nessuno» resta in fondo anche quando è la scelta di adesso
+  const title=k==='wh'?'Manager di '+w.name:k==='cs'?'Responsabile del customer service':r.name;
+  const txt=k==='wh'?'Operazioni per produttività e puntualità, Precisione per l\'accuratezza, Leadership per il morale.'
+    :k==='cs'?'Negoziazione calma i clienti, Precisione fa rispondere giusto.':'Sotto 10 il direttore fa più danni che altro.';
+  const hh=k==='dir'?r.stat:k==='cs'?'neg':'op';
+  return `<div class="src"><span>${esc(title)}</span><span>${shortDate(S.day)}</span></div><div class="win-b mp">
+    <div class="mp-h"><span class="sm">${ks.length>1?'Contano':'Conta'}</span>${ks.map(x=>mpQuiet(statBadge(x,null,14,true))).join('')}</div>
+    <div class="sm">${txt} In grigio chi ha già un incarico: guida un magazzino, il customer service o un posto in Direzione.</div>
+    <div class="lab">Disponibili</div>${ok.map(row).join('')}
+    ${no.length?`<div class="lab">Già impegnati</div>${no.map(row).join('')}`:''}
+    ${all.length?'':`<div class="sm">Non hai ancora manager in squadra: cercane uno tra i candidati o con l'head hunter.</div>`}
+    <div class="row"><button class="btn" data-act="closemodal">Annulla</button><button class="btn" data-act="mpcand" data-k="${hh}">Cerca un manager</button></div></div>`;
 }
 // trattativa nella scheda del candidato: offerta con + e −, stima della risposta, controproposta da accettare
 function negBox(p,src){
@@ -6820,7 +6876,6 @@ const VIEWS={
   const id=UI.sel.wh||S.warehouses[0].id; const w=whById(id)||S.warehouses[0]; UI.sel.wh=w.id; const k=w.kpi||computeWH(w);
   const tabs=S.warehouses.length>1?`<div class="tabs" role="tablist">${S.warehouses.map(x=>`<button role="tab" aria-selected="${x.id===w.id}" data-act="selwh" data-id="${x.id}">${esc(x.name)}</button>`).join('')}</div>`:'';
   const q=S.queue.filter(q=>q.wh===w.id);
-  const mgrOpts=[w.mgr==='ceo'||!S.warehouses.some(x=>x.mgr==='ceo')?`<option value="ceo" ${w.mgr==='ceo'?'selected':''}>${esc(ceo().name)} (CEO)</option>`:'',...S.managers.filter(m=>m.hired&&!seatOf(m.id)&&!isCs(m.id)&&(!m.wh||m.wh===w.id)).map(m=>`<option value="${m.id}" ${w.mgr===m.id?'selected':''}>${esc(m.name)}</option>`)].join('');
   const cl=S.clients.filter(c=>c.wh===w.id&&c.status!=='perso');
   const ld=staffLoad(w,k);
   if(UI.whProd) return tabs+prodView(w,k,ld);
@@ -6835,7 +6890,7 @@ const VIEWS={
   const sP=thr('sP'), sA=thr('sA'), mor=Math.round(w.morale), morC=mor>=60?'ok':mor>=45?'warn':'bad';
   const satC=k.sm.obj&&k.satM<k.sm.obj-0.5?'bad':'';
   const tile=(cls,lab,val,sub,tip)=>`<div class="kpi wh-k ${cls}" ${tip?`data-tip="${tip}"`:''}><div class="lab">${lab}</div><b>${val}</b><div class="sm">${sub}</div></div>`;
-  const mgrImg=w.mgr==='ceo'?ceoImg(ceo()):w.mgr&&personById(w.mgr)?mImg(personById(w.mgr)):IMG.anon;
+  const mgrImg=w.mgr==='ceo'?ceoImg(ceo()):w.mgr&&personById(w.mgr)?mImg(personById(w.mgr)):IMG.anon, mgrN=w.mgr==='ceo'?ceo().name+' (CEO)':w.mgr&&personById(w.mgr)?personById(w.mgr).name:'Nessuno';
   const leas=Math.max(0,w.staff.autCE-w.motrici);
   const occ=Math.round(k.sat*100);
   return `${tabs}
@@ -6843,7 +6898,7 @@ const VIEWS={
    <div class="wh-top"><span class="wh-name">${esc(w.name)}<span class="wh-prov">${w.prov}</span></span><span class="wh-own">${w.own?'di proprietà':'in affitto'} · ${eur(w.fixed)}/mese</span></div>
    <div class="wh-occ"><span class="lab">${kw('saturazione','Occupazione')}</span><span class="num"><b style="color:${barColor(k.sat)==='var(--ok)'?'#6fdc8c':barColor(k.sat)==='var(--warn)'?'#ffc53d':'#ff8a8d'}">${occ}%</b> ${n0(k.stock)} / ${n0(k.cap)} posti</span></div>
    <div class="bar wh-bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div>
-   <label class="wh-mgr">${pFace(mgrImg,'m',w.mgr?'':'Posto vacante')}<span class="lab">${kw('manager','Manager')}</span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
+   <div class="wh-mgr">${pFace(mgrImg,'m',w.mgr?'':'Posto vacante')}<span class="lab">${kw('manager','Manager')}</span>${mpBtn('wh',w.id,mgrN,'Scegli il manager del magazzino')}</div>
    ${k.m.none?'<div class="wh-warn">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
    ${mgrFxHtml(k.m)}
   </div>
@@ -7023,8 +7078,6 @@ const VIEWS={
  customer(){
   const Q=csQual(), q=Q.v, m=csPers(), p=csWho(), act=csAct(), n=csNeed(), L=S.cs.log||[], W=S.cs.q||[];
   const qc=q>=CS.hi?'ok':q<CS.lo?'bad':'', eff=csSat(q);
-  const free=S.managers.filter(x=>x.hired&&!x.wh&&!seatOf(x.id)&&!isCs(x.id));
-  const opts=`<option value="" ${m?'':'selected'}>${esc(ceo().name)} (CEO, con una penalità di ${-CS.ceo})</option>`+[...(m?[m]:[]),...free].map(x=>`<option value="${x.id}" ${m===x?'selected':''}>${esc(x.name)} (Negoziazione ${x.st.neg}, Precisione ${x.st.prec})</option>`).join('');
   const csScore=x=>2*x.st.neg+1.5*x.st.prec+((x.tal||[]).reduce((a,t)=>a+(((TALENTS[t]||{}).cs||{}).q||0),0));
   const mk=[...mktList(),...cands().map(c=>(candById(candId(c))||{}).p).filter(Boolean)].sort((a,b)=>csScore(b)-csScore(a))[0];
   const cli=c=>S.clients.find(x=>x.id===c), PK=act.filter(c=>c.peak), OVL=S.cs.ov||[];
@@ -7035,7 +7088,7 @@ const VIEWS={
     ${rpTile('Richieste in attesa',W.length,W.length?'arrivano tra le notifiche':'nessuna','richieste_clienti',W.length?'':'ok')}</div>
    <div class="card"><div class="row"><span class="h3">${kw('customer_service','Responsabile')}</span><span class="sm">${m?'in carica':'nessuno: se ne occupa il CEO'}</span></div>
     <div class="cs-p"><img class="px mport" src="${pImg(p)}" alt="Ritratto di ${esc(p.name)}" width="80" height="94">${rpPerson(p,m?`${kw('customer_service','Responsabile del customer service')} · ${eur(m.ral)} l'anno`:'CEO, nel tempo che avanza')}</div>
-    <select data-act="setcs" aria-label="Responsabile del customer service">${opts}</select>
+    ${mpBtn('cs','',m?m.name:'Nessuno: se ne occupa il CEO','Scegli il responsabile del customer service')}
     <div class="sm">Contano ${statBadge('neg',p.st.neg,14)} Negoziazione (calma i clienti) e ${statBadge('prec',p.st.prec,14)} Precisione (risponde giusto). Puoi nominare un manager che non guida un magazzino e non siede in Direzione.</div></div>
    ${rpParts('Qualità del servizio','qualita_cs',Q.parts,q,'',0,100)}
    <div class="card"><div class="row"><span class="h3">Addetti in sede</span><span class="sm">uno ogni ${CS.per} clienti dopo i primi ${CS.free}</span></div>${csRow()}
@@ -7182,10 +7235,9 @@ const VIEWS={
   if(!R('direzione')) return `<div class="card pend"><span class="h3">Serve la Struttura direzionale</span><div>La squadra dei dirigenti arriva con la ricerca <b>Struttura direzionale</b> nell'albero Sviluppo aziendale (richiede il Gestionale amministrativo).</div><div><button class="btn sm2 pri" data-act="opentech" data-tree="org" data-id="direzione">Apri l'albero</button></div></div>`;
   const pool=S.managers.filter(m=>m.hired&&!m.wh&&!isCs(m.id));
   const seats=DIR_ROLES.map(r=>{const p=personById(S.dirs[r.id]);const v=p?p.st[r.stat]:null;
-    const opts=pool.filter(x=>!seatOf(x.id)||S.dirs[r.id]===x.id).map(x=>`<option value="${x.id}" ${S.dirs[r.id]===x.id?'selected':''}>${esc(x.name)} (${r.statN} ${x.st[r.stat]})</option>`).join('');
     return `<div class="card dr-s ${p?(v>=10?'':'cl-bad'):'pend'}"><div class="wh-st" style="border:0;padding:0">${pFace(p?mImg(p):IMG.anon,'m',p?'':'Posto vacante')}
       <div class="wh-sm"><b class="wh-nm">${kw('dir_'+r.id,r.name)}</b><span class="sm ${p?(v>=10?'ok':'bad'):''}">${p?esc(p.name)+' · '+r.eff(v):'Posto vacante'}</span></div>${statBadge(r.stat,v,16)}</div>
-      <select data-act="setdir" data-role="${r.id}" aria-label="${r.name}"><option value="">Vacante</option>${opts}</select></div>`;}).join('');
+      ${mpBtn('dir',r.id,p?p.name:'Posto vacante','Scegli: '+r.name)}</div>`;}).join('');
   const busy=DIR_ROLES.filter(r=>S.dirs[r.id]).length;
   return `<div class="wh-kpis c2">
     <div class="kpi wh-k ${busy===DIR_ROLES.length?'ok':busy?'warn':'bad'}"><div class="lab">Posti coperti</div><b>${busy} / ${DIR_ROLES.length}</b><div class="sm">direttori</div></div>
@@ -7751,6 +7803,10 @@ const ACT={
   else {c.exit={day:S.day+e.days};news('Il Sole 24 Pallet',`${S.company.name} recede dal contratto con ${c.name}`,`Penale di ${eur(e.pen)}; l'ultimo camion partirà il ${shortDate(c.exit.day)}.`);}
   toast(`Penale pagata: ${eur(e.pen)}`,'warn'); renderAll();},
  setsatobj(d,el){ const w=whById(d.wh); w.satObj=+el.value||0; kpiNow(); renderAll(); },
+ // finestrella per scegliere chi guida un magazzino, il customer service o un posto in Direzione (mgrPick)
+ mpopen(d){ if($('#modal').innerHTML) return; if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);} showModal(mgrPick(d.k,d.id)); },
+ mpick(d){ const v=d.v||''; closeModal(); if(d.k==='wh') ACT.setmgr({wh:d.id},{value:v}); else if(d.k==='cs') ACT.setcs({},{value:v}); else ACT.setdir({role:d.id},{value:v}); },
+ mpcand(d){ closeModal(); ACT.gomgr({tab:'cand',k:d.k}); },
  setmgr(d,el){
   const w=whById(d.wh); const v=el.value;
   S.warehouses.forEach(x=>{ if(x.id!==w.id&&x.mgr===v) x.mgr=null; });
@@ -8160,6 +8216,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.87',t:'Scelta dei manager',x:['Il manager di un magazzino, il responsabile del customer service e i direttori non si scelgono più da un menu a tendina: tocca «Cambia» accanto al nome e si apre una finestrella con tutti i manager della squadra, con ritratto, rango e abilità.','In cima ci sono quelli che puoi nominare, dal più adatto al posto (per i direttori e il customer service le abilità che contano sono in evidenza); sotto, in grigio, quelli che hanno già un incarico, con scritto quale: «Manager di Genova», «Direttore finanziario», «Responsabile del customer service», oppure quando arrivano.','In fondo alla finestrella «Cerca un manager» porta dritto ai candidati.']},
  {v:'0.86',t:'Personale più chiaro',x:['Nelle righe piccole i ritratti del personale e dei manager non sono più rimpiccioliti a metà: si vede la testa (o il mezzo busto) disegnata a pixel interi, nitida come nelle scenette, sul computer e sul telefono.','Chi è in arrivo ha una barretta che si riempie fino al giorno in cui entra in servizio: sotto il reparto nella finestra Personale e in quella del magazzino, e nelle Assunzioni in corso, che quando c\'è qualcuno in arrivo stanno in cima alla finestra Personale. Il suggerimento della barretta dice la data esatta.']},
  {v:'0.85',t:'Eventi sull\'iPhone',x:['Sul telefono la finestra di un evento lungo non finisce più sotto l\'orologio e la batteria: parte sotto la barra di stato e la striscia sfocata dell\'iPhone, e in fondo lascia libero lo spazio del tasto Home. Titolo, fonte e data si leggono sempre.']},
  {v:'0.84',t:'Icone ridisegnate',x:['Tutte le icone del gioco sono state ridisegnate da capo, una per una: i 109 talenti, le 61 tecnologie, le 17 policy, le sei abilità, il menu, le lenti della mappa e i pulsanti. Lo stile resta quello di prima (bordo scuro, fascia più scura in basso, niente riflessi), con linee più pulite e disegni più chiari anche quando l\'icona è piccola.','Qualche soggetto nuovo, dove il vecchio si capiva poco o c\'era un doppione: Gatto in ufficio è Bancale, il gatto rosso seduto sul pallet; Mano larga offre la pizza al turno di notte; Conosce tutti al bar ha l\'insegna del bar; il Consigliere comunale ha il municipio col tricolore; il Fortunato al gratta e vinci gratta il suo biglietto; il Tifo sfegatato alza la sciarpa; Promette tutto dice «SÌ!» a tutti.','Tra le tecnologie il Regolamento aziendale diventa le tavole della legge, la Struttura direzionale una poltrona rossa, la Sicurezza muletti un muletto col lampeggiante, la Lavanderia delle divise una lavatrice e l\'HACCP un cappello da cuoco. Nel menu il Customer service ha la cuffia col microfono, e la lente Viaggi è un camion.']},
