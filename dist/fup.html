@@ -684,7 +684,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .cbar b{font-family:var(--f-disp);font-size:14px;width:20px;text-align:right}
 .ceo-d{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 18px;align-items:center;border-left:8px solid var(--hc)}
 .ceo-d q{font-style:italic}
-.ceo-d .cl{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.ceo-d .ceo-cl{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 @media (max-width:1000px){.ceos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:30px 12px 14px;margin:-16px -12px 0}.ceo{flex:0 0 min(78%,250px);scroll-snap-align:center}}
 
 /* Schermata introduttiva: il camioncino porta il pallet dell'icona */
@@ -1145,7 +1145,7 @@ const SITES={
  rivalta:{name:'Rivalta Scrivia',prov:'AL',lon:8.86,lat:44.86,cap:3000,rent:8000},
  pioltello:{name:'Pioltello',prov:'MI',lon:9.33,lat:45.50,cap:4000,rent:12000},
  novara:{name:'Novara CIM',prov:'NO',lon:8.66,lat:45.42,cap:3200,rent:9000},
- voltri:{name:'Genova Voltri',prov:'GE',lon:8.75,lat:44.43,cap:2400,rent:7000},
+ voltri:{name:'Genova Voltri',prov:'GE',lon:8.75,lat:44.43,cap:3200,rent:7000},
  orbassano:{name:'Orbassano',prov:'TO',lon:7.54,lat:45.01,cap:3500,rent:10000},
  lodi:{name:'Lodi',prov:'LO',lon:9.47,lat:45.29,cap:2000,rent:6500},
  orio:{name:'Bergamo Orio',prov:'BG',lon:9.70,lat:45.66,cap:2500,rent:8000},
@@ -1167,18 +1167,18 @@ const CEOS=[
   st:{op:17,prec:9,neg:5,lead:14,amm:6,inn:2},tal:['Un milione di km al volante','Allergico al gestionale','Dialetto stretto'],
   bio:'Trent\'anni sulle strade d\'Europa, poi il capannone di Rivalta comprato con la liquidazione. Diffida di tutto ciò che ha una presa elettrica.',
   client:{name:'Pastificio Mezzemaniche',slogan:'Al dente o rimborsati',sector:'Alimentare secco',stock:700,pal:300,sP:92,sA:null,req:['haccp']}},
- {id:'edoardo',arch:'Figlio d\'arte',name:'Edoardo Ferretti',age:31,origin:'Figlio del fondatore',site:'pioltello',cash:320000,motrici:2,fixed:5500,rep:50,company:'Ferretti Logistica',
+ {id:'edoardo',arch:'Figlio d\'arte',name:'Edoardo Ferretti',age:31,origin:'Figlio del fondatore',site:'pioltello',cash:320000,motrici:3,fixed:4000,rep:50,company:'Ferretti Logistica',startMgr:{id:'rosa',ral:38000},
   st:{op:6,prec:7,neg:13,lead:6,amm:12,inn:10},tal:['Laureato in Bocconi','Papà ha sempre ragione','Sempre al telefono'],
-  bio:'Ha ereditato il magazzino di Pioltello e un padre che passa "solo per un caffè" tutti i giorni alle 8.',
+  bio:'Ha ereditato il magazzino di Pioltello, Rosa che lo manda avanti da quando lui andava alle elementari, e un padre che passa "solo per un caffè" tutti i giorni alle 8.',
   client:{name:'Mobilificio Brianzolo',slogan:'Il divano di tua nonna, da tre generazioni',sector:'Arredamento',stock:1100,pal:350,sP:88,sA:94}},
  {id:'valeria',arch:'Squalo delle gare',name:'Valeria Conti',sx:'f',age:44,origin:'Ex manager di multinazionale',site:'novara',cash:220000,motrici:2,fixed:4200,rep:45,company:'Conti Logistica',
   st:{op:13,prec:10,neg:18,lead:5,amm:10,inn:9},tal:['Parla per acronimi','Stacanovista','Cena col buyer'],
   bio:'Quindici anni di slide e KPI in una multinazionale. Dorme quattro ore a notte e lo considera un vantaggio competitivo.',
-  client:{name:'Saponaria Italia',slogan:'Detersivi per un mondo più bianco',sector:'Largo consumo',stock:900,pal:500,sP:92,sA:95}},
- {id:'marco',arch:'Il nerd del WMS',name:'Marco Pellegrino',age:36,origin:'Ingegnere gestionale',site:'voltri',cash:300000,motrici:1,fixed:3000,rep:42,company:'Pellegrino Smart Logistics',
-  st:{op:9,prec:13,neg:5,lead:5,amm:11,inn:17},tal:['Excel-dipendente','Parla con i robot','Calma olimpica'],startTech:['barcode'],
-  bio:'Ha progettato magazzini automatici per altri, ora ne vuole uno suo. Ogni pallet ha un codice, ogni codice un foglio Excel.',
-  client:{name:'Caffè Portuale',slogan:'Tostato col sale del porto',sector:'Alimentare secco',stock:700,pal:300,sP:90,sA:97,req:['haccp']}}
+  client:{name:'Saponaria Italia',slogan:'Detersivi per un mondo più bianco',sector:'Largo consumo',stock:900,pal:440,sP:92,sA:95}},
+ {id:'marco',arch:'Il nerd del WMS',name:'Marco Pellegrino',age:36,origin:'Ingegnere gestionale',site:'voltri',cash:300000,motrici:2,fixed:3000,rep:45,company:'Pellegrino Smart Logistics',
+  st:{op:9,prec:13,neg:5,lead:5,amm:11,inn:17},tal:['Excel-dipendente','Parla con i robot','Calma olimpica'],startTech:['barcode','wms','gestionale','gps'],
+  bio:'Ha progettato magazzini automatici per altri, ora ne vuole uno suo. Il WMS e il GPS sui camion li ha installati prima delle scaffalature: ogni pallet ha un codice, ogni codice un foglio Excel.',
+  client:{name:'Caffè Portuale',slogan:'Tostato col sale del porto',sector:'Alimentare secco',stock:900,pal:450,sP:90,sA:97,req:['haccp']}}
 ];
 const MANAGERS=[
  {id:'rosa',name:'Rosa Brambati',sx:'f',age:47,role:'Ha iniziato sul muletto, poi dieci anni in RSU',tal:['Ex sindacalista','Mano larga'],st:{op:12,prec:11,neg:7,lead:17,amm:5,inn:6},ral:46000},
@@ -2171,6 +2171,8 @@ Nei ritmi senza pausa le finestre non fermano il tempo: se non rispondi a un eve
 wk('ceo','basi','CEO',`Sei tu: il personaggio scelto all'inizio, con le sue sei abilità e tre talenti.`,
 `Il CEO conta in tutta l'azienda con due abilità: la [[st_neg|Negoziazione]] pesa nelle [[gare]] e l'[[st_inn|Innovazione]] accorcia le [[ricerca|ricerche]]. All'inizio guida anche il primo magazzino come [[manager]]: lì contano le sue [[st_op|Operazioni]], [[st_prec|Precisione]] e [[st_lead|Leadership]].
 
+Ogni CEO parte con la sua dote: magazzino, cassa, [[motrici]] e cliente storico. Chi è più debole sul campo parte con qualcosa in più: Edoardo eredita dal padre Rosa Brambati, che guida già il magazzino di Pioltello (così lui resta libero per gare e clienti); Marco, il nerd del WMS, ha già installati lettori barcode, WMS e GPS, il gestionale e un magazzino più grande a Genova Voltri.
+
 I [[talenti]] del CEO cambiano le abilità e a volte aprono scelte speciali negli [[eventi]]. Il CEO costa 4.000 € al mese di compenso.
 
 Il CEO invecchia ([[eta|età]]) e vive i suoi eventi personali, che possono cambiargli abilità e talenti ([[storia]]). Dai 65 anni pensa alla [[pensione]] e, quando lascia, scegli il [[successione|successore]]: da lì giochi con il nuovo CEO.`);
@@ -3059,8 +3061,10 @@ function newGame(ceoId,coName,color,custom,co){
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextEvent:25,project:null,seen:{},over:false,uid:1,
      execs:[],dirs:{op:null,comm:null,hr:null,fin:null,tech:null},weeks:[],repNew:false,hist:[],tw:{win:0,lose:0,skip:0},pol:{},notes:[],noteId:0,certMig:3,certCo:{},qual:{n:0}};
   const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,capo:0,autB:0,autCE:1,imp:1,fm:0};
-  // tecnologie di partenza, più le certificazioni che chiede il cliente storico (l'HACCP per chi ha un cliente alimentare)
-  [...new Set([...(C.startTech||[]),...(C.client.req||[])])].forEach(t=>{wh.tech[t]={day:-60};S.researched[t]=true; if((TECH.find(x=>x.id===t)||{}).tree==='cert') certNew(0,wh.tech[t]);});
+  // tecnologie di partenza (ricercate; quelle da magazzino già installate e imparate), più le certificazioni che chiede il cliente storico (l'HACCP per chi ha un cliente alimentare)
+  [...new Set([...(C.startTech||[]),...(C.client.req||[])])].forEach(t=>{const T=TECH_ALL.find(x=>x.id===t)||{}; S.researched[t]=true; if(!perWh(T)) return; wh.tech[t]={day:-60}; if(T.tree==='cert') certNew(0,wh.tech[t]);});
+  // manager di partenza (Edoardo eredita Rosa dal padre): guida già il magazzino, e il CEO resta libero
+  if(C.startMgr){ const M=C.startMgr, p=S.managers.find(x=>x.id===M.id); if(p){ p.hired=true; p.ral=M.ral||p.ral; p.raiseDay=0; p.unh=0; p.quit=null; p.tol={}; p.wh=wh.id; wh.mgr=p.id; plog(p,`Guida il magazzino di ${wh.name} da prima che arrivasse ${C.name}`); } }
   S.log=[{d:0,ic:'azienda',t:`Nasce ${S.company.name}: ${C.name} apre il primo magazzino a ${wh.name}`}]; S.yrs=[];
   S.clients.push({id:nid('c'),...C.client,zone:cinfo(C.client).zones[0],src:cinfo(C.client).src,mode:cinfo(C.client).mode,wh:wh.id,mult:1,sat:70,status:'attivo',start:0,end:24*30,storico:true});
   chMigrate(); // autisti B per la parte di merce che va con i furgoni
@@ -8147,6 +8151,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.83',t:'Partenze più giuste',x:['I quattro CEO partono più alla pari. Nelle partite di prova l\'azienda di Marco falliva 19 volte su 20 e quella di Edoardo 4 su 5, contro una su tre di Gino e Valeria; ora Marco ed Edoardo falliscono poco più di una volta su due.','Edoardo eredita dal padre Rosa Brambati, che guida già il magazzino di Pioltello con lo stipendio di sempre (38.000 €): lui resta libero per gare e clienti. Ha anche una motrice in più e un capannone che costa meno (4.000 € al mese).','Marco, il nerd del WMS, parte con lettori barcode, WMS e GPS già installati e con il gestionale. Il magazzino di Genova Voltri sale a 3.200 posti, ha due motrici e reputazione 45, e Caffè Portuale gli affida più merce (900 posti, 450 pallet al mese).','Valeria resta la squalo delle gare, ma Saponaria Italia parte con 440 pallet al mese invece di 500.','Nella scelta del CEO la scheda dice anche il manager e le tecnologie di partenza.']},
  {v:'0.82',t:'Ritratti nuovi',x:['Tutti i ritratti sono stati ridisegnati nello stile delle scenette: CEO, manager, personale, sindacalisti e i volti dei candidati. Testa tonda, contorno scuro, occhi a puntino e colori pieni, così i personaggi delle finestre sono gli stessi omini che si vedono nelle scene.','Ognuno tiene i suoi segni particolari: il berretto e i baffi di Gino, il caschetto di Valeria, la barba di Marco, i ricci di Greta, la cuffia del customer service, il casco di chi lavora in magazzino.']},
  {v:'0.81',t:'Cinque passioni',x:['Cinque talenti nuovi per CEO e manager, ognuno con i suoi pregi, i suoi difetti e i suoi eventi: Amante dell\'IA (impara in fretta le tecnologie, ma i turni dell\'algoritmo e le mail scritte dalla macchina possono finire male), Larper (gioca di ruolo dal vivo, alza il morale e il ritratto diventa elfico, con le orecchie a punta), Guerrafondaio (softair la domenica: camion puntuali, morale più basso), Otaku (ama il Giappone: più ordine e conformità in magazzino, e una delegazione di Osaka da accogliere) e Musicista (batterista di una cover band da sagra: morale più alto, inventari a rischio).','Un manager può prendersi la passione per l\'intelligenza artificiale dopo un weekend sulle reti neurali.']},
  {v:'0.80',t:'Scene per tutti',x:['L\'ufficio del CEO ha quattro versioni: alla scrivania c\'è un uomo o una donna, come il CEO della tua partita, e il caffè lo porta una segretaria o un segretario.','In alcune scene ci sono persone in carrozzina: il capo dell\'ufficio col report sulle ginocchia, chi presenta i numeri al consiglio d\'amministrazione, la ricercatrice dell\'ufficio tecnologie e una signora in fila al ministero, che adesso ha anche la rampa.']},
@@ -8279,7 +8284,9 @@ function stepScelta(){const cc=startSel.cc;
   const c=CEOS.find(x=>x.id===startSel.ceo), s=c&&SITES[c.site], t=c&&topStat(c.st);
   const det=c?`<div class="card ceo-d" style="--hc:${t.c}"><div style="display:flex;flex-direction:column;gap:6px"><b class="disp" style="font-size:20px">${esc(c.name)}</b><q>${esc(c.bio)}</q></div>
     <div style="display:flex;flex-direction:column;gap:6px"><span class="sm">Magazzino: <b>${esc(s.name)} (${s.prov})</b> · ${n0(s.cap)} posti · ${c.motrici} motrici</span>
-    <span class="sm cl">${logoSvg(c.client.name,24)} Cliente storico: <b>${esc(c.client.name)}</b> ${rankIcon(c.client,18)}</span></div></div>`:'';
+    <span class="sm ceo-cl">${logoSvg(c.client.name,24)} Cliente storico: <b>${esc(c.client.name)}</b> ${rankIcon(c.client,18)}</span>
+    ${c.startMgr?`<span class="sm">Manager dal primo giorno: <b>${esc(MANAGERS.find(m=>m.id===c.startMgr.id).name)}</b>, guida già il magazzino</span>`:''}
+    ${(c.startTech||[]).length?`<span class="sm">Tecnologie di partenza: <b>${c.startTech.map(id=>esc(TECH_ALL.find(t=>t.id===id).name)).join(', ')}</b></span>`:''}</div></div>`:'';
   return `<div><h1>FUP</h1><div class="disp" style="font-size:20px;margin-top:4px">Fino all'ultimo pallet</div></div>
    <p style="margin:0;max-width:65ch">Guida un'azienda di trasporti e logistica nel Nord Italia, da Torino a Trieste. Vinci gare, assumi le persone giuste, investi in tecnologia e non far scendere la cassa sotto i −50.000 €.</p>
    ${installCard()}

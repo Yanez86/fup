@@ -11,6 +11,7 @@ Questo è il riferimento per le meccaniche del prototipo. In caso di dubbio, fa 
 - Si parte a gennaio 2002. Alcuni eventi hanno un anno minimo; le tecnologie no: contano solo quelle che le precedono nell'albero.
 - Si va in fallimento se a fine mese la cassa è sotto −50.000 €.
 - Partenza: il magazzino ha già gli autisti che servono al cliente storico e un impiegato; il cliente storico parte con soddisfazione 70.
+- **Doti di partenza** (0.83, tarate con `tools/bilanciamento.py`, vedi «Bilanciamento»): Gino a Rivalta Scrivia (3.000 posti), 180.000 €, 3 motrici, Pastificio Mezzemaniche; Edoardo a Pioltello (4.000 posti), 320.000 €, 3 motrici, immobile 4.000 €/mese, Mobilificio Brianzolo, e **Rosa Brambati** che guida già il magazzino (`startMgr`, con la RAL di 38.000 € che le dava il padre: il CEO resta libero); Valeria a Novara (3.200 posti), 220.000 €, 2 motrici, Saponaria Italia da 440 pallet al mese; Marco a Genova Voltri (3.200 posti), 300.000 €, 2 motrici, reputazione 45, Caffè Portuale da 900 posti e 450 pallet, con lettori barcode, WMS e GPS installati e il gestionale (`startTech`: le tecnologie da magazzino partono installate e imparate). Il CEO creato prende magazzino, cassa, motrici e cliente, non il manager né le tecnologie.
 - **Reputazione** guadagnata col lavoro (`repUp()`: +0,15 al mese per cliente sopra soglia, gare vinte, nuovi magazzini) vale piena fino a 50, poi × (100 − reputazione)/50: a 75 la metà, a 100 zero. Eventi, ricerche e perdite restano a valore pieno.
 
 ## Tempo
@@ -307,16 +308,26 @@ Si sceglie nel passo **Pacchetti**, l'ultimo della creazione della partita (`ste
 **Vittoria «L'azienda dove tutti vogliono lavorare»** (`climaProg()`): 5 anni senza scioperi, morale medio ≥ 75, almeno 150 dipendenti (`CLIMA_N`; erano 300 fino alla 0.74, più di quanti ne reggano i 19 magazzini del Nord divisi tra quattro aziende).
 
 ## Bilanciamento (misure di riferimento)
-`python3 tools/bilanciamento.py` fa giocare partite di 12 anni con 4 aziende guidate dal computer (anche quella del giocatore, stile Standard, eventi decisi dal vice), con semi fissi: con lo stesso codice escono gli stessi numeri. `--sub 'vecchio|||nuovo'` prova una modifica senza ricompilare. Misure della 0.75 (64 partite per lato, 256 aziende):
+`python3 tools/bilanciamento.py` fa giocare partite di 12 anni con 4 aziende guidate dal computer (anche quella del giocatore, stile Standard, eventi decisi dal vice), con semi fissi: con lo stesso codice escono gli stessi numeri. `--sub 'vecchio|||nuovo'` prova una modifica senza ricompilare. Misure della 0.83 (128 partite per lato, 512 aziende):
 
 | | Fallite in 12 anni | Vive al 5° anno | Margine al 12° anno | Personale / ricavi |
 |---|---|---|---|---|
-| Senza pacchetti | 57% | 73% | −1,1% | 47% |
-| Relazioni industriali, 0.74 (prima del bilanciamento) | 84% | 57% | −2,9% | 55% |
-| Relazioni industriali, 0.75 | 62% | 68% | −0,8% | 52% |
+| Senza pacchetti | 46% | 84% | −1,3% | 47% |
+| Relazioni industriali | 46% | 88% | −0,6% | 52% |
 
-Col pacchetto, nei giorni-magazzino: calma 79%, mugugno 21%, stato di agitazione 0,3%, sciopero meno dello 0,1%, presidio 0,1%; lo stile Prezzo (Linea dura, fornitori) sta in mugugno il 37% del tempo, lo stile Qualità l'8%.
-Da tenere d'occhio nel gioco base: con il computer alla guida i CEO non partono alla pari. In 12 anni falliscono il 27% delle aziende di Valeria, il 33% di Gino, il 75% di Edoardo e il 94% di Marco (Genova Voltri: magazzino piccolo e lontano dalle zone delle gare, personale e mezzi oltre il 90% dei ricavi).
+Prima: col pacchetto falliva l'84% delle aziende nella 0.74 (stipendi su, tariffe ferme) e il 62% dalla 0.75 (clausola di adeguamento); senza pacchetti il 57-59%. Il calo della 0.83 viene dalle nuove partenze dei CEO: prima Marco ed Edoardo fallivano quasi sempre.
+Col pacchetto, nei giorni-magazzino: calma 85%, mugugno 15%, stato di agitazione 0,5%, sciopero 0,1%, presidio 0,1%; lo stile Prezzo (Linea dura, fornitori) sta in mugugno il 38% del tempo, lo stile Qualità il 4%.
+
+**Partenze dei CEO** (aziende fallite in 12 anni, 256 per CEO, metà col pacchetto; tra parentesi quelle ancora in piedi al 5° anno):
+
+| CEO | Prima | Dalla 0.83 |
+|---|---|---|
+| Valeria | 27% (96%) | 32% (95%) |
+| Gino | 39% (91%) | 38% (88%) |
+| Edoardo | 81% (63%) | 54% (90%) |
+| Marco | 95% (32%) | 59% (71%) |
+
+Con il computer alla guida conta molto il CEO che guida il primo magazzino (Operazioni e Leadership): Gino (Operazioni 17, Leadership 14) e Valeria (Negoziazione 18 e il cliente storico più ricco) partivano avvantaggiati; Edoardo (Operazioni 6) e Marco (Operazioni 9, Leadership 5, a Genova lontano dalle zone delle gare) no. Le doti della 0.83 sono in «Partita». Un giocatore che assume subito un buon manager riduce il divario più del computer, che tiene sempre il CEO nel primo magazzino. Provate e scartate: soldi in più (il computer li spende in ricerche), la pianificazione rotte a Marco, la formazione a Edoardo, Totò al posto di Rosa (va in pensione nel 2009).
 
 ## Idee aperte
 - Espansione al Centro e al Sud, concorrenti più attivi sulla mappa, flotta con tipi di mezzi diversi (motrici, bilici, frigo), contratti con i fornitori, uffici.
