@@ -7918,7 +7918,10 @@ const ACT={
  seltree(d){UI.sel.tree=d.id;UI.sel.tech=null;renderWin('tecnologia');},
  seltech(d){const t=TECH.find(x=>x.id===d.id); if(t) UI.sel.tree=t.tree; UI.sel.tech=d.id; renderWin('tecnologia');
    const det=document.querySelector('#win-tecnologia .tmain:not(.side) .tdet, .mob #win-tecnologia .tdet'); if(det) det.scrollIntoView({block:'nearest'});},
- poltog(d){const on=!polOn(d.id); if(polBlock(d.id,on)) return; polSet(d.id,on); toast(`Policy ${on?'accesa':'spenta'}: ${POL[d.id].name}`,on?'ok':'warn'); renderAll();},
+ poltog(d){const on=!polOn(d.id); if(polBlock(d.id,on)) return; const P=POL[d.id];
+  if(!d.ok){ const ang=S.managers.filter(m=>m.hired&&(m.tal||[]).some(n=>{const x=POL_TAL[n]||{}; return ((on?x.hate:x.want)||[]).includes(d.id);})).map(m=>m.name);
+   return askOk(`${on?'Accendere':'Spegnere'} la policy ${P.name}?`,`Una volta ${on?'accesa':'spenta'} non si può cambiare per ${wks(POL_CD)}.${on&&P.opp&&polOn(P.opp)?` Si spegne «${esc(POL[P.opp].name)}», che va contro.`:''}${ang.length?` <b class="bad">Non piacerà a ${esc(ang.join(', '))}.</b>`:''}`,on?'Sì, accendi':'Sì, spegni',()=>ACT.poltog({...d,ok:1})); }
+  polSet(d.id,on); toast(`Policy ${on?'accesa':'spenta'}: ${POL[d.id].name}`,on?'ok':'warn'); renderAll();},
  opentech(d){UI.sel.tree=d.tree;UI.sel.tech=d.id;openWin('tecnologia');},
  research(d){const t=TECH.find(x=>x.id===d.id); if(S.project||S.cash<t.cost||R(t.id)||!techOpen(t))return; S.cash-=t.cost; S.cur.tech+=t.cost;
   const days=techDays(t); S.project={tech:t.id,left:days,total:days,cost:t.cost}; toast(`Ricerca avviata: ${t.name}, pronta tra ${wks(days)}`,'ok'); renderAll();},
@@ -7970,7 +7973,9 @@ const ACT={
  bidwh(d,el){UI.bid.wh=el.value;renderWin('gare');},
  bidmult(d,el){UI.bid.mult=(+el.value)/100;const sel=S.tenders.find(t=>t.id===UI.bid.t);$('#bidmv').textContent=(UI.bid.mult>=1?'+':'')+Math.round((UI.bid.mult-1)*100)+'%';$('#bidest').innerHTML=bidEstHtml(sel,bidEstimate(sel,UI.bid.wh,UI.bid.mult));},
  bid(d){const t=S.tenders.find(x=>x.id===d.id);t.bid={wh:UI.bid.wh,mult:UI.bid.mult};toast(`Offerta inviata per ${t.name}`,'ok');renderAll();},
- withdraw(d){const t=S.tenders.find(x=>x.id===d.id);t.bid=null;renderAll();},
+ withdraw(d){const t=S.tenders.find(x=>x.id===d.id); if(!t||!t.bid) return;
+  if(!d.ok) return askOk(`Ritirare l'offerta per ${t.name}?`,'Esci dalla gara: se cambi idea puoi rimandare un\'offerta finché la gara è aperta, ma senza offerta il contratto va a qualcun altro.','Sì, ritira',()=>ACT.withdraw({...d,ok:1}));
+  t.bid=null;renderAll();},
  evopt(d){const ev=UI.ev,o=ev&&ev.opts[+d.i]; if(!o) return;
   // gli eventi casuali danno il risultato il giorno dopo; le decisioni sul personale (ultimatum) valgono subito
   if(EVENTS.some(e=>e.id===ev.id&&!e.now)){ evChoose(ev,+d.i); toast(`«${o.t}»: come andrà lo saprai domani`,'warn'); }
@@ -8276,6 +8281,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.90',t:'Altre conferme',x:['Chiedono conferma anche accendere o spegnere una policy (poi non si cambia per 13 settimane; la finestra avvisa se va contro un\'altra policy o se un manager non la sopporta) e ritirare un\'offerta in una gara.']},
  {v:'0.89',t:'Magazzino per le gare',x:['Anche il magazzino per un nuovo cliente non si sceglie più da un menu a tendina: nella finestra delle Gare tocca «Cambia» accanto al magazzino e si apre la finestrella con tutti i tuoi magazzini.','In cima quelli che possono prendere il cliente, dalla probabilità di vincere più alta: per ognuno l\'occupazione dopo il contratto, puntualità e accuratezza previste (in rosso se sotto la soglia del cliente) e i km al mese di trasporti. Sotto, in grigio, quelli che non possono, con il motivo: poco spazio o una certificazione che il magazzino non ha.','In fondo, «Nuovo magazzino» porta dritto all\'espansione.']},
  {v:'0.88',t:'Scelta dei manager',x:['Il manager di un magazzino, il responsabile del customer service e i direttori non si scelgono più da un menu a tendina: tocca «Cambia» accanto al nome e si apre una finestrella con tutti i manager della squadra, con ritratto, rango e abilità.','In cima ci sono quelli che puoi nominare, dal più adatto al posto (per i direttori e il customer service le abilità che contano sono in evidenza); sotto, in grigio, quelli che hanno già un incarico, con scritto quale: «Manager di Genova», «Direttore finanziario», «Responsabile del customer service», oppure quando arrivano.','In fondo alla finestrella «Cerca un manager» porta dritto ai candidati.']},
  {v:'0.87',t:'Conferme',x:['Le decisioni che pesano chiedono conferma prima di partire: licenziare una persona, un manager o un addetto alla qualità, passare il magazzino alla cooperativa o a un fornitore di handling e riportare il personale in casa, alzarsi dal tavolo col sindacato, annullare una ricerca. La finestra dice cosa costa e cosa succede; «No, lascia stare» non cambia niente.','Rimandare indietro un facchino della cooperativa resta immediato: non costa niente.']},

@@ -518,6 +518,8 @@ async def main():
         await pg.evaluate("()=>{const S=window.__FUP.S; ['regolamento','barcode','hr'].forEach(t=>S.researched[t]=true);}")
         await win(pg, 'policy')
         await pg.click('#win-azienda [data-act=poltog][data-id=zerostra]')
+        assert not await pg.evaluate("()=>window.__FUP.polOn('zerostra')"), 'la policy deve aspettare la conferma'
+        await pg.click('#modal [data-act=okgo]')
         assert await pg.evaluate("()=>window.__FUP.polOn('zerostra')"), 'zero straordinario non acceso'
         assert await pg.eval_on_selector('#win-azienda [data-act=poltog][data-id=zerostra]', 'e=>e.disabled'), 'la policy si può cambiare subito'
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; F.ACT.hiremgr({id:'davide'}); F.ACT.hiremgr({id:'rosa'});
