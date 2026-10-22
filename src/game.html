@@ -1536,7 +1536,7 @@ const POLICIES=[
 ];
 const POL=Object.fromEntries(POLICIES.map(p=>[p.id,p]));
 // pretese dei manager e dei dirigenti, legate ai talenti: want = la vogliono accesa, hate = la vogliono spenta
-const POL_TAL={'Ex sindacalista':{want:['zerostra','nocoop'],hate:['sabato']},'Stacanovista':{want:['sabato'],hate:['zerostra','corta']},'Sempre al telefono':{hate:['telefoni']},
+const POL_TAL={'Amante dell\'IA':{want:['smart'],hate:['spunta']},'Larper':{want:['corta'],hate:['sabato']},'Guerrafondaio':{want:['sicurezza','sabato'],hate:['smart']},'Otaku':{want:['spunta']},'Musicista':{want:['smart'],hate:['sabato']},'Ex sindacalista':{want:['zerostra','nocoop'],hate:['sabato']},'Stacanovista':{want:['sabato'],hate:['zerostra','corta']},'Sempre al telefono':{hate:['telefoni']},
  'Excel-dipendente':{want:['spunta']},'Braccino corto':{want:['spending']},'Mano larga':{hate:['spending']},'Cena col buyer':{want:['cliente']},'Insonne':{want:['smart']},
  'Ha fatto il militare':{want:['sicurezza'],hate:['smart']},'Formato sulla sicurezza':{want:['sicurezza']},'Esaurito':{want:['smart'],hate:['sabato','dueore']},'Voce da call center':{want:['dueore']},'Risponde anche alle 23':{want:['dueore']},'Promette tutto':{want:['cliente']},'Parla con i robot':{hate:['spunta']}};
 const RAL={pick:18000,car:19500,capo:25000,autB:19000,autCE:23000,imp:22000,plan:26000,cs:24000,fm:30000}, COEF=1.42;
@@ -1659,6 +1659,12 @@ const TALENTS={
  'Venuto dalla strada':{t:'mix',fx:'Operazioni +2 · Negoziazione +2 · Amministrazione −2',fl:'A quattordici anni scaricava cassette all\'ortomercato. Le fatture le tiene ancora nel portafoglio, insieme agli scontrini del bar.'},
  'Spirito bellicoso':{t:'mix',wh:{mor:-2},fx:'Negoziazione +2 · Leadership +1 · Morale −2 nel magazzino che guida',fl:'Litiga con i buyer, con i fornitori e con la macchinetta del caffè. Vince sempre, tranne con la macchinetta.'},
  'Cuore d\'oro':{t:'pos',fx:'Leadership +2 · Amministrazione −1',fl:'Conosce i nomi dei figli di tutti i carrellisti. E i loro problemi con la caldaia.'},
+ /* passioni: bonus e malus sulle abilità, un effetto nel magazzino che guida e i loro eventi (CEO e manager) */
+ 'Amante dell\'IA':{t:'mix',learn:0.8,fx:'Innovazione +3 · Precisione −1 · Leadership −1 · Apprendimento delle tecnologie −20% nel magazzino che guida',fl:'Chiama l\'assistente virtuale «collega». Gli chiede anche come ha passato il weekend.'},
+ 'Larper':{t:'mix',wh:{mor:3},fx:'Leadership +2 · Negoziazione +1 · Amministrazione −2 · Morale +3 nel magazzino che guida · Il ritratto diventa elfico',fl:'Nel weekend è Elrandil, ramingo dei boschi sopra Varzi. Il lunedì le orecchie a punta restano: dice che è la colla.'},
+ 'Guerrafondaio':{t:'mix',wh:{P:0.5,mor:-2},fx:'Leadership +2 · Operazioni +1 · Negoziazione −2 · Nel magazzino che guida: puntualità +0,5, morale −2',fl:'La domenica gioca a softair in mimetica. Il lunedì chiama le baie di carico «teste di ponte».'},
+ 'Otaku':{t:'mix',conf:3,fx:'Precisione +2 · Innovazione +1 · Negoziazione −1 · Leadership −1 · Conformità +3 nel magazzino che guida (5S e kaizen)',fl:'Ha imparato il giapponese dai cartoni animati. Sa dire «robot gigante» e «sbrigati», che in magazzino basta e avanza.'},
+ 'Musicista':{t:'mix',wh:{mor:2},fx:'Leadership +2 · Precisione −1 · Amministrazione −1 · Morale +2 nel magazzino che guida',fl:'Suona la batteria nei «Bancali Erranti», cover band da sagra. Tiene il tempo anche sulla scrivania, durante le riunioni.'},
  /* talenti del customer service: contano per chi guida il servizio clienti (il responsabile, o il CEO se non c'è); ognuno ha il suo evento */
  'Voce da call center':{t:'pos',cs:{q:8},fx:'Negoziazione +1 · Da responsabile del customer service: qualità del servizio +8 · Da CEO: la telefonata a un cliente arrabbiato va sempre bene',fl:'Dice «la capisco perfettamente» con una voce che calmerebbe un vulcano.'},
  'Risponde anche alle 23':{t:'mix',cs:{q:10,burn:1},fx:'Precisione +1 · Da responsabile del customer service: qualità del servizio +10, ma rischia di esaurirsi',fl:'Ha una suoneria diversa per ogni cliente. Di notte le riconosce nel sonno.'},
@@ -2311,6 +2317,7 @@ Gli effetti sulle [[abilita|abilità]] sono già sommati nei numeri. I talenti n
 • «nel magazzino che guida»: vale solo nel [[magazzino]] di cui il personaggio è [[manager]] (anche il CEO, se lo guida lui): [[morale]], [[puntualita]], costi dell'immobile, tempi di [[apprendimento]];
 • «da CEO»: vale se il talento è del CEO, per esempio nelle [[gare]] o nelle [[assunzioni]];
 • alcuni aprono scelte speciali negli [[eventi]], e quasi tutti i tratti di carattere hanno un evento tutto loro.
+• le passioni (Amante dell'IA, Larper, Guerrafondaio, Otaku, Musicista) hanno un pregio e un difetto sulle abilità, un effetto nel magazzino che guida ed eventi propri sia per il CEO sia per i manager; chi è Larper ha il ritratto elfico, con le orecchie a punta.
 
 Le voci si leggono nella scheda Modificatori del Riepilogo.
 
@@ -3071,7 +3078,20 @@ function addWarehouse(site,own,fixed,motrici){
   S.warehouses.push(wh); return wh;
 }
 const ceo=()=>S.boss;  // il CEO in carica: all'inizio quello scelto, dopo la pensione il suo successore
-const ceoImg=C=>IMG[C.img||C.id];
+const ceoImg=C=>elfOf(C,IMG[C.img||C.id]);
+/* Larper: ritratto «elfico», con le orecchie a punta disegnate sopra quello vero (griglia 48x56, come i ritratti).
+   La prima volta l'immagine si prepara su un canvas: intanto si vede quella normale, poi si ridisegna tutto. */
+const ELF_EAR=['K.......','KK......','KFK.....','KFFK....','.KFFK...','.KFFFK..','..KFFFK.','..KFFfFK','...KFffF','...KFffF','....KFfF','.....KFF','......KK'], ELF_C={};
+const elfOf=(p,src)=>p&&(p.tal||[]).includes('Larper')?elfImg(src):src;
+function elfImg(src){ const c=ELF_C[src]; if(c) return c===1?src:c; if(!src||typeof Image==='undefined') return src;
+  ELF_C[src]=1; const im=new Image(); im.onload=()=>{ try{ ELF_C[src]=elfDraw(im); if(typeof S!=='undefined'&&S) renderAll(); }catch(e){} }; im.src=src; return src; }
+function elfDraw(im){ const W=im.naturalWidth, H=im.naturalHeight, s=Math.round(W/48), cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const g=cv.getContext('2d'); g.imageSmoothingEnabled=false; g.drawImage(im,0,0); const d=g.getImageData(0,0,W,H).data, cnt={};
+  // colore della pelle: il più frequente tra gli occhi e il naso
+  for(let y=21;y<29;y++) for(let x=21;x<27;x++){ const i=((y*s+(s>>1))*W+x*s+(s>>1))*4; if(d[i+3]>200&&d[i]+d[i+1]+d[i+2]>250){ const k=d[i]+','+d[i+1]+','+d[i+2]; cnt[k]=(cnt[k]||0)+1; } }
+  const sk=(Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0]||['242,199,155'])[0].split(',').map(Number), col={K:TPAL.K,F:`rgb(${sk})`,f:`rgb(${sk.map(v=>Math.round(v*0.82))})`};
+  [0,1].forEach(side=>ELF_EAR.forEach((row,j)=>[...row].forEach((ch,i)=>{ if(ch==='.') return; const x=side?47-(5+i):5+i; g.fillStyle=col[ch]; g.fillRect(x*s,(12+j)*s,s,s); })));
+  return cv.toDataURL(); }
 const whById=id=>S.warehouses.find(w=>w.id===id);
 const clientRev=c=>{const w=S&&whById(c.wh); const t=w?clientLog(c,w):{oKm:240,in:0,iKm:0}; const pm=palOf(c); const sup=peakOn(c)&&c.peak.sup?1+c.peak.sup*(c.peak.mul-1)/c.peak.mul:1;
   return (c.stock*T_ST+(2*pm*T_MO+pm*(18+0.05*t.oKm)*chAvg(c,'price')+t.in*t.iKm*1.5)*sup)*c.mult*rankOf(c).rev*tarK();};   // supplemento solo sui pallet in più del picco (movimenti e trasporto, non i posti a stock); tarK = adeguamento al contratto nazionale
@@ -3174,7 +3194,7 @@ function showSuccession(){
   if(AUTO){ best(); return; }
   if(!UI.evSpeed) UI.evSpeed=S.speed; setSpeed(0);
   const B=S.boss, L=L0, yrs=Math.max(1,Math.round((S.day-(B.since||0))/365)); UI.succ=L;
-  const src=c=>c.k==='f'?IMG[c.p.id]:c.k==='x'?IMG.anon:mImg(c.p);
+  const src=c=>c.k==='f'?elfOf(c.p,IMG[c.p.id]):c.k==='x'?IMG.anon:mImg(c.p);
   const what=c=>c.k==='in'?(seatOf(c.p.id)?DIR_ROLES.find(r=>r.id===seatOf(c.p.id)).name:isCs(c.p.id)?'Responsabile del customer service':c.p.wh?'Manager a '+whById(c.p.wh).name:'Nella tua squadra'):c.k==='mk'?'Sul mercato':c.k==='f'?`Ha fondato ${c.p.company}`:c.p.role;
   showModal(`<div class="src"><span>La Gazzetta del Muletto</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:21px">Chi prende il tuo posto?</h3>
    <p class="ev-x">${esc(B.name)} lascia la guida di ${esc(S.company.name)} dopo ${yrs} ${yrs===1?'anno':'anni'}. Scegli il nuovo ${kw('successione','CEO')}: da domani giochi con lui o con lei, con le sue abilità e i suoi talenti. Se scegli un tuo manager, il suo magazzino o il suo posto in Direzione resta libero.</p>
@@ -3219,7 +3239,7 @@ const statName=k=>STATS.find(s=>s.k===k).n;
 // volti generici dei candidati creati dal gioco (p_v0 ... p_v39): 0-19 uomini, 20-39 donne; a gruppi di 7: giovani, di mezza età, anziani
 function faceOf(f,age){ const b=age<36?0:age<52?1:2, busy=new Set(mkt().l.map(p=>p.face)), l=[...Array(20).keys()].filter(i=>Math.min(2,Math.floor(i/7))===b).map(i=>i+(f?20:0));
   const fr=l.filter(i=>!busy.has(i)); return pick(fr.length?fr:l); }
-const mImg=p=>p.face!=null?IMG['v'+p.face]:IMG['m_'+p.id]||IMG.anon;
+const mImg=p=>elfOf(p,p.face!=null?IMG['v'+p.face]:IMG['m_'+p.id]||IMG.anon);
 const GEN_N={m:['Marco','Alessandro','Stefano','Fabio','Andrea','Paolo','Massimo','Simone','Luca','Riccardo','Daniele','Matteo','Giorgio','Mauro','Claudio','Enrico','Federico','Emanuele','Walter','Ivano','Diego','Cristian','Mirko','Gabriele','Alberto','Franco','Sergio','Omar','Karim','Ionut','Ahmed','Bogdan'],
   f:['Laura','Francesca','Silvia','Elisa','Chiara','Monica','Paola','Federica','Valentina','Barbara','Simona','Roberta','Cristina','Daniela','Giorgia','Marta','Alessia','Sabrina','Manuela','Michela','Ilaria','Lucia','Anna','Patrizia','Samira','Fatima','Irina','Elena']};
 const GEN_S=['Brambilla','Colombo','Fumagalli','Cattaneo','Bertolini','Zanella','Pozzi','Rota','Moretti','Barbieri','Fontana','Bonetti','Gatti','Lombardi','Ghezzi','Pellegrini','Zanoni','Carrara','Bassi','Valsecchi','Zanotti','Gandolfi','Bergamaschi','Pagani','Bottazzi','Riva','Cavalli','Sartori','De Luca','Russo','Greco','Toffolo','Furlan','Zago','Pavan','Bortolotti','Dal Molin','Parodi','Bruzzone','Ferrando','Cerutti','Gribaudo','Bosio','Tosi','Vitali','Malaguti','Gualtieri','Benassi','Casadei','Foschi','Mazzotti','Bernardi','Negri','Rossetti','Dalla Valle','Perego','Mapelli','Crippa','Tagliabue','Sironi'];
@@ -4885,6 +4905,9 @@ const F_MASTER=m=>ageOf(m)<45&&!m.tal.includes('Master in supply chain'), F_CELL
   F_MENTORE=m=>m.wh&&ageOf(m)>=40&&!m.tal.includes('Mentore'), F_INGLESE=m=>!m.tal.includes('Laureato in lingue')&&!m.tal.includes('Parla per acronimi'),
   F_CUOCO=m=>m.wh&&!m.tal.includes('Cuoco provetto'), F_VIDEO=m=>m.wh&&!m.tal.includes('Guru dei social'), F_FIGLI=m=>ageOf(m)<46&&!m.tal.includes('Tre figli piccoli'),
   F_KARAOKE=m=>!m.tal.includes('Re del karaoke'), F_GOLF=e=>!e.tal.includes('Golfista'), F_POLITICA=e=>!e.tal.includes('Consigliere comunale');
+// passioni dei manager: chi le ha già (eventi dedicati) e chi può prendersi la febbre dell'IA
+const F_IA=m=>!m.tal.includes('Amante dell\'IA'), F_TAL=n=>m=>m.tal.includes(n), F_TALW=n=>m=>m.wh&&m.tal.includes(n),
+  talPick=f=>{const l=hiredM(f); return pick(l.length?l:hiredM());};   // chi vive l'evento (la condizione garantisce che ci sia)
 // i drammi dei clienti: un problema enorme, che a guardarlo bene è una sciocchezza (n = nome breve, t = titolo, x = racconto)
 const DRAMMI=[
  {n:'il bancale fantasma',t:'manca un bancale!',x:'Mail tutta in maiuscolo alle 23:40, con quattordici persone in copia: «MANCA UN BANCALE, BLOCCHIAMO TUTTO». Nella foto allegata, per chi guarda bene, il bancale c\'è: dietro la loro macchinetta del caffè.'},
@@ -5327,6 +5350,41 @@ const EVENTS=[
   setup:ev=>{ev.c=actC();ev.text=`Rileggendo per la quinta volta il contratto di ${ev.c.name} hai trovato una virgola fuori posto. Vale 6.000 € l'anno, a tuo favore.`;},
   opts:[{t:'Faglielo notare',d:'Telefoni al cliente e gli segnali l\'errore. Apprezza l\'onestà e lo racconta in giro.',e:'Soddisfazione +8, reputazione +2',r:'Il cliente ringrazia e lo racconta in giro. Una virgola onesta vale più di tanti spot.',f:function(){this.c.sat=clamp(this.c.sat+8,0,100);S.rep+=2;}},
         {t:'Taci e incassa',d:'Non dici niente e lasci il contratto com\'è. Speri che nessuno lo rilegga.',e:'+6.000 €; se se ne accorgono, soddisfazione −15',r:'La virgola resta dov\'è. Ogni volta che il cliente chiama, ti prende un piccolo spavento.',f:function(){S.cash+=6000;if(Math.random()<0.3){this.c.sat=clamp(this.c.sat-15,0,100);toast('Se ne sono accorti','bad');}}}]},
+ // passioni del CEO: intelligenza artificiale, gioco di ruolo dal vivo, softair, Giappone, musica
+ {id:'t_ia_turni',src:'Ufficio del personale',title:'I turni li fa l\'algoritmo',cond:()=>hasTal('Amante dell\'IA'),
+  text:'Hai comprato un programma «intelligente» che promette di fare i turni da solo. Nella prima settimana ha messo tre capiturno di notte, nessuno di giorno e un carrellista in pensione da sei anni al sabato mattina. Però, a guardar bene, i camion partono tutti in orario.',
+  opts:[{t:'Fidati della macchina',d:'Lasci i turni all\'algoritmo: impara, dicono. Le lamentele le smisti tu.',e:'Puntualità +2 e morale −4 in tutti i magazzini per 2 mesi',r:'I camion partono come orologi svizzeri. In mensa, invece, si parla solo di come spegnere il computer dei turni.',f:()=>mod('all',{P:2,mor:-4},60)},
+        {t:'Turni a mano, come sempre',d:'Il capoturno riprende il suo foglio a quadretti e la matita dietro l\'orecchio.',e:'Nessun effetto',r:'Il programma resta installato. Ogni tanto manda una notifica che sembra offesa.',f:()=>{}},
+        {t:'La macchina propone, il capoturno decide',d:'Passi una settimana a insegnare al programma che i capiturno dormono anche loro.',e:'−1.000 €, puntualità +1 e accuratezza +1 per 3 mesi',req:()=>ceo().st.inn>=13,reqT:'Innovazione 13',r:'Il capoturno e l\'algoritmo hanno trovato un accordo. Lui lo chiama «il ragazzo»; il ragazzo, per ora, non si lamenta.',f:()=>{S.cash-=1000; mod('all',{P:1,A:1},90);}}]},
+ {id:'t_ia_mail',src:'Posta elettronica',title:'La mail l\'ha scritta la macchina',cond:()=>hasTal('Amante dell\'IA')&&actC(),
+  setup:ev=>{ev.c=actC(); ev.text=yearOf(S.day)>=2023?`Hai fatto scrivere all'assistente virtuale la mail di rinnovo per ${ev.c.name}. È partita così com'era, compresa la prima riga: «Certo! Ecco una versione cordiale ma ferma della tua mail, che non sembri scritta da un'intelligenza artificiale».`
+    :`Hai affidato al traduttore automatico la mail di rinnovo per ${ev.c.name}, che ha la casa madre a Monaco. «Vi ringraziamo per la fiducia» è diventato «Vi ringraziamo per il pollo fidato». Il loro direttore ha risposto con una parola sola: «Bitte?»`;},
+  opts:[{t:'Chiedi scusa al telefono',d:'Telefoni, ammetti tutto e prometti che la prossima mail la scrivi con le tue dita.',e:'Soddisfazione −2',r:'Il cliente ha riso, alla fine. Ma la mail gira ancora nel suo ufficio, stampata e appesa.',f:function(){this.c.sat=clamp(this.c.sat-2,0,100);}},
+        {t:'Rivendica: «È il futuro»',d:'Spieghi che era tutto voluto: una prova di innovazione. Metà dei clienti ci crede.',e:'Una volta su due soddisfazione +4 e reputazione +1, altrimenti soddisfazione −6',r:'Il cliente ci ha pensato su a lungo. Il resto lo dice il suo prossimo ordine.',
+          f:function(){ if(Math.random()<0.5){ this.c.sat=clamp(this.c.sat+4,0,100); S.rep+=1; toast('Ci ha creduto: ti chiede pure il nome del programma','ok'); } else { this.c.sat=clamp(this.c.sat-6,0,100); toast('Non ci ha creduto','bad'); } }},
+        {t:'Fai scrivere le scuse alla macchina',d:'Le scuse le scrive il programma, ma le rileggi tre volte. Escono perfette.',e:'Soddisfazione +2',req:()=>ceo().st.neg>=12,reqT:'Negoziazione 12',r:'Le scuse più belle mai ricevute dal cliente. Non saprà mai chi le ha scritte.',f:function(){this.c.sat=clamp(this.c.sat+2,0,100);}}]},
+ {id:'t_larp',src:'Ufficio commerciale',title:'Il buyer è un orco',cond:()=>hasTal('Larper')&&actC(),
+  setup:ev=>{ev.c=actC(); ev.text=`Al raduno di gioco di ruolo dal vivo nei boschi sopra Varzi, sotto il trucco verde del capo degli orchi, hai riconosciuto il buyer di ${ev.c.name}. Lui ha riconosciuto te dalle orecchie a punta. Domenica c'è la battaglia finale: elfi contro orchi.`;},
+  opts:[{t:'Lascia vincere gli orchi',d:'Ti fai colpire da una spada di gommapiuma e cadi con un lamento molto credibile.',e:'Soddisfazione +6',r:'Il buyer racconta la vittoria a tutto l\'ufficio acquisti. Ora ti saluta con un grugnito affettuoso.',f:function(){this.c.sat=clamp(this.c.sat+6,0,100);}},
+        {t:'Gli elfi non si arrendono',d:'Guidi la carica e abbatti il capo degli orchi davanti a tutta la tribù.',e:'Leadership +1, soddisfazione −3',r:'Vittoria gloriosa. Il lunedì il buyer risponde alle tue mail con un giorno di ritardo, per principio.',f:function(){addSt(ceo(),'lead',1); this.c.sat=clamp(this.c.sat-3,0,100);}},
+        {t:'Proponi un trattato tra i popoli',d:'Tratti in gioco una pace tra elfi e orchi, con tanto di pergamena e sigillo di ceralacca.',e:'Soddisfazione +8, reputazione +1',req:()=>ceo().st.neg>=13,reqT:'Negoziazione 13',r:'La pergamena del trattato è appesa nell\'ufficio acquisti del cliente. Accanto, incorniciato, c\'è il vostro contratto.',f:function(){this.c.sat=clamp(this.c.sat+8,0,100); S.rep+=1;}}]},
+ {id:'t_softair',src:'La Gazzetta del Muletto',title:'Sfida a softair',cond:()=>hasTal('Guerrafondaio'),
+  text:'Hai sfidato a softair i magazzinieri di un concorrente di Piacenza: domenica, in una cava abbandonata, venti contro venti. In magazzino non si parla d\'altro e qualcuno ha già dipinto la mimetica su un muletto.',
+  opts:[{t:'Guidi tu l\'assalto',d:'Tute mimetiche per tutti e un piano d\'attacco disegnato sulla lavagna dei turni.',e:'−800 €, morale +5 per 2 mesi; 3 volte su 10 qualcuno si storce una caviglia (puntualità −1 per 2 settimane)',r:'La cava è vostra. Il lunedì in mensa si raccontano la battaglia come fosse lo sbarco in Normandia.',
+          f:()=>{S.cash-=800; mod('all',{mor:5},60); if(Math.random()<0.3){ mod('all',{P:-1},14); toast('Una caviglia storta: due settimane di stampelle','bad'); }}},
+        {t:'Annulla: troppi rischi',d:'Ritiri la sfida con un comunicato di due righe. Il concorrente festeggia la vittoria a tavolino.',e:'Morale −3 per un mese',r:'In magazzino ora ti chiamano «il generale della ritirata». Mai in tua presenza.',f:()=>mod('all',{mor:-3},30)},
+        {t:'Prima un\'esercitazione di sicurezza',d:'La mattina prova di evacuazione e primo soccorso, in mimetica; il pomeriggio la battaglia.',e:'−1.200 €, morale +3 e accuratezza +1 per 2 mesi',req:()=>ceo().st.lead>=13,reqT:'Leadership 13',r:'Mai vista un\'evacuazione così veloce: tutti fuori in novanta secondi, strisciando. Il responsabile della sicurezza si è commosso.',f:()=>{S.cash-=1200; mod('all',{mor:3,A:1},60);}}]},
+ {id:'t_otaku',src:'Ufficio commerciale',title:'La delegazione di Osaka',cond:()=>hasTal('Otaku'),
+  text:'Una delegazione di un\'azienda di elettronica di Osaka gira il Nord Italia per scegliere un operatore logistico. Tu il giapponese l\'hai imparato in trent\'anni di cartoni animati. È il tuo momento.',
+  opts:[{t:'Accoglili in giapponese',d:'Inchino, biglietto da visita con due mani e il discorso che hai provato allo specchio.',e:'Reputazione +3; 3 volte su 10 il tuo giapponese da cartone fa ridere tutti (solo +1)',r:'La delegazione applaude. Qualcuno, a voce bassa, chiede perché hai detto «attacco del robot gigante» durante i saluti.',
+          f:()=>{ if(Math.random()<0.7) S.rep+=3; else { S.rep+=1; toast('Hai citato un cartone animato al posto dei saluti','bad'); } }},
+        {t:'Mostra un magazzino in stile 5S',d:'Prima della visita fai etichettare tutto, con le strisce gialle a terra e la ginnastica del mattino.',e:'−1.500 €, accuratezza +2 per 3 mesi, reputazione +1',r:'Il capo delegazione fotografa le strisce gialle. Dice che a Osaka non le fanno così dritte.',f:()=>{S.cash-=1500; mod('all',{A:2},90); S.rep+=1;}},
+        {t:'Un modellino di robot gigante per tutti',d:'Regali a ogni ospite un robot da montare. Il tuo, dalla vetrinetta.',e:'−400 €, reputazione +1',r:'Il robot ha avuto più successo della presentazione. Il tuo posto in vetrinetta, però, è vuoto.',f:()=>{S.cash-=400; S.rep+=1;}}]},
+ {id:'t_band',src:'La Gazzetta del Muletto',title:'Il concerto alla sagra',cond:()=>hasTal('Musicista'),
+  text:'La tua cover band suona sabato alla sagra della salamella. Lo stesso sabato c\'è l\'inventario annuale. Il bassista ha già stampato i manifesti, con la tua faccia al centro.',
+  opts:[{t:'Suona: l\'inventario lo fanno loro',d:'Lasci le liste al capoturno e parti con le bacchette in tasca.',e:'Accuratezza −2 e morale +2 per un mese, reputazione +1',r:'Concerto memorabile. L\'inventario un po\' meno: ci sono tre bancali di troppo e nessuno sa da dove vengano.',f:()=>{mod('all',{A:-2,mor:2},30); S.rep+=1;}},
+        {t:'Fai l\'inventario',d:'Rinunci al concerto. La band trova un sostituto: il nipote del bassista, dodici anni.',e:'Morale −1 per un mese',r:'Inventario perfetto. Il video del nipote alla batteria, però, ha più visualizzazioni di tutti i vostri concerti.',f:()=>mod('all',{mor:-1},30)},
+        {t:'Porta la sagra in magazzino',d:'Inventario fino alle sei, poi concerto nel piazzale con salamelle per tutti.',e:'−1.200 €, morale +5 per 2 mesi, reputazione +1',req:()=>ceo().st.lead>=13,reqT:'Leadership 13',r:'Inventario chiuso alle 17:58. Alle 18:00 il primo colpo di batteria. Il piazzale non è mai stato così pieno.',f:()=>{S.cash-=1200; mod('all',{mor:5},60); S.rep+=1;}}]},
  // talenti del customer service: contano quelli di chi guida il servizio clienti (il responsabile, o il CEO)
  {id:'t_callcenter',src:'Customer service',title:'La telefonata registrata',cond:()=>csHas('Voce da call center')&&!!actC(),
   setup:ev=>{ev.p=csWho(); ev.c=actC(); ev.text=`Il responsabile qualità di ${ev.c.name} ha chiamato urlando per un collo ammaccato. Dopo dieci minuti con ${ev.p.name} ha chiesto scusa, ha ringraziato e ha domandato se la telefonata era registrata: vuole farla sentire al suo terapeuta.`;},
@@ -5541,6 +5599,36 @@ const EVENTS=[
   opts:[{t:'Fai il tifo: «Vai!»',d:'Un applauso d\'incoraggiamento e il microfono resta dov\'è. Che sarà mai.',e:'Una volta su due soddisfazione +4 e «Re del karaoke», altrimenti soddisfazione −2',r:'Il microfono è passato di mano. Com\'è andata lo dicono gli applausi, o il silenzio.',
           f:function(){if(Math.random()<0.5){gainTal(this.p,'Re del karaoke','La serata con il buyer'); this.c.sat=clamp(this.c.sat+4,0,100);} else this.c.sat=clamp(this.c.sat-2,0,100);}},
         {t:'Prendi tu il microfono',d:'Salvi la serata, o almeno ci provi.',e:'Soddisfazione +2',r:'Steccato l\'acuto, ma il buyer apprezza il coraggio e ordina un altro giro.',f:function(){this.c.sat=clamp(this.c.sat+2,0,100);}}]},
+ // passioni dei manager
+ {id:'m_ia',src:'Ufficio del personale',title:'Il manager e la macchina pensante',cond:()=>yearOf(S.day)>=2004&&hiredM(F_IA).length>0&&!hasTal('Amante dell\'IA'),
+  setup:ev=>{const p=ev.p=pick(hiredM(F_IA));
+    ev.text=`${p.name} ha passato il weekend a leggere di reti neurali e il lunedì ti ha chiesto un budget per «addestrare un modello sui dati dei bancali». Nessuno ha capito cosa voglia dire. Sembra felicissim${oa(p)}.`;},
+  opts:[{t:'Dagli il budget',d:'Un computer nuovo, un corso online e la scrivania vicino al server.',e:'−2.000 €, Innovazione +1; una volta su due «Amante dell\'IA»',r:'Il modello per ora prevede solo che il lunedì arrivano più camion. Lo sapevate, ma adesso c\'è un grafico.',
+          f:function(){S.cash-=2000; addSt(this.p,'inn',1); tryTal(this.p,'Amante dell\'IA',0.5,'Il weekend delle reti neurali');}},
+        {t:'Prima i bancali, poi i modelli',d:'Gli ricordi con gentilezza che il magazzino non si addestra da solo.',e:'Nessun effetto',r:'Torna al lavoro un po\' deluso. La sera, però, continua a leggere.',f:()=>{}}]},
+ {id:'m_larp',src:'La Gazzetta del Muletto',title:'Una notte di gioco in magazzino',cond:()=>hiredM(F_TALW('Larper')).length>0,
+  setup:ev=>{const p=ev.p=talPick(F_TALW('Larper'));
+    ev.text=`${p.name} chiede di usare il magazzino di notte, a turno finito, per una partita di gioco di ruolo dal vivo: le scaffalature diventano le Montagne Grigie, il muletto un drago addormentato. Metà del turno di notte si è già iscritta come nani.`;},
+  opts:[{t:'Concedi, con la sicurezza presente',d:'Il responsabile della sicurezza controlla che il drago resti spento.',e:'−500 €, morale +5 nel suo magazzino per 2 mesi',r:'I nani hanno vinto. Il turno di notte ora si saluta con «per la barba di mio padre».',f:function(){S.cash-=500; mod(this.p.wh||'all',{mor:5},60);}},
+        {t:'Il magazzino non è un castello',d:'Gentile ma fermo: le scaffalature restano scaffalature.',e:'Morale −2 nel suo magazzino per un mese',r:'Si gioca nel bosco, come sempre. In magazzino resta qualche nano deluso.',f:function(){mod(this.p.wh||'all',{mor:-2},30);}},
+        {t:'Partecipa anche tu, da stregone',d:'Cappello a punta, barba finta e un incantesimo improvvisato sul transpallet.',e:'−500 €, morale +7 nel suo magazzino per 2 mesi, Leadership +1; accuratezza −1 per una settimana',r:'Lo stregone ha salvato i nani dal drago. Il giorno dopo, però, mezzo turno sbadigliava sulle bolle.',f:function(){S.cash-=500; mod(this.p.wh||'all',{mor:7},60); mod(this.p.wh||'all',{A:-1},7); addSt(ceo(),'lead',1);}}]},
+ {id:'m_softair',src:'La Gazzetta del Muletto',title:'Operazione Piazzale',cond:()=>hiredM(F_TALW('Guerrafondaio')).length>0,
+  setup:ev=>{const p=ev.p=talPick(F_TALW('Guerrafondaio'));
+    ev.text=`${p.name} ha riorganizzato il piazzale come un'operazione militare: bilici in colonna, un nome in codice per ogni baia, radio con «passo e chiudo». Gli autisti esterni sono confusi, quelli interni salutano sull'attenti. I camion, però, partono in orario.`;},
+  opts:[{t:'Lascia fare: funziona',d:'I risultati parlano. Il gergo, pazienza.',e:'Puntualità +1 e morale −3 nel suo magazzino per 2 mesi',r:'Baia Alfa, baia Bravo, baia Charlie: tutto in orario. Un autista bulgaro ha chiesto se doveva mostrare il passaporto.',f:function(){mod(this.p.wh||'all',{P:1,mor:-3},60);}},
+        {t:'Riposo, soldato',d:'Gli chiedi di togliere almeno i nomi in codice e il «passo e chiudo».',e:'Morale +2 nel suo magazzino per un mese',r:'Il piazzale torna civile. Sulla porta della baia 3, però, è rimasta la scritta «Charlie».',f:function(){mod(this.p.wh||'all',{mor:2},30);}}]},
+ {id:'m_otaku',auto:0,src:'Ufficio del personale',title:'Ferie a Lucca',cond:()=>monthOf(S.day)===9&&hiredM(F_TAL('Otaku')).length>0,
+  setup:ev=>{const p=ev.p=talPick(F_TAL('Otaku'));
+    ev.text=`${p.name} chiede cinque giorni di ferie per la fiera del fumetto di Lucca. Il costume è già pronto: un pilota di robot gigante alto due metri e mezzo, che non entra in macchina. È la settimana in cui i clienti preparano il Natale.`;},
+  opts:[{t:'Buon viaggio',d:'Ferie concesse. Chiedi solo una foto con il costume.',e:'Puntualità −1 nel suo magazzino per una settimana; Innovazione +1',r:'Torna con trecento foto, un dorso a pezzi e tante idee per organizzare gli scaffali «come in un\'astronave».',f:function(){mod(this.p.wh||'all',{P:-1},7); addSt(this.p,'inn',1);}},
+        {t:'Niente ferie a ottobre',d:'Il picco è il picco: Lucca sarà l\'anno prossimo.',e:'3 volte su 10 dà le dimissioni',r:'Accetta senza dire niente. Sulla scrivania compare un robottino con l\'aria molto triste.',
+          f:function(){const p=this.p; if(Math.random()<0.3){p.quit={day:S.day+30,why:`${p.name} ha trovato un posto con le ferie a fine ottobre.`}; toast(`${p.name} dà le dimissioni: un mese di preavviso`,'bad');}}},
+        {t:'Uno stand con il vostro logo',d:'Ferie pagate, in cambio di uno stand alla fiera con il robot e un muletto in miniatura.',e:'−1.000 €, reputazione +2; puntualità −1 nel suo magazzino per una settimana',r:'Il robot col logo aziendale finisce su tre riviste del settore. E su molte magliette.',f:function(){S.cash-=1000; S.rep+=2; mod(this.p.wh||'all',{P:-1},7);}}]},
+ {id:'m_band',src:'La Gazzetta del Muletto',title:'Il concerto di Natale',cond:()=>monthOf(S.day)===11&&hiredM(F_TAL('Musicista')).length>0&&!hasTal('Musicista'),
+  setup:ev=>{const p=ev.p=talPick(F_TAL('Musicista'));
+    ev.text=`${p.name} propone di suonare alla cena di Natale con la sua band, i «Bancali Erranti». Garantisce: niente canzoni sui pallet. In scaletta, però, ci sono sei assoli di batteria.`;},
+  opts:[{t:'Palco e luci',d:'Noleggi un palco vero e le luci colorate.',e:'−800 €, morale +4 in tutti i magazzini per 2 mesi; Leadership +1',r:'Al quarto assolo di batteria ballavano anche i capiturno. Al sesto, anche il commercialista.',f:function(){S.cash-=800; mod('all',{mor:4},60); addSt(this.p,'lead',1);}},
+        {t:'Meglio un DJ',d:'Ringrazi e chiami il solito DJ dei matrimoni.',e:'−600 €, morale +1 per un mese',r:'Il DJ mette le solite canzoni. In un angolo, qualcuno tiene il tempo sul tavolo, un po\' offeso.',f:function(){S.cash-=600; mod('all',{mor:1},30);}}]},
  // dirigenti
  {id:'d_golf',src:'Ufficio commerciale',title:'Il circolo del golf',cond:()=>hiredE(F_GOLF).length>0,
   setup:ev=>{const p=ev.p=pick(hiredE(F_GOLF));
@@ -7908,7 +7996,7 @@ function ccPoints(){const left=ccLeft(startSel.cc);
 function stepCC1(){const cc=startSel.cc;
   return `<div class="card ccbox"><div class="row"><span class="h3">Chi è il tuo ${kw('crea_ceo','CEO')}?</span><span class="sm">Il soprannome e il motto sono facoltativi</span></div>
    <div class="cc-top">
-    <div class="cc-por"><button class="btn sm2" data-act="ccimg" data-d="-1" aria-label="Ritratto precedente">◀</button><div class="portrait" style="width:144px;height:168px;overflow:hidden"><img class="px" src="${IMG[cc.img]}" alt="Ritratto scelto" width="144" height="168"></div><button class="btn sm2" data-act="ccimg" data-d="1" aria-label="Ritratto successivo">▶</button></div>
+    <div class="cc-por"><button class="btn sm2" data-act="ccimg" data-d="-1" aria-label="Ritratto precedente">◀</button><div class="portrait" style="width:144px;height:168px;overflow:hidden"><img class="px" src="${elfOf({tal:ccTal(cc)},IMG[cc.img])}" alt="Ritratto scelto" width="144" height="168"></div><button class="btn sm2" data-act="ccimg" data-d="1" aria-label="Ritratto successivo">▶</button></div>
     <div style="display:flex;flex-direction:column;gap:10px">
      <div class="cc-fields"><label><span class="lab">Nome</span><input type="text" id="cc-nome" maxlength="20" value="${esc(cc.nome)}" placeholder="Es. Ornella"></label>
       <label><span class="lab">Cognome</span><input type="text" id="cc-cognome" maxlength="24" value="${esc(cc.cognome)}" placeholder="Es. Bancalini"></label>
@@ -7945,7 +8033,7 @@ function stepCV(){
   const lvl=v=>v>=16?'eccellente':v>=12?'buono':v>=8?'discreto':v>=5?'scolastico':'da migliorare';
   const sec=(t,body)=>`<div class="cv-s"><div class="cv-l">${t}</div><div class="cv-r">${body}</div></div>`;
   return `<div class="cv"><div class="cv-h"><div><div class="cv-t">Curriculum vitae</div><div class="sm">Formato europeo · aggiornato a gennaio 2002</div></div><div class="cv-eu" aria-hidden="true">${'★'.repeat(6)}</div></div>
-   <div class="cv-b"><div class="cv-side"><div class="portrait" style="width:120px;height:140px;overflow:hidden"><img class="px" src="${IMG[cc.img]}" alt="Ritratto di ${esc(C.name)}" width="120" height="140"></div>
+   <div class="cv-b"><div class="cv-side"><div class="portrait" style="width:120px;height:140px;overflow:hidden"><img class="px" src="${elfOf({tal:ccTal(cc)},IMG[cc.img])}" alt="Ritratto di ${esc(C.name)}" width="120" height="140"></div>
      <b class="disp" style="font-size:20px;line-height:1.1">${esc(C.name)}</b>${C.nick?`<span class="sm">detto «${esc(C.nick)}»</span>`:''}</div>
     <div class="cv-main">
      ${sec('Informazioni personali',`<table class="t"><tr><td>Nome</td><td><b>${esc(C.name)}</b></td></tr>${C.nick?`<tr><td>Soprannome</td><td>${esc(C.nick)}</td></tr>`:''}<tr><td>Età</td><td>${C.age} anni</td></tr><tr><td>Nazionalità</td><td>italiana</td></tr><tr><td>Patente</td><td>B, C, CE e patentino del muletto</td></tr></table>`)}
@@ -8048,7 +8136,8 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.81',t:'Ritratti nuovi',x:['Tutti i ritratti sono stati ridisegnati nello stile delle scenette: CEO, manager, personale, sindacalisti e i volti dei candidati. Testa tonda, contorno scuro, occhi a puntino e colori pieni, così i personaggi delle finestre sono gli stessi omini che si vedono nelle scene.','Ognuno tiene i suoi segni particolari: il berretto e i baffi di Gino, il caschetto di Valeria, la barba di Marco, i ricci di Greta, la cuffia del customer service, il casco di chi lavora in magazzino.']},
+ {v:'0.82',t:'Ritratti nuovi',x:['Tutti i ritratti sono stati ridisegnati nello stile delle scenette: CEO, manager, personale, sindacalisti e i volti dei candidati. Testa tonda, contorno scuro, occhi a puntino e colori pieni, così i personaggi delle finestre sono gli stessi omini che si vedono nelle scene.','Ognuno tiene i suoi segni particolari: il berretto e i baffi di Gino, il caschetto di Valeria, la barba di Marco, i ricci di Greta, la cuffia del customer service, il casco di chi lavora in magazzino.']},
+ {v:'0.81',t:'Cinque passioni',x:['Cinque talenti nuovi per CEO e manager, ognuno con i suoi pregi, i suoi difetti e i suoi eventi: Amante dell\'IA (impara in fretta le tecnologie, ma i turni dell\'algoritmo e le mail scritte dalla macchina possono finire male), Larper (gioca di ruolo dal vivo, alza il morale e il ritratto diventa elfico, con le orecchie a punta), Guerrafondaio (softair la domenica: camion puntuali, morale più basso), Otaku (ama il Giappone: più ordine e conformità in magazzino, e una delegazione di Osaka da accogliere) e Musicista (batterista di una cover band da sagra: morale più alto, inventari a rischio).','Un manager può prendersi la passione per l\'intelligenza artificiale dopo un weekend sulle reti neurali.']},
  {v:'0.80',t:'Scene per tutti',x:['L\'ufficio del CEO ha quattro versioni: alla scrivania c\'è un uomo o una donna, come il CEO della tua partita, e il caffè lo porta una segretaria o un segretario.','In alcune scene ci sono persone in carrozzina: il capo dell\'ufficio col report sulle ginocchia, chi presenta i numeri al consiglio d\'amministrazione, la ricercatrice dell\'ufficio tecnologie e una signora in fila al ministero, che adesso ha anche la rampa.']},
  {v:'0.79',t:'Scene nelle finestre',x:['Anche cinque finestre hanno la loro scena animata in cima: il lavoro in magazzino in Magazzini, l\'ufficio tecnologie in Tecnologia (si mette al lavoro solo quando c\'è una ricerca in corso), le operatrici con la cuffia nel Customer service, il consiglio d\'amministrazione in Direzione e l\'ufficio del direttore in Azienda e CEO.']},
  {v:'0.78',t:'Tre manager nuovi',x:['Sul mercato dei manager arrivano tre facce nuove, ognuna col suo ritratto. Luca «Non il calciatore» Del Sasso: rango A, un mago della trattativa ma pessimo capo, con un master, l\'ansia da prestazione e la certezza che andrà tutto male.','Giuseppe «O\' Mariuolo» Pasqualino: forte nelle operazioni e nelle trattative, nemico dei computer, fa crescere chi lavora con lui.','Greta Brambilla: forte nelle operazioni, ragioniera e stacanovista, con un carattere che non perdona nessuno.','Due talenti nuovi: «Venuto dalla strada» (Operazioni e Negoziazione +2, Amministrazione −2) e «Spirito bellicoso» (Negoziazione +2, Leadership +1, ma morale −2 nel magazzino che guida).']},
@@ -8174,7 +8263,7 @@ function ceoCard(id,on,arch,st,img,nm,sub,body,ft){const t=st?topStat(st):null;
    <div class="ceo-bd">${body}</div><div class="ceo-ft">${ft}</div>${on?'<span class="ceo-ok">SCELTO!</span>':''}</button>`;}
 function stepScelta(){const cc=startSel.cc;
   const st=CEOS.map(c=>ceoCard(c.id,startSel.ceo===c.id,c.arch,c.st,IMG[c.id],c.name,`${c.age} anni · ${esc(c.origin)}`,ceoBars(c.st)+talentIcons(c.tal,32),`<span>${eur(c.cash)}</span><span class="sm">${esc(SITES[c.site].name)}</span>`)).join('')
-   +(cc?ceoCard('custom',startSel.ceo==='custom','Fatto su misura',ccStats(cc),IMG[cc.img],ccName(cc)||'Il tuo CEO','Tocca per modificarlo',ceoBars(ccStats(cc))+talentIcons(ccTal(cc),32),'<span>Modifica ›</span>')
+   +(cc?ceoCard('custom',startSel.ceo==='custom','Fatto su misura',ccStats(cc),elfOf({tal:ccTal(cc)},IMG[cc.img]),ccName(cc)||'Il tuo CEO','Tocca per modificarlo',ceoBars(ccStats(cc))+talentIcons(ccTal(cc),32),'<span>Modifica ›</span>')
      :ceoCard('custom',false,'Fatto su misura',null,null,'Crea il tuo CEO','Nome, abilità e carattere',`<span class="sm">${CC_PTS} punti da distribuire tra abilità e talenti. Il resto è colpa tua.</span>`,'<span>Inizia ›</span>'));
   const c=CEOS.find(x=>x.id===startSel.ceo), s=c&&SITES[c.site], t=c&&topStat(c.st);
   const det=c?`<div class="card ceo-d" style="--hc:${t.c}"><div style="display:flex;flex-direction:column;gap:6px"><b class="disp" style="font-size:20px">${esc(c.name)}</b><q>${esc(c.bio)}</q></div>
