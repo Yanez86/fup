@@ -655,6 +655,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .mp-n .rank{vertical-align:-3px;margin-right:6px}
 .mp-n .pill{margin-left:6px;vertical-align:2px;background:var(--yellow)}
 .mp-r .stc{cursor:inherit}.mp-r .stc.mp-lo{opacity:.4}
+.mp-ic{flex:none;display:flex;align-items:center;justify-content:center;width:40px;line-height:0}
+.mp-n .wh-prov{margin-left:6px;font-size:12px;padding:0 5px;border-width:1px;border-color:var(--ink);vertical-align:2px}
+.mp-r.off .mp-ic,.mp-r.off .wh-prov{filter:grayscale(1);opacity:.55}
+.mp-h b{font-size:16px}
+.gr-o .mp-b{flex:1;max-width:320px}
 /* finestra evento: scena, chi è coinvolto, risposte raccontate */
 .ev-who{display:flex;flex-wrap:wrap;gap:6px}
 .ev-who span{display:inline-flex;align-items:center;gap:6px;padding:2px 8px 2px 3px;background:#fff;border:2px solid var(--ink);font-size:14px;font-weight:600}
@@ -2622,7 +2627,7 @@ wk('clienti','cli','Clienti',`Le aziende che ti affidano la merce: pagano per i 
 
 Il primo cliente è quello storico del tuo CEO; tutti gli altri arrivano dalle [[gare]].`);
 wk('gare','cli','Gare d\'appalto',`Un cliente cerca un fornitore logistico: hai poco più di 6 settimane per fare un'offerta. Le gare arrivano una alla volta, quando capita: in media una ogni 3 settimane e mezza (circa 15 l'anno), a volte due vicine, a volte nessuna per qualche settimana. Ogni [[avversari|azienda avversaria]] in gara porta il 20% di gare in più, l'Ufficio commerciale un terzo in più. Escono più spesso i clienti piccoli (rank C, D, F) e le zone piccole, come una sola provincia.`,
-`Scegli il [[magazzino]] e il [[prezzo]]. Il gioco stima i KPI che avresti e la probabilità di vincere, che dipende da:
+`Scegli il [[magazzino]] e il [[prezzo]]. Il magazzino si sceglie con «Cambia»: si apre l'elenco dei tuoi magazzini, sopra quelli che possono prendere il cliente (dalla probabilità di vincere più alta, con occupazione, KPI previsti e km al mese) e sotto, in grigio, quelli che non possono, con il motivo (poco spazio, una certificazione che manca). Il gioco stima i KPI che avresti e la probabilità di vincere, che dipende da:
 • il prezzo: ogni 1% di sconto vale +1,5 punti (e ogni 1% di ricarico li toglie);
 • i KPI previsti rispetto alle [[soglie]] del cliente (stare sotto pesa molto; stare sopra aiuta, ma oltre un punto e mezzo di margine non conta più);
 • la [[reputazione]], la [[st_neg|Negoziazione]] del CEO e il [[dir_comm|direttore commerciale]];
@@ -3510,6 +3515,9 @@ function personCard(m,where,btn,bad,busy){
 const mpTask=m=>{const r=seatOf(m.id), w=m.wh&&whById(m.wh); return r?DIR_ROLES.find(x=>x.id===r).name:isCs(m.id)?'Responsabile del customer service':w?'Manager di '+w.name:m.arr!=null&&!m.hired?'In arrivo: entra il '+shortDate(m.arr):'';};
 const mpBtn=(k,id,name,lab)=>`<button class="btn mp-b" data-act="mpopen" data-k="${k}" data-id="${id}" aria-label="${esc(lab)}"><span>${esc(name)}</span><span class="mp-c">Cambia ›</span></button>`;
 const mpQuiet=h=>h.replace(/ data-(act|id|tip)="[^"]*"/g,'');  // dentro una riga ogni tocco sceglie: niente tooltip né enciclopedia
+// una riga della finestrella: pulsante se si può scegliere, in grigio (off) se no; on = la scelta di adesso
+const mpRow=(k,id,cur,o)=>{const on=o.v===cur, inner=`${o.face}<span class="mp-t"><span class="mp-n">${o.medal||''}<b>${esc(o.name)}</b>${o.tag||''}${on?`<span class="pill">${o.onT||'in carica'}</span>`:''}</span><span class="sm">${o.sub}</span>${o.more||''}</span>`;
+  return o.off?`<div class="mp-r off" aria-disabled="true">${inner}</div>`:`<button class="mp-r${on?' on':''}${o.none?' none':''}" data-act="mpick" data-k="${k}" data-id="${id}" data-v="${o.v}" ${on?'aria-current="true"':''}>${inner}</button>`;};
 function mgrPick(k,id){
   const w=k==='wh'&&whById(id), r=k==='dir'&&DIR_ROLES.find(x=>x.id===id), B=ceo();
   const cur=(k==='wh'?w.mgr:k==='cs'?(csPers()||{}).id:S.dirs[id])||'';
@@ -3517,8 +3525,7 @@ function mgrPick(k,id){
   const ks=k==='wh'?['op','prec','lead']:k==='cs'?['neg','prec']:[r.stat];
   // le abilità di ognuno; per il customer service e la Direzione quelle che non contano restano sbiadite
   const chips=st=>`<span class="stats">${STATS.map(x=>mpQuiet(statBadge(x.k,st[x.k],14)).replace('class="stc"',`class="stc${k!=='wh'&&!ks.includes(x.k)?' mp-lo':''}"`)).join('')}</span>`;
-  const row=(o)=>{const on=o.v===cur, inner=`${pFace(o.img,'m')}<span class="mp-t"><span class="mp-n">${o.medal||''}<b>${esc(o.name)}</b>${on?`<span class="pill">${o.none&&k!=='cs'?'adesso':'in carica'}</span>`:''}</span><span class="sm">${o.sub}</span>${o.st?chips(o.st):''}</span>`;
-    return o.off?`<div class="mp-r off" aria-disabled="true">${inner}</div>`:`<button class="mp-r${on?' on':''}${o.none?' none':''}" data-act="mpick" data-k="${k}" data-id="${id}" data-v="${o.v}" ${on?'aria-current="true"':''}>${inner}</button>`;};
+  const row=o=>mpRow(k,id,cur,{...o,face:pFace(o.img,'m'),more:o.st?chips(o.st):'',onT:o.none&&k!=='cs'?'adesso':'in carica'});
   const man=(m,off)=>({v:m.id,img:mImg(m),name:m.name,medal:mpQuiet(mRankIcon(m,20)),st:m.st,off,
     sub:off?`<b class="mp-u">${esc(mpTask(m))}</b>`:k==='dir'?esc(r.eff(m.st[r.stat])):`${ageOf(m)} anni · ${esc(m.role)}`});
   const all=S.managers.filter(m=>m.hired||m.arr!=null), free=m=>m.hired&&(m.id===cur||!m.wh&&!seatOf(m.id)&&!isCs(m.id));
@@ -3540,6 +3547,25 @@ function mgrPick(k,id){
     ${no.length?`<div class="lab">Già impegnati</div>${no.map(row).join('')}`:''}
     ${all.length?'':`<div class="sm">Non hai ancora manager in squadra: cercane uno tra i candidati o con l'head hunter.</div>`}
     <div class="row"><button class="btn" data-act="closemodal">Annulla</button><button class="btn" data-act="mpcand" data-k="${hh}">Cerca un manager</button></div></div>`;
+}
+// scelta del magazzino per una gara (k:'bid'): sopra quelli che possono prendere il cliente, dalla probabilità di vincere più alta;
+// sotto in grigio quelli che non possono, con il motivo (spazio, certificazione del magazzino, ricerca che manca)
+function whPick(tid){
+  const t=S.tenders.find(x=>x.id===tid); if(!t) return '';
+  const cur=UI.bid.wh, ic=`<span class="mp-ic">${noteIc('magazzini',32)}</span>`, pc=v=>f1(v)+'%';
+  const L=S.warehouses.map(w=>{const e=bidEstimate(t,w.id,UI.bid.mult), ch=Math.round(e.chance*100), oc=Math.round(e.sat*100), lg=clientLog(t,w);
+    const why=e.naz.length?'Solo per grandi logistiche: manca '+e.naz.join(', '):e.missing.length?'Serve la ricerca '+e.missing.join(', '):e.certW.length?'Il magazzino non ha '+e.certW.join(', '):!e.fits?`Non c'è spazio: servirebbero ${n0(e.stock)} posti su ${n0(e.cap)}`:'';
+    return {ch,km:lg.km,o:{v:w.id,face:ic,name:w.name,tag:`<span class="wh-prov">${w.prov}</span>`,onT:'scelto',off:!!why,
+      sub:why?`<b class="mp-u">${esc(why)}</b>`:`Probabilità di vincere <b class="${ch>=60?'ok':ch>=35?'warn':'bad'}">${ch}%</b> · occupazione dopo <b class="${oc>85?'bad':oc>70?'warn':'ok'}">${oc}%</b>`,
+      more:why?'':`<span class="sm">Puntualità <b class="${kpiCls(e.P0,t.sP)}">${pc(e.P0)}</b>${t.sA?` · accuratezza <b class="${kpiCls(e.A0,t.sA)}">${pc(e.A0)}</b>`:''} · ${n0(lg.km)} km al mese</span>`}};});
+  const ok=L.filter(x=>!x.o.off).sort((a,b)=>b.ch-a.ch||a.km-b.km), no=L.filter(x=>x.o.off), i=ok.findIndex(x=>x.o.v===cur); if(i>0) ok.unshift(...ok.splice(i,1));
+  const row=x=>mpRow('bid',t.id,cur,x.o);
+  return `<div class="src"><span>Magazzino per la gara</span><span>${shortDate(S.day)}</span></div><div class="win-b mp">
+    <div class="mp-h">${logoSvg(t.name,24)}<b>${esc(t.name)}</b><span class="sm">zona ${esc(zoneName(t.zone))} · ${n0(t.stock)} posti · ${n0(t.pal)} pallet al mese</span></div>
+    <div class="sm">Stime con il prezzo che hai scelto (${UI.bid.mult>=1?'+':''}${Math.round((UI.bid.mult-1)*100)}% sul listino) e il personale di oggi. Soglie del cliente: puntualità ${pc(t.sP)}${t.sA?', accuratezza '+pc(t.sA):''}.</div>
+    <div class="lab">Possono prenderlo</div>${ok.map(row).join('')||'<div class="sm">Nessun magazzino, per ora.</div>'}
+    ${no.length?`<div class="lab">Non possono</div>${no.map(row).join('')}`:''}
+    <div class="row"><button class="btn" data-act="closemodal">Annulla</button><button class="btn" data-act="mpnew">Nuovo magazzino</button></div></div>`;
 }
 // trattativa nella scheda del candidato: offerta con + e −, stima della risposta, controproposta da accettare
 function negBox(p,src){
@@ -6988,6 +7014,7 @@ const VIEWS={
   let detail='';
   if(sel){
     if(UI.bid.t!==sel.id) UI.bid={t:sel.id,wh:sel.bid?sel.bid.wh:S.warehouses[0].id,mult:sel.bid?sel.bid.mult:1};
+    if(!whById(UI.bid.wh)) UI.bid.wh=S.warehouses[0].id;   // magazzino venduto nel frattempo
     const e=bidEstimate(sel,UI.bid.wh,UI.bid.mult), ours=S.clients.filter(c=>c.name===sel.name&&c.status!=='perso');
     detail=`<div class="card gr-d">
      <div class="cl-h">${logoSvg(sel.name,48)}<div class="wh-sm"><b class="cl-n">${rankIcon(sel,22)}<span class="wh-nm">${esc(sel.name)}</span></b><span class="sm wh-nm">${esc(sel.sector)} · ${kw('zona','zona')} <b style="color:var(--ink)">${esc(zoneName(sel.zone))}</b></span><span class="sm wh-nm cl-slo">"${esc(sel.slogan)}"</span><span class="pill cl-st warn">scade il ${shortDate(sel.deadline)}</span></div></div>
@@ -7007,7 +7034,7 @@ const VIEWS={
      ${UI.gareLog?logInfoList(sel,whById(UI.bid.wh)):''}
      <div class="gr-o">
       <div class="h3">La tua offerta</div>
-      <label class="row" style="align-items:center"><span class="lab">Magazzino</span><select data-act="bidwh" aria-label="Magazzino per la gara">${S.warehouses.map(w=>`<option value="${w.id}" ${w.id===UI.bid.wh?'selected':''}>${esc(w.name)}</option>`).join('')}</select></label>
+      <div class="row" style="align-items:center"><span class="lab">Magazzino</span>${mpBtn('bid',sel.id,whById(UI.bid.wh).name+' ('+whById(UI.bid.wh).prov+')','Scegli il magazzino per la gara')}</div>
       <label class="gr-p"><span class="row" style="align-items:center"><span class="lab">${kw('prezzo','Prezzo sul listino')}</span><b class="num" id="bidmv">${UI.bid.mult>=1?'+':''}${Math.round((UI.bid.mult-1)*100)}%</b></span>
        <input type="range" min="80" max="120" step="1" value="${Math.round(UI.bid.mult*100)}" data-act="bidmult" aria-label="Prezzo rispetto al listino"><span class="gr-pl"><span>−20% più facile vincere</span><span>+20% più margine</span></span></label>
       <div id="bidest">${bidEstHtml(sel,e)}</div>
@@ -7818,9 +7845,10 @@ const ACT={
   toast(`Penale pagata: ${eur(e.pen)}`,'warn'); renderAll();},
  setsatobj(d,el){ const w=whById(d.wh); w.satObj=+el.value||0; kpiNow(); renderAll(); },
  // finestrella per scegliere chi guida un magazzino, il customer service o un posto in Direzione (mgrPick)
- mpopen(d){ if($('#modal').innerHTML) return; if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);} showModal(mgrPick(d.k,d.id)); },
- mpick(d){ const v=d.v||''; closeModal(); if(d.k==='wh') ACT.setmgr({wh:d.id},{value:v}); else if(d.k==='cs') ACT.setcs({},{value:v}); else ACT.setdir({role:d.id},{value:v}); },
+ mpopen(d){ if($('#modal').innerHTML) return; const h=d.k==='bid'?whPick(d.id):mgrPick(d.k,d.id); if(!h) return; if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);} showModal(h); },
+ mpick(d){ const v=d.v||''; closeModal(); if(d.k==='bid') ACT.bidwh({},{value:v}); else if(d.k==='wh') ACT.setmgr({wh:d.id},{value:v}); else if(d.k==='cs') ACT.setcs({},{value:v}); else ACT.setdir({role:d.id},{value:v}); },
  mpcand(d){ closeModal(); ACT.gomgr({tab:'cand',k:d.k}); },
+ mpnew(){ closeModal(); openWin('espansione'); },
  setmgr(d,el){
   const w=whById(d.wh); const v=el.value;
   S.warehouses.forEach(x=>{ if(x.id!==w.id&&x.mgr===v) x.mgr=null; });
@@ -8248,6 +8276,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.89',t:'Magazzino per le gare',x:['Anche il magazzino per un nuovo cliente non si sceglie più da un menu a tendina: nella finestra delle Gare tocca «Cambia» accanto al magazzino e si apre la finestrella con tutti i tuoi magazzini.','In cima quelli che possono prendere il cliente, dalla probabilità di vincere più alta: per ognuno l\'occupazione dopo il contratto, puntualità e accuratezza previste (in rosso se sotto la soglia del cliente) e i km al mese di trasporti. Sotto, in grigio, quelli che non possono, con il motivo: poco spazio o una certificazione che il magazzino non ha.','In fondo, «Nuovo magazzino» porta dritto all\'espansione.']},
  {v:'0.88',t:'Scelta dei manager',x:['Il manager di un magazzino, il responsabile del customer service e i direttori non si scelgono più da un menu a tendina: tocca «Cambia» accanto al nome e si apre una finestrella con tutti i manager della squadra, con ritratto, rango e abilità.','In cima ci sono quelli che puoi nominare, dal più adatto al posto (per i direttori e il customer service le abilità che contano sono in evidenza); sotto, in grigio, quelli che hanno già un incarico, con scritto quale: «Manager di Genova», «Direttore finanziario», «Responsabile del customer service», oppure quando arrivano.','In fondo alla finestrella «Cerca un manager» porta dritto ai candidati.']},
  {v:'0.87',t:'Conferme',x:['Le decisioni che pesano chiedono conferma prima di partire: licenziare una persona, un manager o un addetto alla qualità, passare il magazzino alla cooperativa o a un fornitore di handling e riportare il personale in casa, alzarsi dal tavolo col sindacato, annullare una ricerca. La finestra dice cosa costa e cosa succede; «No, lascia stare» non cambia niente.','Rimandare indietro un facchino della cooperativa resta immediato: non costa niente.']},
  {v:'0.86',t:'Personale più chiaro',x:['Nelle righe piccole i ritratti del personale e dei manager non sono più rimpiccioliti a metà: si vede la testa (o il mezzo busto) disegnata a pixel interi, nitida come nelle scenette, sul computer e sul telefono.','Chi è in arrivo ha una barretta che si riempie fino al giorno in cui entra in servizio: sotto il reparto nella finestra Personale e in quella del magazzino, e nelle Assunzioni in corso, che quando c\'è qualcuno in arrivo stanno in cima alla finestra Personale. Il suggerimento della barretta dice la data esatta.']},

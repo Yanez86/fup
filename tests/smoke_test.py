@@ -195,7 +195,7 @@ async def phone(b, w, h, name, errs):
     await cdp.send('Emulation.setSafeAreaInsetsOverride', {'insets': {}}); await cdp.detach()
     await pg.tap('#modal [data-act=closemodal]')
     assert await pg.evaluate("()=>window.__FUP.S.notes.some(n=>n.k==='ev')"), f'{name}: evento sparito con «Decidi più tardi»'
-    await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
+    await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'}); if(!F.S.tenders.some(t=>!t.done)) F.newTender();}")
     for wn in ['azienda','riepilogo','magazzini','traffico','clienti','gare','report','personale','manager','giornale','tecnologia','enciclopedia']+(['sindacato'] if ri else []):
         await menu(pg, wn)
         if wn in TABS: await pg.tap(f'#win-{wn} [data-act=wtab][data-id={wn}]')   # dal menu si apre la scheda con un problema: si riparte dalla prima
@@ -212,6 +212,13 @@ async def phone(b, w, h, name, errs):
             bad = await pg.evaluate(NOSIDE, '#modal .modal')
             assert not bad, f'{name}: scelta del manager: {bad}'
             await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_scelta_manager.png'))
+            await pg.tap('#modal [data-act=closemodal]')
+        if wn == 'gare':   # scelta del magazzino per la gara
+            await pg.tap('#win-gare [data-act=mpopen][data-k=bid]')
+            assert await pg.evaluate(FITS, '#modal .modal'), f'{name}: la scelta del magazzino esce dallo schermo'
+            bad = await pg.evaluate(NOSIDE, '#modal .modal')
+            assert not bad, f'{name}: scelta del magazzino: {bad}'
+            await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_scelta_magazzino.png'))
             await pg.tap('#modal [data-act=closemodal]')
         if wn == 'manager':   # le altre due schede: candidati con la trattativa e head hunter
             for tb in ['cand', 'hh']:
@@ -850,6 +857,22 @@ async def main():
         await pg.click('#notepop [data-act=notegopen]')
         assert not await pg.query_selector(f'#notes [data-act=noteg][data-id={col["g"][0]}]'), 'aprendo la finestra le notizie varie restano'
         await pg.evaluate("()=>document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click())")
+        # gare: il magazzino si sceglie dalla finestrella, sopra chi può prendere il cliente, sotto in grigio chi no (qui manca l'HACCP)
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; S.cash=Math.max(S.cash,5e6); const clr=()=>{document.querySelector('#modal').innerHTML='';};
+          const ids=Object.keys(F.SITES).filter(i=>!S.warehouses.some(w=>w.site==i)); F.ACT.rent({id:ids[3]}); F.ACT.rent({id:ids[9]}); clr();
+          S.researched.haccp=true; const w=S.warehouses[S.warehouses.length-2]; w.tech.haccp={day:0,iss:S.day,exp:S.day+900,next:S.day+300,nc:null,susp:null,pend:null};
+          let t=null; for(let i=0;i<30;i++){ S.tenders=S.tenders.filter(x=>x.done); F.newTender(); t=S.tenders[S.tenders.length-1]; t.req=['haccp']; t.stock=Math.min(t.stock,1200); const e=F.bidEstimate(t,w.id,1); if(e&&e.fits) break; }
+          document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); return {w:w.id,name:w.name,n:S.warehouses.length};}''')
+        await win(pg, 'gare')
+        await pg.click('#win-gare [data-act=mpopen][data-k=bid]')
+        assert await pg.evaluate(MPORD), 'scelta del magazzino: quelli che possono prendere il cliente devono stare sopra'
+        assert 'HACCP' in await pg.inner_text('#modal .mp-r.off'), 'il magazzino senza certificazione non è in grigio col motivo'
+        assert await pg.eval_on_selector_all('#modal .mp-r', 'e=>e.length') == r['n'], 'nella scelta mancano dei magazzini'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_scelta_magazzino_gara.png'))
+        await pg.click(f'#modal [data-act=mpick][data-v={r["w"]}]')
+        assert r['name'] in await pg.inner_text('#win-gare [data-act=mpopen][data-k=bid]'), 'il magazzino scelto non compare nella gara'
+        assert not await pg.eval_on_selector('#win-gare [data-act=bid]', 'e=>e.disabled'), 'col magazzino certificato l\'offerta resta bloccata'
+        await pg.click('#win-gare [data-act=close]')
         # partita completa con 3 avversari: due anni senza errori, offerte vere nelle gare, magazzini rivali sulla mappa
         r = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino',null,{mode:'classica',win:{reputazione:true},reputazione:200});
           const H=F.HUM; H.bots=[['edoardo','espansione'],['valeria','qualita'],['marco','prezzo']].map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],'normale',i));
