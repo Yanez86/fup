@@ -141,10 +141,9 @@ persona("_impiegata", { testa: "lunghi", corpo: "seduto", swap: { B: "P", b: "p"
 sprite("impiegata", { base: "__impiegata", outline: "K", pivot: "bottom" },
   // la cornetta all'orecchio e la mano che la tiene
   rect(8, 3, 2, 6, "R"), px(9, 2, "r"), px(9, 9, "r"), rect(8, 9, 2, 2, "F"), px(9, 11, "p"))
-persona("_capo", { testa: "calvo", corpo: "piedi", abito: "completo", swap: { B: "D", b: "d", D: "d", M: "S" } })
-sprite("capo", { w: 14, h: 20, outline: "K", pivot: [6, 22] }, stamp("__capo"),
-  // tiene in mano il report stampato, con l'ultima riga in rosso
-  rect(10, 10, 4, 6, "W"), hline(11, 11, 2, "s"), hline(11, 13, 2, "s"), hline(11, 14, 2, "R"), px(9, 15, "F"), px(10, 15, "F"))
+carrozzina("_capo", { testa: "calvo", abito: "completo", swap: { B: "D", b: "d", D: "d", M: "S" } })
+// il capo in carrozzina, col report stampato sulle ginocchia (l'ultima riga in rosso)
+sprite("capo", { w: 20, h: 23, outline: "K", pivot: "bottom" }, stamp("__capo"), rect(7, 15, 6, 4, "W"), hline(8, 16, 4, "s"), hline(8, 17, 4, "R"))
 
 scene("ufficio", { w: SW, h: SH, bg: "C", world: { light: [-0.6, -1], ground: 66 } },
   layer("muro",

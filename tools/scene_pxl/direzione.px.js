@@ -136,7 +136,7 @@ persona("_presidente", { testa: "calvo", corpo: "seduto", abito: "completo", swa
 persona("_cons_a", { testa: "lunghi", corpo: "seduto", abito: "completo", swap: { B: "D", b: "d", M: "K", R: "W" } })
 persona("_cons_b", { testa: "corti", corpo: "seduto", abito: "completo", swap: { B: "d", b: "K", M: "S", R: "b" } })
 persona("_cons_c", { testa: "corti", corpo: "seduto", abito: "completo", swap: { B: "D", b: "d", M: "M", R: "G" } })
-persona("_relatore", { testa: "corti", abito: "completo", swap: { B: "b", b: "d", M: "m", F: "c", f: "x" } })
+carrozzina("_relatore", { testa: "corti", abito: "completo", swap: { B: "b", b: "d", M: "m", F: "c", f: "x" } })
 sprite("presidente", { w: 10, h: 16, outline: "K", pivot: "bottom" }, stamp("__presidente"))
 sprite("cons_a", { w: 10, h: 16, outline: "K", pivot: "bottom" }, stamp("__cons_a"))
 // il consigliere che si appisola: occhi chiusi, bocca aperta
@@ -149,10 +149,10 @@ anim("zzz", { w: 14, h: 18, frames: LOOP, fps: FPS }, (c) => {
     c.text(Math.floor(t / 2), 13 - t, "Z", t < 8 ? "W" : "S")
   }
 })
-// chi presenta: il braccio alzato col puntatore che batte sul grafico
-anim("relatore", { w: 30, h: 40, fps: FPS, outline: "K", pivot: [5, 40] }, stamp("__relatore", 0, 20),
-  frame({ hold: 4 }, line(11, 22, 28, 1, "N"), rect(9, 21, 2, 4, "b"), px(10, 21, "F")),
-  frame({ hold: 4 }, line(11, 22, 29, 4, "N"), rect(9, 21, 2, 4, "b"), px(10, 21, "F")))
+// chi presenta, in carrozzina: il braccio alzato col puntatore che batte sul grafico
+anim("relatore", { w: 34, h: 40, fps: FPS, outline: "K", pivot: [10, 40] }, stamp("__relatore", 0, 17),
+  frame({ hold: 4 }, line(16, 23, 32, 1, "N"), rect(14, 24, 2, 4, "b"), px(15, 23, "F")),
+  frame({ hold: 4 }, line(16, 23, 33, 4, "N"), rect(14, 24, 2, 4, "b"), px(15, 23, "F")))
 // lo schermo del proiettore: la linea del fatturato che si disegna e sale, poi la freccia
 const CURVA = [[4, 24], [8, 22], [12, 23], [16, 19], [20, 20], [24, 16], [28, 14], [32, 15], [36, 10], [40, 6]]
 anim("schermo", { w: 46, h: 32, frames: LOOP, fps: FPS },
@@ -198,20 +198,23 @@ scene("consiglio", { w: SW, h: SH, bg: "M", world: { light: [-0.6, -1], ground: 
     stamp("cartellina", 44, 45), stamp("cartellina", 62, 45), stamp("cartellina", 94, 45),
     stamp("bottiglia_cda", 50, 45), stamp("bicchiere_cda", 66, 45), stamp("bottiglia_cda", 82, 45), stamp("bicchiere_cda", 31, 45),
     stamp("zzz", 92, 15)),
-  layer("relatore", stamp("relatore", 108, 66)),
+  layer("relatore", stamp("relatore", 110, 66)),
 )
 
 // ================================================================ UFFICIO DEL DIRETTORE
 // L'ufficio del CEO: la vetrata sulla città, il diploma, la libreria coi trofei, il mappamondo, la scrivania grande
-// con la targa, il pendolo di Newton che batte, il telefono che lampeggia e la segretaria che porta il caffè.
+// con la targa, il pendolo di Newton che batte, il telefono che lampeggia e chi porta il caffè. CEO e segreteria uomo o donna.
 
-persona("_ceo", { testa: "corti", corpo: "seduto", abito: "completo", swap: { B: "b", b: "d", M: "m" } })
-anim("ceo", { w: 10, h: 16, fps: FPS, outline: "K", pivot: "bottom" }, stamp("__ceo"),
+// il CEO dietro la scrivania (uomo o donna, come quello della partita): ogni tanto sbatte gli occhi
+persona("_ceo_m", { testa: "corti", corpo: "seduto", abito: "completo", swap: { B: "b", b: "d", M: "m" } })
+persona("_ceo_f", { testa: "lunghi", corpo: "seduto", abito: "completo", swap: { B: "r", b: "m", M: "y", R: "W" } })
+for (const x of ["m", "f"]) anim("ceo_" + x, { w: 10, h: 16, fps: FPS, outline: "K", pivot: "bottom" }, stamp("__ceo_" + x),
   frame({ hold: 13 }), frame({ hold: 1 }, px(3, 5, "F"), px(6, 5, "F")), frame({ hold: 2 }))
-persona("_segretaria", { testa: "lunghi", abito: "completo", swap: { B: "e", b: "r", M: "K", R: "W", D: "d" } })
-// la segretaria col vassoio e il caffè
-sprite("segretaria", { w: 16, h: 20, outline: "K", pivot: [5, 22] }, stamp("__segretaria"),
-  rect(8, 12, 8, 1, "S"), hline(8, 13, 8, "s"), rect(11, 9, 3, 3, "W"), px(14, 10, "W"), px(11, 9, "m"), px(12, 9, "m"), rect(8, 14, 2, 2, "F"))
+// chi porta il caffè col vassoio: la segretaria o il segretario
+persona("_segr_f", { testa: "lunghi", abito: "completo", swap: { B: "e", b: "r", M: "K", R: "W", D: "d" } })
+persona("_segr_m", { testa: "corti", abito: "completo", swap: { B: "T", b: "t", M: "o", D: "d", F: "c", f: "x" } })
+for (const x of ["m", "f"]) sprite("segr_" + x, { w: 16, h: 20, outline: "K", pivot: [5, 22] }, stamp("__segr_" + x),
+  rect(8, 12, 8, 1, "S"), hline(8, 13, 8, "s"), rect(11, 9, 3, 3, "W"), px(14, 10, "W"), px(11, 9, "m"), px(12, 9, "m"), rect(8, 14, 2, 2, x === "m" ? "c" : "F"))
 // la poltrona di pelle dietro la scrivania
 sprite("poltrona_ceo", { w: 16, h: 22, outline: "K", pivot: "bottom" }, rect(0, 0, 16, 22, "m"), hline(1, 0, 14, "M"), vline(0, 1, 21, "M"),
   ...[4, 8, 12].map((x) => [px(x, 4, "N"), px(x, 9, "N"), px(x, 14, "N")]).flat())
@@ -273,16 +276,18 @@ sprite("pianta_ceo", { outline: "K", pivot: "bottom" }, `
 sprite("vetrata", { w: 56, h: 34 }, clip([2, 2, 52, 30], stamp("_citta", -4, 0)), box(0, 0, 56, 34, "K"), box(1, 1, 54, 32, "S"),
   vline(19, 2, 30, "S"), vline(37, 2, 30, "S"), hline(1, 33, 54, "s"))
 
-scene("direttore", { w: SW, h: SH, bg: "g", world: { light: [-0.6, -1], ground: 66 } },
+// quattro versioni: direttore_<CEO><chi porta il caffè>, m o f (il gioco sceglie quella col CEO della partita)
+for (const c of ["m", "f"]) for (const g of ["m", "f"])
+scene("direttore_" + c + g, { w: SW, h: SH, bg: "g", world: { light: [-0.6, -1], ground: 66 } },
   layer("muro",
     rect(0, 0, SW, 3, "t"), hline(0, 3, SW, "q"),
     rect(0, 40, SW, 16, "N"), hline(0, 40, SW, "k"), hline(0, 55, SW, "m"), ...[8, 32, 56, 80, 104, 128, 152].map((x) => box(x - 8, 43, 20, 10, "M")),   // boiserie
     rect(0, 56, SW, 16, "k"), ...[60, 65, 70].map((y) => hline(0, y, SW, "N")), ...Array.from({ length: 12 }, (_, i) => vline(i * 14 + (i % 2) * 7, 56, 4, "N")),  // parquet
     stamp("vetrata", 4, 5), stamp("diploma", 98, 10), stamp("libreria", 140, 59)),
   layer("dietro", stamp("pianta_ceo", 12, 67), stamp("mappamondo", 30, 66)),
-  layer("ceo", stamp("poltrona_ceo", 76, 45), stamp("ceo", 76, 49)),
+  layer("ceo", stamp("poltrona_ceo", 76, 45), stamp("ceo_" + c, 76, 49)),
   layer("scrivania",
     stamp("scrivania_ceo", 76, 69),
     stamp("pendolo", 99, 47), stamp("tel_ceo", 52, 47), stamp("cartellina", 64, 47)),
-  layer("segretaria", stamp("segretaria", 124, 68), stamp("_fumo", 132, 57)),
+  layer("segretaria", stamp("segr_" + g, 124, 68), stamp("_fumo", 132, 57)),
 )

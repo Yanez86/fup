@@ -24,9 +24,9 @@ anim("_fumo", { w: 5, h: 9, frames: LOOP, fps: FPS, pivot: "bottom" }, (c) => {
 })
 // un omino visto di spalle, in piedi (la nuca e la schiena)
 persona("_fila1", { testa: "nuca", swap: { B: "O", b: "o", M: "m" } })
-persona("_fila2", { testa: "nuca", swap: { B: "T", b: "t", M: "S" } })
+carrozzina("_fila2", { testa: "nuca", retro: true, swap: { B: "T", b: "t", M: "S" } })
 sprite("fila1", { w: 10, h: 20, outline: "K", pivot: "bottom" }, stamp("__fila1"))
-sprite("fila2", { w: 10, h: 20, outline: "K", pivot: "bottom" }, stamp("__fila2"))
+sprite("fila2", { w: 20, h: 23, outline: "K", pivot: "bottom" }, stamp("__fila2"))
 
 // ================================================================ MINISTERO
 // Il palazzo con le colonne e la scalinata, le bandiere italiana ed europea che sventolano,
@@ -85,13 +85,16 @@ scene("ministero", { w: SW, h: SH, bg: "L", world: { light: [-0.6, -1], ground: 
     rect(22, 62, 138, 4, "S"), hline(22, 62, 138, "W"), hline(22, 65, 138, "s"),
     rect(0, 66, SW, 6, "j"), ...[4, 20, 36, 52, 68, 84, 100, 116, 132, 148].map((x) => vline(x, 67, 5, "s")), hline(0, 66, SW, "s")),
   layer("colonne", ...[34, 49, 131, 146].map((x) => stamp("colonna", x + 5, 55))),
+  // la rampa per le carrozzine, lungo la scalinata a destra, col corrimano
+  layer("rampa", poly([112, 66, 160, 52, 160, 57, 128, 66], "j"), line(112, 65, 160, 51, "S"), line(128, 65, 160, 56, "D"),
+    line(114, 59, 160, 45, "D"), ...[[116, 59], [130, 55], [144, 51], [158, 46]].map(([x, y]) => vline(x, y, 6, "D"))),
   layer("sportello",
     stamp("foglio_timbrato", 114, 45),
     stamp("funzionario", 112, 50),
     stamp("moduli", 74, 46), stamp("moduli", 89, 46, { flip: "x" })),
   layer("bandiere", vline(5, 2, 64, "s"), vline(18, 6, 60, "s"), rect(3, 64, 5, 2, "D"), rect(16, 64, 5, 2, "D"),
     stamp("bandiera_it", 4, 2), stamp("bandiera_ue", 17, 6, { delay: 250 })),
-  layer("fila", { sort: "y" }, stamp("fila1", 80, 69), stamp("fila2", 95, 70)),
+  layer("fila", { sort: "y" }, stamp("fila1", 80, 69), stamp("fila2", 99, 70)),
 )
 
 // ================================================================ EDICOLA

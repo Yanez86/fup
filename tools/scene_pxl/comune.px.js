@@ -117,3 +117,26 @@ function persona(nome, { testa = "corti", corpo = "piedi", abito, swap = {} } = 
   const sopra = abito ? ABITI[abito].map((r, i) => [0, 10 + i, r]).filter(([, , r]) => r) : []
   sprite("_" + nome, { mx: true, swap }, righe.join("\n"), ...sopra.map(([x, y, r]) => grid(x, y, r)))
 }
+
+// persona in carrozzina (18 colonne), vista di fronte o da dietro («retro», con le teste «nuca»): le ruote grandi
+// un po' di sbieco ai lati (copertone K, cerchio s, mozzo S), le maniglie di spinta dietro le spalle, i braccioli, la pedana.
+// Come persona(): carrozzina("_x", {...}) crea la parte "__x" (senza contorno), da timbrare nello sprite finale 20×23.
+function carrozzina(nome, { testa = "corti", abito, swap = {}, retro = false } = {}) {
+  const T = TESTE[testa], C = CORPI.seduto
+  const busto = retro ? [C[0], C[1], C[2], "BbddD", "BbddD", "BbddD"] : C          // da dietro lo schienale copre la schiena
+  const righe = [
+    ...T.map((r, i) => (i >= 8 ? "....s" : ".....") + r),
+    ...busto.map((r, i) => (i >= 5 ? "....d" : ".....") + r),
+    "....d" + (retro ? "ddddd" : ".DDDD"),
+    "....." + (retro ? ".dd.." : ".DDDD"),
+    "....." + (retro ? ".d..." : ".DDd."),
+    "....." + (retro ? ".d..." : ".DDd."),
+    "....." + (retro ? ".d..." : ".KKK."),
+    "....." + (retro ? "KK..." : "sssss"),
+    "....." + (retro ? "....." : ".K...")]
+  const sopra = abito ? ABITI[abito].map((r, i) => [5, 10 + i, r]).filter(([, , r]) => r) : []
+  sprite("_" + nome + "_corpo", { mx: true, swap }, righe.join("\n"), ...sopra.map(([x, y, r]) => grid(x, y, r)))
+  // la ruota di sbieco: copertone scuro, corrimano chiaro, dentro i raggi e il mozzo (si vede attraverso)
+  const ruota = (cx) => [ellipse(cx, 16, 3, 6, "K"), ellipse(cx, 16, 2, 5, "S"), ellipse(cx, 16, 1, 4, "_"), vline(cx, 12, 9, "s"), px(cx, 16, "d")]
+  sprite("_" + nome, { w: 20, h: 23 }, stamp("_" + nome + "_corpo"), ...ruota(3), ...ruota(16))
+}

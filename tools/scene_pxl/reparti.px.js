@@ -201,10 +201,10 @@ sprite("lavagna_schemi", { w: 34, h: 26, outline: "K" },
   rect(0, 0, 34, 26, "S"), rect(1, 1, 32, 22, "W"), rect(2, 23, 30, 3, "s"), rect(8, 23, 4, 1, "R"), rect(14, 23, 4, 1, "b"),
   box(3, 3, 8, 5, "b"), box(23, 3, 8, 5, "b"), box(13, 14, 8, 5, "G"), line(11, 5, 22, 5, "R"), px(21, 4, "R"), px(21, 6, "R"),
   line(7, 8, 14, 13, "R"), line(27, 8, 20, 13, "R"), text(26, 15, "?", "P"), hline(4, 20, 8, "s"))
-// la ricercatrice in camice che indica la lavagna
-persona("_ricerca", { testa: "lunghi", swap: { B: "W", b: "S", M: "y", D: "b" } })
-sprite("ricercatrice", { w: 12, h: 22, outline: "K", pivot: [5, 24] }, stamp("__ricerca", 0, 2),
-  rect(9, 3, 2, 10, "W"), vline(10, 3, 10, "S"), rect(9, 0, 2, 3, "F"), px(11, 0, "R"))               // braccio alzato col pennarello
+// la ricercatrice in camice, in carrozzina, che indica la lavagna
+carrozzina("_ricerca", { testa: "lunghi", swap: { B: "W", b: "S", M: "y", D: "b" } })
+sprite("ricercatrice", { w: 20, h: 26, outline: "K", pivot: [10, 26] }, stamp("__ricerca", 0, 3),
+  rect(14, 4, 2, 9, "W"), vline(15, 4, 9, "S"), rect(14, 1, 2, 3, "F"), px(16, 1, "R"))               // braccio alzato col pennarello
 // la lampadina dell'idea: spenta, poi si accende coi raggi
 anim("idea", { w: 9, h: 9, fps: FPS },
   frame({ hold: 8 }),
@@ -237,7 +237,7 @@ scene("tecnologia", { w: SW, h: SH, bg: "L", world: { light: [-0.6, -1], ground:
     stamp("mon_codice", 50, 44), stamp("mon_grafico", 75, 44), stamp("mon_barra", 100, 44),
     stamp("robot", 115, 44), stamp("tazza_tec", 37, 44),
     stamp("ricercatrice", 139, 66), stamp("idea", 128, 34)),
-  layer("ombre", { shade: true }, ellipse(15, 67, 12, 1, "K"), ellipse(139, 67, 7, 1, "K")),
+  layer("ombre", { shade: true }, ellipse(15, 67, 12, 1, "K"), ellipse(139, 67, 10, 1, "K")),
   layer("tecnici", { sort: "y" },
     stamp("tec1", 62, 61), stamp("sedia_uff", 62, 72),
     stamp("tec2", 92, 61), stamp("sedia_uff", 92, 72)),
