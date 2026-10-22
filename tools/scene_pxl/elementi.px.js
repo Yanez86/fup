@@ -18,18 +18,18 @@ const MONDO = { light: [-0.6, -1] }          // la luce viene dall'alto a sinist
 const onda = (c, n = 1) => Math.sin(c.phase * Math.PI * 2 * n)   // va e viene in un giro di 16 fotogrammi
 
 // ================================================================ GIARDINO (x 0..23, y 18..71)
-// L'orto aziendale: il tiglio con la panchina, il cassone dei pomodori sulle canne, quello dell'insalata,
-// la collega che annaffia nella pausa pranzo e i fiori che ondeggiano.
+// L'orto aziendale: il tiglio, il cassone rialzato coi pomodori sulle canne e l'insalata, la panchina,
+// la collega che nella pausa pranzo annaffia i tulipani (l'acqua scende, i fiori ondeggiano col vento).
 
 // il prato dell'orto
 sprite("gia_prato", { w: 24, h: 16 }, rect(0, 0, 24, 16, "G"), hline(0, 0, 24, "g"))
 // il tiglio: tronco che si allarga al piede, rami che salgono nella chioma. La chioma è un mucchio di ciuffi, prima quelli
 // in basso: ognuno scuro sotto, medio nel corpo, chiaro sul cappello verso il sole (in alto a sinistra)
-const CIUFFI = [[4, 15, 3], [13, 15, 4], [8, 14, 4], [3, 10, 4], [14, 9, 4], [9, 9, 4], [6, 5, 4], [12, 4, 4]]
+const CHIOMA = [[4, 15, 3], [13, 15, 4], [8, 14, 4], [3, 10, 4], [14, 9, 4], [9, 9, 4], [6, 5, 4], [12, 4, 4]]
 sprite("gia_albero", { w: 18, h: 37, outline: "K", pivot: "bottom" },
   rect(7, 18, 3, 19, "N"), vline(9, 18, 19, "M"), px(6, 36, "N"), px(10, 36, "M"),
   line(7, 21, 4, 17, "N"), line(9, 20, 13, 17, "M"),
-  ...CIUFFI.map(([x, y, r]) => [circ(x, y, r, "g"), circ(x - 1, y - 1, r - 1, "G"),
+  ...CHIOMA.map(([x, y, r]) => [circ(x, y, r, "g"), circ(x - 1, y - 1, r - 1, "G"),
     clip((px, py) => (px - x) + 1.2 * (py - y) < -r * 0.7, circ(x - 1, y - 1, r - 1, "h"))]).flat())
 // la panchina vista di fronte: due assi di schienale, la seduta, le gambe di ferro
 sprite("gia_panchina", { w: 12, h: 7, outline: "K", pivot: "bottom" },
@@ -43,24 +43,24 @@ sprite("gia_cassone", { w: 12, h: 14, outline: "K", pivot: "bottom" },
   ...[6, 9].map((x) => [rect(x, 6, 3, 3, "h"), px(x, 6, "_"), px(x + 2, 6, "_"), hline(x, 8, 3, "G"), px(x + 1, 7, "W")]).flat(),
   rect(0, 9, 12, 5, "N"), hline(0, 9, 12, "m"), hline(0, 10, 12, "k"), hline(0, 13, 12, "M"), vline(6, 11, 2, "M"))
 // l'aiuola dei tulipani davanti: quattro steli che ondeggiano col vento (16 fotogrammi)
-anim("gia_tulipani", { w: 10, h: 9, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
-  ...[[1, 1, "Y", "i"], [4, 0, "e", "W"], [7, 2, "R", "e"], [9, 1, "P", "l"]].map(([x, y, k, l]) =>
-    [vline(x, y + 2, 7 - y, "g"), rect(x - 1, y, 2, 2, k), px(x - 1, y, l), px(x, y + 1, k)]).flat(),
-  px(2, 5, "G"), px(3, 4, "G"), px(6, 6, "G"), px(8, 5, "G"),
-  hline(0, 8, 10, "m"),
-  (c) => c.warp((x, y) => [Math.round(onda(c) * (7 - y) / 4), 0], [0, 0, 10, 8]))
-// la collega che annaffia: l'annaffiatoio arancione inclinato, l'acqua che scende dalla cipolla (4 fotogrammi)
+anim("gia_tulipani", { w: 10, h: 7, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
+  ...[[1, 1, "Y", "i"], [4, 0, "e", "W"], [7, 1, "R", "e"], [9, 0, "P", "l"]].map(([x, y, k, l]) =>
+    [vline(x, y + 2, 5 - y, "g"), rect(x - 1, y, 2, 2, k), px(x - 1, y, l), px(x, y + 1, k)]).flat(),
+  px(2, 4, "G"), px(3, 3, "G"), px(6, 4, "G"), px(8, 3, "G"),
+  hline(0, 6, 10, "m"),
+  (c) => c.warp((x, y) => [Math.round(onda(c) * (5 - y) / 3), 0], [0, 0, 10, 6]))
+// la collega che annaffia: l'annaffiatoio arancione inclinato, retto col braccio teso sopra i tulipani
 persona("_ortolana", { testa: "lunghi", swap: { M: "N" } })
-sprite("_ortolana_k", { w: 10, h: 20, outline: "K" }, stamp("__ortolana"))
+sprite("_ortolana_k", { w: 14, h: 20, outline: "K" },
+  stamp("__ortolana"), rect(9, 12, 1, 4, "_"), rect(9, 11, 3, 2, "B"), hline(9, 12, 3, "b"), rect(12, 11, 2, 2, "F"), px(13, 12, "f"))
 sprite("_annaffiatoio", { w: 9, h: 7, outline: "K" },
   rect(0, 2, 5, 4, "O"), hline(0, 2, 5, "a"), vline(0, 3, 2, "a"), hline(0, 5, 5, "o"), hline(1, 0, 3, "o"), px(0, 1, "o"), px(4, 1, "o"),
   line(5, 4, 7, 6, "O"), rect(7, 6, 2, 1, "o"))
-anim("gia_ortolana", { w: 20, h: 22, frames: LOOP, fps: FPS, pivot: [6, 22] },
-  stamp("_ortolana_k", 0, 0),
-  stamp("_annaffiatoio", 9, 13), px(10, 16, "F"))
+sprite("gia_ortolana", { w: 24, h: 22, pivot: [6, 22] },
+  stamp("_ortolana_k", 0, 0), stamp("_annaffiatoio", 12, 11), rect(13, 12, 2, 1, "F"))
 // l'acqua che scende dalla cipolla dell'annaffiatoio: gocce che cadono a due a due (4 fotogrammi)
-anim("gia_acqua", { w: 2, h: 4, frames: LOOP, fps: FPS },
-  (c) => { for (let y = 0; y < 4; y++) c.px((y + c.frame) % 2, y, (y + c.frame) % 4 < 2 ? "B" : "L") })
+anim("gia_acqua", { w: 2, h: 3, frames: LOOP, fps: FPS },
+  (c) => { for (let y = 0; y < 3; y++) c.px((y + c.frame) % 2, y, (y + c.frame) % 4 < 2 ? "B" : "L") })
 
 function elGiardino() {
   return [
@@ -71,12 +71,12 @@ function elGiardino() {
       stamp("gia_ortolana", 6, 65),
       stamp("gia_tulipani", 18, 72),
       stamp("gia_panchina", 7, 72)),
-    layer("giardino_acqua", stamp("gia_acqua", 16, 62))]
+    layer("giardino_acqua", stamp("gia_acqua", 20, 62))]
 }
 
 // ================================================================ AREA CANI (x 24..59, y 58..71)
-// Il recinto con la rete verde e i paletti, il prato, il cane che scodinzola e ogni tanto beve dalla ciotola,
-// il cartello con l'impronta.
+// Il recinto con la staccionata di legno, il prato, il cane che scodinzola e ogni tanto beve dalla ciotola,
+// il cartello con l'impronta sul paletto d'angolo.
 
 // il prato del recinto, visto un po' dall'alto: più stretto dietro, ombreggiato sotto la staccionata
 sprite("can_prato", { w: 36, h: 10 }, poly([2, 0, 33, 0, 35, 9, 0, 9], "G"), hline(2, 0, 32, "g"), hline(1, 1, 34, "g"))
@@ -98,7 +98,6 @@ sprite("can_ciotola", { w: 6, h: 2, outline: "K", pivot: "bottom" }, rect(0, 0, 
 sprite("can_cartello", { w: 7, h: 7, outline: "K", pivot: "bottom" },
   rect(0, 0, 7, 7, "W"), vline(6, 0, 7, "S"), hline(0, 6, 7, "S"),
   grid(1, 1, ".K.K.\nK...K\n..K..\n.KKK.\n.KKK."))
-// il cane bianco con la macchia marrone: scodinzola (2 fotogrammi) e ogni giro abbassa la testa nella ciotola (16)
 // il cane bianco con la macchia marrone, di profilo col muso a sinistra: scodinzola (2 fotogrammi) e ogni giro
 // abbassa la testa nella ciotola per bere (16 fotogrammi)
 const CANE_TESTA = "...NN\n.WWWN\nWWKWW\nKWWWW\n.WWWS"
@@ -179,6 +178,7 @@ function elColonnine() {
 // La piazzola di ricarica a strisce gialle e nere, due muletti parcheggiati attaccati al caricabatterie:
 // le spie lampeggiano, le tacche della carica salgono (16 fotogrammi), il cartello «P».
 
+// la piazzola vista un po' dall'alto: il bordo a strisce gialle e nere in diagonale, i lati obliqui
 sprite("mul_strisce", { w: 44, h: 8 },
   (c) => { for (let y = 0; y < 8; y++) for (let x = 0; x < 44; x++) {
     const bordo = y < 2 || y > 5 || x - (7 - y) / 2 < 3 || x + (7 - y) / 2 > 40
@@ -263,7 +263,7 @@ function elPulmino() {
 }
 
 // ================================================================ CANTIERE (x 100..159, y 0..55)
-// La gru gialla dell'ampliamento: torre a traliccio davanti all'angolo del capannone, braccio sopra il tetto e il cielo,
+// La gru gialla dell'ampliamento: torre a traliccio davanti alla parte destra del capannone, braccio sopra il tetto e il cielo,
 // contrappeso di cemento; il carrello col gancio che oscilla col carico di travi (16 fotogrammi), la luce rossa in cima.
 // Giù in basso le transenne bianche e rosse col lampeggiante e il cartello LAVORI.
 
@@ -310,7 +310,7 @@ function elCantiere() {
       stamp("gru_carico", 148, 7),
       stamp("gru_luce", 114, 0)),
     layer("cantiere_terra", { sort: "y" },
-      rect(110, 52, 9, 3, "s"),
+      rect(110, 52, 9, 3, "s"),                                     // il plinto di cemento della torre
       stamp("gru_cartello", 117, 51),
       stamp("gru_transenna", 107, 56), stamp("gru_transenna", 128, 56),
       stamp("gru_lampeggiante", 133, 48))]
