@@ -631,7 +631,7 @@ async def main():
           // esterni dei magazzini: il tipo segue lo stato e le dotazioni, gli elementi compaiono sopra quando ci sono
           const w=F.S.warehouses[0], tipi=['fatiscente','standard','moderno','freddo']; out.est8=tipi.every(t=>F.SCENE['est_'+t+'1']&&F.SCENE['est_'+t+'2']);
           out.el6=F.EST_EL.every(([n])=>F.SCENE['el_'+n]); w.cond=30; out.fat=F.estScena(w).k.startsWith('est_fatiscente'); w.cond=100;
-          out.std=F.estScena(w).k.startsWith('est_standard')&&!F.estScena(w).el.length; w.tech.orto={day:F.S.day}; w.tech.anticoll={day:F.S.day};
+          const t0=w.tech; w.tech={}; out.std=F.estScena(w).k.startsWith('est_standard')&&!F.estScena(w).el.length; w.tech=t0; w.tech.orto={day:F.S.day}; w.tech.anticoll={day:F.S.day};
           const im=apri('magazzini').querySelector('i'); out.el=im.dataset.el==='el_giardino el_muletti'&&(im.style.backgroundImage.match(/url\(/g)||[]).length===3;
           delete w.tech.orto; delete w.tech.anticoll;
           // l'ufficio del direttore: quattro versioni, il CEO come quello della partita
