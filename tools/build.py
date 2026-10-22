@@ -15,10 +15,6 @@ s = s.replace('{{ICONE}}', open(A('assets', 'icone.json'), encoding='utf-8').rea
 SC = A('assets', 'scene')
 s = s.replace('{{SCENE}}', json.dumps({f[:-4]: 'data:image/png;base64,' + base64.b64encode(open(os.path.join(SC, f), 'rb').read()).decode()
                                        for f in sorted(os.listdir(SC)) if f.endswith('.png')}, separators=(',', ':')))
-# strati del capannone nella scheda di un magazzino, da tools/scene_pxl/esporta.py (capannoni.px.js)
-CP = A('assets', 'capannoni')
-s = s.replace('{{CAPANNONI}}', json.dumps({f[:-4]: 'data:image/png;base64,' + base64.b64encode(open(os.path.join(CP, f), 'rb').read()).decode()
-                                       for f in sorted(os.listdir(CP)) if f.endswith('.png')}, separators=(',', ':')))
 s = re.sub(r'\{\{P_(\w+)\}\}', lambda m: b64(f'ritratto_{m.group(1)}.png'), s)  # CEO
 s = re.sub(r'\{\{Q_(\w+)\}\}', lambda m: b64(f'p_{m.group(1)}.png'), s)         # manager, dirigenti, staff
 left = re.findall(r'\{\{\w+\}\}', s.replace('{{SUPABASE}}', ''))

@@ -721,9 +721,10 @@ async def main():
         await pg.screenshot(path=os.path.join(OUT, 'shot_magazzino_dotazioni.png'))
         # elenco dei capannoni a schede e scheda con l'immagine; «Affitta» dalla scheda la chiude e apre il magazzino
         await pg.evaluate("()=>{window.__FUP.ACT.openwh({id:window.__FUP.S.warehouses[0].id}); window.__FUP.ACT.site({id:'castelsg'});}")
-        assert not await pg.query_selector('#modal .cap-img'), 'Castel San Giovanni non deve esserci prima del 2004'
+        assert not await pg.query_selector('#modal .ev-scn'), 'Castel San Giovanni non deve esserci prima del 2004'
         await pg.evaluate("()=>{document.querySelector('#modal').innerHTML=''; window.__FUP.ACT.site({id:'orio'});}")
         await pg.screenshot(path=os.path.join(OUT, 'shot_capannone.png'))
+        assert await pg.evaluate("()=>{const i=document.querySelector('#modal .ev-scn i'); return !!i&&i.dataset.scena.startsWith('est_')&&i.dataset.el.includes('el_muletti');}"), 'scheda del capannone senza il suo esterno'
         ca = await pg.evaluate('''()=>{const F=window.__FUP,n=F.S.warehouses.length; document.querySelector('#modal [data-act=rent]').click();
           return {n:F.S.warehouses.length-n,chiusa:!document.querySelector('#modal').innerHTML,orio:F.S.warehouses.some(w=>w.site==='orio'&&w.cl==='mod'&&!!w.dot.sprinkler)};}''')
         assert all(ca.values()) and ca['n'] == 1, f'affitto dalla scheda: {ca}'
@@ -799,7 +800,8 @@ async def main():
           for(const [tab,w] of Object.entries(F.WSCN)){let k=typeof w==='function'?w():w; k=k.k||k; const d=apri(tab), i=d&&d.querySelector('i'); out[tab]=!!i&&i.dataset.scena===k&&i.getBoundingClientRect().width===(['customer','personale'].includes(tab)?320:480);}
           // esterni dei magazzini: il capannone segue la classe dell'edificio (celle frigo: quello frigorifero), sopra le dotazioni dell'area esterna
           const w=F.S.warehouses[0], tipi=['fatiscente','vecchio','standard','moderno','innovativo','freddo'], s0={cl:w.cl,dot:w.dot,tech:w.tech,build:w.build};
-          out.est12=tipi.every(t=>F.SCENE['est_'+t+'1']&&F.SCENE['est_'+t+'2']); out.el=F.EST_EL.every(([n])=>F.SCENE['el_'+n]);
+          out.est12=tipi.every(t=>F.SCENE['est_'+t+'1']&&F.SCENE['est_'+t+'2'])&&!!F.SCENE.est_lotto&&!!F.SCENE.est_costruzione; out.el=F.EST_EL.every(([n])=>F.SCENE['el_'+n]);
+          out.su=F.EST_SU.every(([,p])=>Object.keys(F.SCENE).some(k=>k.startsWith('el_'+p+'_')));
           Object.assign(w,{cl:'fat',dot:{},tech:{},build:null}); out.fat=F.estScena(w).k.startsWith('est_fatiscente');
           w.cl='std'; out.std=F.estScena(w).k.startsWith('est_standard')&&F.estScena(w).el.join()==='el_muletti';
           w.dot={frigo:{day:0}}; out.frigo=F.estScena(w).k.startsWith('est_freddo'); w.dot={giardino:{day:0}};
