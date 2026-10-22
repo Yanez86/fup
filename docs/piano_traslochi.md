@@ -1,6 +1,6 @@
 # Traslochi (progetto)
 
-**Stato: fase 1 costruita nella versione 0.102** (le formule esatte sono in `docs/design.md`, sezioni «Traslochi», «Capannone vuoto e vendita» e «Ordinanza sui capannoni fatiscenti»). Restano da fare le fasi 2-4.
+**Stato: fase 1 costruita nella versione 0.103** (le formule esatte sono in `docs/design.md`, sezioni «Traslochi», «Capannone vuoto e vendita» e «Ordinanza sui capannoni fatiscenti»). Restano da fare le fasi 2-4.
 I numeri sono una prima proposta, da ritoccare con `tools/bilanciamento.py`.
 
 Differenze rispetto al progetto, decise durante la costruzione:
