@@ -326,6 +326,13 @@ async def phone(b, w, h, name, errs):
               const l=(S.loans||[])[(S.loans||[]).length-1]; if(!l) return {got:false,d0}; const got=S.cash-c0>=l.amt-1, left=l.left; for(let i=0;i<32;i++){document.querySelector('#modal').innerHTML='';S.cash=Math.max(S.cash,150000);F.step();}
               return {got, paid:l.left<left, d0, d1:F.debt(), over:S.over, day:S.day};}''')
             assert r['got'] and r['paid'], f'{name}: prestito non funziona {r}'
+            # al massimo tre prestiti in corso: col terzo aperto la banca non ne concede altri
+            r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; S.cash=Math.max(S.cash,150000); S.loans=(S.loans||[]).slice(0,3);
+              while(S.loans.length<3) S.loans.push({amt:10000,left:10000,rate:6,n:48,rata:240,day:S.day});
+              F.renderAll(); const btn=!!document.querySelector('#win-cassa [data-act=loantake]'); F.UI.sel.loanA=10000; F.ACT.loantake();
+              return {n:S.loans.length, btn, lim:F.loanLimit(), txt:document.querySelector('#win-cassa').textContent.includes('3 prestiti in corso, il massimo')};}''')
+            assert r == {'n': 3, 'btn': False, 'lim': 0, 'txt': True}, f'{name}: tetto di tre prestiti {r}'
+            await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_tre_prestiti.png'), full_page=True)
         await pg.tap(f'#win-{wn} [data-act=close]')
     await ctx.close()
 

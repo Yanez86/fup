@@ -3151,7 +3151,7 @@ Per tutta l'azienda: interessi sui [[prestiti]], [[pianificatori]] del traffico,
 wk('conto','eco','Conto economico',`Il riepilogo del mese scorso: ricavi meno costi, voce per voce. In fondo c'è l'utile.`,
 `Si chiude a fine mese: il numero in alto "Mese scorso" è il suo risultato e, toccandolo, mostra entrate e spese voce per voce, confrontate con il mese prima e con il mese in corso. Se l'utile è negativo per troppi mesi la [[cassa]] finisce. Vedi [[ricavi]] e [[costi]].`);
 wk('prestiti','eco','Prestiti',`Soldi dalla banca da restituire a rate mensili fisse, in 2, 4 o 6 anni.`,
-`Si chiedono dalla finestra Cassa e bilancio (tocca la cassa in alto). La banca concede al massimo quattro mesi di [[ricavi]] (almeno 60.000 €), meno i prestiti già aperti.
+`Si chiedono dalla finestra Cassa e bilancio (tocca la cassa in alto). La banca concede al massimo quattro mesi di [[ricavi]] (almeno 60.000 €), meno i prestiti già aperti, e non più di tre prestiti in corso insieme.
 
 Il tasso annuo parte dal 6,5%: scende di 0,6 punti ogni 10 punti di [[reputazione]] sopra 40, di 0,1 per ogni punto di Amministrazione del [[ceo|CEO]] sopra 10 e di 0,1 per ogni punto del direttore finanziario sopra 10; sale di mezzo punto oltre i 3 anni e di un altro mezzo oltre i 5. Resta tra il 2,5% e il 12%.
 
@@ -4538,7 +4538,7 @@ function monthEnd(){
   save();
 }
 // prestiti bancari: rata fissa a fine mese; gli interessi vanno nel conto economico, la quota di capitale abbassa il debito
-const LOAN_AMT=[50000,100000,200000,400000], LOAN_DUR=[24,48,72], LOAN_FEE=0.02;
+const LOAN_AMT=[50000,100000,200000,400000], LOAN_DUR=[24,48,72], LOAN_FEE=0.02, LOAN_MAX=3;
 // bilancio: valore stimato dei beni di proprietà
 const BAL_PAL=120, BAL_MOT=30000;
 const debt=()=>(S.loans||[]).reduce((a,l)=>a+l.left,0);
@@ -4546,8 +4546,8 @@ const loanRata=(amt,rate,n)=>{const i=rate/1200; return amt*i/(1-Math.pow(1+i,-n
 // tasso annuo: scende con la reputazione, l'Amministrazione del CEO e il direttore finanziario; sale con la durata
 function loanRate(n){ const fin=dirStat('fin');
   return clamp(6.5-(S.rep-40)*0.06-(ceo().st.amm-10)*0.1-(fin!=null?0.1*(fin-10):0)+(n>36?0.5:0)+(n>60?0.5:0),2.5,12); }
-// fido: quattro mesi di ricavi (minimo 60.000 €) meno i prestiti già aperti
-function loanLimit(){ const H=(S.hist||[]).slice(-3), h=H.length?H.reduce((a,x)=>a+x.ric,0)/H.length:0, now=S.warehouses.reduce((a,w)=>a+(w.kpi?w.kpi.rev:0),0);
+// fido: quattro mesi di ricavi (minimo 60.000 €) meno i prestiti già aperti; con LOAN_MAX prestiti aperti niente altro
+function loanLimit(){ if((S.loans||[]).length>=LOAN_MAX) return 0; const H=(S.hist||[]).slice(-3), h=H.length?H.reduce((a,x)=>a+x.ric,0)/H.length:0, now=S.warehouses.reduce((a,w)=>a+(w.kpi?w.kpi.rev:0),0);
   return Math.max(0,Math.floor((Math.max(60000,4*Math.max(h,now))-debt())/10000)*10000); }
 function loansMonth(){
   if(!(S.loans||[]).length) return;
@@ -7270,7 +7270,7 @@ const VIEWS={
   const col=(t,rows,tot,tl)=>`<div class="card bal"><span class="h3">${t}</span>${rows.map(([n,v])=>`<div class="az-r"><span>${n}</span><b class="num">${eur(v)}</b></div>`).join('')}<div class="az-r rp-tot"><span>${tl}</span><b class="num">${eur(tot)}</b></div></div>`;
   return `<div class="rp-tiles c4">
     ${rpTile('Cassa',eur(S.cash),S.cash<0?'sotto i −50.000 € a fine mese si fallisce':'soldi disponibili oggi','cassa',S.cash<0?'bad':'')}
-    ${rpTile('Debito',eur(D),loans.length?`${loans.length} ${loans.length>1?'prestiti':'prestito'} in corso`:'nessun prestito','prestiti',D?'':'ok')}
+    ${rpTile('Debito',eur(D),loans.length?`${loans.length} ${loans.length>1?'prestiti':'prestito'} in corso su ${LOAN_MAX}`:'nessun prestito','prestiti',D?'':'ok')}
     ${rpTile('Rate al mese',eur(rate),rate?'pagate a fine mese':'—','prestiti')}
     ${rpTile('Patrimonio netto',eur(pn),'quanto vale l\'azienda, al netto dei debiti','bilancio',pn>=0?'ok':'bad')}</div>
    <div class="card"><div class="row"><span class="h3">${kw('bilancio','Bilancio')}</span><span class="sm">oggi, valori stimati</span></div>
@@ -7285,6 +7285,7 @@ const VIEWS={
     <div class="lab">In quanto tempo</div><div class="xl-cli rp-whs">${LOAN_DUR.map(n=>`<button data-act="loandur" data-v="${n}" aria-pressed="${n===N}">${n/12} anni</button>`).join('')}</div>
     <div class="loan-sum"><span>Tasso <b>${f1(r)}%</b> all'anno</span><span>Rata <b>${eur(q)}</b> al mese</span><span>Interessi in tutto <b>${eur(q*N-A)}</b></span></div>
     <div class="row" style="align-items:center"><span class="sm">Il tasso scende con la ${kw('reputazione')}, l'Amministrazione del CEO e il direttore finanziario.</span><button class="btn pri" data-act="loantake">Firma il prestito</button></div>`
+    :loans.length>=LOAN_MAX?`<div class="sm bad">La banca non concede altro credito: hai già ${LOAN_MAX} prestiti in corso, il massimo. Estinguine uno o aspetta che finisca.</div>`
     :'<div class="sm bad">La banca non concede altro credito: il fido è di quattro mesi di ricavi e lo stai già usando tutto. Restituisci una parte dei prestiti o fai crescere i ricavi.</div>'}</div>
    ${lineChart('cs_cash',{title:'Cassa e debito a fine mese',labels:lab,xl:'',nice:1,min:-1e12,max:1e12,ml:62,mr:140,maxLab:4,fmt:v=>eur(v),ax:euK,empty:'Il grafico compare dalla fine del secondo mese.',series:[{n:'Cassa',c:SERIES_C[0],v:H.map(h=>h.cash)},{n:'Debito',c:SERIES_C[1],v:H.map(h=>h.debt||0)}],w:620,h:220})}`;
  },
@@ -8757,7 +8758,7 @@ TUT.avanzato={n:'Tutorial avanzato',corso:'Diventa CEO, secondo livello',L:[
     return `Le aziende sono in ordine di ${kw('valore','valore')}.${r?` ${esc(r.boss.name)} fa le offerte alle stesse gare (sono segrete), assume dagli stessi candidati e prende i capannoni liberi.`:''}${on.length?` In questa partita ${on.map(k=>esc(winTxt(k,cfg).replace(/^V/,'v'))).join(' Oppure ')}`:''}`;}}]},
  {n:'Prestiti e contratti',s:[
   {hi:()=>'#stats [data-id=cassa]',ok:()=>!!UI.open.cassa,w:()=>`${tTap()} la cassa in alto`,t:()=>`Ultima lezione: i soldi.`},
-  {hi:()=>'#win-cassa [data-act=loantake]',t:()=>`Qui ci sono il ${kw('bilancio','bilancio')} e la banca: presta fino a quattro mesi di ricavi, a un tasso che scende con la reputazione, l'Amministrazione del CEO e il direttore finanziario. Un ${kw('prestiti','prestito')} serve per crescere (un magazzino nuovo, una ricerca cara), non per tappare i buchi. Se vuoi prova, altrimenti «Avanti».`},
+  {hi:()=>'#win-cassa [data-act=loantake]',t:()=>`Qui ci sono il ${kw('bilancio','bilancio')} e la banca: presta fino a quattro mesi di ricavi, con al massimo tre prestiti insieme, a un tasso che scende con la reputazione, l'Amministrazione del CEO e il direttore finanziario. Un ${kw('prestiti','prestito')} serve per crescere (un magazzino nuovo, una ricerca cara), non per tappare i buchi. Se vuoi prova, altrimenti «Avanti».`},
   {hi:()=>tDock('clienti'),t:()=>`E se un cliente ti fa perdere soldi? Nella finestra Clienti puoi non rinnovargli il contratto alla scadenza, oppure recedere subito pagando la penale. Prima però guarda se il problema è il prezzo o i KPI: a volte basta un manager migliore.`},
   {f:'occhiolino',t:()=>{const r=tRiv(); return `Il corso è finito: hai visto tutto quello che serve per guidare un'azienda grande. ${esc(S.company.name)} adesso è tua: in bocca al lupo${r?`, e salutami ${esc(r.boss.name.split(' ')[0])}`:''}!`;}}]}
 ]};
@@ -9105,6 +9106,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.100',t:'Al massimo tre prestiti',x:['La banca concede al massimo tre prestiti in corso insieme. Con tre prestiti aperti la finestra Cassa e bilancio non ne propone altri: per chiederne uno nuovo devi estinguerne uno o aspettare che finisca. Il riquadro Debito mostra quanti ne hai su tre.','Vale anche per le aziende avversarie.']},
  {v:'0.99',t:'Il tutorial avanzato',x:['Nella schermata principale il riquadro Tutorial ha due pulsanti: Base e Avanzato. Il tutorial avanzato parte da un\'azienda già grande: due anni di Conti Logistica giocati in pochi secondi (con la barra di avanzamento), sempre uguali, fino a gennaio 2004, con tre magazzini, una decina di clienti, Gino Bertolotti come concorrente e il pacchetto Relazioni industriali.','In nove lezioni la dottoressa Ribalta ti fa nominare il primo direttore, trattare lo stipendio di un manager, scegliere il responsabile del customer service, chiedere l\'audit HACCP in un magazzino, costruire una dotazione nel capannone e accendere una policy. Poi spiega welfare, agitazione e tavolo col sindacato, classifica e vittoria, prestiti e contratti in perdita.','Alla fine arriva l\'attestato del corso «Diventa CEO, secondo livello» e la partita continua da lì.','Il cartellino di una notifica non copre più la cosa che la dottoressa ti chiede di toccare.']},
  {v:'0.98',t:'Data e ricerca più chiare',x:['In alto la data mostra anche il giorno: «13 febbraio 2002» sul computer, «13 feb 02» sul telefono.','Nella finestra Tecnologia la ricerca in corso ha una barra di avanzamento ben visibile, con la percentuale accanto: prima era schiacciata in una riga sottile.']},
  {v:'0.97',t:'Il magazzino visto da fuori',x:['In cima alla finestra Magazzini c\'è il magazzino visto da fuori, diverso per ogni magazzino: il capannone cambia con la classe dell\'edificio (fatiscente, vecchio, standard, moderno, innovativo, ognuna in due versioni) e con le celle frigo diventa un magazzino frigorifero. Gli stessi disegni si vedono nella scheda dei capannoni da affittare; i terreni edificabili e i cantieri da zero hanno il loro.','Sul capannone e davanti compaiono le dotazioni che ha davvero: pannelli solari sul tetto, ribalte di carico, cisterna dell\'antincendio, lampioni a LED, portineria con la sbarra, giardino, mensa, parcheggio dei camion e piazzale, più la zona di ricarica dei muletti e la gru durante un cantiere. Dove resta posto si vedono anche l\'area cani, le colonnine di ricarica e il pulmino del welfare.','La scena del lavoro in magazzino, col nastro trasportatore, passa nella finestra Personale.']},
