@@ -28,7 +28,8 @@ def frames(nome):
         im.seek(i)
         fr = im.convert('RGB')
         out += [fr] * max(1, round(im.info.get('duration', MS) / MS))   # la GIF arrotonda a centesimi: 125 ms diventano 130
-    return out
+    # se tutto quello che si muove ha un giro più corto (8, 4 o 2 fotogrammi), pxl ne esporta solo uno: lo ripeto fino a 2 secondi
+    return out * (N // len(out)) if N % len(out) == 0 else out
 
 os.makedirs(DEST, exist_ok=True)
 fatte = []
