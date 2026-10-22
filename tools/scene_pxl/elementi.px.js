@@ -1,20 +1,24 @@
 // Elementi degli esterni dei magazzini: nove scene trasparenti (el_*) che il gioco mette sopra l'esterno del magazzino
 // quando il magazzino ha quella dotazione (EST_EL in src/game.html). Fuori dall'elemento tutto resta trasparente.
+// Si disegna su 160×72, ma il gioco mostra solo le colonne x 8..151 (le 8 a sinistra e le 8 a destra si tagliano):
+// tutto quello che conta sta lì dentro.
 // Ognuno sta nella sua zona della pianta comune agli esterni (capannone in x 24..135, y 6..55, terreno 56..71):
-//   el_giardino   SINISTRA            x 0..23,   y 18..71   l'orto aziendale
+//   el_giardino   SINISTRA            x 8..23,   y 18..71   l'orto aziendale
 //   el_cani       DAVANTI a sinistra  x 24..59,  y 58..71   l'area cani
-//   el_colonnine  DESTRA              x 136..159, y 30..71  le colonnine di ricarica
+//   el_colonnine  DESTRA              x 136..151, y 30..71  la colonnina di ricarica
 //   el_muletti    DAVANTI al centro   x 60..103, y 58..71   la zona di ricarica dei muletti
 //   el_pulmino    DAVANTI a destra    x 104..135, y 56..71  il pulmino dei dipendenti
-//   el_cantiere   gru sopra il tetto  x 100..159, y 0..55   (a destra di x 135 solo sopra y 30: sotto ci sono le colonnine)
+//   el_cantiere   gru sopra il tetto  x 100..151, y 0..55   (a destra di x 135 solo sopra y 30: sotto ci sono le colonnine)
 // Tre zone hanno un'alternativa (il gioco ne mostra una sola per zona): la dotazione vince sul servizio del welfare.
-//   el_mensa      DESTRA              x 136..159, y 30..71  la mensa esterna, al posto delle colonnine
+//   el_mensa      DESTRA              x 136..151, y 30..71  la mensa esterna, al posto delle colonnine (la palazzina
+//                                                           continua oltre il bordo; il fumo sale nel cielo fino a y 17)
 //   el_parcheggio DAVANTI a sinistra  x 24..59,  y 58..71   il parcheggio dei camion, al posto dell'area cani
 //   el_piazzale   DAVANTI a destra    x 104..135, y 56..71  il piazzale esterno con la tettoia, al posto del pulmino
 // Sopra gli elementi delle zone il gioco mette ancora, in quest'ordine:
-//   el_portineria in basso a sinistra x 0..23,  y 46..71   la guardiola e la sbarra (sopra il giardino; la sbarra abbassata
-//                                                           sporge fino a x 27 nelle righe del terreno)
-//   el_led        due lampioni        x 22..26 e 134..138, y 28..71   l'illuminazione a LED, sopra a tutto
+//   el_portineria in basso a sinistra x 8..20,  y 46..71   la guardiola e la sbarra (sopra il giardino; la sbarra abbassata
+//                                                           sporge fino a x 28 nelle righe del terreno)
+//   el_led        due lampioni        x 22..26 e 134..138, y 28..71   l'illuminazione a LED, sopra a tutto (i pali in
+//                                                           x 23..25 e 135..137: mensa, colonnine e sbarra li evitano)
 // Le scene prova_elementi e prova_elementi2 (fuori dal gioco) le mettono tutte insieme sopra un esterno finto, per vedere
 // che non si pestano: la prima coi servizi del welfare, la seconda con mensa, parcheggio e piazzale; prova_elementi3 come
 // la seconda più portineria e lampioni, nell'ordine del gioco.
@@ -27,61 +31,59 @@ include("comune.px.js", { palette: true })
 const MONDO = { light: [-0.6, -1] }          // la luce viene dall'alto a sinistra
 const onda = (c, n = 1) => Math.sin(c.phase * Math.PI * 2 * n)   // va e viene in un giro di 16 fotogrammi
 
-// ================================================================ GIARDINO (x 0..23, y 18..71)
-// L'orto aziendale: il tiglio, il cassone rialzato coi pomodori sulle canne e l'insalata, la panchina,
-// la collega che nella pausa pranzo annaffia i tulipani (l'acqua scende, i fiori ondeggiano col vento).
+// ================================================================ GIARDINO (x 8..23, y 18..71)
+// L'orto aziendale in 16 colonne: il tiglio dietro, il cassone rialzato coi pomodori sulle canne e l'insalata, la collega
+// che nella pausa pranzo annaffia i tulipani (l'acqua scende, i fiori ondeggiano col vento), davanti la panchina.
 
 // il prato dell'orto
-sprite("gia_prato", { w: 24, h: 16 }, rect(0, 0, 24, 16, "G"), hline(0, 0, 24, "g"))
+sprite("gia_prato", { w: 16, h: 16 }, rect(0, 0, 16, 16, "G"), hline(0, 0, 16, "g"))
 // il tiglio: tronco che si allarga al piede, rami che salgono nella chioma. La chioma è un mucchio di ciuffi, prima quelli
 // in basso: ognuno scuro sotto, medio nel corpo, chiaro sul cappello verso il sole (in alto a sinistra)
-const CHIOMA = [[4, 15, 3], [13, 15, 4], [8, 14, 4], [3, 10, 4], [14, 9, 4], [9, 9, 4], [6, 5, 4], [12, 4, 4]]
-sprite("gia_albero", { w: 18, h: 37, outline: "K", pivot: "bottom" },
-  rect(7, 18, 3, 19, "N"), vline(9, 18, 19, "M"), px(6, 36, "N"), px(10, 36, "M"),
-  line(7, 21, 4, 17, "N"), line(9, 20, 13, 17, "M"),
+const CHIOMA = [[3, 12, 3], [10, 12, 3], [7, 12, 3], [3, 8, 3], [10, 8, 3], [7, 7, 3], [4, 3, 3], [9, 3, 3]]
+sprite("gia_albero", { w: 14, h: 34, outline: "K", pivot: "bottom" },
+  rect(2, 15, 3, 19, "N"), vline(4, 15, 19, "M"), px(1, 33, "N"), px(5, 33, "M"),
+  line(2, 18, 0, 15, "N"), line(4, 17, 7, 14, "M"),
   ...CHIOMA.map(([x, y, r]) => [circ(x, y, r, "g"), circ(x - 1, y - 1, r - 1, "G"),
     clip((px, py) => (px - x) + 1.2 * (py - y) < -r * 0.7, circ(x - 1, y - 1, r - 1, "h"))]).flat())
 // la panchina vista di fronte: due assi di schienale, la seduta, le gambe di ferro
-sprite("gia_panchina", { w: 12, h: 7, outline: "K", pivot: "bottom" },
-  hline(0, 0, 12, "k"), hline(0, 1, 12, "N"), hline(0, 3, 12, "k"), hline(0, 4, 12, "M"),
-  vline(1, 2, 1, "d"), vline(10, 2, 1, "d"), vline(1, 5, 2, "d"), vline(10, 5, 2, "d"))
-// il cassone rialzato: i pomodori sulle canne a sinistra (rossi, uno ancora verde), i cespi d'insalata a destra
-sprite("gia_cassone", { w: 12, h: 14, outline: "K", pivot: "bottom" },
+sprite("gia_panchina", { w: 7, h: 7, outline: "K", pivot: "bottom" },
+  hline(0, 0, 7, "k"), hline(0, 1, 7, "N"), hline(0, 3, 7, "k"), hline(0, 4, 7, "M"),
+  vline(1, 2, 1, "d"), vline(5, 2, 1, "d"), vline(1, 5, 2, "d"), vline(5, 5, 2, "d"))
+// il cassone rialzato: i pomodori sulle canne a sinistra (rossi, uno ancora verde), il cespo d'insalata a destra
+sprite("gia_cassone", { w: 9, h: 14, outline: "K", pivot: "bottom" },
   ...[1, 4].map((x) => vline(x, 0, 10, "k")),
   ...[[1, 2], [4, 1]].map(([x, y]) => [rect(x - 1, y, 3, 8, "G"), hline(x - 1, y, 3, "h"), px(x + 1, y + 1, "g"), vline(x + 1, y + 4, 4, "g")]).flat(),
   px(0, 5, "R"), px(2, 7, "R"), px(3, 4, "R"), px(5, 6, "R"), px(0, 4, "e"), px(3, 3, "e"),
-  ...[6, 9].map((x) => [rect(x, 6, 3, 3, "h"), px(x, 6, "_"), px(x + 2, 6, "_"), hline(x, 8, 3, "G"), px(x + 1, 7, "W")]).flat(),
-  rect(0, 9, 12, 5, "N"), hline(0, 9, 12, "m"), hline(0, 10, 12, "k"), hline(0, 13, 12, "M"), vline(6, 11, 2, "M"))
-// l'aiuola dei tulipani davanti: quattro steli che ondeggiano col vento (16 fotogrammi)
-anim("gia_tulipani", { w: 10, h: 7, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
-  ...[[1, 1, "Y", "i"], [4, 0, "e", "W"], [7, 1, "R", "e"], [9, 0, "P", "l"]].map(([x, y, k, l]) =>
-    [vline(x, y + 2, 5 - y, "g"), rect(x - 1, y, 2, 2, k), px(x - 1, y, l), px(x, y + 1, k)]).flat(),
-  px(2, 4, "G"), px(3, 3, "G"), px(6, 4, "G"), px(8, 3, "G"),
-  hline(0, 6, 10, "m"),
-  (c) => c.warp((x, y) => [Math.round(onda(c) * (5 - y) / 3), 0], [0, 0, 10, 6]))
-// la collega che annaffia: l'annaffiatoio arancione inclinato, retto col braccio teso sopra i tulipani
+  rect(6, 6, 3, 3, "h"), px(6, 6, "_"), px(8, 6, "_"), hline(6, 8, 3, "G"), px(7, 7, "W"),
+  rect(0, 9, 9, 5, "N"), hline(0, 9, 9, "m"), hline(0, 10, 9, "k"), hline(0, 13, 9, "M"), vline(4, 11, 2, "M"))
+// l'aiuola dei tulipani davanti: tre steli che ondeggiano col vento (16 fotogrammi)
+anim("gia_tulipani", { w: 8, h: 6, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
+  ...[[1, 1, "Y", "i"], [4, 0, "P", "l"], [7, 1, "R", "e"]].map(([x, y, k, l]) =>
+    [vline(x, y + 2, 4 - y, "g"), rect(x - 1, y, 2, 2, k), px(x - 1, y, l), px(x, y + 1, k)]).flat(),
+  px(2, 3, "G"), px(5, 3, "G"),
+  hline(0, 5, 8, "m"),
+  (c) => c.warp((x, y) => [Math.round(onda(c) * (4 - y) / 3), 0], [0, 0, 8, 5]))
+// la collega che annaffia: il braccio giù, l'annaffiatoio arancione inclinato in mano, la cipolla sopra i tulipani
 persona("_ortolana", { testa: "lunghi", swap: { M: "N" } })
-sprite("_ortolana_k", { w: 14, h: 20, outline: "K" },
-  stamp("__ortolana"), rect(9, 12, 1, 4, "_"), rect(9, 11, 3, 2, "B"), hline(9, 12, 3, "b"), rect(12, 11, 2, 2, "F"), px(13, 12, "f"))
-sprite("_annaffiatoio", { w: 9, h: 7, outline: "K" },
-  rect(0, 2, 5, 4, "O"), hline(0, 2, 5, "a"), vline(0, 3, 2, "a"), hline(0, 5, 5, "o"), hline(1, 0, 3, "o"), px(0, 1, "o"), px(4, 1, "o"),
-  line(5, 4, 7, 6, "O"), rect(7, 6, 2, 1, "o"))
-sprite("gia_ortolana", { w: 24, h: 22, pivot: [6, 22] },
-  stamp("_ortolana_k", 0, 0), stamp("_annaffiatoio", 12, 11), rect(13, 12, 2, 1, "F"))
+sprite("gia_ortolana", { w: 14, h: 20, outline: "K" },
+  stamp("__ortolana"),
+  rect(10, 15, 3, 3, "O"), hline(10, 15, 3, "a"), hline(10, 17, 3, "o"),          // il bidoncino
+  px(10, 14, "o"), px(11, 13, "o"), px(12, 14, "o"),                               // il manico, nella mano
+  px(13, 16, "O"), px(13, 17, "o"))                                                 // il becco e la cipolla
 // l'acqua che scende dalla cipolla dell'annaffiatoio: gocce che cadono a due a due (4 fotogrammi)
 anim("gia_acqua", { w: 2, h: 3, frames: LOOP, fps: FPS },
   (c) => { for (let y = 0; y < 3; y++) c.px((y + c.frame) % 2, y, (y + c.frame) % 4 < 2 ? "B" : "L") })
 
 function elGiardino() {
   return [
-    layer("giardino_prato", stamp("gia_prato", 0, 56)),
-    layer("giardino", { sort: "y" },
-      stamp("gia_albero", 8, 57),
-      stamp("gia_cassone", 17, 58),
-      stamp("gia_ortolana", 6, 65),
-      stamp("gia_tulipani", 18, 72),
-      stamp("gia_panchina", 7, 72)),
-    layer("giardino_acqua", stamp("gia_acqua", 20, 62))]
+    layer("giardino_prato", stamp("gia_prato", 8, 56)),
+    layer("giardino",
+      stamp("gia_albero", 16, 54),
+      stamp("gia_cassone", 18, 54),
+      stamp("gia_ortolana", 8, 46),
+      stamp("gia_panchina", 12, 72),
+      stamp("gia_tulipani", 19, 72)),
+    layer("giardino_acqua", stamp("gia_acqua", 22, 65))]
 }
 
 // ================================================================ AREA CANI (x 24..59, y 58..71)
@@ -137,51 +139,45 @@ function elCani() {
     layer("cani_cartello", stamp("can_cartello", 28, 67))]
 }
 
-// ================================================================ COLONNINE (x 136..159, y 30..71)
-// La pensilina coi pannelli solari, due colonnine di ricarica, l'auto elettrica attaccata al cavo:
+// ================================================================ COLONNINE (x 136..151, y 30..71)
+// La pensilina a sbalzo coi pannelli solari, la colonnina di ricarica, l'utilitaria elettrica attaccata al cavo che scende
+// davanti alla colonnina (non più a sinistra di x 138: in x 135..137 può esserci il palo del lampione a LED);
 // la luce di ricarica pulsa e la barra della batteria si riempie (16 fotogrammi).
 
 // la piazzola d'asfalto con la riga verde del posto auto elettrico
-sprite("col_piazzola", { w: 24, h: 14 }, rect(0, 0, 24, 14, "D"), hline(0, 0, 24, "d"), hline(1, 12, 22, "G"), vline(1, 6, 6, "G"), vline(22, 6, 6, "G"))
-// la pensilina fotovoltaica: i pannelli inclinati verso il sole, la trave, i due pilastri, il cartello verde col fulmine
-sprite("col_pensilina", { w: 22, h: 30, outline: "K", pivot: "bottom" },
-  rect(0, 0, 22, 3, "b"), ...[5, 11, 16].map((x) => vline(x, 0, 3, "B")), hline(0, 1, 22, "B"), hline(1, 0, 3, "L"), px(1, 2, "B"),
-  hline(0, 3, 22, "S"), hline(0, 4, 22, "s"),
-  vline(1, 5, 25, "S"), vline(2, 5, 25, "s"), vline(19, 5, 25, "S"), vline(20, 5, 25, "s"),
-  rect(8, 6, 6, 7, "G"), vline(13, 6, 7, "g"), hline(8, 12, 6, "g"), grid(9, 6, "..WW\n.WW.\nWWWW\n.WW.\nWW..\nW..."))
+sprite("col_piazzola", { w: 16, h: 14 }, rect(0, 0, 16, 14, "D"), hline(0, 0, 16, "d"), hline(1, 12, 14, "G"), vline(1, 6, 6, "G"), vline(14, 6, 6, "G"))
+// la pensilina fotovoltaica a sbalzo: i pannelli inclinati verso il sole, la trave, il pilastro solo, il cartello verde col
+// fulmine appeso alla trave sopra la colonnina
+sprite("col_pensilina", { w: 14, h: 30, outline: "K", pivot: "bottom" },
+  rect(0, 0, 14, 3, "b"), ...[4, 9].map((x) => vline(x, 0, 3, "B")), hline(0, 1, 14, "B"), hline(1, 0, 2, "L"), px(1, 2, "B"),
+  hline(0, 3, 14, "S"), hline(0, 4, 14, "s"),
+  vline(11, 5, 25, "S"), vline(12, 5, 25, "s"),
+  rect(2, 5, 6, 7, "G"), vline(7, 5, 7, "g"), hline(2, 11, 6, "g"), grid(3, 5, "..WW\n.WW.\nWWWW\n.WW.\nWW..\nW..."))
 const LUCE = ["g", "g", "G", "G", "h", "h", "W", "W", "h", "h", "G", "G", "g", "g", "g", "g"]   // la luce verde che pulsa
-// la colonnina bianca: testa col colore dell'azienda, schermo, presa, la striscia di luce; quella attaccata pulsa e
-// sullo schermo la batteria si riempie (16 fotogrammi), quella libera aspetta con la luce azzurra
-function colonnina(nome, attaccata) {
-  anim(nome, { w: 6, h: 17, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
-    rect(0, 0, 6, 17, "W"), vline(5, 0, 17, "S"), hline(0, 16, 6, "S"), hline(0, 0, 6, "T"), hline(0, 1, 6, "t"),
-    rect(1, 3, 3, 3, "d"), rect(1, 9, 2, 3, "s"), px(1, 9, "S"),
-    (c) => {
-      if (attaccata) { c.vline(4, 3, 10, LUCE[c.frame]); c.vline(2, 5 - Math.floor(c.frame / 4), Math.floor(c.frame / 4) + 1, "h"); c.px(2, 10, "K") }
-      else { c.vline(4, 3, 10, "B"); c.px(2, 4, "B") }
-    })
-}
-colonnina("col_colonnina_a", true)
-colonnina("col_colonnina_b", false)
-// l'auto elettrica, piccola e tonda, col muso a destra; la presa di ricarica dietro, con la sua luce che pulsa
-anim("col_auto", { w: 22, h: 11, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
-  poly([4, 4, 7, 0, 15, 0, 19, 4], "R"), hline(7, 0, 8, "e"),
-  poly([6, 4, 8, 1, 11, 1, 11, 4], "L"), poly([12, 4, 12, 1, 15, 1, 17, 4], "L"), px(8, 1, "W"), px(12, 1, "W"),
-  rect(0, 4, 22, 4, "R"), hline(1, 4, 20, "e"), px(0, 4, "_"), px(21, 4, "_"), hline(0, 7, 22, "r"), vline(21, 5, 2, "r"),
-  hline(11, 5, 2, "r"), px(21, 5, "i"), px(0, 5, "r"),
-  rect(2, 7, 4, 4, "K"), px(3, 8, "s"), rect(16, 7, 4, 4, "K"), px(17, 8, "s"),
-  (c) => { c.rect(1, 5, 2, 2, "d"); c.px(1, 5, LUCE[c.frame]) })
+// la colonnina bianca: testa col colore dell'azienda, schermo, presa, la striscia di luce che pulsa;
+// sullo schermo la batteria si riempie (16 fotogrammi)
+anim("col_colonnina", { w: 6, h: 17, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
+  rect(0, 0, 6, 17, "W"), vline(5, 0, 17, "S"), hline(0, 16, 6, "S"), hline(0, 0, 6, "T"), hline(0, 1, 6, "t"),
+  rect(1, 3, 3, 3, "d"), rect(1, 9, 2, 3, "s"), px(1, 9, "S"),
+  (c) => { c.vline(4, 3, 10, LUCE[c.frame]); c.vline(2, 5 - Math.floor(c.frame / 4), Math.floor(c.frame / 4) + 1, "h"); c.px(2, 10, "K") })
+// l'utilitaria elettrica, corta e tonda, col muso a destra; la presa di ricarica dietro, con la sua luce che pulsa
+anim("col_auto", { w: 12, h: 10, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
+  poly([2, 4, 3, 0, 8, 0, 11, 4], "R"), hline(3, 0, 5, "e"),
+  poly([4, 4, 4, 1, 5, 1, 5, 4], "L"), poly([6, 4, 6, 1, 8, 1, 10, 4], "L"), px(4, 1, "W"), px(6, 1, "W"),
+  rect(0, 4, 12, 4, "R"), hline(1, 4, 10, "e"), px(0, 4, "_"), px(11, 4, "_"), hline(0, 7, 12, "r"), vline(11, 5, 2, "r"),
+  px(6, 5, "r"), px(11, 5, "i"),
+  rect(1, 7, 3, 3, "K"), px(2, 8, "s"), rect(8, 7, 3, 3, "K"), px(9, 8, "s"),
+  (c) => { c.rect(0, 5, 2, 2, "d"); c.px(1, 5, LUCE[c.frame]) })
 
 function elColonnine() {
   return [
     layer("colonnine_piazzola", stamp("col_piazzola", 136, 58)),
-    layer("colonnine", { sort: "y" },
-      stamp("col_pensilina", 148, 62),
-      stamp("col_colonnina_a", 144, 62),
-      stamp("col_colonnina_b", 154, 62),
-      stamp("col_auto", 148, 71)),
+    layer("colonnine",
+      stamp("col_pensilina", 144, 62),
+      stamp("col_colonnina", 141, 62),
+      stamp("col_auto", 145, 71)),
     // il cavo: dalla presa della colonnina giù fino alla presa dell'auto, con la sua pancia
-    layer("colonnine_cavo", px(141, 54, "K"), line(140, 55, 138, 58, "K"), vline(138, 59, 3, "K"), px(139, 62, "K"))]
+    layer("colonnine_cavo", px(140, 56, "K"), vline(139, 57, 7, "K"))]
 }
 
 // ================================================================ ZONA MULETTI (x 60..103, y 58..71)
@@ -272,33 +268,33 @@ function elPulmino() {
     layer("pulmino", stamp("pul_pulmino", 120, 71))]
 }
 
-// ================================================================ CANTIERE (x 100..159, y 0..55)
-// La gru gialla dell'ampliamento: torre a traliccio davanti alla parte destra del capannone, braccio sopra il tetto e il cielo,
-// contrappeso di cemento; il carrello col gancio che oscilla col carico di travi (16 fotogrammi), la luce rossa in cima.
-// Giù in basso le transenne bianche e rosse col lampeggiante e il cartello LAVORI.
+// ================================================================ CANTIERE (x 100..151, y 0..55)
+// La gru gialla dell'ampliamento: torre a traliccio davanti alla parte destra del capannone, braccio sopra il tetto e il cielo
+// (finisce a x 150, dentro il taglio del gioco), contrappeso di cemento; il carrello col gancio che oscilla col carico di travi
+// (16 fotogrammi), la luce rossa in cima. Giù in basso le transenne bianche e rosse col lampeggiante e il cartello LAVORI.
 
 sprite("gru_torre", { w: 5, h: 46, outline: "K", pivot: "bottom" },
   vline(0, 0, 46, "Y"), vline(4, 0, 46, "y"),
   (c) => { for (let y = 0, k = 0; y < 46; y += 4, k++) c.line(k % 2 ? 3 : 1, y, k % 2 ? 1 : 3, y + 3, "Y") })
-sprite("gru_braccio", { w: 60, h: 13, outline: "K" },
-  // il braccio lungo verso destra: traliccio a triangoli
-  hline(16, 5, 44, "Y"), hline(16, 7, 44, "y"),
-  (c) => { for (let x = 16; x < 59; x += 4) { c.px(x + 1, 6, "Y"); c.px(x + 3, 6, "y") } },
+sprite("gru_braccio", { w: 50, h: 13, outline: "K" },
+  // il braccio verso destra: traliccio a triangoli
+  hline(16, 5, 34, "Y"), hline(16, 7, 34, "y"),
+  (c) => { for (let x = 16; x < 49; x += 4) { c.px(x + 1, 6, "Y"); c.px(x + 3, 6, "y") } },
   // il controbraccio con i blocchi di cemento
   hline(0, 5, 12, "Y"), hline(0, 7, 12, "y"), rect(0, 8, 6, 4, "S"), hline(0, 8, 6, "W"), vline(5, 9, 3, "s"), hline(0, 10, 6, "s"),
   // la punta della torre e i tiranti
-  poly([12, 4, 14, 0, 16, 4], "Y"), line(14, 1, 40, 5, "s"), line(14, 1, 1, 5, "s"),
+  poly([12, 4, 14, 0, 16, 4], "Y"), line(14, 1, 35, 5, "s"), line(14, 1, 1, 5, "s"),
   // la cabina del gruista
   rect(16, 8, 5, 4, "W"), rect(17, 9, 3, 2, "L"), vline(20, 8, 4, "S"))
 // il carico appeso: il cavo dal carrello, il gancio, le travi rosse; oscilla come un pendolo (16 fotogrammi)
-anim("gru_carico", { w: 18, h: 20, frames: LOOP, fps: FPS, pivot: [9, 0] },
+anim("gru_carico", { w: 18, h: 16, frames: LOOP, fps: FPS, pivot: [9, 0] },
   (c) => {
     const dx = Math.round(onda(c) * 2), x = 9 + dx
     c.rect(7, 0, 5, 2, "d")                                         // il carrello sotto il braccio
-    c.line(9, 2, x, 11, "K")                                         // il cavo
-    c.rect(x - 1, 11, 2, 2, "s"); c.px(x, 13, "K")                   // il gancio
-    c.line(x, 13, x - 5, 16, "K"); c.line(x, 13, x + 5, 16, "K")     // le funi
-    c.rect(x - 7, 16, 15, 3, "R"); c.hline(x - 7, 16, 15, "e"); c.hline(x - 7, 18, 15, "r"); c.box(x - 8, 15, 17, 5, "K")
+    c.line(9, 2, x, 5, "K")                                          // il cavo
+    c.rect(x - 1, 5, 2, 2, "s"); c.px(x, 7, "K")                     // il gancio
+    c.line(x, 7, x - 4, 11, "K"); c.line(x, 7, x + 4, 11, "K")       // le funi
+    c.rect(x - 5, 12, 11, 3, "R"); c.hline(x - 5, 12, 11, "e"); c.hline(x - 5, 14, 11, "r"); c.box(x - 6, 11, 13, 5, "K")
   })
 // la luce rossa in cima alla gru
 anim("gru_luce", { w: 1, h: 1, frames: LOOP, fps: FPS }, (c) => c.px(0, 0, c.frame % 8 < 2 ? "R" : "r"))
@@ -317,7 +313,7 @@ function elCantiere() {
     layer("cantiere_gru",
       stamp("gru_torre", 115, 56),
       stamp("gru_braccio", 100, -1),
-      stamp("gru_carico", 148, 7),
+      stamp("gru_carico", 143, 7),
       stamp("gru_luce", 114, 0)),
     layer("cantiere_terra", { sort: "y" },
       rect(110, 52, 9, 3, "s"),                                     // il plinto di cemento della torre
@@ -326,10 +322,10 @@ function elCantiere() {
       stamp("gru_lampeggiante", 133, 48))]
 }
 
-// ================================================================ MENSA (x 136..159, y 30..71), al posto delle colonnine
+// ================================================================ MENSA (x 136..151, y 30..71), al posto delle colonnine
 // La mensa esterna: a destra la palazzina bassa (continua oltre il bordo) con l'insegna della forchetta e del coltello sul tetto,
-// la tenda e la vetrata; sul fianco la canna fumaria della cucina che fuma (16 fotogrammi). A sinistra il dehors sulla pedana
-// di legno: il tavolino con l'ombrellone e un magazziniere in pausa che beve il caffè; davanti alla porta la lavagna del menù.
+// la tenda e la vetrata; dietro l'insegna spunta il comignolo della cucina, che fuma (16 fotogrammi). Davanti
+// il dehors sulla pedana di legno: il tavolino con l'ombrellone e un magazziniere in pausa che beve il caffè.
 
 // la pedana di legno del dehors, rialzata: le assi, il bordo davanti
 sprite("men_pedana", { w: 14, h: 11, outline: "K" },
@@ -343,63 +339,59 @@ sprite("men_palazzina", { w: 12, h: 14, outline: "K" },
   line(1, 9, 2, 8, "W"), line(9, 9, 10, 8, "W"), px(6, 8, "K"), px(6, 9, "i"), px(11, 8, "K"), px(11, 9, "i"),
   hline(0, 13, 12, "z"))
 // l'insegna sul tetto: la forchetta e il coltello bianchi sul cartello rosso
-sprite("men_insegna", { w: 11, h: 9, outline: "K" },
-  rect(0, 0, 11, 9, "R"), hline(0, 8, 11, "r"),
-  grid(1, 1, ["W.W.W...W", "W.W.W..WW", "WWWWW..WW", ".WWW...WW", "..W.....W", "..W.....W", "..W.....W"].join("\n")))
-// la canna fumaria della cucina, d'acciaio, col cappello e la fascetta che la tiene al muro
-sprite("men_camino", { w: 4, h: 13, outline: "K", pivot: "bottom" },
-  hline(0, 0, 4, "s"), hline(0, 1, 4, "S"), rect(1, 2, 2, 11, "S"), vline(2, 2, 11, "s"), hline(1, 9, 2, "d"))
-// il fumo della cucina: sbuffi che salgono e piegano col vento (16 fotogrammi)
-// quattro sbuffi in fila: escono piccoli e bianchi, crescono, ingrigiscono e si sfilacciano verso sinistra
-anim("men_fumo", { w: 11, h: 5, frames: LOOP, fps: FPS }, (c) => {
+sprite("men_insegna", { w: 10, h: 9, outline: "K" },
+  rect(0, 0, 10, 9, "R"), hline(0, 8, 10, "r"),
+  grid(1, 1, ["W.W.W..W", "W.W.W.WW", "WWWWW.WW", ".WWW..WW", "..W....W", "..W....W", "..W....W"].join("\n")))
+// il comignolo della cucina, d'acciaio, col cappello e la fascetta: sale dal tetto dietro l'insegna (il gioco può mettere
+// il lampione a LED di destra in x 134..138, quindi camino e fumo stanno più a destra)
+sprite("men_camino", { w: 4, h: 7, outline: "K" },
+  hline(0, 0, 4, "s"), hline(0, 1, 4, "S"), rect(1, 2, 2, 5, "S"), vline(2, 2, 5, "s"), hline(1, 4, 2, "d"))
+// il fumo della cucina: sbuffi che salgono e piegano col vento verso destra (16 fotogrammi)
+// quattro sbuffi in fila: escono piccoli e bianchi, crescono, ingrigiscono e si sfilacciano
+anim("men_fumo", { w: 8, h: 7, frames: LOOP, fps: FPS }, (c) => {
   for (const o of [0, 4, 8, 12]) {
-    const t = (c.frame + o) % 16, x = Math.round(9 - t * 0.55), y = Math.round(4 - t * 0.3)
+    const t = (c.frame + o) % 16, x = Math.round(1 + t * 0.25), y = Math.round(6 - t * 0.3)
     if (t < 3) c.px(x, y, "W")
     else if (t < 8) { c.hline(x, y - 1, 2, "W"); c.hline(x, y, 2, "S") }
-    else if (t < 13) { c.hline(x, y - 1, 2, "S"); c.hline(x - 1, y, 3, "S"); c.px(x + 1, y, "j") }
-    else { c.px(x, y - 1, "S"); c.px(x - 1, y, "j"); c.px(x + 1, y, "j") }
+    else if (t < 13) { c.hline(x, y - 1, 2, "S"); c.hline(x, y, 3, "S"); c.px(x - 1, y, "j") }
+    else { c.px(x + 1, y - 1, "S"); c.px(x, y, "j"); c.px(x + 2, y, "j") }
   }
 })
 // l'ombrellone a spicchi bianchi e rossi col pomolo in cima, l'asta che scende nel tavolino
-sprite("men_ombrellone", { w: 13, h: 20, outline: "K", pivot: "bottom" },
-  poly([3, 1, 9, 1, 12, 4, 0, 4], "R"), hline(5, 0, 3, "R"),
-  (c) => { for (let y = 0; y < 5; y++) for (let x = 0; x < 13; x++) if (c.is(x, y, "R") && Math.floor((x + 1) / 3) % 2) c.px(x, y, "W") },
-  hline(0, 4, 13, "r"), (c) => { for (let x = 1; x < 13; x += 3) c.px(x, 4, "W") },
-  vline(6, 5, 15, "S"))
+sprite("men_ombrellone", { w: 11, h: 18, outline: "K", pivot: "bottom" },
+  poly([3, 1, 7, 1, 10, 4, 0, 4], "R"), hline(4, 0, 3, "R"),
+  (c) => { for (let y = 0; y < 5; y++) for (let x = 0; x < 11; x++) if (c.is(x, y, "R") && Math.floor((x + 1) / 3) % 2) c.px(x, y, "W") },
+  hline(0, 4, 11, "r"), (c) => { for (let x = 1; x < 11; x += 3) c.px(x, 4, "W") },
+  vline(5, 5, 13, "S"))
 // il magazziniere in pausa, seduto, col gilet giallo
 persona("_commensale", { corpo: "seduto", abito: "gilet", swap: { B: "Y", b: "y", M: "N" } })
 // ogni tanto sbatte le palpebre (16 fotogrammi)
 anim("men_commensale", { w: 10, h: 16, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
   stamp("__commensale"), (c) => { if (c.frame === 13 || c.frame === 14) { c.px(3, 5, "F"); c.px(6, 5, "F") } })
 // il tavolino con la tovaglia a quadretti bianchi e rossi che scende fin quasi alla pedana
-sprite("men_tavolino", { w: 13, h: 7, outline: "K", pivot: "bottom" },
-  hline(0, 0, 13, "W"), hline(0, 1, 13, "S"),
-  (c) => { for (let y = 2; y < 7; y++) for (let x = 0; x < 13; x++) c.px(x, y, (Math.floor(x / 2) + Math.floor((y - 2) / 2)) % 2 ? "W" : "R") },
-  hline(0, 6, 13, "r"), (c) => { for (let x = 1; x < 13; x += 2) if (c.is(x, 6, "r")) c.px(x, 6, "S") })
+sprite("men_tavolino", { w: 11, h: 7, outline: "K", pivot: "bottom" },
+  hline(0, 0, 11, "W"), hline(0, 1, 11, "S"),
+  (c) => { for (let y = 2; y < 7; y++) for (let x = 0; x < 11; x++) c.px(x, y, (Math.floor(x / 2) + Math.floor((y - 2) / 2)) % 2 ? "W" : "R") },
+  hline(0, 6, 11, "r"), (c) => { for (let x = 1; x < 11; x += 2) if (c.is(x, 6, "r")) c.px(x, 6, "S") })
 // la tazzina del caffè
 sprite("men_tazzina", { w: 3, h: 2, outline: "K", pivot: "bottom" }, hline(0, 0, 3, "m"), hline(0, 1, 3, "W"))
 // il vapore del caffè: un filo che sale ondeggiando (8 fotogrammi)
 anim("men_vapore", { w: 3, h: 4, frames: LOOP, fps: FPS },
   (c) => { const t = c.frame % 8; if (t < 6) c.px(1 + [0, 1, 1, 0, -1, -1][t], 3 - Math.floor(t * 2 / 3), t < 3 ? "W" : "S") })
-// la lavagna del menù sul cavalletto: due righe scritte col gesso
-sprite("men_lavagna", { w: 6, h: 9, outline: "K", pivot: "bottom" },
-  rect(0, 0, 6, 7, "N"), rect(1, 1, 4, 5, "d"), hline(1, 2, 3, "W"), hline(2, 4, 3, "S"),
-  px(0, 7, "N"), px(0, 8, "N"), px(5, 7, "N"), px(5, 8, "N"))
 
 function elMensa() {
   return [
     layer("mensa",
-      stamp("men_camino", 146, 48),
-      stamp("men_palazzina", 147, 40),
-      stamp("men_insegna", 148, 30)),
-    layer("mensa_fumo", { unlit: true }, stamp("men_fumo", 136, 30)),
+      stamp("men_camino", 141, 23),
+      stamp("men_palazzina", 140, 40),
+      stamp("men_insegna", 140, 30)),
+    layer("mensa_fumo", { unlit: true }, stamp("men_fumo", 141, 16)),
     layer("mensa_dehors",
       stamp("men_pedana", 136, 59),
-      stamp("men_ombrellone", 143, 65),
+      stamp("men_ombrellone", 143, 64),
       stamp("men_commensale", 143, 69),
       stamp("men_tavolino", 143, 70),
-      stamp("men_tazzina", 147, 63),
-      stamp("men_lavagna", 155, 71)),
+      stamp("men_tazzina", 147, 63)),
     layer("mensa_vapore", { unlit: true }, stamp("men_vapore", 146, 57))]
 }
 
@@ -500,54 +492,55 @@ function elPiazzale() {
       stamp("pia_cassone", 129, 70))]
 }
 
-// ================================================================ PORTINERIA (x 0..23, y 46..71), sopra il giardino
+// ================================================================ PORTINERIA (x 8..20, y 46..71; la sbarra fino a x 28), sopra il giardino
 // La guardiola dell'ingresso sull'isola di cemento col bordo a strisce gialle e nere: il portiere col berretto e i baffi al
 // finestrino; accanto la sbarra bianca e rossa che si alza, resta su e si riabbassa (16 fotogrammi), il lampeggiante
 // arancione acceso mentre si muove, e il portiere che la guarda passare. Da giù la sbarra sporge di qualche pixel a destra,
-// sopra il bordo della zona davanti a sinistra (resta nelle righe del terreno); su, sta tutta dentro la sua zona.
+// sopra il bordo della zona davanti a sinistra (resta nelle righe del terreno); su, sta tutta a sinistra di x 24.
 
 // la guardiola: la soletta del tetto col colore dell'azienda, le pareti bianche (ombra a destra e sotto il tetto), il
 // finestrino col portiere, il davanzale dello sportello e il citofono per gli autisti
-anim("por_guardiola", { w: 15, h: 21, frames: LOOP, fps: FPS, outline: "K" },
-  rect(0, 0, 15, 3, "T"), hline(0, 0, 15, "S"), hline(0, 2, 15, "t"),
-  rect(1, 3, 13, 18, "W"), vline(13, 3, 18, "S"), hline(1, 3, 13, "S"),
-  rect(2, 5, 11, 9, "s"), rect(3, 6, 9, 7, "L"), px(3, 7, "W"), px(4, 6, "W"),
-  grid(3, 6, [".Ddddddd.", "..dddYd..", "..KKKKK..", "..FFFFf..", "..FMMMf..", "...FFf...", "dddWRWddd"].join("\n")),
-  hline(1, 14, 13, "s"), hline(2, 15, 11, "S"), vline(13, 14, 2, "s"),
-  rect(3, 17, 3, 2, "d"), px(3, 17, "s"),
+anim("por_guardiola", { w: 11, h: 21, frames: LOOP, fps: FPS, outline: "K" },
+  rect(0, 0, 11, 3, "T"), hline(0, 0, 11, "S"), hline(0, 2, 11, "t"),
+  rect(0, 3, 10, 18, "W"), vline(9, 3, 18, "S"), hline(0, 3, 10, "S"),
+  rect(0, 5, 9, 9, "s"), rect(1, 6, 7, 7, "L"), px(1, 7, "W"), px(1, 8, "W"),
+  grid(1, 6, [".Ddddd.", "DdddYdd", ".KKKKK.", ".FFFFf.", ".FMMMf.", "..FFf..", "ddWRWdd"].join("\n")),
+  hline(0, 14, 10, "s"), hline(1, 15, 8, "S"), vline(9, 14, 2, "s"),
+  rect(2, 17, 3, 2, "d"), px(2, 17, "s"),
   // gli occhi: guarda avanti, sbatte le palpebre, poi segue la sbarra a destra finché non è giù
   (c) => {
     const f = c.frame
     if (f === 2) return
     const dx = f >= 4 && f <= 14 ? 1 : 0
-    c.px(5 + dx, 9, "K"); c.px(7 + dx, 9, "K")
+    c.px(2 + dx, 9, "K"); c.px(4 + dx, 9, "K")
   })
-// la sbarra: la cassetta del motore bianca col lampeggiante in cima, l'asta a fasce bianche e rosse (2 pixel, la punta
-// rossa) imperniata in alto sulla cassetta. Angolo per fotogramma: giù, sale, resta su, scende (16 fotogrammi).
-// Perno e lunghezza scelti perché l'asta, a ogni angolo, stia a sinistra di x 24 oppure sotto la riga 56.
+// la sbarra: la cassetta del motore bianca col lampeggiante in cima, l'asta a fasce bianche e rosse di 2 pixel (spessa 2,
+// la punta rossa) imperniata in alto sulla cassetta. Angolo per fotogramma: giù, sale, resta su, scende (16 fotogrammi).
+// Perno e lunghezza scelti perché l'asta, a ogni angolo, stia sotto la riga 56 o a sinistra di x 24, e da giù finisca a x 27
+// (il palo del lampione a LED, x 23..25, ne copre un pezzo: le fasce corte fanno vedere il bianco e il rosso ai due lati).
 const SBARRA = [0, 0, 0, 0, 8, 25, 50, 75, 90, 90, 90, 90, 68, 42, 18, 4]
-anim("por_sbarra", { w: 12, h: 15, frames: LOOP, fps: FPS, outline: "K" },
+anim("por_sbarra", { w: 11, h: 15, frames: LOOP, fps: FPS, outline: "K" },
   rect(0, 9, 3, 6, "W"), vline(2, 9, 6, "S"), hline(0, 12, 3, "T"), hline(0, 14, 3, "s"),
   (c) => {
-    const a = SBARRA[c.frame] * Math.PI / 180, co = Math.cos(a), si = Math.sin(a), L = 10
-    for (let y = 0; y < 12; y++) for (let x = 0; x < 12; x++) {
+    const a = SBARRA[c.frame] * Math.PI / 180, co = Math.cos(a), si = Math.sin(a), L = 8
+    for (let y = 0; y < 12; y++) for (let x = 0; x < 11; x++) {
       const dx = x - 1, dy = y - 10, t = dx * co - dy * si, s = dx * si + dy * co
-      if (t >= -0.5 && t <= L && s >= -0.5 && s < 1.5) c.px(x, y, Math.floor((L - t + 0.5) / 3) % 2 ? "W" : "R")
+      if (t >= -0.5 && t <= L && s >= -0.5 && s < 1.5) c.px(x, y, Math.floor((t + 0.5) / 2) % 2 ? "W" : "R")
     }
     c.px(1, 10, "s")                                                            // il perno
     c.px(0, 8, c.frame >= 4 && c.frame % 2 === 0 ? "a" : "o")                  // il lampeggiante
   })
 // l'isola spartitraffico: il piano di cemento e il bordo a strisce gialle e nere
-sprite("por_isola", { w: 21, h: 4, outline: "K" },
-  hline(0, 0, 21, "S"),
-  (c) => { for (let y = 1; y < 4; y++) for (let x = 0; x < 21; x++) c.px(x, y, Math.floor((x + y) / 2) % 2 ? "K" : "Y") })
+sprite("por_isola", { w: 13, h: 4, outline: "K" },
+  hline(0, 0, 13, "S"),
+  (c) => { for (let y = 1; y < 4; y++) for (let x = 0; x < 13; x++) c.px(x, y, Math.floor((x + y) / 2) % 2 ? "K" : "Y") })
 
 function elPortineria() {
   return [
     layer("portineria",
-      stamp("por_guardiola", -1, 46),
-      stamp("por_sbarra", 14, 52),
-      stamp("por_isola", -1, 67))]
+      stamp("por_guardiola", 8, 46),
+      stamp("por_sbarra", 17, 52),
+      stamp("por_isola", 8, 67))]
 }
 
 // ================================================================ LAMPIONI A LED (x 22..26 e 134..138, y 28..71), sopra a tutto
