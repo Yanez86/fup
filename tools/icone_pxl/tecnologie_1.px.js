@@ -103,18 +103,18 @@ tecnologia("rf", "log", {}, `
   .b.b
   ...b
   ..b.`)))
-// Magazzino verticale: torre automatica a cassetti con la freccia su e giù
+// Magazzino verticale: torre automatica a cassetti che porge un vassoio col collo all'operatore
 tecnologia("verticale", "log", {}, `
-  SSSSSS..Y.
-  SOOBBS.YYY
-  SssssS..Y.
-  SGGRRS..Y.
-  SssssS..Y.
-  SBBYYS..Y.
-  SssssS..Y.
-  SKKKKS..Y.
-  SOOOOS.YYY
-  SSSSSS..Y.`)
+  SSSSSS....
+  SssssS....
+  SSSSSS....
+  SssssS....
+  SSSSSS.YYY
+  SKKKKS.YYY
+  SOOOOOOOOO
+  SSSSSS....
+  SssssS....
+  SSSSSS....`)
 // Sinergia in pianificazione: camion carico di colli di clienti diversi
 tecnologia("sinergia", "log", {}, `
   ..........
@@ -259,14 +259,14 @@ tecnologia("academy", "org", {}, `
   ..DDDDDD.Y
   ..DDDDDD.Y
   .........Y
-  .RRRRRRRR.
-  RCCCCCCCCR
-  RCCCCCCCCR
+  .CCC..CCC.
+  CCCCqqCCCC
+  CCCCqqCCCC
   .RRRRRRRR.`)
 // Relazioni sindacali: due nuvolette, l'azienda (bianca) e il sindacato (rossa)
 tecnologia("relsind", "org", { tieni: "W", dopo: [grid(1, 1, `
-  sssss
-  ss.ss`), grid(4, 6, `
+  sss.s
+  s.sss`), grid(4, 6, `
   WW.W`)] }, `
   .WWWWW....
   WWWWWWW...
@@ -454,4 +454,37 @@ tecnologia("ecom", "mkt", { dopo: [grid(4, 3, `
   ..........
   ..........`)
 
+tecnologia("talpa_a", "org", { mx: true }, `
+  .....
+  ...DD
+  ..DDD
+  .DKDD
+  .DDDF
+  .DDDF
+  FFDDD
+  NNNNN
+  NNNNN
+  .NNNN`)
+tecnologia("talpa_b", "org", { mx: true }, `
+  ...RR
+  ..RRR
+  .RRRR
+  .DKDD
+  .DDDF
+  .DDDF
+  FFDDD
+  NNNNN
+  NNNNN
+  .NNNN`)
+tecnologia("talpa_c", "org", { mx: true }, `
+  .....
+  ...NN
+  ..NNN
+  .NKNN
+  .NNNF
+  .NNNF
+  FFNNN
+  MMMMM
+  MMMMM
+  .MMMM`)
 foglio("foglio")

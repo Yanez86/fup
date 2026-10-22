@@ -397,36 +397,22 @@ talento("Insonne", "neg", {}, `
   ...YYYYYYYY...
   ....YYYYYY....`)
 
-// Tifo sfegatato: il pallone del derby
-talento("Tifo sfegatato", "mix", { dopo: [grid(0, 0, `
-  ..............
-  .....KKKK.....
-  ......KK......
-  ..............
-  ..............
-  .K....KK....K.
-  .KK..KKKK..KK.
-  .KK..KKKK..KK.
-  .K....KK....K.
-  ..............
-  ..............
-  ...KK....KK...
-  ...KKK..KKK...
-  ..............`)] }, `
-  ....WWWWWW....
-  ..WWWWWWWWWW..
-  .WWWWWWWWWWWW.
-  .WWWWWWWWWWWW.
-  WWWWWWWWWWWWWW
-  WWWWWWWWWWWWWW
-  WWWWWWWWWWWWWW
-  WWWWWWWWWWWWWW
-  WWWWWWWWWWWWWW
-  WWWWWWWWWWWWWW
-  .WWWWWWWWWWWW.
-  .WWWWWWWWWWWW.
-  ..WWWWWWWWWW..
-  ....WWWWWW....`)
+// Tifo sfegatato: la sciarpa da stadio a righe tenuta in alto, con le frange
+talento("Tifo sfegatato", "mix", { mx: true }, `
+  .......
+  OOOOBBO
+  OOOOBBO
+  OOOOBBO
+  OOOOBBO
+  BBBB...
+  BBBB...
+  OOOO...
+  OOOO...
+  BBBB...
+  BBBB...
+  O.O....
+  O.O....
+  .......`)
 
 // Ex fumatore: divieto di fumo sopra la sigaretta
 talento("Ex fumatore", "pos", { fascia: false }, `
@@ -765,21 +751,21 @@ talento("Maturità scientifica", "pos", { tieni: "L", dopo: [grid(4, 3, `
   hhhhhhhhhhhhhh
   GGGGGGGGGGGGGG`)
 
-// Diplomato all'alberghiero: il cappello da cuoco
-talento("Diplomato all'alberghiero", "mix", { mx: true, dopo: [grid(4, 1, "S\nS"), grid(3, 8, "SSSS")] }, `
-  .WWW.WW
+// Diplomato all'alberghiero: la campana d'argento da servizio sul piatto
+talento("Diplomato all'alberghiero", "mix", { mx: true }, `
+  .......
+  .....SS
+  ......S
+  ....SSS
+  ..SSSSS
+  .SSSSSS
+  .SSSSSS
+  .SSSSSS
+  .SSSSSS
+  .SSSSSS
+  .SSSSSS
   WWWWWWW
-  WWWWWWW
-  WWWWWWW
-  WWWWWWW
-  WWWWWWW
-  .WWWWWW
-  ..WWWWW
-  ...WWWW
-  ...WWSW
-  ...WWSW
-  ...WWSW
-  ...WWSW
-  ...WWWW`)
+  ..SSSSS
+  .......`)
 
 foglio("foglio")

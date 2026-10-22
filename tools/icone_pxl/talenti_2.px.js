@@ -60,6 +60,10 @@ sprite("_t2pennello", { w: 7, h: 7, outline: "K" }, `
   ....DD.
   .....DD
   ......D`)
+// cuscino del lettino
+sprite("_t2cuscino", { w: 3, h: 2, outline: "K" }, `
+  CCC
+  CCC`)
 // cronometro del lead time
 sprite("_t2orologio", { w: 7, h: 8, outline: "K" }, `
   ...S...
@@ -290,7 +294,8 @@ talento("Laureato in psicologia", "mix", {}, `
   RRRRRRRRRRRRRR
   RRRRRRRRRRRRRR
   .NN........NN.
-  .NN........NN.`)
+  .NN........NN.`,
+  stamp("_t2cuscino", 4, 4), t2netto)
 // Laureato in scienze politiche: la scheda che entra nell'urna
 talento("Laureato in scienze politiche", "mix", { tieni: "W" }, `
   ....WWWWWW....
@@ -387,7 +392,7 @@ talento("Laureato in architettura", "mix", { tieni: "SB" }, `
 talento("Laureato in agraria", "pos", {}, `
   .........GGG..
   ......NGGGGGG.
-  ......NGGGG...
+  ......NGGGGG..
   ...OOONOOO....
   .OOOOOoOOOOO..
   OOOOOOoOOOOOO.
