@@ -11,9 +11,10 @@ pal({ K: "#16202e", W: "#ffffff", Y: "#ffd23f", O: "#ff7a3d", R: "#e0393e", G: "
       k: "#c08a55", j: "#7f95b0", v: "#ffe2c6", c: "#b8784a", x: "#8a5232", A: "#e3a877", X: "#b97c50", Z: "#e9edf2",
       // chiavi «di lavoro», cambiate da ogni personaggio con swap:
       // capelli H I J (base, riflesso, ombra), vestito Q U V (base, chiaro, ombra), pelle F f v (base, ombra, luce),
-      // 1 occhiali, 2 labbra, 3 orecchini, 4 cravatta o collana
+      // 1 occhiali, 2 labbra, 3 orecchini, 4 cravatta o collana: colori propri (a un passo da K, R e Y), perché swap cambia
+      // un colore ovunque e, con gli stessi colori del contorno o del rosso, gli occhiali colorati ricoloravano anche il contorno
       H: "#3d2412", I: "#6b3e1f", J: "#2a1a0e", Q: "#4a5f7a", U: "#7f95b0", V: "#2a3a50",
-      1: "#16202e", 2: "#e0393e", 3: "#ffd23f", 4: "#e0393e" })
+      1: "#16202f", 2: "#e0393f", 3: "#ffd240", 4: "#e1393e" })
 
 // ================================================================ testa (metà sinistra, 12 colonne; mx la specchia)
 // 3 righe vuote in cima per i capelli; occhi alle righe 15-17, bocca alla 21, mento alla 25
@@ -435,6 +436,25 @@ const ABITO = {
     "YYYYYyYYYYYYYYYYYYYyrR",
     "YYYYYyYYYYYYYYYYYYYyRr",
     "YYYYYyYYYYYYYYYYYYYyrR"]]],
+  // camicetta bianca (Ornella): colletto aperto chiaro (U) sulla base (Q), scollo a V, bottoni, pieghe sotto il petto, vita stretta
+  camicetta: [[3, [
+    "............QQVUUUVFFF",
+    "........QQQQQQQVUUUVFF",
+    ".....QQQQQQQQQQQVUUVFF",
+    "...QQQQQQQQQQQQQQVUUVF",
+    "..QQQQQQQQQQQQQQQQVUVf",
+    ".QQQQQQQQQQQQQQQQQQVVV",
+    ".QQQQQQQQQQQQQQQQQQQQQ",
+    "QQQQQVQQQQQUUUUQQQQQQs",
+    "QQQQQVQQQQQQUUQQQQQQVQ",
+    "QQQQQVQQQQQQQQQQQQQVQQ",
+    "QQQQQVQQQVQQQQQQQQVQQs",
+    "QQQQQVQQQQVVVVVVVVQQQQ",
+    "QQQQQVVQQQQQQQQQQQQQQQ",
+    "QQQQQVVQQQQQQQQQQQQQQs",
+    "QQQQQVVVQQQQQQQQQQQQQQ",
+    "QQQQQVVVQQQQQQQQQQQQQQ",
+    "QQQQQVVVVQQQQQQQQQQQQs"]]],
   // felpa col cappuccio (Marco): cordini chiari sul petto
   felpa: [[3, [
     "...........UUUUUUUVfFF",
@@ -525,6 +545,7 @@ const cuffie_collo = () => grid(13, 36, `
   KuuuK............KuuuK
   KtttK............KtttK
   KKKKK............KKKKK`)
+const occhiolino = () => grid(26, 22, "FKKF\nKFFK\nFFFF")   // l'occhio a destra chiuso a lunetta
 const punto = () => grid(21, 44, `
   .KKKK.
   KssssK
@@ -587,6 +608,13 @@ ritratto("p_kevin", { pelle: "media", capelli: "spettinati", cap: ["#2c2420", "#
 ritratto("p_delsasso", { pelle: "media", capelli: "riccetti", cap: ["#2c2420", "#4a3c34"], bocca: "sorriso", vest: NAVY })
 ritratto("p_sorrentino", { pelle: "media", capelli: "stempiato", cap: ["#4a4644", "#9aa0a8"], viso: ["naso", "stretti"], abito: "polo", vest: ["#2f5f9e", "#1f4377", "#4a7fc0"] })
 ritratto("p_greta", { capelli: "riccioni", cap: ["#e8c25a", "#fbe39a", "#b08a2e"], bocca: "ridente", labbra: "#c85a62", viso: ["occhioni", "orecchini"], abito: "polo", vest: ["#ff7a3d", "#c8551f", "#ffb07a"] })
+
+// --- la dottoressa Ornella Ribalta, insegnante dei tutorial: tre espressioni (spiega, contenta, occhiolino)
+const ORNELLA = { pelle: "media", capelli: "caschetto", cap: ["#1c1a22", "#3a3848"], viso: ["occhiali", "orecchini"], occhiali: "#e0393e",
+  orecchini: "#e2b84a", labbra: "#c8323a", abito: "camicetta", vest: ["#e9edf2", "#c3d0dc", "#ffffff"] }
+ritratto("p_ornella", { ...ORNELLA, bocca: "rossetto" })
+ritratto("p_ornella_contenta", { ...ORNELLA, bocca: "ridente" })
+ritratto("p_ornella_occhiolino", { ...ORNELLA, bocca: "ridente" }, [occhiolino()])
 
 // --- ritratti a scelta per il CEO creato dal giocatore
 ritratto("p_cc1", { pelle: "media", capelli: "corti", cap: ["#2c2420", "#463830"], bocca: "sorriso", abito: "completo", accento: "Y", vest: NAVY })

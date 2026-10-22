@@ -1,6 +1,7 @@
 """Test automatico: apre il gioco in Chromium headless, clicca tutti i menu, prova alberi tecnologici e direzione,
 crea un CEO personalizzato, prova il gioco su un telefono (verticale e orizzontale: finestre, tocchi, zoom con due dita),
 poi fa giocare un bot semplice 3 anni con ognuno dei 4 CEO e con uno creato, e una partita col pacchetto Relazioni industriali.
+Percorre anche il tutorial della dottoressa Ribalta, sul computer e sul telefono.
 Fallisce se ci sono errori JavaScript.
 Uso: python3 tools/build.py && python3 tests/smoke_test.py   (richiede: pip install playwright && playwright install chromium)"""
 import asyncio, os, sys
@@ -317,10 +318,73 @@ async def phone(b, w, h, name, errs):
         await pg.tap(f'#win-{wn} [data-act=close]')
     await ctx.close()
 
+# tutorial della dottoressa Ribalta: si percorre tutto toccando quello che il riquadro giallo indica (o «Avanti»);
+# nei passi in cui il tempo scorre il test fa avanzare i giorni più in fretta. Il fumetto resta nello schermo, il tempo resta fermo
+# nei passi da leggere, la partita si salva e riparte dal passo giusto, la gara della lezione si vince e alla fine arriva l'attestato.
+TUT_ST = """()=>{const F=window.__FUP,S=F.S,L=F.tutSteps(S.tut.id),s=L[S.tut.i]||{};return {i:S.tut.i,n:L.length,done:S.tut.done||0,run:!!s.run,speed:S.speed}}"""
+TUT_HI = """()=>{const h=document.querySelector('#tuthi');if(!h||h.hidden)return null;const r=h.getBoundingClientRect();return [r.left+Math.min(r.width/2,26),r.top+Math.min(r.height/2,26)]}"""
+async def tutorial(b, errs, mob):
+    name = 'tel_tutorial' if mob else 'tutorial'
+    ctx = await (b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True) if mob else b.new_context(viewport={'width': 1440, 'height': 860}))
+    pg = await ctx.new_page(); pg.on('pageerror', lambda e: errs.append(f'{name}: {e}'))
+    await pg.goto('file://' + PAGE)
+    await (pg.tap if mob else pg.click)('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
+    await pg.screenshot(path=os.path.join(OUT, f'shot_{name}_avvio.png'))
+    await (pg.tap if mob else pg.click)('#start [data-act=tutorial]')
+    await pg.wait_for_selector('#tut .tut-b')
+    shots = {0: 'benvenuto', 6: 'personale', 10: 'offerta', 13: 'ricerca', 20: 'evento', 21: 'risposte', 26: 'report', 29: 'fine'}
+    last, seen, held, idle = -1, set(), False, 0
+    for _ in range(600):
+        st = await pg.evaluate(TUT_ST)
+        if st['done']: break
+        if st['i'] != last:
+            last, idle = st['i'], 0; seen.add(last)
+            await pg.wait_for_timeout(150)
+            assert await pg.evaluate(FITS, '#tut'), f'{name}: fumetto fuori dallo schermo al passo {last}'
+            if last in shots: await pg.screenshot(path=os.path.join(OUT, f'shot_{name}_{last:02d}_{shots[last]}.png'))
+            if not st['run'] and not held:
+                held = True; assert await pg.evaluate("()=>{const F=window.__FUP; F.ACT.speed({v:'1'}); return F.S.speed}") == 0, f'{name}: il tempo parte in un passo da leggere'
+            if last == 12 and not mob:
+                # la partita salvata riparte dal passo dov'era
+                await pg.evaluate('()=>window.__FUP.save()'); await pg.reload()
+                await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
+                await pg.click('#start [data-act=continue]'); await pg.wait_for_selector('#tut .tut-b')
+                assert await pg.evaluate('()=>window.__FUP.S.tut.i') == 12, f'{name}: dopo il caricamento il tutorial non riparte dal passo giusto'
+            continue
+        if await pg.evaluate('()=>window.__FUP.S.tut.i') != last: continue
+        nx = await pg.query_selector('#tut [data-act=tutnext]')
+        if nx and await nx.is_visible():
+            await (nx.tap() if mob else nx.click()); await pg.wait_for_timeout(80); continue
+        if st['run'] and st['speed'] > 0:   # tempo che scorre: un giorno in più a ogni giro
+            await pg.evaluate("()=>{const F=window.__FUP; if(F.S.speed>0){F.step(); F.renderAll();}}")
+        hi = await pg.evaluate(TUT_HI)
+        if hi and idle % 5 == 0:
+            if mob: await pg.touchscreen.tap(hi[0], hi[1])
+            else: await pg.mouse.click(hi[0], hi[1])
+        idle += 1; assert idle < 120, f'{name}: tutorial fermo al passo {last}'
+        await pg.wait_for_timeout(150)
+    await pg.wait_for_selector('#modal .attest')
+    await pg.screenshot(path=os.path.join(OUT, f'shot_{name}_attestato.png'))
+    r = await pg.evaluate("""()=>{const F=window.__FUP,S=F.S,g=S.tenders.find(t=>t.tut);
+      return {done:S.tut.done, vinta:!!g&&S.clients.some(c=>c.name===g.name), fm:S.warehouses[0].staff.fm+S.queue.filter(q=>q.role==='fm').length,
+        ricerca:!!S.project||!!S.researched.barcode, ev:S.nextEvent<1e8, gare:S.tNext<1e8}}""")
+    assert len(seen) == st['n'] and r == {'done': 1, 'vinta': True, 'fm': 1, 'ricerca': True, 'ev': True, 'gare': True}, (sorted(set(range(st['n'])) - seen), r)
+    await (pg.tap if mob else pg.click)('#modal [data-act=closemodal]')
+    assert await pg.evaluate("()=>!document.querySelector('#tut').innerHTML&&document.querySelector('#tuthi').hidden"), f'{name}: fumetto rimasto dopo la fine'
+    if not mob:
+        # saltare il tutorial (con conferma): la partita continua normale
+        await pg.evaluate('()=>window.__FUP.ACT.quitgame()'); await pg.click('#start [data-act=tutorial]'); await pg.wait_for_selector('#tut .tut-b')
+        await pg.click('#tut [data-act=tutskip]'); await pg.click('#modal [data-act=okgo]')
+        r = await pg.evaluate("()=>{const S=window.__FUP.S;return {done:S.tut.done,ev:S.nextEvent<1e8,tut:!!document.querySelector('#tut').innerHTML}}")
+        assert r == {'done': 2, 'ev': True, 'tut': False}, r
+    await ctx.close()
+
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch()
         errs = []
+        await tutorial(b, errs, False)
+        await tutorial(b, errs, True)
         await phone(b, 390, 844, 'verticale', errs)
         await phone(b, 844, 390, 'orizzontale', errs)
         pg = await b.new_page(viewport={'width': 1440, 'height': 860})
