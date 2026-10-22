@@ -1782,7 +1782,9 @@ const TALENTS={
  /* talenti del pacchetto Relazioni industriali (ri:1): contano solo nelle partite col pacchetto */
  'Pugno di ferro':{t:'mix',ri:1,wh:{ag:5},fx:'Leadership +1 · Amministrazione +1 · Con la Linea dura gli scioperi falliscono 2 volte su 3 · Agitazione sindacale +5 nel magazzino che guida',fl:'Tiene in ufficio una foto di sé davanti a un picchetto. Sorride solo lui.'},
  'Mediatore nato':{t:'pos',ri:1,fx:'Negoziazione +2 · Al tavolo delle trattative ogni seduta conta doppio',fl:'Ha fatto firmare la pace a due condomini in lite da trent\'anni. Con un vassoio di bignè.'},
- 'Amico del delegato':{t:'pos',ri:1,wh:{ag:-10},fx:'Leadership +1 · Agitazione sindacale −10 nel magazzino che guida',fl:'Giocano a briscola insieme il giovedì sera. Il delegato perde sempre, e lo sa.'}
+ 'Amico del delegato':{t:'pos',ri:1,wh:{ag:-10},fx:'Leadership +1 · Agitazione sindacale −10 nel magazzino che guida',fl:'Giocano a briscola insieme il giovedì sera. Il delegato perde sempre, e lo sa.'},
+ /* talento di chi diventa manager dopo un anno di affiancamento (eventi dei talenti in banchina, vedi cresDone) */
+ 'Cresciuto in banchina':{t:'pos',wh:{mor:3},fx:'Operazioni +1 · Leadership +1 · Morale +3 nel magazzino che guida',fl:'Sa dove sta ogni codice e come si chiama il cane del capoturno. Le scarpe antinfortunistiche le porta anche alle riunioni coi clienti.'}
 };
 const TTYPE={pos:['Positivo','#eaf6ec','#6fdc8c'],neg:['Negativo','#fbecec','#ff8a8d'],mix:['Misto','#fff6dc','#ffd23f']};
 const TFRAME={log:{c:'#ff7a3d',bg:'#ffe8d9',bg2:'#ffd6bd',cut:[0,0,0],shape:'Quadrato arancione'},org:{c:'#9b6bff',bg:'#ece3ff',bg2:'#dccdff',cut:[3,2,1],shape:'Ottagono viola'},mkt:{c:'#2e9e48',bg:'#dff3d6',bg2:'#c9e9bd',cut:[5,3,2,1,1],shape:'Tondo verde'},wel:{c:'#e0393e',bg:'#ffe1e1',bg2:'#ffcaca',cut:[2,1],shape:'Quadrato smussato rosso'},
@@ -2642,6 +2644,18 @@ wk('preavviso','pers','Preavviso',`Chi firma non arriva subito: una settimana pe
 Durante il preavviso, una volta su cinque, il vecchio datore di lavoro fa una controfferta: puoi pareggiarla (stipendio +10%), rilanciare poco (+4%, una volta su due basta) o lasciarlo andare.
 
 Il giorno in cui arriva, il nuovo manager prende il primo magazzino senza manager.`);
+wk('promozione_interna','pers','Talenti in banchina',`Ogni tanto tra magazzinieri e impiegati di magazzino spunta qualcuno con la stoffa: con un anno di affiancamento diventa manager. Di solito è un manager discreto, a volte un fuoriclasse.`,
+`Di rado (in media una volta ogni cinque o sei anni) la Gazzetta del Muletto racconta di un [[magazzinieri|magazziniere]] o di un [[impiegati|impiegato di magazzino]] che si è fatto notare: ha ridisegnato il picking, ritrovato i colli spariti, tenuto in piedi un turno di notte, strappato uno sconto al telefono, scritto le macro del gestionale o scovato un errore nelle fatture. Ogni storia dice per quale [[abilita|abilità]] si è fatto notare. Più magazzinieri e impiegati hai, più è facile che spunti un talento (i facchini della [[cooperativa]] non contano); mai nel primo anno, tra una scoperta e l'altra passano almeno due anni e le persone in crescita sono al massimo due alla volta.
+
+Puoi rispondere in quattro modi:
+• **un anno di affiancamento** (3.000 € di corsi): resta al suo posto per un anno, poi diventa manager;
+• **te ne occupi tu**, con [[st_lead|Leadership]] 13 o il talento Mentore: come sopra, ma arriva con Leadership +1 e +1 nell'abilità per cui si è fatto notare;
+• **un premio** (1.500 €): morale +3 nel magazzino per 2 mesi, e resta dov'è;
+• **ognuno al suo posto**: una volta su tre se ne va dalla concorrenza.
+
+Durante l'anno lo trovi nella finestra Manager, sotto «In crescita», con la data della promozione. Le abilità e il [[rango_manager|rango]] si scoprono solo quel giorno: più o meno una volta su due è un manager di rango C, una volta su tre forte (B, a volte A), una volta su sette un fuoriclasse di rango S. A volte il capoturno se ne accorge prima, e lo dice nel racconto.
+
+Il giorno della promozione lascia il suo reparto (una persona in meno nel magazzino), prende il talento «Cresciuto in banchina» (Operazioni +1, Leadership +1, morale +3 nel magazzino che guida) e, se c'è, il magazzino da cui viene o un altro senza manager. Costa il 20% in meno dello stipendio di mercato del suo rango, e non serve né trattativa né [[preavviso]].`);
 wk('welfare_mag','pers','Servizi di welfare',`Servizi per chi lavora in un magazzino: dai boccioni d'acqua alla mensa, dalla palestra all'asilo, fino all'area cani. Si ricercano nell'albero Welfare e si installano sito per sito.`,
 `Ogni servizio si ricerca una volta nell'albero Welfare della finestra Tecnologia, poi si [[installazione|installa]] nei magazzini che vuoi, con un costo iniziale e un canone al mese. Funziona da subito, senza [[apprendimento]].
 
@@ -3428,11 +3442,13 @@ const GEN_BIO=[
  {k:'lead',t:'Responsabile del personale di un gruppo con duemila magazzinieri'},{k:'lead',t:'Ha rimesso in piedi un magazzino di {c} dopo tre scioperi di fila'},{k:'lead',t:'Ha allenato una squadra di basket, poi un reparto: i turni li gestisce come un time-out'},
  {k:'amm',t:'Controller di un gruppo del freddo a {c}: conosce ogni centesimo'},{k:'amm',t:'Responsabile amministrativ{o} di una cooperativa di {c}: tre bilanci in attivo di fila'},{k:'amm',t:'Ex revisore dei conti: legge un conto economico come un romanzo giallo'},
  {k:'inn',t:'Ha progettato tre magazzini automatici in Emilia'},{k:'inn',t:'Ha portato il WMS in un deposito di {c} che usava ancora i fogli a quadretti'},{k:'inn',t:'Consulente informatic{o} per vent\'anni: parla di robot e sensori come di vecchi amici'}];
-const TAL_EDU=Object.keys(TALENTS).filter(n=>TALENTS[n].edu), TAL_GEN=Object.keys(TALENTS).filter(n=>!TALENTS[n].edu&&!['Papà ha sempre ragione','Esaurito','Golfista','Consigliere comunale'].includes(n));
+const TAL_EDU=Object.keys(TALENTS).filter(n=>TALENTS[n].edu), TAL_GEN=Object.keys(TALENTS).filter(n=>!TALENTS[n].edu&&!['Papà ha sempre ragione','Esaurito','Golfista','Consigliere comunale','Cresciuto in banchina'].includes(n));
 // un candidato nuovo: o.k / o.min = abilità e valore minimo chiesti all'head hunter; senza, una candidatura spontanea (rango basso)
+// nome e cognome che nessuno ha già (manager in partita, candidati, chi sta crescendo in banchina)
+function genName(f){ const used=new Set([...liveCo().flatMap(c=>c.managers.map(p=>p.name)),...mkt().l.map(p=>p.name),...cands().map(c=>c.p?c.p.name:''),...(S.cresc||[]).map(x=>x.name)]);
+  let name=''; for(let i=0;i<40&&(!name||used.has(name));i++) name=pick(GEN_N[f?'f':'m'])+' '+pick(GEN_S); return name; }
 function genPerson(o){ o=o||{};
-  const f=Math.random()<0.45, used=new Set([...liveCo().flatMap(c=>c.managers.map(p=>p.name)),...mkt().l.map(p=>p.name),...cands().map(c=>c.p?c.p.name:'')]);
-  let name=''; for(let i=0;i<40&&(!name||used.has(name));i++) name=pick(GEN_N[f?'f':'m'])+' '+pick(GEN_S);
+  const f=Math.random()<0.45, name=genName(f);
   const age=o.k?rint(30,60):pick([rint(23,34),rint(28,50),rint(36,60)]), top=o.k&&Math.random()<0.1, st={};
   STATS.forEach(s=>st[s.k]=o.k?(top?rint(8,15):rint(5,13)):rint(4,11));
   if(!o.k&&Math.random()<0.15) st[pick(STATS).k]=rint(13,15);
@@ -3520,6 +3536,43 @@ function arrive(p){ delete p.arr; delete p.cof; delete p.cofPend; p.hired=true; 
   notify('green','manager','Ufficio del personale',`${p.name} entra in azienda`,w?`Da oggi guida il magazzino di ${w.name}. Puoi spostarl${oa(p)} dalla finestra del magazzino, in Direzione o al customer service.`:`Non c'è un magazzino senza manager: assegnal${oa(p)} a un magazzino, alla Direzione o al customer service.`,'manager',{mtab:'team'});
   if(!isBot()) news('La Gazzetta del Muletto',`${p.name} entra in ${S.company.name}`,`${p.role}. ${ageOf(p)} anni, rango ${mRank(p)}.`);
 }
+// talenti in banchina: un magazziniere o un impiegato di magazzino si fa notare (eventi b_*); con un anno di affiancamento diventa manager.
+// S.cresc: chi sta crescendo {id,name,sx,bd,face,role,wh,wn,k,star,men,day0,end}; le abilità si decidono solo il giorno della promozione.
+// star: 0 normale (di solito rango C), 1 forte (B, a volte A), 2 fuoriclasse (S); lv = [min, max] delle altre abilità e dell'abilità per cui si è fatto notare.
+// k2: la seconda abilità, secondo il mestiere; ral: stipendio rispetto al mercato (cresciuto in casa, costa meno); men: seguito dal CEO (+1 abilità, +1 Leadership)
+const CRESC={days:365,gap:730,p:0.3,n:20,cost:3000,ral:0.8,star:[0.55,0.85],lv:[[4,10,13,15],[5,11,15,17],[8,13,18,20]],k2:{pick:['op','lead','prec'],imp:['prec','amm','neg']},max:2};
+const crescL=()=>S.cresc||(S.cresc=[]);
+const bMest=(role,sx)=>role==='imp'?(sx==='f'?'impiegata':'impiegato')+' di magazzino':sx==='f'?'magazziniera':'magazziniere';
+// chi si è fatto notare, per i ritratti (finestra dell'evento e scheda In crescita): niente abilità finché non è promosso
+const cresFace=x=>({id:x.id||'b',name:x.name||x.nm,sx:x.sx,face:x.face,tal:[],st:{}});
+function cresStart(ev,men){ S.cash-=CRESC.cost; const w=ev.w&&whById(ev.w.id);
+  crescL().push({id:'g'+(uid++),name:ev.nm,sx:ev.sx,bd:ev.bd,face:ev.face,role:ev.role,wh:w?w.id:null,wn:w?w.name:'',k:ev.k,star:ev.star,men:men?1:0,day0:S.day,end:S.day+CRESC.days});
+  if(w) mod(w.id,{mor:2},60); }
+// un anno dopo: le abilità (secondo la stoffa), il talento «Cresciuto in banchina», lo stipendio sotto il mercato; lascia il suo reparto e prende un magazzino senza manager
+function cresDone(x){
+  const T=CRESC.lv[x.star], st={}; STATS.forEach(s=>st[s.k]=rint(T[0],T[1]));
+  st[x.k]=rint(T[2],T[3]); const k2=pick(CRESC.k2[x.role].filter(k=>k!==x.k)); st[k2]=Math.max(st[k2],T[2]-2+rint(0,1));
+  if(x.men){ st[x.k]++; st.lead++; }
+  const tal=['Cresciuto in banchina']; if(Math.random()<0.5){ const n=pick(TAL_GEN.filter(n=>riOn()||!TALENTS[n].ri)); if(!tal.includes(n)) tal.push(n); }
+  tal.forEach(n=>Object.entries(talMods(n)).forEach(([k,v])=>st[k]+=v)); STATS.forEach(s=>st[s.k]=clamp(st[s.k],1,20));
+  // un fuoriclasse è sempre di rango S: se i dadi non ci arrivano, crescono le abilità più deboli
+  if(x.star===2) for(let i=0;i<40&&mScore({st})<MRANK[0].min;i++){ const k=STATS.map(s=>s.k).sort((a,b)=>st[a]-st[b])[0]; st[k]++; }
+  const mest=bMest(x.role,x.sx), w0=whById(x.wh);
+  const p={id:x.id,gen:1,int:1,name:x.name,sx:x.sx,bd:x.bd,role:`Cresciut${oa(x)} in casa: ${mest} a ${x.wn||'magazzino'}, poi un anno di affiancamento`,tal,st,face:x.face,hired:true,wh:null,log:[],ann:true};
+  p.ral=r500(ralOf(mScore(p))*CRESC.ral); p.raiseDay=S.day; p.unh=0; p.quit=null; p.tol={};
+  if(w0&&w0.staff[x.role]>0) w0.staff[x.role]--;
+  S.managers.push(p); plog(p,`Da ${mest} a manager, dopo un anno di affiancamento`);
+  const w=w0&&!w0.mgr?w0:S.warehouses.find(v=>!v.mgr); if(w){ w.mgr=p.id; p.wh=w.id; }
+  const rk=mRank(p), best=STATS.reduce((a,s)=>p.st[s.k]>p.st[a.k]?s:a,STATS[0]), top=x.star===2;
+  const dove=w?`Da oggi guida il magazzino di ${w.name}.`:`Non c'è un magazzino senza manager: assegnal${oa(p)} a un magazzino, alla Direzione o al customer service.`;
+  notify('green','manager','Ufficio del personale',top?`${p.name}: un fuoriclasse cresciuto in casa`:`${p.name} diventa manager`,
+    (top?`Un anno fa ${p.sx==='f'?'la':'lo'} trovavi in banchina a ${x.wn}. Alla prima riunione da manager ha messo in fila tutti: rango ${rk}, ${best.n} ${p.st[best.k]}. `
+      :`Dopo un anno di affiancamento ${nm1(p)} lascia il posto da ${mest} e passa dall'altra parte della scrivania: rango ${rk}, forte in ${best.n}. `)
+    +`Stipendio ${eur(p.ral)} l'anno, meno di quanto chiederebbe sul mercato. ${dove}`,'manager',{mtab:'team'});
+  news('La Gazzetta del Muletto',`${p.name}: dalla banchina alla scrivania`,`${mest[0].toUpperCase()+mest.slice(1)} a ${x.wn}, dopo un anno di affiancamento diventa manager di ${S.company.name}. ${ageOf(p)} anni, rango ${rk}.`);
+  chron('personale',`${p.name} passa dalla banchina a manager (rango ${rk})`);
+}
+function cresDaily(){ if(!S.cresc||!S.cresc.length) return; const done=S.cresc.filter(x=>S.day>=x.end); if(!done.length) return; S.cresc=S.cresc.filter(x=>S.day<x.end); done.forEach(cresDone); }
 function cofEvent(p){ const base=EVENTS.find(e=>e.id==='controfferta'); if(!base) return;
   const ev={...base,p,r10:r500(p.ral*1.1),r4:r500(p.ral*1.04)};
   ev.title=`${nm1(p)} ci ripensa?`; ev.text=`${p.name} ti chiama, imbarazzat${oa(p)}: «Il mio capo ha saputo che me ne vado e mi ha offerto il 10% in più per restare. Da voi vorrei venire, però...». Il ${shortDate(p.arr)} è vicino, e il telefono scotta.`;
@@ -3527,6 +3580,7 @@ function cofEvent(p){ const base=EVENTS.find(e=>e.id==='controfferta'); if(!base
 // ogni giorno, per ogni azienda: arrivi, controfferte, ricerche finite, profili scaduti, risposte alle offerte
 function mgrDaily(){
   if(!S.bot) mktDaily();
+  cresDaily();
   S.managers.filter(p=>p.arr!=null).forEach(p=>{
     if(p.cof!=null&&S.day>=p.cof&&S.day<p.arr){ if(!evBusy()&&!S.over){ delete p.cof; p.cofPend=true; cofEvent(p); } return; }
     if(S.day>=p.arr&&!p.cofPend) arrive(p); });
@@ -3625,6 +3679,13 @@ function personCard(m,where,btn,bad,busy){
     ${demHtml(m)}${storiaHtml(m,2)}
     <div class="pr-ma">${btn}</div></div>`;
 }
+// scheda di chi sta crescendo in banchina (S.cresc): le abilità si scoprono il giorno della promozione
+function cresCard(x){ const s=STATS.find(z=>z.k===x.k), pc=clamp((S.day-x.day0)/Math.max(1,x.end-x.day0),0,1);
+  return `<div class="card pr-m"><div class="pf-h"><img class="px mport" src="${mImg(cresFace(x))}" alt="Ritratto di ${esc(x.name)}" width="80" height="94">
+    <div class="wh-sm"><b class="pf-n"><span>${esc(x.name)}</span></b><span class="pf-r">${kw('eta',ageOf(x)+' anni')} · ${esc(bMest(x.role,x.sx))} a ${esc(x.wn||'magazzino')}</span>
+     <span class="pf-tags"><span class="pill">diventa manager il ${shortDate(x.end)}</span><span class="pill pf-best" style="background:${s.bg};border-color:${s.c}">${statIcon(s.k,12)} si è fatt${oa(x)} notare in ${s.n}</span></span></div></div>
+    <div class="bar" data-tip="Affiancamento: ${Math.round(pc*100)}%"><i style="width:${Math.round(pc*100)}%;background:var(--accent)"></i></div>
+    <div class="sm">${x.men?'Ogni venerdì passa un\'ora nel tuo ufficio. ':''}Le abilità e il ${kw('rango_manager','rango')} si scoprono il giorno della promozione: di solito è un manager discreto, a volte un fuoriclasse.</div></div>`; }
 // scelta di chi guida un magazzino (k:'wh'), il customer service (k:'cs') o un posto in Direzione (k:'dir'): finestrella con tutti i manager della squadra,
 // sopra quelli che si possono nominare (prima chi è già al posto, poi dal più adatto), sotto in grigio quelli che hanno già un incarico, col loro ruolo
 const mpTask=m=>{const r=seatOf(m.id), w=m.wh&&whById(m.wh); return r?DIR_ROLES.find(x=>x.id===r).name:isCs(m.id)?'Responsabile del customer service':w?'Manager di '+w.name:m.arr!=null&&!m.hired?'In arrivo: entra il '+shortDate(m.arr):'';};
@@ -5290,6 +5351,7 @@ const SCN_EV={
   t_epoca:'piazzale',m_spavento:'piazzale',gestionale:'ufficio',stagista:'ufficio',brambilla:'ufficio',t_scenata:'ufficio',t_social:'ufficio',
   t_ipocondria:'ufficio',t_cugino:'ufficio',t_budget:'ufficio',pensione_ceo:'ufficio',klaus:'trattoria',coop_sciopero:'sciopero',ri_bf:'sciopero',
   t_guanto:'ispezione',t_maratona:'strada',x_stramilano:'strada',ri_grazie:'trattativa',
+  b_picking:'talento',b_inventario:'talento',b_turno:'talento',b_telefono:'talento',b_macro:'talento',b_fatture:'talento',
   // Il Sole 24 Pallet
   sciopero:'sciopero',ri_rivale:'sciopero',duore:'strada',olimpiadi:'neve',coop_ispettorato:'ispezione',ri_caporalato:'ispezione',concorrente:'piazzale',
   // Ufficio del personale
@@ -5308,6 +5370,50 @@ const scnHtml=(k,ferma)=>k&&SCENE[k]?`<div class="ev-scn${ferma?' ferma':''}"><i
 const WSCN={magazzini:'lavoro',tecnologia:'tecnologia',customer:'customer',direzione:'consiglio',
   azienda:()=>'direttore_'+(ceo()&&ceo().sx==='f'?'f':'m')+(hashN(S.company.name||'')%2?'f':'m')};
 const scnWin=tab=>{const k=typeof WSCN[tab]==='function'?WSCN[tab]():WSCN[tab]; return k?scnHtml(k,tab==='tecnologia'&&!S.project):'';};
+// talenti in banchina: un magazziniere (pick) o un impiegato di magazzino (imp) si fa notare per un'abilità (k). Eventi rari: sei storie,
+// ognuna passa il controllo con una probabilità che cresce con le persone in banchina (bOdds: più magazzinieri e impiegati, più talenti), mai nel
+// primo anno di gioco; tra una scoperta e l'altra passano almeno due anni (CRESC.gap); al massimo CRESC.max persone in crescita insieme. La stoffa (star) si scopre solo alla promozione,
+// ma a volte il capoturno se ne accorge prima (hint). t = racconto: n nome, m mestiere, a anzianità, w magazzino, g(maschile, femminile)
+const B_HINT=[x=>`Il capoturno, che in trent'anni non ha mai fatto un complimento a nessuno, stavolta dice solo: «${x.g('Uno','Una')} così non l'ho mai vist${x.o}».`,
+  x=>`Il vecchio carrellista del turno di notte, che ha visto passare quattro direttori, scuote la testa: «${x.g('Questo','Questa')} ci comanda tutti, prima o poi». Non sembra preoccupato.`];
+const B_STORY={
+ b_picking:{role:'pick',k:'op',title:x=>`${x.f} ha ridisegnato il picking`,
+  t:x=>`Il capoturno di ${x.w} entra in ufficio con un foglio a quadretti: è la mappa del magazzino, ridisegnata a mano con quattro evidenziatori. L'ha fatta ${x.n}, ${x.m} ${x.a}: di notte, tra un ordine e l'altro, ha spostato gli articoli che escono di più vicino alle baie. Il picking del mattino va più veloce del 12%, e nessuno gliel'aveva chiesto.`},
+ b_inventario:{role:'imp',k:'prec',title:x=>`${x.f} ritrova i colli spariti`,
+  t:x=>`Da tre inventari a ${x.w} mancavano 41 colli. ${x.n}, ${x.m} ${x.a}, si è portat${x.o} a casa i tabulati: una settimana di sere col foglio di calcolo e li ha ritrovati tutti, uno per uno. Un codice doppio, una bolla registrata due volte e un bancale finito sotto quello del cliente sbagliato. Già che c'era, ha scritto una procedura di due pagine perché non succeda più.`},
+ b_turno:{role:'pick',k:'lead',title:x=>`La notte di ${x.f}`,
+  t:x=>`Alle 3 di notte a ${x.w} il capoturno è a casa con la febbre e arrivano tre bilici insieme. Due carrellisti litigano su chi scarica per primo, l'autista olandese suona il clacson. ${x.n}, ${x.m} ${x.a}, sale su un bancale, divide il turno in due squadre e alle 6 i camion ripartono vuoti. Il mattino dopo, alla macchinetta, tutti ${x.g('lo','la')} chiamano «capo». Il capoturno vero ride un po' meno.`},
+ b_telefono:{role:'imp',k:'neg',title:x=>`${x.f} al telefono`,
+  t:x=>`Il fornitore di bancali di ${x.w} aveva annunciato un aumento del 15%. ${x.n}, ${x.m} ${x.a}, l'ha richiamato «per una cosa veloce»: quaranta minuti dopo l'aumento era sparito, e il fornitore ritira pure i bancali rotti, gratis. La telefonata l'hanno sentita tutti, in ufficio. Il commerciale, soprattutto.`},
+ b_macro:{role:'imp',k:'inn',title:x=>`Le macro di ${x.f}`,
+  t:x=>`A ${x.w} le etichette dei pallet si stampano da sole, le bolle partono in automatico e il gestionale non si blocca più alle 11. Nessuno ha comprato niente: è stat${x.o} ${x.n}, ${x.m} ${x.a}, con qualche macro scritta in pausa pranzo «per non impazzire». Il consulente del WMS è passato a vedere ed è andato via con gli appunti.`},
+ b_fatture:{role:'imp',k:'amm',title:x=>`${x.f} e le fatture del gasolio`,
+  t:x=>`${x.n}, ${x.m} a ${x.w} ${x.a}, ha riletto le fatture del gasolio dell'ultimo anno «perché i conti non mi tornavano». Non tornavano: il distributore contava due volte i rifornimenti del sabato. Sul tuo tavolo c'è già la lettera di contestazione, con gli allegati in ordine di data e un riassunto di mezza pagina per chi ha fretta.`}};
+// dove può succedere: magazzinieri assunti da noi (non della cooperativa o di un fornitore di handling) o impiegati di magazzino
+const bLast=()=>Math.max(-1e9,...Object.keys(B_STORY).map(id=>S.seen[id]!=null?S.seen[id]:-1e9));   // l'ultima scoperta, di qualunque storia
+const bOdds=()=>clamp(CRESC.p*S.warehouses.reduce((a,w)=>a+(w.coop?0:w.staff.pick)+w.staff.imp,0)/CRESC.n,CRESC.p/2,CRESC.p*2);
+const bWh=role=>S.warehouses.filter(w=>w.staff[role]>0&&!(role==='pick'&&w.coop));
+function bSetup(ev,b){ const w=pick(bWh(b.role)), f=Math.random()<0.45, sx=f?'f':'m', age=rint(22,44), yrs=Math.min(rint(2,8),Math.floor(S.day/365));
+  Object.assign(ev,{w,role:b.role,k:b.k,sx,nm:genName(f),bd:S.day-age*365-rint(0,364),face:faceOf(f,age),star:Math.random()<CRESC.star[0]?0:Math.random()<(CRESC.star[1]-CRESC.star[0])/(1-CRESC.star[0])?1:2});
+  const x={n:ev.nm,f:ev.nm.split(' ')[0],m:bMest(b.role,sx),w:w.name,o:f?'a':'o',g:(a,c)=>f?c:a,a:yrs>=2?`da ${yrs} anni`:yrs===1?'da un anno':'da pochi mesi'};
+  ev.title=b.title(x); ev.text=b.t(x)+(Math.random()<(ev.star===2?0.6:0.1)?' '+pick(B_HINT)(x):''); ev.p=cresFace(ev); }
+// le risposte: un anno di affiancamento (da solo o seguito dal CEO), un premio, oppure niente (e a volte se ne va)
+const B_OPTS=[
+ {t:'Un anno di affiancamento, poi manager',d:'Corsi serali, riunioni coi clienti, la prima gara vista da vicino. Per un anno resta in banchina, poi passa dall\'altra parte della scrivania.',
+  e:'−3.000 € di corsi; tra un anno diventa manager, con uno stipendio del 20% sotto il mercato; morale +2 nel magazzino per 2 mesi',
+  r:'Il primo giorno di corso arriva con mezz\'ora di anticipo e un quaderno nuovo. In banchina, quando passa, qualcuno ha già cominciato a dire «buongiorno, capo». Per scherzo, ma non del tutto.',f:function(){cresStart(this,false);}},
+ {t:'Te ne occupi tu, ogni venerdì',d:'Oltre ai corsi, un\'ora ogni venerdì nel tuo ufficio: turni, clienti, bilanci, e come si dice di no a un buyer senza perderlo.',
+  e:'−3.000 €; tra un anno diventa manager, con Leadership +1 e +1 nell\'abilità per cui si è fatto notare; stipendio del 20% sotto il mercato; morale +2 nel magazzino per 2 mesi',
+  req:()=>ceo().st.lead>=13||hasTal('Mentore'),reqT:'Leadership 13 o Mentore',
+  r:'Il venerdì diventa un appuntamento fisso. Dopo qualche mese ti accorgi che in riunione usa le tue battute. Anche quelle che non fanno ridere.',f:function(){cresStart(this,true);}},
+ {t:'Un premio e i complimenti davanti a tutti',d:'Un premio in busta paga e una stretta di mano davanti al turno. Il posto, però, resta quello di prima.',e:'−1.500 €, morale +3 nel magazzino per 2 mesi',
+  r:'Il turno applaude e il premio arriva con lo stipendio. Per un po\' in banchina si lavora meglio, e anche più volentieri.',f:function(){S.cash-=1500; const w=this.w&&whById(this.w.id); if(w) mod(w.id,{mor:3},60);}},
+ {t:'«Ognuno al suo posto»',d:'Le idee piacciono a tutti, ma in banchina servono braccia. Le promozioni si fanno con i titoli di studio.',e:'Una volta su tre se ne va dalla concorrenza: una persona in meno nel magazzino, morale −2',
+  r:'In banchina si torna a lavorare come prima. Qualcuno, però, ha cominciato a leggere gli annunci di lavoro della concorrenza.',
+  f:function(){ if(Math.random()>=1/3) return; const w=this.w&&whById(this.w.id); if(w){ if(w.staff[this.role]>0) w.staff[this.role]--; mod(w.id,{mor:-2},30); }
+    toast(`${this.nm} se ne va: ${pick(rivalNames())} ${this.sx==='f'?'l\'ha presa':'l\'ha preso'} come capoturno`,'bad'); }}];
+const B_EVENTS=Object.entries(B_STORY).map(([id,b])=>({id,src:'La Gazzetta del Muletto',title:'Un talento in banchina',auto:2,
+  cond:()=>bWh(b.role).length>0&&crescL().length<CRESC.max&&S.day>=365&&S.day-bLast()>=CRESC.gap&&Math.random()<bOdds(),setup:ev=>bSetup(ev,b),restore:ev=>{ev.p=cresFace(ev);},opts:B_OPTS}));
 const EVENTS=[
  // dopo un licenziamento (non della cooperativa): chi è stato mandato via fa causa e chiede di tornare
  {id:'impugna',src:'Ufficio del personale',title:'Licenziamento impugnato',
@@ -5829,6 +5935,8 @@ const EVENTS=[
   opts:[{t:'Dagli l\'anticipo',d:'Gli dai l\'anticipo in busta paga, senza fare domande.',e:'−1.500 € (metà non torna mai indietro), morale +5 per 2 mesi',r:'Il carrellista ti ringrazia con una stretta di mano. La caldaia è nuova.',f:()=>{S.cash-=1500;mod('all',{mor:5},60);}},
         {t:'Prestito aziendale a rate',d:'Gli proponi un prestito aziendale da restituire a piccole rate. Lui ringrazia, sollevato.',e:'Morale +3',req:()=>ceo().st.amm>=11,reqT:'Amministrazione 11',r:'Il prestito è firmato. Il carrellista paga la prima rata con un sorriso.',f:()=>mod('all',{mor:3},60)},
         {t:'"Mi dispiace, non possiamo"',d:'Gli spieghi che l\'azienda non può. Se ne va senza dire niente.',e:'Morale −3',r:'Il carrellista torna al lavoro senza dire niente. La caldaia, forse, aspetta.',f:()=>mod('all',{mor:-3},30)}]},
+ // talenti in banchina: un magazziniere o un impiegato di magazzino che si potrebbe promuovere manager (B_STORY, cresStart/cresDone)
+ ...B_EVENTS,
  // ===== eventi personali: il CEO, i manager e i dirigenti cambiano (abilità e talenti, vedi gainTal/addSt) =====
  // CEO
  {id:'p_serale',src:'Il Politecnico della Bassa',title:'Corso serale all\'università',cond:()=>ageB()<55&&!S.boss.tal.some(n=>LAUREA.test(n)),setup:ev=>{ev.p=S.boss;},
@@ -6851,7 +6959,7 @@ function wtabsHtml(p){ const cur=wtabOf(p);
     return `<button role="tab" aria-selected="${c===cur}" data-act="wtab" data-p="${p}" data-id="${c}"${lk?' class="lk"':''}${nt?` data-tip="<div class='tt'>${esc(n)}</div>${esc(nt[1])}"`:''}>${pxSvg(ICONE.menu[c],32)}<span>${esc(n)}</span>${nt&&nt[0]==='bad'&&c!==cur?'<i class="dot"></i>':''}</button>`;}).join(''); }
 // riga di stato della finestra Manager: controproposte, ricerche dell'head hunter, profili, arrivi
 function mgrNote(){ const N=Object.values(negs()), h=hhList(), c=cands().length, a=S.managers.filter(p=>p.arr!=null).length;
-  return N.some(n=>n.counter&&n.day==null)?['bad','Una controproposta aspetta']:h.length?['acc','Head hunter al lavoro: ancora '+wks(Math.min(...h.map(x=>x.end))-S.day)]:c?['acc',c===1?'1 profilo dell\'head hunter':c+' profili dell\'head hunter']:a?['acc',a===1?'1 manager in arrivo':a+' manager in arrivo']:['mut','3 candidati in cerca di lavoro']; }
+  return N.some(n=>n.counter&&n.day==null)?['bad','Una controproposta aspetta']:h.length?['acc','Head hunter al lavoro: ancora '+wks(Math.min(...h.map(x=>x.end))-S.day)]:c?['acc',c===1?'1 profilo dell\'head hunter':c+' profili dell\'head hunter']:a?['acc',a===1?'1 manager in arrivo':a+' manager in arrivo']:(S.cresc||[]).length?['acc',S.cresc.length===1?'1 talento in crescita':S.cresc.length+' talenti in crescita']:['mut','3 candidati in cerca di lavoro']; }
 // OTIF: puntualità × accuratezza, media dei magazzini pesata sui pallet movimentati
 const otifOf=k=>k?k.P*k.A/100:0;
 function otifNow(){ const ws=S.warehouses.filter(w=>w.kpi), m=ws.reduce((a,w)=>a+w.kpi.mov,0);
@@ -7342,6 +7450,7 @@ const VIEWS={
    <div><button class="btn sm2 pri" data-act="gomgr" data-tab="team">Apri la finestra Manager</button></div></div>`;
  },
  manager(){
+  const cresc=crescL();
   const tab=UI.sel.mtab||'team', board=mktList(), C=cands().map(c=>candById(candId(c))).filter(Boolean), hired=S.managers.filter(m=>m.hired), arr=S.managers.filter(m=>m.arr!=null).sort((a,b)=>a.arr-b.arr);
   const N=negs(), cnt=Object.values(N).filter(n=>n.counter&&n.day==null).length, H=hhList();
   const tile=(cls,lab,val,sub)=>`<div class="kpi wh-k ${cls}"><div class="lab">${lab}</div><b>${val}</b><div class="sm">${sub}</div></div>`;
@@ -7350,6 +7459,7 @@ const VIEWS={
   if(tab==='team'){
     const where=m=>seatOf(m.id)?esc(DIR_ROLES.find(r=>r.id===seatOf(m.id)).name):isCs(m.id)?'Customer service':m.wh?'a '+esc(whById(m.wh).name):'senza incarico';
     body=`<div class="sm">Chi è in squadra può guidare un ${kw('magazzino','magazzino')} (dalla sua finestra), sedere in ${kw('direzione','Direzione')} o guidare il ${kw('customer_service','customer service')}. Per assumere qualcuno apri la scheda Candidati.</div>
+     ${cresc.length?`<div class="lab">${kw('promozione_interna','In crescita')}</div>${cresc.map(cresCard).join('')}`:''}
      ${arr.length?`<div class="lab">${kw('preavviso','In arrivo')}</div>${arr.map(m=>personCard(m,`entra il ${shortDate(m.arr)}`,`<span class="sm">${m.cofPend?'Ha ricevuto una controfferta: guarda tra le notifiche.':`Ha firmato per ${eur(m.ral)} l'anno.`}</span>`,false,false)).join('')}`:''}
      ${hired.length?hired.map(m=>personCard(m,where(m),`<button class="btn sm2" data-act="firemgr" data-id="${m.id}">Licenzia · ${eur(m.ral/12*COEF)}</button>`,m.quit||(m.unh||0)>=20,!!(m.wh||seatOf(m.id)||isCs(m.id)))).join(''):`<div class="card pend"><span class="h3">Nessun manager in squadra</span><div>Per ora i magazzini li guidi tu. Nella scheda Candidati ci sono sempre tre persone in cerca di lavoro.</div><div><button class="btn sm2 pri" data-act="mtab" data-id="cand">Vedi i candidati</button></div></div>`}`;
   } else if(tab==='cand'){
@@ -7369,7 +7479,7 @@ const VIEWS={
      ${H.map(h=>{const tot=Math.max(1,h.end-h.day0), pc=clamp((S.day-h.day0)/tot,0,1); return `<div class="card"><div class="row"><span class="h3">Ricerca in corso</span><span class="pill">ancora ${wks(h.end-S.day)}</span></div>
       <div class="row" style="justify-content:flex-start;gap:8px">${statBadge(h.k,h.min,20)}<span>almeno ${h.min} in ${statName(h.k)}</span></div><div class="bar"><i style="width:${Math.round(pc*100)}%;background:var(--accent)"></i></div></div>`;}).join('')}`;
   }
-  return `<div class="wh-kpis c4">${tile('',kw('manager','In squadra'),hired.length,arr.length?`+${arr.length} in arrivo`:'manager e dirigenti')}${tile(cnt?'warn':'','Candidati',board.length+C.length,cnt?'una controproposta aspetta':'in cerca di lavoro')}${tile(H.length?'acc':'',kw('head_hunter','Head hunter'),H.length?Math.max(1,Math.round((Math.min(...H.map(h=>h.end))-S.day)/7)):'—',H.length?'settimane alla fine':'nessuna ricerca')}${tile('',kw('rango_manager','Stipendi'),eurS(hired.reduce((a,m)=>a+m.ral,0)),'l\'anno, in tutto')}</div>${tabs}${body}`;
+  return `<div class="wh-kpis c4">${tile('',kw('manager','In squadra'),hired.length,arr.length||cresc.length?[arr.length?`+${arr.length} in arrivo`:'',cresc.length?`${cresc.length} in crescita`:''].filter(Boolean).join(' · '):'manager e dirigenti')}${tile(cnt?'warn':'','Candidati',board.length+C.length,cnt?'una controproposta aspetta':'in cerca di lavoro')}${tile(H.length?'acc':'',kw('head_hunter','Head hunter'),H.length?Math.max(1,Math.round((Math.min(...H.map(h=>h.end))-S.day)/7)):'—',H.length?'settimane alla fine':'nessuna ricerca')}${tile('',kw('rango_manager','Stipendi'),eurS(hired.reduce((a,m)=>a+m.ral,0)),'l\'anno, in tutto')}</div>${tabs}${body}`;
  },
  customer(){
   const Q=csQual(), q=Q.v, m=csPers(), p=csWho(), act=csAct(), n=csNeed(), L=S.cs.log||[], W=S.cs.q||[];
@@ -8590,6 +8700,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.93',t:'Talenti in banchina',x:['Di rado la Gazzetta del Muletto racconta di un magazziniere o di un impiegato di magazzino che si è fatto notare: ha ridisegnato il picking, ritrovato i colli spariti, tenuto in piedi il turno di notte, strappato uno sconto al telefono, scritto le macro del gestionale o scovato un errore nelle fatture del gasolio. Ogni storia ha la sua scenetta: il raggio di sole dal lucernario, la lampadina dell\'idea e la lavagna col grafico che sale.','Puoi fargli fare un anno di affiancamento, o seguirlo tu ogni venerdì se hai Leadership 13 o sei Mentore. Un anno dopo diventa manager, col nuovo talento «Cresciuto in banchina» e uno stipendio sotto il mercato, senza trattativa. Le abilità si scoprono solo quel giorno: di solito è un manager discreto, a volte un fuoriclasse di rango S. Intanto lo trovi nella finestra Manager, sotto «In crescita».']},
  {v:'0.92',t:'Capannoni, dotazioni e cantieri',x:['Ogni magazzino ha una classe: fatiscente, vecchio, standard, moderno o innovativo. Un capannone vecchio costa poco ma rende meno, consuma di più e si rompe spesso; uno moderno fa lavorare meglio, piace al morale e alle committenti nelle gare. Le committenti di rango S non mettono la merce in un capannone fatiscente.','Nella scheda Immobile del magazzino ci sono le dotazioni: ribalte di carico (senza si carica dai portoni a raso, più lenti), pannelli solari, LED, parcheggio dei camion, portineria, piazzale esterno, giardino, mensa esterna, celle frigo, antincendio e ricarica dei muletti. I capannoni arrivano con le loro; le altre si costruiscono con il facility manager. Parcheggio, piazzale, giardino e mensa occupano l\'area esterna, che è limitata.','I pannelli montati tra il 2007 e il 2012 prendono l\'incentivo statale. La mensa esterna dimezza il prezzo del servizio Mensa del Welfare, le celle frigo quello della Catena del freddo.','Le dotazioni si rompono: ribalte bloccate, grandine sui pannelli, celle frigo in avaria, ricarica dei muletti in tilt, il tetto che perde nei capannoni vecchi, e ogni tanto un principio d\'incendio. L\'Ufficio tecnico chiede se riparare subito, programmare il tecnico o arrangiarsi.','Si può ristrutturare un magazzino per alzarne la classe, fino a moderno.','Sul mercato arrivano capannoni nuovi con gli anni (poli moderni dal 2004, innovativi dal 2014) e ci sono vecchi stabilimenti a poco prezzo. Nella scheda Nuovo magazzino, e sulla mappa con i quadratini verdi, ci sono i terreni: si compra il terreno e si costruisce un magazzino tutto tuo, scegliendo posti, classe e dotazioni. In 8-12 mesi è pronto, ed è di proprietà.']},
  {v:'0.91',t:'Com\'è andata',x:['Nel riquadro «Com\'è andata» di un evento trovi solo quello che è successo davvero: niente più probabilità («4 volte su 10…») né rischi che non si sono avverati. Se la scelta dipendeva dalla sorte, gli effetti sono i numeri veri: soldi, reputazione, soddisfazione dei clienti, morale e KPI a tempo.']},
  {v:'0.90',t:'Altre conferme',x:['Chiedono conferma anche accendere o spegnere una policy (poi non si cambia per 13 settimane; la finestra avvisa se va contro un\'altra policy o se un manager non la sopporta) e ritirare un\'offerta in una gara.']},
@@ -8959,6 +9070,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>
