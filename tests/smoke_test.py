@@ -9,6 +9,9 @@ from playwright.async_api import async_playwright
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'tools', 'out'); os.makedirs(OUT, exist_ok=True)
 PAGE = os.path.join(ROOT, 'dist', 'fup.html')
+# animazioni di finestre e notifiche spente (casella delle Opzioni, 0.100): misure e tocchi trovano tutto già fermo al suo posto.
+# Solo la partita sul computer le tiene accese, come di base, e prova che funzionano.
+ANIM_OFF = "try{if(localStorage.getItem('fup-animazioni')==null)localStorage.setItem('fup-animazioni','0');}catch(e){}"
 
 CLEAR = '''()=>{const F=window.__FUP,n=(F.S.notes||[]).find(x=>x.k==='ev');F.cardsOff();if(n&&!document.querySelector('#modal').innerHTML)F.ACT.note({id:n.id});const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}}'''
 BOT = '''(ceo)=>{
@@ -96,6 +99,7 @@ async def menu(pg, wid):
 
 async def phone(b, w, h, name, errs):
     ctx = await b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    await ctx.add_init_script(ANIM_OFF)
     pg = await ctx.new_page(); pg.on('pageerror', lambda e: errs.append(f'{name}: {e}'))
     await pg.goto('file://' + PAGE)
     assert await pg.evaluate("document.documentElement.classList.contains('mob')"), 'layout telefono non attivo'
@@ -156,6 +160,12 @@ async def phone(b, w, h, name, errs):
     assert await pg.evaluate(FITS, '#lenses'), f'{name}: lenti aperte fuori schermo'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_lenti.png'))
     await pg.tap('#lenses [data-act=lensmenu]')
+    # Opzioni: la casella delle animazioni c'è (qui spenta dal test) e la finestrella sta nello schermo
+    await pg.tap('#top [data-act=options]')
+    assert await pg.evaluate("document.querySelector('#modal [data-act=animset]').checked===false&&!document.documentElement.classList.contains('anim')"), f'{name}: casella delle animazioni mancante o sbagliata'
+    assert await pg.evaluate(FITS, '#modal .modal'), f'{name}: le Opzioni escono dallo schermo'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_opzioni.png'))
+    await pg.tap('#modal [data-act=closemodal]')
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
     await pg.tap('#burger'); await pg.wait_for_timeout(250)
     assert await pg.evaluate(FITS, '#dock'), f'{name}: menu aperto fuori schermo'
@@ -345,6 +355,7 @@ async def tutorial(b, errs, mob, tid='base'):
     av = tid == 'avanzato'
     name = ('tel_' if mob else '') + ('tutorial_avanzato' if av else 'tutorial')
     ctx = await (b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True) if mob else b.new_context(viewport={'width': 1440, 'height': 860}))
+    await ctx.add_init_script(ANIM_OFF)
     pg = await ctx.new_page(); pg.on('pageerror', lambda e: errs.append(f'{name}: {e}'))
     await pg.goto('file://' + PAGE)
     await (pg.tap if mob else pg.click)('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
@@ -420,6 +431,10 @@ async def main():
         await tutorial(b, errs, True, 'avanzato')
         await phone(b, 390, 844, 'verticale', errs)
         await phone(b, 844, 390, 'orizzontale', errs)
+        # «riduci movimento» nel sistema: finché non si sceglie nelle Opzioni, le animazioni partono spente
+        rc = await b.new_context(viewport={'width': 1440, 'height': 860}, reduced_motion='reduce'); rp = await rc.new_page(); await rp.goto('file://' + PAGE)
+        assert not await rp.evaluate("document.documentElement.classList.contains('anim')"), 'con «riduci movimento» le animazioni devono partire spente'
+        await rc.close()
         pg = await b.new_page(viewport={'width': 1440, 'height': 860})
         pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + PAGE)
@@ -511,6 +526,25 @@ async def main():
         assert not m['wide'] and m['ls'] == '0' and m['w'] < 80, f'menu a icone: {m}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_menu_icone.png'))
         await pg.click('#dock [data-act=dockw]')
+        # animazioni (0.100): accese di base; la finestra entra animata e, chiusa, esce subito dal gioco
+        # (la copia che svanisce non ha il suo id né pulsanti e se ne va da sola); dalle Opzioni si spengono per questo dispositivo
+        WINANIM = '''()=>{const F=window.__FUP; if(document.querySelector('#win-gare')) F.ACT.toggle({id:'gare'}); document.querySelector('#ghosts').innerHTML='';
+          F.ACT.toggle({id:'gare'}); const w=document.querySelector('#win-gare'), o={inn:w.classList.contains('w-in')}; w.querySelector('[data-act=close]').click();
+          const g=document.querySelector('#ghosts>.win'); o.gone=!document.querySelector('#win-gare'); o.ghost=!!g&&g.inert&&!g.id&&!g.querySelector('[data-act]'); return o;}'''
+        a = await pg.evaluate(WINANIM); await pg.wait_for_timeout(250)
+        a['vuoto'] = await pg.evaluate("document.querySelector('#ghosts').children.length===0")
+        assert await pg.evaluate("document.documentElement.classList.contains('anim')") and a == {'inn': True, 'gone': True, 'ghost': True, 'vuoto': True}, f'animazioni delle finestre {a}'
+        await pg.click('#top [data-act=options]')
+        assert await pg.evaluate("document.querySelector('#modal .ovl').classList.contains('m-in')"), 'la finestrella delle Opzioni non entra animata'
+        await pg.click('#modal [data-act=animset]')
+        a = await pg.evaluate("()=>({anim:document.documentElement.classList.contains('anim'), ls:localStorage.getItem('fup-animazioni')})")
+        await pg.click('#modal [data-act=closemodal]')
+        a['ovl'] = await pg.evaluate("document.querySelectorAll('body>.ovl').length")
+        a.update(await pg.evaluate(WINANIM))
+        assert a == {'anim': False, 'ls': '0', 'ovl': 0, 'inn': False, 'gone': True, 'ghost': False}, f'animazioni spente dalle Opzioni {a}'
+        await pg.click('#top [data-act=options]'); await pg.click('#modal [data-act=animset]'); await pg.click('#modal [data-act=closemodal]')
+        assert await pg.evaluate("document.documentElement.classList.contains('anim')&&localStorage.getItem('fup-animazioni')==='1'"), 'animazioni non riaccese'
+        await pg.wait_for_timeout(250)
         # lente delle province
         assert not await pg.is_visible('#lenses [data-act=lens][data-id=prov]'), 'le lenti devono partire chiuse'
         await pg.click('#lenses [data-act=lensmenu]')
@@ -819,7 +853,7 @@ async def main():
         # la Tecnologia è ferma senza ricerca e si muove con una ricerca in corso
         r = await pg.evaluate('''()=>{const F=window.__FUP,out={},P={magazzini:'magazzini',personale:'personale',tecnologia:'tecnologia',customer:'clienti',direzione:'manager',azienda:'azienda'};F.newGame('marco');F.S.researched.direzione=true;
           const apri=tab=>{document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.ACT.toggle({id:P[tab]}); F.ACT.wtab({p:P[tab],id:tab}); return document.querySelector('#wins .win .ev-scn');};
-          for(const [tab,w] of Object.entries(F.WSCN)){let k=typeof w==='function'?w():w; k=k.k||k; const d=apri(tab), i=d&&d.querySelector('i'); out[tab]=!!i&&i.dataset.scena===k&&i.getBoundingClientRect().width===(['customer','personale'].includes(tab)?320:tab==='magazzini'?432:480);}
+          for(const [tab,w] of Object.entries(F.WSCN)){let k=typeof w==='function'?w():w; k=k.k||k; const d=apri(tab), i=d&&d.querySelector('i'); out[tab]=!!i&&i.dataset.scena===k&&i.offsetWidth===(['customer','personale'].includes(tab)?320:tab==='magazzini'?432:480);}   // offsetWidth: la misura vera, anche mentre la finestra si apre con lo zoom
           // esterni dei magazzini: il capannone segue la classe dell'edificio (celle frigo: quello frigorifero), sopra le dotazioni dell'area esterna
           const w=F.S.warehouses[0], tipi=['fatiscente','vecchio','standard','moderno','innovativo','freddo'], s0={cl:w.cl,dot:w.dot,tech:w.tech,build:w.build};
           out.est12=tipi.every(t=>F.SCENE['est_'+t+'1']&&F.SCENE['est_'+t+'2'])&&!!F.SCENE.est_lotto&&!!F.SCENE.est_costruzione; out.el=F.EST_EL.every(([n])=>F.SCENE['el_'+n]);
