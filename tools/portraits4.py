@@ -197,7 +197,7 @@ def mariuolo(c):
     c.px([(24,25),(25,25),(24,26),(25,26),(25,27),(26,27),(22,27),(26,28),(22,28),(26,29),(22,29)],sd)
     c.px([(23,27),(24,27),(23,28),(24,28),(25,28)],s); c.px([(23,25),(23,26)],sl)
     c.px([(23,29),(25,29),(26,27),(26,28)],sdd); c.px([(24,29)],sd)
-person('sorrentino',skin='media',hair='#4a4644',hairl='#6b6f75',hairstyle='bald',cloth='#3a4658',clothd='#2a3442',clothl='#4f5d72',collar=tie('#e0393e'),extra=mariuolo)
+person('sorrentino',skin='media',hair='#4a4644',hairl='#6b6f75',hairstyle='bald',cloth='#2f5f9e',clothd='#1f4377',clothl='#4a7fc0',collar=polo('#1f4377'),extra=mariuolo)
 # Greta Brambilla: ricci biondi, occhi grandi e tondi
 def occhioni(c):
     for x0 in (17,27):
