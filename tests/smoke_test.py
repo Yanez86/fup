@@ -196,6 +196,8 @@ async def phone(b, w, h, name, errs):
     await pg.tap('#modal [data-act=closemodal]')
     assert await pg.evaluate("()=>window.__FUP.S.notes.some(n=>n.k==='ev')"), f'{name}: evento sparito con «Decidi più tardi»'
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'}); if(!F.S.tenders.some(t=>!t.done)) F.newTender();}")
+    # un talento in banchina in crescita: la sua scheda nella finestra Manager deve stare nello schermo
+    await pg.evaluate("()=>{const S=window.__FUP.S,w=S.warehouses[0]; S.cresc=[{id:'gt1',name:'Mirko Pozzi',sx:'m',bd:S.day-27*365,face:3,role:'pick',wh:w.id,wn:w.name,k:'op',star:0,men:1,day0:S.day-100,end:S.day+265}];}")
     for wn in ['azienda','riepilogo','magazzini','traffico','clienti','gare','report','personale','manager','giornale','tecnologia','enciclopedia']+(['sindacato'] if ri else []):
         await menu(pg, wn)
         if wn in TABS: await pg.tap(f'#win-{wn} [data-act=wtab][data-id={wn}]')   # dal menu si apre la scheda con un problema: si riparte dalla prima
@@ -641,7 +643,7 @@ async def main():
           o.cl=!!F.WCLASS[w.cl]; w.build=null; S.cash+=2e6; const p0=F.computeWH(w).prod;
           F.renderAll(); const b=document.querySelector('#win-magazzini [data-act=dotbuild]:not([disabled])'), di=b&&b.dataset.id; b.click(); o.cant=!!w.build&&w.build.k==='dot'&&w.build.id===di;
           w.build.left=1; F.stepOne(); o.dot=!!w.dot[di];
-          F.koStart(w,'ricarica'); o.ko=F.computeWH(w).prod<p0*0.95; o.ev=S.notes.some(n=>n.k==='ev'&&n.ev.id==='guasto');
+          F.koStart(w,'ricarica'); const kx=w.ko.ricarica, p1=F.computeWH(w).prod; delete w.ko.ricarica; const p2=F.computeWH(w).prod; w.ko.ricarica=kx; o.ko=p1<p2*0.95&&p0>0; o.ev=S.notes.some(n=>n.k==='ev'&&n.ev.id==='guasto');
           F.renderAll(); document.querySelector('#win-magazzini [data-act=koripara][data-id=ricarica]').click(); o.rip=w.ko.ricarica.fine>S.day;
           w.ko.ricarica.fine=S.day+1; F.stepOne(); F.stepOne(); o.fixed=!w.ko.ricarica;
           F.fuocoStart(w); o.fuoco=S.notes.some(n=>n.k==='ev'&&n.ev.id==='incendio');
@@ -838,6 +840,46 @@ async def main():
         assert await pg.query_selector('#notepop .ev-chg .chg'), await pg.inner_text('#notepop')
         await pg.screenshot(path=os.path.join(OUT, 'shot_evento_personale.png'))
         await pg.click('#notepop [data-act=notedel]')
+        # talenti in banchina: l'evento raro con la sua scenetta, un anno di affiancamento nella finestra Manager, poi la promozione a manager
+        r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame('gino');const S=F.S,bad=[],w=S.warehouses[0]; document.querySelector('#modal').innerHTML='';
+          S.day=800; w.staff.pick=Math.max(w.staff.pick,4); w.staff.imp=Math.max(w.staff.imp,2); S.cash+=1e5;
+          // ogni storia: titolo, racconto, persona e magazzino; tutte le risposte funzionano
+          const evs=F.EVENTS.filter(e=>e.id.startsWith('b_'));
+          evs.forEach(e=>{ e.opts.forEach((o,i)=>{ const ev={...e}, st0={...w.staff}, c0=S.cresc; try{ e.setup(ev); if(!ev.text||!ev.p||!ev.w||ev.title===e.title) bad.push(e.id+': racconto');
+            if(!o.req||o.req()) o.f.call(ev); }catch(x){bad.push(e.id+' '+i+': '+x);} w.staff=st0; S.cresc=c0; }); });
+          // raro: dopo una scoperta ne passano almeno due anni prima della prossima
+          const rnd=Math.random; Math.random=()=>0; const b=evs[0], ok0=b.cond(); S.seen[b.id]=S.day-100; const ok1=evs[1].cond(); S.seen[b.id]=S.day-800; const ok2=evs[1].cond(); Math.random=rnd;
+          // la stoffa: un fuoriclasse è sempre di rango S, uno normale mai
+          const rk=star=>{ S.cresc=[{id:'gx'+star,name:'Prova '+star,sx:'f',bd:S.day-30*365,face:21,role:'imp',wh:w.id,wn:w.name,k:'prec',star,men:0,day0:S.day,end:S.day}];
+            F.cresDaily(); const p=S.managers.pop(); S.warehouses.forEach(x=>{if(x.mgr===p.id) x.mgr=null;}); w.staff.imp++; return F.mRank(p); };
+          const r2=[0,1,2,3].map(()=>rk(2)), r0=[0,1,2,3].map(()=>rk(0)); S.notes=[]; S.cresc=[]; S.seen={}; document.querySelector('#toasts').innerHTML='';
+          return {n:evs.length,bad,ok0,ok1,ok2,r2,r0,scn:evs.every(e=>F.evScena(e.id,e.src)==='talento')};}''')
+        assert r['n'] == 6 and not r['bad'] and r['ok0'] and not r['ok1'] and r['ok2'] and r['scn'], r
+        assert all(x == 'S' for x in r['r2']) and 'S' not in r['r0'], f'stoffa dei talenti in banchina {r}'
+        await pg.evaluate(FIRE, 'b_picking')
+        await pg.click('#notes [data-act=note]')
+        scn = await pg.evaluate("()=>{const i=document.querySelector('#modal .ev-scn i'); return i&&[i.dataset.scena,i.getBoundingClientRect().width]}")
+        assert scn == ['talento', 480], f'scenetta del talento in banchina {scn}'
+        who = await pg.evaluate("()=>{const e=document.querySelector('#modal .ev-who'); return e&&e.innerText}")
+        nm = await pg.evaluate("()=>window.__FUP.S.notes.find(n=>n.k==='ev').ev.vars.nm")
+        assert who and nm in who, f'chi è coinvolto nell\'evento: {who} {nm}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_evento_talento.png'))
+        # un anno di affiancamento: la scelta passa dal salvataggio (evUnpack), il giorno dopo parte la crescita
+        cash0 = await pg.evaluate('()=>window.__FUP.S.cash')
+        await pg.click('#modal [data-act=evopt][data-i="0"]')
+        await pg.evaluate("()=>{const F=window.__FUP;F.S.nextEvent=1e9;F.step();}")
+        r = await pg.evaluate("()=>{const S=window.__FUP.S,x=(S.cresc||[])[0];return {n:(S.cresc||[]).length,nm:x&&x.name,days:x&&x.end-x.day0,cash:S.cash}}")
+        assert r['n'] == 1 and r['nm'] == nm and r['days'] == 365 and cash0 - r['cash'] >= 3000, r
+        sel = await win(pg, 'manager')
+        assert nm in await pg.inner_text(f'{sel} .win-b'), 'il talento in crescita non compare nella finestra Manager'
+        await pg.evaluate(f"()=>{{const c=[...document.querySelectorAll('{sel} .card')].find(e=>e.innerText.includes('diventa manager')); if(c) c.scrollIntoView({{block:'center'}});}}")
+        await pg.screenshot(path=os.path.join(OUT, 'shot_manager_crescita.png'))
+        # un anno dopo diventa manager: lascia il reparto, prende il talento, costa meno del mercato e guida un magazzino libero
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,x=S.cresc[0],w=S.warehouses.find(v=>v.id===x.wh); w.mgr=null; const pk=w.staff.pick; x.end=S.day; S.nextEvent=1e9; F.step();
+          const p=S.managers.find(m=>m.name===x.name); return {p:!!p,hired:p&&p.hired,tal:p&&p.tal.includes('Cresciuto in banchina'),cheap:p&&p.ral<F.ralOf(F.mScore(p)),
+            wh:p&&p.wh===w.id&&w.mgr===p.id,staff:pk-w.staff.pick,left:S.cresc.length,note:S.notes.some(n=>n.k==='info'&&n.title.includes(x.name.split(' ')[0]))};}''')
+        assert r['p'] and r['hired'] and r['tal'] and r['cheap'] and r['wh'] and r['staff'] == 1 and r['left'] == 0 and r['note'], f'promozione del talento in banchina {r}'
+        await pg.click(f'{sel} [data-act=close]'); await pg.evaluate("()=>window.__FUP.cardsOff()")
         # pensione di un manager: al compleanno dei 66 anni annuncia la pensione, dopo il preavviso esce dalle liste
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; F.ACT.hiremgr({id:'toto'}); const t=S.managers.find(m=>m.id==='toto');
           t.bd=S.day+1-66*365; S.nextEvent=1e9; F.step(); return {age:F.ageOf(t),ev:S.notes.filter(n=>n.k==='ev').map(n=>n.title).join()};}''')
@@ -972,6 +1014,8 @@ async def main():
           document.querySelector('#modal').innerHTML='';
           const w=H.warehouses[0], out={day:H.day,wage:H.ri.wage,idx:H.riw.idx,ti:H.riw.ti,ag:w.ag!=null,bots:H.bots.map(b=>!!b.ri&&b.warehouses.every(x=>x.ag!=null)),
             tech:F.TECH.some(t=>t.id==='talpa'),strikes:H.ri.strikes,clima:F.climaProg(H)};
+          // le tariffe si provano su un cliente attivo: se dopo tre anni il magazzino non ne ha (gare perse), gliene diamo uno
+          if(!H.clients.some(c=>c.status==='attivo'&&c.wh===w.id)){ const c0=H.clients[0]||H.bots.flatMap(b=>b.clients)[0]; if(c0) H.clients.push({...c0,id:'cltar',req:[],line:null,peak:null,wh:w.id,status:'attivo',pal:400,stock:300,sat:60}); }
           { const r0=F.computeWH(w).rev; H.riw.ti*=1.1; const r1=F.computeWH(w).rev; H.riw.ti/=1.1; out.tarOk=r0>0&&r1/r0>1.05&&r1/r0<1.1001; }
           // tavolo forzato: concedendo tutto si firma alla prima seduta
           // il magazzino nasce senza sindacato: senza, niente tavolo; col morale a terra il sindacato arriva

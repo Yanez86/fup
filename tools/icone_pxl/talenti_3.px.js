@@ -1,4 +1,4 @@
-// Talenti dei personaggi, terzo gruppo (36 icone 16×16: hobby, manie, customer service, relazioni industriali).
+// Talenti dei personaggi, terzo gruppo (37 icone 16×16: hobby, manie, customer service, relazioni industriali, promozione interna).
 //   node .claude/skills/pxl-pixel-art/bin/pxl.js shot tools/icone_pxl/talenti_3.px.js foglio
 include("comune.px.js", { palette: true })
 
@@ -639,5 +639,22 @@ talento("Amico del delegato", "pos", { tieni: "W" }, `
   ......WWWYYYYW
   ......WWWWWWWW
   ......WWWWWWWW`)
+
+// Cresciuto in banchina: il germoglio che spunta da un bancale (chi è diventato manager dopo un anno di affiancamento)
+talento("Cresciuto in banchina", "pos", {}, `
+  ...........GG.
+  .........GGGgG
+  .GG.....GGGgGG
+  GgGG...GGGgGG.
+  GGgGG..GGgGG..
+  .GGgGG.GgGG...
+  ..GGgGGgGG....
+  ....GgGG......
+  .....GG.......
+  .....GG.......
+  .....GG.......
+  NNNNNNNNNNNNNN
+  NN..NN..NN..NN
+  NNNNNNNNNNNNNN`)
 
 foglio("foglio")
