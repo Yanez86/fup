@@ -1,7 +1,16 @@
 # Traslochi (progetto)
 
-**Stato: progetto approvato nelle linee generali, da costruire. Niente è ancora nel gioco.**
+**Stato: fase 1 costruita nella versione 0.102** (le formule esatte sono in `docs/design.md`, sezioni «Traslochi», «Capannone vuoto e vendita» e «Ordinanza sui capannoni fatiscenti»). Restano da fare le fasi 2-4.
 I numeri sono una prima proposta, da ritoccare con `tools/bilanciamento.py`.
+
+Differenze rispetto al progetto, decise durante la costruzione:
+- Il pulsante «Trasloca clienti» sta nel riquadro Clienti della finestra del magazzino (non tra i lavori dell'immobile): si spostano clienti.
+- Il cliente che non vuole traslocare arriva come richiesta gialla subito alla conferma; se nessuno risponde decide il vice dopo 2 settimane, come per tutti gli eventi (non 4).
+- Navette del lampo: a noleggio, tutte insieme, il 20% più care (al posto degli «autisti CE in affanno»).
+- La stima del progetto mostra i KPI a regime con la squadra al completo e quante persone assumere nel magazzino di arrivo.
+- Il capannone vuoto paga le bollette al 30%; tenerlo è la scelta di base. Venderlo è nella fase 1 (le offerte vengono da compratori qualsiasi); restano per dopo l'affitto a un inquilino e le offerte delle avversarie.
+- In più, chiesto da Davide: l'**ordinanza sui capannoni fatiscenti**, un evento raro dal 2007 (ogni capannone ha una data sua tra il 2007 e il 2009, e serve averlo da almeno un anno): entro sei mesi va ristrutturato o chiuso, altrimenti cantiere d'ufficio del Comune, multa e reputazione.
+- Gli eventi del trasloco della fase 2 non ci sono ancora: per ora l'unico evento è il rifiuto del cliente.
 
 ## Decisioni prese con Davide
 - Il trasloco è sempre un **trasferimento di clienti**: si sceglie quali clienti spostare e in quale dei propri magazzini. Per traslocare tutto si apre prima il capannone nuovo (affitto o costruzione) e poi ci si spostano tutti i clienti.

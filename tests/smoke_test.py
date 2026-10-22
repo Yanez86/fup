@@ -1,6 +1,7 @@
 """Test automatico: apre il gioco in Chromium headless, clicca tutti i menu, prova alberi tecnologici e direzione,
 crea un CEO personalizzato, prova il gioco su un telefono (verticale e orizzontale: finestre, tocchi, zoom con due dita),
 poi fa giocare un bot semplice 3 anni con ognuno dei 4 CEO e con uno creato, e una partita col pacchetto Relazioni industriali.
+Prova anche un trasloco completo (con un cliente che si rifiuta), il capannone vuoto restituito e venduto e l'ordinanza sui capannoni fatiscenti.
 Percorre anche i due tutorial della dottoressa Ribalta (base e avanzato), sul computer e sul telefono.
 Fallisce se ci sono errori JavaScript.
 Uso: python3 tools/build.py && python3 tests/smoke_test.py   (richiede: pip install playwright && playwright install chromium)"""
@@ -72,6 +73,15 @@ BAR = '''()=>{window.__FUP.ACT.speed({v:'0'}); const hs=[...document.querySelect
   const p=document.querySelector('#paused').getBoundingClientRect(), t=document.querySelector('#top').getBoundingClientRect();
   return {hs:[...new Set(hs)], eq:new Set(hs).size===1, right:!document.querySelector('#paused').hidden&&p.width>0&&t.right-p.right<30&&p.top<t.top+60};}'''
 
+# Chromium a volte perde il localStorage delle pagine file:// quando le ricarica (succedeva anche prima dei traslochi, a caso):
+# prima di ricaricare se ne fa una copia e, se dopo manca qualcosa, lo si rimette e si ricarica di nuovo. Il gioco legge i salvataggi come sempre.
+KEEP = "(s)=>{let n=0; for(const [k,v] of Object.entries(s)) if(localStorage.getItem(k)===null){localStorage.setItem(k,v); n++;} return n;}"
+async def reload(pg):
+    snap = await pg.evaluate("()=>Object.fromEntries(Object.keys(localStorage).map(k=>[k,localStorage.getItem(k)]))")
+    for _ in range(4):
+        await pg.reload()
+        if not await pg.evaluate(KEEP, snap): return
+
 async def intro(pg, shot):
     # schermata introduttiva: il camioncino arriva, poi un tocco la chiude e resta la schermata iniziale
     await pg.wait_for_timeout(2900)
@@ -104,7 +114,7 @@ async def phone(b, w, h, name, errs):
     await pg.goto('file://' + PAGE)
     assert await pg.evaluate("document.documentElement.classList.contains('mob')"), 'layout telefono non attivo'
     # schermata principale con due partite salvate (il terzo posto resta per la partita del test)
-    await pg.evaluate(SEED); await pg.evaluate(f"localStorage.removeItem(window.__FUP.slotKey(3))"); await pg.reload()
+    await pg.evaluate(SEED); await pg.evaluate(f"localStorage.removeItem(window.__FUP.slotKey(3))"); await reload(pg)
     await intro(pg, f'shot_tel_{name}_intro.png')
     assert await pg.evaluate("document.querySelectorAll('#start .sv').length") == 2, f'{name}: partite salvate mancanti'
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: la schermata principale scorre di lato'
@@ -277,6 +287,20 @@ async def phone(b, w, h, name, errs):
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_progetto.png'))
     await pg.evaluate("()=>{window.__FUP.ACT.edclose();}")
     await pg.tap('#win-magazzini [data-act=close]')
+    # trasloco (0.102): il progetto a passi e il riquadro del capannone vuoto stanno nello schermo del telefono
+    await pg.evaluate("()=>{const F=window.__FUP,S=F.S; S.cash=3e6; const id=Object.keys(F.SITES).find(k=>F.rentable(k)); F.ACT.rent({id}); window.__nw=S.warehouses.find(w=>w.site===id).id; document.querySelector('#modal').innerHTML=''; F.ACT.openwh({id:S.warehouses[0].id}); F.ACT.tropen({wh:S.warehouses[0].id});}")
+    assert await pg.query_selector('#win-magazzini .tr-box [data-act=trgo]'), f'{name}: manca il progetto del trasloco'
+    assert await pg.evaluate(FITS, '#win-magazzini'), f'{name}: il progetto del trasloco esce dallo schermo'
+    bad = await pg.evaluate(NOSIDE, '#win-magazzini')
+    assert not bad, f'{name}: progetto del trasloco: {bad}'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_trasloco.png'))
+    await pg.evaluate("()=>document.querySelector('#win-magazzini [data-act=trgo]').scrollIntoView({block:'center'})")
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_trasloco_conto.png'))
+    await pg.evaluate("()=>{const F=window.__FUP; F.ACT.trclose(); F.ACT.openwh({id:window.__nw}); document.querySelector('#win-magazzini [data-act=wvrent]').closest('.card').scrollIntoView({block:'center'});}")
+    bad = await pg.evaluate(NOSIDE, '#win-magazzini')
+    assert not bad, f'{name}: capannone vuoto: {bad}'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_capannone_vuoto.png'))
+    await pg.tap('#win-magazzini [data-act=close]')
     # parola chiave: primo tocco = tooltip, secondo tocco = enciclopedia
     await menu(pg, 'magazzini')
     await pg.tap('#win-magazzini .kw[data-id=saturazione]')
@@ -379,7 +403,7 @@ async def tutorial(b, errs, mob, tid='base'):
                 held = True; assert await pg.evaluate("()=>{const F=window.__FUP; F.ACT.speed({v:'1'}); return F.S.speed}") == 0, f'{name}: il tempo parte in un passo da leggere'
             if last == 12 and not mob and not av:
                 # la partita salvata riparte dal passo dov'era
-                await pg.evaluate('()=>window.__FUP.save()'); await pg.reload()
+                await pg.evaluate('()=>window.__FUP.save()'); await reload(pg)
                 await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
                 await pg.click('#start [data-act=continue]'); await pg.wait_for_selector('#tut .tut-b')
                 assert await pg.evaluate('()=>window.__FUP.S.tut.i') == 12, f'{name}: dopo il caricamento il tutorial non riparte dal passo giusto'
@@ -807,7 +831,7 @@ async def main():
           S.managers=S.managers.filter(m=>!m.from&&!EX.includes(m.id)).map(m=>{const x={...m}; delete x.bd; delete x.log; delete x.ann; return x;}); delete S.hh; delete S.cands; delete S.negs; delete S.mkt;
           delete S.certMig; S.researched.freddo=true; delete S.researched.haccp; delete w.tech.haccp; delete w.tech.freddo;
           F.save(); return true;}''')
-        await pg.evaluate('()=>location.reload()'); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached'); await pg.wait_for_selector('[data-act=continue]')
+        await reload(pg); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached'); await pg.wait_for_selector('[data-act=continue]')
         await pg.click('[data-act=continue]'); await pg.evaluate(CLEAR)
         st = await pg.evaluate('''()=>{const S=window.__FUP.S;return {st:S.warehouses[0].staff,imp:S.imp,q:S.queue.map(q=>q.role+String.fromCharCode(58)+!!q.wh)}}''')
         assert st['imp'] is None and sum(st['st'].values()) == 8+3 and st['st']['autB'] > 0, st
@@ -1177,6 +1201,81 @@ async def main():
         assert await pg.query_selector('#ov [aria-label="Clima sindacale"]'), 'lente del clima sindacale mancante'
         await pg.screenshot(path=os.path.join(OUT, 'shot_ri_lente.png'))
         await pg.evaluate("()=>window.__FUP.ACT.lens({id:'base'})")
+        # traslochi (0.102): progetto a passi nella finestra del magazzino, conferma, un cliente che si rifiuta, giorni del trasloco,
+        # stabilizzazione e fine; capannone vuoto restituito e venduto; ordinanza sul capannone fatiscente e cantiere d'ufficio
+        await pg.evaluate('''()=>{const F=window.__FUP; document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); document.querySelector('#modal').innerHTML='';
+          F.newGame('gino'); const S=F.S; S.cash=3e6; S.speed=0; F.ACT.rent({id:'piacenza'}); document.querySelector('#modal').innerHTML='';
+          const o=S.warehouses[0], d=S.warehouses[1]; Object.assign(d.staff,{pick:4,car:4,imp:2,autCE:3,autB:2,fm:1});
+          const t=F.TENDER_POOL.find(x=>!(x.req||[]).length&&F.CINFO[x.name]), ci=F.CINFO[t.name];
+          S.clients.push({id:'cx1',name:t.name,slogan:t.slogan,sector:t.sector,req:[],stock:400,pal:300,sP:t.sP,sA:t.sA,zone:ci.zones[0],src:ci.src,mode:ci.mode,wh:o.id,mult:1,sat:20,status:'attivo',start:0,end:900,dur:24});
+          F.ACT.openwh({id:o.id}); F.ACT.tropen({wh:o.id});}''')
+        tb = await pg.evaluate('''()=>{const b=document.querySelector('#win-magazzini .tr-box'); return {box:!!b,steps:b?b.querySelectorAll('.tr-n').length:0,to:!!b&&!!b.querySelector('[data-act=trto][aria-pressed=true]'),go:!!b&&!b.querySelector('[data-act=trgo]').disabled};}''')
+        assert tb == {'box': True, 'steps': 6, 'to': True, 'go': True}, f'progetto di trasloco: {tb}'
+        await pg.click('#win-magazzini [data-act=trmode][data-v=lampo]')
+        s0 = await pg.evaluate("()=>window.__FUP.trEst(window.__FUP.UI.sel.tr).start")
+        await pg.click('#win-magazzini [data-act=trwk][data-v="7"]')
+        s1 = await pg.evaluate("()=>window.__FUP.trEst(window.__FUP.UI.sel.tr).start")
+        assert s1 == s0 + 7, f'data del trasloco: {s0} -> {s1}'
+        box = await pg.query_selector('#win-magazzini .tr-box'); await box.scroll_into_view_if_needed(); await box.screenshot(path=os.path.join(OUT, 'shot_trasloco_progetto.png'))
+        await pg.click('#win-magazzini [data-act=trgo]')
+        assert 'Traslocare' in await pg.inner_text('#modal'), 'manca la conferma del trasloco'
+        await pg.evaluate("()=>{window.__R0=Math.random; Math.random=()=>0.99;}")   # rifiuta solo chi è sicuro di rifiutare
+        await pg.click('#modal [data-act=okgo]')
+        await pg.evaluate("()=>{Math.random=window.__R0;}")
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,T=F.trList()[0],n=S.notes.find(x=>x.k==='ev'&&x.ev.id==='tr_rifiuto');
+          return {T:!!T&&T.fase==='prep',ref:!!T&&T.ref.includes('cx1'),note:!!n,cid:n?n.id:0,c0:!!T&&S.clients[0].tr===T.id,closed:!document.querySelector('#win-magazzini [data-act=trgo]')};}''')
+        assert r['T'] and r['ref'] and r['note'] and r['c0'] and r['closed'], f'conferma del trasloco: {r}'
+        await pg.evaluate(f"()=>window.__FUP.ACT.note({{id:{r['cid']}}})")
+        assert await pg.eval_on_selector_all('#modal [data-act=evopt]', 'e=>e.length') == 3, 'cliente che non vuole traslocare: tre risposte'
+        await pg.wait_for_timeout(400); await pg.screenshot(path=os.path.join(OUT, 'shot_trasloco_rifiuto.png'))
+        await pg.click('#modal [data-act=evopt][data-i="1"]')
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; F.stepOne(); const T=F.trList()[0],c2=S.clients.find(c=>c.id==='cx1');
+          return {out:!T.cli.includes('cx1')&&!c2.tr&&c2.wh===S.warehouses[0].id};}''')
+        assert r['out'], f'il cliente resta dov\'è: {r}'
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,T=F.trList()[0],o=S.warehouses[0],d=S.warehouses[1],c=S.clients[0],out={};
+          const go=()=>{ document.querySelector('#modal').innerHTML=''; S.notes=S.notes.filter(n=>n.k!=='ev'); F.stepOne(); };
+          while(T.fase==='prep'&&S.day<400) go();
+          out.move=T.fase==='move'&&c.wh===d.id; const k=F.computeWH(d); out.malus=k.pP.some(x=>x[0]==='Trasloco in corso'&&x[1]<0);
+          F.renderMap(); out.arrow=!!document.querySelector('#ov polygon'); F.ACT.openwh({id:d.id}); document.querySelector('#win-magazzini .win-b').scrollTop=0; out.card=!!document.querySelector('#win-magazzini .tr-box .wh-bar');
+          return out;}''')
+        assert all(r.values()), f'giorni del trasloco: {r}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_trasloco_in_corso.png'))
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,T=F.trList()[0],o=S.warehouses[0],d=S.warehouses[1],c=S.clients[0],out={};
+          const go=()=>{ document.querySelector('#modal').innerHTML=''; S.notes=S.notes.filter(n=>n.k!=='ev'); F.stepOne(); };
+          while(T.fase==='move'&&S.day<500) go();
+          const k=F.computeWH(d); out.stab=T.fase==='stab'&&k.pP.some(x=>x[0].startsWith('Stabilizzazione')&&x[1]<0)&&k.prF.trs<1;
+          while(F.trList().includes(T)&&S.day<900) go();
+          out.done=!F.trList().length&&!c.tr&&S.notes.some(n=>n.k==='info'&&/^Trasloco (riuscito|finito)/.test(n.title)); out.left=S.clients.find(x=>x.id==='cx1').wh===o.id;
+          return out;}''')
+        assert all(r.values()), f'stabilizzazione: {r}'
+        await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; F.ACT.rent({id:'lodi'}); document.querySelector('#modal').innerHTML='';
+          const w=S.warehouses.find(x=>x.site==='lodi'); w.staff.pick=2; w.cond=60; F.ACT.openwh({id:w.id});}''')
+        card = await pg.evaluate_handle("()=>document.querySelector('#win-magazzini [data-act=wvrent]').closest('.card')")
+        await card.as_element().scroll_into_view_if_needed()
+        await card.as_element().screenshot(path=os.path.join(OUT, 'shot_capannone_vuoto.png'))
+        cash0 = await pg.evaluate("()=>window.__FUP.S.cash")
+        await pg.click('#win-magazzini [data-act=wvrent]')
+        await pg.click('#modal [data-act=okgo]')
+        r = await pg.evaluate(f"()=>{{const F=window.__FUP,S=F.S; return {{gone:!S.warehouses.some(x=>x.site==='lodi'),paid:{cash0}-S.cash,free:F.rentable('lodi')}};}}")
+        assert r['gone'] and r['free'] and r['paid'] >= 2 * 6500, f'capannone restituito: {r}'
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,o=S.warehouses[0],d=S.warehouses[1],out={}; S.clients.filter(c=>c.wh===o.id).forEach(c=>c.wh=d.id);
+          F.ACT.openwh({id:o.id}); document.querySelector('#win-magazzini [data-act=wvsale]').click(); out.sale=!!o.sale;
+          o.sale.next=S.day; F.stepOne(); out.off=!!o.sale.off&&S.notes.some(n=>n.k==='info'&&n.title.startsWith('Offerta per'));
+          const amt=o.sale.off.amt, c0=S.cash; F.ACT.wvsell({wh:o.id,ok:1}); out.sold=!S.warehouses.includes(o)&&S.cash>c0+amt*0.9; return out;}''')
+        assert all(r.values()), f'capannone venduto: {r}'
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; F.ACT.rent({id:'mortara'}); document.querySelector('#modal').innerHTML='';
+          const w=S.warehouses.find(x=>x.site==='mortara'); w.d0=S.day-400; S.day=Math.max(S.day,F.ordDay(w)); return F.ordCand().includes(w);}''')
+        assert r, 'ordinanza: il capannone fatiscente deve essere candidato'
+        await pg.evaluate(FIRE, 'ordinanza')
+        await pg.evaluate("()=>{const F=window.__FUP,n=F.S.notes.find(x=>x.k==='ev'&&x.ev.id==='ordinanza'); F.ACT.note({id:n.id});}")
+        assert await pg.eval_on_selector_all('#modal [data-act=evopt]', 'e=>e.length') == 3, 'ordinanza: tre risposte'
+        await pg.wait_for_timeout(400); await pg.screenshot(path=os.path.join(OUT, 'shot_ordinanza.png'))
+        await pg.click('#modal [data-act=evopt][data-i="1"]')
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses.find(x=>x.site==='mortara'),out={}; document.querySelector('#modal').innerHTML=''; F.stepOne();
+          out.ord=!!w.ord&&w.ord.k==='chiudi'&&w.ord.until>S.day; out.alert=F.noteAlerts().some(a=>a.id==='ord'); F.ACT.openwh({id:w.id}); out.card=!!document.querySelector('#win-magazzini .cl-bad [data-id=ordinanza]');
+          w.ord.until=S.day+1; const c0=S.cash, r0=S.rep; F.stepOne(); F.stepOne(); out.uff=!!w.build&&w.build.k==='rist'&&!!w.build.uff&&S.cash<c0-20000&&S.rep<r0;
+          w.build.left=1; F.stepOne(); F.stepOne(); out.chiusa=!w.ord&&w.cl==='vec'; return out;}''')
+        assert all(r.values()), f'ordinanza: {r}'
         # senza il pacchetto la partita resta com'era: niente ricerche, voce di menu e lente del pacchetto
         off = await pg.evaluate("()=>{const F=window.__FUP; F.newGame('gino'); F.renderAll(); return {tech:F.TECH.some(t=>t.ri),pol:F.POLICIES.some(p=>p.ri),dock:!!document.querySelector('#dock [data-id=sindacato]'),lens:F.lensL().some(l=>l.ri)};}")
         assert not any(off.values()), f'senza pacchetto restano pezzi del pacchetto: {off}'
@@ -1203,13 +1302,13 @@ async def main():
         assert await pg.evaluate('()=>!localStorage.getItem(window.__FUP.KEY)'), 'salvataggio non cancellato'
         assert not await pg.query_selector('#start [data-act=continue]'), 'partita cancellata ancora nella schermata iniziale'
         await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino'); F.save();}''')
-        await pg.evaluate('()=>location.reload()'); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
+        await reload(pg); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
         await pg.click('#start [data-act=delask]'); await pg.screenshot(path=os.path.join(OUT, 'shot_cancella_avvio.png'))
         await pg.click('#start [data-act=delno]'); await pg.wait_for_selector('#start [data-act=continue]')
         await pg.click('#start [data-act=delask]'); await pg.click('#start [data-act=delsave]')
         assert not await pg.query_selector('#start [data-act=continue]') and await pg.evaluate('()=>!localStorage.getItem(window.__FUP.KEY)'), 'cancellazione dalla schermata iniziale'
         # tre posti di salvataggio: l'ultima giocata in cima, con tre partite il pulsante per una nuova si spegne
-        await pg.evaluate(SEED); await pg.reload(); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
+        await pg.evaluate(SEED); await reload(pg); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
         hm = await pg.evaluate("({n:document.querySelectorAll('#start .sv').length, top:document.querySelector('#start .sv.top .sv-co').innerText, full:document.querySelector('#start [data-act=newgame]').disabled})")
         assert hm == {'n': 3, 'top': 'Prova 2', 'full': True}, hm
         await pg.screenshot(path=os.path.join(OUT, 'shot_avvio_partite.png'), full_page=True)
