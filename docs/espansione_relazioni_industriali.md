@@ -159,7 +159,7 @@ Sciopero a sorpresa prima del Black Friday · Sciopero a singhiozzo · Il delega
 ## 11. Da preparare oltre alle regole
 - Voci `WIKI` (con `kw()`): agitazione, contagio, fasce, sindacati, delegato, tavolo, pazienza, accordo integrativo, contratto nazionale, rate, arretrati, Confpallet, fornitori, clausola sociale, responsabilità solidale, internalizzazione, rancore, talpa, pace sociale.
 - Icone in `tools/icone_gioco/`: 6 ricerche, 4 policy, 3 talenti; loghi degli 11 fornitori e delle 3 sigle.
-- Ritratti dei 3 leader sindacali (`portraits4.py`).
+- Ritratti dei 3 leader sindacali (`tools/ritratti_pxl/ritratti.px.js`).
 - Finestre: tavolo delle trattative, scheda del fornitore, lente «Clima sindacale»; provate anche nel layout telefono.
 - Cronaca di fine partita: «10 anni senza sciopero», «La talpa più longeva del Nord».
 - Nuova forma di `S`: alzare la versione del salvataggio o aggiungere la migrazione (cooperativa → fornitore).
