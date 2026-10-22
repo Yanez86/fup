@@ -555,6 +555,11 @@ async def main():
         await pg.click('#dock [data-id=personale]')
         if not await pg.query_selector('#win-personale'): await pg.click('#dock [data-id=personale]')
         assert await pg.eval_on_selector_all('#win-personale .pr-r', 'e=>e.length') == 7
+        # chi è in arrivo: una barretta per persona sotto il reparto e nelle assunzioni in corso, che si riempie fino all'arrivo
+        q = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0],q0=S.queue; S.queue=[{role:'pick',wh:w.id,days:5,tot:20},{role:'plan',wh:null,days:9}]; F.renderAll();
+          const W=s=>[...document.querySelectorAll('#win-personale '+s)].map(i=>i.style.width), r={row:W('.pr-in .qbs .bar i'),card:W('.pr-q .pr-n .bar i')};
+          S.queue=q0; F.renderAll(); return r;}''')
+        assert q['row'] == ['75%'] and q['card'][0] == '75%' and len(q['card']) == 2, f'barrette delle assunzioni in arrivo: {q}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_personale.png'))
         await pg.click('#win-personale [data-act=openwh]')
         assert await pg.eval_on_selector_all('#win-magazzini [data-act=hire]', 'e=>e.length') == 7

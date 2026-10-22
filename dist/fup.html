@@ -322,7 +322,11 @@ table.t td.r,table.t th.r{text-align:right}
 .wh-bar{height:12px}
 .wh-hero .wh-bar{flex:none;background:var(--ink3);border-color:var(--ink2)}
 .wh-mgr{display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:8px;border-top:2px dashed var(--ink3)}
-.wh-mgr img,.wh-st img{width:40px;height:46px;background:#3a6db0;border:2px solid var(--ink);flex:none}
+/* ritratti ritagliati: il disegno 48×56 a un pixel dello schermo per pixel, così resta nitido; .pf testa (32×32), .pf.m mezzo busto (40×46) */
+.pf{display:inline-block;flex:none;overflow:hidden;width:32px;height:32px;background:#3a6db0;border:2px solid var(--ink);line-height:0;vertical-align:middle}
+.pf img{display:block;width:48px;height:56px;max-width:none;margin:-3px 0 0 -8px}
+.pf.m{width:40px;height:46px}.pf.m img{margin:-2px 0 0 -4px}
+.pr-r>.pf,.ev-who .pf{flex:none;padding:0;background:#3a6db0}
 .wh-mgr .lab{flex:1}
 .wh-warn{font-size:14px;color:#ff8a8d}
 .tr-c{display:flex;flex-direction:column;gap:6px}.tr-r{display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid var(--panel2)}.tr-r .tkp{flex:none}
@@ -380,7 +384,6 @@ input.sw:disabled{opacity:.45;cursor:not-allowed}
 .pr-hd{display:flex;justify-content:space-between;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
 .pr-r,.pr-q{display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--panel2);font-size:15px}
 .pr-r:last-child{border-bottom:0}
-.pr-r img,.pr-q img{flex:none;width:24px;height:28px}
 .pr-r .wh-nm,.pr-q .wh-nm{flex:1;min-width:0}
 .pr-r>b{font:700 17px var(--f-disp);min-width:22px;text-align:right}
 .pr-l{display:flex;align-items:center;gap:6px;width:112px;flex:none;justify-content:flex-end}
@@ -402,6 +405,11 @@ input.sw:disabled{opacity:.45;cursor:not-allowed}
 .pr-cols{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:8px;align-items:start}
 .mob .pr-cols{grid-template-columns:minmax(0,1fr)}
 .pr-r{align-items:baseline;gap:8px}.pr-r>span{min-width:0;flex:1}.pr-r b{white-space:nowrap;flex-shrink:0;padding-right:2px}
+/* reparti con il ritratto: chi è in arrivo va a capo sotto il nome */
+.pr-r.pr-s{align-items:center;flex-wrap:wrap}.pr-s .pr-in{flex:1 0 100%;box-sizing:border-box;padding-left:44px;margin-top:-2px}
+.pr-n{display:flex;flex-direction:column;min-width:0}.pr-q>.pr-n{flex:1}.pr-n .wh-nm{flex:none}.pr-n .bar{flex:none;height:8px;margin-top:3px}
+.wh-inq{display:flex;flex-wrap:wrap;align-items:center;gap:2px 6px}.wh-inq>.sm{font-weight:400;color:var(--muted)}
+.qbs{display:inline-flex;gap:4px}.qbs .bar{flex:none;width:30px;min-width:0;height:8px;cursor:help}.qbs .bar i,.pr-n .bar i{background:var(--accent)}
 .pr-g{margin-top:8px}
 /* finestra Clienti */
 .cl{gap:8px}
@@ -815,7 +823,7 @@ button.pk{cursor:pointer}.pk[aria-pressed="true"]{border-color:var(--accent);box
 .ri-meter{display:grid;grid-template-columns:120px minmax(60px,1fr) auto;gap:8px;align-items:center}
 .ri-tags{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}.ri-f,.ri-u{white-space:nowrap}
 .ri-st{display:flex;flex-direction:column;gap:2px}.ri-st .warn{color:var(--warn-t,#8a5a00)}
-.ri-del{display:flex;gap:8px;align-items:center;min-width:0}.ri-del img{flex:none;background:var(--panel2);border:2px solid var(--ink)}
+.ri-del{display:flex;gap:8px;align-items:center;min-width:0}.ri-del .pf{background:var(--panel2)}
 .ri-chips{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
 .ri-tav-who{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .ri-req{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)}.ri-req:last-child{border-bottom:0}
@@ -2506,6 +2514,8 @@ wk('attrattivita','pers','Attrattività',`Quanto l'azienda piace a chi cerca lav
 wk('assunzioni','pers','Assunzioni',`Annuncio (economico ma lento) o agenzia interinale (veloce ma cara). Il nuovo arrivato si presenta dopo qualche giorno.`,
 `I tempi base con l'annuncio o con l'agenzia, in settimane: [[magazzinieri]] 3 o 1, [[carrellisti]] 4 o 1, [[impiegati]] 3 o 1, [[autisti_b|autisti B]] 2 o 1, [[autisti_ce|autisti CE]] 6 o 2, [[capoturno|capiturno]] e [[pianificatori]] 4 o 1, [[addetti_cs|addetti al customer service]] 3 o 1, [[facility|facility manager]] 4 o 1. Con la [[cooperativa]] magazzinieri e carrellisti arrivano in pochi giorni (meno di una settimana), gratis. Si accorciano con i [[welfare|benefit aziendali]], i [[welfare_mag|servizi di welfare del magazzino]], la [[reputazione]], l'[[tech_hr|ufficio del personale]], l'[[tech_academy|Academy aziendale]] e il [[dir_hr|direttore HR]].
 
+Chi è in arrivo si vede nella finestra Personale e in quella del magazzino: sotto il reparto c'è una barretta per ogni persona, che si riempie fino al giorno in cui entra in servizio; il suggerimento della barretta dice la data esatta.
+
 Assumi in anticipo: quando vinci una [[gare|gara]] hai 4 settimane prima che il cliente parta.`);
 wk('licenziamenti','pers','Licenziamenti',`Costano un mese di stipendio di buonuscita, abbassano il morale del magazzino per 4 settimane e un po' la reputazione. Troppi in un mese fanno notizia.`,
 `Il pulsante − toglie una persona subito. Paghi un mese di stipendio di buonuscita, il [[morale]] del magazzino scende di 4 punti per un mese e la [[reputazione]] perde 0,3 punti. Utile quando perdi un cliente o finisce la [[stagionalita|stagione]] di picco e il personale resta senza lavoro.
@@ -3136,6 +3146,8 @@ const avail=p=>!p.gen&&p.arr==null&&!p.retired&&yearOf(S.day)>=(p.from||0)&&!hel
 const oa=p=>p&&p.sx==='f'?'a':'o';
 const nm1=p=>p.name.split(' ')[0];
 const pImg=p=>p===S.boss?ceoImg(p):mImg(p);
+// ritratto ritagliato per le righe piccole: 's' la testa, 'm' il mezzo busto (classi .pf in CSS)
+const pFace=(src,sz='s',alt='')=>`<span class="pf ${sz}"><img class="px" src="${src}" alt="${alt}" width="48" height="56"></span>`;
 function plog(p,t){(p.log=p.log||[]).push({d:S.day,t}); if(p.log.length>12) p.log.shift();}
 // cambia un'abilità (1-20; l'esperienza si ferma a 18) e la segna tra i cambiamenti da mostrare nel risultato dell'evento
 function addSt(p,k,d,max){const v0=p.st[k], v=clamp(v0+d,1,Math.max(v0,max||20)); p.st[k]=v; if(v!==v0&&UI.chg) UI.chg.push({p,k,d:v-v0}); return v-v0;}
@@ -3148,7 +3160,7 @@ function loseTal(p,n,why){ const i=p.tal.indexOf(n); if(i<0) return false; p.tal
   if(UI.chg) UI.chg.push({p,tal:n,on:false}); if(why) plog(p,why); return true;}
 const tryTal=(p,n,pr,why)=>Math.random()<pr&&gainTal(p,n,why);
 // cambiamenti di abilità e talenti, come chip colorati (risultato degli eventi)
-function chgHtml(list){ return list.map(c=>`<span class="chg"><img class="px" src="${pImg(c.p)}" alt="" width="20" height="24">${esc(c.p===S.boss?'Tu':nm1(c.p))}${c.tal?`${talentIcons([c.tal],18)}<span>${c.on?esc(c.tal):`perde «${esc(c.tal)}»`}</span>`:`${statBadge(c.k,c.p.st[c.k],14,true)}<b class="${c.d>0?'ok':'bad'}">${c.d>0?'+':'−'}${Math.abs(c.d)}</b>`}</span>`).join(''); }
+function chgHtml(list){ return list.map(c=>`<span class="chg">${pFace(pImg(c.p))}${esc(c.p===S.boss?'Tu':nm1(c.p))}${c.tal?`${talentIcons([c.tal],18)}<span>${c.on?esc(c.tal):`perde «${esc(c.tal)}»`}</span>`:`${statBadge(c.k,c.p.st[c.k],14,true)}<b class="${c.d>0?'ok':'bad'}">${c.d>0?'+':'−'}${Math.abs(c.d)}</b>`}</span>`).join(''); }
 function storiaHtml(p,n){const l=(p.log||[]).slice(-(n||3)).reverse(); return l.length?`<div class="sm storia"><b>${kw('storia','Storia')}</b>${l.map(x=>`<div><b>${yearOf(x.d)}</b> ${esc(x.t)}</div>`).join('')}</div>`:'';}
 const retChance=a=>a>=66?1:a===65?0.5:a===64?0.25:0;
 // compleanno: esperienza da giovani, acciacchi da anziani, e il momento di pensare alla pensione
@@ -4836,7 +4848,7 @@ function riTavView(){ const R0=S.ri, L=tavList();
   const reqRow=(r,i)=>{ const Q=RI_REQ[r.id];
     return `<div class="ri-req"><div class="wh-sm"><b>${esc(Q.n(r.lv))}</b><span class="sm">${esc(Q.d)} · peso ${'●'.repeat(Q.w)}</span></div><div class="seg" role="group">${[['si','Concedo'],['tratto','Tratto'],['no','Rifiuto']].map(([v,n])=>`<button class="btn sm2" data-act="rireq" data-wh="${w.id}" data-i="${i}" data-v="${v}" aria-pressed="${r.c===v}" ${v==='tratto'&&!Q.half?'disabled':''}>${n}</button>`).join('')}</div></div>`; };
   return `${pick}<div class="card"><div class="row"><span class="h3">${kw('tavolo','Tavolo')} a ${esc(w.name)}</span>${unionTag(T.un)}</div>
-    <div class="ri-tav-who"><div class="ri-del"><img class="px" src="${pImg(N.p)}" alt="" width="40" height="46"><div class="wh-sm"><span class="sm">Tratta per te</span><b>${esc(N.p.name)}</b><span class="ri-chips">${statBadge('neg',N.neg,12)}${N.med?talentIcons(['Mediatore nato'],18):''}${(N.p.tal||[]).includes('Ex sindacalista')?talentIcons(['Ex sindacalista'],18):''}</span></div></div>${riDelegate(w,40)}</div>
+    <div class="ri-tav-who"><div class="ri-del">${pFace(pImg(N.p),'m')}<div class="wh-sm"><span class="sm">Tratta per te</span><b>${esc(N.p.name)}</b><span class="ri-chips">${statBadge('neg',N.neg,12)}${N.med?talentIcons(['Mediatore nato'],18):''}${(N.p.tal||[]).includes('Ex sindacalista')?talentIcons(['Ex sindacalista'],18):''}</span></div></div>${riDelegate(w,40)}</div>
     <div class="sm">${N.hr?'Tratta il direttore delle risorse umane.':'Tratti tu: con la Struttura direzionale può farlo il direttore delle risorse umane.'} Ogni seduta il sindacato abbassa un po' le pretese (conta la Negoziazione di chi tratta contro la Leadership del delegato) e perde un po' di pazienza.</div>
     <div class="ri-meter"><span class="lab">Quanto concedi</span><div class="bar"><i style="width:${Math.round(V*100)}%;background:var(--accent)"></i>${seeMin?`<s style="left:${Math.round(T.min*100)}%"></s>`:''}</div><b class="num">${Math.round(V*100)}%</b></div>
     <div class="sm">${seeMin?`La ${kw('talpa','talpa')} dice che firmano dal <b>${Math.round(T.min*100)}%</b>.`:'Quanto basta per firmare lo sa solo il sindacato: con la ricerca Talpa nel sindacato lo sapresti anche tu.'}</div>
@@ -5868,7 +5880,7 @@ function openEv(n){
   const opts=ev.opts.map((o,i)=>{const ok=!o.req||o.req();return `<button class="opt" data-act="evopt" data-i="${i}" ${ok?'':'disabled'}><b>${esc(o.t)}</b>${o.d?`<span class="ev-d">${esc(o.d)}</span>`:''}${o.req?evReq(o.reqT,ok):''}</button>`}).join('');
   // chi è coinvolto: il cliente (con logo) e il magazzino, se l'evento ne ha scelto uno
   const w=ev.w||(ev.wh&&S.warehouses.find(x=>x.id===ev.wh));
-  const who=[ev.p?`<span><img class="px" src="${pImg(ev.p)}" alt="" width="24" height="28">${esc(ev.p===S.boss?ev.p.name+' (tu)':ev.p.name)}</span>`:'',ev.c?`<span>${logoSvg(ev.c.name,24)}${esc(ev.c.name)}</span>`:'',w?`<span>${pinIcon()}${esc(w.name)}</span>`:''].join('');
+  const who=[ev.p?`<span>${pFace(pImg(ev.p))}${esc(ev.p===S.boss?ev.p.name+' (tu)':ev.p.name)}</span>`:'',ev.c?`<span>${logoSvg(ev.c.name,24)}${esc(ev.c.name)}</span>`:'',w?`<span>${pinIcon()}${esc(w.name)}</span>`:''].join('');
   showModal(`<div class="src"><span>${esc(n.src)}</span><span>${shortDate(n.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:21px">${esc(n.title)}</h3>${scnHtml(evScena(ev.id,n.src))}${who?`<div class="ev-who">${who}</div>`:''}<p class="ev-x">${esc(n.text)}</p><div class="ev-q">Cosa fai?</div>${opts}
     <button class="btn" data-act="closemodal">Decidi più tardi</button><div class="sm">L'evento resta tra le ${kw('notifiche','notifiche')} ancora ${wks(Math.max(1,n.due-S.day))}, poi sceglie il tuo vice.</div></div>`);
   renderNotes();
@@ -6677,12 +6689,17 @@ function lensTrips(){ const L=[],R=[];
     }); });
   return [`<g aria-label="Viaggi" shape-rendering="auto">`,...L,...R,'</g>'];
 }
+// assunzioni in arrivo: una barretta per persona che si riempie fino al giorno in cui entra (q.tot = giorni d'attesa all'inizio)
+const hirePc=q=>clamp(1-q.days/Math.max(q.tot||(HIRE[q.role]||{ann:[1]}).ann[0],q.days,1),0,1);
+const hireTip=q=>`<div class='tt'>${esc(ROLE1[q.role]||ROLE[q.role])}</div>Entra il ${shortDate(S.day+q.days)}, tra ${wks(q.days)}. Ricerca al ${Math.round(hirePc(q)*100)}%.`;
+function inqHtml(list,cls=''){ if(!list.length) return ''; const L=[...list].sort((a,b)=>a.days-b.days), n=L.length;
+  return `<div class="wh-inq ${cls}"><span>+${n} in arrivo</span><span class="qbs">${L.slice(0,4).map(q=>`<span class="bar" data-tip="${hireTip(q)}"><i style="width:${Math.round(hirePc(q)*100)}%"></i></span>`).join('')}${n>4?'…':''}</span><span class="sm">${n>1?'il primo ':''}tra ${wks(L[0].days)}</span></div>`; }
 // riga degli addetti al customer service: ritratto, carico, pulsanti per assumere e licenziare (Personale e Customer service)
-function csRow(){ const n=csNeed(), l=csLoad(), q=S.queue.filter(x=>x.role==='cs').length;
-  return `<div class="wh-st"><img class="px" src="${S.office.cs?IMG.cs:IMG.anon}" alt="" width="40" height="46">
+function csRow(){ const n=csNeed(), l=csLoad(), q=S.queue.filter(x=>x.role==='cs');
+  return `<div class="wh-st">${pFace(S.office.cs?IMG.cs:IMG.anon,'m')}
     <div class="wh-sm"><div class="wh-nm">${kw('addetti_cs',ROLE.cs)}</div>
      ${n&&l<9?`<div class="wh-ld"><div class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></div><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b></div>`:`<div class="sm wh-nm">${n?'<span class="bad">nessuno: qualità del servizio in calo</span>':`fino a ${CS.free} clienti basta il responsabile`}</div>`}
-     ${q?`<div class="sm wh-inq">+${q} in arrivo</div>`:''}</div>
+     ${inqHtml(q,'sm')}</div>
     <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="cs" ${S.office.cs<=0?'disabled':''} aria-label="Licenzia: addetto al customer service" data-tip="<div class='tt'>Licenzia</div>Un mese di stipendio di buonuscita, reputazione −0,3. Dal 4° licenziamento in 4 settimane è un'ondata: finisce sul giornale.">−</button><b class="num ${l>1.02?'bad':''}">${S.office.cs}</b><button class="btn sm2 pri" data-act="hire" data-role="cs" aria-label="Assumi: addetto al customer service" data-tip="Assumi">+</button></div></div>`; }
 const CS_HOW={auto:'sistemato dal customer service',manager:'è andato il manager',mail:'risposta per mail',ceo:'ha chiamato il CEO',nessuno:'nessuno ha risposto',tutto:'accettato tutto',supplemento:'con supplemento',meta:'accettato a metà',rifiuto:'rifiutato',magazzino:'accettato',lontano:'troppo lontano, rinuncia',pieno:'nessun magazzino libero',proroga:'prorogato',ritiro:'ritirato'};
 const VIEWS={
@@ -6819,11 +6836,11 @@ const VIEWS={
   const ld=staffLoad(w,k);
   if(UI.whProd) return tabs+prodView(w,k,ld);
   // una riga per reparto: ritratto, nome, barra del carico e [− numero +]
-  const staffRow=(r,have)=>{const inq=q.filter(x=>x.role===r).length, l=ld[r], bar=r!=='fm'&&!(r==='capo'&&l===0)&&l<9;
-   return `<div class="wh-st"><img class="px" src="${have?IMG[r]:IMG.anon}" alt="${have?'':'Nessuno in questo ruolo'}" width="40" height="46">
+  const staffRow=(r,have)=>{const inq=q.filter(x=>x.role===r), l=ld[r], bar=r!=='fm'&&!(r==='capo'&&l===0)&&l<9;
+   return `<div class="wh-st">${pFace(have?IMG[r]:IMG.anon,'m',have?'':'Nessuno in questo ruolo')}
     <div class="wh-sm"><div class="wh-nm">${kw(ROLE_WK[r],ROLE[r])}</div>
      ${bar?`<div class="wh-ld" data-tip="<div class='tt'>Carico di lavoro ${Math.round(l*100)}%</div>${l>1.02?'In affanno: KPI e morale peggiorano. Assumi qualcuno.':l>0.85?'Al limite: un picco di lavoro lo manda in affanno.':'Tutto sotto controllo.'}"><div class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></div><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b></div>`:`<div class="sm wh-nm">${loadTxt(r,l,have)}</div>`}
-     ${inq?`<div class="sm wh-inq">+${inq} in arrivo</div>`:''}</div>
+     ${inqHtml(inq,'sm')}</div>
     <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="${r}" data-wh="${w.id}" ${have<=0?'disabled':''} aria-label="Licenzia: ${esc(ROLE1[r]||ROLE[r])}" data-tip="<div class='tt'>Licenzia</div>Un mese di stipendio di buonuscita, morale del magazzino −4 per un mese, reputazione −0,3. Dal 4° licenziamento in 4 settimane è un'ondata: finisce sul giornale.">−</button><b class="num ${bar&&l>1.02?'bad':''}">${have}</b><button class="btn sm2 pri" data-act="hire" data-role="${r}" data-wh="${w.id}" aria-label="Assumi: ${esc(ROLE1[r]||ROLE[r])}" data-tip="Assumi">+</button></div></div>`;};
   const thr=key=>{const v=cl.filter(c=>c.status==='attivo'&&c[key]!=null).map(c=>c[key]);return v.length?Math.max(...v):null;};
   const sP=thr('sP'), sA=thr('sA'), mor=Math.round(w.morale), morC=mor>=60?'ok':mor>=45?'warn':'bad';
@@ -6837,7 +6854,7 @@ const VIEWS={
    <div class="wh-top"><span class="wh-name">${esc(w.name)}<span class="wh-prov">${w.prov}</span></span><span class="wh-own">${w.own?'di proprietà':'in affitto'} · ${eur(w.fixed)}/mese</span></div>
    <div class="wh-occ"><span class="lab">${kw('saturazione','Occupazione')}</span><span class="num"><b style="color:${barColor(k.sat)==='var(--ok)'?'#6fdc8c':barColor(k.sat)==='var(--warn)'?'#ffc53d':'#ff8a8d'}">${occ}%</b> ${n0(k.stock)} / ${n0(k.cap)} posti</span></div>
    <div class="bar wh-bar"><i style="width:${Math.min(100,k.sat*100)}%;background:${barColor(k.sat)}"></i></div>
-   <label class="wh-mgr"><img class="px" src="${mgrImg}" alt="${w.mgr?'':'Posto vacante'}" width="40" height="46"><span class="lab">${kw('manager','Manager')}</span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
+   <label class="wh-mgr">${pFace(mgrImg,'m',w.mgr?'':'Posto vacante')}<span class="lab">${kw('manager','Manager')}</span><select data-act="setmgr" data-wh="${w.id}" aria-label="Manager del magazzino"><option value="">Nessuno</option>${mgrOpts}</select></label>
    ${k.m.none?'<div class="wh-warn">Senza manager le prestazioni calano: assumine uno da Personale.</div>':''}
    ${mgrFxHtml(k.m)}
   </div>
@@ -6948,35 +6965,38 @@ const VIEWS={
    ${done.length?`<div class="lab">Risultati recenti</div><div class="card" style="gap:0">`+done.map(t=>{const w=t.result&&t.result.win;return `<div class="pr-q">${logoSvg(t.name,24)}<span class="wh-sm"><span class="wh-nm">${esc(t.name)}</span><span class="sm wh-nm">${esc(zoneName(t.zone))}${t.result&&!w?` · ${t.bid?'vinta da':'presa da'} ${esc(t.result.by)}`:''}</span></span><span class="pill cl-st ${w?'ok':t.bid?'bad':''}">${t.result?(w?'Vinta':t.bid?'Persa':'Non partecipato'):''}</span></div>`;}).join('')+'</div>':''}`;
  },
  personale(){
-  const ks=S.warehouses.map(w=>[w,w.kpi||computeWH(w)]), pn=planNeed(), pl=planLoad(), pq=S.queue.filter(q=>q.role==='plan').length;
+  const ks=S.warehouses.map(w=>[w,w.kpi||computeWH(w)]), pn=planNeed(), pl=planLoad(), pq=S.queue.filter(q=>q.role==='plan'), Q=[...S.queue].sort((a,b)=>a.days-b.days);
   const tot=ks.reduce((a,[w])=>a+staffTot(w),0)+S.office.plan+S.office.cs;
   const hot=ks.reduce((a,[w,k])=>{const l=staffLoad(w,k);return a+LOAD_ROLES.filter(r=>l[r]>1.02).length+(l.fm>0?1:0);},0)+(pn&&pl>1.02?1:0);
   const hired=S.managers.filter(m=>m.hired), arrN=S.managers.filter(m=>m.arr!=null).length;
   const tile=(cls,lab,val,sub)=>`<div class="kpi wh-k ${cls}"><div class="lab">${lab}</div><b>${val}</b><div class="sm">${sub}</div></div>`;
-  // reparto in una riga: ritratto, nome, persone, barra del carico
-  const roleRow=(w,k,r)=>{const l=staffLoad(w,k)[r], n=w.staff[r], bar=r!=='fm'&&!(r==='capo'&&l===0)&&l<9;
+  // reparto in una riga: ritratto, nome, persone, barra del carico; sotto, chi è in arrivo
+  const roleRow=(w,k,r)=>{const l=staffLoad(w,k)[r], n=w.staff[r], bar=r!=='fm'&&!(r==='capo'&&l===0)&&l<9, inq=S.queue.filter(q=>q.wh===w.id&&q.role===r);
    const txt=r==='fm'?(l?'<span class="bad">manca</span>':'<span class="ok">ok</span>'):r==='capo'&&l===0?'<span class="sm">dal manager</span>':l>=9?'<span class="bad">fermo</span>':'';
-   return `<div class="pr-r"><img class="px" src="${n?IMG[r]:IMG.anon}" alt="" width="24" height="28"><span class="wh-nm">${kw(ROLE_WK[r],ROLE[r])}</span><b class="num ${bar&&l>1.02?'bad':''}">${n}</b><span class="pr-l">${bar?`<span class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></span><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>`:txt}</span></div>`;};
+   return `<div class="pr-r pr-s">${pFace(n?IMG[r]:IMG.anon)}<span class="wh-nm">${kw(ROLE_WK[r],ROLE[r])}</span><b class="num ${bar&&l>1.02?'bad':''}">${n}</b><span class="pr-l">${bar?`<span class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></span><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>`:txt}</span>${inqHtml(inq,'sm pr-in')}</div>`;};
+  // assunzioni in corso, la prima in cima: ognuna con la sua barretta che si riempie
+  const qCard=`<div class="card"><div class="row"><span class="h3">${kw('assunzioni')} in corso</span><span class="sm">${Q.length||'nessuna'}</span></div>
+   ${Q.map(q=>`<div class="pr-q">${pFace(IMG[q.role])}<span class="pr-n"><span class="wh-nm">${ROLE1[q.role]||ROLE[q.role]} <span class="sm">${q.wh?esc(whById(q.wh).name):'sede'}</span></span><span class="bar" data-tip="${hireTip(q)}"><i style="width:${Math.round(hirePc(q)*100)}%"></i></span></span><span class="pill">${wks(q.days)}</span></div>`).join('')}
+   <div class="sm">${Q.length?`La barretta si riempie fino al giorno in cui la persona entra in servizio. `:''}Fanno prima benefit, welfare del magazzino e reputazione alta. Gli autisti CE sono i più difficili da trovare.</div></div>`;
   return `<div class="wh-kpis c2">
    ${tile('','Persone',tot,'in tutta l\'azienda')}
    ${tile(hot?'bad':'ok',kw('carico','In affanno'),hot,hot===1?'reparto':'reparti')}
    ${tile(S.queue.length?'warn':'',kw('assunzioni','In arrivo'),S.queue.length,S.queue.length===1?'assunzione':'assunzioni')}
    ${tile('',kw('manager','Manager'),hired.length,arrN?`+${arrN} in arrivo`:'in squadra')}
   </div>
+  ${Q.length?qCard:''}
   ${ks.map(([w,k])=>`<div class="card"><div class="row" style="align-items:center"><span class="h3 wh-nm">${esc(w.name)}</span><button class="btn sm2" data-act="openwh" data-id="${w.id}">Apri il magazzino</button></div>
    <div class="pr-hd"><span>Reparto</span><span>persone · ${kw('carico','carico')}</span></div>
    ${ROLES.map(r=>roleRow(w,k,r)).join('')}</div>`).join('')}
   <div class="card"><div class="row"><span class="h3">Sede</span><span class="sm">si assume e si licenzia da qui</span></div>
-   <div class="wh-st"><img class="px" src="${S.office.plan?IMG.plan:IMG.anon}" alt="" width="40" height="46">
+   <div class="wh-st">${pFace(S.office.plan?IMG.plan:IMG.anon,'m')}
     <div class="wh-sm"><div class="wh-nm">${kw('pianificatori',ROLE.plan)}</div>
      ${pn&&pl<9?`<div class="wh-ld"><div class="bar"><i style="width:${Math.min(100,pl*100/1.5)}%;background:${loadCol(pl)}"></i></div><b style="color:${loadCol(pl)}">${Math.round(pl*100)}%</b></div>`:`<div class="sm wh-nm">${pn?'<span class="bad">nessuno: giri non organizzati</span>':'i giri li organizzi tu'}</div>`}
-     ${pq?`<div class="sm wh-inq">+${pq} in arrivo</div>`:''}</div>
+     ${inqHtml(pq,'sm')}</div>
     <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="plan" ${S.office.plan<=0?'disabled':''} aria-label="Licenzia: pianificatore del traffico" data-tip="<div class='tt'>Licenzia</div>Un mese di stipendio di buonuscita, reputazione −0,3. Dal 4° licenziamento in 4 settimane è un'ondata: finisce sul giornale.">−</button><b class="num ${pl>1.02?'bad':''}">${S.office.plan}</b><button class="btn sm2 pri" data-act="hire" data-role="plan" aria-label="Assumi: pianificatore del traffico" data-tip="Assumi">+</button></div></div>
    <div class="sm">${pn?`Organizzano i giri dei camion di tutti i magazzini: ognuno che manca toglie 2 punti di puntualità ovunque, con la squadra al completo i km costano il 4% in meno.`:`Fino a 150 viaggi al mese i giri li organizzi tu, poi serve un pianificatore ogni 150 viaggi.`}</div>
    ${csRow()}<div class="sm">Rispondono alle richieste dei clienti: ne serve uno ogni ${CS.per} clienti dopo i primi ${CS.free}. Il responsabile si sceglie nella finestra ${kw('customer_service','Customer service')}.</div></div>
-  <div class="card"><div class="row"><span class="h3">${kw('assunzioni')} in corso</span><span class="sm">${S.queue.length||'nessuna'}</span></div>
-   ${S.queue.map(q=>`<div class="pr-q"><img class="px" src="${IMG[q.role]}" alt="" width="24" height="28"><span class="wh-nm">${ROLE1[q.role]||ROLE[q.role]} <span class="sm">${q.wh?esc(whById(q.wh).name):'sede'}</span></span><span class="pill">${wks(q.days)}</span></div>`).join('')}
-   <div class="sm">Fanno prima benefit, welfare del magazzino e reputazione alta. Gli autisti CE sono i più difficili da trovare.</div></div>
+  ${Q.length?'':qCard}
   <div class="card"><div class="row"><span class="h3">${kw('manager','Manager')}</span><span class="sm">${hired.length} in squadra${arrN?` · ${arrN} in arrivo`:''}</span></div>
    <div class="sm">Guidano i magazzini, la Direzione e il customer service. Si cercano tra le candidature spontanee o con un ${kw('head_hunter','head hunter')}, e lo stipendio si tratta.</div>
    <div><button class="btn sm2 pri" data-act="gomgr" data-tab="team">Apri la finestra Manager</button></div></div>`;
@@ -7157,7 +7177,7 @@ const VIEWS={
     body=alert+lines+grid+gare+`<div class="sm">Le ${kw('certificazioni')} di magazzino si ricercano una volta nell'albero Certificazioni, poi si ottengono capannone per capannone con un primo ${kw('audit')}. Valgono 3 anni, con un controllo ogni anno: l'esito dipende dalla ${kw('conformita','conformità')} del magazzino (tocca il numero per vedere da cosa dipende). Un audit preparato vale +${AUD.prep}.</div>`;
   } else {
     const ws=S.warehouses.length, cov=Math.min(ws,qn*QUAL.cover);
-    body=`<div class="card"><div class="wh-st" style="border:0;padding:0"><img class="px" src="${qn?IMG.plan:IMG.anon}" alt="" width="40" height="46"><div class="wh-sm"><b class="wh-nm">${kw('ufficio_qualita','Ufficio qualità')}</b>
+    body=`<div class="card"><div class="wh-st" style="border:0;padding:0">${pFace(qn?IMG.plan:IMG.anon,'m')}<div class="wh-sm"><b class="wh-nm">${kw('ufficio_qualita','Ufficio qualità')}</b>
       <span class="sm">${qn?`${qn} ${qn===1?'addetto':'addetti'} · segue ${cov} ${cov===1?'magazzino':'magazzini'} su ${ws} · ${eur(qn*QUAL.ral*COEF/12)} al mese`:'Nessuno: le procedure le segue chi ha tempo, cioè nessuno'}</span></div>
       <div class="wh-step"><button class="btn sm2" data-act="qualfire" ${qn?'':'disabled'} aria-label="Licenzia un addetto all'ufficio qualità">−</button><b class="num">${qn}</b><button class="btn sm2 pri" data-act="qualhire" ${qn<QUAL.max&&S.cash>=QUAL.hire?'':'disabled'} aria-label="Assumi un addetto all'ufficio qualità">+</button></div></div>
       <div class="sm">Ogni addetto (${eur(QUAL.ral)} di RAL, assunzione ${eur(QUAL.hire)}) segue fino a ${QUAL.cover} magazzini: conformità +${QUAL.bonus} dove arriva. Con almeno un addetto puoi fare gli audit interni (${eur(QUAL.ia)}): conformità +${QUAL.iaBonus} per 4 mesi e ti dice qual è il punto debole.</div></div>`;
@@ -7174,7 +7194,7 @@ const VIEWS={
   const pool=S.managers.filter(m=>m.hired&&!m.wh&&!isCs(m.id));
   const seats=DIR_ROLES.map(r=>{const p=personById(S.dirs[r.id]);const v=p?p.st[r.stat]:null;
     const opts=pool.filter(x=>!seatOf(x.id)||S.dirs[r.id]===x.id).map(x=>`<option value="${x.id}" ${S.dirs[r.id]===x.id?'selected':''}>${esc(x.name)} (${r.statN} ${x.st[r.stat]})</option>`).join('');
-    return `<div class="card dr-s ${p?(v>=10?'':'cl-bad'):'pend'}"><div class="wh-st" style="border:0;padding:0"><img class="px" src="${p?mImg(p):IMG.anon}" alt="${p?'':'Posto vacante'}" width="40" height="46">
+    return `<div class="card dr-s ${p?(v>=10?'':'cl-bad'):'pend'}"><div class="wh-st" style="border:0;padding:0">${pFace(p?mImg(p):IMG.anon,'m',p?'':'Posto vacante')}
       <div class="wh-sm"><b class="wh-nm">${kw('dir_'+r.id,r.name)}</b><span class="sm ${p?(v>=10?'ok':'bad'):''}">${p?esc(p.name)+' · '+r.eff(v):'Posto vacante'}</span></div>${statBadge(r.stat,v,16)}</div>
       <select data-act="setdir" data-role="${r.id}" aria-label="${r.name}"><option value="">Vacante</option>${opts}</select></div>`;}).join('');
   const busy=DIR_ROLES.filter(r=>S.dirs[r.id]).length;
@@ -7201,7 +7221,7 @@ const VIEWS={
   if(!R('regolamento')) return `<div class="card pend"><span class="h3">Serve il Regolamento aziendale</span><div>Le ${kw('policy')} si accendono e si spengono da qui dopo la ricerca <b>Regolamento aziendale</b> nell'albero Sviluppo aziendale.</div><div><button class="btn sm2 pri" data-act="opentech" data-tree="org" data-id="regolamento">Apri l'albero</button></div></div>`;
   const ppl=staffPeople(), unh=ppl.filter(p=>p.quit||grievances(p).length);
   const alert=unh.length?`<div class="card pend"><span class="h3">${kw('pretese','Manager scontenti')}</span>${unh.map(p=>{const g=grievances(p);
-    return `<div class="row" style="flex-wrap:wrap"><span style="display:flex;gap:8px;align-items:center"><img class="px" src="${mImg(p)}" width="24" height="28" alt="">${esc(p.name)}</span><span class="sm ${p.quit?'bad':'warn'}">${p.quit?`lascia l'azienda il ${shortDate(p.quit.day)}`:g.map(x=>(x.want?'vuole ':'non sopporta ')+esc(POL[x.id].name)).join(', ')+` · ultimatum tra ${wks(Math.max(1,30-(p.unh||0)))}`}</span></div>`;}).join('')}</div>`:'';
+    return `<div class="row" style="flex-wrap:wrap"><span style="display:flex;gap:8px;align-items:center">${pFace(mImg(p))}${esc(p.name)}</span><span class="sm ${p.quit?'bad':'warn'}">${p.quit?`lascia l'azienda il ${shortDate(p.quit.day)}`:g.map(x=>(x.want?'vuole ':'non sopporta ')+esc(POL[x.id].name)).join(', ')+` · ultimatum tra ${wks(Math.max(1,30-(p.unh||0)))}`}</span></div>`;}).join('')}</div>`:'';
   const card=P=>{const open=polOpen(P.id), on=polOn(P.id), blk=open?polBlock(P.id,!on):'', tech=TECH.find(t=>t.id===P.tech);
     const fans=ppl.filter(p=>polDem(p).want.includes(P.id)), foes=ppl.filter(p=>polDem(p).hate.includes(P.id));
     const nm=l=>l.map(p=>esc(p.name.split(' ')[0])+((p.tol||{})[P.id]?' (la tollera)':'')).join(', ');
@@ -7682,7 +7702,7 @@ function bidEstHtml(t,e){
     <div class="kpi wh-k ${aC}"><div class="lab">${kw('accuratezza')}</div><b>${f1(e.A0)}%</b><div class="sm">prevista${t.sA?' · soglia '+f1(t.sA)+'%':''}</div></div>
    </div>
    ${rs.length?`<div class="gr-ld"><div class="pr-hd"><span>${kw('carico','Carico')} dopo</span><span>personale di oggi</span></div>
-    ${rs.map(r=>{const l=e.ld[r];return `<div class="pr-r"><img class="px" src="${IMG[r]}" alt="" width="24" height="28"><span class="wh-nm">${ROLE[r]}</span><span class="pr-l">${l>=9?'<span class="bad">nessuno</span>':`<span class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></span><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>`}</span></div>`;}).join('')}</div>`:''}
+    ${rs.map(r=>{const l=e.ld[r];return `<div class="pr-r pr-s">${pFace(IMG[r])}<span class="wh-nm">${ROLE[r]}</span><span class="pr-l">${l>=9?'<span class="bad">nessuno</span>':`<span class="bar"><i style="width:${Math.min(100,l*100/1.5)}%;background:${loadCol(l)}"></i></span><b style="color:${loadCol(l)}">${Math.round(l*100)}%</b>`}</span></div>`;}).join('')}</div>`:''}
    <div class="sm">Oltre il 100% un reparto è in affanno: decidi tu quanti assumere. La committente valuta il progetto come se il magazzino reggesse il carico.</div>`;
 }
 
@@ -7900,7 +7920,7 @@ function wikiShow(){
   const l=el.querySelector('#wiki-list'); l.scrollTop=ls; const c=l.querySelector('[aria-current="true"]');
   if(c&&(c.offsetTop<l.scrollTop||c.offsetTop>l.scrollTop+l.clientHeight-30)) l.scrollTop=c.offsetTop-l.clientHeight/3;
 }
-function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh:OFFICE.includes(r)?null:wh,days});toast(`Ricerca avviata: arriva tra ${wks(days)}`,'ok');}
+function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh:OFFICE.includes(r)?null:wh,days,tot:days});toast(`Ricerca avviata: arriva tra ${wks(days)}`,'ok');}
 function setSpeed(v){if(contMode())v=1; S.speed=Math.min(v,1);renderTop();}
 function showModal(html){if(contMode()&&!AUTO)UI.auto={due:S.day+7,f:closeModal}; $('#modal').innerHTML=`<div class="ovl"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;const b=$('#modal button');if(b)b.focus({preventScroll:true});}  // la finestra parte dall'alto (scenetta e titolo), anche se il primo pulsante è più giù
 function closeModal(){$('#modal').innerHTML='';UI.auto=null;if(UI.evSpeed){setSpeed(UI.evSpeed);UI.evSpeed=0;} if((UI.mq||[]).length&&S&&!S.over) modalInfo(...UI.mq.shift());}
@@ -8151,6 +8171,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.86',t:'Personale più chiaro',x:['Nelle righe piccole i ritratti del personale e dei manager non sono più rimpiccioliti a metà: si vede la testa (o il mezzo busto) disegnata a pixel interi, nitida come nelle scenette, sul computer e sul telefono.','Chi è in arrivo ha una barretta che si riempie fino al giorno in cui entra in servizio: sotto il reparto nella finestra Personale e in quella del magazzino, e nelle Assunzioni in corso, che quando c\'è qualcuno in arrivo stanno in cima alla finestra Personale. Il suggerimento della barretta dice la data esatta.']},
  {v:'0.85',t:'Eventi sull\'iPhone',x:['Sul telefono la finestra di un evento lungo non finisce più sotto l\'orologio e la batteria: parte sotto la barra di stato e la striscia sfocata dell\'iPhone, e in fondo lascia libero lo spazio del tasto Home. Titolo, fonte e data si leggono sempre.']},
  {v:'0.84',t:'Icone ridisegnate',x:['Tutte le icone del gioco sono state ridisegnate da capo, una per una: i 109 talenti, le 61 tecnologie, le 17 policy, le sei abilità, il menu, le lenti della mappa e i pulsanti. Lo stile resta quello di prima (bordo scuro, fascia più scura in basso, niente riflessi), con linee più pulite e disegni più chiari anche quando l\'icona è piccola.','Qualche soggetto nuovo, dove il vecchio si capiva poco o c\'era un doppione: Gatto in ufficio è Bancale, il gatto rosso seduto sul pallet; Mano larga offre la pizza al turno di notte; Conosce tutti al bar ha l\'insegna del bar; il Consigliere comunale ha il municipio col tricolore; il Fortunato al gratta e vinci gratta il suo biglietto; il Tifo sfegatato alza la sciarpa; Promette tutto dice «SÌ!» a tutti.','Tra le tecnologie il Regolamento aziendale diventa le tavole della legge, la Struttura direzionale una poltrona rossa, la Sicurezza muletti un muletto col lampeggiante, la Lavanderia delle divise una lavatrice e l\'HACCP un cappello da cuoco. Nel menu il Customer service ha la cuffia col microfono, e la lente Viaggi è un camion.']},
  {v:'0.83',t:'Partenze più giuste',x:['I quattro CEO partono più alla pari. Nelle partite di prova l\'azienda di Marco falliva 19 volte su 20 e quella di Edoardo 4 su 5, contro una su tre di Gino e Valeria; ora Marco ed Edoardo falliscono poco più di una volta su due.','Edoardo eredita dal padre Rosa Brambati, che guida già il magazzino di Pioltello con lo stipendio di sempre (38.000 €): lui resta libero per gare e clienti. Ha anche una motrice in più e un capannone che costa meno (4.000 € al mese).','Marco, il nerd del WMS, parte con lettori barcode, WMS e GPS già installati e con il gestionale. Il magazzino di Genova Voltri sale a 3.200 posti, ha due motrici e reputazione 45, e Caffè Portuale gli affida più merce (900 posti, 450 pallet al mese).','Valeria resta la squalo delle gare, ma Saponaria Italia parte con 440 pallet al mese invece di 500.','Nella scelta del CEO la scheda dice anche il manager e le tecnologie di partenza.']},
