@@ -7823,7 +7823,10 @@ const ACT={
  seltree(d){UI.sel.tree=d.id;UI.sel.tech=null;renderWin('tecnologia');},
  seltech(d){const t=TECH.find(x=>x.id===d.id); if(t) UI.sel.tree=t.tree; UI.sel.tech=d.id; renderWin('tecnologia');
    const det=document.querySelector('#win-tecnologia .tmain:not(.side) .tdet, .mob #win-tecnologia .tdet'); if(det) det.scrollIntoView({block:'nearest'});},
- poltog(d){const on=!polOn(d.id); if(polBlock(d.id,on)) return; polSet(d.id,on); toast(`Policy ${on?'accesa':'spenta'}: ${POL[d.id].name}`,on?'ok':'warn'); renderAll();},
+ poltog(d){const on=!polOn(d.id); if(polBlock(d.id,on)) return; const P=POL[d.id];
+  if(!d.ok){ const ang=S.managers.filter(m=>m.hired&&(m.tal||[]).some(n=>{const x=POL_TAL[n]||{}; return ((on?x.hate:x.want)||[]).includes(d.id);})).map(m=>m.name);
+   return askOk(`${on?'Accendere':'Spegnere'} la policy ${P.name}?`,`Una volta ${on?'accesa':'spenta'} non si può cambiare per ${wks(POL_CD)}.${on&&P.opp&&polOn(P.opp)?` Si spegne «${esc(POL[P.opp].name)}», che va contro.`:''}${ang.length?` <b class="bad">Non piacerà a ${esc(ang.join(', '))}.</b>`:''}`,on?'Sì, accendi':'Sì, spegni',()=>ACT.poltog({...d,ok:1})); }
+  polSet(d.id,on); toast(`Policy ${on?'accesa':'spenta'}: ${POL[d.id].name}`,on?'ok':'warn'); renderAll();},
  opentech(d){UI.sel.tree=d.tree;UI.sel.tech=d.id;openWin('tecnologia');},
  research(d){const t=TECH.find(x=>x.id===d.id); if(S.project||S.cash<t.cost||R(t.id)||!techOpen(t))return; S.cash-=t.cost; S.cur.tech+=t.cost;
   const days=techDays(t); S.project={tech:t.id,left:days,total:days,cost:t.cost}; toast(`Ricerca avviata: ${t.name}, pronta tra ${wks(days)}`,'ok'); renderAll();},
@@ -7875,7 +7878,9 @@ const ACT={
  bidwh(d,el){UI.bid.wh=el.value;renderWin('gare');},
  bidmult(d,el){UI.bid.mult=(+el.value)/100;const sel=S.tenders.find(t=>t.id===UI.bid.t);$('#bidmv').textContent=(UI.bid.mult>=1?'+':'')+Math.round((UI.bid.mult-1)*100)+'%';$('#bidest').innerHTML=bidEstHtml(sel,bidEstimate(sel,UI.bid.wh,UI.bid.mult));},
  bid(d){const t=S.tenders.find(x=>x.id===d.id);t.bid={wh:UI.bid.wh,mult:UI.bid.mult};toast(`Offerta inviata per ${t.name}`,'ok');renderAll();},
- withdraw(d){const t=S.tenders.find(x=>x.id===d.id);t.bid=null;renderAll();},
+ withdraw(d){const t=S.tenders.find(x=>x.id===d.id); if(!t||!t.bid) return;
+  if(!d.ok) return askOk(`Ritirare l'offerta per ${t.name}?`,'Esci dalla gara: se cambi idea puoi rimandare un\'offerta finché la gara è aperta, ma senza offerta il contratto va a qualcun altro.','Sì, ritira',()=>ACT.withdraw({...d,ok:1}));
+  t.bid=null;renderAll();},
  evopt(d){const ev=UI.ev,o=ev&&ev.opts[+d.i]; if(!o) return;
   // gli eventi casuali danno il risultato il giorno dopo; le decisioni sul personale (ultimatum) valgono subito
   if(EVENTS.some(e=>e.id===ev.id&&!e.now)){ evChoose(ev,+d.i); toast(`«${o.t}»: come andrà lo saprai domani`,'warn'); }
@@ -8181,7 +8186,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.87',t:'Conferme',x:['Le decisioni che pesano chiedono conferma prima di partire: licenziare una persona, un manager o un addetto alla qualità, passare il magazzino alla cooperativa o a un fornitore di handling e riportare il personale in casa, alzarsi dal tavolo col sindacato, annullare una ricerca. La finestra dice cosa costa e cosa succede; «No, lascia stare» non cambia niente.','Rimandare indietro un facchino della cooperativa resta immediato: non costa niente.']},
+ {v:'0.87',t:'Conferme',x:['Le decisioni che pesano chiedono conferma prima di partire: licenziare una persona, un manager o un addetto alla qualità, passare il magazzino alla cooperativa o a un fornitore di handling e riportare il personale in casa, alzarsi dal tavolo col sindacato, annullare una ricerca, accendere o spegnere una policy, ritirare un\'offerta in una gara. La finestra dice cosa costa e cosa succede; «No, lascia stare» non cambia niente.','Rimandare indietro un facchino della cooperativa resta immediato: non costa niente.']},
  {v:'0.86',t:'Personale più chiaro',x:['Nelle righe piccole i ritratti del personale e dei manager non sono più rimpiccioliti a metà: si vede la testa (o il mezzo busto) disegnata a pixel interi, nitida come nelle scenette, sul computer e sul telefono.','Chi è in arrivo ha una barretta che si riempie fino al giorno in cui entra in servizio: sotto il reparto nella finestra Personale e in quella del magazzino, e nelle Assunzioni in corso, che quando c\'è qualcuno in arrivo stanno in cima alla finestra Personale. Il suggerimento della barretta dice la data esatta.']},
  {v:'0.85',t:'Eventi sull\'iPhone',x:['Sul telefono la finestra di un evento lungo non finisce più sotto l\'orologio e la batteria: parte sotto la barra di stato e la striscia sfocata dell\'iPhone, e in fondo lascia libero lo spazio del tasto Home. Titolo, fonte e data si leggono sempre.']},
  {v:'0.84',t:'Icone ridisegnate',x:['Tutte le icone del gioco sono state ridisegnate da capo, una per una: i 109 talenti, le 61 tecnologie, le 17 policy, le sei abilità, il menu, le lenti della mappa e i pulsanti. Lo stile resta quello di prima (bordo scuro, fascia più scura in basso, niente riflessi), con linee più pulite e disegni più chiari anche quando l\'icona è piccola.','Qualche soggetto nuovo, dove il vecchio si capiva poco o c\'era un doppione: Gatto in ufficio è Bancale, il gatto rosso seduto sul pallet; Mano larga offre la pizza al turno di notte; Conosce tutti al bar ha l\'insegna del bar; il Consigliere comunale ha il municipio col tricolore; il Fortunato al gratta e vinci gratta il suo biglietto; il Tifo sfegatato alza la sciarpa; Promette tutto dice «SÌ!» a tutti.','Tra le tecnologie il Regolamento aziendale diventa le tavole della legge, la Struttura direzionale una poltrona rossa, la Sicurezza muletti un muletto col lampeggiante, la Lavanderia delle divise una lavatrice e l\'HACCP un cappello da cuoco. Nel menu il Customer service ha la cuffia col microfono, e la lente Viaggi è un camion.']},
