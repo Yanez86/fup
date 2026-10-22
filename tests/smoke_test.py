@@ -170,11 +170,11 @@ async def phone(b, w, h, name, errs):
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_mappa.png'))
     # barra in alto: tutto su una riga sopra i numeri, riquadri di settimana e mese sempre larghi uguali
     top = await pg.evaluate('''()=>{const y=s=>Math.round(document.querySelector(s).getBoundingClientRect().top), w=document.querySelector('#wkn'), d=document.querySelector('#date');
-      const ws=['S1','S52'].map(t=>{w.textContent=t;return w.offsetWidth;}), ds=['gen 02','set 08'].map(t=>{d.textContent=t;return d.offsetWidth;});
+      const ws=['S1','S52'].map(t=>{w.textContent=t;return w.offsetWidth;}), ds=['1 gen 02','28 mar 08'].map(t=>{d.textContent=t;return d.offsetWidth;});
       return {row:Math.abs(y('#wkn')-y('#top .optb'))<12, ws, ds, txt:(window.__FUP.ACT.speed({v:'0'}),document.querySelector('#date').textContent)};}''')
     bar = await pg.evaluate(BAR)
     assert bar['eq'] and bar['right'], f'{name}: barra in alto {bar}'
-    assert top['row'] and top['ws'][0] == top['ws'][1] and top['ds'][0] == top['ds'][1] and top['txt'] == 'gen 02', f'{name}: barra in alto {top}'
+    assert top['row'] and top['ws'][0] == top['ws'][1] and top['ds'][0] == top['ds'][1] and top['txt'] == '1 gen 02', f'{name}: barra in alto {top}'
     # notifiche: l'evento arriva come tessera, con il cartellino accanto; la tessera apre la finestra, «Decidi più tardi» la lascia lì
     await pg.evaluate(FIRE, 'cesto'); await pg.wait_for_timeout(100)
     for sel in ['#notes', '#notecard']:

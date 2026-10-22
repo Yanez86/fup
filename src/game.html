@@ -94,7 +94,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .chip{display:flex;flex-direction:column;justify-content:center;line-height:1.1;padding:2px 10px;background:#1d2a3b;border:2px solid #2f4057;min-width:0}
 .chip span:first-child{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--hi)}
 .chip b{font-family:var(--f-disp);font-size:17px;font-weight:600}
-.date{font-family:var(--f-disp);font-size:17px;padding:3px 10px;min-width:calc(8.3em + 46px);text-align:center;white-space:nowrap;box-sizing:border-box;background:var(--ink3);border:2px solid var(--ink4);box-shadow:inset 0 -2px 0 #1d2a3b}
+.date{font-family:var(--f-disp);font-size:17px;padding:3px 10px;min-width:calc(10em + 46px);text-align:center;white-space:nowrap;box-sizing:border-box;background:var(--ink3);border:2px solid var(--ink4);box-shadow:inset 0 -2px 0 #1d2a3b}
 .spd{display:flex;gap:4px}.spd[hidden]{display:none}
 .spd button{width:44px;height:34px;border:2px solid var(--ink4);background:var(--ink3);color:#fff;font-family:var(--f-disp);font-weight:700;box-shadow:inset 0 -3px 0 #1d2a3b, inset 0 2px 0 #3b4f6a}
 .spd button[aria-pressed="true"]{background:var(--accent);color:var(--ink);border-color:#fff;box-shadow:inset 0 -3px 0 var(--accent-d), inset 0 2px 0 var(--accent-l)}
@@ -234,6 +234,7 @@ html:not(.mob) #dock.wide .dg{height:auto;border:0;overflow:visible;margin:5px 2
 .rbar.idle{background:#ffe1d6;border-left:8px solid var(--bad)}
 .rb-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .rbar .num{flex:none;white-space:nowrap}
+.rb-p{display:flex;align-items:center;gap:8px}.rb-p .bar{height:14px;background:#fff;border-width:2px}.rb-p .num{min-width:2.6em;text-align:right}
 .rbar .btn{flex:none;display:flex;flex-direction:column;align-items:center;line-height:1.15}.rbar .btn small,.tdet .btn small{font:500 12px var(--f-body)}
 .tstats{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;font-size:14px}.tstats>span{display:inline-flex;align-items:center;gap:6px}
 .tdesc{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between}.tdesc .btn{flex:none}
@@ -1021,7 +1022,7 @@ html,body{overscroll-behavior:none}
 .mob #top{--bh:38px;display:flex;flex-wrap:wrap;gap:6px;row-gap:6px;padding:4px max(8px, env(safe-area-inset-right, 0px)) 5px max(8px, env(safe-area-inset-left, 0px));padding-top:calc(4px + env(safe-area-inset-top, 0px) + var(--glass, 0px))}
 .mob #top .logo{font-size:19px}
 .mob #top .logo small,.mob #top .spacer{display:none}
-.mob #top .wkn,.mob #top .date,.mob #top .clk,.mob #top .paused{font-size:14px;padding:0 7px}.mob .date{min-width:5em}
+.mob #top .wkn,.mob #top .date,.mob #top .clk,.mob #top .paused{font-size:14px;padding:0 7px}.mob .date{min-width:5em}.mob #top .date{gap:5px}.mob.land .date{min-width:7.6em}
 .mob .spd button{width:36px;height:36px}.mob .optb{width:38px;height:38px}
 @media (max-width:379px){.mob #top .logo .lt{display:none}}
 .mob .paused{min-width:0;border-color:var(--ink)}.mob.land .paused{margin-left:auto}.mob .wkn{min-width:3.6em}.mob .clk b{display:none}
@@ -2259,8 +2260,8 @@ const DAY0=Date.UTC(2002,0,1);
 const MESI=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
 const GG=['dom','lun','mar','mer','gio','ven','sab'];
 const dateOf=d=>new Date(DAY0+d*86400000);
-// in alto: solo mese e anno, accanto alla settimana (sul telefono corti: «gen 02»)
-const fmtMonth=(d,short)=>{const t=dateOf(d), m=MESI[t.getUTCMonth()], y=t.getUTCFullYear(); return short?`${m.slice(0,3)} ${String(y).slice(2)}`:`${m} ${y}`;};
+// in alto: giorno, mese e anno, accanto alla settimana (sul telefono corti: «14 gen 02»)
+const fmtTop=(d,short)=>{const t=dateOf(d), m=MESI[t.getUTCMonth()], y=t.getUTCFullYear(); return `${t.getUTCDate()} `+(short?`${m.slice(0,3)} ${String(y).slice(2)}`:`${m} ${y}`);};
 const fmtDate=d=>{const t=dateOf(d);return `${GG[t.getUTCDay()]} ${t.getUTCDate()} ${MESI[t.getUTCMonth()]} ${t.getUTCFullYear()}`};
 const shortDate=d=>{const t=dateOf(d);return `${t.getUTCDate()} ${MESI[t.getUTCMonth()].slice(0,3)} ${t.getUTCFullYear()}`};
 const yearOf=d=>dateOf(d).getUTCFullYear();
@@ -7038,7 +7039,7 @@ function otifNow(){ const ws=S.warehouses.filter(w=>w.kpi), m=ws.reduce((a,w)=>a
 function otifGap(){ let g=null; S.clients.filter(c=>c.status==='attivo').forEach(c=>{const k=(whById(c.wh)||{}).kpi; if(!k) return;
   const v=Math.min(k.P-c.sP,c.sA?k.A-c.sA:99); g=g==null?v:Math.min(g,v);}); return g; }
 function renderTop(){
-  {const si=seasonOf(S.day), dt=$('#date'), h=seasIcon(si,16)+`<span>${fmtMonth(S.day,MOB)}</span>`; if(dt.innerHTML!==h) dt.innerHTML=h;
+  {const si=seasonOf(S.day), dt=$('#date'), h=seasIcon(si,16)+`<span>${fmtTop(S.day,MOB)}</span>`; if(dt.innerHTML!==h) dt.innerHTML=h;
    dt.dataset.tip=`<div class='tt'>${SEAS_N[si][1]} ${yearOf(S.day)}</div>${fmtDate(S.day)}. Le committenti vendono di più o di meno secondo la stagione: i volumi da preparare e da consegnare seguono il loro andamento.`;}
   $('#wkn').textContent=(MOB?'Wk':'Settimana ')+weekOf(S.day); $('#wkn').dataset.tip=`<div class='tt'>Settimana ${weekOf(S.day)} del ${yearOf(S.day)}</div>Il tempo del gioco si conta a settimane: il lunedì arriva il report KPI. ${esc(MODES[modeOf()].d)}`;
   const cm=contMode(); document.querySelector('.spd').hidden=cm; const ck=$('#clk'); ck.hidden=!cm;
@@ -7591,7 +7592,7 @@ const VIEWS={
   // in cima: la ricerca in corso (o l'avviso che è ferma) e tre numeri in una riga
   const pt=pj&&TECH.find(x=>x.id===pj.tech);
   const rbar=pt?`<div class="rbar">${techIcon(pt,40)}<div class="rb-m"><div class="row"><span>${kw('ricerca','In corso')}: <button class="lnk" data-act="seltech" data-id="${pt.id}"><b>${esc(pt.name)}</b></button></span><b class="num">${wks(pj.left)}</b></div>
-     <div class="bar"><i style="width:${Math.round((1-pj.left/pj.total)*100)}%;background:var(--accent)"></i></div><span class="sm">${esc(trN(pt.tree))} · fine prevista il ${shortDate(S.day+pj.left)}</span></div>
+     <div class="rb-p"><div class="bar"><i style="width:${Math.round((1-pj.left/pj.total)*100)}%;background:var(--accent)"></i></div><b class="num">${Math.round((1-pj.left/pj.total)*100)}%</b></div><span class="sm">${esc(trN(pt.tree))} · fine prevista il ${shortDate(S.day+pj.left)}</span></div>
      <button class="btn sm2" data-act="canceltech">Annulla<small>rimborso 50%</small></button></div>`
    :`<div class="rbar idle"><div class="rb-m"><b>Nessuna ${kw('ricerca','ricerca')} in corso</b><span class="sm">Scegli una tecnologia con il riquadro bianco e avviala: se ne ricerca una alla volta.</span></div></div>`;
   const stats=`<div class="tstats"><span>${kw('alberi','Ricercate')} <b>${nDone} / ${TECH.length}</b></span>
@@ -8964,6 +8965,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.98',t:'Data e ricerca più chiare',x:['In alto la data mostra anche il giorno: «13 febbraio 2002» sul computer, «13 feb 02» sul telefono.','Nella finestra Tecnologia la ricerca in corso ha una barra di avanzamento ben visibile, con la percentuale accanto: prima era schiacciata in una riga sottile.']},
  {v:'0.97',t:'Il magazzino visto da fuori',x:['In cima alla finestra Magazzini c\'è il magazzino visto da fuori, diverso per ogni magazzino: il capannone cambia con la classe dell\'edificio (fatiscente, vecchio, standard, moderno, innovativo, ognuna in due versioni) e con le celle frigo diventa un magazzino frigorifero. Gli stessi disegni si vedono nella scheda dei capannoni da affittare; i terreni edificabili e i cantieri da zero hanno il loro.','Sul capannone e davanti compaiono le dotazioni che ha davvero: pannelli solari sul tetto, ribalte di carico, cisterna dell\'antincendio, lampioni a LED, portineria con la sbarra, giardino, mensa, parcheggio dei camion e piazzale, più la zona di ricarica dei muletti e la gru durante un cantiere. Dove resta posto si vedono anche l\'area cani, le colonnine di ricarica e il pulmino del welfare.','La scena del lavoro in magazzino, col nastro trasportatore, passa nella finestra Personale.']},
  {v:'0.96',t:'Capannoni ridisegnati',x:['Le immagini dei capannoni nelle schede sono rifatte nello stile delle scenette degli eventi: più vicine, con il contorno scuro su ogni cosa e tanta gente al lavoro. Il portiere nella guardiola alza la sbarra, la carrellista fa avanti e indietro col muletto, dalla baia che si apre spunta il magazziniere col gilet, l\'autista beve il caffè accanto alla motrice.','Le classi si riconoscono a colpo d\'occhio: lamiere arrugginite e vetri rotti nel fatiscente, tetto a shed e ciminiera nel vecchio, lamiera grigia nello standard, pannelli bianchi e bandiera nel moderno, vetrate, tetto verde e pala eolica nell\'innovativo. Rifatti anche il terreno in vendita, col geometra, e il cantiere con la gru.']},
  {v:'0.95',t:'Il tutorial della dottoressa Ribalta',x:['Nella schermata principale c\'è il Tutorial: una partita guidata dalla dottoressa Ornella Ribalta, docente del corso regionale «Diventa CEO in 9 lezioni». In circa 15 minuti spiega la mappa, il tempo, il magazzino con puntualità e accuratezza, il personale, le gare, la ricerca, i manager, gli eventi e il report del lunedì.','La dottoressa parla da un fumetto e un riquadro giallo indica cosa toccare: il gioco aspetta che tu lo faccia. Mentre spiega il tempo resta fermo. Il fumetto si rimpicciolisce con ▾ e il tutorial si può saltare in qualsiasi momento.','Si gioca con Valeria Conti a Novara, senza avversari. Alla fine arriva l\'attestato di partecipazione e la partita continua come una normale, con le gare e gli eventi di sempre. Il tutorial avanzato arriverà presto.','Ritratti corretti: Franca, Nicola, uno dei ritratti del CEO creato da te e due candidati con gli occhiali colorati avevano anche il contorno e gli occhi di quel colore; ora il contorno è scuro come per tutti. E chi aveva le labbra del colore sbagliato (della collana, o bianche) ha il suo rossetto.']},
