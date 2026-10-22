@@ -692,6 +692,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .mob .ev-scn{margin:0 calc(-1 * max(10px, env(safe-area-inset-right, 0px))) 0 -10px}
 .win .ev-scn i{width:320px} .win.wide .ev-scn i,.win.xwide .ev-scn i{width:480px} .mob .ev-scn i,.mob .win .ev-scn i{width:320px}
 .ev-scn.ferma i{animation:none}
+/* esterni dei capannoni: 144×72 (tagliati ai lati in esportazione), quindi 432 o 288 punti, sempre a multipli interi */
+.ev-scn.est i{width:432px;aspect-ratio:144/72} .win .ev-scn.est i{width:288px} .win.wide .ev-scn.est i,.win.xwide .ev-scn.est i{width:432px} .mob .ev-scn.est i,.mob .win .ev-scn.est i{width:288px}
 .ev-scn i{display:block;width:480px;max-width:100%;aspect-ratio:160/72;background-size:1600% 100%;background-repeat:no-repeat;image-rendering:pixelated;box-shadow:0 0 0 3px var(--ink);animation:scn 2s steps(16) infinite}
 @keyframes scn{to{background-position:calc(100% * 16 / 15) 0}}
 @media (prefers-reduced-motion:reduce){.ev-scn i{animation:none}}
@@ -5418,7 +5420,7 @@ function evScena(id,src){const k=SCN_EV[id]||SCN_SRC[src]||'ufficio'; return SCE
 // il ritardo negativo aggancia ogni scena allo stesso orologio: quando una finestra si ridisegna la scena riprende da dove era, senza scatti
 // el: elementi trasparenti messi sopra la scena (strisce el_*, tutte con gli stessi 16 fotogrammi: scorrono insieme)
 const scnHtml=(k,ferma,el=[])=>{if(!k||!SCENE[k]) return ''; el=el.filter(e=>SCENE[e]);
-  return `<div class="ev-scn${ferma?' ferma':''}"><i style="background-image:${[...el,k].map(x=>`url(${SCENE[x]})`).join(',')};animation-delay:-${Math.round(performance.now()%2000)}ms" data-scena="${k}" data-el="${el.join(' ')}" aria-hidden="true"></i></div>`;};
+  return `<div class="ev-scn${ferma?' ferma':''}${k.startsWith('est_')?' est':''}"><i style="background-image:${[...el,k].map(x=>`url(${SCENE[x]})`).join(',')};animation-delay:-${Math.round(performance.now()%2000)}ms" data-scena="${k}" data-el="${el.join(' ')}" aria-hidden="true"></i></div>`;};
 // scene in cima alle finestre (per scheda): la Tecnologia si muove solo con una ricerca in corso. Nell'ufficio del direttore
 // il CEO è uomo o donna come quello della partita; chi porta il caffè (segretaria o segretario) dipende dal nome dell'azienda
 const WSCN={magazzini:()=>estScena(whById(UI.sel.wh)||S.warehouses[0]),personale:'lavoro',tecnologia:'tecnologia',customer:'customer',direzione:'consiglio',

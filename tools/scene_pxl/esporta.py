@@ -3,6 +3,7 @@ Builda ogni file (tranne comune.px.js) in una cartella pulita, poi per ogni scen
 una striscia di 16 fotogrammi 160x72 da 125 ms l'uno, che il gioco fa scorrere con il CSS (vedi SCN in src/game.html).
 build.py le incorpora tutte al posto di {{SCENE}}. Le scene che si chiamano prova_* o test_* restano fuori.
 Le scene el_* (elementi da mettere sopra un esterno di magazzino) sono trasparenti fuori dall'elemento: restano con la trasparenza.
+Gli esterni (est_*) e i loro strati (el_*) si disegnano su 160x72 ma si tagliano a x 8..151: nel gioco sono 144x72, un po' meno allungati.
 Uso: python3 tools/scene_pxl/esporta.py            (tutti i file; toglie le scene che non esistono più)
      python3 tools/scene_pxl/esporta.py eventi.px.js  (solo quei file)"""
 import os, shutil, subprocess, sys
@@ -13,6 +14,7 @@ OUT = os.path.join(ROOT, 'tools', 'out', 'scene_pxl_esporta')
 DEST = os.path.join(ROOT, 'assets', 'scene')
 PXL = os.path.join(ROOT, '.claude', 'skills', 'pxl-pixel-art', 'bin', 'pxl.js')
 W, H, N, MS = 160, 72, 16, 125   # misura, fotogrammi e durata di ogni fotogramma (16 x 125 ms = 2 secondi)
+TAGLIO = 8                       # colonne tolte a sinistra e a destra degli esterni e dei loro strati
 
 shutil.rmtree(OUT, ignore_errors=True)
 tutti = len(sys.argv) < 2
@@ -41,8 +43,10 @@ for f in sorted(os.listdir(os.path.join(OUT, 'scenes'))):
     el = nome.startswith('el_')
     fr = frames(nome, 'RGBA' if el else 'RGB')
     if len(fr) != N or fr[0].size != (W, H): sys.exit(f'{nome}: servono {N} fotogrammi da {MS} ms di {W}x{H}, ne ho {len(fr)} da {fr[0].size}')
-    st = Image.new('RGBA' if el else 'RGB', (W * N, H))
-    for i, x in enumerate(fr): st.paste(x, (W * i, 0))
+    if el or nome.startswith('est_'): fr = [x.crop((TAGLIO, 0, W - TAGLIO, H)) for x in fr]
+    w = fr[0].size[0]
+    st = Image.new('RGBA' if el else 'RGB', (w * N, H))
+    for i, x in enumerate(fr): st.paste(x, (w * i, 0))
     if el:   # elemento trasparente: PNG con la trasparenza, i pixel o sono pieni o non ci sono
         st.save(os.path.join(DEST, nome + '.png'), optimize=True)
         fatte.append(f'{nome} ({os.path.getsize(os.path.join(DEST, nome + ".png")) // 1024 + 1} KB)'); continue
