@@ -183,6 +183,12 @@ async def phone(b, w, h, name, errs):
       const r=i.getBoundingClientRect(), q=m.getBoundingClientRect(); return {k:i.dataset.scena, w:r.width, h:r.height, in:r.left>=q.left&&r.right<=q.right};}""")
     assert scn and scn['in'] and abs(scn['w'] / scn['h'] - 160 / 72) < 0.02 and (scn['w'] == 320 or w < 400), f'{name}: scenetta dell\'evento {scn}'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_evento.png'))
+    # iPhone: l'evento lungo resta fuori dalla barra di stato e dalla striscia del tasto Home (bordi finti via CDP)
+    cdp = await ctx.new_cdp_session(pg)
+    await cdp.send('Emulation.setSafeAreaInsetsOverride', {'insets': {'top': 59, 'bottom': 34}}); await pg.wait_for_timeout(50)
+    m = await pg.evaluate("()=>{const r=document.querySelector('#modal .modal').getBoundingClientRect();return {top:r.top,bottom:r.bottom,h:innerHeight};}")
+    assert m['top'] >= 59 + 8 and m['bottom'] <= m['h'] - 34, f'{name}: evento sotto la barra di stato del telefono {m}'
+    await cdp.send('Emulation.setSafeAreaInsetsOverride', {'insets': {}}); await cdp.detach()
     await pg.tap('#modal [data-act=closemodal]')
     assert await pg.evaluate("()=>window.__FUP.S.notes.some(n=>n.k==='ev')"), f'{name}: evento sparito con «Decidi più tardi»'
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
