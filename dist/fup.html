@@ -6001,9 +6001,23 @@ function evChoose(ev,i){
 function evResolve(p){
   const ev=evUnpack(p,p.title,p.src); if(!ev) return;
   const o=ev.opts[p.i]; if(!o) return;
-  UI.chg=[]; UI.evMsg=[]; evApply(ev,o); const ch=UI.chg, msg=UI.evMsg; UI.chg=null; UI.evMsg=null;
+  const s0=evSnap(); UI.chg=[]; UI.evMsg=[]; evApply(ev,o); const ch=UI.chg, msg=UI.evMsg; UI.chg=null; UI.evMsg=null;
   news(ev.src,`${ev.title}: com'è andata`,o.r||o.d||''); if(!ev.cs) chron('evento',`${ev.title}: «${o.t}»`);
-  noteAdd({k:'res',col:'blue',ic:ev.ic||'evento',src:ev.src,title:ev.title,text:o.r||o.d||'',pick:o.t,eff:o.e,msg,ch:ch.map(c=>({...c,p:c.p.id}))});
+  noteAdd({k:'res',col:'blue',ic:ev.ic||'evento',src:ev.src,title:ev.title,text:o.r||o.d||'',pick:o.t,eff:evEff(o,s0)||(msg.length||ch.length?'':'Nessuna conseguenza'),msg,ch:ch.map(c=>({...c,p:c.p.id}))});
+}
+// nel «Com'è andata» solo quello che è successo davvero: se la scelta dipendeva dal caso, gli effetti si leggono dai numeri
+// (soldi, reputazione, soddisfazione, agitazione, effetti a tempo); altrimenti resta il testo della scelta senza rischi e probabilità
+const EV_FORSE=/volte su|una volta su|probabilit|\d+ ?%:|\d+% che|rischi|può |potrebbe|forse|se va |se esageri|se scopri|se dormi|oppure|altrimenti|con alcuni talenti/i;
+function evSnap(){ return {cash:S.cash,rep:S.rep,mods:S.mods.length,sat:new Map(S.clients.map(c=>[c,c.sat])),ag:new Map(S.warehouses.map(w=>[w,w.ag]))}; }
+function evEff(o,s0){
+  if(!/Math\.random|rnd\(|pick\(/.test(String(o.f))) return (o.e||'').split(/;\s*/).filter(x=>x&&!EV_FORSE.test(x)).join('; ')||o.e||'';
+  const sg=v=>(v>0?'+':'−')+Math.abs(v), out=[], dc=Math.round(S.cash-s0.cash), dr=Math.round(S.rep-s0.rep);
+  if(dc) out.push((dc>0?'+':'')+eur(dc)); if(dr) out.push('reputazione '+sg(dr));
+  S.clients.forEach(c=>{const d=Math.round(c.sat-(s0.sat.has(c)?s0.sat.get(c):c.sat)); if(d) out.push(`soddisfazione di ${cname(c)} ${sg(d)}`);});
+  S.warehouses.forEach(w=>{if(w.ag==null||!s0.ag.has(w)||s0.ag.get(w)==null) return; const d=Math.round(w.ag-s0.ag.get(w)); if(d) out.push(`agitazione a ${w.name} ${sg(d)}`);});
+  S.mods.slice(s0.mods).forEach(m=>{const t=Object.keys(MOD_N).filter(k=>m[k]).map(k=>`${MOD_N[k].toLowerCase()} ${m[k]>0?'+':'−'}${f1(Math.abs(m[k])).replace(',0','')}`).join(', ');
+    if(t) out.push(`${t} ${m.scope==='all'?'in tutti i magazzini':'a '+((whById(m.scope)||{}).name||'magazzino')} per ${wks(m.until-S.day)}`);});
+  const t=out.join(', '); return t?t[0].toUpperCase()+t.slice(1):'';
 }
 function pinIcon(){const P=['..XXXX..','.XOOOOX.','XOOXXOOX','XOOXXOOX','.XOOOOX.','..XOOX..','...XX...'];let r='';P.forEach((row,y)=>[...row].forEach((c,x)=>{if(c!=='.')r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${c==='X'?TPAL.K:TPAL.O}"/>`;}));return `<svg width="18" height="16" viewBox="-1 -1 10 9" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
 function modalInfo(src,title,text){
@@ -8281,6 +8295,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.91',t:'Com\'è andata',x:['Nel riquadro «Com\'è andata» di un evento trovi solo quello che è successo davvero: niente più probabilità («4 volte su 10…») né rischi che non si sono avverati. Se la scelta dipendeva dalla sorte, gli effetti sono i numeri veri: soldi, reputazione, soddisfazione dei clienti, morale e KPI a tempo.']},
  {v:'0.90',t:'Altre conferme',x:['Chiedono conferma anche accendere o spegnere una policy (poi non si cambia per 13 settimane; la finestra avvisa se va contro un\'altra policy o se un manager non la sopporta) e ritirare un\'offerta in una gara.']},
  {v:'0.89',t:'Magazzino per le gare',x:['Anche il magazzino per un nuovo cliente non si sceglie più da un menu a tendina: nella finestra delle Gare tocca «Cambia» accanto al magazzino e si apre la finestrella con tutti i tuoi magazzini.','In cima quelli che possono prendere il cliente, dalla probabilità di vincere più alta: per ognuno l\'occupazione dopo il contratto, puntualità e accuratezza previste (in rosso se sotto la soglia del cliente) e i km al mese di trasporti. Sotto, in grigio, quelli che non possono, con il motivo: poco spazio o una certificazione che il magazzino non ha.','In fondo, «Nuovo magazzino» porta dritto all\'espansione.']},
  {v:'0.88',t:'Scelta dei manager',x:['Il manager di un magazzino, il responsabile del customer service e i direttori non si scelgono più da un menu a tendina: tocca «Cambia» accanto al nome e si apre una finestrella con tutti i manager della squadra, con ritratto, rango e abilità.','In cima ci sono quelli che puoi nominare, dal più adatto al posto (per i direttori e il customer service le abilità che contano sono in evidenza); sotto, in grigio, quelli che hanno già un incarico, con scritto quale: «Manager di Genova», «Direttore finanziario», «Responsabile del customer service», oppure quando arrivano.','In fondo alla finestrella «Cerca un manager» porta dritto ai candidati.']},
@@ -8648,6 +8663,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},renderAll,SCENE,WSCN,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>
