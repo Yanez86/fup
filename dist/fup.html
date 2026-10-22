@@ -7797,7 +7797,7 @@ function wikiShow(){
 }
 function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh:OFFICE.includes(r)?null:wh,days});toast(`Ricerca avviata: arriva tra ${wks(days)}`,'ok');}
 function setSpeed(v){if(contMode())v=1; S.speed=Math.min(v,1);renderTop();}
-function showModal(html){if(contMode()&&!AUTO)UI.auto={due:S.day+7,f:closeModal}; $('#modal').innerHTML=`<div class="ovl"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;const b=$('#modal button');if(b)b.focus();}
+function showModal(html){if(contMode()&&!AUTO)UI.auto={due:S.day+7,f:closeModal}; $('#modal').innerHTML=`<div class="ovl"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;const b=$('#modal button');if(b)b.focus({preventScroll:true});}  // la finestra parte dall'alto (scenetta e titolo), anche se il primo pulsante è più giù
 function closeModal(){$('#modal').innerHTML='';UI.auto=null;if(UI.evSpeed){setSpeed(UI.evSpeed);UI.evSpeed=0;} if((UI.mq||[]).length&&S&&!S.over) modalInfo(...UI.mq.shift());}
 function showChoice(title,text,opts){UI.choice=opts.map(o=>o.f);UI.evSpeed=S.speed;S.speed=0;renderTop();
  showModal(`<div class="src"><span>${esc(title)}</span><span></span></div><div class="win-b"><p style="margin:0">${esc(text)}</p>${opts.map((o,i)=>`<button class="opt" data-act="choice" data-i="${i}">${esc(o.t)}<small>${esc(o.e)}</small></button>`).join('')}<button class="btn" data-act="closemodal">Annulla</button></div>`);}
