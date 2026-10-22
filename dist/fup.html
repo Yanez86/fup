@@ -643,6 +643,35 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #notecard .nc-t{height:5px;background:var(--ink3)} #notecard .nc-t i{display:block;height:5px;width:100%;background:var(--accent)}
 .optchk{display:flex;align-items:center;gap:10px;font-size:15px;cursor:pointer}
 .optchk input{width:20px;height:20px;flex:none}
+/* Animazioni di finestre e notifiche: solo con la classe .anim su <html> (casella nelle Opzioni, animOn()).
+   Chi entra parte dallo stato «from» e torna alle sue regole a fine corsa (backwards); chi esce è una copia staccata in #ghosts o in fondo alla pagina */
+#ghosts{position:relative;z-index:20;pointer-events:none}
+#ghosts>*,.ovl.m-out{pointer-events:none}
+.anim .win.w-in{animation:winIn .16s steps(4) backwards}
+.anim .win.w-out{animation:winOut .14s steps(3) forwards}
+.anim.mob .win.w-in{animation:winSlide .18s steps(4) backwards}
+.anim.mob .win.w-out{animation:winSlideOut .14s steps(3) forwards}
+@keyframes winIn{from{transform:scale(.9);opacity:0}}
+@keyframes winOut{to{transform:scale(.9);opacity:0}}
+@keyframes winSlide{from{transform:translateX(48px);opacity:0}}
+@keyframes winSlideOut{to{transform:translateX(48px);opacity:0}}
+.anim .ovl.m-dim{animation:ovlIn .2s backwards}
+.anim .ovl.m-in .modal{animation:modIn .22s cubic-bezier(.2,1.35,.4,1) backwards}
+.anim .ovl.m-out{animation:ovlOut .14s forwards} .anim .ovl.m-out .modal{animation:modOut .14s forwards}
+@keyframes ovlIn{from{background:rgba(8,16,30,0)}}
+@keyframes ovlOut{to{background:rgba(8,16,30,0)}}
+@keyframes modIn{from{transform:translateY(-40px);opacity:0}}
+@keyframes modOut{to{transform:translateY(-16px);opacity:0}}
+.anim .nt.in{animation:ntIn .36s ease-out backwards}   /* al posto del lampeggio delle nuove, che riparte quando la tessera è arrivata */
+@keyframes ntIn{0%{transform:translateX(90px);opacity:0}55%{transform:translateX(-8px);opacity:1}78%{transform:translateX(3px)}100%{transform:none}}
+.anim #notecard.in{animation:ncIn .22s cubic-bezier(.2,1.3,.4,1) backwards}
+.anim #notecard.out{animation:ncOut .15s forwards}
+@keyframes ncIn{from{transform:translateX(60px);opacity:0}}
+@keyframes ncOut{to{transform:translateX(60px);opacity:0}}
+.anim #notepop.in{animation:npIn .14s steps(3) backwards;transform-origin:right top}
+@keyframes npIn{from{transform:scale(.92);opacity:0}}
+.anim .toast{animation:toastIn .18s steps(3) backwards}
+@keyframes toastIn{from{transform:translateY(14px);opacity:0}}
 /* Tooltip, notifiche, modali */
 #tip{position:fixed;z-index:1000;max-width:320px;padding:9px 11px;background:var(--ink);color:#fff;border:2px solid var(--ink2);box-shadow:inset 0 2px 0 var(--ink3), 4px 4px 0 rgba(12,19,29,.5);font-size:14px;line-height:1.45;pointer-events:none}
 #tip .tt{font-family:var(--f-disp);font-size:16px;color:var(--yellow)}
@@ -1192,6 +1221,7 @@ html,body{overscroll-behavior:none}
 <button id="ppb" data-act="spdcycle" aria-label="Velocità del tempo">II</button>
 <nav id="lenses" aria-label="Lenti della mappa"></nav>
 <div id="wins"></div>
+<div id="ghosts" aria-hidden="true"></div>
 <div id="toasts" aria-live="polite"></div>
 <div id="notes" role="region" aria-label="Notifiche"></div>
 <div id="notepop" role="dialog" hidden></div>
@@ -2372,7 +2402,9 @@ wk('notifiche','basi','Notifiche',`La colonna di tessere a destra della mappa: d
 • **I problemi aperti** (un reparto in affanno o senza facility manager, pianificatori o addetti al customer service che non bastano, qualcuno che sta per andarsene o è scontento delle policy, una controproposta di un candidato che aspetta, nessuna ricerca in corso, posti da direttore liberi) restano finché non li risolvi: la tessera apre la finestra dove si sistemano.
 • **Sotto la riga le notizie varie**, tessere piccole raggruppate per tipo con il numero: nuove gare, assunzioni arrivate, ricerche finite, clienti, il [[report]] del lunedì. Si leggono anche aprendo la finestra di cui parlano.
 
-Quando arriva qualcosa di importante, accanto alla colonna compare per qualche secondo un cartellino con «Apri» e «Dopo»; poi resta solo la tessera, che lampeggia finché non la guardi. La X in alto a destra della schedina toglie una notizia; le notizie varie se ne vanno da sole dopo 8 settimane, le importanti dopo 12. Se le tessere non ci stanno tutte, le ultime finiscono in «+N». Tutto resta anche nel [[giornale]].`);
+Quando arriva qualcosa di importante, accanto alla colonna compare per qualche secondo un cartellino con «Apri» e «Dopo»; poi resta solo la tessera, che lampeggia finché non la guardi. La X in alto a destra della schedina toglie una notizia; le notizie varie se ne vanno da sole dopo 8 settimane, le importanti dopo 12. Se le tessere non ci stanno tutte, le ultime finiscono in «+N». Tutto resta anche nel [[giornale]].
+
+Le tessere nuove entrano da destra con un piccolo rimbalzo e il cartellino scivola dentro e fuori; anche le finestre si aprono e si chiudono con una breve animazione. Se preferisci tutto fermo, togli «Animazioni di finestre e notifiche» nelle Opzioni (la scelta vale per questo telefono o computer; se hai attivato «riduci movimento» nel sistema, parte già spenta).`);
 wk('menu','basi','Menu',`Le voci a sinistra della mappa, divise in quattro gruppi: Operazioni, Commerciale, Azienda e Informazioni.`,
 `Ogni voce apre una finestra e dice in una riga come sta il suo reparto: in rosso i problemi (un reparto in affanno, gare aperte, clienti a rischio), in arancione le cose da sapere.
 
@@ -6528,14 +6560,14 @@ const tipNote=(t,x)=>`<div class='tt'>${esc(t)}</div>${esc(x)}`;
 let notesHtml='';
 function renderNotes(){
   const el=$('#notes'); if(!el||(S&&HUM&&S!==HUM)) return;
-  if(!S||S.over||$('#start').innerHTML||!S.notes){ if(notesHtml){el.innerHTML=notesHtml='';} closePop(); hideCard(); return; }
+  if(!S||S.over||$('#start').innerHTML||!S.notes){ if(notesHtml){el.innerHTML=notesHtml='';} UI.ntSeen=null; closePop(); hideCard(); return; }
   const tb=$('#top').getBoundingClientRect().bottom; document.documentElement.style.setProperty('--top-h',Math.round(tb)+'px');
   const N=S.notes, big=MOB?52:60, sm=46, gB=MOB?14:16, gS=10;
   const all=[...N.filter(n=>n.k==='ev'),...N.filter(n=>n.k==='info'||n.k==='res')].map(n=>({t:'n',n,b:1}))
     .concat(noteAlerts().map(a=>({t:'a',a,b:1})))
     .concat(Object.keys(NOTE_G).map(g=>({t:'g',g,l:N.filter(n=>n.k==='var'&&n.g===g),b:0})).filter(x=>x.l.length).sort((a,b)=>b.l[0].id-a.l[0].id));
   // quante tessere ci stanno tra la barra in alto e le lenti (sul telefono il pulsante Menu): le altre finiscono in «+N»
-  const lim=(MOB?$('#burger'):$('#lenses')).getBoundingClientRect().top||innerHeight, avail=lim-12-(tb+(MOB?12:22))-(gB-5);   // gB-5: la lineetta tra grandi e piccole (3 px, margini −8, più lo spazio della colonna)
+  const lim=(MOB?$('#burger'):$('#lenses')).getBoundingClientRect().top||innerHeight, avail=lim-12-(tb+(MOB?12:62))-(gB-5);   // 12 / 62: dove parte la colonna (top di #notes); gB-5: la lineetta tra grandi e piccole (3 px, margini −8, più lo spazio della colonna)
   const H=x=>x.b?big+gB:sm+gS; let h=0, i=0;
   for(;i<all.length;i++){ if(h+H(all[i])+(i<all.length-1?sm+gS:0)>avail+gS) break; h+=H(all[i]); }
   const shown=all.slice(0,i); UI.noteHid=all.slice(i);
@@ -6548,7 +6580,10 @@ function renderNotes(){
   const sep=shown.some(x=>x.b)&&(shown.some(x=>!x.b)||UI.noteHid.length)?'<div class="nt-sep"></div>':'';
   const html=shown.filter(x=>x.b).map(tile).join('')+sep+shown.filter(x=>!x.b).map(tile).join('')
     +(UI.noteHid.length?`<button class="nt small more${P&&P.t==='more'?' on':''}" data-act="notemore" aria-label="Altre ${UI.noteHid.length} notifiche">+${UI.noteHid.length}</button>`:'');
-  if(html!==notesHtml) el.innerHTML=notesHtml=html;
+  if(html!==notesHtml){ el.innerHTML=notesHtml=html;
+    // le tessere che prima non c'erano entrano da destra (non al primo disegno, quando si carica la partita)
+    const k=b=>b.dataset.act+':'+(b.dataset.id||''), seen=UI.ntSeen, L=[...el.querySelectorAll('.nt')]; UI.ntSeen=new Set(L.map(k));
+    if(seen) L.forEach(b=>{ if(!seen.has(k(b))) animGo(b,'in',360); }); }
   renderPop(); placeCard();
 }
 // schedina accanto alla tessera: la notizia intera, l'elenco di un gruppo o le tessere che non ci stanno
@@ -6571,7 +6606,7 @@ function renderPop(){
     html=`<div class="src"><span>Altre notifiche</span><span>${L.length}</span></div><div class="np-b">${L.map(x=>x.t==='n'?`<button class="np-r" data-act="note" data-id="${x.n.id}">${noteIc(x.n.ic,32)}<span>${esc(x.n.title)}</span></button>`
       :x.t==='a'?`<button class="np-r" data-act="noteal" data-id="${x.a.id}">${noteIc(x.a.ic,32)}<span>${esc(x.a.title)}</span></button>`
       :`<button class="np-r" data-act="noteg" data-id="${x.g}">${noteIc(NOTE_G[x.g].ic,32)}<span>${esc(NOTE_G[x.g].n)} · ${x.l.length}</span></button>`).join('')}</div>`; }
-  p.innerHTML=html; p.hidden=false;
+  const was=p.hidden; p.innerHTML=html; p.hidden=false; if(was) animGo(p,'in',140);
   const col=$('#notes').getBoundingClientRect(), t=$('#notes '+anchor), r=t?t.getBoundingClientRect():col, R=innerWidth-col.left+12;
   p.style.right=R+'px'; p.style.left=MOB?Math.max(8,innerWidth-R-380)+'px':'auto';
   p.style.top=clamp(r.top-6,8,innerHeight-p.offsetHeight-8)+'px';
@@ -6583,9 +6618,10 @@ function nextCard(){
 }
 function showCard(n){
   const c=$('#notecard'); if(!c) return; UI.card={id:n.id,left:CARD_MS,hover:false};
+  clearTimeout(c.outT); c.classList.remove('out'); c.inert=false;
   c.style.setProperty('--nc',NOTE_C[n.col]);
   c.innerHTML=`<div class="nc-b">${noteIc(n.ic,32)}<div><b>${esc(n.k==='res'?'Com\'è andata: '+n.title:n.title)}</b><p>${esc(n.text)}</p></div></div><div class="nc-r"><button class="btn pri sm2" data-act="note" data-id="${n.id}">Apri</button><button class="btn sm2" data-act="cardoff">Dopo</button></div><div class="nc-t"><i></i></div>`;
-  c.hidden=false; placeCard();
+  c.hidden=false; placeCard(); animGo(c,'in',220);
 }
 function placeCard(){
   const c=$('#notecard'); if(!c||!UI.card) return;
@@ -6594,7 +6630,10 @@ function placeCard(){
   c.style.right=R+'px'; c.style.left=MOB?Math.max(8,innerWidth-R-380)+'px':'auto'; c.style.width=MOB?'auto':'';
   c.style.top=Math.max(8,top-4)+'px';
 }
-function hideCard(id){ if(!UI.card||(id!=null&&UI.card.id!==+id)) return; UI.card=null; const c=$('#notecard'); if(c){c.hidden=true; c.innerHTML='';} setTimeout(nextCard,300); }
+function hideCard(id){ if(!UI.card||(id!=null&&UI.card.id!==+id)) return; UI.card=null; const c=$('#notecard');
+  if(c){ const end=()=>{c.hidden=true; c.innerHTML=''; c.classList.remove('out'); c.inert=false;};
+    clearTimeout(c.outT); c.classList.remove('in'); if(animOn()&&!c.hidden&&!document.hidden){ c.inert=true; c.classList.add('out'); c.outT=setTimeout(end,150); } else end(); }   // con le animazioni esce scivolando
+  setTimeout(nextCard,300); }
 setInterval(()=>{const k=UI.card; if(!k) return; if(!k.hover) k.left-=100; const i=$('#notecard .nc-t i'); if(i) i.style.width=Math.max(0,k.left/CARD_MS*100)+'%'; if(k.left<=0) hideCard();},100);
 {const c=$('#notecard'); c.addEventListener('mouseenter',()=>{if(UI.card)UI.card.hover=true;}); c.addEventListener('mouseleave',()=>{if(UI.card)UI.card.hover=false;});}
 // un tocco fuori dalla schedina la chiude
@@ -7024,6 +7063,20 @@ const dockGo=id=>{const n=dockNote(id); return n&&n[0]==='bad'?n[2]:id;};
 // sul computer il menu può essere largo (nomi e righe di stato) o solo icone; la scelta resta in questo browser
 let DOCKW=null;
 function dockWide(){ if(DOCKW==null){ let v=null; try{v=localStorage.getItem('fup-menu-largo');}catch(e){} DOCKW=v==null?innerWidth>=1280&&innerHeight>=760:v==='1'; } return DOCKW; }
+// animazioni di finestre e notifiche: scelta del dispositivo (come il menu largo), di base spente con «riduci movimento»
+let ANIM=null;
+function animOn(){ if(ANIM==null){ let v=null; try{v=localStorage.getItem('fup-animazioni');}catch(e){} ANIM=v==null?!matchMedia('(prefers-reduced-motion: reduce)').matches:v==='1'; } return ANIM; }
+function animSet(on){ ANIM=!!on; try{localStorage.setItem('fup-animazioni',ANIM?'1':'0');}catch(e){} document.documentElement.classList.toggle('anim',ANIM); }
+document.documentElement.classList.toggle('anim',animOn());
+// fa partire l'animazione di entrata (classe k, lunga ms) e poi toglie la classe, così non riparte quando cambia il layout
+function animGo(el,k,ms){ if(!el||!animOn()) return; const K=k.split(' '); clearTimeout(el.animT); el.classList.remove(...K); void el.offsetWidth; el.classList.add(...K); el.animT=setTimeout(()=>el.classList.remove(...K),ms+60); }
+// chi esce: esce subito dal gioco (senza il suo id e senza pulsanti, fuori da #wins e #modal), resta solo da vedere finché finisce l'animazione
+function animOut(el,k,ms,to){
+  if(!animOn()||document.hidden||!el.getClientRects().length){ el.remove(); return; }
+  el.removeAttribute('id'); el.querySelectorAll('[data-act]').forEach(x=>x.removeAttribute('data-act'));
+  el.inert=true; el.setAttribute('aria-hidden','true'); clearTimeout(el.animT); el.classList.remove('w-in','m-in','m-dim'); el.classList.add(k);
+  (to||document.body).appendChild(el); setTimeout(()=>el.remove(),ms);
+}
 const chevSvg=d=>`<svg width="14" height="10" viewBox="0 0 7 5" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor">${[1,2,3,2,1].map((w,y)=>[0,4].map(x=>`<rect x="${d>0?x:x+3-w}" y="${y}" width="${w}" height="1"/>`).join('')).join('')}</svg>`;
 function renderDock(){
   document.documentElement.classList.toggle('haswin',Object.keys(UI.open).length>0);  // sul telefono le lenti si nascondono sotto le finestre
@@ -7093,7 +7146,7 @@ function openWin(id,opts){
     el.innerHTML=`<header class="win-h"><span class="grip"></span><h2>${TITLES[id]}</h2><button class="xbtn" data-act="close" data-id="${id}" aria-label="Chiudi">x</button></header>${WTABS[id]?'<nav class="win-t" role="tablist" aria-label="Schede"></nav>':''}<div class="win-b"></div>`;
     $('#wins').appendChild(el); makeDraggable(el,id);
     const mx=Math.max(0,innerWidth-el.offsetWidth-16); if(p.x>mx){p.x=mx;el.style.left=p.x+'px';}
-    el.style.zIndex=++UI.z; renderWin(id); renderDock(); fitWin(el,id,true); return;
+    el.style.zIndex=++UI.z; renderWin(id); renderDock(); fitWin(el,id,true); animGo(el,'w-in',200); return;
   }
   el.style.zIndex=++UI.z; renderWin(id); renderDock(); fitWin(el,id);
 }
@@ -7108,7 +7161,7 @@ function fitWin(el,id,move){
   el.style.maxHeight=Math.max(160,innerHeight-el.offsetTop-GAP)+'px';
 }
 function fitAllWins(){Object.keys(UI.open).forEach(id=>{const el=document.getElementById('win-'+id);if(el)fitWin(el,id);});}
-function closeWin(id){id=winOf(id);delete UI.open[id];const el=document.getElementById('win-'+id);if(el)el.remove();renderDock();}
+function closeWin(id){id=winOf(id);delete UI.open[id];const el=document.getElementById('win-'+id);if(el)animOut(el,'w-out',150,$('#ghosts'));renderDock();}
 function makeDraggable(el,id){
   const h=el.querySelector('.win-h'); let d=null;
   el.addEventListener('pointerdown',()=>{el.style.zIndex=++UI.z;});
@@ -8529,6 +8582,7 @@ const ACT={
  notegdel(d){S.notes=S.notes.filter(n=>!(n.k==='var'&&n.g===d.id)); closePop(); renderNotes();},
  cardoff(){hideCard();},
  evpause(d,el){if(HUM&&HUM.cfg) HUM.cfg.noPause=!el.checked;},
+ animset(d,el){animSet(el.checked);},
  choice(d){const f=UI.choice[+d.i];closeModal();f();renderAll();},
  closemodal(){closeModal();},
  okgo(){const f=UI.okF; UI.okF=null; closeModal(); if(f) f(); renderAll();},
@@ -8546,7 +8600,7 @@ const ACT={
  save(){save();toast('Partita salvata','ok');},
  restart(){if(S&&!S.over)save();closeModal();Object.keys(UI.open).forEach(closeWin);startSel.step='home';startSel.del=0;startSel.stamp=false;showStart();},
  options(){if($('#modal').innerHTML)return;if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);}
-   showModal(`<div class="src"><span>Opzioni</span><span>${shortDate(S.day)}</span></div><div class="win-b"><button class="btn pri" data-act="closemodal">Riprendi</button><button class="btn" data-act="quitgame">Esci dal gioco</button><button class="btn" data-act="svgame">Scarica la partita su file</button><button class="btn" data-act="delgame">Cancella la partita</button>${contMode()?'':`<label class="optchk"><input type="checkbox" data-act="evpause" ${HUM&&HUM.cfg&&HUM.cfg.noPause?'':'checked'}>Metti in pausa quando arriva un evento da decidere</label>`}<p class="sm" style="margin:0">Uscendo la partita viene salvata: la ritrovi nella schermata principale: tocca «Continua» sulla sua scheda.</p></div>`);},
+   showModal(`<div class="src"><span>Opzioni</span><span>${shortDate(S.day)}</span></div><div class="win-b"><button class="btn pri" data-act="closemodal">Riprendi</button><button class="btn" data-act="quitgame">Esci dal gioco</button><button class="btn" data-act="svgame">Scarica la partita su file</button><button class="btn" data-act="delgame">Cancella la partita</button>${contMode()?'':`<label class="optchk"><input type="checkbox" data-act="evpause" ${HUM&&HUM.cfg&&HUM.cfg.noPause?'':'checked'}>Metti in pausa quando arriva un evento da decidere</label>`}<label class="optchk"><input type="checkbox" data-act="animset" ${animOn()?'checked':''}>Animazioni di finestre e notifiche</label><p class="sm" style="margin:0">Uscendo la partita viene salvata: la ritrovi nella schermata principale: tocca «Continua» sulla sua scheda.</p></div>`);},
  delask(d){startSel.del=+d.slot||1;showStart();},
  delno(){startSel.del=0;showStart();},
  delsave(d){const n=+d.slot||startSel.del||1,sv=load(n),m=cMeta(n);delSave(n);cloudDel(n,m,sv&&sv.at);startSel.del=0;showStart();toast('Partita cancellata','ok');},
@@ -8564,8 +8618,11 @@ function wikiShow(){
 }
 function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh:OFFICE.includes(r)?null:wh,days,tot:days});toast(`Ricerca avviata: arriva tra ${wks(days)}`,'ok');}
 function setSpeed(v){if(contMode())v=1; if(v>0&&tutHold()){v=0; if(!$('#modal').innerHTML) tutNudge();} S.speed=Math.min(v,1);renderTop();}
-function showModal(html){if(contMode()&&!AUTO)UI.auto={due:S.day+7,f:closeModal}; $('#modal').innerHTML=`<div class="ovl"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;const b=$('#modal button');if(b)b.focus({preventScroll:true});}  // la finestra parte dall'alto (scenetta e titolo), anche se il primo pulsante è più giù
-function closeModal(){$('#modal').innerHTML='';UI.auto=null;if(UI.evSpeed){setSpeed(UI.evSpeed);UI.evSpeed=0;} if((UI.mq||[]).length&&S&&!S.over) modalInfo(...UI.mq.shift());}
+function showModal(html){if(contMode()&&!AUTO)UI.auto={due:S.day+7,f:closeModal}; const m=$('#modal'), fresh=!m.innerHTML, gh=document.querySelectorAll('body>.ovl.m-out');
+  gh.forEach(x=>x.remove());   // se un'altra finestrella stava sparendo lo sfondo resta scuro, senza lampo
+  m.innerHTML=`<div class="ovl"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`; if(fresh) animGo(m.firstChild,gh.length?'m-in':'m-in m-dim',240);
+  const b=$('#modal button');if(b)b.focus({preventScroll:true});}  // la finestra parte dall'alto (scenetta e titolo), anche se il primo pulsante è più giù
+function closeModal(){const o=$('#modal>.ovl'); if(o) animOut(o,'m-out',150); $('#modal').innerHTML='';UI.auto=null;if(UI.evSpeed){setSpeed(UI.evSpeed);UI.evSpeed=0;} if((UI.mq||[]).length&&S&&!S.over) modalInfo(...UI.mq.shift());}
 function showChoice(title,text,opts){UI.choice=opts.map(o=>o.f);UI.evSpeed=S.speed;S.speed=0;renderTop();
  showModal(`<div class="src"><span>${esc(title)}</span><span></span></div><div class="win-b"><p style="margin:0">${esc(text)}</p>${opts.map((o,i)=>`<button class="opt" data-act="choice" data-i="${i}">${esc(o.t)}<small>${esc(o.e)}</small></button>`).join('')}<button class="btn" data-act="closemodal">Annulla</button></div>`);}
 // conferma per le azioni rischiose (licenziamenti, passaggi tra personale interno e fornitori esterni, tavolo sindacale...):
@@ -9105,6 +9162,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.100',t:'Finestre e notifiche animate',x:['Le finestre si aprono con un piccolo zoom a scatti e si chiudono rimpicciolendosi; sul telefono entrano ed escono scivolando di lato.','Le finestrelle al centro (eventi, conferme, Opzioni) scendono dall\'alto mentre lo sfondo si scurisce piano.','Le tessere nuove delle notifiche entrano da destra con un piccolo rimbalzo, il cartellino scivola dentro e fuori, la schedina si apre con un mini zoom e gli avvisi in basso salgono un poco.','Nelle Opzioni c\'è la casella «Animazioni di finestre e notifiche» per spegnerle: vale per il telefono o il computer che stai usando. Se nel sistema hai attivato «riduci movimento», partono già spente.','Sul computer, quando le notifiche sono tante, la colonna non copre più il pulsante delle lenti: quelle che non ci stanno finiscono in «+N».']},
  {v:'0.99',t:'Il tutorial avanzato',x:['Nella schermata principale il riquadro Tutorial ha due pulsanti: Base e Avanzato. Il tutorial avanzato parte da un\'azienda già grande: due anni di Conti Logistica giocati in pochi secondi (con la barra di avanzamento), sempre uguali, fino a gennaio 2004, con tre magazzini, una decina di clienti, Gino Bertolotti come concorrente e il pacchetto Relazioni industriali.','In nove lezioni la dottoressa Ribalta ti fa nominare il primo direttore, trattare lo stipendio di un manager, scegliere il responsabile del customer service, chiedere l\'audit HACCP in un magazzino, costruire una dotazione nel capannone e accendere una policy. Poi spiega welfare, agitazione e tavolo col sindacato, classifica e vittoria, prestiti e contratti in perdita.','Alla fine arriva l\'attestato del corso «Diventa CEO, secondo livello» e la partita continua da lì.','Il cartellino di una notifica non copre più la cosa che la dottoressa ti chiede di toccare.']},
  {v:'0.98',t:'Data e ricerca più chiare',x:['In alto la data mostra anche il giorno: «13 febbraio 2002» sul computer, «13 feb 02» sul telefono.','Nella finestra Tecnologia la ricerca in corso ha una barra di avanzamento ben visibile, con la percentuale accanto: prima era schiacciata in una riga sottile.']},
  {v:'0.97',t:'Il magazzino visto da fuori',x:['In cima alla finestra Magazzini c\'è il magazzino visto da fuori, diverso per ogni magazzino: il capannone cambia con la classe dell\'edificio (fatiscente, vecchio, standard, moderno, innovativo, ognuna in due versioni) e con le celle frigo diventa un magazzino frigorifero. Gli stessi disegni si vedono nella scheda dei capannoni da affittare; i terreni edificabili e i cantieri da zero hanno il loro.','Sul capannone e davanti compaiono le dotazioni che ha davvero: pannelli solari sul tetto, ribalte di carico, cisterna dell\'antincendio, lampioni a LED, portineria con la sbarra, giardino, mensa, parcheggio dei camion e piazzale, più la zona di ricarica dei muletti e la gru durante un cantiere. Dove resta posto si vedono anche l\'area cani, le colonnine di ricarica e il pulmino del welfare.','La scena del lavoro in magazzino, col nastro trasportatore, passa nella finestra Personale.']},
