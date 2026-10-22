@@ -536,21 +536,28 @@ talento("Risponde anche alle 23", "mix", { tieni: "S", dopo: [grid(2, 3, `
   SSSSSSSSS.....
   SSSSDSSSS.....
   SSSSSSSSS.....`)
-// Promette tutto: il pollice alzato
-talento("Promette tutto", "mix", {}, `
-  .....FF.......
-  ....FFFF......
-  ....FFFF......
-  ....FFFF......
-  ...FFFFFFFFFF.
-  BBWFFFFFFFFFFF
-  BBWFFFFFFfffF.
-  BBWFFFFFFFFFFF
-  BBWFFFFFFfffF.
-  BBWFFFFFFFFFF.
-  BBWFFFFFFfffF.
-  BBWFFFFFFFFF..
-  ...FFFFFFFF...
+// Promette tutto: il fumetto col «SÌ!» grande, a qualsiasi richiesta
+talento("Promette tutto", "mix", { tieni: "W", dopo: [grid(2, 1, `
+  ......K...
+  .......K..
+  .KKK..KK.KK
+  KK....KK.KK
+  .KK...KK.KK
+  ..KK..KK...
+  KKK...KK.KK`)] }, `
+  .WWWWWWWWWWWW.
+  WWWWWWWWWWWWWW
+  WWWWWWWWWWWWWW
+  WWWWWWWWWWWWWW
+  WWWWWWWWWWWWWW
+  WWWWWWWWWWWWWW
+  WWWWWWWWWWWWWW
+  WWWWWWWWWWWWWW
+  WWWWWWWWWWWWWW
+  .WWWWWWWWWWWW.
+  ..WWW.........
+  ..WW..........
+  .WW...........
   ..............`)
 // Maniaco delle procedure: la lista di controllo con tutte le spunte
 talento("Maniaco delle procedure", "pos", { tieni: "W" }, `

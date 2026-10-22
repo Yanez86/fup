@@ -251,7 +251,7 @@ tecnologia("controllo", "org", {}, `
   GGGGGYYYY.
   .GGGGYYY..
   ...GGY....`)
-// Academy aziendale: tocco da laureato sopra il libro
+// Academy aziendale: tocco da laureato sopra il libro chiuso
 tecnologia("academy", "org", {}, `
   ....DD....
   ..DDDDDD..
@@ -259,14 +259,14 @@ tecnologia("academy", "org", {}, `
   ..DDDDDD.Y
   ..DDDDDD.Y
   .........Y
-  .CCC..CCC.
-  CCCCqqCCCC
-  CCCCqqCCCC
+  .RRRRRRRR.
+  .RCCCCCCC.
+  .RCCCCCCC.
   .RRRRRRRR.`)
 // Relazioni sindacali: due nuvolette, l'azienda (bianca) e il sindacato (rossa)
 tecnologia("relsind", "org", { tieni: "W", dopo: [grid(1, 1, `
-  sss.s
-  s.sss`), grid(4, 6, `
+  sssss
+  sss..`), grid(4, 6, `
   WW.W`)] }, `
   .WWWWW....
   WWWWWWW...
@@ -331,16 +331,16 @@ tecnologia("secondo", "org", {}, `
   ...FFFFF..
   ..........
   ..........`)
-// Talpa nel sindacato: la talpa che sbuca dalla sua montagnola
+// Talpa nel sindacato: la talpa che sbuca dalla montagnola, naso rosa e zampe sul bordo
 tecnologia("talpa", "org", { mx: true }, `
+  .....
+  ...DD
   ..DDD
+  .DKDD
   .DDDD
-  DDKDD
-  DDKDD
-  DDDDF
-  FDDDF
-  FFDDD
-  .NNNN
+  ..DDF
+  FF.DF
+  NNNNN
   NNNNN
   .NNNN`)
 
@@ -454,37 +454,4 @@ tecnologia("ecom", "mkt", { dopo: [grid(4, 3, `
   ..........
   ..........`)
 
-tecnologia("talpa_a", "org", { mx: true }, `
-  .....
-  ...DD
-  ..DDD
-  .DKDD
-  .DDDF
-  .DDDF
-  FFDDD
-  NNNNN
-  NNNNN
-  .NNNN`)
-tecnologia("talpa_b", "org", { mx: true }, `
-  ...RR
-  ..RRR
-  .RRRR
-  .DKDD
-  .DDDF
-  .DDDF
-  FFDDD
-  NNNNN
-  NNNNN
-  .NNNN`)
-tecnologia("talpa_c", "org", { mx: true }, `
-  .....
-  ...NN
-  ..NNN
-  .NKNN
-  .NNNF
-  .NNNF
-  FFNNN
-  MMMMM
-  MMMMM
-  .MMMM`)
 foglio("foglio")
