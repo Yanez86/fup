@@ -794,6 +794,7 @@ async def main():
           return {won:H.won,txt:document.querySelector('#modal').innerText};}''')
         assert w['won'] and 'vinto' in w['txt'].lower(), w
         await pg.screenshot(path=os.path.join(OUT, 'shot_vittoria.png'))
+        await pg.evaluate("()=>window.__FUP.cardsOff()")   # un cartellino rimasto dalla partita coprirebbe le schede del report
         await pg.click('#modal [data-act=openclass]')
         await pg.screenshot(path=os.path.join(OUT, 'shot_classifica_fine.png'))
         # report di fine partita: dalla classifica, con tutte le schede; la cronaca ha le tappe della partita
@@ -822,8 +823,9 @@ async def main():
             const n=(H.notes||[]).find(x=>x.k==='ev'); if(n&&!m.innerHTML) F.ACT.note({id:n.id});
             H.cash=Math.max(H.cash,300000); H.tenders.filter(t=>!t.done&&!t.bid).forEach(t=>{const e=F.bidEstimate(t,H.warehouses[0].id,0.95); if(e&&e.fits&&e.sat<0.85) t.bid={wh:H.warehouses[0].id,mult:0.95};}); F.step(); }
           document.querySelector('#modal').innerHTML='';
-          const w=H.warehouses[0], out={day:H.day,wage:H.ri.wage,idx:H.riw.idx,ag:w.ag!=null,bots:H.bots.map(b=>!!b.ri&&b.warehouses.every(x=>x.ag!=null)),
+          const w=H.warehouses[0], out={day:H.day,wage:H.ri.wage,idx:H.riw.idx,ti:H.riw.ti,ag:w.ag!=null,bots:H.bots.map(b=>!!b.ri&&b.warehouses.every(x=>x.ag!=null)),
             tech:F.TECH.some(t=>t.id==='talpa'),strikes:H.ri.strikes,clima:F.climaProg(H)};
+          { const r0=F.computeWH(w).rev; H.riw.ti*=1.1; const r1=F.computeWH(w).rev; H.riw.ti/=1.1; out.tarOk=r0>0&&r1/r0>1.05&&r1/r0<1.1001; }
           // tavolo forzato: concedendo tutto si firma alla prima seduta
           // il magazzino nasce senza sindacato: senza, niente tavolo; col morale a terra il sindacato arriva
           const w2=H.warehouses[H.warehouses.length-1]; out.nosind=w2.sind===false||w2.sind===true;
@@ -840,6 +842,8 @@ async def main():
           H.researched.talpa=true; const rep0=H.rep; F.riTalpaFound(); out.talpa=!H.researched.talpa&&H.rep<rep0&&w.ag>=90&&H.ri.ban>H.day;
           F.renderAll(); out.dock=!!document.querySelector('#dock [data-id=sindacato]'); return out;}''')
         assert r['wage'] > 1.01 and r['idx'] > 1.01 and r['ag'] and all(r['bots']) and r['tech'], f'pacchetto Relazioni industriali: {r}'
+        # clausola di adeguamento: le tariffe salgono di metà degli aumenti del contratto nazionale
+        assert r['tarOk'] and 1.004 < r['ti'] < r['idx'] and abs((r['ti'] - 1) - (r['idx'] - 1) / 2) < 0.01, f'adeguamento delle tariffe: {r}'
         assert r['notav'] and r['sind'] and r['deal'] and r['cool'] and r['talpa'] and r['dock'] and (not r['av'] or (r['early'] and r['offers'] >= 1 and r['hdl'] and r['back'])), f'pacchetto Relazioni industriali: {r}'
         print('relazioni industriali dopo 3 anni:', r)
         await pg.evaluate("()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; S.ri.ban=0; ['relsind','talpa','vendor','paritetico'].forEach(t=>S.researched[t]=true); F.riUnionize(w); w.ag=62; w.tavCd=0; F.riTavOpen(w); F.hdlTender(w); F.ACT.toggle({id:'sindacato'});}")

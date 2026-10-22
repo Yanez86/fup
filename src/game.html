@@ -2746,15 +2746,21 @@ Con la Contrattazione di secondo livello c'è anche un premio legato ai KPI: pun
 
 **Accordo rotto** (licenziamenti dopo l'impegno scritto, passaggio a un fornitore, Linea dura accesa): agitazione +30 per tre mesi e reputazione −2.`);
 wk('contratto_nazionale','ri','Contratto nazionale',`Ogni tre anni si rinnova: aumenti per tutti gli stipendi, divisi in sei rate.`,
-`Il calendario: rinnovo nel 2003, 2006, 2009 e così via. A marzo le trattative a Roma; una volta su due a maggio c'è lo sciopero nazionale della logistica (agitazione +20 e puntualità −2 in tutti i magazzini per due settimane); a giugno la firma, con gli **arretrati**: tre mesi dell'aumento intero, subito.
+`Il calendario: rinnovo nel 2003, 2006, 2009 e così via. A marzo le trattative a Roma; una volta su due a maggio c'è lo sciopero nazionale della logistica (agitazione +20 e puntualità −1 in tutti i magazzini per due settimane); a giugno la firma, con gli **arretrati**: tre mesi dell'aumento intero, subito.
 
 L'aumento totale segue l'inflazione dei tre anni prima: somma × 0,9 + 1%, tra 3% e 10%. Si paga in sei [[rate_ccnl|rate]].
 
-Vale per tutto il personale dei magazzini e della sede, e per tutte le aziende della partita. Manager e dirigenti hanno i loro stipendi.`);
+Vale per tutto il personale dei magazzini e della sede, e per tutte le aziende della partita. Manager e dirigenti hanno i loro stipendi. I clienti ne pagano la metà, con la [[adeguamento|clausola di adeguamento]]; gli arretrati e gli aumenti degli [[accordo_integrativo|accordi integrativi]] restano tutti a tuo carico.`);
 wk('rate_ccnl','ri','Rate del contratto',`Un sesto dell'aumento del rinnovo, a luglio e a gennaio.`,
-`Ogni rata alza tutti gli stipendi del [[contratto_nazionale|contratto nazionale]]. Con [[confpallet|Confpallet]] ogni rata costa 0,2 punti in meno.
+`Ogni rata alza tutti gli stipendi del [[contratto_nazionale|contratto nazionale]]. Con [[confpallet|Confpallet]] ogni rata costa 0,2 punti in meno. Nello stesso mese le tariffe dei clienti salgono di metà della rata ([[adeguamento|clausola di adeguamento]]).
 
 Anche i [[fornitori]] alzano i prezzi a ogni rata. Alcuni locali non passano l'aumento ai loro lavoratori (35% delle volte per quelli a rischio legale alto, 10% per gli altri): costano meno, ma lì l'agitazione sale di 15 e c'è il rischio di una vertenza, che con la responsabilità solidale paghi tu.`);
+wk('adeguamento','ri','Clausola di adeguamento',`Nei contratti dei clienti: a ogni rata del contratto nazionale le tariffe salgono della metà dell'aumento.`,
+`Il costo del lavoro è circa metà del prezzo di un servizio di logistica, e i contratti lo sanno: quando il [[contratto_nazionale|contratto nazionale]] alza gli stipendi, i clienti riconoscono la metà dell'aumento. A ogni [[rate_ccnl|rata]] tutte le tariffe salgono di metà della rata: quelle dei contratti in corso, delle [[gare]] e dei rinnovi.
+
+Così il rinnovo pesa poco su chi tiene le persone giuste per il lavoro, e di più su chi ha un magazzino gonfio di personale. Restano a carico tuo gli arretrati del rinnovo e gli aumenti degli [[accordo_integrativo|accordi integrativi]]. Con [[confpallet|Confpallet]] le rate costano 0,2 punti in meno, ma le tariffe salgono come per tutti.
+
+La finestra Relazioni industriali, scheda Contratto nazionale, mostra di quanto sono salite le tariffe rispetto al 2002.`);
 wk('confpallet','ri','Confpallet',`L'associazione delle aziende della logistica: una quota al mese per avere voce nei rinnovi.`,
 `Quota: 150 € al mese più 4 € per ogni dipendente dei magazzini.
 
@@ -2795,7 +2801,7 @@ wk('vittoria','basi','Condizioni di vittoria',`Si scelgono nella lobby, anche pi
 • **Fatturato**: vince chi per prima arriva a 3, 6 o 12 milioni di [[ricavi]] negli ultimi 12 mesi chiusi.
 • **Reputazione**: vince chi per prima arriva a [[reputazione]] 80, 90 o 100.
 • **Al traguardo**: il 1° gennaio del 2008, 2012 o 2020 vince l'azienda con il [[valore]] più alto.
-• **L'azienda dove tutti vogliono lavorare** (solo con il pacchetto [[relazioni_industriali|Relazioni industriali]]): vince chi per prima passa 5 anni senza [[sciopero|scioperi]], con il [[morale]] medio sopra 75 e almeno 300 dipendenti.
+• **L'azienda dove tutti vogliono lavorare** (solo con il pacchetto [[relazioni_industriali|Relazioni industriali]]): vince chi per prima passa 5 anni senza [[sciopero|scioperi]], con il [[morale]] medio sopra 75 e almeno 150 dipendenti.
 
 Se vince un'altra azienda hai perso la partita, ma puoi continuare a giocare per l'onore; se fallisci tu la partita finisce. A che punto è ognuno lo vedi in [[classifica]].`);
 wk('report_finale','basi','Report della partita',`Il resoconto di tutta la partita: com'è finita, i numeri totali, la crescita anno per anno e la cronaca delle tappe importanti.`,
@@ -2873,7 +2879,7 @@ wk('ricavi','eco','Ricavi',`Quanto paga ogni cliente al mese: posti occupati, mo
 • 18 € per pallet consegnato, più 5 centesimi per ogni km del viaggio, × la tariffa media dei [[canali]] del cliente (da ×0,9 per GDO e industria a ×1,3 per l'horeca);
 • 1,50 € per km dei viaggi di [[ritiro]].
 
-Il totale si moltiplica per il [[prezzo]] offerto in gara.`);
+Il totale si moltiplica per il [[prezzo]] offerto in gara. Con il pacchetto Relazioni industriali si moltiplica anche per l'indice della [[adeguamento|clausola di adeguamento]], che sale a ogni rata del contratto nazionale.`);
 wk('costi','eco','Costi',`Personale, mezzi e gasolio, immobili, tecnologie, manager, welfare e benefit, penali.`,
 `Per ogni magazzino: stipendi del [[personale]], mezzi (gasolio, manutenzione, pedaggi, spese degli autisti, [[motrici]] e furgoni in leasing), affitto più 1.000 € di utenze, canoni delle [[installazione|tecnologie installate]].
 
@@ -3054,7 +3060,7 @@ const ceo=()=>S.boss;  // il CEO in carica: all'inizio quello scelto, dopo la pe
 const ceoImg=C=>IMG[C.img||C.id];
 const whById=id=>S.warehouses.find(w=>w.id===id);
 const clientRev=c=>{const w=S&&whById(c.wh); const t=w?clientLog(c,w):{oKm:240,in:0,iKm:0}; const pm=palOf(c); const sup=peakOn(c)&&c.peak.sup?1+c.peak.sup*(c.peak.mul-1)/c.peak.mul:1;
-  return (c.stock*T_ST+(2*pm*T_MO+pm*(18+0.05*t.oKm)*chAvg(c,'price')+t.in*t.iKm*1.5)*sup)*c.mult*rankOf(c).rev;};   // supplemento solo sui pallet in più del picco (movimenti e trasporto, non i posti a stock)
+  return (c.stock*T_ST+(2*pm*T_MO+pm*(18+0.05*t.oKm)*chAvg(c,'price')+t.in*t.iKm*1.5)*sup)*c.mult*rankOf(c).rev*tarK();};   // supplemento solo sui pallet in più del picco (movimenti e trasporto, non i posti a stock); tarK = adeguamento al contratto nazionale
 // rubriche del giornale, ricavate dal titolo: [filtro, etichetta, colore]
 const NEWS_F=[['all','Tutte'],['gare','Gare'],['cli','Clienti'],['az','Azienda'],['cro','Cronaca']];
 function newsTag(n){const t=n.title, gz=n.src==='La Gazzetta del Muletto';
@@ -4311,11 +4317,12 @@ const WINS={
  fatturato:{n:'Fatturato',d:t=>`Vince chi per prima fattura ${eur(t)} in 12 mesi.`,opts:[3000000,6000000,12000000]},
  reputazione:{n:'Reputazione',d:t=>`Vince chi per prima arriva a reputazione ${t}.`,opts:[80,90,100]},
  traguardo:{n:'Al traguardo',d:t=>`Il 1° gennaio ${t} vince l'azienda che vale di più.`,opts:[2008,2012,2020]},
- clima:{ri:1,n:'L\'azienda dove tutti vogliono lavorare',d:'Vince chi per prima passa 5 anni senza scioperi, con il morale medio sopra 75 e almeno 300 dipendenti (pacchetto Relazioni industriali).'}
+ clima:{ri:1,n:'L\'azienda dove tutti vogliono lavorare',d:'Vince chi per prima passa 5 anni senza scioperi, con il morale medio sopra 75 e almeno 150 dipendenti (pacchetto Relazioni industriali).'}
 };
 // a che punto è un'azienda verso «L'azienda dove tutti vogliono lavorare»: anni senza scioperi, morale e dipendenti
+const CLIMA_N=150;   // dipendenti che servono (300 fino alla 0.74: più di quanti ne regga il Nord con 19 magazzini da dividere)
 function climaProg(c){ return withCo(c,()=>{ const ws=S.warehouses, n=ws.reduce((a,w)=>a+staffTot(w),0)+S.office.plan+S.office.cs, mor=ws.length?ws.reduce((a,w)=>a+w.morale,0)/ws.length:0;
-  return Math.min((S.day-((S.ri&&S.ri.lastStrike)||0))/1825,mor/75,n/300); }); }
+  return Math.min((S.day-((S.ri&&S.ri.lastStrike)||0))/1825,mor/75,n/CLIMA_N); }); }
 const winTxt=(id,cfg)=>{const W=WINS[id]; return typeof W.d==='function'?W.d(cfg[id]):W.d;};
 // fatturato degli ultimi 12 mesi chiusi
 const rev12=c=>(c.hist||[]).slice(-12).reduce((a,h)=>a+h.ric,0);
@@ -4367,7 +4374,8 @@ function riPack(on){
   Object.assign(POL.nocoop,on?{name:'Niente appalti locali',con:'Vietati i fornitori di handling locali (i globali restano permessi): chi lavora con un locale passa alle tue dipendenze, 600 € di pratiche a persona',
     txt:'Solo personale tuo o delle multinazionali dell\'handling, con il contratto della logistica. Le cooperative di provincia restano fuori dal cancello, e con loro qualche guaio.'}:NOCOOP0);
 }
-const RI={ag0:12,k:0.02,cont:0.5,adh:0.7,strikeGap:21,dealM:18,dealM2:24,conf:150,confPer:4,talpa:0.02,talpaUse:0.005,talpaAmm:0.002,fine:20000};
+// tar = quota di ogni rata del contratto nazionale che passa alle tariffe dei clienti (clausola di adeguamento)
+const RI={ag0:12,k:0.02,cont:0.5,adh:0.7,strikeGap:21,dealM:18,dealM2:24,conf:150,confPer:4,talpa:0.02,talpaUse:0.005,talpaAmm:0.002,fine:20000,tar:0.5};
 const FASCE=[['Calma','#2e9e48'],['Mugugno','#8ed15b'],['Stato di agitazione','#ffc53d'],['Sciopero','#ff7a3d'],['Presidio','#e0393e']];
 // sindacati: th = soglie di agitazione per mugugno, stato di agitazione, sciopero, presidio; pat = pazienza al tavolo; min = quanto devi concedere (0-1)
 const UNIONS={
@@ -4382,11 +4390,11 @@ const UNIONS={
 // q = accuratezza, mor = morale (rotazione delle persone), sind = agitazione in più, legal = rischio legale al mese, pen = mesi di penale per uscire (globali),
 // req = tecnologia del magazzino richiesta, cert = punti nelle gare delle committenti che chiedono pace sociale
 const HDL=[
- {id:'spalle',n:'Coop. Spalle Larghe',loc:['MI','LO','PV'],cost:0.72,flex:2,q:-2,mor:-4,sind:18,legal:0.03,d:'Economica e velocissima nei picchi. Il rischio legale è altissimo.'},
- {id:'basso',n:'Consorzio Facchini Riuniti del Basso Lodigiano',loc:['LO','CR','PC'],cost:0.74,flex:3,q:-1.5,mor:-3,sind:15,legal:0.025,d:'Cambia nome ogni due anni e nessuno sa chi sia il presidente.'},
+ {id:'spalle',n:'Coop. Spalle Larghe',loc:['MI','LO','PV'],cost:0.72,flex:2,q:-1.5,mor:-4,sind:15,legal:0.03,d:'Economica e velocissima nei picchi. Il rischio legale è altissimo.'},
+ {id:'basso',n:'Consorzio Facchini Riuniti del Basso Lodigiano',loc:['LO','CR','PC'],cost:0.74,flex:3,q:-1,mor:-3,sind:15,legal:0.025,d:'Cambia nome ogni due anni e nessuno sa chi sia il presidente.'},
  {id:'laboriosa',n:'La Laboriosa Soc. Coop.',loc:['BO','MO','RE'],cost:0.85,flex:5,q:0,mor:-2,sind:10,legal:0.005,d:'La cooperativa storica emiliana: seria, un po\' cara per essere locale, con un sindacato forte ma dialogante.'},
  {id:'sgobbo',n:'Movimentazioni Fratelli Sgobbo',loc:['VR','VI','MN'],cost:0.8,flex:7,q:0.5,mor:-2,sind:8,legal:0.01,d:'Azienda di famiglia: buona qualità, ma poche persone, quindi poco flessibile.'},
- {id:'muletto',n:'Coop. Il Muletto Allegro',loc:['TO','AT','CN'],cost:0.76,flex:3,q:-1.5,mor:-4,sind:14,legal:0.02,d:'Molta rotazione: ogni settimana facce nuove, Accuratezza ballerina.'},
+ {id:'muletto',n:'Coop. Il Muletto Allegro',loc:['TO','AT','CN'],cost:0.76,flex:3,q:-1,mor:-4,sind:14,legal:0.02,d:'Molta rotazione: ogni settimana facce nuove, Accuratezza ballerina.'},
  {id:'lanterna',n:'Servizi Portuali Lanterna',loc:['GE','SV','SP'],cost:0.82,flex:4,q:0.5,mor:-3,sind:16,legal:0.01,d:'Sono quelli del porto: bravissimi, ma se si fermano si ferma tutta la Liguria.'},
  {id:'serenissima',n:'Coop. Serenissima Logistica',loc:['VE','PD','TV'],cost:0.8,flex:4,q:-0.5,mor:-3,sind:12,legal:0.015,d:'Nella media su tutto, punto di riferimento del Nord-Est.'},
  {id:'friulana',n:'Friulana Handling',loc:['UD','PN','TS'],cost:0.82,flex:5,q:1,mor:-2,sind:6,legal:0.005,d:'Precisi e affidabili, ma lontani da tutto: pochi magazzini da servire.'},
@@ -4418,8 +4426,11 @@ const RI_CP=[
  {id:'corso',m:0.04,n:'Un corso di formazione pagato dall\'azienda',d:'3.000 € alla seduta.',cost:()=>3000}
 ];
 // ---- fornitori: dati di partita (nome di oggi, indice dei prezzi, se paga gli aumenti, se è fallito, chi l'ha comprato) ----
-function riWorld(){ const H=HUM||S; if(!H.riw) H.riw={idx:1,ren:null,last:-1,h:{}};
-  const W=H.riw; HDL.forEach(x=>{ if(!W.h[x.id]) W.h[x.id]={n:x.n,idx:1,skip:false,dead:0,own:null}; }); return W; }
+function riWorld(){ const H=HUM||S; if(!H.riw) H.riw={idx:1,ti:1,ren:null,last:-1,h:{}};
+  const W=H.riw; if(W.ti==null) W.ti=1+(W.idx-1)*RI.tar;   // partite di prima della 0.75: le tariffe recuperano subito la loro parte
+  HDL.forEach(x=>{ if(!W.h[x.id]) W.h[x.id]={n:x.n,idx:1,skip:false,dead:0,own:null}; }); return W; }
+// indice delle tariffe dei clienti (clausola di adeguamento al contratto nazionale): 1 senza il pacchetto
+const tarK=()=>{ if(!riOn()) return 1; const W=(HUM||S).riw; return W&&W.ti||1; };
 const hdlBase=id=>HDL.find(x=>x.id===id);
 // dati effettivi di un fornitore: quelli di un globale se l'ha comprato
 function hdlD(id){ const b=hdlBase(id); if(!b) return null; const st=riWorld().h[id], o=st.own&&hdlBase(st.own);
@@ -4657,17 +4668,17 @@ function riWorldDay(){ if(!riOn()) return; const W=riWorld(), H=HUM, d=H.day; if
   if(renYear(y)&&m===2){ W.ren={y,total:renTotal(y),strike:Math.random()<0.5,left:6};
     each(()=>riNote('blue','sindacato',`Rinnovo del contratto nazionale: si tratta a Roma`,`Sindacati e associazioni delle aziende si siedono al tavolo per il rinnovo ${y}-${y+3}. Con l'inflazione di questi anni si parla di circa il ${f1(W.ren.total)}% in tre anni.${S.ri.conf?' Confpallet ti terrà informato.':''}`,{ritab:'ccnl'},'ccnl')); }
   if(W.ren&&W.ren.y===y&&W.ren.strike&&m===3) each(()=>{ if(S.ri.conf) riNote('yellow','sindacato','Confpallet: a maggio sciopero nazionale','La trattativa si è incagliata: i sindacati annunciano uno sciopero nazionale della logistica per maggio. Ti avvisiamo per tempo, come promesso con la quota.',{ritab:'ccnl'},'ccnl'); });
-  if(W.ren&&W.ren.y===y&&W.ren.strike&&m===4) each(()=>{ S.mods.push({scope:'all',ag:20,P:-2,until:S.day+14,src:'Sciopero nazionale della logistica'});
-    riNote('red','sindacato','Sciopero nazionale della logistica','La trattativa per il contratto è ferma: oggi si fermano i magazzini di tutto il Paese. Per due settimane agitazione +20 e puntualità −2 in tutti i magazzini.',{ritab:'ccnl'},'ccnl');
+  if(W.ren&&W.ren.y===y&&W.ren.strike&&m===4) each(()=>{ S.mods.push({scope:'all',ag:20,P:-1,until:S.day+14,src:'Sciopero nazionale della logistica'});
+    riNote('red','sindacato','Sciopero nazionale della logistica','La trattativa per il contratto è ferma: oggi si fermano i magazzini di tutto il Paese. Per due settimane agitazione +20 e puntualità −1 in tutti i magazzini.',{ritab:'ccnl'},'ccnl');
     if(!isBot()) news('Il Sole 24 Pallet','Sciopero nazionale della logistica','Magazzini fermi da Trieste a Ventimiglia: i sindacati chiedono il rinnovo del contratto.'); });
   if(W.ren&&W.ren.y===y&&m===5) each(()=>{ const a=Math.round(payroll()*W.ren.total/100*3/100)*100; S.cash-=a; S.cur.pers+=a;
     riNote('blue','sindacato',`Firmato il contratto nazionale ${y}-${y+3}`,`Aumento del ${f1(W.ren.total)}% in sei rate, una ogni sei mesi da luglio${S.ri.conf?' (con Confpallet ogni rata costa 0,2 punti in meno)':''}. Arretrati una tantum: ${eur(a)} subito.`,{ritab:'ccnl'},'ccnl');
     if(!isBot()) news('Il Sole 24 Pallet',`Contratto della logistica: firmato il rinnovo ${y}-${y+3}`,`Aumento del ${f1(W.ren.total)}% in sei rate. Arretrati in busta paga entro l'estate.`); });
-  if(W.ren&&W.ren.left>0&&(m===6||m===0)&&!(m===0&&W.ren.y===y)){ const r=W.ren.total/6; W.ren.left--; W.idx*=1+r/100;
+  if(W.ren&&W.ren.left>0&&(m===6||m===0)&&!(m===0&&W.ren.y===y)){ const r=W.ren.total/6; W.ren.left--; W.idx*=1+r/100; W.ti=(W.ti||1)*(1+RI.tar*r/100);
     HDL.forEach(x=>{ const st=W.h[x.id], p=x.loc?(x.legal>=0.015?0.35:0.1):0;
       if(Math.random()<p){ st.skip=true; } else { st.skip=false; st.idx=W.idx; } });
     each(()=>{ const rr=Math.max(0,r-(S.ri.conf?0.2:0)); S.ri.wage*=1+rr/100; S.ri.rl=(S.ri.rl||[]).concat({d:S.day,r:rr}).slice(-24);
-      riNote('blue','sindacato',`Rata del contratto nazionale: +${f1(rr)}%`,`Da questo mese tutti gli stipendi salgono del ${f1(rr)}%.${W.ren.left?` Restano ${W.ren.left} ${W.ren.left===1?'rata':'rate'}.`:' Era l\'ultima rata di questo rinnovo.'}${S.warehouses.some(w=>w.hdl&&W.h[w.hdl].skip)?' Qualche fornitore locale non passa l\'aumento ai suoi lavoratori: costa meno, ma lì l\'agitazione sale.':''}`,{ritab:'ccnl'},'rata'); }); }
+      riNote('blue','sindacato',`Rata del contratto nazionale: +${f1(rr)}%`,`Da questo mese tutti gli stipendi salgono del ${f1(rr)}%; con la clausola di adeguamento le tariffe dei clienti salgono del ${f1(r*RI.tar)}%.${W.ren.left?` Restano ${W.ren.left} ${W.ren.left===1?'rata':'rate'}.`:' Era l\'ultima rata di questo rinnovo.'}${S.warehouses.some(w=>w.hdl&&W.h[w.hdl].skip)?' Qualche fornitore locale non passa l\'aumento ai suoi lavoratori: costa meno, ma lì l\'agitazione sale.':''}`,{ritab:'ccnl'},'rata'); }); }
   // Confpallet: quota a inizio mese
   each(()=>{ if(S.ri.conf){ const q=RI.conf+RI.confPer*S.warehouses.reduce((a,w)=>a+staffTot(w),0); S.cash-=q; S.cur.altro+=q; } });
   // fornitori locali: falliscono, cambiano nome, vengono comprati da un globale
@@ -4726,7 +4737,7 @@ function botRI(st){ if(!riOn()) return; const R0=riCo(), sty=S.bot.style, hard=S
   tavList().forEach(w=>{ w.tav.reqs.forEach(r=>{ r.c=hard?(r.id==='buoni'?'tratto':'no'):sty==='qualita'?(r.id==='stab'?'no':'si'):(r.id==='aumento'||r.id==='stab'?'tratto':RI_REQ[r.id].half?'tratto':'no'); }); });
   if(hard&&R('contenim')&&!polOn('lineadura')) polSet('lineadura',true);
   if(sty==='qualita'&&R('relsind')&&!polOn('porte')) polSet('porte',true);
-  if(!R0.conf&&sty!=='prezzo'&&S.warehouses.reduce((a,w)=>a+staffTot(w),0)>40) R0.conf=true;
+  if(!R0.conf&&sty!=='prezzo'&&S.warehouses.reduce((a,w)=>a+staffTot(w),0)>15) R0.conf=true;
   S.warehouses.forEach(w=>{ if(w.hNext) return;
     if((sty==='prezzo'||sty==='espansione')&&!w.ht&&(!w.hdl&&w.staff.pick+w.staff.car>=6||w.hdl&&w.hEnd&&w.hEnd-S.day<=45)) hdlTender(w);
     if(sty==='qualita'&&w.hdl&&hdlLocal(w)&&S.cash>80000) hdlInternal(w,true); });
@@ -4786,8 +4797,9 @@ function riTavView(){ const R0=S.ri, L=tavList();
 function riCcnl(){ const R0=S.ri, W=riWorld(), nx=riNext(), y=yearOf(S.day), staff=S.warehouses.reduce((a,w)=>a+staffTot(w),0), q=RI.conf+RI.confPer*staff;
   const ren=W.ren?`Rinnovo ${W.ren.y}-${W.ren.y+3}: +${f1(W.ren.total)}% in sei rate${W.ren.left?`, ne restano ${W.ren.left}`:', tutte pagate'}.`:'Il primo rinnovo si tratta nel 2003.';
   return `<div class="card"><span class="h3">${kw('contratto_nazionale','Contratto nazionale della logistica')}</span>
-    <div class="sm">Si rinnova ogni tre anni (2003, 2006, 2009…): a marzo le trattative a Roma, a volte uno sciopero nazionale a maggio, a giugno la firma con gli arretrati, poi una ${kw('rate_ccnl','rata')} di aumento ogni sei mesi, a luglio e a gennaio. Gli aumenti seguono l'inflazione degli anni prima. Valgono per tutti, concorrenza compresa.</div>
+    <div class="sm">Si rinnova ogni tre anni (2003, 2006, 2009…): a marzo le trattative a Roma, a volte uno sciopero nazionale a maggio, a giugno la firma con gli arretrati, poi una ${kw('rate_ccnl','rata')} di aumento ogni sei mesi, a luglio e a gennaio. Gli aumenti seguono l'inflazione degli anni prima. Valgono per tutti, concorrenza compresa; i clienti, con la clausola di adeguamento, ne pagano la metà.</div>
     <div class="row"><span>Stipendi rispetto al 2002</span><b>${'+'+f1((R0.wage-1)*100)}%</b></div>
+    <div class="row"><span>Tariffe dei clienti (${kw('adeguamento','clausola di adeguamento')})</span><b>${'+'+f1((W.ti-1)*100)}%</b></div>
     <div class="row"><span>${ren}</span></div>
     <div class="row"><span>Prossimo passo</span><b>${nx.d?`rata del ${shortDate((nx.d-DAY0)/86400000)}: +${f1(Math.max(0,nx.r-(R0.conf?0.2:0)))}%`:`trattative per il rinnovo a marzo ${nx.ren}`}</b></div>
     ${(R0.rl||[]).length?`<div class="lab">Rate pagate</div>${R0.rl.slice().reverse().slice(0,6).map(x=>`<div class="row sm"><span>${shortDate(x.d)}</span><b>+${f1(x.r)}%</b></div>`).join('')}`:''}</div>
@@ -7983,6 +7995,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.75',t:'Relazioni industriali in equilibrio',x:['Nuova clausola di adeguamento nei contratti: a ogni rata del contratto nazionale anche le tariffe dei clienti salgono, della metà dell\'aumento. Prima gli stipendi salivano e i prezzi restavano fermi, e dopo qualche rinnovo quasi tutte le aziende finivano in rosso.','Nella finestra Relazioni industriali, scheda Contratto nazionale, accanto agli stipendi c\'è quanto sono salite le tariffe dal 2002. Lo dice anche l\'avviso di ogni rata.','Lo sciopero nazionale pesa meno: puntualità −1 invece di −2 per le due settimane (l\'agitazione resta +20).','Le cooperative locali più spregiudicate sbagliano un po\' meno: Spalle Larghe ha accuratezza −1,5 e rischio sindacale +15, il Consorzio del Basso Lodigiano e il Muletto Allegro accuratezza −1. Restano economiche e rischiose, ma non sono più una trappola sicura.','Le aziende avversarie si iscrivono a Confpallet già dai 15 dipendenti (prima dai 40).','Vittoria «L\'azienda dove tutti vogliono lavorare»: bastano 150 dipendenti invece di 300, che con i magazzini del Nord da dividere tra quattro aziende era quasi impossibile.']},
  {v:'0.74',t:'Il sindacato si conquista',x:['I magazzini nascono senza sindacato. Se il morale resta sotto 45 per circa un mese (due settimane sotto 35) i lavoratori si organizzano: arriva il sindacato con il suo delegato, e da lì in poi resta.','Senza sindacato al massimo c\'è il mugugno: niente stato di agitazione, scioperi, presidi né tavolo. Nella finestra Relazioni industriali e in quella del magazzino si vede quanto manca.']},
  {v:'0.73',t:'Gare per l\'handling e un tavolo per magazzino',x:['I fornitori di handling non si scelgono più da un elenco: dalla finestra del magazzino si bandisce una gara. Per tre settimane arrivano le offerte, con tariffa, tipo di contratto e durata; poi hai due settimane per scegliere quella che preferisci.','I contratti con i fornitori hanno una scadenza: due mesi prima arriva l\'avviso, e senza una nuova gara si rinnovano da soli con la tariffa +5%.','Il tavolo delle trattative non si convoca più a comando: si apre da solo quando un magazzino entra in stato di agitazione. Ogni magazzino ha il suo, quindi si tratta in più posti insieme.','Se il tavolo salta (o ti alzi tu) il sindacato non torna a trattare per tre mesi; se si firma, il tavolo non si riapre finché dura l\'accordo.']},
  {v:'0.72',t:'Ricerca in ordine',x:['La scheda Ricerca della finestra Tecnologia è rifatta: in cima una sola barra con la ricerca in corso (rossa se è ferma), poi una riga con le tecnologie ricercate, l\'Innovazione e quelle da installare.','Sul computer la finestra è più larga e, quando c\'è posto, la scheda della tecnologia scelta sta a destra dell\'albero: non serve più scorrere fino in fondo per leggerla.','La scheda dice cosa serve e cosa apre dopo: un clic su una di quelle tecnologie ci porta, anche se è in un altro albero. Le linee della tecnologia scelta si colorano di arancione e un cartellino come «+Sviluppo» avvisa quando serve una ricerca di un altro albero.','I nomi lunghi non escono più dai riquadri, le linee non passano più dietro le altre tecnologie e l\'albero delle Certificazioni è più compatto. Al posto del pulsante grigio, un avviso spiega perché non si può avviare: ricerca già in corso, soldi che mancano o cosa serve prima.','Sul telefono le schede degli alberi stanno in una riga sola e l\'albero comincia subito.','La scheda con i certificati dei magazzini si chiama ora «Certificati e audit», per non confondersi con l\'albero Certificazioni.']},
@@ -8332,6 +8345,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},renderAll,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},renderAll,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>

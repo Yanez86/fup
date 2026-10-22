@@ -11,6 +11,7 @@ Gioco di strategia single player per browser (computer e telefono, installabile 
 ```bash
 python3 tools/build.py          # src/game.html + assets/ -> dist/fup.html (+ controllo sintassi JS con node)
 python3 tests/smoke_test.py     # Chromium headless: telefono (verticale col pacchetto Relazioni industriali, orizzontale senza), menu, alberi, direzione, 3 anni di bot per ogni CEO, lobby, partita con 3 avversari, pacchetto Relazioni industriali, vittoria, tempo veloce e persistente
+python3 tools/bilanciamento.py  # bilanciamento: partite di 12 anni con 4 aziende guidate dal computer, con e senza pacchetto; sopravvivenza, margini, costi, fasce di agitazione (--sub prova una modifica senza ricompilare)
 ```
 Requisiti: Python 3 con `pillow numpy scipy openpyxl playwright` (`playwright install chromium`) e Node per il controllo sintassi.
 Il gioco si apre facendo doppio clic su `dist/fup.html`, non serve un server.
@@ -22,7 +23,7 @@ src/game.html      UNICO file sorgente del gioco: CSS + HTML + JS vanilla; unica
 src/manifest.webmanifest, src/sw.js   web app (installazione e gioco senza rete), copiati in dist/ da build.py
 assets/            supabase.js (@supabase/supabase-js, build UMD copiata da npm; versione in SB_VER dentro build.py) + licenza; PNG in pixel art: mappa, ritratti CEO (192x224), manager/dirigenti/staff (96x112), volti generici dei candidati `p_v0`…`p_v39`
 dist/              fup.html (build autonoma con le immagini in base64) + manifest, sw.js e icone della web app (tutto da committare dopo ogni build)
-tools/             build.py e generatori procedurali di asset e fogli (vedi sotto)
+tools/             build.py, bilanciamento.py (simulazioni per il bilanciamento) e generatori procedurali di asset e fogli (vedi sotto)
 tests/             smoke_test.py
 docs/              design.md (regole e formule), supabase.sql (tabella `partite` e regole di accesso, da incollare nell'editor SQL di Supabase), foglio KPI/bilanciamento, screenshot
 ```
