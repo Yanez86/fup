@@ -826,7 +826,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .hm-new .ar{font-family:var(--f-disp);font-size:32px;font-weight:700}
 .hm-new:disabled{background:var(--panel2);box-shadow:inset 0 -5px 0 var(--line),4px 4px 0 var(--ink);cursor:not-allowed}.hm-new:disabled .hm-plus,.hm-new:disabled .ar{opacity:.4}
 .hm-tut{background:#bfe6ff;box-shadow:inset 0 -5px 0 #5fb4f0,inset 0 3px 0 #e6f5ff,4px 4px 0 var(--ink)}
-.hm-orn{width:52px;height:60px;flex:none;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--ink)}.hm-new:disabled .hm-orn{opacity:.4}
+.hm-orn{width:52px;height:60px;flex:none;align-self:flex-start;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--ink)}.hm-tut.off .hm-orn{opacity:.4}
+.hm-tut{cursor:default;box-sizing:border-box}.hm-tut.off{background:var(--panel2);box-shadow:inset 0 -5px 0 var(--line),4px 4px 0 var(--ink)}.hm-tut .hm-tb{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}.hm-tut .hm-tb .btn{flex:1 1 11em;display:flex;flex-direction:column;align-items:flex-start;font-family:var(--f-disp);font-size:18px;padding:6px 12px;text-align:left}.hm-tut .hm-tb small{font-family:var(--f-body);font-size:13px}
 /* tutorial: il fumetto della dottoressa Ribalta (#tut) e il riquadro che lampeggia sulla cosa da toccare (#tuthi) */
 #tut{position:fixed;z-index:60;left:96px;bottom:16px;width:min(520px, calc(100vw - 32px));display:flex;gap:10px;align-items:flex-end;pointer-events:none}
 #tut:empty{display:none}
@@ -2896,10 +2897,14 @@ wk('ritiro','cli','Ritiro o consegna',`Da dove arriva la merce: la consegna il c
 `Con "consegna" la merce arriva al magazzino gratis. Con "ritiro" mandi un bilico da 33 pallet fino allo stabilimento del cliente: servono più [[autisti_ce|autisti CE]] e più gasolio, ma il cliente paga 1,5 € per ogni km di ritiro.`);
 wk('concorrenti','cli','Concorrenti',`Gruppo Bartolazzi, Logistix Global, F.lli Brambilla e la Cooperativa La Fatica: il resto del mercato, che si prende le gare che nessuno vince.`,
 `Non li vedi lavorare, ma ci sono: una [[gare|gara]] che non va né a te né a un'[[avversari|azienda avversaria]] finisce a uno di loro, di solito con uno sconto aggressivo. Le aziende avversarie vere, quelle degli altri CEO, le trovi in [[classifica]].`);
-wk('tutorial','basi','Tutorial',`Una partita guidata dalla dottoressa Ornella Ribalta: nove lezioni sulle basi del gioco, in circa 15 minuti.`,
-`Si avvia dalla schermata principale con il pulsante Tutorial e occupa un posto di salvataggio come una partita normale. Si gioca con Valeria Conti a Novara, senza avversari, con il [[tempo]] in Classica.
+wk('tutorial','basi','Tutorial',`Due partite guidate dalla dottoressa Ornella Ribalta: il tutorial base sulle prime cose e quello avanzato su un'azienda già grande.`,
+`Si avviano dalla schermata principale, dal riquadro Tutorial, e occupano un posto di salvataggio come una partita normale. Si gioca con Valeria Conti a Novara, con il [[tempo]] in Classica.
+
+**Base** (circa 15 minuti, senza avversari):
 
 La dottoressa Ribalta, docente del corso regionale «Diventa CEO in 9 lezioni», spiega una cosa alla volta in un fumetto e indica con un riquadro giallo cosa toccare: la [[mappa]], il [[magazzino]] con [[saturazione|occupazione]], [[puntualita]] e [[accuratezza]], il [[carico|carico di lavoro]] del personale e il [[facility|facility manager]] da assumere, una [[gare|gara d'appalto]] preparata apposta, la prima [[ricerca]], i [[manager]], le [[notifiche]] e gli [[eventi]], il [[report]] del lunedì e la [[cassa]].
+
+**Avanzato** (circa 20 minuti): la partita parte da gennaio 2004, dopo due anni giocati in fretta e sempre uguali: tre magazzini, una decina di clienti, un'azienda [[avversari|avversaria]] e il pacchetto [[relazioni_industriali|Relazioni industriali]]. Le lezioni: la [[direzione|Direzione]], la [[trattativa]] con un candidato, il [[customer_service|customer service]], le [[certificazioni]] e l'[[audit]], le dotazioni del capannone, le [[policy]] e il welfare, l'[[agitazione]] e il [[tavolo]], la classifica e la [[vittoria]], i [[prestiti]] e i contratti in perdita.
 
 Mentre parla il tempo resta fermo: si riparte quando lo dice lei. Finché dura il corso non arrivano altre gare né eventi a caso. Il fumetto si rimpicciolisce toccando il ritratto o ▾, e il tutorial si può saltare in qualsiasi momento: la partita continua normale. Alla fine arriva l'attestato di partecipazione e si continua a giocare la stessa partita.`);
 wk('lobby','basi','Lobby',`L'ultimo passaggio prima di iniziare: le quattro aziende in gara, il ritmo del tempo e le condizioni di vittoria.`,
@@ -8689,6 +8694,127 @@ const TUT={base:{n:'Tutorial base',corso:'Diventa CEO in 9 lezioni',L:[
     return c?`Gara vinta! Il contratto parte il ${shortDate(c.start)}: da quel giorno il magazzino lavora di più. Apri il magazzino, guarda le barre del carico e assumi chi serve prima che parta. Il resto lo impari giocando: in bocca al lupo!`
      :`Stavolta la gara non è andata. Succede: ne arriveranno altre, una ogni poche settimane. Tieni d'occhio le Gare d'appalto e, quando ne vinci una, assumi chi serve prima che parta il contratto. Il resto lo impari giocando: in bocca al lupo!`;}}]}
 ]}};
+// tutorial avanzato: l'azienda ha già due anni di storia (tutPrep()), con tre magazzini, un'azienda avversaria e il pacchetto Relazioni industriali
+const tRiv=()=>rivals()[0]||null;
+const tFree=()=>S.managers.filter(m=>m.hired&&!m.wh&&!seatOf(m.id)&&!isCs(m.id));
+const tPick=k=>$('#modal').innerHTML?'*#modal .mp-r[data-act=mpick]:not(.none)':`[data-act=mpopen][data-k=${k}]`;
+const tNg=()=>negs()[S.tut.ng];
+const tTab=(p,c,n)=>!UI.open[p]?tDock(p):`#win-${p} [data-act=wtab][data-id=${c}]`;
+TUT.avanzato={n:'Tutorial avanzato',corso:'Diventa CEO, secondo livello',L:[
+ {n:'La Direzione',s:[
+  {f:'contenta',t:()=>{const r=tRiv(), d=dateOf(S.day);
+    return `Benvenuta al secondo livello! Facciamo un salto in avanti: è ${MESI[d.getUTCMonth()]} ${d.getUTCFullYear()} e ${esc(S.company.name)} ha ${S.warehouses.length} magazzini (${S.warehouses.map(w=>esc(w.name)).join(', ')}), ${S.clients.filter(c=>c.status==='attivo').length} clienti e ${eur(S.cash)} in cassa.${r?` In gara c'è anche ${esc(r.boss.name)} con ${esc(r.company.name)}.`:''} E c'è il pacchetto Relazioni industriali. Oggi le cose da azienda grande.`;}},
+  {hi:()=>tDock('manager'),ok:()=>!!UI.open.manager,w:()=>tMenu('Manager'),t:()=>`Con la ricerca Struttura direzionale si apre la ${kw('direzione','Direzione')}: cinque posti da direttore, nella finestra Manager.`},
+  {hi:()=>tTab('manager','direzione'),ok:()=>!!UI.open.manager&&wtabOf('manager')==='direzione',w:()=>`${tTap()} la scheda «Direzione»`,t:()=>`La Direzione è una scheda della finestra Manager.`},
+  {hi:()=>UI.open.manager&&wtabOf('manager')==='direzione'?tPick('dir'):tTab('manager','direzione'),ok:()=>DIR_ROLES.some(r=>S.dirs[r.id]),w:()=>`${tTap()} «Cambia» accanto a un posto e scegli un manager libero`,
+   t:()=>{const L=tFree(); return `Ogni direttore guida un'area di tutta l'azienda con la sua abilità: Operazioni per l'operativo, Negoziazione per il commerciale, Leadership per le risorse umane, Amministrazione per la finanza, Innovazione per la tecnologia.${L.length?` In squadra senza incarico hai ${L.map(m=>esc(m.name)).join(' e ')}: mettine uno dove la sua abilità è più alta.`:''}`;}},
+  {f:'contenta',t:()=>{const r=DIR_ROLES.find(r=>S.dirs[r.id]), p=r&&personById(S.dirs[r.id]), v=p?p.st[r.stat]:10;
+    return `${p?`${esc(p.name)} è il nuovo ${esc(r.name.toLowerCase())}: ${esc(r.eff(v))}. `:''}Sotto 10 nell'abilità del posto un direttore fa più danni che altro: meglio un posto vuoto. Il direttore delle risorse umane fa anche lavorare due head hunter insieme.`;}}]},
+ {n:'La trattativa',s:[
+  {hi:()=>!UI.open.manager?tDock('manager'):wtabOf('manager')!=='manager'?'#win-manager [data-act=wtab][data-id=manager]':'#win-manager [data-act=mtab][data-id=cand]',
+   ok:()=>!!UI.open.manager&&wtabOf('manager')==='manager'&&UI.sel.mtab==='cand',w:()=>`${tTap()} la scheda «Manager», poi «Candidati»`,t:()=>`Ora assumiamo qualcuno. I manager non si prendono e basta: lo stipendio si tratta.`},
+  {hi:()=>'#win-manager [data-act=offer]',ok:()=>Object.keys(negs()).length>0,w:()=>`Scegli quanto offrire con − e +, poi «Fai l'offerta»`,
+   t:()=>`Qui ci sono le ${kw('candidature','candidature spontanee')}: tre persone di rango basso, che cambiano ogni qualche settimana. Sotto l'offerta vedi come la prenderà: troppo poco e si offende, il giusto e firma. Per i profili migliori c'è l'${kw('head_hunter','head hunter')}, che cerca per abilità e si fa pagare.`},
+  {go:()=>{if(!S.tut.ng) S.tut.ng=Object.keys(negs())[0];},hi:()=>S.speed?null:tPlay(),ok:()=>!tNg()||tNg().day==null,run:1,w:()=>`${tTap()} › e aspetta la risposta`,t:()=>`Ci pensa qualche giorno: fai scorrere il tempo.`},
+  {f:'',hi:()=>tNg()&&tNg().counter?'#win-manager [data-act=negok]':null,t:()=>{const n=tNg(), q=S.managers.find(m=>m.id===S.tut.ng&&(m.arr!=null||m.hired));
+    if(q) return `${esc(q.name)} ha firmato: entra il ${shortDate(q.arr!=null?q.arr:S.day)}. Chi arriva dalle candidature spontanee entra dopo una settimana; chi trova l'head hunter deve prima dare il preavviso, e intanto qualcuno può fargli una controfferta.`;
+    if(n&&n.counter) return `${esc(n.nm)} fa una controproposta: ${eur(n.counter)} l'anno. Puoi accettarla con «Accetta», rilanciare o lasciar perdere: decidi tu, poi «Avanti».`;
+    if(n) return `«È troppo poco», dice ${esc(n.nm)}. Puoi rilanciare, hai ancora ${MGR.rounds-n.round} tentativi: decidi tu, poi «Avanti».`;
+    return `Stavolta è andata male: non ne vuole sapere. Succede, soprattutto con le offerte basse; tra qualche settimana ci saranno altri candidati.`;}}]},
+ {n:'Il customer service',s:[
+  {hi:()=>tTab('clienti','customer'),ok:()=>!!UI.open.clienti&&wtabOf('clienti')==='customer',w:()=>`${tMenu('Clienti')}, poi la scheda «Customer service»`,
+   t:()=>`Con ${S.clients.filter(c=>c.status==='attivo').length} clienti le telefonate non le regge più il CEO: serve il ${kw('customer_service','customer service')}.`},
+  {hi:()=>tPick('cs'),ok:()=>!!S.cs.resp,w:()=>`${tTap()} «Cambia» sotto il responsabile e scegli un manager libero`,
+   t:()=>`Il responsabile conta con Negoziazione (calma i clienti) e Precisione (risponde giusto). Più è alta la ${kw('qualita_cs','qualità del servizio')}, più i clienti sono contenti a fine mese.`},
+  {hi:()=>$('#modal').innerHTML?'*#modal [data-act=choice]':'#win-clienti [data-act=hire][data-role=cs]',ok:()=>S.office.cs+S.queue.filter(q=>q.role==='cs').length>=csNeed(),w:()=>`${tTap()} + accanto agli addetti e scegli come cercarli`,
+   t:()=>`Poi servono gli addetti in sede: uno ogni ${CS.per} clienti dopo i primi ${CS.free}. Ognuno che manca toglie punti di qualità.`},
+  {f:'contenta',t:()=>`Le richieste dei clienti (drammi, picchi di consegna, overstock) arrivano come tessere gialle: il customer service sistema da solo quelle piccole, le altre le decidi tu.`}]},
+ {n:'Certificazioni e audit',s:[
+  {hi:()=>tTab('tecnologia','certificazioni'),ok:()=>!!UI.open.tecnologia&&wtabOf('tecnologia')==='certificazioni'&&(UI.sel.ctab||'mag')==='mag',w:()=>`${tMenu('Tecnologia')}, poi la scheda «Certificati e audit»`,
+   t:()=>`Certi clienti vogliono una ${kw('certificazioni','certificazione')}: l'HACCP per il cibo, la catena del freddo per i surgelati, la ISO 9001 per i più pignoli.`},
+  {hi:()=>`#win-tecnologia [data-act=install][data-id=haccp][data-wh="${S.tut.cw}"]`,ok:()=>!whById(S.tut.cw)||!!whById(S.tut.cw).tech.haccp,w:()=>`${tTap()} «${certBtn({id:'haccp'})}» sotto ${esc((whById(S.tut.cw)||{}).name||'')}`,
+   t:()=>`L'HACCP è già ricercato, ma ogni magazzino lo deve ottenere con un primo ${kw('audit')}. A ${esc((whById(S.tut.cw)||{}).name||'')} non c'è ancora: senza, lì non entrano i clienti che trattano cibo.`},
+  {f:'contenta',t:()=>`Il primo audit arriva tra qualche settimana. Poi il certificato vale tre anni, con un controllo ogni anno: l'esito dipende dalla ${kw('conformita','conformità')} del magazzino. Quando l'audit si avvicina, preparalo; e con l'ufficio qualità (scheda Azienda) si sbaglia meno.`}]},
+ {n:'Il capannone',s:[
+  {hi:()=>tTab('magazzini','magazzini'),ok:()=>!!UI.open.magazzini&&wtabOf('magazzini')==='magazzini',w:()=>tMenu('Magazzini'),t:()=>`Ogni capannone ha una classe, dal fatiscente all'innovativo, e le sue dotazioni.`},
+  {hi:()=>'#win-magazzini [data-act=dotbuild]:not([disabled])',ok:()=>S.warehouses.some(w=>w.build&&w.build.k==='dot')||!!UI.open.magazzini&&wtabOf('magazzini')==='magazzini'&&!$('#win-magazzini [data-act=dotbuild]:not([disabled])'),
+   w:()=>`${tTap()} «Costruisci» accanto a una dotazione`,t:()=>`Nella scheda Immobile ci sono le dotazioni: ribalte, pannelli solari, celle frigo, antincendio, ricarica dei muletti... Costano, ma fanno lavorare meglio e piacciono ai clienti. I lavori li segue il ${kw('facility','facility manager')}.`},
+  {hi:()=>'#win-magazzini [data-act=wtab][data-id=espansione]',t:()=>`Lì vicino ci sono Amplia (più posti), Ristruttura (una classe in più) e i guasti da riparare. Nella scheda Nuovo magazzino trovi i capannoni in affitto e i terreni: si compra il terreno e in 8-12 mesi c'è un magazzino tutto tuo.`}]},
+ {n:'Policy e welfare',s:[
+  {hi:()=>tTab('azienda','policy'),ok:()=>!!UI.open.azienda&&wtabOf('azienda')==='policy',w:()=>`${tMenu('Azienda e CEO')}, poi la scheda «Policy»`,t:()=>`Le ${kw('policy','policy')} sono le regole della casa e valgono per tutta l'azienda.`},
+  {go:()=>{if(!S.tut.pol0) S.tut.pol0=Object.fromEntries(POLICIES.map(P=>[P.id,polOn(P.id)]));},hi:()=>$('#modal').innerHTML?'#modal [data-act=okgo]':['#win-azienda .po:not(.polon) [data-act=poltog]:not([disabled])','#win-azienda [data-act=poltog]:not([disabled])'],
+   ok:()=>POLICIES.some(P=>polOn(P.id)!==!!S.tut.pol0[P.id])||!!UI.open.azienda&&wtabOf('azienda')==='policy'&&!$('#modal').innerHTML&&!$('#win-azienda [data-act=poltog]:not([disabled])'),
+   w:()=>`${tTap()} «Accendi» su una policy e conferma`,t:()=>`Ognuna ha un vantaggio e un prezzo. Occhio ai manager: c'è chi ne pretende una e chi non ne sopporta un'altra, e chi resta scontento per un mese ti dà l'ultimatum. Dopo un cambio la policy resta così per 13 settimane.`},
+  {t:()=>`Il welfare invece sta nell'albero Welfare della Tecnologia: caffè, spogliatoi, pulmini, mensa... Si ricerca una volta e si installa magazzino per magazzino: alza il morale, aiuta a trovare personale e tiene bassa l'agitazione.`}]},
+ {n:'Relazioni industriali',s:[
+  {hi:()=>tDock('sindacato'),ok:()=>!!UI.open.sindacato,w:()=>tMenu('Relazioni industriali'),t:()=>`Con il pacchetto Relazioni industriali il personale non è più solo un numero in busta paga.`},
+  {hi:()=>'#win-sindacato .ri-w',t:()=>`Ogni magazzino ha la sua ${kw('agitazione','agitazione')}, da 0 a 100: sale con il morale basso, i licenziamenti e i fornitori, scende con il welfare, un buon manager e gli accordi. Dove arriva il sindacato c'è un delegato, e oltre certe soglie arrivano ${kw('sciopero','scioperi')} e ${kw('presidio','presidi')}.`},
+  {hi:()=>'#win-sindacato [data-act=ritab][data-id=tav]',ok:()=>!!UI.open.sindacato&&UI.sel.ritab==='tav',w:()=>`${tTap()} la scheda «Tavolo»`,t:()=>`Quando un magazzino entra in agitazione si apre il tavolo delle trattative.`},
+  {t:()=>`Al ${kw('tavolo','tavolo')} il sindacato porta le sue richieste, una seduta a settimana, e per ognuna dici sì, tratti o no. Se si firma l'agitazione scende e resta giù finché dura l'accordo; se salta, il tavolo non si riapre per tre mesi. Nella scheda Contratto ci sono gli aumenti nazionali, in Fornitori le alternative alla cooperativa.`}]},
+ {n:'Avversari e vittoria',s:[
+  {hi:()=>tDock('classifica'),ok:()=>!!UI.open.classifica,w:()=>tMenu('Classifica'),t:()=>`E poi c'è la concorrenza.`},
+  {hi:()=>'#win-classifica .cls-l',t:()=>{const r=tRiv(), cfg=HUM.cfg||{win:{}}, on=Object.keys(WINS).filter(k=>cfg.win&&cfg.win[k]&&(!WINS[k].ri||cfg.ri));
+    return `Le aziende sono in ordine di ${kw('valore','valore')}.${r?` ${esc(r.boss.name)} fa le offerte alle stesse gare (sono segrete), assume dagli stessi candidati e prende i capannoni liberi.`:''}${on.length?` In questa partita ${on.map(k=>esc(winTxt(k,cfg).replace(/^V/,'v'))).join(' Oppure ')}`:''}`;}}]},
+ {n:'Prestiti e contratti',s:[
+  {hi:()=>'#stats [data-id=cassa]',ok:()=>!!UI.open.cassa,w:()=>`${tTap()} la cassa in alto`,t:()=>`Ultima lezione: i soldi.`},
+  {hi:()=>'#win-cassa [data-act=loantake]',t:()=>`Qui ci sono il ${kw('bilancio','bilancio')} e la banca: presta fino a quattro mesi di ricavi, a un tasso che scende con la reputazione, l'Amministrazione del CEO e il direttore finanziario. Un ${kw('prestiti','prestito')} serve per crescere (un magazzino nuovo, una ricerca cara), non per tappare i buchi. Se vuoi prova, altrimenti «Avanti».`},
+  {hi:()=>tDock('clienti'),t:()=>`E se un cliente ti fa perdere soldi? Nella finestra Clienti puoi non rinnovargli il contratto alla scadenza, oppure recedere subito pagando la penale. Prima però guarda se il problema è il prezzo o i KPI: a volte basta un manager migliore.`},
+  {f:'occhiolino',t:()=>{const r=tRiv(); return `Il corso è finito: hai visto tutto quello che serve per guidare un'azienda grande. ${esc(S.company.name)} adesso è tua: in bocca al lupo${r?`, e salutami ${esc(r.boss.name.split(' ')[0])}`:''}!`;}}]}
+]};
+// numeri casuali con un seme: la preparazione dà sempre la stessa partita
+const tutRand=s=>()=>{s=s+0x6D2B79F5|0; let t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296;};
+const TUT_PREP={days:730,seed:10,open:[250,500],cash:250000,fatt:6000000,style:'prezzo',tech:['gestionale','regolamento','barcode','formazione','commerciale','gps','haccp'],riv:'normale'};
+// due anni giocati in fretta: l'azienda del giocatore decide come un'avversaria (personale, manager, offerte, ricerca, prestiti, sindacato)
+// e apre due magazzini; gli eventi li decide il vice (AUTO). Intanto una finestra con la barra di avanzamento.
+function tutPrep(n){
+  slot=n; cMetaSet(slot,{}); uid=1; startSel.ceo='valeria'; startSel.color=COLORS[0][0];
+  const rnd0=Math.random, rand=tutRand(TUT_PREP.seed), seeded=f=>{Math.random=rand; AUTO=true; try{f();}finally{Math.random=rnd0; AUTO=false;}};
+  UI.catching=true;
+  seeded(()=>{ newGame('valeria','',COLORS[0][0],null,{logo:'camion',claim:''});
+    HUM=S; S.cfg={mode:'classica',win:{ultimo:true,fatturato:true},fatturato:TUT_PREP.fatt,reputazione:90,traguardo:2012,ri:true}; riPack(true);
+    S.bots=[newRival('gino',COLORS[1][0],'camion','standard',TUT_PREP.riv,0)];
+    // le ricerche dei primi mesi, già fatte e installate nel primo magazzino
+    const w0=S.warehouses[0]; TUT_PREP.tech.forEach(id=>{const t=TECH_ALL.find(x=>x.id===id); if(!t) return; S.researched[id]=true; if(!perWh(t)) return; w0.tech[id]={day:-60}; if(t.tree==='cert') certNew(0,w0.tech[id]);});
+    tendersInit(); });
+  const ov=document.createElement('div'); ov.className='ovl'; ov.id='tutprep'; ov.style.zIndex=95; document.body.appendChild(ov);
+  const show=()=>{ov.innerHTML=`<div class="modal"><div class="src"><span>${TUT_N}</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3">La dottoressa prepara l'aula</h3><p style="margin:0">Due anni di ${esc(S.company.name)} in pochi secondi: gare, assunzioni, ricerche e un concorrente.</p><div class="bar"><i style="width:${Math.round(S.day/TUT_PREP.days*100)}%;background:var(--accent)"></i></div><div class="sm">Settimana ${Math.ceil(S.day/7)} di ${Math.ceil(TUT_PREP.days/7)}</div></div></div>`;};
+  const chunk=()=>{ let fine=false;
+    try{ seeded(()=>{ const t0=performance.now(); while(S.day<TUT_PREP.days&&!S.over&&performance.now()-t0<40){ if(TUT_PREP.open.includes(S.day)) tutOpenWh(); if(S.day%7===0) tutBot(); stepWorld(); } }); fine=S.day>=TUT_PREP.days||S.over; }
+    catch(e){ UI.catching=false; ov.remove(); throw e; }
+    show(); if(!fine) return setTimeout(chunk,0);
+    UI.catching=false; ov.remove(); tutReady(); };
+  show(); setTimeout(chunk,30);
+}
+function tutBot(){
+  const st=BOT_STYLE[TUT_PREP.style], df=BOT_DIFF.normale; S.bot={id:'tut',style:TUT_PREP.style,diff:'normale',k:0};
+  try{ botStaff(df); botMgr(); botBids(st,df); botTech(st); botMoney(st); S.bot.style='standard'; botRI(BOT_STYLE.standard); } finally { delete S.bot; }
+  S.tenders.forEach(t=>{ const b=t.bids&&t.bids.tut; if(!b) return; if(!t.bid&&!t.done) t.bid={wh:b.wh,mult:b.mult}; delete t.bids.tut; });
+  if(S.cash<30000) tutSoci(100000);
+}
+const tutSoci=v=>{S.cash+=v; S.soci=(S.soci||0)+v; news('Il Sole 24 Pallet',`I soci di ${S.company.name} mettono altri soldi`,`Un aumento di capitale da ${eur(v)} per tenere i conti in ordine.`);};
+// il magazzino in affitto più vicino al primo, non fatiscente
+function tutOpenWh(){
+  const w0=S.warehouses[0], free=Object.keys(SITES).filter(id=>rentable(id)&&SITES[id].cl!=='fat'); if(!free.length) return;
+  const id=free.sort((a,b)=>siteDist(SITES[a],SITES[w0.site])-siteDist(SITES[b],SITES[w0.site]))[0], s=SITES[id], cost=2*s.rent+15000;
+  if(S.cash<cost+60000) tutSoci(cost+60000);
+  S.cash-=cost; S.cur.altro+=cost; addWarehouse(id,false,0,0); repUp(3); chron('magazzini',`Apre il magazzino di ${s.name} (${n0(s.cap)} posti pallet)`);
+  news('Il Sole 24 Pallet',`${S.company.name} apre a ${s.name}`,`Nuovo magazzino da ${n0(s.cap)} posti pallet.`);
+}
+// gli ultimi ritocchi per le lezioni: Struttura direzionale e Regolamento ricercati, due manager in squadra senza incarico
+// (nessuno al customer service), un magazzino senza HACCP, i conti in ordine e la colonna delle notifiche pulita
+function tutReady(){
+  const res=id=>{const t=TECH_ALL.find(x=>x.id===id); if(!t) return; (t.req||[]).forEach(res); S.researched[id]=true;};
+  ['direzione','regolamento','haccp'].forEach(res); if(S.project&&R(S.project.tech)) S.project=null;
+  if(S.cs.resp) S.cs.resp=null; S.managers.forEach(m=>{delete m.csTo;});
+  const sc=m=>m.st.op*2+m.st.neg*2+m.st.prec+m.st.lead+m.st.amm, pool=S.managers.filter(m=>!m.gen&&!m.hired&&avail(m)&&ageOf(m)<60).sort((a,b)=>sc(b)-sc(a));
+  while(tFree().length<2&&pool.length){ const m=pool.shift(); m.hired=true; m.ral=askOf(m); m.raiseDay=S.day; m.unh=0; m.quit=null; m.wh=null; m.tol={}; plog(m,`Entra in ${S.company.name} per ${eur(m.ral)} l'anno`); }
+  const noH=w=>!S.clients.some(c=>c.wh===w.id&&c.status!=='perso'&&cliReq(c).includes('haccp')), cw=[...S.warehouses].reverse().find(noH);
+  if(cw) delete cw.tech.haccp;
+  if(S.cash<TUT_PREP.cash) tutSoci(r500(TUT_PREP.cash-S.cash));
+  S.notes=[]; S.evPend=[]; S.cs.q=[]; S.negs={}; S.repNew=false;
+  S.tut={id:'avanzato',i:0,cw:cw?cw.id:null}; S.nextEvent=1e9; S.tNext=1e9;
+  startSel.step='home'; startSel.stamp=false; boot(); tutEnter(); save();
+}
 const tutSteps=id=>(TUT[id]||TUT.base).L.flatMap((l,li)=>l.s.map(s=>({...s,li})));
 const tutStep=()=>tutOn()?tutSteps(S.tut.id)[S.tut.i]:null;
 // il tempo resta fermo durante i passi da leggere: premere › scuote il fumetto
@@ -8705,6 +8831,7 @@ function tutTender(){
   renderDock();
 }
 function tutStart(id,n){
+  if(id==='avanzato') return tutPrep(n);
   slot=n; cMetaSet(slot,{}); uid=1; startSel.ceo='valeria'; startSel.color=COLORS[0][0];
   newGame('valeria','',COLORS[0][0],null,{logo:'camion',claim:''});
   HUM=S; S.cfg={mode:'classica',win:{},ri:false}; riPack(false); S.bots=[];
@@ -8753,6 +8880,8 @@ function tutPaint(){
   const el=$('#tut'), hi=$('#tuthi'), s=tutStep(); if(!s) return;
   const r=tutTarget(s);
   if(r){ const p=5; Object.assign(hi.style,{left:(r.left-p)+'px',top:(r.top-p)+'px',width:(r.width+2*p)+'px',height:(r.height+2*p)+'px'}); hi.hidden=false; } else hi.hidden=true;
+  // il cartellino di una notifica non deve coprire la cosa da toccare
+  if(r&&UI.card){ const c=$('#notecard').getBoundingClientRect(); if(c.width&&r.right>c.left&&r.left<c.right&&r.bottom>c.top&&r.top<c.bottom) hideCard(); }
   // sul computer il fumetto sta in basso a sinistra, accanto al menu; sul telefono in basso, sopra i pulsanti. Se copre la cosa da toccare, va in alto
   if(!MOB){ const dr=Math.round(($('#dock').getBoundingClientRect().right||80)+12); if(el.style.left!==dr+'px') el.style.left=dr+'px'; } else if(el.style.left) el.style.left='';
   const b=el.getBoundingClientRect(), up=el.classList.contains('up'), h=b.height, top=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-h'))||64)+10;
@@ -8775,7 +8904,7 @@ function tutFinish(skip){
   const C=ceo(), f=C.sx==='f';
   showModal(`<div class="src"><span>Regione del Nord · Fondo sociale europeo</span><span>${shortDate(S.day)}</span></div><div class="win-b"><div class="attest">
     <div class="at-h">Attestato di partecipazione</div><div class="sm">Corso di formazione «${esc((TUT[S.tut.id]||TUT.base).corso)}»</div>
-    <p>Si attesta che <b>${esc(C.name)}</b>, ${f?'amministratrice':'amministratore'} di <b>${esc(S.company.name)}</b>, ha frequentato con profitto tutte le lezioni: mappa, tempo, magazzino, personale, gare, tecnologia, manager, eventi e report.</p>
+    <p>Si attesta che <b>${esc(C.name)}</b>, ${f?'amministratrice':'amministratore'} di <b>${esc(S.company.name)}</b>, ha frequentato con profitto tutte le ${(TUT[S.tut.id]||TUT.base).L.length} lezioni: ${(TUT[S.tut.id]||TUT.base).L.map(l=>'«'+esc(l.n)+'»').join(', ')}.</p>
     <div class="at-f"><img class="px" src="${IMG.ornella_occhiolino}" alt="" width="48" height="56"><div><i>Ornella Ribalta</i><span class="sm">la docente</span></div></div>
     <div class="sm">Il presente attestato non dà diritto a crediti formativi, ma incorniciato in ufficio fa la sua figura.</div></div>
     <div class="row"><button class="btn" data-act="quitgame">Torna al menu</button><button class="btn pri" data-act="closemodal">Continua la partita</button></div></div>`);
@@ -8976,6 +9105,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.99',t:'Il tutorial avanzato',x:['Nella schermata principale il riquadro Tutorial ha due pulsanti: Base e Avanzato. Il tutorial avanzato parte da un\'azienda già grande: due anni di Conti Logistica giocati in pochi secondi (con la barra di avanzamento), sempre uguali, fino a gennaio 2004, con tre magazzini, una decina di clienti, Gino Bertolotti come concorrente e il pacchetto Relazioni industriali.','In nove lezioni la dottoressa Ribalta ti fa nominare il primo direttore, trattare lo stipendio di un manager, scegliere il responsabile del customer service, chiedere l\'audit HACCP in un magazzino, costruire una dotazione nel capannone e accendere una policy. Poi spiega welfare, agitazione e tavolo col sindacato, classifica e vittoria, prestiti e contratti in perdita.','Alla fine arriva l\'attestato del corso «Diventa CEO, secondo livello» e la partita continua da lì.','Il cartellino di una notifica non copre più la cosa che la dottoressa ti chiede di toccare.']},
  {v:'0.98',t:'Data e ricerca più chiare',x:['In alto la data mostra anche il giorno: «13 febbraio 2002» sul computer, «13 feb 02» sul telefono.','Nella finestra Tecnologia la ricerca in corso ha una barra di avanzamento ben visibile, con la percentuale accanto: prima era schiacciata in una riga sottile.']},
  {v:'0.97',t:'Il magazzino visto da fuori',x:['In cima alla finestra Magazzini c\'è il magazzino visto da fuori, diverso per ogni magazzino: il capannone cambia con la classe dell\'edificio (fatiscente, vecchio, standard, moderno, innovativo, ognuna in due versioni) e con le celle frigo diventa un magazzino frigorifero. Gli stessi disegni si vedono nella scheda dei capannoni da affittare; i terreni edificabili e i cantieri da zero hanno il loro.','Sul capannone e davanti compaiono le dotazioni che ha davvero: pannelli solari sul tetto, ribalte di carico, cisterna dell\'antincendio, lampioni a LED, portineria con la sbarra, giardino, mensa, parcheggio dei camion e piazzale, più la zona di ricarica dei muletti e la gru durante un cantiere. Dove resta posto si vedono anche l\'area cani, le colonnine di ricarica e il pulmino del welfare.','La scena del lavoro in magazzino, col nastro trasportatore, passa nella finestra Personale.']},
  {v:'0.96',t:'Capannoni ridisegnati',x:['Le immagini dei capannoni nelle schede sono rifatte nello stile delle scenette degli eventi: più vicine, con il contorno scuro su ogni cosa e tanta gente al lavoro. Il portiere nella guardiola alza la sbarra, la carrellista fa avanti e indietro col muletto, dalla baia che si apre spunta il magazziniere col gilet, l\'autista beve il caffè accanto alla motrice.','Le classi si riconoscono a colpo d\'occhio: lamiere arrugginite e vetri rotti nel fatiscente, tetto a shed e ciminiera nel vecchio, lamiera grigia nello standard, pannelli bianchi e bandiera nel moderno, vetrate, tetto verde e pala eolica nell\'innovativo. Rifatti anche il terreno in vendita, col geometra, e il cantiere con la gru.']},
@@ -9185,7 +9315,8 @@ function stepHome(){const L=[]; for(let n=1;n<=SLOTS;n++){const sv=load(n); if(s
   return `<div class="hm-h">${hmIc('salva',32)}<h2>Partite salvate</h2><span class="hm-n" aria-label="${L.length} posti occupati su ${SLOTS}">${L.length}/${SLOTS}</span></div>
    ${L.length?L.map((x,i)=>slotCard(x,!i)).join(''):'<div class="hm-empty"><b>Nessuna partita salvata</b><span>Il piazzale è vuoto: è il momento di scaricare il primo pallet.</span></div>'}
    <button class="hm-new" data-act="newgame" ${full?'disabled':''}><span class="hm-plus">${hmIc('nuova',32)}</span><span class="t"><b>Crea nuova partita</b><span>${full?`Tutti e ${SLOTS} i posti sono occupati: cancella una partita per iniziarne un'altra.`:'Scegli il CEO, dai un nome all\'azienda e apri il primo magazzino a gennaio 2002.'}</span></span><span class="ar" aria-hidden="true">›</span></button>
-   <button class="hm-new hm-tut" data-act="tutorial" data-id="base" ${full?'disabled':''}><span class="hm-orn"><img class="px" src="${IMG.ornella_contenta}" alt="" width="48" height="56"></span><span class="t"><b>Tutorial</b><span>${full?`Per il tutorial serve un posto libero: cancella una partita.`:'Una partita guidata dalla dottoressa Ornella Ribalta: mappa, magazzino, personale, gare, ricerca ed eventi, in circa 15 minuti. Il tutorial avanzato arriverà presto.'}</span></span><span class="ar" aria-hidden="true">›</span></button>
+   <div class="hm-new hm-tut${full?' off':''}"><span class="hm-orn"><img class="px" src="${IMG.ornella_contenta}" alt="" width="48" height="56"></span><span class="t"><b>Tutorial</b><span>${full?`Per il tutorial serve un posto libero: cancella una partita.`:'La dottoressa Ornella Ribalta ti insegna il gioco, giocando.'}</span>
+    <span class="hm-tb"><button class="btn" data-act="tutorial" data-id="base" ${full?'disabled':''}>Base<small>le prime cose · circa 15 minuti</small></button><button class="btn" data-act="tutorial" data-id="avanzato" ${full?'disabled':''}>Avanzato<small>un'azienda già grande · circa 20 minuti</small></button></span></span></div>
    ${cloudCard()}${newsCard()}<div class="hm-cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></div>`;}
 function showStart(){
   setSpeedSafe(0); WIKI_ON=false; const k=startSel.step;
@@ -9353,6 +9484,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>
