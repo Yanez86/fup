@@ -61,6 +61,8 @@ const talento = (nome, tipo, o, ...art) => icona("tal", nome, 16, { ...o, tipo }
 const tecnologia = (id, albero, o, ...art) => icona("tec", id, 12, { ...o, tipo: albero }, ...art)
 // policy 12×12 (sul foglio del regolamento 16×16)
 const policy = (id, o, ...art) => icona("pol", id, 12, { ...o, tipo: "pol" }, ...art)
+// dotazioni dell'immobile e classi dell'edificio (c_<classe>) 12×12 (nella tessera grigio-azzurra 16×16 della planimetria)
+const dotazione = (id, o, ...art) => icona("dot", id, 12, { ...o, tipo: "dot" }, ...art)
 // abilità 10×10, menu e lenti 16×16, pulsanti (ui) quadrati di qualsiasi misura (di solito 16)
 const abilita = (id, o, ...art) => icona("stat", id, 10, o, ...art)
 const menu = (id, o, ...art) => icona("menu", id, 16, o, ...art)
@@ -74,7 +76,7 @@ const TESS = {   // fondo, fascia in basso, filetto, ombra del disegno, lato, ri
   pos: ["1", "2", "G", "3", 20, "smussa"], neg: ["4", "5", "R", "6", 20, "smussa"], mix: ["7", "8", "0", "9", 20, "smussa"],
   log: ["!", "+", "O", "+", 16, [0, 0, 0]], org: ["=", "%", "P", "%", 16, [3, 2, 1]], mkt: ["&", "*", "G", "*", 16, [5, 3, 2, 1, 1]],
   wel: ["@", "$", "R", "$", 16, [2, 1]], cert: ["^", "~", "b", "~", 16, { rows: [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 3, 4, 5, 6] }],
-  pol: ["C", ";", null, ";", 16, [0]],
+  pol: ["C", ";", null, ";", 16, [0]], dot: [":", "S", "D", "S", 16, [1]],
 }
 function tessera(t, X, Y, id) {
   const [bg, bg2, rim, sh, n, cut] = TESS[t]
@@ -93,11 +95,11 @@ function tessera(t, X, Y, id) {
 }
 function foglio(nome, per = 8) {
   const lista = ICONE.slice()
-  const passo = Math.max(...lista.map((i) => (i.pre === "tal" ? 20 : i.pre === "tec" || i.pre === "pol" ? 16 : i.lato))) + 4
+  const passo = Math.max(...lista.map((i) => (i.pre === "tal" ? 20 : i.pre === "tec" || i.pre === "pol" || i.pre === "dot" ? 16 : i.lato))) + 4
   const righe = Math.ceil(lista.length / per)
   scene(nome, { w: per * passo + 4, h: righe * passo + 4, bg: ":" }, ...lista.flatMap((ic, i) => {
     const X = 4 + (i % per) * passo, Y = 4 + Math.floor(i / per) * passo
-    if (ic.pre === "tal" || ic.pre === "tec" || ic.pre === "pol") return tessera(ic.pre === "pol" ? "pol" : ic.tipo, X, Y, ic.id)
+    if (ic.pre === "tal" || ic.pre === "tec" || ic.pre === "pol" || ic.pre === "dot") return tessera(ic.pre === "pol" || ic.pre === "dot" ? ic.pre : ic.tipo, X, Y, ic.id)
     return [stamp(ic.id, X, Y)]
   }))
 }

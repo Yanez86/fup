@@ -246,6 +246,15 @@ async def phone(b, w, h, name, errs):
             assert not bad, f'{name}: finestra {wn}, scheda {tb}: {bad}'
             await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{tb}.png'))
         await pg.tap(f'#win-{wn} [data-act=close]')
+    # progetto di un magazzino da costruire su un terreno (scheda Nuovo magazzino)
+    await pg.evaluate("()=>{const F=window.__FUP; F.S.cash=2e6; F.ACT.site({id:'l_vercelli'});}")
+    assert await pg.query_selector('#win-magazzini .ed-box'), f'{name}: manca il progetto del nuovo magazzino'
+    assert await pg.evaluate(FITS, '#win-magazzini'), f'{name}: il progetto del magazzino esce dallo schermo'
+    bad = await pg.evaluate(NOSIDE, '#win-magazzini')
+    assert not bad, f'{name}: progetto del magazzino: {bad}'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_progetto.png'))
+    await pg.evaluate("()=>{window.__FUP.ACT.edclose();}")
+    await pg.tap('#win-magazzini [data-act=close]')
     # parola chiave: primo tocco = tooltip, secondo tocco = enciclopedia
     await menu(pg, 'magazzini')
     await pg.tap('#win-magazzini .kw[data-id=saturazione]')
@@ -618,6 +627,24 @@ async def main():
         card = await pg.evaluate_handle("()=>document.querySelector('#win-magazzini [data-act=straord]').closest('.card')")
         await card.as_element().scroll_into_view_if_needed()
         await card.as_element().screenshot(path=os.path.join(OUT, 'shot_magazzino_immobile.png'))
+        # immobile (0.92): classe, dotazioni, lavori, guasti, ristrutturazione e costruzione da zero
+        im = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0],o={};
+          o.cl=!!F.WCLASS[w.cl]; w.build=null; S.cash+=2e6; const p0=F.computeWH(w).prod;
+          F.renderAll(); const b=document.querySelector('#win-magazzini [data-act=dotbuild]:not([disabled])'), di=b&&b.dataset.id; b.click(); o.cant=!!w.build&&w.build.k==='dot'&&w.build.id===di;
+          w.build.left=1; F.stepOne(); o.dot=!!w.dot[di];
+          F.koStart(w,'ricarica'); o.ko=F.computeWH(w).prod<p0*0.95; o.ev=S.notes.some(n=>n.k==='ev'&&n.ev.id==='guasto');
+          F.renderAll(); document.querySelector('#win-magazzini [data-act=koripara][data-id=ricarica]').click(); o.rip=w.ko.ricarica.fine>S.day;
+          w.ko.ricarica.fine=S.day+1; F.stepOne(); F.stepOne(); o.fixed=!w.ko.ricarica;
+          F.fuocoStart(w); o.fuoco=S.notes.some(n=>n.k==='ev'&&n.ev.id==='incendio');
+          w.cl='vec'; F.ACT.rist({wh:w.id,ok:1}); o.rist=!!w.build&&w.build.k==='rist'&&w.build.to==='std'; w.build.left=1; F.stepOne(); o.std=w.cl==='std';
+          o.taken=!F.siteOpen(w.site)&&!F.rentable('l_casale')&&!F.siteOpen('landriano');
+          F.ACT.site({id:'l_casale'}); o.box=!!document.querySelector('#win-magazzini .ed-box');
+          F.ACT.edgo({ok:1}); o.cantiere=S.cantieri.length===1&&!F.siteOpen('l_casale');
+          S.cantieri[0].left=1; F.stepOne(); const n=S.warehouses.find(x=>x.site==='l_casale'); o.nuovo=!!n&&n.own&&n.cl==='mod'&&!!n.dot.ribalte&&n.cap===3000;
+          F.ACT.openwh({id:w.id}); F.renderAll(); return o;}''')
+        assert all(im.values()), f'immobile: {im}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_magazzino_dotazioni.png'))
+        await pg.evaluate(CLEAR)
         await pg.click('#win-magazzini [data-act=coop]')
         assert not await pg.evaluate('()=>window.__FUP.S.warehouses[0].coop'), 'la cooperativa deve aspettare la conferma'
         assert 'Conferma' in await pg.inner_text('#modal'), 'manca la conferma della cooperativa'
@@ -882,7 +909,7 @@ async def main():
           for(let d=0;d<730&&!H.over;d++){ const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}
             H.cash=Math.max(H.cash,300000); bids+=H.tenders.filter(t=>t.bids&&Object.keys(t.bids).length&&t.deadline===H.day).length; F.step(); }
           F.ACT.toggle({id:'classifica'});
-          const gm=H.bots.reduce((a,b)=>a+b.managers.filter(m=>m.gen&&(m.hired||m.arr!=null)).length,0), more=H.bots.some(b=>b.warehouses.length>1);
+          const gm=H.bots.reduce((a,b)=>a+b.managers.filter(m=>m.gen&&(m.hired||m.arr!=null)).length,0), more=H.bots.some(b=>b.warehouses.filter(w=>w.mgr!=='ceo').length>1);   // il CEO può guidare un magazzino da sé: serve un manager nuovo solo oltre quello
           return {gm,more,board:F.mktList().length,bids,cli:H.bots.map(b=>b.clients.filter(c=>c.status==='attivo').length),day:H.day,mk:document.querySelectorAll('#ov [data-act=openclass]').length,
             sizeKB:Math.round(JSON.stringify(H).length/1024)};}''')
         assert r['bids'] > 3 and sum(r['cli']) > 6 and r['day'] >= 729, r

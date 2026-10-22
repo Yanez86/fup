@@ -4,10 +4,10 @@ che build.py incorpora al posto di {{ICONE}}.
 Builda ogni file (tranne comune.px.js) in una cartella pulita, rilegge i PNG degli sprite, li riconverte in righe di
 lettere TPAL e controlla misure, colori e nomi contro i dati del gioco (talenti, tecnologie, policy, menu, lenti).
 Scrive anche i fogli di anteprima nelle tessere del gioco: tools/out/icone_talenti.png, _tecnologie, _policy,
-_interfaccia.
+_dotazioni, _interfaccia.
 
 Nomi degli sprite (li crea comune.px.js): tal_<nome del talento senza accenti>, tec_<id>, pol_<id>, stat_<id>,
-menu_<id>, lens_<id>, ui_<id>.
+menu_<id>, lens_<id>, ui_<id>, dot_<id> (dotazioni dell'immobile, il terreno 'lotto' e le classi 'c_<classe>').
 Uso: python3 tools/icone_pxl/esporta.py                       (tutti i file -> assets/icone.json)
      python3 tools/icone_pxl/esporta.py --prova policy.px.js   (solo quei file: controlli e anteprime, senza scrivere assets/icone.json)"""
 import json, os, re, shutil, subprocess, sys, unicodedata
@@ -17,8 +17,8 @@ DIR = os.path.join(ROOT, 'tools', 'icone_pxl')
 OUT = os.path.join(ROOT, 'tools', 'out', 'icone_pxl')
 PXL = os.path.join(ROOT, '.claude', 'skills', 'pxl-pixel-art', 'bin', 'pxl.js')
 SRC = open(os.path.join(ROOT, 'src', 'game.html'), encoding='utf-8').read()
-KIND = {'tal': 'tal', 'tec': 'tec', 'pol': 'pol', 'stat': 'stat', 'menu': 'menu', 'lens': 'lens', 'ui': 'ui'}
-SIZE = {'tal': 16, 'tec': 12, 'pol': 12, 'stat': 10, 'menu': 16, 'lens': 16}
+KIND = {'tal': 'tal', 'tec': 'tec', 'pol': 'pol', 'dot': 'dot', 'stat': 'stat', 'menu': 'menu', 'lens': 'lens', 'ui': 'ui'}
+SIZE = {'tal': 16, 'tec': 12, 'pol': 12, 'dot': 12, 'stat': 10, 'menu': 16, 'lens': 16}
 
 def slug(s):   # uguale a slug() di comune.px.js
     s = ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn').lower()
@@ -35,7 +35,9 @@ def game_data():
     lens = re.findall(r"\{id:'(\w+)',n:'[^']*',d:", SRC)
     i = SRC.index('const TPAL={'); j = SRC.index('};', i)
     tpal = re.findall(r"'?(\w)'?:'(#[0-9a-f]{6})'", SRC[i:j])
-    return tal, tec, pol, dock, lens, tpal
+    i = SRC.index('const DOT=['); j = SRC.index('\n];', i)
+    dot = re.findall(r"\{id:'(\w+)',n:'", SRC[i:j]) + ['lotto'] + ['c_' + k for k in re.findall(r"^ (\w+):\{n:'", SRC[SRC.index('const WCLASS={'):SRC.index('const WCL_ORD')], re.M)]
+    return tal, tec, pol, dock, lens, tpal, dot
 
 def hexrgb(h):
     h = h.lstrip('#'); return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
@@ -71,19 +73,20 @@ def collect(tpal):
     return out, err
 
 def check(out, data):
-    tal, tec, pol, dock, lens, tpal = data; err = []; warn = []
+    tal, tec, pol, dock, lens, tpal, dot = data; err = []; warn = []
     tslug = {slug(n): n for n in tal}
     talenti = {}
     for k, rows in out['tal'].items():
         if k not in tslug: err.append(f'talento sconosciuto: {k} (il nome deve essere quello di TALENTS)')
         else: talenti[tslug[k]] = rows
     out['tal'] = {n: talenti[n] for n in tal if n in talenti}   # nell'ordine di TALENTS
-    for kind, known in (('tec', tec), ('pol', pol)):
+    for kind, known in (('tec', tec), ('pol', pol), ('dot', dot)):
         for k in out[kind]:
             if k not in known: err.append(f'{kind}: id sconosciuto {k}')
     warn += [f'talento senza icona: {k}' for k in tal if k not in out['tal']]
     warn += [f'tecnologia senza icona: {k}' for k in tec if k not in out['tec']]
     warn += [f'policy senza icona: {k}' for k in pol if k not in out['pol']]
+    warn += [f'dotazione o classe senza icona: {k}' for k in dot if k not in out['dot']]
     warn += [f'voce del menu senza icona: {k}' for k in dock if k not in out['menu']]
     warn += [f'lente senza icona: {k}' for k in lens if k not in out['lens']]
     return err, warn
@@ -139,7 +142,7 @@ def sheet(items, path, pal, scale=3, per=8, label_w=130):
     im.save(path)
 
 def previews(out, data):
-    tal, tec, pol, dock, lens, tpal = data; pal = dict(tpal); od = os.path.join(ROOT, 'tools', 'out'); fr = tframes()
+    tal, tec, pol, dock, lens, tpal, dot = data; pal = dict(tpal); od = os.path.join(ROOT, 'tools', 'out'); fr = tframes()
     def tt(art, typ):
         bg, bg2, rim, sh = TAL_T.get(typ, TAL_T['mix']); n = 20
         return tile(n, lambda x, y: 0 <= x < n and 0 <= y < n and min(x, n-1-x) + min(y, n-1-y) >= 2, rim, bg, bg2, art, sh, pal)
@@ -151,6 +154,8 @@ def previews(out, data):
     sheet([(n, tt(g, tal.get(n, 'mix'))) for n, g in out['tal'].items()], os.path.join(od, 'icone_talenti.png'), pal)
     sheet([(k, te(g, tec.get(k, 'log'))) for k, g in out['tec'].items()], os.path.join(od, 'icone_tecnologie.png'), pal, 4)
     sheet([(k, pt(g)) for k, g in out['pol'].items()], os.path.join(od, 'icone_policy.png'), pal, 4)
+    dt = lambda art: tile(16, lambda x, y: 0 <= y < 16 and (1 if y in (0, 15) else 0) <= x < 16 - (1 if y in (0, 15) else 0), '#4a5f7a', '#e6eef3', '#c3d0dc', art, '#c3d0dc', pal)
+    sheet([(k, dt(g)) for k, g in out['dot'].items()], os.path.join(od, 'icone_dotazioni.png'), pal, 4)
     sheet([(k, g) for kind in ('stat', 'menu', 'lens', 'ui') for k, g in out[kind].items()], os.path.join(od, 'icone_interfaccia.png'), pal, 4)
 
 if __name__ == '__main__':
@@ -164,7 +169,7 @@ if __name__ == '__main__':
     if err:
         for e in err: print('ERRORE:', e)
         sys.exit(1)
-    out = {k: out[k] for k in ('tal', 'tec', 'pol', 'stat', 'menu', 'lens', 'ui')}
+    out = {k: out[k] for k in ('tal', 'tec', 'pol', 'dot', 'stat', 'menu', 'lens', 'ui')}
     if prova:
         previews(out, data); print('prova:', {k: len(v) for k, v in out.items()}, '· anteprime in tools/out/icone_*.png'); sys.exit()
     json.dump(out, open(os.path.join(ROOT, 'assets', 'icone.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
