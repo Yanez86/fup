@@ -53,6 +53,23 @@ for f in sorted(os.listdir(os.path.join(OUT, 'scenes'))):
     assert p.convert('RGB').tobytes() == st.tobytes(), nome
     p.save(os.path.join(DEST, nome + '.png'), optimize=True)
     fatte.append(f'{nome} ({os.path.getsize(os.path.join(DEST, nome + ".png")) // 1024 + 1} KB)')
+# strati del capannone (capannoni.px.js): anim 160x72 trasparenti, in assets/capannoni/ con la trasparenza
+CAP = os.path.join(ROOT, 'assets', 'capannoni'); capf = []
+an = os.path.join(OUT, 'anims')
+if os.path.isdir(an) and any(f.startswith('cap_') for f in os.listdir(an)):
+    os.makedirs(CAP, exist_ok=True)
+    for f in sorted(os.listdir(an)):
+        nome, ext = os.path.splitext(f)
+        if ext != '.png' or not nome.startswith('cap_'): continue
+        im = Image.open(os.path.join(an, f)).convert('RGBA'); n = im.width // W
+        if im.height != H or im.width % W or N % n: sys.exit(f'{nome}: servono fotogrammi {W}x{H}, in numero che divide {N}')
+        st = Image.new('RGBA', (W * N, H))
+        for i in range(N): st.paste(im.crop(((i % n) * W, 0, (i % n + 1) * W, H)), (W * i, 0))
+        st.save(os.path.join(CAP, nome[4:] + '.png'), optimize=True); capf.append(nome[4:])
+    if tutti:
+        for f in os.listdir(CAP):
+            if f[:-4] not in capf: os.remove(os.path.join(CAP, f))
+    print('Strati del capannone in assets/capannoni:', ', '.join(capf))
 vecchie = [f for f in os.listdir(DEST) if f[:-4] not in [x.split(' ')[0] for x in fatte]] if tutti else []
 for f in vecchie: os.remove(os.path.join(DEST, f))
 print('Scene esportate in assets/scene:', ', '.join(fatte) + (f' · tolte: {", ".join(vecchie)}' if vecchie else ''))
