@@ -632,10 +632,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .ev-who span{display:inline-flex;align-items:center;gap:6px;padding:2px 8px 2px 3px;background:#fff;border:2px solid var(--ink);font-size:14px;font-weight:600}
 .ev-x{margin:0;line-height:1.5;font-size:16px;padding:10px 12px;background:#fff;border-left:4px solid var(--accent)}
 .ev-q{font-family:var(--f-disp);font-size:16px;margin-top:2px}
-/* scenetta dell'evento sotto il titolo, larga quanto la finestra: striscia di 16 fotogrammi 160×72 (SCENE), 3× sul computer e 2× sul telefono, a multipli interi */
-.ev-scn{display:flex;justify-content:center;background:var(--ink);padding:3px 0;margin:0 -14px;line-height:0}
+/* scenetta dell'evento sotto il titolo, su sfondo chiaro con la cornice scura: striscia di 16 fotogrammi 160×72 (SCENE), 3× sul computer e 2× sul telefono, a multipli interi */
+.ev-scn{display:flex;justify-content:center;padding:3px 0;margin:0 -14px;line-height:0}
 .mob .ev-scn{margin:0 calc(-1 * max(10px, env(safe-area-inset-right, 0px))) 0 -10px}
-.ev-scn i{display:block;width:480px;max-width:100%;aspect-ratio:160/72;background-size:1600% 100%;background-repeat:no-repeat;image-rendering:pixelated;animation:scn 2s steps(16) infinite}
+.ev-scn i{display:block;width:480px;max-width:100%;aspect-ratio:160/72;background-size:1600% 100%;background-repeat:no-repeat;image-rendering:pixelated;box-shadow:0 0 0 3px var(--ink);animation:scn 2s steps(16) infinite}
 .mob .ev-scn i{width:320px}
 @keyframes scn{to{background-position:calc(100% * 16 / 15) 0}}
 @media (prefers-reduced-motion:reduce){.ev-scn i{animation:none}}
