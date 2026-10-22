@@ -250,10 +250,10 @@ async def phone(b, w, h, name, errs):
             await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{tb}.png'))
         await pg.tap(f'#win-{wn} [data-act=close]')
     # progetto di un magazzino da costruire su un terreno (scheda Nuovo magazzino)
-    # scheda di un capannone sopra l'elenco: immagine a strati (edificio della sua classe e le sue dotazioni), numeri e dotazioni
+    # scheda di un capannone sopra l'elenco: il suo esterno (capannone della sua classe con sopra le sue dotazioni), numeri e dotazioni
     await pg.evaluate("()=>{const F=window.__FUP; F.S.cash=2e6; F.ACT.site({id:'bologna'});}")
-    sc = await pg.evaluate('''()=>{const i=document.querySelector('#modal .cap-img i'); return {img:!!i&&(i.style.backgroundImage.match(/url\(/g)||[]).length,elenco:!!document.querySelector('#win-magazzini .es-k'),dot:document.querySelectorAll('#modal .dt-r').length};}''')
-    assert sc['elenco'] and sc['img'] >= 8 and sc['dot'] == 11, f'{name}: scheda del capannone {sc}'
+    sc = await pg.evaluate('''()=>{const i=document.querySelector('#modal .ev-scn i'); return {img:!!i&&i.dataset.scena.startsWith('est_')&&(i.style.backgroundImage.match(/url\(/g)||[]).length,elenco:!!document.querySelector('#win-magazzini .es-k'),dot:document.querySelectorAll('#modal .dt-r').length};}''')
+    assert sc['elenco'] and sc['img'] >= 2 and sc['dot'] == 11, f'{name}: scheda del capannone {sc}'
     assert await pg.evaluate(FITS, '#modal .modal'), f'{name}: la scheda del capannone esce dallo schermo'
     bad = await pg.evaluate(NOSIDE, '#modal .modal')
     assert not bad, f'{name}: scheda del capannone: {bad}'
