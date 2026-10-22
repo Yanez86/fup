@@ -178,6 +178,11 @@ async def phone(b, w, h, name, errs):
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_notifiche.png'))
     await pg.tap('#notes [data-act=note]')
     assert await pg.query_selector('#modal [data-act=evopt]'), f'{name}: la tessera non apre l\'evento'
+    # scenetta in cima all'evento: a 2× sul telefono (o più piccola se lo schermo è stretto), dentro la finestra
+    scn = await pg.evaluate("""()=>{const i=document.querySelector('#modal .ev-scn i'), m=document.querySelector('#modal .modal'); if(!i) return null;
+      const r=i.getBoundingClientRect(), q=m.getBoundingClientRect(); return {k:i.dataset.scena, w:r.width, h:r.height, in:r.left>=q.left&&r.right<=q.right};}""")
+    assert scn and scn['in'] and abs(scn['w'] / scn['h'] - 160 / 72) < 0.02 and (scn['w'] == 320 or w < 400), f'{name}: scenetta dell\'evento {scn}'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_evento.png'))
     await pg.tap('#modal [data-act=closemodal]')
     assert await pg.evaluate("()=>window.__FUP.S.notes.some(n=>n.k==='ev')"), f'{name}: evento sparito con «Decidi più tardi»'
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
@@ -610,6 +615,14 @@ async def main():
           const S=F.S;let small=0,n=0;for(let i=0;i<300;i++){S.tenders=[];F.newTender();const t=S.tenders[0];n++;if(F.ZONES[t.zone].k==='prov'||F.ZONES[t.zone].k==='grp')small++;}
           return {bad,small:small/n,open:F.S.tenders.length};}''')
         assert not r['bad'] and r['small'] > 0.4, r
+        # scenette degli eventi: ogni evento ne ha una che esiste, ogni striscia è 16 fotogrammi da 160x72
+        r = await pg.evaluate('''async()=>{const F=window.__FUP,bad=[],ids=F.EVENTS.map(e=>e.id);
+          F.EVENTS.forEach(e=>{const k=F.SCN_EV[e.id]||F.SCN_SRC[e.src]; if(!k||!F.SCENE[k]) bad.push(e.id+': scena '+k);});
+          Object.keys(F.SCN_EV).forEach(id=>{if(!ids.includes(id)) bad.push('SCN_EV: evento '+id+' inesistente');});
+          [...Object.values(F.SCN_EV),...Object.values(F.SCN_SRC)].forEach(k=>{if(!F.SCENE[k]) bad.push('scena mancante: '+k);});
+          for(const [k,src] of Object.entries(F.SCENE)){const im=new Image(); im.src=src; await im.decode(); if(im.naturalWidth!==2560||im.naturalHeight!==72) bad.push(k+': '+im.naturalWidth+'x'+im.naturalHeight);}
+          return {bad,n:Object.keys(F.SCENE).length};}''')
+        assert not r['bad'] and r['n'] >= 14, r
         # eventi: l'effetto della scelta arriva il giorno dopo, con il racconto di com'è andata
         await pg.evaluate("()=>{const F=window.__FUP;F.newGame('marco');F.S.speed=1;}")
         await pg.evaluate(FIRE, 'cesto')
@@ -618,6 +631,9 @@ async def main():
         await pg.screenshot(path=os.path.join(OUT, 'shot_notifiche_evento.png'))
         cash0 = await pg.evaluate('()=>window.__FUP.S.cash')
         await pg.click('#notes [data-act=note]')
+        scn = await pg.evaluate("()=>{const i=document.querySelector('#modal .ev-scn i'); return i&&[i.dataset.scena,i.getBoundingClientRect().width]}")
+        assert scn == ['festa', 480], f'scenetta del cesto natalizio {scn}'   # sul computer a 3×
+        await pg.screenshot(path=os.path.join(OUT, 'shot_evento.png'))
         await pg.click('#modal [data-act=evopt][data-i="0"]')
         r = await pg.evaluate('()=>{const S=window.__FUP.S;return {cash:S.cash,pend:S.evPend.length,altro:S.cur.altro}}')
         assert r['cash'] == cash0 and r['pend'] == 1, r

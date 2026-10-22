@@ -1,123 +1,9 @@
-// Scenette degli eventi: piccole scene animate (160×72, mostrate a 2× sul telefono e a 3× sul computer)
-// da mettere in cima alla finestra di un evento. Disegnate con pxl (.claude/skills/pxl-pixel-art), lettere di TPAL (src/game.html).
-// Prove: ufficio, sciopero, tavolo delle trattative.
+// Scenette degli eventi (ufficio, sciopero, trattativa): piccole scene animate da 160×72 in cima alla finestra di un evento.
+// Disegnate con pxl (.claude/skills/pxl-pixel-art), lettere di TPAL (src/game.html). Colori e omini in comune.px.js.
 //
-//   node .claude/skills/pxl-pixel-art/bin/pxl.js build tools/scene_pxl/eventi.px.js --out tools/out/scene_pxl
+//   python3 tools/scene_pxl/esporta.py     (builda tutti i file e porta le scene in assets/scene/)
 
-pal({ K: "#16202e", W: "#ffffff", Y: "#ffd23f", O: "#ff7a3d", R: "#e0393e", G: "#2e9e48", B: "#5fb4f0", N: "#8a5f36", S: "#c3d0dc",
-      D: "#4a5f7a", T: "#1f9e8f", F: "#f2c79b", P: "#9b6bff", C: "#fff3c4", L: "#bfe6ff", M: "#6b3e1f",
-      y: "#c98a00", o: "#c8551f", r: "#a8262a", g: "#217a36", b: "#2f7fd6", s: "#8a96a6", d: "#2a3a50", t: "#146b61", f: "#d9946a",
-      p: "#6f43cf", q: "#e8c96a", m: "#3d2412", i: "#ffe680", a: "#ffb07a", e: "#ff8a8d", h: "#8ed15b", l: "#c8adff", u: "#5fd4c4",
-      k: "#c08a55", j: "#7f95b0", v: "#ffe2c6",
-      // in più per le scene: pelle scura, plastica beige dei computer del 2002
-      c: "#b8784a", x: "#8a5232", z: "#e3d9b8", Z: "#b5a983" })
-ramps("KdDjsSW", "KbBL", "moOa", "yYi", "KrRe", "KgGh", "xfFv", "mMNk", "tTu", "pPl", "ZzC")
-
-const SW = 160, SH = 72            // misura di ogni scenetta
-const FPS = 8, LOOP = 16           // 16 fotogrammi a 8 al secondo: un giro di 2 secondi
-
-// ================================================================ persone
-// Omini in stile «chibi» (testa grande quanto il corpo), visti di fronte. Si scrive la metà sinistra
-// (5 colonne) e mx la specchia. M capelli, F pelle, f ombra della pelle, K occhi, B giacca, b pieghe,
-// D pantaloni, K scarpe. Ogni persona cambia i colori con swap.
-const TESTE = {
-  corti: [
-    "..MMM",
-    ".MMMM",
-    "MMMMM",
-    "MMFFF",
-    "MFFFF",
-    "FFFKF",
-    "FFFKF",
-    "fFFFF",
-    ".fFFf",
-    "..fff"],
-  lunghi: [
-    "..MMM",
-    ".MMMM",
-    "MMMMM",
-    "MMMFF",
-    "MMFFF",
-    "MFFKF",
-    "MFFKF",
-    "MfFFF",
-    "MMfFf",
-    "MM.ff"],
-  calvo: [
-    "..FFF",
-    ".FFFF",
-    "MFFFF",
-    "MMFFF",
-    "MFFFF",
-    "FFFKF",
-    "FFFKF",
-    "fFFFF",
-    ".fMMM",
-    "..fff"],
-  berretto: [
-    "..RRR",
-    ".RRRR",
-    "RRRRR",
-    "rrrrr",
-    "MFFFF",
-    "FFFKF",
-    "FFFKF",
-    "fFFFF",
-    ".fFFf",
-    "..fff"],
-  nuca: [
-    "..MMM",
-    ".MMMM",
-    "MMMMM",
-    "MMMMM",
-    "MMMMM",
-    "FMMMM",
-    "FMMMM",
-    ".MMMM",
-    "..MMM",
-    "..fff"],
-  nuca_calva: [
-    "..FFF",
-    ".FFFF",
-    "FFFFF",
-    "FFFFF",
-    "MMFFF",
-    "FMMMM",
-    "FMMMM",
-    ".MMMM",
-    "..fff",
-    "..fff"],
-}
-const CORPI = {
-  piedi: [
-    ".BBBB",
-    "BBBBB",
-    "BbBBB",
-    "BbBBB",
-    "BbBBB",
-    "FbBBB",
-    ".DDDD",
-    ".DDd.",
-    ".DDd.",
-    ".KKK."],
-  seduto: [
-    ".BBBB",
-    "BBBBB",
-    "BbBBB",
-    "BbBBB",
-    "BbBBB",
-    "BbBBB"],
-}
-// giacca e cravatta, gilet ad alta visibilità: disegnati sopra al corpo (metà sinistra)
-const ABITI = {
-  completo: ["....W", "...WR", "..bBR", "..bBR"],
-  gilet:    ["", "", "", "BbSSS", "", ""],
-}
-function persona(nome, { testa = "corti", corpo = "piedi", abito, swap = {} } = {}) {
-  const righe = [...TESTE[testa], ...CORPI[corpo]]
-  const sopra = abito ? ABITI[abito].map((r, i) => [0, 10 + i, r]).filter(([, , r]) => r) : []
-  sprite("_" + nome, { mx: true, swap }, righe.join("\n"), ...sopra.map(([x, y, r]) => grid(x, y, r)))
-}
+include("comune.px.js", { palette: true })
 
 // ================================================================ UFFICIO
 // L'ufficio traffico in un pomeriggio qualunque: la finestra sulla tangenziale (passa un bilico),
@@ -287,6 +173,18 @@ scene("ufficio", { w: SW, h: SH, bg: "C", world: { light: [-0.6, -1], ground: 66
 // Davanti ai cancelli del magazzino: lo striscione, la bandiera che sventola, il delegato col megafono,
 // il pugno alzato, il bidone col fuoco (con un pallet dentro, ovviamente) e il bilico fermo che non entra.
 
+// la facciata del magazzino vista dal piazzale: cielo, pannelli, la fascia col colore dell'azienda, due portoni, l'asfalto
+function facciata() {
+  return [
+    rect(0, 0, SW, 3, "B"),
+    ellipse(30, 6, 9, 2, "W"), ellipse(118, 4, 12, 2, "W"),
+    rect(0, 9, SW, 47, "S"), ...Array.from({ length: 20 }, (_, i) => vline(i * 8 + 4, 13, 43, "s")),
+    rect(0, 8, SW, 1, "K"), rect(0, 9, SW, 4, "T"), hline(0, 12, SW, "t"),            // fascia col colore dell'azienda
+    ...[56, 104].map((x) => [rect(x, 22, 30, 34, "j"), ...[25, 29, 33, 37, 41, 45, 49, 53].map((y) => hline(x, y, 30, "s")), box(x - 1, 21, 32, 35, "D"),
+      rect(x - 3, 50, 2, 6, "K"), rect(x + 31, 50, 2, 6, "K")]).flat(),                   // portoni delle baie di carico
+    rect(0, 56, SW, 16, "D"), hline(0, 56, SW, "d"), ...[0, 24, 48, 72, 96, 120, 144].map((x) => hline(x + 4, 70, 12, "Y"))]
+}
+
 // i lavoratori in gilet ad alta visibilità
 persona("_op1", { testa: "corti", abito: "gilet", swap: { B: "Y", b: "y", M: "m" } })
 persona("_op2", { testa: "berretto", abito: "gilet", swap: { B: "O", b: "o", M: "K", F: "c", f: "x" } })
@@ -337,14 +235,7 @@ sprite("bilico_fermo", { w: 46, h: 27, outline: "K", pivot: "bottom" },
   circ(7, 23, 3, "K"), circ(15, 23, 3, "K"), circ(38, 23, 3, "K"), px(7, 23, "s"), px(15, 23, "s"), px(38, 23, "s"))
 
 scene("sciopero", { w: SW, h: SH, bg: "L", world: { light: [-0.6, -1], ground: 66 } },
-  layer("fondo",
-    rect(0, 0, SW, 3, "B"),
-    ellipse(30, 6, 9, 2, "W"), ellipse(118, 4, 12, 2, "W"),
-    rect(0, 9, SW, 47, "S"), ...Array.from({ length: 20 }, (_, i) => vline(i * 8 + 4, 13, 43, "s")),
-    rect(0, 8, SW, 1, "K"), rect(0, 9, SW, 4, "T"), hline(0, 12, SW, "t"),            // fascia col colore dell'azienda
-    ...[56, 104].map((x) => [rect(x, 22, 30, 34, "j"), ...[25, 29, 33, 37, 41, 45, 49, 53].map((y) => hline(x, y, 30, "s")), box(x - 1, 21, 32, 35, "D"),
-      rect(x - 3, 50, 2, 6, "K"), rect(x + 31, 50, 2, 6, "K")]).flat(),                   // portoni delle baie di carico
-    rect(0, 56, SW, 16, "D"), hline(0, 56, SW, "d"), ...[0, 24, 48, 72, 96, 120, 144].map((x) => hline(x + 4, 70, 12, "Y"))),
+  layer("fondo", ...facciata()),
   layer("ombre", { shade: true }, ellipse(80, 67, 70, 2, "K")),
   layer("gente", { sort: "y" },
     stamp("bilico_fermo", 21, 69),
@@ -449,4 +340,118 @@ scene("trattativa", { w: SW, h: SH, bg: "l", world: { light: { at: [80, 12] } } 
     stamp("rsu1", 66, 62), stamp("sedia_retro", 66, 69),
     stamp("rsu2", 98, 62), stamp("sedia_retro", 98, 69)),
   layer("lampada", stamp("lampada", 80, 0)),
+)
+
+// ================================================================ PIAZZALE
+// Il piazzale in un giorno qualunque: la sbarra della guardiola che si alza e si abbassa, il semaforo della baia,
+// il bilico attaccato alla baia con le porte aperte, l'autista col caffè della macchinetta, il gatto nero che guarda.
+
+// la guardiola col guardiano al finestrino
+sprite("guardiola", { w: 20, h: 30, outline: "K", pivot: "bottom" },
+  rect(0, 0, 20, 3, "D"), hline(0, 2, 20, "d"), rect(1, 3, 18, 27, "W"), vline(18, 3, 27, "S"), hline(1, 29, 18, "S"),
+  rect(3, 7, 12, 9, "L"), box(3, 7, 12, 9, "D"), hline(4, 8, 6, "W"),
+  rect(7, 11, 5, 5, "F"), hline(7, 10, 5, "d"), rect(6, 10, 7, 1, "d"), px(8, 12, "K"), px(10, 12, "K"), hline(7, 15, 5, "D"),  // il guardiano col berretto
+  rect(3, 18, 12, 2, "R"), hline(3, 19, 12, "r"))
+// la sbarra bianca e rossa: giù, su, ferma, giù
+anim("sbarra", { w: 34, h: 34, frames: LOOP, fps: FPS, outline: "K", pivot: [2, 34] }, (c) => {
+  const ANG = [0, 0, 0, 0, 0, 0, 30, 60, 84, 84, 84, 84, 84, 84, 60, 30][c.frame] * Math.PI / 180
+  c.rect(0, 20, 4, 14, "S"); c.vline(3, 20, 14, "s"); c.rect(0, 18, 4, 3, "D")
+  for (let t = 1; t <= 30; t++) {
+    const x = Math.round(2 + t * Math.cos(ANG)), y = Math.round(19 - t * Math.sin(ANG)), k = Math.floor(t / 4) % 2 ? "W" : "R"
+    c.px(x, y, k); c.px(x + (ANG > 0.7 ? 1 : 0), y + (ANG > 0.7 ? 0 : 1), k)
+  }
+})
+// il semaforo della baia: rosso, poi verde
+anim("semaforo", { w: 5, h: 9, fps: FPS, outline: "K" }, rect(0, 0, 5, 9, "d"),
+  frame({ hold: 8 }, rect(1, 1, 3, 3, "R"), px(1, 1, "e"), rect(1, 5, 3, 3, "g")),
+  frame({ hold: 8 }, rect(1, 1, 3, 3, "r"), rect(1, 5, 3, 3, "G"), px(1, 5, "h")))
+// il rimorchio visto da dietro, attaccato alla baia con le porte aperte e i pallet dentro
+sprite("rimorchio_retro", { w: 32, h: 38, outline: "K", pivot: "bottom" },
+  rect(0, 0, 32, 31, "S"), hline(0, 0, 32, "W"), vline(0, 1, 30, "W"), vline(31, 1, 30, "s"), rect(3, 3, 26, 26, "d"), rect(3, 3, 26, 3, "K"),
+  rect(5, 14, 10, 15, "k"), hline(5, 21, 10, "N"), hline(5, 28, 10, "M"), rect(17, 17, 10, 12, "O"), hline(17, 22, 10, "o"), hline(17, 28, 10, "o"),
+  rect(5, 11, 10, 3, "q"), rect(0, 31, 32, 3, "K"), rect(1, 29, 3, 2, "R"), rect(28, 29, 3, 2, "R"), rect(13, 31, 6, 2, "Y"),
+  rect(2, 34, 8, 4, "K"), rect(22, 34, 8, 4, "K"), hline(3, 35, 6, "d"), hline(23, 35, 6, "d"))
+// pila di pallet vuoti
+sprite("pallet_vuoti", { outline: "K", pivot: "bottom" }, Array.from({ length: 5 }, () => "kkkkkkkkkkkkkk\nNN....NN....NN").join("\n"))
+// il gatto nero seduto, con la coda che si muove
+anim("gatto", { w: 8, h: 10, fps: FPS, pivot: "bottom" }, grid(0, 0, `
+  K...K...
+  KK.KK...
+  KKKKK...
+  KYKYK...
+  KKKKK...
+  .KKK....
+  KKKKK...
+  KKKKK...
+  KKKKKKK.`),
+  frame({ hold: 6 }, px(7, 7, "K"), px(7, 6, "K")),
+  frame({ hold: 2 }, px(7, 7, "K"), px(7, 8, "K")),
+  frame({ hold: 6 }, px(7, 7, "K"), px(7, 6, "K")),
+  frame({ hold: 2 }, px(6, 7, "K"), px(7, 8, "K")))
+persona("_autista", { testa: "berretto", swap: { R: "B", r: "b", B: "G", b: "g", M: "K" } })
+sprite("autista", { w: 12, h: 20, outline: "K", pivot: [5, 22] }, stamp("__autista"), rect(9, 13, 3, 3, "W"), hline(9, 13, 3, "m"), px(9, 15, "F"))
+
+scene("piazzale", { w: SW, h: SH, bg: "L", world: { light: [-0.6, -1], ground: 66 } },
+  layer("fondo", ...facciata()),
+  layer("ombre", { shade: true }, ellipse(118, 66, 18, 2, "K"), ellipse(70, 67, 8, 1, "K"), ellipse(48, 67, 9, 1, "K")),
+  layer("cose", { sort: "y" },
+    stamp("guardiola", 12, 66),
+    stamp("sbarra", 24, 66),
+    stamp("pallet_vuoti", 48, 67),
+    stamp("rimorchio_retro", 119, 64),
+    stamp("autista", 72, 67),
+    stamp("gatto", 92, 69)),
+  layer("sopra", stamp("semaforo", 140, 30), stamp("vapore", 77, 58)),
+)
+
+// ================================================================ UFFICIO DI NOTTE
+// Le 3:47: l'ufficio al buio, solo la lampada da tavolo accesa. Il CEO che non dorme, tre caffè, una mail che arriva.
+
+const NOTTE = { W: "S", S: "j", C: "j", L: "j", B: "b", k: "N", q: "k", N: "M", M: "m", G: "g", h: "G", O: "o", R: "r", Y: "y", z: "Z", Z: "s", F: "f", e: "r", b: "d" }
+// la finestra di notte: stelle, luna, le Alpi scure, i fari sulla tangenziale
+anim("_finestra_buia", { w: 38, h: 30, frames: LOOP, fps: FPS },
+  rect(0, 0, 38, 30, "d"), rect(0, 7, 38, 9, "K"),
+  ...[[3, 9], [12, 11], [20, 8], [33, 10], [8, 13]].map(([x, y]) => px(x, y, "S")), circ(29, 11, 2, "C"), px(30, 10, "d"),
+  poly([0, 17, 6, 12, 10, 14, 16, 10, 22, 14, 27, 11, 33, 15, 38, 13, 38, 18, 0, 18], "D"),
+  rect(0, 18, 38, 12, "K"), rect(0, 22, 38, 3, "d"), hline(0, 21, 38, "D"),
+  (c) => { const x = Math.floor(c.phase * 52) - 6; c.px(x, 23, "Y"); c.px(x + 1, 23, "i"); const z = 40 - Math.floor(((c.phase + 0.5) % 1) * 52); c.px(z, 22, "R") },
+  rect(0, 0, 38, 7, "s"), ...[1, 3, 5].map((y) => hline(0, y, 38, "j")), hline(0, 7, 38, "D"))
+// l'orologio segna le 3:47
+sprite("orologio347", { w: 11, h: 11, outline: "K" }, circ(5, 5, 5, "j"), ring(5, 5, 5, "s"), px(5, 1, "K"), px(9, 5, "K"), px(5, 9, "K"), px(1, 5, "K"),
+  line(5, 5, 7, 6, "K"), line(5, 5, 2, 4, "K"), px(5, 5, "r"))
+// la lampada da tavolo verde
+sprite("lampada_tavolo", { w: 12, h: 12, outline: "K", pivot: "bottom" }, poly([1, 0, 11, 0, 12, 4, 0, 4], "G"), hline(1, 0, 10, "h"), hline(0, 4, 12, "g"),
+  rect(3, 5, 6, 1, "i"), vline(6, 6, 4, "q"), rect(3, 10, 7, 2, "q"), hline(3, 11, 7, "y"))
+// il CEO che non dorme: occhiaie, camicia e cravatta allentata; ogni tanto sbatte gli occhi
+persona("_insonne", { testa: "corti", corpo: "seduto", abito: "completo", swap: { B: "W", b: "S", M: "m" } })
+anim("insonne", { w: 10, h: 16, fps: FPS, outline: "K", pivot: "bottom" }, stamp("__insonne"), px(3, 7, "l"), px(6, 7, "l"), px(5, 12, "r"),
+  frame({ hold: 12 }), frame({ hold: 2 }, px(3, 5, "F"), px(6, 5, "F")), frame({ hold: 2 }))
+// la mail che arriva sopra il monitor
+anim("mail", { w: 9, h: 9, fps: FPS, outline: "K" },
+  frame({ hold: 8 }),
+  frame({ hold: 2 }, rect(0, 3, 8, 6, "W"), line(0, 3, 4, 6, "S"), line(7, 3, 4, 6, "S"), circ(7, 2, 1, "R")),
+  frame({ hold: 2 }, rect(0, 2, 8, 6, "W"), line(0, 2, 4, 5, "S"), line(7, 2, 4, 5, "S"), circ(7, 1, 1, "R")),
+  frame({ hold: 4 }, rect(0, 3, 8, 6, "W"), line(0, 3, 4, 6, "S"), line(7, 3, 4, 6, "S"), circ(7, 2, 1, "R")))
+
+scene("ufficio_notte", { w: SW, h: SH, bg: "D", world: { light: { at: [46, 36] } } },
+  layer("muro",
+    ellipse(46, 40, 30, 18, "j"),                                               // l'alone della lampada sul muro
+    rect(0, 0, SW, 3, "d"), hline(0, 3, SW, "K"),
+    rect(0, 54, SW, 2, "M"), hline(0, 54, SW, "N"), hline(0, 55, SW, "m"),
+    rect(0, 56, SW, 16, "d"), ...[59, 63, 68].map((y) => hline(0, y, SW, "K")),
+    stamp("_finestra_buia", 8, 8), stamp("finestra_cornice", 6, 6, { swap: { W: "s", S: "j" } }),
+    stamp("orologio347", 59, 7), stamp("calendario", 124, 12, { swap: NOTTE }),
+    stamp("lavagna", 76, 8, { swap: NOTTE })),
+  layer("cose", { sort: "y" },
+    stamp("pianta", 126, 66, { swap: NOTTE }),
+    stamp("boccione", 147, 66, { swap: NOTTE, frame: 0 })),
+  layer("scrivania",
+    stamp("insonne", 64, 48),
+    stamp("scrivania", 68, 68),
+    stamp("pratiche", 102, 47, { swap: { W: "S", S: "j" } }),
+    stamp("crt", 86, 47, { swap: { z: "Z", Z: "s" } }),
+    stamp("lampada_tavolo", 44, 47),
+    stamp("tazza", 52, 47), stamp("tazza", 113, 47, { swap: { R: "B", r: "b" } }), stamp("tazza", 118, 47, { swap: { R: "G", r: "g" } }),
+    stamp("vapore", 52, 42),
+    stamp("mail", 87, 25)),
 )
