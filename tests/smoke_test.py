@@ -622,12 +622,18 @@ async def main():
           [...Object.values(F.SCN_EV),...Object.values(F.SCN_SRC)].forEach(k=>{if(!F.SCENE[k]) bad.push('scena mancante: '+k);});
           for(const [k,src] of Object.entries(F.SCENE)){const im=new Image(); im.src=src; await im.decode(); if(im.naturalWidth!==2560||im.naturalHeight!==72) bad.push(k+': '+im.naturalWidth+'x'+im.naturalHeight);}
           return {bad,n:Object.keys(F.SCENE).length};}''')
-        assert not r['bad'] and r['n'] >= 24, r
+        assert not r['bad'] and r['n'] >= 38, r
         # scene in cima alle finestre: Magazzini, Tecnologia, Customer service, Direzione, Azienda e CEO (3× nelle finestre larghe, 2× nelle strette);
         # la Tecnologia è ferma senza ricerca e si muove con una ricerca in corso
-        r = await pg.evaluate('''()=>{const F=window.__FUP,out={},P={magazzini:'magazzini',tecnologia:'tecnologia',customer:'clienti',direzione:'manager',azienda:'azienda'};F.newGame('marco');F.S.researched.direzione=true;
+        r = await pg.evaluate('''()=>{const F=window.__FUP,out={},P={magazzini:'magazzini',personale:'personale',tecnologia:'tecnologia',customer:'clienti',direzione:'manager',azienda:'azienda'};F.newGame('marco');F.S.researched.direzione=true;
           const apri=tab=>{document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.ACT.toggle({id:P[tab]}); F.ACT.wtab({p:P[tab],id:tab}); return document.querySelector('#wins .win .ev-scn');};
-          for(const [tab,w] of Object.entries(F.WSCN)){const k=typeof w==='function'?w():w, d=apri(tab), i=d&&d.querySelector('i'); out[tab]=!!i&&i.dataset.scena===k&&i.getBoundingClientRect().width===(tab==='customer'?320:480);}
+          for(const [tab,w] of Object.entries(F.WSCN)){let k=typeof w==='function'?w():w; k=k.k||k; const d=apri(tab), i=d&&d.querySelector('i'); out[tab]=!!i&&i.dataset.scena===k&&i.getBoundingClientRect().width===(['customer','personale'].includes(tab)?320:480);}
+          // esterni dei magazzini: il tipo segue lo stato e le dotazioni, gli elementi compaiono sopra quando ci sono
+          const w=F.S.warehouses[0], tipi=['fatiscente','standard','moderno','freddo']; out.est8=tipi.every(t=>F.SCENE['est_'+t+'1']&&F.SCENE['est_'+t+'2']);
+          out.el6=F.EST_EL.every(([n])=>F.SCENE['el_'+n]); w.cond=30; out.fat=F.estScena(w).k.startsWith('est_fatiscente'); w.cond=100;
+          out.std=F.estScena(w).k.startsWith('est_standard')&&!F.estScena(w).el.length; w.tech.orto={day:F.S.day}; w.tech.anticoll={day:F.S.day};
+          const im=apri('magazzini').querySelector('i'); out.el=im.dataset.el==='el_giardino el_muletti'&&(im.style.backgroundImage.match(/url\(/g)||[]).length===3;
+          delete w.tech.orto; delete w.tech.anticoll;
           // l'ufficio del direttore: quattro versioni, il CEO come quello della partita
           out.dir4=['mm','mf','fm','ff'].every(x=>F.SCENE['direttore_'+x]); F.S.boss.sx='f'; out.dirF=apri('azienda').querySelector('i').dataset.scena.startsWith('direttore_f');
           F.S.boss.sx='m'; out.dirM=apri('azienda').querySelector('i').dataset.scena.startsWith('direttore_m');
