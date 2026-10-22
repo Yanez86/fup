@@ -610,6 +610,10 @@ async def main():
         await card.as_element().scroll_into_view_if_needed()
         await card.as_element().screenshot(path=os.path.join(OUT, 'shot_magazzino_immobile.png'))
         await pg.click('#win-magazzini [data-act=coop]')
+        assert not await pg.evaluate('()=>window.__FUP.S.warehouses[0].coop'), 'la cooperativa deve aspettare la conferma'
+        assert 'Conferma' in await pg.inner_text('#modal'), 'manca la conferma della cooperativa'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_conferma.png'))
+        await pg.click('#modal [data-act=okgo]')
         assert await pg.evaluate('()=>window.__FUP.S.warehouses[0].coop')
         await pg.click('#win-magazzini [data-act=hire][data-role=pick]')
         assert 'Cooperativa' in await pg.inner_text('#modal'), 'canale cooperativa mancante'
@@ -904,7 +908,7 @@ async def main():
           for(let i=0;i<20;i++){ w.morale=30; F.step(); } out.sind=w.sind&&!!w.rsu;
           w.tav=null; w.deal=null; w.tavCd=0; w.ag=70; F.riTavOpen(w); w.tav.reqs.forEach(r=>r.c='si'); w.tav.next=H.day; F.step(); out.deal=!!w.deal&&!w.tav;
           // il tavolo non si riapre a comando: dopo un tavolo saltato si aspettano tre mesi
-          w.deal=null; w.ag=70; F.riTavOpen(w); F.ACT.riquit({wh:w.id}); F.step(); out.cool=!w.tav&&w.tavCd>H.day+80;
+          w.deal=null; w.ag=70; F.riTavOpen(w); F.ACT.riquit({wh:w.id,ok:1}); F.step(); out.cool=!w.tav&&w.tavCd>H.day+80;
           // gara per l'handling: tre settimane di offerte, poi si sceglie; e ritorno al personale interno
           w.ag=20; w.tavCd=1e9; w.strike=null; const av=F.hdlAvail(w); out.av=av.length;
           if(av.length){ F.hdlTender(w); out.early=F.htPick(w,0)===null; for(let i=0;i<22;i++){ document.querySelector('#modal').innerHTML=''; F.step(); }

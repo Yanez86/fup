@@ -7784,7 +7784,10 @@ const ACT={
    {t:`Agenzia interinale · ${wks(hireDays(h.age[0],w,r))}`,e:`${eur(h.age[1])}`,f:()=>doHire(r,d.wh,hireDays(h.age[0],w,r),h.age[1])}]);
  },
  fire(d){
-  const r=d.role, x=fireOne(OFFICE.includes(r)?null:whById(d.wh),r); if(!x) return;
+  const r=d.role, w0=OFFICE.includes(r)?null:whById(d.wh);
+  if(!d.ok&&!(w0&&isCoop(w0,r))){ const sal=RAL[r]*COEF/12, wave=firesRecent()+1>=FIRE.wave;
+   return askOk(`Licenziare un ${ROLE1[r]}${w0?` a ${w0.name}`:''}?`,`Buonuscita di <b>${eur(sal)}</b> (un mese di stipendio), reputazione −0,3${w0?`, morale del magazzino −4 per un mese${riOn()?' e più agitazione':''}`:''}.${wave?' <b class="bad">Sarebbe il 4° licenziamento in 4 settimane: è un\'ondata, finisce sul giornale e il morale cala in tutti i magazzini.</b>':''}${w0&&w0.deal&&w0.deal.nofire?' <b class="bad">Hai firmato al tavolo che non avresti licenziato: l\'accordo salta.</b>':''}`,'Sì, licenzia',()=>ACT.fire({...d,ok:1})); }
+  const x=fireOne(OFFICE.includes(r)?null:whById(d.wh),r); if(!x) return;
   if(x.coop) toast(`${riOn()&&whById(d.wh).hdl?hdlName(whById(d.wh).hdl):'La cooperativa'} riprende 1 ${ROLE1[r]}: nessuna buonuscita`,'ok');
   else toast(`Licenziamento: ${eur(x.sal)} di buonuscita, morale e reputazione in calo${x.wave?'. È un\'ondata di licenziamenti!':''}`,x.wave?'bad':'warn');
   kpiNow(); renderAll();
@@ -7815,11 +7818,14 @@ const ACT={
  },
  // assunzione immediata, senza trattativa: la usano solo i test
  hiremgr(d){const m=S.managers.find(x=>x.id===d.id);delete m.arr;m.hired=true;m.raiseDay=S.day;m.unh=0;m.quit=null;toast(`${m.name} entra in azienda: assegnalo a un magazzino o alla direzione`,'ok');const w=S.warehouses.find(w=>!w.mgr);if(w){w.mgr=m.id;m.wh=w.id;}renderAll();},
- firemgr(d){const m=S.managers.find(x=>x.id===d.id);const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});if(isCs(m.id))S.cs.resp=null;m.hired=false;m.wh=null;if(m.gen)S.managers=S.managers.filter(x=>x!==m);kpiNow();renderAll();},
+ firemgr(d){const m=S.managers.find(x=>x.id===d.id); if(!m) return;
+  if(!d.ok) return askOk(`Licenziare ${m.name}?`,`Buonuscita di <b>${eur(m.ral/12*COEF)}</b>. ${m.wh||seatOf(m.id)||isCs(m.id)?'Il suo posto resta scoperto finché non nomini qualcun altro.':'Al momento non guida niente.'}${m.gen?' Esce dal giro: non potrai più richiamarlo.':''}`,'Sì, licenzia',()=>ACT.firemgr({...d,ok:1}));
+  const c=m.ral/12*COEF;S.cash-=c;S.cur.altro+=c;S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;});Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});if(isCs(m.id))S.cs.resp=null;m.hired=false;m.wh=null;if(m.gen)S.managers=S.managers.filter(x=>x!==m);kpiNow();renderAll();},
  mtab(d){UI.sel.mtab=d.id; renderWin('manager');},
  ctab(d){UI.sel.ctab=d.id; renderWin('certificazioni');},
  qualhire(){ if(!S.qual) S.qual={n:0}; if(S.qual.n>=QUAL.max||S.cash<QUAL.hire) return; S.cash-=QUAL.hire; S.cur.altro+=QUAL.hire; S.qual.n++; toast('Assunto un addetto all\'ufficio qualità','ok'); renderAll(); },
- qualfire(){ if(!S.qual||S.qual.n<=0) return; const c=Math.round(QUAL.ral*COEF/12); S.cash-=c; S.cur.altro+=c; S.qual.n--; toast(`Un addetto all'ufficio qualità lascia l'azienda: buonuscita ${eur(c)}`,'warn'); renderAll(); },
+ qualfire(d){ if(!S.qual||S.qual.n<=0) return; const c=Math.round(QUAL.ral*COEF/12);
+   if(!(d&&d.ok)) return askOk('Licenziare un addetto all\'ufficio qualità?',`Buonuscita di <b>${eur(c)}</b>. Con meno addetti gli audit vanno peggio${S.qual.n===1?' e senza nessuno niente audit interni':''}.`,'Sì, licenzia',()=>ACT.qualfire({ok:1})); S.cash-=c; S.cur.altro+=c; S.qual.n--; toast(`Un addetto all'ufficio qualità lascia l'azienda: buonuscita ${eur(c)}`,'warn'); renderAll(); },
  iaudit(d){ const w=whById(d.wh); if(!w||!(S.qual&&S.qual.n)||S.cash<QUAL.ia||w.ia!=null&&S.day-w.ia<QUAL.iaDays) return; S.cash-=QUAL.ia; S.cur.tech+=QUAL.ia; w.ia=S.day;
    const L=confOf(w).L.filter(x=>x[1]<0).sort((a,b)=>a[1]-b[1]); toast(`Audit interno a ${w.name}: conformità ${Math.round(confOf(w).v)}${L.length?`. Il punto debole: ${L[0][0].toLowerCase()}`:'. Niente da segnalare'}`,'ok'); renderAll(); },
  certact(d){const t=TECH.find(x=>x.id===d.id), w=d.wh?whById(d.wh):null, it=crec(w,t), st=certState(w,t); if(!it) return;
@@ -7879,7 +7885,9 @@ const ACT={
   const days=techDays(t); S.project={tech:t.id,left:days,total:days,cost:t.cost}; toast(`Ricerca avviata: ${t.name}, pronta tra ${wks(days)}`,'ok'); renderAll();},
  install(d){const t=TECH.find(x=>x.id===d.id), w=whById(d.wh); if(!R(t.id)||w.tech[t.id]||S.cash<t.inst||(t.tree==='wel'&&polOn('spending'))||!instReq(t,w))return; S.cash-=t.inst; S.cur[t.tree==='wel'?'welf':'tech']+=t.inst; w.tech[t.id]={day:S.day};
   toast(t.tree==='cert'?`${t.name} a ${w.name}: l'audit è fissato, certificato tra ${wks(t.weeks*7)}`:t.weeks?`${t.name} installato a ${w.name}: inizia l'apprendimento`:`${t.name} attivo a ${w.name}`,'ok'); renderAll();},
- canceltech(){ if(!S.project)return; const r=S.project.cost*0.5; S.cash+=r; S.cur.tech-=r; toast(`Ricerca annullata: rimborsati ${eur(r)}`,'warn'); S.project=null; renderAll(); },
+ canceltech(d){ if(!S.project)return; const t=TECH.find(x=>x.id===S.project.tech);
+  if(!(d&&d.ok)) return askOk(`Annullare la ricerca ${t?t.name:''}?`,`Ti tornano indietro solo <b>${eur(S.project.cost*0.5)}</b>, metà del costo, e il lavoro fatto fin qui si perde.`,'Sì, annulla',()=>ACT.canceltech({ok:1}));
+  const r=S.project.cost*0.5; S.cash+=r; S.cur.tech-=r; toast(`Ricerca annullata: rimborsati ${eur(r)}`,'warn'); S.project=null; renderAll(); },
  setdir(d,el){const v=el.value||null; Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===v)S.dirs[k]=null;}); S.dirs[d.role]=v; if(isCs(v)) S.cs.resp=null; if(v){const p=personById(v); toast(`${p.name} è il nuovo ${DIR_ROLES.find(r=>r.id===d.role).name.toLowerCase()}`,'ok');} kpiNow(); renderAll();},
  rent(d){
   const s=SITES[d.id]; const cost=2*s.rent+15000; if(S.cash<cost||siteTaken(d.id))return;
@@ -7890,6 +7898,8 @@ const ACT={
  coop(d,el){
   const w=whById(d.wh), n=w.staff.pick+w.staff.car;
   if(el.checked&&polOn('nocoop')){el.checked=false; toast('La policy Niente cooperative vieta i facchini in cooperativa','warn'); return;}
+  if(!d.ok){ const on=el.checked; el.checked=!on;
+   return askOk(on?`Passare ${w.name} alla cooperativa?`:`Riportare in casa il personale di ${w.name}?`,on?`Le ${n} persone tra magazzinieri e carrellisti passano alla cooperativa: costano il 20% in meno, ma sbagliano di più. Morale −5 per un mese e i sindacati non la prendono bene.`:`Assumi direttamente ${n} persone tra magazzinieri e carrellisti: <b>${eur(600*n)}</b> di pratiche e stipendi pieni, ma morale +5 per due mesi e meno errori.`,on?'Sì, passa alla cooperativa':'Sì, assumili',()=>ACT.coop({...d,ok:1},{checked:on})); }
   if(el.checked){w.coop=true;mod(w.id,{mor:-5*fireMul(w)},30);toast(`${w.name}: magazzinieri e carrellisti passano alla cooperativa. I sindacati non sono contenti.`,'warn');}
   else {const c=600*n;w.coop=false;S.cash-=c;S.cur.altro+=c;mod(w.id,{mor:5},60);toast(`${w.name}: ${n} persone assunte direttamente, ${eur(c)} di pratiche`,'ok');}
   kpiNow(); renderAll();
@@ -7899,15 +7909,21 @@ const ACT={
  ritab(d){UI.sel.ritab=d.id; renderWin('sindacato');},
  riwh(d){UI.sel.wh=d.id; renderWin('sindacato');},
  httender(d){ const w=whById(d.wh); if(!w) return; if(hdlTender(w)) toast(`Gara per l'handling aperta a ${w.name}: offerte fino al ${shortDate(w.ht.end)}`,'ok'); renderAll(); },
- htpick(d){ const w=whById(d.wh); if(!w) return; const o=w.ht&&w.ht.offers[+d.i], r=htPick(w,+d.i); if(!r) return;
+ htpick(d){ const w=whById(d.wh); if(!w) return; const o=w.ht&&w.ht.offers[+d.i]; if(!o) return;
+  if(!d.ok&&w.hdl!==o.id) return askOk(w.hdl?`Cambiare fornitore di handling a ${w.name}?`:`Dare l'handling di ${w.name} a ${hdlName(o.id)}?`,w.hdl?`${hdlName(w.hdl)} lascia il magazzino tra 30 giorni e arriva ${hdlName(o.id)}: con la clausola sociale passa il 70% delle persone, gli altri vanno richiesti.${hdlPenalty(w)?` Penale al vecchio fornitore: <b>${eur(hdlPenalty(w))}</b>.`:''}`:`Magazzinieri e carrellisti, oggi dipendenti tuoi, passano subito a ${hdlName(o.id)} per ${o.mo} mesi. I sindacati non sono contenti e tornare indietro costa pratiche ed eventuali penali.`,'Sì, firma',()=>ACT.htpick({...d,ok:1}));
+  const r=htPick(w,+d.i); if(!r) return;
   toast(r==='now'?`${w.name}: magazzinieri e carrellisti passano a ${hdlName(o.id)}. I sindacati non sono contenti.`:r==='next'?`Cambio d'appalto: ${hdlName(o.id)} arriva tra 30 giorni (preavviso al vecchio fornitore)`:`Contratto con ${hdlName(o.id)} rinnovato per ${o.mo} mesi`,r==='now'?'warn':'ok'); kpiNow(); renderAll(); },
  htcancel(d){ const w=whById(d.wh); if(w){ w.ht=null; renderAll(); } },
- hdlhome(d){ const w=whById(d.wh); if(!w||!w.hdl) return; hdlInternal(w); kpiNow(); renderAll(); },
+ hdlhome(d){ const w=whById(d.wh); if(!w||!w.hdl) return; const n=w.staff.pick+w.staff.car, pen=hdlPenalty(w);
+  if(!d.ok) return askOk(`Riportare in casa il personale di ${w.name}?`,`Lasci ${hdlName(w.hdl)} e assumi direttamente ${n} persone: <b>${eur(600*n)}</b> di pratiche${pen?` e <b>${eur(pen)}</b> di penale per il contratto interrotto`:''}. In cambio agitazione −25 e morale +5 per due mesi.`,'Sì, assumili',()=>ACT.hdlhome({...d,ok:1}));
+  hdlInternal(w); kpiNow(); renderAll(); },
  hdlundo(d){ const w=whById(d.wh); if(w){ w.hNext=null; renderAll(); } },
  ritavgo(d){ UI.sel.ritab='tav'; UI.sel.tavwh=d.id; openWin('sindacato'); renderWin('sindacato'); },
  rireq(d){ const w=whById(d.wh), T=w&&w.tav; if(!T) return; const r=T.reqs[+d.i]; if(!r) return; if(d.v==='tratto'&&!RI_REQ[r.id].half) return; r.c=d.v; renderWin('sindacato'); },
  ricp(d){ const w=whById(d.wh), T=w&&w.tav; if(!T) return; T.cp=T.cp===d.id?null:d.id; renderWin('sindacato'); },
- riquit(d){ const w=whById(d.wh); if(!w||!w.tav) return; riTavFail(w); renderAll(); },
+ riquit(d){ const w=whById(d.wh); if(!w||!w.tav) return;
+  if(!d.ok) return askOk(`Alzarti dal tavolo di ${w.name}?`,'Il sindacato lo prende come una porta in faccia: parte uno sciopero e il tavolo non si riapre per tre mesi.','Sì, mi alzo',()=>ACT.riquit({...d,ok:1}));
+  riTavFail(w); renderAll(); },
  riconf(){ const R0=riCo(); R0.conf=!R0.conf; toast(R0.conf?'Iscritto a Confpallet: quota ogni mese, rate più leggere e agitazione −5':'Esci da Confpallet: niente quota, ma niente sconti sulle rate','ok'); renderAll(); },
  straord(d){const w=whById(d.wh), c=straordCost(w); if(!w.staff.fm||S.cash<c||w.cond>=95)return; S.cash-=c; S.cur.altro+=c; w.cond=100; kpiNow(); toast(`${w.name}: manutenzione straordinaria fatta, stato al 100%`,'ok'); renderAll();},
  amplia(d){const w=whById(d.wh), c=expCost(w); if(!w.staff.fm||w.build||(w.exp||0)>=MAINT.expMax||S.cash<c)return; S.cash-=c; S.cur.altro+=c;
@@ -7935,6 +7951,7 @@ const ACT={
  evpause(d,el){if(HUM&&HUM.cfg) HUM.cfg.noPause=!el.checked;},
  choice(d){const f=UI.choice[+d.i];closeModal();f();renderAll();},
  closemodal(){closeModal();},
+ okgo(){const f=UI.okF; UI.okF=null; closeModal(); if(f) f(); renderAll();},
  succ(d){const c=(UI.succ||[])[+d.i]; if(!c||c.cost>S.cash) return; newBoss(c); UI.succ=null; closeModal();
    modalInfo('La Gazzetta del Muletto',`${S.boss.name} guida ${S.company.name}`,`Da oggi giochi con ${S.boss.name}: ${ageOf(S.boss)} anni, le sue abilità e i suoi talenti. ${c.k==='in'?'Il suo vecchio posto è libero: controlla i magazzini e la Direzione.':'La squadra lo accoglie con un caffè e qualche dubbio.'}`); renderAll();},
  wiki(d,el){
@@ -7971,6 +7988,10 @@ function showModal(html){if(contMode()&&!AUTO)UI.auto={due:S.day+7,f:closeModal}
 function closeModal(){$('#modal').innerHTML='';UI.auto=null;if(UI.evSpeed){setSpeed(UI.evSpeed);UI.evSpeed=0;} if((UI.mq||[]).length&&S&&!S.over) modalInfo(...UI.mq.shift());}
 function showChoice(title,text,opts){UI.choice=opts.map(o=>o.f);UI.evSpeed=S.speed;S.speed=0;renderTop();
  showModal(`<div class="src"><span>${esc(title)}</span><span></span></div><div class="win-b"><p style="margin:0">${esc(text)}</p>${opts.map((o,i)=>`<button class="opt" data-act="choice" data-i="${i}">${esc(o.t)}<small>${esc(o.e)}</small></button>`).join('')}<button class="btn" data-act="closemodal">Annulla</button></div>`);}
+// conferma per le azioni rischiose (licenziamenti, passaggi tra personale interno e fornitori esterni, tavolo sindacale...):
+// la finestra dice cosa succede e aspetta il sì; il gioco resta in pausa finché non si sceglie
+function askOk(title,html,okT,f){UI.okF=f; if(S.speed){UI.evSpeed=S.speed;S.speed=0;renderTop();}
+ showModal(`<div class="src"><span>Conferma</span><span>${shortDate(S.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:20px">${esc(title)}</h3><p style="margin:0;line-height:1.45">${html}</p><div class="row"><button class="btn" data-act="closemodal">No, lascia stare</button><button class="btn del" data-act="okgo">${esc(okT)}</button></div></div>`);}
 function toast(text,kind){
   if(isBot()||AUTO) return;  // le aziende avversarie e il recupero dell'assenza non mandano avvisi
   if(UI.evMsg){ UI.evMsg.push([text,kind||'']); return; }  // effetti di una scelta: finiscono nella notifica di com'è andata
@@ -8216,7 +8237,8 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.87',t:'Scelta dei manager',x:['Il manager di un magazzino, il responsabile del customer service e i direttori non si scelgono più da un menu a tendina: tocca «Cambia» accanto al nome e si apre una finestrella con tutti i manager della squadra, con ritratto, rango e abilità.','In cima ci sono quelli che puoi nominare, dal più adatto al posto (per i direttori e il customer service le abilità che contano sono in evidenza); sotto, in grigio, quelli che hanno già un incarico, con scritto quale: «Manager di Genova», «Direttore finanziario», «Responsabile del customer service», oppure quando arrivano.','In fondo alla finestrella «Cerca un manager» porta dritto ai candidati.']},
+ {v:'0.88',t:'Scelta dei manager',x:['Il manager di un magazzino, il responsabile del customer service e i direttori non si scelgono più da un menu a tendina: tocca «Cambia» accanto al nome e si apre una finestrella con tutti i manager della squadra, con ritratto, rango e abilità.','In cima ci sono quelli che puoi nominare, dal più adatto al posto (per i direttori e il customer service le abilità che contano sono in evidenza); sotto, in grigio, quelli che hanno già un incarico, con scritto quale: «Manager di Genova», «Direttore finanziario», «Responsabile del customer service», oppure quando arrivano.','In fondo alla finestrella «Cerca un manager» porta dritto ai candidati.']},
+ {v:'0.87',t:'Conferme',x:['Le decisioni che pesano chiedono conferma prima di partire: licenziare una persona, un manager o un addetto alla qualità, passare il magazzino alla cooperativa o a un fornitore di handling e riportare il personale in casa, alzarsi dal tavolo col sindacato, annullare una ricerca. La finestra dice cosa costa e cosa succede; «No, lascia stare» non cambia niente.','Rimandare indietro un facchino della cooperativa resta immediato: non costa niente.']},
  {v:'0.86',t:'Personale più chiaro',x:['Nelle righe piccole i ritratti del personale e dei manager non sono più rimpiccioliti a metà: si vede la testa (o il mezzo busto) disegnata a pixel interi, nitida come nelle scenette, sul computer e sul telefono.','Chi è in arrivo ha una barretta che si riempie fino al giorno in cui entra in servizio: sotto il reparto nella finestra Personale e in quella del magazzino, e nelle Assunzioni in corso, che quando c\'è qualcuno in arrivo stanno in cima alla finestra Personale. Il suggerimento della barretta dice la data esatta.']},
  {v:'0.85',t:'Eventi sull\'iPhone',x:['Sul telefono la finestra di un evento lungo non finisce più sotto l\'orologio e la batteria: parte sotto la barra di stato e la striscia sfocata dell\'iPhone, e in fondo lascia libero lo spazio del tasto Home. Titolo, fonte e data si leggono sempre.']},
  {v:'0.84',t:'Icone ridisegnate',x:['Tutte le icone del gioco sono state ridisegnate da capo, una per una: i 109 talenti, le 61 tecnologie, le 17 policy, le sei abilità, il menu, le lenti della mappa e i pulsanti. Lo stile resta quello di prima (bordo scuro, fascia più scura in basso, niente riflessi), con linee più pulite e disegni più chiari anche quando l\'icona è piccola.','Qualche soggetto nuovo, dove il vecchio si capiva poco o c\'era un doppione: Gatto in ufficio è Bancale, il gatto rosso seduto sul pallet; Mano larga offre la pizza al turno di notte; Conosce tutti al bar ha l\'insegna del bar; il Consigliere comunale ha il municipio col tricolore; il Fortunato al gratta e vinci gratta il suo biglietto; il Tifo sfegatato alza la sciarpa; Promette tutto dice «SÌ!» a tutti.','Tra le tecnologie il Regolamento aziendale diventa le tavole della legge, la Struttura direzionale una poltrona rossa, la Sicurezza muletti un muletto col lampeggiante, la Lavanderia delle divise una lavatrice e l\'HACCP un cappello da cuoco. Nel menu il Customer service ha la cuffia col microfono, e la lente Viaggi è un camion.']},
