@@ -316,6 +316,180 @@ function elCantiere() {
       stamp("gru_lampeggiante", 133, 48))]
 }
 
+// ================================================================ MENSA (x 136..159, y 30..71), al posto delle colonnine
+// La mensa esterna: a destra la palazzina bassa (continua oltre il bordo) con l'insegna della forchetta e del coltello sul tetto,
+// la tenda e la vetrata; sul fianco la canna fumaria della cucina che fuma (16 fotogrammi). A sinistra il dehors sulla pedana
+// di legno: il tavolino con l'ombrellone e un magazziniere in pausa che beve il caffè; davanti alla porta la lavagna del menù.
+
+// la pedana di legno del dehors, rialzata: le assi, il bordo davanti
+sprite("men_pedana", { w: 14, h: 11, outline: "K" },
+  rect(0, 0, 14, 11, "k"), ...[0, 3, 6].map((y) => hline(0, y, 14, "N")), rect(0, 9, 14, 2, "N"), hline(0, 10, 14, "M"))
+// la palazzina: il parapetto, la fascia col colore dell'azienda, la tenda a strisce col bordo a festoni, la vetrata col riflesso
+// del cielo e le lampade accese dentro, lo zoccolo
+sprite("men_palazzina", { w: 12, h: 14, outline: "K" },
+  rect(0, 0, 12, 14, "C"), hline(0, 0, 12, "W"), hline(0, 1, 12, "S"), hline(0, 2, 12, "s"), hline(0, 3, 12, "T"),
+  (c) => { for (let x = 0; x < 12; x++) { const k = Math.floor(x / 2) % 2 ? "W" : "T"; c.vline(x, 4, 2, k); if (x % 2 === 0) c.px(x, 6, k) } },
+  rect(0, 7, 12, 6, "L"), hline(0, 7, 12, "s"), ...[0, 4, 8].map((x) => vline(x, 7, 6, "s")), hline(0, 12, 12, "s"),
+  line(1, 9, 2, 8, "W"), line(9, 9, 10, 8, "W"), px(6, 8, "K"), px(6, 9, "i"), px(11, 8, "K"), px(11, 9, "i"),
+  hline(0, 13, 12, "z"))
+// l'insegna sul tetto: la forchetta e il coltello bianchi sul cartello rosso
+sprite("men_insegna", { w: 11, h: 9, outline: "K" },
+  rect(0, 0, 11, 9, "R"), hline(0, 8, 11, "r"),
+  grid(1, 1, ["W.W.W...W", "W.W.W..WW", "WWWWW..WW", ".WWW...WW", "..W.....W", "..W.....W", "..W.....W"].join("\n")))
+// la canna fumaria della cucina, d'acciaio, col cappello e la fascetta che la tiene al muro
+sprite("men_camino", { w: 4, h: 13, outline: "K", pivot: "bottom" },
+  hline(0, 0, 4, "s"), hline(0, 1, 4, "S"), rect(1, 2, 2, 11, "S"), vline(2, 2, 11, "s"), hline(1, 9, 2, "d"))
+// il fumo della cucina: sbuffi che salgono e piegano col vento (16 fotogrammi)
+// quattro sbuffi in fila: escono piccoli e bianchi, crescono, ingrigiscono e si sfilacciano verso sinistra
+anim("men_fumo", { w: 11, h: 5, frames: LOOP, fps: FPS }, (c) => {
+  for (const o of [0, 4, 8, 12]) {
+    const t = (c.frame + o) % 16, x = Math.round(9 - t * 0.55), y = Math.round(4 - t * 0.3)
+    if (t < 3) c.px(x, y, "W")
+    else if (t < 8) { c.hline(x, y - 1, 2, "W"); c.hline(x, y, 2, "S") }
+    else if (t < 13) { c.hline(x, y - 1, 2, "S"); c.hline(x - 1, y, 3, "S"); c.px(x + 1, y, "j") }
+    else { c.px(x, y - 1, "S"); c.px(x - 1, y, "j"); c.px(x + 1, y, "j") }
+  }
+})
+// l'ombrellone a spicchi bianchi e rossi col pomolo in cima, l'asta che scende nel tavolino
+sprite("men_ombrellone", { w: 13, h: 20, outline: "K", pivot: "bottom" },
+  poly([3, 1, 9, 1, 12, 4, 0, 4], "R"), hline(5, 0, 3, "R"),
+  (c) => { for (let y = 0; y < 5; y++) for (let x = 0; x < 13; x++) if (c.is(x, y, "R") && Math.floor((x + 1) / 3) % 2) c.px(x, y, "W") },
+  hline(0, 4, 13, "r"), (c) => { for (let x = 1; x < 13; x += 3) c.px(x, 4, "W") },
+  vline(6, 5, 15, "S"))
+// il magazziniere in pausa, seduto, col gilet giallo
+persona("_commensale", { corpo: "seduto", abito: "gilet", swap: { B: "Y", b: "y", M: "N" } })
+// ogni tanto sbatte le palpebre (16 fotogrammi)
+anim("men_commensale", { w: 10, h: 16, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
+  stamp("__commensale"), (c) => { if (c.frame === 13 || c.frame === 14) { c.px(3, 5, "F"); c.px(6, 5, "F") } })
+// il tavolino con la tovaglia a quadretti bianchi e rossi che scende fin quasi alla pedana
+sprite("men_tavolino", { w: 13, h: 7, outline: "K", pivot: "bottom" },
+  hline(0, 0, 13, "W"), hline(0, 1, 13, "S"),
+  (c) => { for (let y = 2; y < 7; y++) for (let x = 0; x < 13; x++) c.px(x, y, (Math.floor(x / 2) + Math.floor((y - 2) / 2)) % 2 ? "W" : "R") },
+  hline(0, 6, 13, "r"), (c) => { for (let x = 1; x < 13; x += 2) if (c.is(x, 6, "r")) c.px(x, 6, "S") })
+// la tazzina del caffè
+sprite("men_tazzina", { w: 3, h: 2, outline: "K", pivot: "bottom" }, hline(0, 0, 3, "m"), hline(0, 1, 3, "W"))
+// il vapore del caffè: un filo che sale ondeggiando (8 fotogrammi)
+anim("men_vapore", { w: 3, h: 4, frames: LOOP, fps: FPS },
+  (c) => { const t = c.frame % 8; if (t < 6) c.px(1 + [0, 1, 1, 0, -1, -1][t], 3 - Math.floor(t * 2 / 3), t < 3 ? "W" : "S") })
+// la lavagna del menù sul cavalletto: due righe scritte col gesso
+sprite("men_lavagna", { w: 6, h: 9, outline: "K", pivot: "bottom" },
+  rect(0, 0, 6, 7, "N"), rect(1, 1, 4, 5, "d"), hline(1, 2, 3, "W"), hline(2, 4, 3, "S"),
+  px(0, 7, "N"), px(0, 8, "N"), px(5, 7, "N"), px(5, 8, "N"))
+
+function elMensa() {
+  return [
+    layer("mensa",
+      stamp("men_camino", 146, 48),
+      stamp("men_palazzina", 147, 40),
+      stamp("men_insegna", 148, 30)),
+    layer("mensa_fumo", { unlit: true }, stamp("men_fumo", 136, 30)),
+    layer("mensa_dehors",
+      stamp("men_pedana", 136, 59),
+      stamp("men_ombrellone", 143, 65),
+      stamp("men_commensale", 143, 69),
+      stamp("men_tavolino", 143, 70),
+      stamp("men_tazzina", 147, 63),
+      stamp("men_lavagna", 155, 71)),
+    layer("mensa_vapore", { unlit: true }, stamp("men_vapore", 146, 57))]
+}
+
+// ================================================================ PARCHEGGIO DEI CAMION (x 24..59, y 58..71), al posto dell'area cani
+// Il parcheggio recintato dei camion: la motrice parcheggiata di muso tra le strisce bianche, il posto libero accanto, la rete
+// coi paletti, il lampione col cartello blu della P. In cabina l'autista dorme (le Z salgono, 16 fotogrammi), le quattro frecce
+// accese (8 fotogrammi), la lampada del lampione che ogni tanto sfarfalla.
+
+// il piazzale d'asfalto coi posti tracciati in bianco, un po' dall'alto (le righe si aprono verso di noi)
+sprite("par_piazzola", { w: 36, h: 14 }, rect(0, 0, 36, 14, "D"), hline(0, 0, 36, "d"), line(7, 3, 6, 13, "W"), line(27, 3, 28, 13, "W"),
+  ellipse(32, 10, 2, 1, "d"), px(30, 9, "d"))                                            // la macchia d'olio sul posto libero
+// la rete di recinzione dietro: i paletti, il tubo in cima, il filo teso più in basso
+sprite("par_rete", { w: 36, h: 4 },
+  hline(0, 0, 36, "s"), hline(0, 2, 36, "j"), ...[0, 7, 14, 21, 28, 35].map((x) => [vline(x, 0, 4, "s"), px(x, 0, "S"), px(x, 3, "d")]).flat())
+// la motrice vista di muso: lo spoiler sul tetto, il parabrezza, la calandra, i fari, il paraurti, le gomme, gli specchi sui bracci.
+// In cabina l'autista dorme con la testa sul finestrino; le quattro frecce lampeggiano (8 fotogrammi)
+const MOTRICE = [
+  ".....eeeeeee.....",
+  "....RRRRRRRRR....",
+  "...eeeeeeeeeee...",
+  "...RdddddddddR...",
+  "...RLLLLLLLLLR...",
+  "...RLLLLLLLLLR...",
+  "...RLLLLLLLLLR...",
+  "...RsdsdsWsdsR...",
+  "...RdsdsdsdsdR...",
+  "...OYRRRRRRRYO...",
+  "...ddddddddddd...",
+  "....KKK...KKK...."]
+anim("par_motrice", { w: 17, h: 12, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
+  grid(0, 0, MOTRICE.join("\n")),
+  line(4, 6, 6, 4, "W"),                                                                  // il riflesso sul parabrezza
+  hline(9, 4, 3, "N"), rect(9, 5, 2, 2, "F"), px(11, 5, "N"), px(9, 5, "f"), px(8, 6, "G"),   // l'autista che dorme, la testa sul finestrino
+  layer("specchi", { outline: false }, vline(0, 4, 4, "K"), px(1, 5, "K"), vline(16, 4, 4, "K"), px(15, 5, "K"), px(0, 5, "j"), px(16, 5, "j")),
+  (c) => { const on = c.frame % 8 < 4; c.px(3, 9, on ? "a" : "o"); c.px(13, 9, on ? "a" : "o") })
+// le Z dell'autista che dorme: escono dal finestrino e salgono, prima piccole poi grandi (16 fotogrammi)
+anim("par_zeta", { w: 8, h: 8, frames: LOOP, fps: FPS }, (c) => {
+  for (const o of [0, 8]) {
+    const t = (c.frame + o) % 16; if (t >= 12) continue
+    const big = t >= 6, x = Math.floor(t / 3), y = 7 - Math.floor(t / 2) - (big ? 3 : 2)
+    c.grid(x, y, big ? "WWWW\n..W.\n.W..\nWWWW" : "WWW\n.W.\nWWW")
+  }
+})
+// il lampione del parcheggio: il braccio con la lampada, il cartello blu della P sul palo; la lampada ogni tanto sfarfalla
+const LAMPADA = "1111111111101111"
+anim("par_lampione", { w: 7, h: 12, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
+  vline(0, 0, 12, "s"), hline(0, 0, 7, "S"), hline(3, 1, 4, "s"), hline(0, 11, 2, "s"),
+  rect(2, 3, 5, 7, "B"), hline(2, 3, 5, "L"), hline(2, 9, 5, "b"), grid(3, 4, "WWW\nW.W\nWWW\nW..\nW.."),
+  (c) => { const on = LAMPADA[c.frame] === "1"; c.hline(3, 1, 4, on ? "i" : "s"); if (on) c.px(5, 1, "W") })
+
+function elParcheggio() {
+  return [
+    layer("parcheggio_piazzola", stamp("par_piazzola", 24, 58)),
+    layer("parcheggio_rete", stamp("par_rete", 24, 58)),
+    layer("parcheggio", stamp("par_motrice", 42, 72), stamp("par_lampione", 28, 72)),
+    layer("parcheggio_zeta", { unlit: true }, stamp("par_zeta", 53, 58))]
+}
+
+// ================================================================ PIAZZALE ESTERNO (x 104..135, y 56..71), al posto del pulmino
+// Il piazzale coperto: la tettoia di lamiera col colore dell'azienda sui pilastri d'acciaio, sotto la pila di pallet vuoti;
+// davanti una pila coperta dal telone blu legato male (l'angolo sbatte col vento, 16 fotogrammi), il cassone verde dei rifiuti
+// col cartone e il legno che spuntano.
+
+// l'ombra sotto la tettoia
+sprite("pia_ombra", { w: 16, h: 11 }, rect(0, 0, 16, 11, "d"), hline(0, 10, 16, "D"))
+// la tettoia: la lamiera grecata vista di testa (le onde), la grondaia, i due pilastri con la fascia gialla e nera in basso
+sprite("pia_tettoia", { w: 18, h: 14, outline: "K", pivot: "bottom" },
+  rect(0, 0, 18, 2, "T"), (c) => { for (let x = 0; x < 18; x += 2) c.px(x, 0, "u") }, hline(0, 2, 18, "t"),
+  vline(1, 3, 11, "S"), vline(16, 3, 11, "S"), ...[1, 16].map((x) => [px(x, 10, "Y"), px(x, 11, "K"), px(x, 12, "Y")]).flat())
+// una pila di pallet vuoti (2 righe l'uno: le assi, i blocchetti)
+function pila(nome, n) {
+  sprite(nome, { w: 10, h: 2 * n, outline: "K", pivot: "bottom" },
+    ...Array.from({ length: n }, (_, i) => [hline(0, 2 * i, 10, "k"), grid(0, 2 * i + 1, "NN..NN..NN")]).flat(), hline(0, 0, 10, "q"))
+}
+pila("pia_pila5", 5)
+// il telone blu sopra una pila di pallet: le pieghe, la corda, l'angolo libero che si alza e sbatte (16 fotogrammi)
+const RAFFICA = [0, 0, 1, 2, 3, 3, 2, 1, 0, 0, 0, 1, 2, 1, 0, 0]
+anim("pia_telone", { w: 11, h: 9, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" }, (c) => {
+  c.rect(0, 3, 11, 5, "B"); c.hline(0, 3, 11, "L"); c.vline(4, 4, 4, "b"); c.vline(8, 4, 4, "b"); c.hline(0, 7, 11, "b")
+  c.hline(0, 5, 11, "N")                                                                    // la corda
+  c.hline(0, 8, 11, "k"); c.grid(0, 8, "N..NN..N.NN".replace(/\./g, "."))                  // i pallet che spuntano sotto
+  const a = RAFFICA[c.frame]                                                                // l'angolo libero in alto a destra
+  if (a) { c.poly([7, 3, 10, 3 - a, 10, 3], "L"); c.line(7, 3, 10, 3 - a, "B") }
+})
+// il cassone dei rifiuti: verde, la testata inclinata, le costole, il cartone e il legno che spuntano
+sprite("pia_cassone", { w: 12, h: 9, outline: "K", pivot: "bottom" },
+  rect(2, 0, 4, 2, "k"), hline(2, 0, 4, "q"), rect(7, 0, 3, 2, "N"), hline(7, 0, 3, "k"),
+  poly([0, 2, 11, 2, 11, 7, 2, 7], "G"), hline(0, 2, 12, "h"), ...[4, 7, 10].map((x) => vline(x, 3, 4, "g")),
+  hline(1, 7, 11, "d"), rect(2, 8, 2, 1, "K"), rect(9, 8, 2, 1, "K"))
+
+function elPiazzale() {
+  return [
+    layer("piazzale_ombra", stamp("pia_ombra", 106, 60)),
+    layer("piazzale", { sort: "y" },
+      stamp("pia_tettoia", 114, 72),
+      stamp("pia_pila5", 111, 71),
+      stamp("pia_telone", 122, 72),
+      stamp("pia_cassone", 129, 70))]
+}
+
 // ================================================================ le scene
 scene("el_giardino", { w: SW, h: SH, world: MONDO }, ...elGiardino())
 scene("el_cani", { w: SW, h: SH, world: MONDO }, ...elCani())
@@ -323,6 +497,9 @@ scene("el_colonnine", { w: SW, h: SH, world: MONDO }, ...elColonnine())
 scene("el_muletti", { w: SW, h: SH, world: MONDO }, ...elMuletti())
 scene("el_pulmino", { w: SW, h: SH, world: MONDO }, ...elPulmino())
 scene("el_cantiere", { w: SW, h: SH, world: MONDO }, ...elCantiere())
+scene("el_mensa", { w: SW, h: SH, world: MONDO }, ...elMensa())
+scene("el_parcheggio", { w: SW, h: SH, world: MONDO }, ...elParcheggio())
+scene("el_piazzale", { w: SW, h: SH, world: MONDO }, ...elPiazzale())
 
 // ================================================================ prova (fuori dal gioco)
 // un esterno finto semplice nel riquadro della pianta, con tutti gli elementi sopra
@@ -337,3 +514,7 @@ function esternoFinto() {
 scene("prova_elementi", { w: SW, h: SH, bg: "L", world: MONDO },
   layer("esterno", ...esternoFinto()),
   ...elCantiere(), ...elGiardino(), ...elColonnine(), ...elCani(), ...elMuletti(), ...elPulmino())
+// la versione con tutte le dotazioni: mensa, parcheggio dei camion e piazzale esterno al posto di colonnine, area cani e pulmino
+scene("prova_elementi2", { w: SW, h: SH, bg: "L", world: MONDO },
+  layer("esterno", ...esternoFinto()),
+  ...elCantiere(), ...elGiardino(), ...elMensa(), ...elParcheggio(), ...elMuletti(), ...elPiazzale())
