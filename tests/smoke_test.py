@@ -247,7 +247,16 @@ async def phone(b, w, h, name, errs):
             await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{tb}.png'))
         await pg.tap(f'#win-{wn} [data-act=close]')
     # progetto di un magazzino da costruire su un terreno (scheda Nuovo magazzino)
-    await pg.evaluate("()=>{const F=window.__FUP; F.S.cash=2e6; F.ACT.site({id:'l_vercelli'});}")
+    # scheda di un capannone sopra l'elenco: immagine a strati (edificio della sua classe e le sue dotazioni), numeri e dotazioni
+    await pg.evaluate("()=>{const F=window.__FUP; F.S.cash=2e6; F.ACT.site({id:'bologna'});}")
+    sc = await pg.evaluate('''()=>{const i=document.querySelector('#modal .cap-img i'); return {img:!!i&&(i.style.backgroundImage.match(/url\(/g)||[]).length,elenco:!!document.querySelector('#win-magazzini .es-k'),dot:document.querySelectorAll('#modal .dt-r').length};}''')
+    assert sc['elenco'] and sc['img'] >= 8 and sc['dot'] == 11, f'{name}: scheda del capannone {sc}'
+    assert await pg.evaluate(FITS, '#modal .modal'), f'{name}: la scheda del capannone esce dallo schermo'
+    bad = await pg.evaluate(NOSIDE, '#modal .modal')
+    assert not bad, f'{name}: scheda del capannone: {bad}'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_capannone.png'))
+    await pg.tap('#modal [data-act=closemodal]')
+    await pg.evaluate("()=>{window.__FUP.ACT.edsel({id:'l_vercelli'});}")
     assert await pg.query_selector('#win-magazzini .ed-box'), f'{name}: manca il progetto del nuovo magazzino'
     assert await pg.evaluate(FITS, '#win-magazzini'), f'{name}: il progetto del magazzino esce dallo schermo'
     bad = await pg.evaluate(NOSIDE, '#win-magazzini')
@@ -638,12 +647,23 @@ async def main():
           F.fuocoStart(w); o.fuoco=S.notes.some(n=>n.k==='ev'&&n.ev.id==='incendio');
           w.cl='vec'; F.ACT.rist({wh:w.id,ok:1}); o.rist=!!w.build&&w.build.k==='rist'&&w.build.to==='std'; w.build.left=1; F.stepOne(); o.std=w.cl==='std';
           o.taken=!F.siteOpen(w.site)&&!F.rentable('l_casale')&&!F.siteOpen('landriano');
-          F.ACT.site({id:'l_casale'}); o.box=!!document.querySelector('#win-magazzini .ed-box');
+          F.ACT.site({id:'l_casale'}); o.lotto=!!document.querySelector('#modal .sc [data-act=edsel]'); document.querySelector('#modal [data-act=edsel]').click(); o.box=!!document.querySelector('#win-magazzini .ed-box')&&!document.querySelector('#modal').innerHTML;
           F.ACT.edgo({ok:1}); o.cantiere=S.cantieri.length===1&&!F.siteOpen('l_casale');
           S.cantieri[0].left=1; F.stepOne(); const n=S.warehouses.find(x=>x.site==='l_casale'); o.nuovo=!!n&&n.own&&n.cl==='mod'&&!!n.dot.ribalte&&n.cap===3000;
           F.ACT.openwh({id:w.id}); F.renderAll(); return o;}''')
         assert all(im.values()), f'immobile: {im}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_magazzino_dotazioni.png'))
+        # elenco dei capannoni a schede e scheda con l'immagine; «Affitta» dalla scheda la chiude e apre il magazzino
+        await pg.evaluate("()=>{window.__FUP.ACT.openwh({id:window.__FUP.S.warehouses[0].id}); window.__FUP.ACT.site({id:'castelsg'});}")
+        assert not await pg.query_selector('#modal .cap-img'), 'Castel San Giovanni non deve esserci prima del 2004'
+        await pg.evaluate("()=>{document.querySelector('#modal').innerHTML=''; window.__FUP.ACT.site({id:'orio'});}")
+        await pg.screenshot(path=os.path.join(OUT, 'shot_capannone.png'))
+        ca = await pg.evaluate('''()=>{const F=window.__FUP,n=F.S.warehouses.length; document.querySelector('#modal [data-act=rent]').click();
+          return {n:F.S.warehouses.length-n,chiusa:!document.querySelector('#modal').innerHTML,orio:F.S.warehouses.some(w=>w.site==='orio'&&w.cl==='mod'&&!!w.dot.sprinkler)};}''')
+        assert all(ca.values()) and ca['n'] == 1, f'affitto dalla scheda: {ca}'
+        await pg.evaluate("()=>{window.__FUP.ACT.wtab({p:'magazzini',id:'espansione'});}")
+        await pg.screenshot(path=os.path.join(OUT, 'shot_espansione.png'))
+        await pg.evaluate("()=>{const F=window.__FUP; F.ACT.wtab({p:'magazzini',id:'magazzini'}); F.ACT.openwh({id:F.S.warehouses[0].id});}")
         await pg.evaluate(CLEAR)
         await pg.click('#win-magazzini [data-act=coop]')
         assert not await pg.evaluate('()=>window.__FUP.S.warehouses[0].coop'), 'la cooperativa deve aspettare la conferma'
