@@ -862,3 +862,442 @@ anim("_ed_innovativo2", { w: SW, h: SH, frames: LOOP, fps: FPS, outline: "K" }, 
 esterno("est_innovativo1", { nuvole: [[12, 10, 7], [74, 4, 10], [148, 9, 9]] }, { dietro: [stamp("_pala", 35, 0)] })
 
 esterno("est_innovativo2", { nuvole: [[12, 12, 8], [46, 3, 8], [148, 8, 9]] }, { cose: [stamp("_drone", 76, -2)] })
+
+// ================================================================ STRATI ATTACCATI ALL'EDIFICIO (el_sol_*, el_rib_*, el_spr_*)
+// Tre dotazioni che stanno addosso al capannone: una scena trasparente per ogni esterno, che il gioco mette sopra l'esterno
+// e sotto gli elementi delle zone (nell'ordine: solare, ribalte, antincendio).
+//   el_sol_<esterno>  i pannelli solari sul tetto, che ne seguono il profilo (piatto, a capanna, a botte, a denti di sega);
+//                     non c'è dove l'esterno li ha già disegnati (moderni e innovativi). Un riflesso passa sui pannelli.
+//   el_rib_<esterno>  le ribalte davanti ai portoni a raso: il molo di cemento alla quota del pianale (la riga 50, come il
+//                     molo degli altri esterni), il labbro del piano mobile a strisce gialle e nere, i respingenti, il semaforo
+//                     della baia. Solo dove i portoni arrivano a terra senza ribalta (fatiscenti e vecchio1).
+//   el_spr_<esterno>  l'antincendio: la cisterna dell'acqua (lamiera rossa o zincata, la scala alla marinara, la luce in cima)
+//                     e il locale pompe col camino della motopompa (davanti alla cisterna), dietro al capannone in x 90..135
+//                     (contorno compreso): si vedono solo sopra il tetto. Dove c'è un muro libero, la cassetta rossa
+//                     dell'idrante sulla facciata.
+// Ogni strato si ricava dalla FORMA del suo esterno: i corpi con gli stessi parametri di capannone() negli anim _ed_ (quindi
+// lo stesso profilo del tetto) e le cose che spuntano sopra il tetto, da non coprire. Se cambi un capannone, cambia anche qui.
+
+// la riga dove comincia l'esterno, colonna per colonna: il contorno sopra il tetto o sopra ciò che ci spunta; più su c'è il cielo.
+// corpi: [tetto, x0, x1, top, alza, denti, sopra] come in capannone() («sopra»: le righe del prato sul bordo dei tetti verdi);
+// sporge: [x0, x1, riga] la prima riga di ciò che spunta sopra il tetto (bandiere, piccioni, insegne, gruppi frigo, camini...)
+function linea({ corpi, sporge = [] }) {
+  const P = corpi.map(([tetto, x0, x1, top, alza = 0, denti = 4, sopra = 0]) => [x0, x1, profilo(tetto, x0, x1, top, alza, denti), sopra])
+  return (x) => {
+    let y = SH
+    for (const [x0, x1, cima, sopra] of P) if (x >= x0 && x <= x1) y = Math.min(y, cima(x) - 1 - sopra)
+    for (const [x0, x1, r] of sporge) if (x >= x0 && x <= x1) y = Math.min(y, r)
+    return y
+  }
+}
+// le volte dei lucernari e le testate dei tegoli di vecchio1, come cose che spuntano dal tetto
+const VOLTINE = [...TEGOLI.map((t) => [t, t + 1, 21]), ...TEGOLI.slice(0, -1).flatMap((t) => VOLTA.map((h, i) => [t + 2 + i, t + 2 + i, 24 - h]))]
+
+// sol: i tratti di tetto [x0, x1, quota?, largo?] coi pannelli (quota: su un telaio a quella riga, sopra le volte; largo: dei pannelli)
+// rib: i moli [x0, x1, [[x, largo] dei piani mobili]] e i semafori [x, y, fase]
+// spr: cisterna [x, largo, cima, lamiera], pompe [x, largo, cima], idrante [x, y] (la cassetta sulla facciata), vapore (il fumo
+//      dell'esterno che passa davanti alla cisterna, ridisegnato sopra solo dove c'è la cisterna)
+const FORME = {
+  standard1: { corpi: [["piatto", 50, 134, 16], ["piatto", 25, 48, 24]], sporge: [[27, 41, 5]],
+    sol: [[51, 105], [31, 47]],
+    spr: { cisterna: [117, 14, 2, "rosso"], pompe: [108, 8, 8], idrante: [126, 37] } },
+  standard2: { corpi: [["capanna", 25, 103, 28, 14], ["piatto", 104, 134, 30]],
+    sporge: [[29, 41, 23], [86, 99, 23], [105, 107, 6], [120, 122, 6]],
+    sol: [[42, 62], [66, 79], [108, 119], [123, 134]],
+    spr: { cisterna: [91, 12, 4, "rosso"], pompe: [94, 7, 14], idrante: [93, 40] } },
+  fatiscente1: { corpi: [["botte", 26, 133, 31, 18]], sporge: [[59, 68, 7], [83, 92, 6], [99, 108, 8]],
+    sol: [[31, 58], [69, 82], [93, 98]],
+    rib: { moli: [[61, 98, [[65, 12], [83, 12]]]], semafori: [[57, 41, 0], [99, 41, 1]] },
+    spr: { cisterna: [117, 14, 3, "rosso"], pompe: [109, 7, 9], idrante: [127, 45] } },
+  fatiscente2: { corpi: [["shed", 25, 134, 27, 13, 4]], sporge: [[49, 59, 9], [60, 74, 12], [77, 85, 8], [117, 125, 14]],
+    sol: [[27, 47], [110, 116], [126, 134]],
+    rib: { moli: [[70, 103, [[74, 11], [90, 11]]]], semafori: [[65, 39, 0]] },
+    spr: { cisterna: [91, 13, 3, "rosso"], pompe: [97, 7, 13], idrante: [129, 32] } },
+  vecchio1: { corpi: [["piatto", 38, 111, 25], ["piatto", 113, 134, 20], ["piatto", 25, 36, 41]],
+    sporge: [...VOLTINE, [111, 112, 19], [64, 71, 13], [101, 108, 13], [124, 131, 13], [28, 33, 12]],
+    sol: [[40, 62, 18], [73, 88, 18]],
+    rib: { moli: [[40, 63, [[45, 14]]], [86, 109, [[91, 14]]]], semafori: [[64, 38, 0], [109, 38, 1]] },
+    spr: { cisterna: [110, 13, 2, "rosso"], pompe: [91, 7, 12], idrante: [80, 44] } },
+  vecchio2: { corpi: [["piatto", 59, 134, 25], ["piatto", 25, 57, 18]],
+    sporge: [[72, 114, 6], [58, 58, 17], [27, 34, 6], [46, 53, 11]],
+    sol: [[60, 71, undefined, 5], [35, 45]],
+    spr: { cisterna: [122, 13, 3, "rosso"], pompe: [115, 6, 14] } },
+  moderno1: { corpi: [["piatto", 52, 134, 10], ["piatto", 25, 51, 19]], sporge: [[53, 130, 6]],
+    spr: { cisterna: [114, 14, 1, "zincato"], idrante: [127, 27] } },
+  moderno2: { corpi: [["piatto", 25, 57, 8], ["piatto", 58, 134, 24], ["piatto", 107, 134, 31]], sporge: [[59, 130, 20]],
+    spr: { cisterna: [112, 14, 3, "zincato"], pompe: [127, 8, 12] } },
+  innovativo1: { corpi: [["piatto", 25, 134, 12, 0, 4, 3]], sporge: [[55, 97, 5], [100, 108, 4], [121, 126, 5]],
+    spr: { cisterna: [109, 12, 0, "zincato"] } },
+  innovativo2: { corpi: [["rampa", 25, 134, 21, 13, 4, 3]], sporge: [[114, 122, 12]],
+    spr: { cisterna: [122, 13, 3, "zincato"], pompe: [107, 7, 8] } },
+  freddo1: { corpi: [["piatto", 25, 134, 19]], sporge: [[31, 61, 8], [68, 73, 12], [94, 99, 11], [107, 128, 8]],
+    sol: [[62, 68, undefined, 7], [73, 92]],
+    // il vapore del camino passa davanti alla cisterna: lo strato lo ridisegna sopra (stessa chiamata di est_freddo1)
+    spr: { cisterna: [100, 13, 2, "zincato"], pompe: [129, 6, 11],
+      vapore: (c) => c.plume(96, 11, "WSj", { every: 2, life: 16, rise: 12, size: [1, 3], wind: 0.3 }) } },
+  freddo2: { corpi: [["piatto", 72, 134, 14], ["piatto", 25, 71, 30]], sporge: [[79, 100, 6], [26, 69, 19]],
+    sol: [[101, 120]],
+    spr: { cisterna: [122, 13, 3, "zincato"], idrante: [105, 40] } },
+}
+
+// i pannelli solari: file di pannelli larghi 6 (lo stacco tra l'uno e l'altro è il contorno), appoggiati sul tetto col contorno
+// di sotto che cade sul contorno del capannone. Su un tratto piatto il pannello inclinato si vede per tre righe (la cornice chiara
+// in cima, il cielo riflesso in un punto), sulle falde e sulle curve due righe che seguono il profilo; «quota» li alza su un
+// telaio con le gambe che scendono al tetto. Il riflesso del sole li attraversa da sinistra a destra in 16 fotogrammi.
+function pannelli(c, lin, campi) {
+  let xa = SW, xb = 0
+  for (const [a, b, quota, l = 6] of campi) {
+    const n = Math.floor((b - a + 2) / (l + 1)), x0 = a + Math.floor((b - a + 2 - (l + 1) * n) / 2)
+    for (let i = 0; i < n; i++) {
+      const p = x0 + (l + 1) * i, fondo = (x) => quota ?? lin(x) - 1
+      const piatto = Array.from({ length: l }, (_, d) => fondo(p + d)).every((y) => y === fondo(p)), h = piatto ? 3 : 2
+      for (let x = p; x < p + l; x++) { c.vline(x, fondo(x) - h + 1, h, "b"); c.px(x, fondo(x) - h + 1, "B") }
+      if (piatto) c.px(p + 1, fondo(p) - 1, "L")
+      if (quota !== undefined) for (const x of [p + 1, p + l - 2]) if (lin(x) - 1 > quota) c.vline(x, quota + 1, lin(x) - 1 - quota, "d")
+      xa = Math.min(xa, p); xb = Math.max(xb, p + l - 1)
+    }
+  }
+  const s = xa - 4 + Math.floor(c.frame * (xb - xa + 8) / LOOP)
+  for (let x = s; x < s + 2; x++) for (let y = 0; y < SH; y++) { const k = { B: "W", b: "B", L: "W" }[c.key(x, y)]; if (k) c.px(x, y, k) }
+}
+
+// la cisterna dell'antincendio: un cilindro di lamiera preso dalla luce a sinistra (rossa, o zincata con la fascia rossa), le
+// giunture delle virole, il tetto a cono basso, la scala alla marinara sul lato in ombra col corrimano che esce sopra il tetto,
+// la luce di segnalazione in cima (si accende due fotogrammi su sedici). Disegnata fino a terra: la taglia il tetto.
+const LAMIERE = {
+  rosso:   { luce: "e", base: "R", ombra: "r", giunto: "r", tetto: "R", tettoOmbra: "r" },
+  zincato: { luce: "W", base: "S", ombra: "s", giunto: "s", tetto: "S", tettoOmbra: "s", fascia: ["R", "r"] },
+}
+function cisterna(c, x0, w, top, lamiera) {
+  const L = LAMIERE[lamiera], ombra = x0 + w - 4
+  c.hline(x0 + 2, top, w - 4, L.tetto); c.hline(x0 + 1, top + 1, w - 2, L.tetto)
+  c.hline(ombra, top, 2, L.tettoOmbra); c.hline(ombra, top + 1, 3, L.tettoOmbra)
+  for (let x = x0; x < x0 + w; x++) {
+    const k = x >= ombra ? L.ombra : x === x0 + 1 || x === x0 + 2 ? L.luce : L.base
+    c.vline(x, top + 2, SH - top - 2, k)
+    for (let y = top + 6; y < SH; y += 5) if (x < ombra) c.px(x, y, L.giunto)
+  }
+  if (L.fascia) { c.rect(x0, top + 3, w, 2, L.fascia[0]); c.hline(ombra, top + 3, 4, L.fascia[1]); c.hline(ombra, top + 4, 4, L.fascia[1]) }
+  // la scala alla marinara: i montanti, i pioli, il corrimano a ponte sopra il bordo del tetto
+  const sx = x0 + w - 5
+  c.vline(sx, top - 1, SH, "S"); c.vline(sx + 2, top - 1, SH, "S"); c.hline(sx, top - 2, 3, "S")
+  for (let y = top + 1; y < SH; y += 2) c.px(sx + 1, y, "s")
+  // la luce sull'asta in cima
+  const cx = x0 + Math.floor(w / 2) - 2, ly = Math.max(0, top - 2)       // sui tetti alti la cisterna tocca il bordo: la luce sta sul cono
+  if (ly < top - 1) c.px(cx, top - 1, "s")
+  c.px(cx, ly, c.frame < 2 ? "e" : "r")
+}
+// il locale pompe: il box di pannelli con la gronda presa dalla luce, la fascia rossa, la griglia d'aerazione, il camino della
+// motopompa col cappello e la lucina verde «in servizio» sul tetto (al suo momento del giro)
+function locale_pompe(c, x0, w, top) {
+  c.rect(x0, top + 1, w, SH, "S"); c.vline(x0 + w - 1, top + 1, SH, "s"); c.hline(x0, top, w, "W")
+  c.rect(x0, top + 2, w, 2, "R"); c.hline(x0, top + 3, w, "r")
+  c.rect(x0 + 1, top + 5, 3, 3, "d"); c.hline(x0 + 1, top + 6, 3, "s")
+  c.vline(x0 + w - 2, top - 3, 3, "s"); c.hline(x0 + w - 3, top - 4, 3, "d")
+  c.px(x0 + 1, top - 1, c.frame >= 8 && c.frame < 10 ? "h" : "g")
+}
+// la cassetta dell'idrante a muro, come quella di vecchio2: rossa, il vetrino, il bordo in ombra sotto
+function idrante(c, x, y) { c.rect(x, y, 4, 5, "R"); c.rect(x + 1, y + 1, 2, 2, "L"); c.hline(x, y + 4, 4, "r") }
+
+// il molo di cemento davanti ai portoni a raso, alla quota del pianale: lo spigolo in alto preso dalla luce, il lato destro in
+// ombra, lo sporco in fondo; per ogni piano mobile il labbro a strisce gialle e nere, la piastra sotto, i respingenti neri
+function molo_ribalta(c, x0, x1, piani) {
+  const w = x1 - x0 + 1
+  c.rect(x0 - 1, 49, w + 2, 7, "K"); c.rect(x0, 50, w, 6, "S"); c.hline(x0, 50, w, "W"); c.vline(x1, 51, 5, "s"); c.hline(x0, 55, w, "s")
+  for (const [x, l] of piani) {
+    for (let i = 0; i < l; i++) c.px(x + i, 50, (i >> 1) % 2 ? "K" : "Y")
+    c.rect(x, 51, l, 2, "j"); c.hline(x, 52, l, "D")
+    for (const bx of [x - 3, x + l + 1]) { c.rect(bx, 51, 2, 3, "K"); c.px(bx, 51, "d") }
+  }
+}
+// il semaforo della baia (come _semaforo, ma su 16 fotogrammi): rosso per otto, verde per otto; «fase» 1 al contrario
+for (const fase of [0, 1]) anim("_semaforo_rib" + fase, { w: 4, h: 8, frames: LOOP, fps: FPS }, (c) => {
+  c.rect(0, 0, 4, 8, "K")
+  if ((c.frame < 8) !== (fase === 1)) { c.rect(1, 1, 2, 2, "R"); c.px(1, 1, "e"); c.rect(1, 5, 2, 2, "g") }
+  else { c.rect(1, 1, 2, 2, "r"); c.rect(1, 5, 2, 2, "G"); c.px(1, 5, "h") }
+})
+
+for (const [e, F] of Object.entries(FORME)) {
+  // sopra la linea il cielo: quello che finisce sotto (il contorno della cisterna lungo il tetto, i lati dei pannelli sulle falde)
+  // lo taglia il clip della scena, e lì resta il contorno dell'esterno. I pannelli stanno sul tetto (le cose che spuntano le
+  // evitano i tratti), quelli sul telaio sopra le volte invece guardano anche le volte.
+  const lin = linea(F), tetto = linea({ corpi: F.corpi }), sopra = (L) => (x, y) => y < L(x)
+  if (F.sol) {
+    const L = F.sol.some((t) => t[2] !== undefined) ? lin : tetto
+    anim("_sol_" + e, { w: SW, h: SH, frames: LOOP, fps: FPS, outline: "K" }, (c) => pannelli(c, L, F.sol))
+    scene("el_sol_" + e, { w: SW, h: SH, world: MONDO }, layer("solare", clip(sopra(L), stamp("_sol_" + e, -1, -1))))
+  }
+  if (F.rib) {
+    scene("el_rib_" + e, { w: SW, h: SH, world: MONDO },
+      layer("ribalte", (c) => { for (const [x0, x1, piani] of F.rib.moli) molo_ribalta(c, x0, x1, piani) }),
+      layer("semafori", ...F.rib.semafori.map(([x, y, b]) => stamp("_semaforo_rib" + b, x, y))))
+  }
+  const { cisterna: [cx, cw, ct, lamiera], pompe, idrante: idr, vapore } = F.spr
+  anim("_spr_" + e, { w: SW, h: SH, frames: LOOP, fps: FPS, outline: "K" }, (c) => c.clip(sopra(lin), () => {
+    cisterna(c, cx, cw, ct, lamiera)
+    if (pompe) locale_pompe(c, ...pompe)                                 // il locale pompe sta tra il capannone e la cisterna
+  }))
+  scene("el_spr_" + e, { w: SW, h: SH, world: MONDO },
+    layer("antincendio", clip(sopra(lin), stamp("_spr_" + e, -1, -1))),
+    ...(vapore ? [layer("vapore", { unlit: true }, clip([cx - 1, 0, cw + 2, SH], vapore))] : []),
+    ...(idr ? [layer("idrante", (c) => idrante(c, ...idr))] : []))
+  // la prova (fuori dal gioco): l'esterno con sopra i suoi strati
+  scene("prova_" + e, { w: SW, h: SH, bg: "L", world: MONDO },
+    layer("esterno", stamp("est_" + e, 0, 0)),
+    ...(F.sol ? [layer("solare", stamp("el_sol_" + e, 0, 0))] : []),
+    ...(F.rib ? [layer("ribalte", stamp("el_rib_" + e, 0, 0))] : []),
+    layer("antincendio", stamp("el_spr_" + e, 0, 0)))
+}
+
+// ================================================================ IL LOTTO (terreno edificabile)
+// Il terreno da comprare per costruirci: lo stesso cielo e la stessa campagna degli esterni (in mezzo, dove di solito c'è il
+// capannone, la pianura continua: le siepi, i pioppi, una cascina lontana), un prato incolto chiuso dalla rete sui paletti di
+// cemento, il cartello VENDESI LOTTO col corvo sopra, i picchetti del geometra col nastro bianco e rosso sulla linea della futura
+// facciata (un tratto si è staccato e sbatte col vento, l'altro capo è a terra), la buca del sondaggio col mucchio di terra e la
+// pala piantata, i solchi delle ruote dalla strada al mucchio. Si muovono il nastro, il corvo, l'erba alta e una rondine.
+
+const TERRA_LOTTO = 52                                             // il prato del lotto comincia qui, dietro c'è la campagna
+const SIEPI_LOTTO = [[30, 4], [41, 3], [52, 5], [99, 3], [108, 5], [120, 4], [131, 3]]
+// la pianura in mezzo: siepi e gelsi bassi, tre pioppi, la cascina col tetto di coppi (anche dietro al cantiere, senza cascina)
+function pianura(c, { cascina = true } = {}) {
+  for (const [x, r] of SIEPI_LOTTO) c.ellipse(x, 48, r, 2, "G")
+  for (const [x, h] of [[64, 6], [68, 8], [72, 5]]) { c.ellipse(x, 48 - h, 1, h, "G"); c.vline(x + 1, 48 - h, h, "g") }
+  if (cascina) {
+    c.rect(80, 44, 14, 4, "z"); c.rect(90, 44, 4, 4, "Z"); c.rect(83, 45, 2, 2, "s"); c.rect(87, 45, 2, 2, "s")
+    c.hline(80, 43, 14, "o"); c.hline(81, 42, 12, "o"); c.hline(83, 41, 8, "r"); c.vline(91, 39, 3, "Z")
+  }
+  c.hline(0, 48, SW, "g"); c.rect(0, 49, SW, 3, "h")
+}
+// il prato incolto: ciuffi più fitti e più grandi verso di noi (file di ciuffi, ogni fila un po' sfalsata), qualche papavero
+// e qualche tarassaco a gruppi, i solchi delle ruote del fuoristrada del geometra
+function prato_lotto(c) {
+  c.rect(0, TERRA_LOTTO, SW, SH - TERRA_LOTTO, "G"); c.hline(0, TERRA_LOTTO, SW, "g")
+  const R = c.rng(7)
+  for (let y = TERRA_LOTTO + 2, fila = 0; y < SH; y += 2 + (fila >> 1), fila++) {
+    const passo = 12 - Math.min(6, fila), grande = y > 62
+    for (let x = (fila * 5) % passo; x < SW; x += passo + Math.floor(R() * 4)) {
+      c.px(x, y, "g"); c.px(x + 1, y - 1, "g"); if (grande) { c.px(x + 2, y, "g"); c.px(x + 1, y - 2, "h") } else c.px(x + 1, y - 2, "h")
+    }
+  }
+  // i solchi: due strisce di terra schiacciata dalla strada (in basso) al mucchio, più larghe vicino a noi
+  for (let y = 57; y < SH; y++) {
+    const t = (y - 57) / (SH - 57), l = 1 + Math.round(t * 2)
+    for (const x0 of [118 - Math.round(t * 34), 125 - Math.round(t * 28)]) { c.hline(x0, y, l, "k"); c.px(x0 + l, y, "N") }
+  }
+  for (const [x, y] of [[8, 66], [10, 69], [13, 67], [140, 64], [143, 67], [146, 65], [149, 69]]) { c.px(x, y, "R"); c.px(x, y + 1, "r") }   // papaveri
+  for (const [x, y] of [[44, 55], [47, 56], [118, 54], [121, 56], [58, 68]]) c.px(x, y, "Y")                                   // tarassaco
+}
+// i paletti di cemento della rete: in fondo bassi, sui lati verso di noi più alti; i fili tesi
+sprite("_lot_paletto", { w: 1, h: 7, outline: "K", pivot: "bottom" }, vline(0, 0, 7, "S"), px(0, 6, "s"))
+sprite("_lot_paletto_alto", { w: 2, h: 12, outline: "K", pivot: "bottom" }, rect(0, 0, 2, 12, "S"), vline(1, 0, 12, "s"))
+const PALI_DIETRO = [6, 20, 34, 48, 62, 76, 90, 104, 146]          // dietro al mucchio non se ne vedono
+function rete(c) {
+  for (const y of [46, 49]) c.hline(0, y, SW, "s")
+  for (const [x0, y0, x1, y1] of [[6, 46, 0, 58], [6, 49, 0, 64], [153, 46, 159, 58], [153, 49, 159, 64]]) c.line(x0, y0, x1, y1, "s")
+}
+// la linea elettrica che passa sul lotto (l'allacciamento c'è già): i pali di cemento dietro la rete, la traversa con gli
+// isolatori, il filo con la pancia e tre rondini posate
+sprite("_lot_palo", { w: 7, h: 38, outline: "K", pivot: "bottom" },
+  rect(2, 2, 2, 36, "S"), vline(3, 2, 36, "s"), hline(0, 2, 7, "D"), px(0, 1, "W"), px(6, 1, "W"), px(3, 0, "W"), vline(2, 30, 8, "j"))
+const FILO = [14, 14, 151, 14, 6]
+function filo(c, x0, y0, x1, y1, pancia) {
+  for (let x = x0; x <= x1; x++) { const t = (x - x0) / (x1 - x0); c.px(x, Math.round(y0 + (y1 - y0) * t + pancia * Math.sin(Math.PI * t)), "d") }
+}
+const sulFilo = (x) => { const [x0, y0, x1, y1, p] = FILO, t = (x - x0) / (x1 - x0); return Math.round(y0 + (y1 - y0) * t + p * Math.sin(Math.PI * t)) }
+sprite("_lot_rondine_ferma", { pivot: "bottom" }, `
+  .d...
+  dddd.
+  ...dd`)
+// i picchetti del geometra: legno con la punta dipinta di rosso
+sprite("_lot_picchetto", { w: 2, h: 6, outline: "K", pivot: "bottom" }, rect(0, 0, 2, 6, "k"), vline(1, 0, 6, "N"), rect(0, 0, 2, 2, "R"), px(1, 0, "r"))
+const PICCHETTI = [[26, 60], [48, 60], [70, 60], [92, 60], [114, 60], [134, 60]]      // [x, piede] sulla linea della facciata
+const DIETRO = [[34, 54], [126, 54]]                                                       // gli spigoli di dietro, più lontani
+// il nastro bianco e rosso tra due punti, con la pancia: due pixel rossi, due bianchi
+function nastro(c, x0, y0, x1, y1) {
+  const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0))
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, x = Math.round(x0 + (x1 - x0) * t), y = Math.round(y0 + (y1 - y0) * t + 1.5 * Math.sin(Math.PI * t))
+    c.px(x, y, (i >> 1) % 2 ? "W" : "R")
+  }
+}
+function nastri(c) {
+  const cima = ([x, p]) => [x, p - 5]
+  for (let i = 0; i < PICCHETTI.length - 1; i++) if (i !== 2) nastro(c, ...cima(PICCHETTI[i]), ...cima(PICCHETTI[i + 1]))
+  nastro(c, ...cima(DIETRO[0]), ...cima(PICCHETTI[0])); nastro(c, ...cima(DIETRO[1]), ...cima(PICCHETTI[5]))
+  // il capo staccato del tratto rotto, a terra davanti al picchetto di destra
+  for (let i = 0; i < 10; i++) c.px(91 - i, 56 + Math.round(i * 0.4), (i >> 1) % 2 ? "W" : "R")
+}
+// il capo libero che sbatte: un'onda che corre lungo il nastro, più ampia verso la punta (16 fotogrammi, due onde)
+anim("_lot_nastro", { w: 13, h: 9, frames: LOOP, fps: FPS }, (c) => {
+  for (let i = 0; i < 12; i++) c.px(i, 2 + Math.round(Math.sin(c.phase * Math.PI * 4 - i / 1.6) * i / 4 + i / 5), (i >> 1) % 2 ? "W" : "R")
+})
+// il cartello dell'agenzia su due pali: la fascia rossa con VENDESI, sotto LOTTO
+sprite("_lot_cartello", { w: 31, h: 30, outline: "K", pivot: "bottom" }, (c) => {
+  for (const x of [5, 24]) { c.rect(x, 14, 2, 16, "N"); c.vline(x + 1, 14, 16, "M") }
+  c.rect(0, 0, 31, 14, "W"); c.rect(0, 0, 31, 7, "R"); c.hline(0, 6, 31, "r"); c.hline(0, 13, 31, "S")
+  c.text(2, 1, "VENDESI", "W"); c.text(6, 8, "LOTTO", "d")
+})
+// il mucchio di terra della buca del sondaggio: due cumuli (due palate di scavatore), il fianco preso dalla luce a sinistra,
+// l'ombra a destra, i sassi tirati su dallo scavo, l'erba che ci è già ricresciuta sopra
+const MUCCHIO = [1, 2, 4, 5, 6, 7, 8, 8, 9, 9, 10, 10, 10, 9, 9, 9, 9, 10, 10, 9, 9, 8, 7, 6, 4, 3, 1]
+sprite("_lot_mucchio", { w: 27, h: 10, outline: "K", pivot: "bottom" }, (c) => {
+  MUCCHIO.forEach((h, x) => {
+    const y = 10 - h
+    c.vline(x, y, h, "N")
+    if (x < 13) { c.px(x, y, "k"); if (x < 8) c.px(x, y + 1, "k") }                  // il fianco e la cima presi dalla luce
+    if (x >= 19) { c.vline(x, y + 1, h - 1, "M"); c.px(x, 9, "m") }                    // il fianco in ombra
+  })
+  for (const [x, y] of [[5, 7], [11, 8], [15, 4], [20, 7], [9, 4]]) c.px(x, y, "M")    // le zolle
+  for (const [x, y] of [[7, 6], [14, 7], [22, 8]]) { c.px(x, y, "S"); c.px(x + 1, y, "s") }   // i sassi tirati su dallo scavo
+  for (const x of [10, 11, 17]) { c.px(x, 10 - MUCCHIO[x] - 1, "G"); c.px(x, 10 - MUCCHIO[x], "g") }   // l'erba ricresciuta
+})
+// la pala piantata nel mucchio: il manico di legno storto, la lama mezza sepolta
+sprite("_lot_pala", { w: 7, h: 13 , outline: "K" }, rect(0, 0, 3, 1, "N"), px(1, 1, "N"), line(1, 2, 5, 10, "k"), px(2, 3, "N"), px(3, 6, "N"),
+  rect(4, 10, 3, 3, "s"), px(4, 10, "S"), px(5, 10, "S"))
+// l'erba alta che piega col vento: steli scuri con la punta chiara, o spighe secche (16 fotogrammi, tutte insieme)
+function erba_alta(nome, steli, { stelo = "g", punta = "h" } = {}) {
+  anim(nome, { w: 8, h: 8, frames: LOOP, fps: FPS, pivot: "bottom" }, (c) => {
+    steli.forEach(([x, h], i) => {
+      const d = Math.round(Math.sin(c.phase * Math.PI * 2 + i * 0.6) * h / 4)
+      c.line(x, 7, x + d, 8 - h, stelo); c.px(x + d, 8 - h, punta)
+    })
+  })
+}
+erba_alta("_lot_erba", [[1, 5], [3, 7], [4, 4], [6, 6]])
+erba_alta("_lot_spighe", [[2, 6], [4, 8], [6, 5]], { stelo: "k", punta: "q" })
+// la rondine lontana: un otto nel cielo, le ali che battono
+anim("_lot_rondine", { w: 26, h: 9, frames: LOOP, fps: FPS }, (c) => {
+  const t = c.phase * Math.PI * 2, x = 11 + Math.round(10 * Math.sin(t)), y = 3 + Math.round(2.5 * Math.sin(2 * t))
+  c.grid(x, y, c.frame % 4 < 2 ? "d.d\n.d." : "ddd\n.d.")
+})
+
+scene("est_lotto", { w: SW, h: SH, bg: "L", world: MONDO },
+  layer("fondo", (c) => { cielo(c, { nuvole: [[16, 8, 8], [76, 5, 11], [146, 10, 8]] }); campagna(c); pianura(c) }),
+  layer("linea", stamp("_lot_palo", 14, TERRA_LOTTO), stamp("_lot_palo", 151, TERRA_LOTTO), (c) => filo(c, ...FILO),
+    ...[44, 50, 99].map((x) => stamp("_lot_rondine_ferma", x, sulFilo(x)))),
+  layer("prato", (c) => prato_lotto(c)),
+  layer("rete", (c) => rete(c), ...PALI_DIETRO.map((x) => stamp("_lot_paletto", x, TERRA_LOTTO)),
+    stamp("_lot_paletto_alto", 3, 61), stamp("_lot_paletto_alto", 156, 61)),
+  layer("buca", ellipse(108, 57, 5, 1, "m"), hline(104, 56, 9, "M"), hline(105, 58, 7, "N")),
+  layer("picchetti", { sort: "y" }, (c) => nastri(c), ...[...DIETRO, ...PICCHETTI].map(([x, p]) => stamp("_lot_picchetto", x, p))),
+  layer("cose", { sort: "y" },
+    stamp("_lot_mucchio", 124, 56), stamp("_lot_pala", 121, 37),
+    stamp("_lot_cartello", 52, 63), stamp("_corvo", 58, 33)),
+  layer("vento", stamp("_lot_nastro", 71, 53), stamp("_lot_rondine", 104, 6),
+    ...[[18, 71, "_lot_erba"], [33, 71, "_lot_spighe"], [80, 70, "_lot_erba"], [124, 71, "_lot_spighe"], [139, 70, "_lot_erba"], [150, 71, "_lot_erba"],
+      [24, 61, "_lot_spighe"], [137, 61, "_lot_erba"]].map(([x, y, n]) => stamp(n, x, y))))
+
+// ================================================================ IL CANTIERE (capannone costruito da zero)
+// Il capannone che sale, nel riquadro della pianta: la platea di cemento, i pilastri d'acciaio nell'antiruggine rossa, le travi
+// reticolari montate su due campate (la terza la porterà la gru dello strato el_cantiere: la sua zona, x 100..159, resta libera,
+// come le zone davanti), i pannelli di tamponamento della prima campata, il ponteggio col carpentiere che batte il martello, il
+// saldatore in ginocchio con le scintille e la saldatrice, la betoniera che gira, il bancale dei sacchi di cemento. Per terra la
+// terra battuta coi solchi dell'autobetoniera. Si muovono la betoniera, il martello e le scintille.
+
+const PILASTRI = [26, 48, 70, 92]          // i pilastri: l'ala presa dalla luce, l'anima, l'ala in ombra
+const TRAVE = 14                            // la riga del corrente alto delle travi reticolari
+const PLATEA = 52                           // il piano della platea: chi ci sta sopra ha i piedi sulla riga 51
+
+anim("_ed_costruzione", { w: SW, h: SH, frames: 1, outline: "K" }, (c) => {
+  // la platea: lo spigolo preso dalla luce, la faccia, lo sporco in basso
+  c.rect(24, PLATEA, 76, 4, "S"); c.hline(24, PLATEA, 76, "W"); c.hline(24, BASE, 76, "s"); c.vline(99, PLATEA + 1, 3, "s")
+  // i pannelli di tamponamento della prima campata, quattro in pila: lo spigolo in luce, il giunto
+  for (let y = 32; y < PLATEA; y += 5) { c.rect(29, y, 19, 5, "z"); c.hline(29, y, 19, "C"); c.hline(29, y + 4, 19, "Z") }
+  // i pilastri con la piastra di base imbullonata e la testa
+  for (const x of PILASTRI) {
+    c.vline(x, TRAVE + 3, PLATEA - TRAVE - 3, "e"); c.vline(x + 1, TRAVE + 3, PLATEA - TRAVE - 3, "R"); c.vline(x + 2, TRAVE + 3, PLATEA - TRAVE - 3, "r")
+    c.hline(x - 1, PLATEA - 1, 5, "s"); c.hline(x, TRAVE + 3, 3, "r")
+  }
+  // le travi reticolari sulle prime due campate: corrente alto, corrente basso, le aste in mezzo (i vuoti li chiude il contorno)
+  c.hline(25, TRAVE, 49, "R"); c.hline(25, TRAVE + 2, 49, "r")
+  for (let x = 25; x < 73; x += 4) { c.px(x + 1, TRAVE + 1, "R"); c.px(x + 3, TRAVE + 1, "r") }
+  // il ponteggio davanti alla seconda campata: i montanti, i correnti, le diagonali, l'impalcato di tavole
+  for (const x of [51, 60, 69]) { c.vline(x, 22, PLATEA - 22, "S"); c.px(x, PLATEA - 1, "s") }
+  for (const y of [22, 31]) c.hline(51, y, 19, "S")
+  c.line(51, 50, 60, 43, "s"); c.line(60, 50, 69, 43, "s")
+  c.rect(50, 41, 21, 2, "k"); c.hline(50, 42, 21, "N"); for (const x of [56, 63]) c.px(x, 41, "N")
+})
+
+// la betoniera: il bicchiere arancione inclinato con la bocca in alto a destra (un cono che si allarga e un fondo tondo
+// lungo l'asse), preso dalla luce in alto a sinistra; la corona dentata, il cavalletto, la ruota, il motore. Gira: le tre
+// costole saldate sul bicchiere passano da un fianco all'altro (due giri in 16 fotogrammi)
+const BOCCA = [13, 3], FONDO = [6.5, 10]
+anim("_cos_betoniera", { w: 18, h: 16, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" }, (c) => {
+  c.line(9, 9, 13, 15, "D"); c.line(8, 9, 5, 13, "D")                                         // il cavalletto
+  c.rect(1, 7, 5, 4, "j"); c.hline(1, 7, 5, "S"); c.vline(5, 8, 3, "D"); c.px(2, 9, "D")       // il motore
+  const [mx, my] = BOCCA, dx = FONDO[0] - mx, dy = FONDO[1] - my, L2 = dx * dx + dy * dy, L = Math.sqrt(L2)
+  const raggio = (t) => (t < 0.4 ? 2 + t / 0.4 * 2.8 : 4.8)
+  const costole = [0, 1, 2].map((k) => c.phase * Math.PI * 4 + k * Math.PI * 2 / 3).filter((a) => Math.cos(a) > 0.2).map((a) => Math.sin(a))
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 18; x++) {
+    const px = x - mx, py = y - my, t = (px * dx + py * dy) / L2, u = (px * dy - py * dx) / L         // u: di lato rispetto all'asse
+    const r = raggio(Math.min(1, Math.max(0, t))), fuori = t > 1 ? Math.hypot(x - FONDO[0], y - FONDO[1]) : Math.abs(u)
+    if (t < 0 || fuori > r) continue
+    const luce = -u / r                                                                            // il fianco sopra l'asse guarda la luce
+    let k = luce > 0.35 ? "a" : luce < -0.45 ? "o" : "O"
+    if (t <= 1 && costole.some((s) => Math.abs(u - s * r) < 0.6)) k = luce < -0.45 ? "r" : "o"
+    if (Math.abs(t - 0.62) < 0.06) k = "D"                                                         // la corona dentata
+    c.px(x, y, k)
+  }
+  c.ellipse(mx + 0.5, my - 0.5, 2, 1, "d"); c.px(mx, my - 1, "K"); c.px(mx + 1, my - 1, "K")      // la bocca
+  c.circ(5, 13, 2, "K"); c.px(5, 13, "s")                                                         // la ruota
+})
+// il bancale coi sacchi di cemento: due file di sacchi di carta (la cucitura, la faccia in luce), il pallet di legno
+sprite("_cos_sacchi", { w: 10, h: 9, outline: "K", pivot: "bottom" }, (c) => {
+  c.hline(0, 7, 10, "k"); for (const x of [0, 4, 8]) c.rect(x, 8, 2, 1, "N")
+  for (const [x, y, w] of [[0, 4, 5], [5, 4, 5], [1, 1, 4], [5, 1, 4]]) { c.rect(x, y, w, 3, "z"); c.hline(x, y, w, "C"); c.vline(x + w - 1, y, 3, "Z"); c.px(x + 1, y + 1, "Z") }
+})
+// la saldatrice: la cassetta rossa sulle ruote, il quadrante, la maniglia
+sprite("_cos_saldatrice", { w: 7, h: 7, outline: "K", pivot: "bottom" },
+  rect(0, 1, 7, 5, "R"), hline(0, 1, 7, "e"), vline(6, 2, 4, "r"), rect(1, 3, 2, 2, "W"), px(2, 4, "K"), px(4, 3, "Y"), px(5, 3, "G"),
+  hline(2, 0, 3, "s"), rect(0, 6, 2, 1, "D"), rect(5, 6, 2, 1, "D"))
+
+// il carpentiere col casco giallo e il gilet arancione sull'impalcato: batte il martello due volte per giro (8 fotogrammi l'una:
+// su, giù, il colpo con la scheggia, di nuovo su)
+persona("_carpentiere", { testa: "berretto", abito: "gilet", swap: { R: "Y", r: "y", B: "O", b: "o", M: "m" } })
+const MARTELLO = ["su", "su", "su", "mezzo", "giu", "giu", "mezzo", "su"]
+anim("_cos_carpentiere", { w: 17, h: 23, frames: LOOP, fps: FPS, outline: "K", pivot: [5, 23] }, stamp("__carpentiere", 0, 3), (c) => {
+  const p = MARTELLO[c.frame % 8]
+  if (p === "su") { c.rect(9, 8, 2, 6, "O"); c.rect(9, 6, 2, 2, "F"); c.vline(10, 2, 4, "k"); c.rect(8, 1, 5, 2, "s"); c.hline(8, 1, 5, "S") }
+  if (p === "mezzo") { c.rect(9, 11, 2, 3, "O"); c.rect(11, 10, 2, 2, "F"); c.line(13, 9, 14, 6, "k"); c.rect(13, 4, 3, 3, "s"); c.px(13, 4, "S") }
+  if (p === "giu") { c.rect(9, 13, 4, 2, "O"); c.rect(13, 13, 2, 2, "F"); c.vline(14, 15, 3, "k"); c.rect(13, 18, 4, 2, "s"); c.hline(13, 18, 4, "S") }
+  if (c.frame % 8 === 4) { c.px(16, 20, "W"); c.px(12, 21, "i") }                                      // la scheggia del colpo
+})
+// il saldatore in ginocchio, la tuta blu, la maschera scura col vetro verde che si accende col lampo, la torcia in mano
+persona("_saldatore", { testa: "berretto", corpo: "seduto", swap: { R: "D", r: "d", B: "b", b: "d", M: "K" } })
+const ARCO = "1101110110111011"                  // il lampo dell'arco: si accende e si spegne
+anim("_cos_saldatore", { w: 14, h: 18, frames: LOOP, fps: FPS, outline: "K", pivot: [5, 18] }, stamp("__saldatore"), (c) => {
+  c.rect(1, 3, 8, 7, "D"); c.hline(1, 3, 8, "j"); c.rect(2, 5, 6, 2, "K"); c.hline(3, 5, 4, ARCO[c.frame] === "1" ? "u" : "t")
+  c.rect(9, 10, 3, 2, "b"); c.rect(11, 10, 2, 2, "F"); c.line(12, 12, 13, 12, "D")
+  c.rect(1, 16, 8, 2, "d"); c.vline(4, 16, 2, "K"); c.hline(0, 17, 2, "K"); c.hline(8, 17, 2, "K")      // le ginocchia a terra
+})
+// le scintille: escono dal punto della saldatura, saltano e cadono (due nuove ogni fotogramma, vivono quattro fotogrammi,
+// dal bianco al giallo all'arancione); col lampo dell'arco il punto si allarga
+const SPRUZZO_X = [1.6, -0.9, 2.3, 0.5, -1.5, 1.9, 0.1, 2.6, -0.4, 1.2, 2.0], SPRUZZO_Y = [-1.5, -2.0, -0.6, -2.3, -1.1, -0.8, -2.5, -0.4, -1.8, -1.3, -0.9, -2.1, -0.5]
+anim("_cos_scintille", { w: 13, h: 12, frames: LOOP, fps: FPS }, (c) => {
+  for (let k = 3; k >= 0; k--) for (let j = 0; j < 2; j++) {
+    const i = ((((c.frame - k) % LOOP) + LOOP) % LOOP) * 2 + j, vx = SPRUZZO_X[i % 11], vy = SPRUZZO_Y[(i * 7) % 13]
+    const x = Math.round(4 + vx * k), y = Math.round(3 + vy * k + 0.55 * k * k)
+    if (y < 12 && x >= 0) c.px(x, y, ["W", "i", "Y", "O"][k])
+  }
+  if (ARCO[c.frame] === "1") { c.px(4, 3, "W"); c.px(3, 3, "i"); c.px(5, 3, "i"); c.px(4, 2, "i"); c.px(4, 4, "i") } else c.px(4, 3, "i")
+})
+
+// la ghiaia stabilizzata del cantiere, il prato dove verrà l'aiuola, i solchi delle ruote dell'autobetoniera che arrivano alla platea
+function terra_cantiere(c) {
+  c.rect(0, TERRA, SW, SH - TERRA, "Z"); c.hline(0, TERRA, SW, "k")
+  c.rect(0, TERRA, 21, SH - TERRA, "G"); c.hline(0, TERRA, 21, "g")
+  for (let y = TERRA + 1; y < SH; y++) {
+    const t = (y - TERRA) / (SH - TERRA), x = 62 + Math.round(t * t * 46), l = 1 + Math.round(t * 2)
+    c.hline(x, y, l, "k"); c.hline(x + 8 + Math.round(t * 6), y, l, "k")
+  }
+}
+
+scene("est_costruzione", { w: SW, h: SH, bg: "L", world: MONDO },
+  layer("fondo", (c) => { cielo(c, { nuvole: [[12, 9, 8], [64, 5, 10], [150, 11, 8]] }); campagna(c); pianura(c, { cascina: false }) }),
+  layer("edificio", stamp("_ed_costruzione", -1, -1)),
+  layer("terreno", (c) => terra_cantiere(c)),
+  layer("cose", { sort: "y" },
+    stamp("_cos_saldatrice", 32, PLATEA), stamp("_cos_saldatore", 41, PLATEA), stamp("_cos_carpentiere", 57, 41),
+    stamp("_cos_betoniera", 80, PLATEA), stamp("_cos_sacchi", 94, PLATEA)),
+  layer("cavo", (c) => { c.line(35, 51, 39, 50, "K"); c.hline(39, 50, 2, "K") }),
+  layer("scintille", { unlit: true }, stamp("_cos_scintille", 45, 44)))
