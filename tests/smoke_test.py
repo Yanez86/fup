@@ -55,6 +55,10 @@ NOSIDE = '''(sel)=>{const el=document.querySelector(sel), out=[];
   el.querySelectorAll('button').forEach(b=>{if(b.offsetParent&&b.scrollWidth>b.clientWidth+1) out.push('testo fuori dal pulsante: '+b.innerText.slice(0,30));});
   return out;}'''
 
+# finestrella di scelta di un manager: prima tutte le righe che si possono scegliere, poi quelle in grigio
+MPORD = '''()=>{const r=[...document.querySelectorAll('#modal .mp-r')], i=r.findIndex(e=>e.classList.contains('off'));
+  return r.length>1&&(i<0||r.slice(i).every(e=>e.classList.contains('off')))&&r.slice(0,i<0?r.length:i).every(e=>e.dataset.act==='mpick');}'''
+
 SEED = '''()=>{const F=window.__FUP; [['gino',1],['marco',2],['valeria',3]].forEach(([c,n])=>{F.slot=n; F.newGame(c); F.S.company.name='Prova '+n;
   for(let d=0;d<35;d++){document.querySelector('#modal').innerHTML=''; F.step();} document.querySelector('#modal').innerHTML=''; if(n===3) F.S.cash=-12000; F.save();
   const k=F.slotKey(n), v=JSON.parse(localStorage.getItem(k)); v.at=Date.now()-(n===2?0:86400000*n); localStorage.setItem(k,JSON.stringify(v));}); F.slot=1;}'''
@@ -183,9 +187,17 @@ async def phone(b, w, h, name, errs):
       const r=i.getBoundingClientRect(), q=m.getBoundingClientRect(); return {k:i.dataset.scena, w:r.width, h:r.height, in:r.left>=q.left&&r.right<=q.right};}""")
     assert scn and scn['in'] and abs(scn['w'] / scn['h'] - 160 / 72) < 0.02 and (scn['w'] == 320 or w < 400), f'{name}: scenetta dell\'evento {scn}'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_evento.png'))
+    # iPhone: l'evento lungo resta fuori dalla barra di stato e dalla striscia del tasto Home (bordi finti via CDP)
+    cdp = await ctx.new_cdp_session(pg)
+    await cdp.send('Emulation.setSafeAreaInsetsOverride', {'insets': {'top': 59, 'bottom': 34}}); await pg.wait_for_timeout(50)
+    m = await pg.evaluate("()=>{const r=document.querySelector('#modal .modal').getBoundingClientRect();return {top:r.top,bottom:r.bottom,h:innerHeight};}")
+    assert m['top'] >= 59 + 8 and m['bottom'] <= m['h'] - 34, f'{name}: evento sotto la barra di stato del telefono {m}'
+    await cdp.send('Emulation.setSafeAreaInsetsOverride', {'insets': {}}); await cdp.detach()
     await pg.tap('#modal [data-act=closemodal]')
     assert await pg.evaluate("()=>window.__FUP.S.notes.some(n=>n.k==='ev')"), f'{name}: evento sparito con «Decidi più tardi»'
-    await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'});}")
+    await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'}); if(!F.S.tenders.some(t=>!t.done)) F.newTender();}")
+    # un talento in banchina in crescita: la sua scheda nella finestra Manager deve stare nello schermo
+    await pg.evaluate("()=>{const S=window.__FUP.S,w=S.warehouses[0]; S.cresc=[{id:'gt1',name:'Mirko Pozzi',sx:'m',bd:S.day-27*365,face:3,role:'pick',wh:w.id,wn:w.name,k:'op',star:0,men:1,day0:S.day-100,end:S.day+265}];}")
     for wn in ['azienda','riepilogo','magazzini','traffico','clienti','gare','report','personale','manager','giornale','tecnologia','enciclopedia']+(['sindacato'] if ri else []):
         await menu(pg, wn)
         if wn in TABS: await pg.tap(f'#win-{wn} [data-act=wtab][data-id={wn}]')   # dal menu si apre la scheda con un problema: si riparte dalla prima
@@ -193,6 +205,23 @@ async def phone(b, w, h, name, errs):
         bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
         assert not bad, f'{name}: finestra {wn}: {bad}'
         await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{wn}.png'))
+        if wn == 'magazzini':   # scelta del manager: i liberi sopra, chi ha già un incarico in grigio sotto
+            await pg.evaluate("()=>{const F=window.__FUP; F.ACT.hirecs({id:'rosa'}); F.ACT.hiremgr({id:'toto'}); F.renderAll();}")
+            await pg.tap('#win-magazzini [data-act=mpopen][data-k=wh]')
+            assert await pg.evaluate(MPORD), f'{name}: scelta del manager, i disponibili devono stare sopra'
+            assert 'customer service' in await pg.inner_text('#modal .mp-r.off'), f'{name}: il responsabile del customer service non è in grigio col suo ruolo'
+            assert await pg.evaluate(FITS, '#modal .modal'), f'{name}: la scelta del manager esce dallo schermo'
+            bad = await pg.evaluate(NOSIDE, '#modal .modal')
+            assert not bad, f'{name}: scelta del manager: {bad}'
+            await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_scelta_manager.png'))
+            await pg.tap('#modal [data-act=closemodal]')
+        if wn == 'gare':   # scelta del magazzino per la gara
+            await pg.tap('#win-gare [data-act=mpopen][data-k=bid]')
+            assert await pg.evaluate(FITS, '#modal .modal'), f'{name}: la scelta del magazzino esce dallo schermo'
+            bad = await pg.evaluate(NOSIDE, '#modal .modal')
+            assert not bad, f'{name}: scelta del magazzino: {bad}'
+            await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_scelta_magazzino.png'))
+            await pg.tap('#modal [data-act=closemodal]')
         if wn == 'manager':   # le altre due schede: candidati con la trattativa e head hunter
             for tb in ['cand', 'hh']:
                 await pg.tap(f'#win-manager [data-act=mtab][data-id={tb}]')
@@ -219,6 +248,15 @@ async def phone(b, w, h, name, errs):
             assert not bad, f'{name}: finestra {wn}, scheda {tb}: {bad}'
             await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_{tb}.png'))
         await pg.tap(f'#win-{wn} [data-act=close]')
+    # progetto di un magazzino da costruire su un terreno (scheda Nuovo magazzino)
+    await pg.evaluate("()=>{const F=window.__FUP; F.S.cash=2e6; F.ACT.site({id:'l_vercelli'});}")
+    assert await pg.query_selector('#win-magazzini .ed-box'), f'{name}: manca il progetto del nuovo magazzino'
+    assert await pg.evaluate(FITS, '#win-magazzini'), f'{name}: il progetto del magazzino esce dallo schermo'
+    bad = await pg.evaluate(NOSIDE, '#win-magazzini')
+    assert not bad, f'{name}: progetto del magazzino: {bad}'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_progetto.png'))
+    await pg.evaluate("()=>{window.__FUP.ACT.edclose();}")
+    await pg.tap('#win-magazzini [data-act=close]')
     # parola chiave: primo tocco = tooltip, secondo tocco = enciclopedia
     await menu(pg, 'magazzini')
     await pg.tap('#win-magazzini .kw[data-id=saturazione]')
@@ -464,8 +502,26 @@ async def main():
         await win(pg, 'direzione')
         await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.ACT.hiremgr({id:'ottavio'}); const o=S.managers.find(m=>m.id==='ottavio'); S.warehouses.forEach(w=>{if(w.mgr==='ottavio')w.mgr=null;}); o.wh=null;}")
         await win(pg, 'direzione')
-        await pg.select_option('#win-manager select[data-role=fin]', 'ottavio')
+        await pg.click('#win-manager [data-act=mpopen][data-k=dir][data-id=fin]')
+        assert await pg.evaluate(MPORD), 'scelta del manager: i disponibili devono stare sopra quelli già impegnati'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_scelta_direttore.png'))
+        await pg.click('#modal [data-act=mpick][data-v=ottavio]')
+        assert not await pg.query_selector('#modal .mp'), 'la finestrella di scelta resta aperta'
         await pg.screenshot(path=os.path.join(OUT, 'shot_direzione.png'))
+        # nel magazzino il nuovo direttore finanziario è in grigio, col suo ruolo
+        await win(pg, 'magazzini')
+        await pg.click('#win-magazzini [data-act=mpopen][data-k=wh]')
+        assert 'Direttore finanziario' in await pg.inner_text('#modal .mp-r.off'), 'nella scelta del manager il direttore non è in grigio col suo ruolo'
+        assert not await pg.query_selector('#modal [data-act=mpick][data-v=ottavio]'), 'un direttore si può scegliere come manager di magazzino'
+        assert await pg.evaluate(MPORD), 'scelta del manager: i disponibili devono stare sopra quelli già impegnati'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_scelta_manager.png'))
+        await pg.click('#modal [data-act=closemodal]')
+        await win(pg, 'customer')
+        await pg.click('#win-clienti [data-act=mpopen][data-k=cs]')
+        assert await pg.evaluate(MPORD), 'scelta del responsabile: i disponibili devono stare sopra quelli già impegnati'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_scelta_cs.png'))
+        await pg.click('#modal [data-act=closemodal]')
+        await win(pg, 'direzione')
         st = await pg.evaluate('()=>({barcode:!!window.__FUP.S.warehouses[0].tech.barcode, fin:window.__FUP.S.dirs.fin})')
         assert st['barcode'] and st['fin'] == 'ottavio', st
         # policy: accensione, attesa di 90 giorni, pretese dei manager, ultimatum con aumento e dimissioni
@@ -473,6 +529,8 @@ async def main():
         await pg.evaluate("()=>{const S=window.__FUP.S; ['regolamento','barcode','hr'].forEach(t=>S.researched[t]=true);}")
         await win(pg, 'policy')
         await pg.click('#win-azienda [data-act=poltog][data-id=zerostra]')
+        assert not await pg.evaluate("()=>window.__FUP.polOn('zerostra')"), 'la policy deve aspettare la conferma'
+        await pg.click('#modal [data-act=okgo]')
         assert await pg.evaluate("()=>window.__FUP.polOn('zerostra')"), 'zero straordinario non acceso'
         assert await pg.eval_on_selector('#win-azienda [data-act=poltog][data-id=zerostra]', 'e=>e.disabled'), 'la policy si può cambiare subito'
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; F.ACT.hiremgr({id:'davide'}); F.ACT.hiremgr({id:'rosa'});
@@ -549,6 +607,11 @@ async def main():
         await pg.click('#dock [data-id=personale]')
         if not await pg.query_selector('#win-personale'): await pg.click('#dock [data-id=personale]')
         assert await pg.eval_on_selector_all('#win-personale .pr-r', 'e=>e.length') == 7
+        # chi è in arrivo: una barretta per persona sotto il reparto e nelle assunzioni in corso, che si riempie fino all'arrivo
+        q = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0],q0=S.queue; S.queue=[{role:'pick',wh:w.id,days:5,tot:20},{role:'plan',wh:null,days:9}]; F.renderAll();
+          const W=s=>[...document.querySelectorAll('#win-personale '+s)].map(i=>i.style.width), r={row:W('.pr-in .qbs .bar i'),card:W('.pr-q .pr-n .bar i')};
+          S.queue=q0; F.renderAll(); return r;}''')
+        assert q['row'] == ['75%'] and q['card'][0] == '75%' and len(q['card']) == 2, f'barrette delle assunzioni in arrivo: {q}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_personale.png'))
         await pg.click('#win-personale [data-act=openwh]')
         assert await pg.eval_on_selector_all('#win-magazzini [data-act=hire]', 'e=>e.length') == 7
@@ -566,7 +629,29 @@ async def main():
         card = await pg.evaluate_handle("()=>document.querySelector('#win-magazzini [data-act=straord]').closest('.card')")
         await card.as_element().scroll_into_view_if_needed()
         await card.as_element().screenshot(path=os.path.join(OUT, 'shot_magazzino_immobile.png'))
+        # immobile (0.92): classe, dotazioni, lavori, guasti, ristrutturazione e costruzione da zero
+        im = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0],o={};
+          o.cl=!!F.WCLASS[w.cl]; w.build=null; S.cash+=2e6; const p0=F.computeWH(w).prod;
+          F.renderAll(); const b=document.querySelector('#win-magazzini [data-act=dotbuild]:not([disabled])'), di=b&&b.dataset.id; b.click(); o.cant=!!w.build&&w.build.k==='dot'&&w.build.id===di;
+          w.build.left=1; F.stepOne(); o.dot=!!w.dot[di];
+          F.koStart(w,'ricarica'); o.ko=F.computeWH(w).prod<p0*0.95; o.ev=S.notes.some(n=>n.k==='ev'&&n.ev.id==='guasto');
+          F.renderAll(); document.querySelector('#win-magazzini [data-act=koripara][data-id=ricarica]').click(); o.rip=w.ko.ricarica.fine>S.day;
+          w.ko.ricarica.fine=S.day+1; F.stepOne(); F.stepOne(); o.fixed=!w.ko.ricarica;
+          F.fuocoStart(w); o.fuoco=S.notes.some(n=>n.k==='ev'&&n.ev.id==='incendio');
+          w.cl='vec'; F.ACT.rist({wh:w.id,ok:1}); o.rist=!!w.build&&w.build.k==='rist'&&w.build.to==='std'; w.build.left=1; F.stepOne(); o.std=w.cl==='std';
+          o.taken=!F.siteOpen(w.site)&&!F.rentable('l_casale')&&!F.siteOpen('landriano');
+          F.ACT.site({id:'l_casale'}); o.box=!!document.querySelector('#win-magazzini .ed-box');
+          F.ACT.edgo({ok:1}); o.cantiere=S.cantieri.length===1&&!F.siteOpen('l_casale');
+          S.cantieri[0].left=1; F.stepOne(); const n=S.warehouses.find(x=>x.site==='l_casale'); o.nuovo=!!n&&n.own&&n.cl==='mod'&&!!n.dot.ribalte&&n.cap===3000;
+          F.ACT.openwh({id:w.id}); F.renderAll(); return o;}''')
+        assert all(im.values()), f'immobile: {im}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_magazzino_dotazioni.png'))
+        await pg.evaluate(CLEAR)
         await pg.click('#win-magazzini [data-act=coop]')
+        assert not await pg.evaluate('()=>window.__FUP.S.warehouses[0].coop'), 'la cooperativa deve aspettare la conferma'
+        assert 'Conferma' in await pg.inner_text('#modal'), 'manca la conferma della cooperativa'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_conferma.png'))
+        await pg.click('#modal [data-act=okgo]')
         assert await pg.evaluate('()=>window.__FUP.S.warehouses[0].coop')
         await pg.click('#win-magazzini [data-act=hire][data-role=pick]')
         assert 'Cooperativa' in await pg.inner_text('#modal'), 'canale cooperativa mancante'
@@ -628,12 +713,14 @@ async def main():
         r = await pg.evaluate('''()=>{const F=window.__FUP,out={},P={magazzini:'magazzini',personale:'personale',tecnologia:'tecnologia',customer:'clienti',direzione:'manager',azienda:'azienda'};F.newGame('marco');F.S.researched.direzione=true;
           const apri=tab=>{document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.ACT.toggle({id:P[tab]}); F.ACT.wtab({p:P[tab],id:tab}); return document.querySelector('#wins .win .ev-scn');};
           for(const [tab,w] of Object.entries(F.WSCN)){let k=typeof w==='function'?w():w; k=k.k||k; const d=apri(tab), i=d&&d.querySelector('i'); out[tab]=!!i&&i.dataset.scena===k&&i.getBoundingClientRect().width===(['customer','personale'].includes(tab)?320:480);}
-          // esterni dei magazzini: il tipo segue lo stato e le dotazioni, gli elementi compaiono sopra quando ci sono
-          const w=F.S.warehouses[0], tipi=['fatiscente','standard','moderno','freddo']; out.est8=tipi.every(t=>F.SCENE['est_'+t+'1']&&F.SCENE['est_'+t+'2']);
-          out.el6=F.EST_EL.every(([n])=>F.SCENE['el_'+n]); w.cond=30; out.fat=F.estScena(w).k.startsWith('est_fatiscente'); w.cond=100;
-          const t0=w.tech; w.tech={}; out.std=F.estScena(w).k.startsWith('est_standard')&&!F.estScena(w).el.length; w.tech=t0; w.tech.orto={day:F.S.day}; w.tech.anticoll={day:F.S.day};
-          const im=apri('magazzini').querySelector('i'); out.el=im.dataset.el==='el_giardino el_muletti'&&(im.style.backgroundImage.match(/url\(/g)||[]).length===3;
-          delete w.tech.orto; delete w.tech.anticoll;
+          // esterni dei magazzini: il capannone segue la classe dell'edificio (celle frigo: quello frigorifero), sopra le dotazioni dell'area esterna
+          const w=F.S.warehouses[0], tipi=['fatiscente','vecchio','standard','moderno','innovativo','freddo'], s0={cl:w.cl,dot:w.dot,tech:w.tech,build:w.build};
+          out.est12=tipi.every(t=>F.SCENE['est_'+t+'1']&&F.SCENE['est_'+t+'2']); out.el=F.EST_EL.every(([n])=>F.SCENE['el_'+n]);
+          Object.assign(w,{cl:'fat',dot:{},tech:{},build:null}); out.fat=F.estScena(w).k.startsWith('est_fatiscente');
+          w.cl='std'; out.std=F.estScena(w).k.startsWith('est_standard')&&F.estScena(w).el.join()==='el_muletti';
+          w.dot={frigo:{day:0}}; out.frigo=F.estScena(w).k.startsWith('est_freddo'); w.dot={giardino:{day:0}};
+          const im=apri('magazzini').querySelector('i'); out.vista=im.dataset.el==='el_giardino el_muletti'&&(im.style.backgroundImage.match(/url\(/g)||[]).length===3;
+          Object.assign(w,s0);
           // l'ufficio del direttore: quattro versioni, il CEO come quello della partita
           out.dir4=['mm','mf','fm','ff'].every(x=>F.SCENE['direttore_'+x]); F.S.boss.sx='f'; out.dirF=apri('azienda').querySelector('i').dataset.scena.startsWith('direttore_f');
           F.S.boss.sx='m'; out.dirM=apri('azienda').querySelector('i').dataset.scena.startsWith('direttore_m');
@@ -741,6 +828,46 @@ async def main():
         assert await pg.query_selector('#notepop .ev-chg .chg'), await pg.inner_text('#notepop')
         await pg.screenshot(path=os.path.join(OUT, 'shot_evento_personale.png'))
         await pg.click('#notepop [data-act=notedel]')
+        # talenti in banchina: l'evento raro con la sua scenetta, un anno di affiancamento nella finestra Manager, poi la promozione a manager
+        r = await pg.evaluate('''()=>{const F=window.__FUP;F.newGame('gino');const S=F.S,bad=[],w=S.warehouses[0]; document.querySelector('#modal').innerHTML='';
+          S.day=800; w.staff.pick=Math.max(w.staff.pick,4); w.staff.imp=Math.max(w.staff.imp,2); S.cash+=1e5;
+          // ogni storia: titolo, racconto, persona e magazzino; tutte le risposte funzionano
+          const evs=F.EVENTS.filter(e=>e.id.startsWith('b_'));
+          evs.forEach(e=>{ e.opts.forEach((o,i)=>{ const ev={...e}, st0={...w.staff}, c0=S.cresc; try{ e.setup(ev); if(!ev.text||!ev.p||!ev.w||ev.title===e.title) bad.push(e.id+': racconto');
+            if(!o.req||o.req()) o.f.call(ev); }catch(x){bad.push(e.id+' '+i+': '+x);} w.staff=st0; S.cresc=c0; }); });
+          // raro: dopo una scoperta ne passano almeno due anni prima della prossima
+          const rnd=Math.random; Math.random=()=>0; const b=evs[0], ok0=b.cond(); S.seen[b.id]=S.day-100; const ok1=evs[1].cond(); S.seen[b.id]=S.day-800; const ok2=evs[1].cond(); Math.random=rnd;
+          // la stoffa: un fuoriclasse è sempre di rango S, uno normale mai
+          const rk=star=>{ S.cresc=[{id:'gx'+star,name:'Prova '+star,sx:'f',bd:S.day-30*365,face:21,role:'imp',wh:w.id,wn:w.name,k:'prec',star,men:0,day0:S.day,end:S.day}];
+            F.cresDaily(); const p=S.managers.pop(); S.warehouses.forEach(x=>{if(x.mgr===p.id) x.mgr=null;}); w.staff.imp++; return F.mRank(p); };
+          const r2=[0,1,2,3].map(()=>rk(2)), r0=[0,1,2,3].map(()=>rk(0)); S.notes=[]; S.cresc=[]; S.seen={}; document.querySelector('#toasts').innerHTML='';
+          return {n:evs.length,bad,ok0,ok1,ok2,r2,r0,scn:evs.every(e=>F.evScena(e.id,e.src)==='talento')};}''')
+        assert r['n'] == 6 and not r['bad'] and r['ok0'] and not r['ok1'] and r['ok2'] and r['scn'], r
+        assert all(x == 'S' for x in r['r2']) and 'S' not in r['r0'], f'stoffa dei talenti in banchina {r}'
+        await pg.evaluate(FIRE, 'b_picking')
+        await pg.click('#notes [data-act=note]')
+        scn = await pg.evaluate("()=>{const i=document.querySelector('#modal .ev-scn i'); return i&&[i.dataset.scena,i.getBoundingClientRect().width]}")
+        assert scn == ['talento', 480], f'scenetta del talento in banchina {scn}'
+        who = await pg.evaluate("()=>{const e=document.querySelector('#modal .ev-who'); return e&&e.innerText}")
+        nm = await pg.evaluate("()=>window.__FUP.S.notes.find(n=>n.k==='ev').ev.vars.nm")
+        assert who and nm in who, f'chi è coinvolto nell\'evento: {who} {nm}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_evento_talento.png'))
+        # un anno di affiancamento: la scelta passa dal salvataggio (evUnpack), il giorno dopo parte la crescita
+        cash0 = await pg.evaluate('()=>window.__FUP.S.cash')
+        await pg.click('#modal [data-act=evopt][data-i="0"]')
+        await pg.evaluate("()=>{const F=window.__FUP;F.S.nextEvent=1e9;F.step();}")
+        r = await pg.evaluate("()=>{const S=window.__FUP.S,x=(S.cresc||[])[0];return {n:(S.cresc||[]).length,nm:x&&x.name,days:x&&x.end-x.day0,cash:S.cash}}")
+        assert r['n'] == 1 and r['nm'] == nm and r['days'] == 365 and cash0 - r['cash'] >= 3000, r
+        sel = await win(pg, 'manager')
+        assert nm in await pg.inner_text(f'{sel} .win-b'), 'il talento in crescita non compare nella finestra Manager'
+        await pg.evaluate(f"()=>{{const c=[...document.querySelectorAll('{sel} .card')].find(e=>e.innerText.includes('diventa manager')); if(c) c.scrollIntoView({{block:'center'}});}}")
+        await pg.screenshot(path=os.path.join(OUT, 'shot_manager_crescita.png'))
+        # un anno dopo diventa manager: lascia il reparto, prende il talento, costa meno del mercato e guida un magazzino libero
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,x=S.cresc[0],w=S.warehouses.find(v=>v.id===x.wh); w.mgr=null; const pk=w.staff.pick; x.end=S.day; S.nextEvent=1e9; F.step();
+          const p=S.managers.find(m=>m.name===x.name); return {p:!!p,hired:p&&p.hired,tal:p&&p.tal.includes('Cresciuto in banchina'),cheap:p&&p.ral<F.ralOf(F.mScore(p)),
+            wh:p&&p.wh===w.id&&w.mgr===p.id,staff:pk-w.staff.pick,left:S.cresc.length,note:S.notes.some(n=>n.k==='info'&&n.title.includes(x.name.split(' ')[0]))};}''')
+        assert r['p'] and r['hired'] and r['tal'] and r['cheap'] and r['wh'] and r['staff'] == 1 and r['left'] == 0 and r['note'], f'promozione del talento in banchina {r}'
+        await pg.click(f'{sel} [data-act=close]'); await pg.evaluate("()=>window.__FUP.cardsOff()")
         # pensione di un manager: al compleanno dei 66 anni annuncia la pensione, dopo il preavviso esce dalle liste
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; F.ACT.hiremgr({id:'toto'}); const t=S.managers.find(m=>m.id==='toto');
           t.bd=S.day+1-66*365; S.nextEvent=1e9; F.step(); return {age:F.ageOf(t),ev:S.notes.filter(n=>n.k==='ev').map(n=>n.title).join()};}''')
@@ -809,6 +936,22 @@ async def main():
         await pg.click('#notepop [data-act=notegopen]')
         assert not await pg.query_selector(f'#notes [data-act=noteg][data-id={col["g"][0]}]'), 'aprendo la finestra le notizie varie restano'
         await pg.evaluate("()=>document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click())")
+        # gare: il magazzino si sceglie dalla finestrella, sopra chi può prendere il cliente, sotto in grigio chi no (qui manca l'HACCP)
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; S.cash=Math.max(S.cash,5e6); const clr=()=>{document.querySelector('#modal').innerHTML='';};
+          const ids=Object.keys(F.SITES).filter(i=>!S.warehouses.some(w=>w.site==i)); F.ACT.rent({id:ids[3]}); F.ACT.rent({id:ids[9]}); clr();
+          S.researched.haccp=true; const w=S.warehouses[S.warehouses.length-2]; w.tech.haccp={day:0,iss:S.day,exp:S.day+900,next:S.day+300,nc:null,susp:null,pend:null};
+          let t=null; for(let i=0;i<30;i++){ S.tenders=S.tenders.filter(x=>x.done); F.newTender(); t=S.tenders[S.tenders.length-1]; t.req=['haccp']; t.stock=Math.min(t.stock,1200); const e=F.bidEstimate(t,w.id,1); if(e&&e.fits) break; }
+          document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); return {w:w.id,name:w.name,n:S.warehouses.length};}''')
+        await win(pg, 'gare')
+        await pg.click('#win-gare [data-act=mpopen][data-k=bid]')
+        assert await pg.evaluate(MPORD), 'scelta del magazzino: quelli che possono prendere il cliente devono stare sopra'
+        assert 'HACCP' in await pg.inner_text('#modal .mp-r.off'), 'il magazzino senza certificazione non è in grigio col motivo'
+        assert await pg.eval_on_selector_all('#modal .mp-r', 'e=>e.length') == r['n'], 'nella scelta mancano dei magazzini'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_scelta_magazzino_gara.png'))
+        await pg.click(f'#modal [data-act=mpick][data-v={r["w"]}]')
+        assert r['name'] in await pg.inner_text('#win-gare [data-act=mpopen][data-k=bid]'), 'il magazzino scelto non compare nella gara'
+        assert not await pg.eval_on_selector('#win-gare [data-act=bid]', 'e=>e.disabled'), 'col magazzino certificato l\'offerta resta bloccata'
+        await pg.click('#win-gare [data-act=close]')
         # partita completa con 3 avversari: due anni senza errori, offerte vere nelle gare, magazzini rivali sulla mappa
         r = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino',null,{mode:'classica',win:{reputazione:true},reputazione:200});
           const H=F.HUM; H.bots=[['edoardo','espansione'],['valeria','qualita'],['marco','prezzo']].map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],'normale',i));
@@ -816,7 +959,7 @@ async def main():
           for(let d=0;d<730&&!H.over;d++){ const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}
             H.cash=Math.max(H.cash,300000); bids+=H.tenders.filter(t=>t.bids&&Object.keys(t.bids).length&&t.deadline===H.day).length; F.step(); }
           F.ACT.toggle({id:'classifica'});
-          const gm=H.bots.reduce((a,b)=>a+b.managers.filter(m=>m.gen&&(m.hired||m.arr!=null)).length,0), more=H.bots.some(b=>b.warehouses.length>1);
+          const gm=H.bots.reduce((a,b)=>a+b.managers.filter(m=>m.gen&&(m.hired||m.arr!=null)).length,0), more=H.bots.some(b=>b.warehouses.filter(w=>w.mgr!=='ceo').length>1);   // il CEO può guidare un magazzino da sé: serve un manager nuovo solo oltre quello
           return {gm,more,board:F.mktList().length,bids,cli:H.bots.map(b=>b.clients.filter(c=>c.status==='attivo').length),day:H.day,mk:document.querySelectorAll('#ov [data-act=openclass]').length,
             sizeKB:Math.round(JSON.stringify(H).length/1024)};}''')
         assert r['bids'] > 3 and sum(r['cli']) > 6 and r['day'] >= 729, r
@@ -859,6 +1002,8 @@ async def main():
           document.querySelector('#modal').innerHTML='';
           const w=H.warehouses[0], out={day:H.day,wage:H.ri.wage,idx:H.riw.idx,ti:H.riw.ti,ag:w.ag!=null,bots:H.bots.map(b=>!!b.ri&&b.warehouses.every(x=>x.ag!=null)),
             tech:F.TECH.some(t=>t.id==='talpa'),strikes:H.ri.strikes,clima:F.climaProg(H)};
+          // le tariffe si provano su un cliente attivo: se dopo tre anni il magazzino non ne ha (gare perse), gliene diamo uno
+          if(!H.clients.some(c=>c.status==='attivo'&&c.wh===w.id)){ const c0=H.clients[0]||H.bots.flatMap(b=>b.clients)[0]; if(c0) H.clients.push({...c0,id:'cltar',req:[],line:null,peak:null,wh:w.id,status:'attivo',pal:400,stock:300,sat:60}); }
           { const r0=F.computeWH(w).rev; H.riw.ti*=1.1; const r1=F.computeWH(w).rev; H.riw.ti/=1.1; out.tarOk=r0>0&&r1/r0>1.05&&r1/r0<1.1001; }
           // tavolo forzato: concedendo tutto si firma alla prima seduta
           // il magazzino nasce senza sindacato: senza, niente tavolo; col morale a terra il sindacato arriva
@@ -867,7 +1012,7 @@ async def main():
           for(let i=0;i<20;i++){ w.morale=30; F.step(); } out.sind=w.sind&&!!w.rsu;
           w.tav=null; w.deal=null; w.tavCd=0; w.ag=70; F.riTavOpen(w); w.tav.reqs.forEach(r=>r.c='si'); w.tav.next=H.day; F.step(); out.deal=!!w.deal&&!w.tav;
           // il tavolo non si riapre a comando: dopo un tavolo saltato si aspettano tre mesi
-          w.deal=null; w.ag=70; F.riTavOpen(w); F.ACT.riquit({wh:w.id}); F.step(); out.cool=!w.tav&&w.tavCd>H.day+80;
+          w.deal=null; w.ag=70; F.riTavOpen(w); F.ACT.riquit({wh:w.id,ok:1}); F.step(); out.cool=!w.tav&&w.tavCd>H.day+80;
           // gara per l'handling: tre settimane di offerte, poi si sceglie; e ritorno al personale interno
           w.ag=20; w.tavCd=1e9; w.strike=null; const av=F.hdlAvail(w); out.av=av.length;
           if(av.length){ F.hdlTender(w); out.early=F.htPick(w,0)===null; for(let i=0;i<22;i++){ document.querySelector('#modal').innerHTML=''; F.step(); }

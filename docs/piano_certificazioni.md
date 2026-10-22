@@ -85,4 +85,4 @@ Schemi privati reali solo con nomi parodia (es. «Bollino Banchina Sicura», «P
 3. **Altre certificazioni** (GDP, ADR, antifurto, doganale, ambiente, sicurezza, parità) con i loro clienti e le nuove linee di business.
 4. **Contorno**: ispezioni a sorpresa (ASL, NAS, Ispettorato del lavoro), Responsabile qualità e audit interni, eventi e talenti a tema.
 
-Ogni fase: voci nell'enciclopedia, icone in `tools/icone_gioco/`, riga nel CHANGELOG, aggiornamento di `design.md`, prova sul telefono.
+Ogni fase: voci nell'enciclopedia, icone in `tools/icone_pxl/`, riga nel CHANGELOG, aggiornamento di `design.md`, prova sul telefono.

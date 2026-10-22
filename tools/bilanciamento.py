@@ -23,6 +23,7 @@ SIM = r'''async (o)=>{
  const F=window.__FUP;
  // generatore con seme: la stessa partita a ogni lancio
  let a=o.seed>>>0; Math.random=function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; };
+ if(o.pre) eval(o.pre);   // --pre: modifiche ai dati prima della partita (per esempio F.CEOS)
  F.newGame(o.human,null,{mode:'classica',win:{},ri:o.ri});
  const H=F.HUM; H.cfg.noPause=true;
  H.bots=o.rivals.map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],o.diff,i));
@@ -75,6 +76,11 @@ def report(res):
         allc = [c for v in by.values() for c in v]; N = len(allc)
         print(f"===== {'CON il pacchetto Relazioni industriali' if ri else 'SENZA pacchetti'}: {len(R)} partite, {N} aziende")
         print('fallite %d/%d · per stile: %s' % (sum(c['over'] for c in allc), N, ', '.join(f"{k} {sum(c['over'] for c in v)}/{len(v)}" for k, v in by.items())))
+        byc = defaultdict(list)
+        for c in allc: byc[c['ceo']].append(c)
+        alive = lambda c, y: len(c['acc']['yr']) >= y and not c['acc']['yr'][y-1]['over']
+        print('per CEO (fallite in %d anni · vive al 5° anno · utile medio dei primi 5 anni): %s' % (years, ' · '.join(
+            f"{k} {sum(c['over'] for c in v)}/{len(v)}, {sum(alive(c, 5) for c in v)}, {mean([r['util'] for c in v for r in c['acc']['yr'][:5] if not r['over']])/1e3:.0f}k" for k, v in sorted(byc.items()))))
         for y in range(1, years + 1):
             rows = [c['acc']['yr'][y-1] for c in allc if len(c['acc']['yr']) >= y and not c['acc']['yr'][y-1]['over']]
             if not rows: continue
@@ -108,7 +114,7 @@ async def simulate(a):
     for s in range(a.semi):
         human, rivals = ROT[(s + a.seed0) % len(ROT)]
         for ri in ([False, True] if a.ri == 'both' else [a.ri == 'on']):
-            jobs.append(dict(seed=1000 + (s + a.seed0) * 7919, ri=ri, years=a.anni, human=human, hstyle='standard', rivals=rivals, diff=a.diff, hook=a.hook))
+            jobs.append(dict(seed=1000 + (s + a.seed0) * 7919, ri=ri, years=a.anni, human=human, hstyle='standard', rivals=rivals, diff=a.diff, hook=a.hook, pre=a.pre))
     async with async_playwright() as p:
         br = await p.chromium.launch(); sem = asyncio.Semaphore(a.par); done = [0]
         async def one(o):
@@ -135,6 +141,7 @@ def main():
     ap.add_argument('--par', type=int, default=os.cpu_count() or 2, help='partite in parallelo')
     ap.add_argument('--sub', action='append', default=[], help="prova una modifica senza ricompilare: 'vecchio|||nuovo'")
     ap.add_argument('--hook', default='', help="codice JS eseguito ogni settimana dopo le scelte del giocatore (F = window.__FUP)")
+    ap.add_argument('--pre', default='', help="codice JS eseguito prima di creare la partita, per provare dati diversi (F = window.__FUP, per esempio F.CEOS)")
     ap.add_argument('--out', default=os.path.join(OUT, 'bil_ultimo.json'))
     ap.add_argument('--riepilogo', nargs='*', help='non simula: rilegge questi file di risultati')
     a = ap.parse_args()

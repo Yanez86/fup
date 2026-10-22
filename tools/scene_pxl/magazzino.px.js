@@ -285,3 +285,87 @@ scene("festa", { w: SW, h: SH, bg: "S", world: { light: [-0.6, -1], ground: 66 }
     if (y < SH) { c.px(x, y, p.k); if ((c.frame + i) % 2) c.px(x + 1, y, p.k) }
   })),
 )
+
+// ================================================================ TALENTO
+// Un talento in banchina: un raggio di sole dal lucernario cade su un magazziniere salito su un bancale, che alza la mappa
+// del picking ridisegnata a mano; sopra la testa la lampadina dell'idea e le scintille. A sinistra il manager col fumetto «!»
+// e il capoturno che applaude, il cane scodinzola; a destra la lavagna col grafico che sale. Per gli eventi b_* (talenti in banchina).
+
+persona("_talento", { testa: "corti", abito: "gilet", swap: { B: "O", b: "o", M: "N" } })
+persona("_manager", { testa: "calvo", abito: "completo", swap: { B: "d", b: "K", M: "s", D: "K", R: "R" } })
+// il bancale su cui è salito
+sprite("bancale", { w: 18, h: 3, outline: "K", pivot: "bottom" }, hline(0, 0, 18, "k"), hline(0, 1, 18, "m"), rect(0, 1, 2, 1, "k"), rect(8, 1, 2, 1, "k"),
+  rect(16, 1, 2, 1, "k"), hline(0, 2, 18, "N"))
+// il magazziniere alza la mappa del magazzino ridisegnata con gli evidenziatori: la sventola su e giù
+anim("eureka", { w: 18, h: 26, fps: FPS, outline: "K", pivot: [5, 26] }, stamp("__talento", 0, 6),
+  frame({ hold: 4 }, rect(9, 9, 2, 7, "O"), px(10, 8, "F"), rect(10, 1, 7, 7, "W"), hline(11, 2, 4, "Y"), hline(11, 4, 2, "G"), px(14, 4, "R"), hline(11, 6, 5, "B"), vline(16, 1, 7, "S")),
+  frame({ hold: 4 }, rect(9, 10, 2, 6, "O"), px(10, 9, "F"), rect(10, 2, 7, 7, "W"), hline(11, 3, 4, "Y"), hline(11, 5, 2, "G"), px(14, 5, "R"), hline(11, 7, 5, "B"), vline(16, 2, 7, "S")))
+// la lampadina dell'idea, accesa
+sprite("lampadina", { outline: "K", pivot: "bottom" }, `
+  .YYY.
+  YiiYY
+  YiYYy
+  YYYYy
+  .YYy.
+  ..s..
+  .sSs.
+  ..s..`)
+// i raggi della lampadina e le scintille intorno: si accendono a turno (giri da 8 fotogrammi)
+const SCINTILLE = [[-14, 12, 0], [12, 4, 3], [-10, 30, 5], [16, 24, 2], [-2, -6, 6]]
+anim("scintille", { w: 48, h: 48, frames: LOOP, fps: FPS, pivot: [24, 24] }, (c) => {
+  // i raggi della lampadina (in mezzo al raggio di sole servono gialli scuri): lunghi e corti a turno
+  // dietro la lampadina un alone chiaro che pulsa, così i raggi si leggono anche sopra le scaffalature
+  const lungo = c.frame % 4 < 2, R = [[0, -1, 8], [-1, -1, 6], [1, -1, 6], [-1, 0, 8], [1, 0, 8]]
+  c.circ(24, 21, lungo ? 7 : 6, "C"); c.circ(24, 21, lungo ? 5 : 4, "i")
+  R.forEach(([a, b, d]) => { const x0 = 24 + a * d, y0 = 21 + b * d; c.px(x0, y0, "W"); c.px(x0 + a, y0 + b, "W"); if (lungo) c.px(x0 + 2 * a, y0 + 2 * b, "Y") })
+  SCINTILLE.forEach(([dx, dy, f0]) => {
+    const t = (c.frame + f0) % 8, x = 24 + dx, y = 24 + dy
+    if (t === 0 || t === 4) c.px(x, y, "Y")
+    else if (t === 1 || t === 3) { c.px(x, y, "W"); c.px(x - 1, y, "i"); c.px(x + 1, y, "i"); c.px(x, y - 1, "i"); c.px(x, y + 1, "i") }
+    else if (t === 2) { c.px(x, y, "W"); [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(([a, b]) => c.px(x + a, y + b, "i")); [[-2, 0], [2, 0], [0, -2], [0, 2]].forEach(([a, b]) => c.px(x + a, y + b, "Y")) }
+  })
+})
+// il manager col fumetto «!» che spunta e rimbalza
+sprite("manager", { w: 10, h: 20, outline: "K", pivot: "bottom" }, stamp("__manager"))
+sprite("_fumetto", { w: 7, h: 9 }, rect(0, 0, 7, 7, "W"), px(1, 7, "W"), px(1, 8, "W"), rect(3, 1, 1, 3, "R"), px(3, 5, "R"))
+anim("fumetto", { w: 9, h: 12, frames: LOOP, fps: FPS, outline: "K", pivot: [1, 12] }, (c) => {
+  const t = c.frame % 8; if (t > 5) return
+  c.stamp("_fumetto", 1, t === 0 ? 3 : t === 1 ? 1 : 2)
+})
+// il capoturno che applaude
+anim("applauso", { w: 10, h: 20, fps: FPS, outline: "K", pivot: "bottom" }, stamp("__capoturno"),
+  frame({ hold: 2 }, px(1, 14, "O"), px(8, 14, "O"), px(1, 13, "F"), px(8, 13, "F")),
+  frame({ hold: 2 }, rect(2, 13, 2, 2, "O"), rect(6, 13, 2, 2, "O"), px(4, 12, "F"), px(5, 12, "F")))
+// la lavagna sul cavalletto: il grafico sale un punto alla volta, poi resta e lampeggia «+12%»
+const PUNTI = [[3, 17], [7, 16], [11, 17], [15, 13], [19, 12], [23, 8], [27, 5]]
+anim("lavagna", { w: 34, h: 36, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
+  vline(5, 22, 14, "N"), vline(28, 22, 14, "N"), vline(4, 30, 6, "M"), vline(29, 30, 6, "M"), hline(5, 28, 24, "M"),     // cavalletto
+  rect(0, 0, 34, 24, "S"), rect(1, 1, 32, 22, "W"), hline(1, 22, 32, "S"), rect(2, 23, 30, 1, "s"),                       // lavagna
+  vline(3, 3, 17, "D"), hline(3, 20, 28, "D"),                                                                              // assi
+  px(26, 23, "R"), px(28, 23, "B"),                                                                                         // pennarelli
+  (c) => {
+    const n = Math.min(PUNTI.length, c.frame + 1)
+    for (let i = 1; i < n; i++) c.line(PUNTI[i - 1][0] + 1, PUNTI[i - 1][1] + 1, PUNTI[i][0] + 1, PUNTI[i][1] + 1, "G")
+    for (let i = 0; i < n; i++) c.px(PUNTI[i][0] + 1, PUNTI[i][1] + 1, "g")
+    if (n === PUNTI.length) { c.line(25, 4, 28, 4, "G"); c.line(28, 4, 28, 7, "G") }                                      // la freccia in cima
+    if (c.frame >= 8 && c.frame % 4 < 2) c.text(5, 3, "+12%", "R")
+  })
+
+scene("talento", { w: SW, h: SH, bg: "S", world: { light: [-0.6, -1], ground: 66 } },
+  layer("fondo", stamp("_capannone")),
+  // il raggio di sole dal lucernario, e la pozza di luce sul pavimento
+  layer("raggio", { light: true }, poly([92, 3, 108, 3, 111, 66, 81, 66], "W")),
+  layer("pozza", { light: true }, ellipse(96, 66, 17, 3, "W")),
+  layer("ombre", { shade: true }, ellipse(22, 67, 6, 1, "K"), ellipse(40, 67, 6, 1, "K"), ellipse(56, 67, 6, 1, "K"), ellipse(138, 67, 13, 1, "K")),
+  layer("cose", { sort: "y" },
+    stamp("cane", 22, 67),
+    stamp("manager", 40, 67),
+    stamp("applauso", 56, 67),
+    stamp("bancale", 96, 66),
+    stamp("eureka", 92, 63),
+    stamp("lavagna", 138, 67)),
+  layer("sopra",
+    stamp("scintille", 92, 31),
+    stamp("lampadina", 92, 34),
+    stamp("fumetto", 45, 44)),
+)
