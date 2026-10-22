@@ -825,6 +825,31 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .hm-plus{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--ink)}
 .hm-new .ar{font-family:var(--f-disp);font-size:32px;font-weight:700}
 .hm-new:disabled{background:var(--panel2);box-shadow:inset 0 -5px 0 var(--line),4px 4px 0 var(--ink);cursor:not-allowed}.hm-new:disabled .hm-plus,.hm-new:disabled .ar{opacity:.4}
+.hm-tut{background:#bfe6ff;box-shadow:inset 0 -5px 0 #5fb4f0,inset 0 3px 0 #e6f5ff,4px 4px 0 var(--ink)}
+.hm-orn{width:52px;height:60px;flex:none;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--ink)}.hm-new:disabled .hm-orn{opacity:.4}
+/* tutorial: il fumetto della dottoressa Ribalta (#tut) e il riquadro che lampeggia sulla cosa da toccare (#tuthi) */
+#tut{position:fixed;z-index:60;left:96px;bottom:16px;width:min(520px, calc(100vw - 32px));display:flex;gap:10px;align-items:flex-end;pointer-events:none}
+#tut:empty{display:none}
+#tut.up{bottom:auto;top:calc(var(--top-h, 64px) + 10px);align-items:flex-start}
+#tut .tut-por{flex:none;padding:0;background:#bfe6ff;border:3px solid var(--ink);box-shadow:inset 0 -4px 0 #5fb4f0,4px 4px 0 rgba(12,19,29,.45);pointer-events:auto;cursor:pointer;line-height:0}
+#tut .tut-b{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;gap:8px;padding:10px 12px 12px;background:#fff;border:3px solid var(--ink);box-shadow:inset 0 -4px 0 var(--line),4px 4px 0 rgba(12,19,29,.45);pointer-events:auto}
+#tut .tut-b::before{content:"";position:absolute;left:-11px;bottom:18px;width:8px;height:12px;background:var(--ink);clip-path:polygon(100% 0,0 50%,100% 100%)}
+#tut.up .tut-b::before{bottom:auto;top:18px}
+#tut .tut-h{display:flex;align-items:flex-start;gap:8px}#tut .tut-n{flex:1;min-width:0;display:flex;flex-direction:column}#tut .tut-n b{font-family:var(--f-disp);font-size:17px}
+#tut .tut-x{flex:none;align-self:flex-start;width:32px;height:28px;padding:0;border:2px solid var(--ink);background:var(--panel2);font-size:14px;cursor:pointer}
+#tut p{margin:0;font-size:16px;line-height:1.45}
+#tut .tut-w{padding:5px 9px;background:#fff3c4;border:2px solid var(--ink);font-weight:600}
+#tut .tut-r{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+#tut.min .tut-b{display:none}
+#tut.nudge .tut-b{animation:tutNudge .45s}
+@keyframes tutNudge{0%,100%{transform:none}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+#tuthi{position:fixed;z-index:59;pointer-events:none;border:4px solid var(--yellow);box-shadow:0 0 0 3px var(--ink),inset 0 0 0 2px var(--ink);animation:tutHi 1s steps(2) infinite}
+#tuthi[hidden]{display:none}
+@keyframes tutHi{50%{border-color:var(--accent)}}
+@media (prefers-reduced-motion:reduce){#tuthi,#tut.nudge .tut-b{animation:none}}
+.attest{display:flex;flex-direction:column;gap:8px;padding:16px 18px;background:#fffdf3;border:3px double var(--ink);text-align:center}
+.attest .at-h{font-family:var(--f-disp);font-size:24px;font-weight:700}.attest p{margin:4px 0;line-height:1.45}
+.attest .at-f{display:flex;align-items:center;justify-content:center;gap:10px}.attest .at-f img{background:#bfe6ff;border:2px solid var(--ink)}.attest .at-f i{font-family:var(--f-disp);font-size:20px;display:block}
 #start .news{padding:0;gap:0;box-shadow:inset 0 -3px 0 var(--panel2),3px 3px 0 var(--ink)}
 #start .news summary{list-style:none;min-height:56px;padding:10px 14px;gap:12px;flex-wrap:nowrap;font-weight:400}
 #start .news summary::-webkit-details-marker{display:none}
@@ -1103,6 +1128,9 @@ html,body{overscroll-behavior:none}
 .mob .sv-kpi{grid-template-columns:minmax(0,1fr)}.mob #start .btn.pri.sv-go{font-size:21px;padding:8px 14px}
 .mob .cl-a .btn{flex:1 1 auto;justify-content:center;min-height:48px}.mob .cl-p{margin-left:0;flex-basis:100%}
 .mob .hm-new{min-height:72px;padding:10px 12px;gap:12px;font-size:13px}.mob .hm-new b{font-size:22px}.mob .hm-new .ar{font-size:28px}
+.mob #tut{left:8px;right:8px;width:auto;bottom:calc(78px + env(safe-area-inset-bottom, 0px));gap:6px}
+.mob #tut.up{top:calc(var(--top-h, 56px) + 8px);bottom:auto}
+.mob #tut p{font-size:15px}.mob #tut .tut-b{padding:8px 10px 10px;gap:6px}.mob #tut .tut-b::before{display:none}
 .mob #start .news summary{padding:10px 12px;gap:10px}.mob .nw-p{display:none}.mob .nw-l{max-height:none}
 .mob .nw-e{gap:10px;padding:8px 12px}.mob .nw-e .v{width:46px}.mob #start .nw-c ul{font-size:14px;padding-left:16px}
 .mob .ceos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:30px 12px 14px;margin:-16px -12px 0}
@@ -1169,6 +1197,8 @@ html,body{overscroll-behavior:none}
 <div id="notecard" aria-live="polite" hidden></div>
 <div id="tip" hidden></div>
 <div id="modal"></div>
+<div id="tut"></div>
+<div id="tuthi" hidden></div>
 <div id="start"></div>
 <div id="intro"></div>
 
@@ -1177,7 +1207,7 @@ html,body{overscroll-behavior:none}
 (function(){
 'use strict';
 /* ====================== DATI ====================== */
-const IMG={anon:'{{Q_anonimo}}',v0:'{{Q_v0}}',v1:'{{Q_v1}}',v2:'{{Q_v2}}',v3:'{{Q_v3}}',v4:'{{Q_v4}}',v5:'{{Q_v5}}',v6:'{{Q_v6}}',v7:'{{Q_v7}}',v8:'{{Q_v8}}',v9:'{{Q_v9}}',v10:'{{Q_v10}}',v11:'{{Q_v11}}',v12:'{{Q_v12}}',v13:'{{Q_v13}}',v14:'{{Q_v14}}',v15:'{{Q_v15}}',v16:'{{Q_v16}}',v17:'{{Q_v17}}',v18:'{{Q_v18}}',v19:'{{Q_v19}}',v20:'{{Q_v20}}',v21:'{{Q_v21}}',v22:'{{Q_v22}}',v23:'{{Q_v23}}',v24:'{{Q_v24}}',v25:'{{Q_v25}}',v26:'{{Q_v26}}',v27:'{{Q_v27}}',v28:'{{Q_v28}}',v29:'{{Q_v29}}',v30:'{{Q_v30}}',v31:'{{Q_v31}}',v32:'{{Q_v32}}',v33:'{{Q_v33}}',v34:'{{Q_v34}}',v35:'{{Q_v35}}',v36:'{{Q_v36}}',v37:'{{Q_v37}}',v38:'{{Q_v38}}',v39:'{{Q_v39}}',fm:'{{Q_facility}}',car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',cs:'{{Q_operatore}}',m_mirella:'{{Q_mirella}}',m_gianfranco:'{{Q_gianfranco}}',m_kevin:'{{Q_kevin}}',m_delsasso:'{{Q_delsasso}}',m_sorrentino:'{{Q_sorrentino}}',m_greta:'{{Q_greta}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',m_giorgio:'{{Q_giorgio}}',m_aisha:'{{Q_aisha}}',m_ivan:'{{Q_ivan}}',m_sara:'{{Q_sara}}',m_nicola:'{{Q_nicola}}',m_elena:'{{Q_elena}}',m_matteo:'{{Q_matteo}}',m_beatrice:'{{Q_beatrice}}',m_paolo:'{{Q_paolo}}',m_federico:'{{Q_federico}}',m_andrew:'{{Q_andrew}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}',u_cup:'{{Q_u_cup}}',u_sam:'{{Q_u_sam}}',u_coba:'{{Q_u_coba}}'};
+const IMG={anon:'{{Q_anonimo}}',v0:'{{Q_v0}}',v1:'{{Q_v1}}',v2:'{{Q_v2}}',v3:'{{Q_v3}}',v4:'{{Q_v4}}',v5:'{{Q_v5}}',v6:'{{Q_v6}}',v7:'{{Q_v7}}',v8:'{{Q_v8}}',v9:'{{Q_v9}}',v10:'{{Q_v10}}',v11:'{{Q_v11}}',v12:'{{Q_v12}}',v13:'{{Q_v13}}',v14:'{{Q_v14}}',v15:'{{Q_v15}}',v16:'{{Q_v16}}',v17:'{{Q_v17}}',v18:'{{Q_v18}}',v19:'{{Q_v19}}',v20:'{{Q_v20}}',v21:'{{Q_v21}}',v22:'{{Q_v22}}',v23:'{{Q_v23}}',v24:'{{Q_v24}}',v25:'{{Q_v25}}',v26:'{{Q_v26}}',v27:'{{Q_v27}}',v28:'{{Q_v28}}',v29:'{{Q_v29}}',v30:'{{Q_v30}}',v31:'{{Q_v31}}',v32:'{{Q_v32}}',v33:'{{Q_v33}}',v34:'{{Q_v34}}',v35:'{{Q_v35}}',v36:'{{Q_v36}}',v37:'{{Q_v37}}',v38:'{{Q_v38}}',v39:'{{Q_v39}}',fm:'{{Q_facility}}',car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',cs:'{{Q_operatore}}',m_mirella:'{{Q_mirella}}',m_gianfranco:'{{Q_gianfranco}}',m_kevin:'{{Q_kevin}}',m_delsasso:'{{Q_delsasso}}',m_sorrentino:'{{Q_sorrentino}}',m_greta:'{{Q_greta}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',m_giorgio:'{{Q_giorgio}}',m_aisha:'{{Q_aisha}}',m_ivan:'{{Q_ivan}}',m_sara:'{{Q_sara}}',m_nicola:'{{Q_nicola}}',m_elena:'{{Q_elena}}',m_matteo:'{{Q_matteo}}',m_beatrice:'{{Q_beatrice}}',m_paolo:'{{Q_paolo}}',m_federico:'{{Q_federico}}',m_andrew:'{{Q_andrew}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}',u_cup:'{{Q_u_cup}}',u_sam:'{{Q_u_sam}}',u_coba:'{{Q_u_coba}}',ornella:'{{Q_ornella}}',ornella_contenta:'{{Q_ornella_contenta}}',ornella_occhiolino:'{{Q_ornella_occhiolino}}'};
 const LON0=4.81, LAT1=47.0, KX=78.29*2, KY=111.111*2;
 const pt=(lon,lat)=>[ (lon-LON0)*KX, (LAT1-lat)*KY ];
 const CITIES=[
@@ -2855,6 +2885,12 @@ wk('ritiro','cli','Ritiro o consegna',`Da dove arriva la merce: la consegna il c
 `Con "consegna" la merce arriva al magazzino gratis. Con "ritiro" mandi un bilico da 33 pallet fino allo stabilimento del cliente: servono più [[autisti_ce|autisti CE]] e più gasolio, ma il cliente paga 1,5 € per ogni km di ritiro.`);
 wk('concorrenti','cli','Concorrenti',`Gruppo Bartolazzi, Logistix Global, F.lli Brambilla e la Cooperativa La Fatica: il resto del mercato, che si prende le gare che nessuno vince.`,
 `Non li vedi lavorare, ma ci sono: una [[gare|gara]] che non va né a te né a un'[[avversari|azienda avversaria]] finisce a uno di loro, di solito con uno sconto aggressivo. Le aziende avversarie vere, quelle degli altri CEO, le trovi in [[classifica]].`);
+wk('tutorial','basi','Tutorial',`Una partita guidata dalla dottoressa Ornella Ribalta: nove lezioni sulle basi del gioco, in circa 15 minuti.`,
+`Si avvia dalla schermata principale con il pulsante Tutorial e occupa un posto di salvataggio come una partita normale. Si gioca con Valeria Conti a Novara, senza avversari, con il [[tempo]] in Classica.
+
+La dottoressa Ribalta, docente del corso regionale «Diventa CEO in 9 lezioni», spiega una cosa alla volta in un fumetto e indica con un riquadro giallo cosa toccare: la [[mappa]], il [[magazzino]] con [[saturazione|occupazione]], [[puntualita]] e [[accuratezza]], il [[carico|carico di lavoro]] del personale e il [[facility|facility manager]] da assumere, una [[gare|gara d'appalto]] preparata apposta, la prima [[ricerca]], i [[manager]], le [[notifiche]] e gli [[eventi]], il [[report]] del lunedì e la [[cassa]].
+
+Mentre parla il tempo resta fermo: si riparte quando lo dice lei. Finché dura il corso non arrivano altre gare né eventi a caso. Il fumetto si rimpicciolisce toccando il ritratto o ▾, e il tutorial si può saltare in qualsiasi momento: la partita continua normale. Alla fine arriva l'attestato di partecipazione e si continua a giocare la stessa partita.`);
 wk('lobby','basi','Lobby',`L'ultimo passaggio prima di iniziare: le quattro aziende in gara, il ritmo del tempo e le condizioni di vittoria.`,
 `È divisa in due parti. **1 · Le aziende in gara**: nel primo posto, con l'etichetta **TU**, ci sei tu. Negli altri tre, con l'etichetta scura **CPU**, ci sono gli altri CEO giocabili, guidati dal computer: per ognuno scegli se è in gara e, dalla tendina «Comportamento e difficoltà», il [[avversari|comportamento]] e la difficoltà (all'inizio Standard e Normale). Se li lasci tutti fuori giochi da solo, come una volta, senza vittoria: si va avanti finché la cassa regge.
 
@@ -4081,6 +4117,7 @@ function csLog(c,n,ok,how){ const L=S.cs.log=S.cs.log||[]; L.unshift({d:S.day,c:
 function csDaily(){
   const q=csQ();
   csAct().forEach(c=>{ peakDaily(c); lineDaily(c);
+    if(tutOn()) return;
     if(!S.bot&&!c.exit&&lineFor(c)&&!csBusy(c)&&Math.random()<LINE.odds){ S.cs.q.push({c:c.id,k:'linea',day:S.day}); return; }
     if(c.exit||Math.random()>=1/CS.every) return;
     // metà sono drammi, un quarto picchi di consegna, un quarto richieste di overstock
@@ -4563,7 +4600,8 @@ function resolveTender(t){
   rivals().forEach(b=>{ const bb=(t.bids||{})[b.bot.id]; if(!bb||b.over) return;
     const e=withCo(b,()=>whById(bb.wh)?bidEstimate(t,bb.wh,bb.mult):null); if(e&&e.fits) L.push({co:b,e,bid:bb}); else b.tw.lose++; });
   const wt=x=>Math.exp(clamp((x.e.score-x.e.comp)/6,-30,30)), tot=1+L.reduce((a,x)=>a+wt(x),0);
-  let r=Math.random()*tot, win=null; for(const x of L){ if((r-=wt(x))<0){win=x;break;} }
+  let r=Math.random()*tot, win=t.tut&&L.find(x=>x.co===(HUM||S))||null;   // la gara del tutorial: col buyer ha già parlato la dottoressa
+  if(!win) for(const x of L){ if((r-=wt(x))<0){win=x;break;} }
   const nb=Object.keys(t.bids||{}).length;
   if(!t.bid){ S.tw.skip++; }
   if(win&&win.co===(HUM||S)){
@@ -6879,7 +6917,7 @@ function setMobile(){
   MOB=matchMedia('(max-width: 760px), (max-height: 500px)').matches;
   const h=document.documentElement; h.classList.toggle('mob',MOB); h.classList.toggle('land',MOB&&innerWidth>innerHeight);
   if(!MOB&&UI.menu) setMenu(false);
-  if(S&&MOB!==UI.mobDock){UI.mobDock=MOB; renderDock(); renderTop();}
+  if(S&&MOB!==UI.mobDock){UI.mobDock=MOB; renderDock(); renderTop(); if(tutOn()) tutRender();}
   layoutVars();
 }
 function layoutVars(){
@@ -8503,7 +8541,7 @@ function wikiShow(){
   if(c&&(c.offsetTop<l.scrollTop||c.offsetTop>l.scrollTop+l.clientHeight-30)) l.scrollTop=c.offsetTop-l.clientHeight/3;
 }
 function doHire(r,wh,days,cost){S.cash-=cost;S.cur.altro+=cost;S.queue.push({role:r,wh:OFFICE.includes(r)?null:wh,days,tot:days});toast(`Ricerca avviata: arriva tra ${wks(days)}`,'ok');}
-function setSpeed(v){if(contMode())v=1; S.speed=Math.min(v,1);renderTop();}
+function setSpeed(v){if(contMode())v=1; if(v>0&&tutHold()){v=0; if(!$('#modal').innerHTML) tutNudge();} S.speed=Math.min(v,1);renderTop();}
 function showModal(html){if(contMode()&&!AUTO)UI.auto={due:S.day+7,f:closeModal}; $('#modal').innerHTML=`<div class="ovl"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;const b=$('#modal button');if(b)b.focus({preventScroll:true});}  // la finestra parte dall'alto (scenetta e titolo), anche se il primo pulsante è più giù
 function closeModal(){$('#modal').innerHTML='';UI.auto=null;if(UI.evSpeed){setSpeed(UI.evSpeed);UI.evSpeed=0;} if((UI.mq||[]).length&&S&&!S.over) modalInfo(...UI.mq.shift());}
 function showChoice(title,text,opts){UI.choice=opts.map(o=>o.f);UI.evSpeed=S.speed;S.speed=0;renderTop();
@@ -8567,6 +8605,170 @@ document.addEventListener('click',e=>{
 document.addEventListener('mouseover',e=>{if(Date.now()-touchT<1000)return;const t=e.target.closest('[data-tip]');if(!t){if(!e.target.closest('svg[data-chart]'))tip.hidden=true;return;}tip.innerHTML=t.dataset.tip;tip.hidden=false;});
 document.addEventListener('mousemove',e=>{if(tip.hidden||Date.now()-touchT<1000)return;const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(e.clientX+14,innerWidth-w-8)+'px';tip.style.top=Math.min(e.clientY+16,innerHeight-h-8)+'px';});
 
+/* ====================== TUTORIAL ====================== */
+// La scuola della dottoressa Ornella Ribalta: una partita preparata apposta (Valeria Conti a Novara, da sola, ritmo Classica,
+// senza pacchetti) in cui un fumetto (#tut) spiega una cosa alla volta, indica cosa toccare con il riquadro che lampeggia (#tuthi)
+// e aspetta che il giocatore lo faccia. Stato in S.tut = {id, i: passo, done: 1 finito, 2 saltato, ev: giorno dell'evento, evf: evento arrivato}.
+// Finché dura non arrivano gare né eventi a caso: solo quelli delle lezioni (la gara ha t.tut e si vince sempre, l'evento è «ordine»).
+// Ogni passo: t testo, f espressione ('' spiega, 'contenta', 'occhiolino'), hi cosa indicare (selettori, il primo visibile),
+// ok quando è fatto (senza ok c'è «Avanti»), w cosa deve fare il giocatore, go all'inizio del passo (deve poter ripartire dopo un salvataggio),
+// run se intanto il tempo può scorrere.
+const TUT_N='Dott.ssa Ornella Ribalta';
+const tutOn=()=>!!(S&&S.tut&&!S.tut.done&&!S.bot);
+const tTap=()=>TOUCH?'Tocca':'Clicca';
+const tDock=id=>MOB&&!UI.menu?'#burger':`#dock [data-id="${id}"]`;   // voce del menu: sul telefono prima il pulsante Menu
+const tPlay=()=>MOB?'#ppb':'#top .spd [data-v="1"]';
+const tMenu=n=>`${tTap()} «${n}» nel menu${MOB?' (prima il pulsante Menu, in basso a destra)':' a sinistra'}`;
+const tWh=()=>S.warehouses[0];
+const tCli=()=>S.clients.find(c=>c.storico)||S.clients[0];
+const tGara=()=>S.tenders.find(t=>t.tut);
+const tEvN=()=>(S.notes||[]).find(n=>n.k==='ev'&&n.ev&&n.ev.id==='ordine');
+const tResN=()=>(S.notes||[]).find(n=>n.k==='res'&&S.tut.evt&&n.title===S.tut.evt);
+const tNote=n=>n?`#notes [data-act=note][data-id="${n.id}"]`:null;
+const TUT={base:{n:'Tutorial base',corso:'Diventa CEO in 9 lezioni',L:[
+ {n:'Benvenuta',s:[
+  {f:'contenta',t:()=>`Buongiorno! Sono la dottoressa Ornella Ribalta, docente del corso regionale «Diventa CEO in 9 lezioni», pagato coi fondi europei. Oggi tu sei ${esc(ceo().name)}: ex manager di multinazionale, hai appena aperto ${esc(S.company.name)}. Io ti spiego le basi, le scelte le fai tu.`},
+  {hi:()=>`#map .mk[data-act=openwh][data-id="${tWh().id}"]`,t:()=>`Questa è la ${kw('mappa','mappa')} del Nord, da Nizza a Trieste. Il capannone qui indicato è il tuo magazzino di ${esc(tWh().name)}: per ora è l'unico. Le parole sottolineate a puntini, come ${kw('magazzino','magazzino')}, si spiegano ${TOUCH?'con un tocco':'passandoci sopra con il mouse'}.`}]},
+ {n:'Il tempo',s:[
+  {hi:()=>MOB?'#ppb':'#top .spd',t:()=>`Adesso il gioco è fermo: lo dice «In pausa» in alto. Quando parte, un giorno dura un secondo e ogni lunedì arriva il report della settimana. Il tempo si avvia con ›${TOUCH?'':' o con la barra spaziatrice'}, ma per ora lascialo fermo: ti dico io quando.`}]},
+ {n:'Il magazzino',s:[
+  {hi:()=>tDock('magazzini'),ok:()=>UI.open.magazzini&&wtabOf('magazzini')==='magazzini',w:()=>tMenu('Magazzini'),t:()=>`Partiamo dal tuo capannone.`},
+  {hi:()=>'#win-magazzini .wh-occ',t:()=>{const k=tWh().kpi||computeWH(tWh()); return `In alto c'è l'${kw('saturazione','occupazione')}: ${Math.round(k.sat*100)}% dei posti pallet. I costi del capannone li paghi tutti, ma lo riempi per un quarto: così perdi soldi ogni mese. Servono clienti nuovi.`;}},
+  {hi:()=>'#win-magazzini .wh-kpis',t:()=>{const c=tCli(); return `Questi sono i numeri che contano: la ${kw('puntualita','puntualità')} (consegne in orario) e l'${kw('accuratezza','accuratezza')} (ordini senza errori). ${esc(c.name)} vuole almeno ${f1(c.sP)}% e ${f1(c.sA)}%: sono le sue ${kw('soglie','soglie')}. Verde va bene, giallo è al limite, rosso vuol dire cliente arrabbiato e ${kw('penali','penali')}.`;}}]},
+ {n:'Il personale',s:[
+  {hi:()=>!UI.open.magazzini?tDock('magazzini'):$('#modal').innerHTML?'*#modal [data-act=choice]':'#win-magazzini [data-act=hire][data-role=fm]',
+   ok:()=>tWh().staff.fm>0||S.queue.some(q=>q.role==='fm'),w:()=>`${tTap()} + accanto a «Facility manager», poi scegli annuncio o agenzia`,
+   t:()=>`Ogni reparto ha la sua barra del ${kw('carico','carico di lavoro')}: verde va bene, rossa vuol dire gente in affanno. Ti manca il ${kw('facility','facility manager')}: senza di lui nessuno fa manutenzione e il capannone si rovina.`},
+  {f:'contenta',t:()=>{const q=S.queue.find(q=>q.role==='fm'); return `Fatto! ${q?`Arriva tra ${wks(q.days)}`:'È già al lavoro'}: le persone non arrivano il giorno dopo. L'annuncio costa meno, l'agenzia fa prima. Regola d'oro: quando vinci un cliente, assumi subito, prima che parta il contratto.`;}}]},
+ {n:'Le gare',s:[
+  {go:()=>tutTender(),hi:()=>tDock('gare'),ok:()=>!!UI.open.gare,w:()=>tMenu('Gare d\'appalto'),t:()=>`I clienti nuovi arrivano dalle ${kw('gare','gare d\'appalto')}. Guarda caso ne è appena uscita una: ${esc((tGara()||{}).name||'')}.`},
+  {hi:()=>'#win-gare .gr-req',t:()=>`Qui c'è quello che chiede: pallet al mese, posti in magazzino, soglie di puntualità e accuratezza e durata del ${kw('contratto','contratto')}. Le soglie sono più basse dei numeri che fai oggi: si può fare.`},
+  {hi:()=>'#win-gare [data-act=bid]',ok:()=>!!(tGara()||{}).bid,w:()=>`${tTap()} «Invia offerta»`,t:()=>`Sotto c'è la tua offerta: il magazzino, il ${kw('prezzo','prezzo')} rispetto al listino e la probabilità di vincere. Più sconti, più è facile vincere e meno guadagni. Per stavolta lascia il prezzo com'è.`},
+  {f:'occhiolino',t:()=>`Offerta inviata! La gara si chiude il ${shortDate((tGara()||{}).deadline||S.day)}. Detto tra noi: col responsabile acquisti ho già parlato io.`}]},
+ {n:'La tecnologia',s:[
+  {hi:()=>tDock('tecnologia'),ok:()=>!!UI.open.tecnologia,w:()=>tMenu('Tecnologia'),t:()=>`Ora la ${kw('ricerca','ricerca')}. Le ${kw('tecnologie','tecnologie')} stanno in cinque ${kw('alberi','alberi')} e se ne ricerca una alla volta.`},
+  {go:()=>{if(UI.open.tecnologia&&!S.project){UI.sel.tree='log';renderWin('tecnologia');}},hi:()=>UI.open.tecnologia?'#win-tecnologia [data-act=seltech][data-id=barcode]':tDock('tecnologia'),ok:()=>UI.sel.tech==='barcode'||!!S.project,w:()=>`${tTap()} «Lettori barcode» nell'albero Logistica`,
+   t:()=>`Ti consiglio i Lettori barcode: meno errori di prelievo, quindi più ${kw('accuratezza','accuratezza')}. Costano poco e bastano tre settimane.`},
+  {hi:()=>UI.open.tecnologia?'#win-tecnologia [data-act=research]':tDock('tecnologia'),ok:()=>!!S.project,w:()=>`${tTap()} «Avvia la ricerca»`,t:()=>`La scheda della tecnologia dice cosa fa, quanto costa e quanto ci vuole. Avviala.`},
+  {f:'contenta',t:()=>`Ricerca partita. Quando finisce, le tecnologie della Logistica vanno ${kw('installazione','installate')} in ogni magazzino, e per qualche settimana il personale ci prende la mano.`}]},
+ {n:'I manager',s:[
+  {hi:()=>tDock('manager'),ok:()=>!!UI.open.manager,w:()=>tMenu('Manager'),t:()=>`Ogni magazzino ha bisogno di qualcuno che lo guidi: il ${kw('manager','manager')}. Per ora a ${esc(tWh().name)} ci sei tu, ma il CEO è uno solo.`},
+  {t:()=>`Qui trovi i candidati in cerca di lavoro e l'${kw('head_hunter','head hunter')}, che ne cerca altri su misura. Ognuno ha le sue ${kw('abilita','abilità')} e i suoi ${kw('talenti','talenti')}, e lo stipendio si tratta. Quando aprirai un secondo magazzino ti servirà qualcuno: tu non puoi stare in due posti.`}]},
+ {n:'Notifiche ed eventi',s:[
+  {go:()=>{if(MOB) Object.keys(UI.open).forEach(closeWin);},hi:tPlay,ok:()=>S.speed>0||!!S.tut.ev,run:1,w:()=>`${tTap()} ›${TOUCH?'':' o premi la barra spaziatrice'}`,t:()=>`Adesso sì: fai partire il tempo.`},
+  {go:()=>{if(!S.tut.ev) S.tut.ev=S.day+3;},hi:()=>S.speed?null:tPlay(),ok:()=>!!tEvN()||!!S.tut.evf,run:1,t:()=>`Il tempo scorre: guarda la data in alto. A destra arrivano le ${kw('notifiche','notifiche')}: assunzioni, gare, notizie. Aspettiamo un attimo...`},
+  {hi:()=>[tNote(tEvN()),'#wins .win .xbtn'],ok:()=>!!$('#modal [data-act=evopt]')||!tEvN(),w:()=>`${tTap()} la tessera rossa a destra`,
+   t:()=>`Ecco un ${kw('eventi','evento')}: è la tessera rossa appena arrivata. Il gioco si è fermato da solo, perché prima si decide e poi si riparte.`},
+  {hi:()=>['*#modal [data-act=evopt]',tNote(tEvN())],ok:()=>!tEvN(),w:()=>`Scegli una risposta`,t:()=>`Ogni risposta ha il suo costo e il suo effetto. Non esiste quella giusta: esiste quella che ti puoi permettere.`},
+  {hi:()=>S.speed?null:tPlay(),ok:()=>!!tResN()||!(S.evPend||[]).some(p=>p.id==='ordine')&&!!S.tut.evt,run:1,w:()=>`${tTap()} › e fai passare un giorno`,t:()=>`Com'è andata lo scopri domani, in una tessera azzurra. Fai ripartire il tempo.`},
+  {f:'contenta',hi:()=>tNote(tResN()),t:()=>`La tessera azzurra «Com'è andata» racconta il risultato: ${TOUCH?'toccala':'cliccala'} quando vuoi. Gli eventi sono rari, uno ogni mese o due, e quasi mai sono una tragedia.`}]},
+ {n:'Soldi e report',s:[
+  {hi:()=>S.speed?null:tPlay(),ok:()=>(S.weeks||[]).length>0,run:1,w:()=>`Fai scorrere il tempo fino a lunedì`,t:()=>`Lascia correre fino a lunedì: arriva il ${kw('report','report KPI')} della settimana.`},
+  {hi:()=>tDock('report'),ok:()=>!!UI.open.report,w:()=>tMenu('Report KPI'),t:()=>`È arrivato lunedì, e con lui il report.`},
+  {hi:()=>'#win-report .xl',t:()=>`Sembra Excel, ed è voluto. C'è una riga per magazzino con la puntualità e l'accuratezza della settimana, il confronto con quella prima, l'occupazione, il morale e il margine. Una cella verde è sopra la soglia del cliente, gialla è al limite, rossa è sotto: lì il cliente se n'è già accorto.`},
+  {hi:()=>'#stats',t:()=>`In alto hai sempre la ${kw('cassa','cassa')}, il risultato del mese scorso, il ${kw('morale','morale')} e l'${kw('otif','OTIF')}: ${TOUCH?'toccali':'cliccali'} per i dettagli. Se a fine mese la cassa è sotto i −50.000 €, l'azienda fallisce. E il corso non te lo rimborso.`},
+  {go:()=>{if(MOB) Object.keys(UI.open).forEach(closeWin);},hi:()=>S.speed?null:tPlay(),ok:()=>!!(tGara()||{done:1}).done,run:1,w:()=>`Fai scorrere il tempo fino al ${shortDate((tGara()||{}).deadline||S.day)}`,t:()=>`Ultima cosa: la gara per ${esc((tGara()||{}).name||'')}. Fai scorrere il tempo fino a quando si chiude.`},
+  {f:'contenta',hi:()=>tDock('magazzini'),t:()=>{const g=tGara(), c=g&&S.clients.find(x=>x.name===g.name&&x.status!=='perso');
+    return c?`Gara vinta! Il contratto parte il ${shortDate(c.start)}: da quel giorno il magazzino lavora di più. Apri il magazzino, guarda le barre del carico e assumi chi serve prima che parta. Il resto lo impari giocando: in bocca al lupo!`
+     :`Stavolta la gara non è andata. Succede: ne arriveranno altre, una ogni poche settimane. Tieni d'occhio le Gare d'appalto e, quando ne vinci una, assumi chi serve prima che parta il contratto. Il resto lo impari giocando: in bocca al lupo!`;}}]}
+]}};
+const tutSteps=id=>(TUT[id]||TUT.base).L.flatMap((l,li)=>l.s.map(s=>({...s,li})));
+const tutStep=()=>tutOn()?tutSteps(S.tut.id)[S.tut.i]:null;
+// il tempo resta fermo durante i passi da leggere: premere › scuote il fumetto
+const tutHold=()=>{const s=tutStep(); return !!s&&!s.run;};
+function tutNudge(){const el=$('#tut'); if(!el) return; UI.tutMin=false; tutRender(); el.classList.remove('nudge'); void el.offsetWidth; el.classList.add('nudge');}
+// la gara della lezione: lo Scatolificio Cartonetti in Piemonte, oppure una qualsiasi se non c'è
+function tutTender(){
+  if(tGara()) return;
+  const tpl=TENDER_POOL.find(t=>t.name==='Scatolificio Cartonetti'), fz=tpl?freeZones(tpl):[];
+  if(tpl&&fz.length){ const ci=cinfo(tpl), zone=fz.includes('reg_pie')?'reg_pie':fz[0];
+    S.tenders.push({id:nid('t'),...tpl,zone,src:ci.src,mode:ci.mode,open:S.day,deadline:S.day+21,dur:24,bid:null,done:false,result:null,tut:1});
+    news('Il Sole 24 Pallet',`Gara d'appalto: ${tpl.name}, ${zoneName(zone)}`,`${n0(tpl.pal)} pallet al mese, ${n0(tpl.stock)} posti. Offerte entro il ${shortDate(S.day+21)}. Contratto di 24 mesi.`);
+  } else if(newTender()){ const t=S.tenders[S.tenders.length-1]; t.tut=1; t.deadline=S.day+21; }
+  renderDock();
+}
+function tutStart(id,n){
+  slot=n; cMetaSet(slot,{}); uid=1; startSel.ceo='valeria'; startSel.color=COLORS[0][0];
+  newGame('valeria','',COLORS[0][0],null,{logo:'camion',claim:''});
+  HUM=S; S.cfg={mode:'classica',win:{},ri:false}; riPack(false); S.bots=[];
+  S.tut={id,i:0}; S.nextEvent=1e9; S.tNext=1e9;   // niente eventi né gare a caso finché dura il corso
+  startSel.step='home'; startSel.stamp=false; boot(); tutEnter(); save();
+}
+// passo successivo: prima di tutto quello che il passo prepara, poi il fumetto; i passi da leggere fermano il tempo
+function tutGo(i){ if(!tutOn()) return; const L=tutSteps(S.tut.id); if(i>=L.length){ tutFinish(); return; } S.tut.i=i; tutEnter(); }
+function tutEnter(){ const s=tutStep(); if(!s) return; UI.tutSc=-1; UI.tutMin=false;
+  if(s.go) s.go(); if(!s.run&&S.speed){S.speed=0; renderTop();}
+  tutRender(); }
+function tutRender(){
+  const el=$('#tut'), s=tutStep(); if(!el) return;
+  if(!s||$('#start').innerHTML){ el.innerHTML=''; $('#tuthi').hidden=true; return; }
+  const T=TUT[S.tut.id]||TUT.base, im=IMG['ornella'+(s.f?'_'+s.f:'')]||IMG.ornella, px=MOB?48:96;
+  el.className=(UI.tutMin?'min ':'')+(el.classList.contains('up')?'up':'');
+  el.innerHTML=`<button class="tut-por" data-act="tutmin" aria-label="${UI.tutMin?'Apri il fumetto della dottoressa':'Rimpicciolisci il fumetto'}" aria-expanded="${!UI.tutMin}"><img class="px" src="${im}" alt="${TUT_N}" width="${px}" height="${Math.round(px*56/48)}"></button>
+   <div class="tut-b" role="status" aria-live="polite"><div class="tut-h"><span class="tut-n"><b>${TUT_N}</b><span class="sm">Lezione ${s.li+1} di ${T.L.length} · ${esc(T.L[s.li].n)}</span></span><button class="tut-x" data-act="tutmin" aria-label="Rimpicciolisci il fumetto">▾</button></div>
+    <p>${s.t()}</p>${s.ok&&s.w?`<div class="tut-w">▸ ${esc(s.w())}</div>`:''}
+    <div class="tut-r"><button class="btn sm2" data-act="tutskip">Salta il tutorial</button>${s.ok?'':`<button class="btn pri" data-act="tutnext">Avanti ›</button>`}</div></div>`;
+}
+// ogni fotogramma: il riquadro sopra la cosa da toccare e il fumetto dalla parte libera; ogni tanto controlla se il passo è fatto
+let tutLast=0;
+function tutTick(now){
+  const el=$('#tut'), hi=$('#tuthi'); if(!el) return;
+  if(!tutOn()||$('#start').innerHTML||S.over){ if(el.innerHTML){el.innerHTML='';hi.hidden=true;} return; }
+  if(!el.innerHTML) tutRender();
+  if(now-tutLast>120){ tutLast=now; const s=tutStep();
+    if(S.tut.ev&&!S.tut.evf&&S.day>=S.tut.ev) tutFire();
+    if(s&&s.ok&&s.ok()){ tutGo(S.tut.i+1); return; } }
+  tutPaint();
+}
+// il primo dei selettori che si vede sullo schermo (in orizzontale): se è fuori in verticale, la finestra scorre fin lì una volta.
+// Con * davanti il riquadro prende tutti gli elementi del selettore (le risposte di un evento, i canali di un'assunzione)
+function tutTarget(s){
+  let L=s.hi?s.hi():null; if(!L) return null; if(!Array.isArray(L)) L=[L];
+  for(let q of L){ if(!q) continue; const all=q[0]==='*'; if(all) q=q.slice(1);
+    const es=[...document.querySelectorAll(q)].slice(0,all?99:1).filter(e=>e.getClientRects().length), e=es[0]; if(!e) continue;
+    const r=e.getBoundingClientRect(); if(!r.width||r.right<=0||r.left>=innerWidth) continue;
+    if((r.bottom<=56||r.bottom>innerHeight-(MOB?84:8))&&UI.tutSc!==S.tut.i){ UI.tutSc=S.tut.i; e.scrollIntoView({block:'center'}); }   // sul telefono in fondo ci sono Menu e ›
+    const R=es.map(x=>x.getBoundingClientRect()), l=Math.min(...R.map(x=>x.left)), t=Math.min(...R.map(x=>x.top));
+    return {left:l,top:t,right:Math.max(...R.map(x=>x.right)),bottom:Math.max(...R.map(x=>x.bottom)),width:Math.max(...R.map(x=>x.right))-l,height:Math.max(...R.map(x=>x.bottom))-t}; }
+  return null;
+}
+function tutPaint(){
+  const el=$('#tut'), hi=$('#tuthi'), s=tutStep(); if(!s) return;
+  const r=tutTarget(s);
+  if(r){ const p=5; Object.assign(hi.style,{left:(r.left-p)+'px',top:(r.top-p)+'px',width:(r.width+2*p)+'px',height:(r.height+2*p)+'px'}); hi.hidden=false; } else hi.hidden=true;
+  // sul computer il fumetto sta in basso a sinistra, accanto al menu; sul telefono in basso, sopra i pulsanti. Se copre la cosa da toccare, va in alto
+  if(!MOB){ const dr=Math.round(($('#dock').getBoundingClientRect().right||80)+12); if(el.style.left!==dr+'px') el.style.left=dr+'px'; } else if(el.style.left) el.style.left='';
+  const b=el.getBoundingClientRect(), up=el.classList.contains('up'), h=b.height, top=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-h'))||64)+10;
+  const down={top:innerHeight-h-(MOB?78:16)}, hit=y=>r&&r.bottom>y&&r.top<y+h&&r.right>b.left&&r.left<b.right;
+  const want=hit(down.top)&&!hit(top);
+  if(want!==up) el.classList.toggle('up',want);
+}
+// l'evento della lezione: «Ordine alle 17:58 di venerdì», con il cliente storico
+function tutFire(){
+  S.tut.evf=1; const b=EVENTS.find(e=>e.id==='ordine'); if(!b) return;
+  const ev={...b}; b.setup(ev); S.tut.evt=ev.title; showEvent(ev); renderAll();
+}
+function tutFinish(skip){
+  if(!tutOn()) return; S.tut.done=skip?2:1;
+  S.nextEvent=S.day+Math.round(rnd(30,55)); S.tNext=S.day+tenderWait();
+  $('#tut').innerHTML=''; $('#tuthi').hidden=true;
+  if(!skip) chron('azienda',`Attestato del corso «${(TUT[S.tut.id]||TUT.base).corso}» con la dottoressa Ribalta`);
+  save(); renderAll();
+  if(skip){ toast('Tutorial saltato: la partita continua','ok'); return; }
+  const C=ceo(), f=C.sx==='f';
+  showModal(`<div class="src"><span>Regione del Nord · Fondo sociale europeo</span><span>${shortDate(S.day)}</span></div><div class="win-b"><div class="attest">
+    <div class="at-h">Attestato di partecipazione</div><div class="sm">Corso di formazione «${esc((TUT[S.tut.id]||TUT.base).corso)}»</div>
+    <p>Si attesta che <b>${esc(C.name)}</b>, ${f?'amministratrice':'amministratore'} di <b>${esc(S.company.name)}</b>, ha frequentato con profitto tutte le lezioni: mappa, tempo, magazzino, personale, gare, tecnologia, manager, eventi e report.</p>
+    <div class="at-f"><img class="px" src="${IMG.ornella_occhiolino}" alt="" width="48" height="56"><div><i>Ornella Ribalta</i><span class="sm">la docente</span></div></div>
+    <div class="sm">Il presente attestato non dà diritto a crediti formativi, ma incorniciato in ufficio fa la sua figura.</div></div>
+    <div class="row"><button class="btn" data-act="quitgame">Torna al menu</button><button class="btn pri" data-act="closemodal">Continua la partita</button></div></div>`);
+}
+Object.assign(ACT,{
+ tutorial(d){const n=freeSlot(); if(!n) return; tutStart(d.id||'base',n);},
+ tutnext(){const s=tutStep(); if(s&&!s.ok) tutGo(S.tut.i+1);},
+ tutmin(){UI.tutMin=!UI.tutMin; tutRender();},
+ tutskip(){askOk('Saltare il tutorial?','La partita continua normalmente da qui, con le gare e gli eventi di sempre. Il tutorial si può rifare quando vuoi dalla schermata principale.','Sì, salta',()=>tutFinish(true));}
+});
 /* ====================== AVVIO ====================== */
 {const b=$('.optb'); if(b&&ICONE.ui.opzioni) b.innerHTML=pxSvg(ICONE.ui.opzioni,32);}  // ingranaggio delle Opzioni
 let startSel={step:'home',slot:0,del:0,ceo:'gino',color:'#ff7a3d',name:'',claim:'',logo:'camion',cc:null,err:'',stamp:false,lb:null};
@@ -8757,6 +8959,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.95',t:'Il tutorial della dottoressa Ribalta',x:['Nella schermata principale c\'è il Tutorial: una partita guidata dalla dottoressa Ornella Ribalta, docente del corso regionale «Diventa CEO in 9 lezioni». In circa 15 minuti spiega la mappa, il tempo, il magazzino con puntualità e accuratezza, il personale, le gare, la ricerca, i manager, gli eventi e il report del lunedì.','La dottoressa parla da un fumetto e un riquadro giallo indica cosa toccare: il gioco aspetta che tu lo faccia. Mentre spiega il tempo resta fermo. Il fumetto si rimpicciolisce con ▾ e il tutorial si può saltare in qualsiasi momento.','Si gioca con Valeria Conti a Novara, senza avversari. Alla fine arriva l\'attestato di partecipazione e la partita continua come una normale, con le gare e gli eventi di sempre. Il tutorial avanzato arriverà presto.','Ritratti corretti: Franca, Nicola, uno dei ritratti del CEO creato da te e due candidati con gli occhiali colorati avevano anche il contorno e gli occhi di quel colore; ora il contorno è scuro come per tutti. E chi aveva le labbra del colore sbagliato (della collana, o bianche) ha il suo rossetto.']},
  {v:'0.94',t:'Schede dei capannoni',x:['Nella scheda Nuovo magazzino ogni capannone ha il suo riquadro ordinato: nome e provincia, poi posti, affitto e costo d\'apertura in tre caselle, la classe e le icone delle dotazioni, e in fondo i pulsanti «Dettagli» e «Affitta», grandi per il dito.','«Dettagli» (o un tocco sul capannone, anche sulla mappa) apre la sua scheda con l\'immagine animata in pixel art: l\'edificio della sua classe e sopra le dotazioni che ha davvero, con il camion in ribalta, la sbarra della portineria che si alza, il muletto sul piazzale, la ventola delle celle frigo, il vapore della mensa. Sotto ci sono i numeri, le dotazioni presenti e quelle che mancano, con il costo per costruirle.','La stessa immagine compare nella scheda Immobile dei tuoi magazzini e cambia quando costruisci o ristrutturi. Anche i terreni hanno la loro scheda, e i cantieri la gru che lavora.']},
  {v:'0.93',t:'Talenti in banchina',x:['Di rado la Gazzetta del Muletto racconta di un magazziniere o di un impiegato di magazzino che si è fatto notare: ha ridisegnato il picking, ritrovato i colli spariti, tenuto in piedi il turno di notte, strappato uno sconto al telefono, scritto le macro del gestionale o scovato un errore nelle fatture del gasolio. Ogni storia ha la sua scenetta: il raggio di sole dal lucernario, la lampadina dell\'idea e la lavagna col grafico che sale.','Puoi fargli fare un anno di affiancamento, o seguirlo tu ogni venerdì se hai Leadership 13 o sei Mentore. Un anno dopo diventa manager, col nuovo talento «Cresciuto in banchina» e uno stipendio sotto il mercato, senza trattativa. Le abilità si scoprono solo quel giorno: di solito è un manager discreto, a volte un fuoriclasse di rango S. Intanto lo trovi nella finestra Manager, sotto «In crescita».']},
  {v:'0.92',t:'Capannoni, dotazioni e cantieri',x:['Ogni magazzino ha una classe: fatiscente, vecchio, standard, moderno o innovativo. Un capannone vecchio costa poco ma rende meno, consuma di più e si rompe spesso; uno moderno fa lavorare meglio, piace al morale e alle committenti nelle gare. Le committenti di rango S non mettono la merce in un capannone fatiscente.','Nella scheda Immobile del magazzino ci sono le dotazioni: ribalte di carico (senza si carica dai portoni a raso, più lenti), pannelli solari, LED, parcheggio dei camion, portineria, piazzale esterno, giardino, mensa esterna, celle frigo, antincendio e ricarica dei muletti. I capannoni arrivano con le loro; le altre si costruiscono con il facility manager. Parcheggio, piazzale, giardino e mensa occupano l\'area esterna, che è limitata.','I pannelli montati tra il 2007 e il 2012 prendono l\'incentivo statale. La mensa esterna dimezza il prezzo del servizio Mensa del Welfare, le celle frigo quello della Catena del freddo.','Le dotazioni si rompono: ribalte bloccate, grandine sui pannelli, celle frigo in avaria, ricarica dei muletti in tilt, il tetto che perde nei capannoni vecchi, e ogni tanto un principio d\'incendio. L\'Ufficio tecnico chiede se riparare subito, programmare il tecnico o arrangiarsi.','Si può ristrutturare un magazzino per alzarne la classe, fino a moderno.','Sul mercato arrivano capannoni nuovi con gli anni (poli moderni dal 2004, innovativi dal 2014) e ci sono vecchi stabilimenti a poco prezzo. Nella scheda Nuovo magazzino, e sulla mappa con i quadratini verdi, ci sono i terreni: si compra il terreno e si costruisce un magazzino tutto tuo, scegliendo posti, classe e dotazioni. In 8-12 mesi è pronto, ed è di proprietà.']},
@@ -8962,6 +9165,7 @@ function stepHome(){const L=[]; for(let n=1;n<=SLOTS;n++){const sv=load(n); if(s
   return `<div class="hm-h">${hmIc('salva',32)}<h2>Partite salvate</h2><span class="hm-n" aria-label="${L.length} posti occupati su ${SLOTS}">${L.length}/${SLOTS}</span></div>
    ${L.length?L.map((x,i)=>slotCard(x,!i)).join(''):'<div class="hm-empty"><b>Nessuna partita salvata</b><span>Il piazzale è vuoto: è il momento di scaricare il primo pallet.</span></div>'}
    <button class="hm-new" data-act="newgame" ${full?'disabled':''}><span class="hm-plus">${hmIc('nuova',32)}</span><span class="t"><b>Crea nuova partita</b><span>${full?`Tutti e ${SLOTS} i posti sono occupati: cancella una partita per iniziarne un'altra.`:'Scegli il CEO, dai un nome all\'azienda e apri il primo magazzino a gennaio 2002.'}</span></span><span class="ar" aria-hidden="true">›</span></button>
+   <button class="hm-new hm-tut" data-act="tutorial" data-id="base" ${full?'disabled':''}><span class="hm-orn"><img class="px" src="${IMG.ornella_contenta}" alt="" width="48" height="56"></span><span class="t"><b>Tutorial</b><span>${full?`Per il tutorial serve un posto libero: cancella una partita.`:'Una partita guidata dalla dottoressa Ornella Ribalta: mappa, magazzino, personale, gare, ricerca ed eventi, in circa 15 minuti. Il tutorial avanzato arriverà presto.'}</span></span><span class="ar" aria-hidden="true">›</span></button>
    ${cloudCard()}${newsCard()}<div class="hm-cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></div>`;}
 function showStart(){
   setSpeedSafe(0); WIKI_ON=false; const k=startSel.step;
@@ -9065,7 +9269,7 @@ function boot(){
   $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;
   Object.keys(UI.open).forEach(closeWin); UI={open:{},sel:{},tab:{},z:30,pos:{},bid:{},lens:UI.lens};
   view.init=0; fitMap(); renderMap(); S.warehouses.forEach(w=>w.kpi=computeWH(w)); syncTrucks(); renderAll();
-  if(S.day===0){ modalInfo('La Gazzetta del Muletto',`Benvenuto, ${ceo().name}`,`Hai un magazzino a ${S.warehouses[0].name} e un solo cliente, ${S.clients[0].name}. Con il magazzino quasi vuoto perdi soldi ogni mese: tieni d'occhio le Gare d'appalto, assumi in anticipo quando ne vinci una e controlla Puntualità e Accuratezza nel menu Magazzini. ${contMode()?`Il tempo scorre da solo e non si ferma (ritmo ${MODES[modeOf()].n}): se non rispondi a un evento entro due settimane, decide il tuo vice. ${rivals().length?`In gara ci sono anche ${rivals().map(b=>b.company.name).join(', ')}: li trovi in Classifica. `:''}`:rivals().length?`In gara ci sono anche ${rivals().map(b=>b.company.name).join(', ')}: li trovi in Classifica. `:''}${contMode()?'':TOUCH?'Tocca › in alto per far scorrere il tempo. ':'Premi spazio per far scorrere il tempo. '}${TOUCH?'Le parole sottolineate a puntini si spiegano con un tocco; toccale di nuovo per aprire l\'Enciclopedia.':'Le parole sottolineate a puntini si spiegano passandoci sopra; cliccale, o premi E, per aprire l\'Enciclopedia.'}`); }
+  if(S.day===0&&!S.tut){ modalInfo('La Gazzetta del Muletto',`Benvenuto, ${ceo().name}`,`Hai un magazzino a ${S.warehouses[0].name} e un solo cliente, ${S.clients[0].name}. Con il magazzino quasi vuoto perdi soldi ogni mese: tieni d'occhio le Gare d'appalto, assumi in anticipo quando ne vinci una e controlla Puntualità e Accuratezza nel menu Magazzini. ${contMode()?`Il tempo scorre da solo e non si ferma (ritmo ${MODES[modeOf()].n}): se non rispondi a un evento entro due settimane, decide il tuo vice. ${rivals().length?`In gara ci sono anche ${rivals().map(b=>b.company.name).join(', ')}: li trovi in Classifica. `:''}`:rivals().length?`In gara ci sono anche ${rivals().map(b=>b.company.name).join(', ')}: li trovi in Classifica. `:''}${contMode()?'':TOUCH?'Tocca › in alto per far scorrere il tempo. ':'Premi spazio per far scorrere il tempo. '}${TOUCH?'Le parole sottolineate a puntini si spiegano con un tocco; toccale di nuovo per aprire l\'Enciclopedia.':'Le parole sottolineate a puntini si spiegano passandoci sopra; cliccale, o premi E, per aprire l\'Enciclopedia.'}`); }
 }
 /* ciclo di gioco: il ritmo del tempo si sceglie nella lobby (MODES); i ritmi con off:1 (senza pausa) restano nascosti finché non arriva il gioco online */
 const MODES={
@@ -9095,6 +9299,7 @@ function loop(now){
     if(m==='persistente'&&now-lastClk>20000){lastClk=now; renderTop();}
   }
   else acc=0;
+  if(S) tutTick(now);
   requestAnimationFrame(loop);
 }
 // ritorno dopo un'assenza (modalità persistente): il gioco calcola a blocchi i giorni passati, poi mostra il riepilogo
@@ -9128,6 +9333,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>
