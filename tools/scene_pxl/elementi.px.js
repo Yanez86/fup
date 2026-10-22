@@ -11,8 +11,13 @@
 //   el_mensa      DESTRA              x 136..159, y 30..71  la mensa esterna, al posto delle colonnine
 //   el_parcheggio DAVANTI a sinistra  x 24..59,  y 58..71   il parcheggio dei camion, al posto dell'area cani
 //   el_piazzale   DAVANTI a destra    x 104..135, y 56..71  il piazzale esterno con la tettoia, al posto del pulmino
+// Sopra gli elementi delle zone il gioco mette ancora, in quest'ordine:
+//   el_portineria in basso a sinistra x 0..23,  y 46..71   la guardiola e la sbarra (sopra il giardino; la sbarra abbassata
+//                                                           sporge fino a x 27 nelle righe del terreno)
+//   el_led        due lampioni        x 22..26 e 134..138, y 28..71   l'illuminazione a LED, sopra a tutto
 // Le scene prova_elementi e prova_elementi2 (fuori dal gioco) le mettono tutte insieme sopra un esterno finto, per vedere
-// che non si pestano: la prima coi servizi del welfare, la seconda con mensa, parcheggio e piazzale.
+// che non si pestano: la prima coi servizi del welfare, la seconda con mensa, parcheggio e piazzale; prova_elementi3 come
+// la seconda più portineria e lampioni, nell'ordine del gioco.
 // Disegnate con pxl (.claude/skills/pxl-pixel-art), lettere di TPAL (src/game.html). Colori e omini in comune.px.js.
 //
 //   python3 tools/scene_pxl/esporta.py     (builda tutti i file e porta le scene in assets/scene/)
@@ -495,6 +500,86 @@ function elPiazzale() {
       stamp("pia_cassone", 129, 70))]
 }
 
+// ================================================================ PORTINERIA (x 0..23, y 46..71), sopra il giardino
+// La guardiola dell'ingresso sull'isola di cemento col bordo a strisce gialle e nere: il portiere col berretto e i baffi al
+// finestrino; accanto la sbarra bianca e rossa che si alza, resta su e si riabbassa (16 fotogrammi), il lampeggiante
+// arancione acceso mentre si muove, e il portiere che la guarda passare. Da giù la sbarra sporge di qualche pixel a destra,
+// sopra il bordo della zona davanti a sinistra (resta nelle righe del terreno); su, sta tutta dentro la sua zona.
+
+// la guardiola: la soletta del tetto col colore dell'azienda, le pareti bianche (ombra a destra e sotto il tetto), il
+// finestrino col portiere, il davanzale dello sportello e il citofono per gli autisti
+anim("por_guardiola", { w: 15, h: 21, frames: LOOP, fps: FPS, outline: "K" },
+  rect(0, 0, 15, 3, "T"), hline(0, 0, 15, "S"), hline(0, 2, 15, "t"),
+  rect(1, 3, 13, 18, "W"), vline(13, 3, 18, "S"), hline(1, 3, 13, "S"),
+  rect(2, 5, 11, 9, "s"), rect(3, 6, 9, 7, "L"), px(3, 7, "W"), px(4, 6, "W"),
+  grid(3, 6, [".Ddddddd.", "..dddYd..", "..KKKKK..", "..FFFFf..", "..FMMMf..", "...FFf...", "dddWRWddd"].join("\n")),
+  hline(1, 14, 13, "s"), hline(2, 15, 11, "S"), vline(13, 14, 2, "s"),
+  rect(3, 17, 3, 2, "d"), px(3, 17, "s"),
+  // gli occhi: guarda avanti, sbatte le palpebre, poi segue la sbarra a destra finché non è giù
+  (c) => {
+    const f = c.frame
+    if (f === 2) return
+    const dx = f >= 4 && f <= 14 ? 1 : 0
+    c.px(5 + dx, 9, "K"); c.px(7 + dx, 9, "K")
+  })
+// la sbarra: la cassetta del motore bianca col lampeggiante in cima, l'asta a fasce bianche e rosse (2 pixel, la punta
+// rossa) imperniata in alto sulla cassetta. Angolo per fotogramma: giù, sale, resta su, scende (16 fotogrammi).
+// Perno e lunghezza scelti perché l'asta, a ogni angolo, stia a sinistra di x 24 oppure sotto la riga 56.
+const SBARRA = [0, 0, 0, 0, 8, 25, 50, 75, 90, 90, 90, 90, 68, 42, 18, 4]
+anim("por_sbarra", { w: 12, h: 15, frames: LOOP, fps: FPS, outline: "K" },
+  rect(0, 9, 3, 6, "W"), vline(2, 9, 6, "S"), hline(0, 12, 3, "T"), hline(0, 14, 3, "s"),
+  (c) => {
+    const a = SBARRA[c.frame] * Math.PI / 180, co = Math.cos(a), si = Math.sin(a), L = 10
+    for (let y = 0; y < 12; y++) for (let x = 0; x < 12; x++) {
+      const dx = x - 1, dy = y - 10, t = dx * co - dy * si, s = dx * si + dy * co
+      if (t >= -0.5 && t <= L && s >= -0.5 && s < 1.5) c.px(x, y, Math.floor((L - t + 0.5) / 3) % 2 ? "W" : "R")
+    }
+    c.px(1, 10, "s")                                                            // il perno
+    c.px(0, 8, c.frame >= 4 && c.frame % 2 === 0 ? "a" : "o")                  // il lampeggiante
+  })
+// l'isola spartitraffico: il piano di cemento e il bordo a strisce gialle e nere
+sprite("por_isola", { w: 21, h: 4, outline: "K" },
+  hline(0, 0, 21, "S"),
+  (c) => { for (let y = 1; y < 4; y++) for (let x = 0; x < 21; x++) c.px(x, y, Math.floor((x + y) / 2) % 2 ? "K" : "Y") })
+
+function elPortineria() {
+  return [
+    layer("portineria",
+      stamp("por_guardiola", -1, 46),
+      stamp("por_sbarra", 14, 52),
+      stamp("por_isola", -1, 67))]
+}
+
+// ================================================================ LAMPIONI A LED (x 22..26 e 134..138, y 28..71), sopra a tutto
+// Due lampioni sottili a testa-palo, uno per lato del capannone: il palo d'acciaio, il basamento di cemento, la testa piatta
+// col LED bianco sotto che fa un piccolo alone; l'alone pulsa piano e una falena gira attorno alla luce (16 fotogrammi).
+// Disegnati a mano (contorno compreso) per restare larghi 5 pixel: sopra gli elementi coprono solo la colonna del palo.
+
+const ALONE = [0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 1, 1, 0, 0, 0, 0]          // quanto è grande l'alone (16 fotogrammi)
+function lampioneLed(nome, verso) {
+  anim(nome, { w: 5, h: 44, frames: LOOP, fps: FPS }, (c) => {
+    c.vline(1, 4, 37, "K"); c.vline(2, 4, 37, "s"); c.vline(3, 4, 37, "K")                 // il palo (righe 32..68)
+    c.rect(1, 41, 3, 3, "s"); c.px(1, 41, "S"); c.vline(0, 41, 3, "K"); c.vline(4, 41, 3, "K")   // il basamento
+    c.hline(1, 1, 3, "K"); c.px(0, 2, "K"); c.px(4, 2, "K"); c.px(0, 3, "K"); c.px(4, 3, "K")   // la testa: contorno
+    c.px(1, 2, "S"); c.hline(2, 2, 2, "s"); c.hline(1, 3, 3, "W")                             // il cappello, il LED sotto
+    // l'alone: sotto la testa ai due lati del palo e, quando è pieno, anche sopra gli angoli
+    const n = ALONE[c.frame]
+    c.px(2, 4, n ? "W" : "S")
+    c.px(0, 4, n ? "W" : "L"); c.px(4, 4, n ? "W" : "L")
+    if (n) { c.px(0, 5, "L"); c.px(4, 5, "L") }
+    if (n > 1) { c.px(0, 1, "L"); c.px(4, 1, "L"); c.px(0, 6, "L"); c.px(4, 6, "L") }
+    // la falena: un giro attorno alla testa (verso = 1 orario, -1 antiorario); dietro la testa non si vede
+    const th = verso * c.phase * Math.PI * 2, x = Math.round(2 + 2.2 * Math.cos(th)), y = Math.round(3 + 3 * Math.sin(th))
+    if (!(y >= 1 && y <= 3 && Math.sin(th) < 0)) c.px(x, y, "z")
+  })
+}
+lampioneLed("led_lampione_sx", 1)
+lampioneLed("led_lampione_dx", -1)
+
+function elLed() {
+  return [layer("led", { unlit: true }, stamp("led_lampione_sx", 22, 28), stamp("led_lampione_dx", 134, 28))]
+}
+
 // ================================================================ le scene
 scene("el_giardino", { w: SW, h: SH, world: MONDO }, ...elGiardino())
 scene("el_cani", { w: SW, h: SH, world: MONDO }, ...elCani())
@@ -505,6 +590,8 @@ scene("el_cantiere", { w: SW, h: SH, world: MONDO }, ...elCantiere())
 scene("el_mensa", { w: SW, h: SH, world: MONDO }, ...elMensa())
 scene("el_parcheggio", { w: SW, h: SH, world: MONDO }, ...elParcheggio())
 scene("el_piazzale", { w: SW, h: SH, world: MONDO }, ...elPiazzale())
+scene("el_portineria", { w: SW, h: SH, world: MONDO }, ...elPortineria())
+scene("el_led", { w: SW, h: SH, world: MONDO }, ...elLed())
 
 // ================================================================ prova (fuori dal gioco)
 // un esterno finto semplice nel riquadro della pianta, con tutti gli elementi sopra
@@ -523,3 +610,7 @@ scene("prova_elementi", { w: SW, h: SH, bg: "L", world: MONDO },
 scene("prova_elementi2", { w: SW, h: SH, bg: "L", world: MONDO },
   layer("esterno", ...esternoFinto()),
   ...elCantiere(), ...elGiardino(), ...elMensa(), ...elParcheggio(), ...elMuletti(), ...elPiazzale())
+// tutto insieme nell'ordine del gioco: elementi delle zone (gru per ultima), poi la portineria, poi i lampioni a LED
+scene("prova_elementi3", { w: SW, h: SH, bg: "L", world: MONDO },
+  layer("esterno", ...esternoFinto()),
+  ...elGiardino(), ...elMensa(), ...elParcheggio(), ...elMuletti(), ...elPiazzale(), ...elCantiere(), ...elPortineria(), ...elLed())
