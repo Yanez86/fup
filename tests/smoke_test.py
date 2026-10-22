@@ -622,7 +622,16 @@ async def main():
           [...Object.values(F.SCN_EV),...Object.values(F.SCN_SRC)].forEach(k=>{if(!F.SCENE[k]) bad.push('scena mancante: '+k);});
           for(const [k,src] of Object.entries(F.SCENE)){const im=new Image(); im.src=src; await im.decode(); if(im.naturalWidth!==2560||im.naturalHeight!==72) bad.push(k+': '+im.naturalWidth+'x'+im.naturalHeight);}
           return {bad,n:Object.keys(F.SCENE).length};}''')
-        assert not r['bad'] and r['n'] >= 14, r
+        assert not r['bad'] and r['n'] >= 21, r
+        # scene in cima alle finestre: Magazzini, Tecnologia, Customer service, Direzione, Azienda e CEO (3× nelle finestre larghe, 2× nelle strette);
+        # la Tecnologia è ferma senza ricerca e si muove con una ricerca in corso
+        r = await pg.evaluate('''()=>{const F=window.__FUP,out={},P={magazzini:'magazzini',tecnologia:'tecnologia',customer:'clienti',direzione:'manager',azienda:'azienda'};F.newGame('marco');F.S.researched.direzione=true;
+          const apri=tab=>{document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.ACT.toggle({id:P[tab]}); F.ACT.wtab({p:P[tab],id:tab}); return document.querySelector('#wins .win .ev-scn');};
+          for(const [tab,k] of Object.entries(F.WSCN)){const d=apri(tab), i=d&&d.querySelector('i'); out[tab]=!!i&&i.dataset.scena===k&&i.getBoundingClientRect().width===(tab==='customer'?320:480);}
+          out.ferma=apri('tecnologia').classList.contains('ferma'); const t=F.TECH.find(x=>!F.S.researched[x.id]); F.S.project={tech:t.id,left:20,total:20,cost:t.cost}; F.renderAll();
+          out.va=!document.querySelector('#wins .win .ev-scn').classList.contains('ferma'); F.S.project=null;
+          document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); return out;}''')
+        assert all(r.values()), f'scene nelle finestre {r}'
         # eventi: l'effetto della scelta arriva il giorno dopo, con il racconto di com'è andata
         await pg.evaluate("()=>{const F=window.__FUP;F.newGame('marco');F.S.speed=1;}")
         await pg.evaluate(FIRE, 'cesto')
