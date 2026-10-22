@@ -1,4 +1,4 @@
-// Elementi degli esterni dei magazzini: sei scene trasparenti (el_*) che il gioco mette sopra l'esterno del magazzino
+// Elementi degli esterni dei magazzini: nove scene trasparenti (el_*) che il gioco mette sopra l'esterno del magazzino
 // quando il magazzino ha quella dotazione (EST_EL in src/game.html). Fuori dall'elemento tutto resta trasparente.
 // Ognuno sta nella sua zona della pianta comune agli esterni (capannone in x 24..135, y 6..55, terreno 56..71):
 //   el_giardino   SINISTRA            x 0..23,   y 18..71   l'orto aziendale
@@ -7,7 +7,12 @@
 //   el_muletti    DAVANTI al centro   x 60..103, y 58..71   la zona di ricarica dei muletti
 //   el_pulmino    DAVANTI a destra    x 104..135, y 56..71  il pulmino dei dipendenti
 //   el_cantiere   gru sopra il tetto  x 100..159, y 0..55   (a destra di x 135 solo sopra y 30: sotto ci sono le colonnine)
-// La scena prova_elementi (fuori dal gioco) le mette tutte insieme sopra un esterno finto, per vedere che non si pestano.
+// Tre zone hanno un'alternativa (il gioco ne mostra una sola per zona): la dotazione vince sul servizio del welfare.
+//   el_mensa      DESTRA              x 136..159, y 30..71  la mensa esterna, al posto delle colonnine
+//   el_parcheggio DAVANTI a sinistra  x 24..59,  y 58..71   il parcheggio dei camion, al posto dell'area cani
+//   el_piazzale   DAVANTI a destra    x 104..135, y 56..71  il piazzale esterno con la tettoia, al posto del pulmino
+// Le scene prova_elementi e prova_elementi2 (fuori dal gioco) le mettono tutte insieme sopra un esterno finto, per vedere
+// che non si pestano: la prima coi servizi del welfare, la seconda con mensa, parcheggio e piazzale.
 // Disegnate con pxl (.claude/skills/pxl-pixel-art), lettere di TPAL (src/game.html). Colori e omini in comune.px.js.
 //
 //   python3 tools/scene_pxl/esporta.py     (builda tutti i file e porta le scene in assets/scene/)
