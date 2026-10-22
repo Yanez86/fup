@@ -405,21 +405,21 @@ talento("Cuore d'oro", "pos", { mx: true }, `
   .....YY
   ......Y
   .......`)
-// Amante dell'IA: il robottino innamorato col cuore sull'antenna
+// Amante dell'IA: il robottino viola innamorato, col cuore sull'antenna
 talento("Amante dell'IA", "mix", { mx: true }, `
   ....RR.
   ....RRR
   .....RR
   ......R
-  ......S
-  .SSSSSS
-  .SSSSSS
-  DSSdddd
-  DSSduud
-  DSSduud
-  DSSdddd
-  .SSSSSS
-  .SSSSSS
+  ......P
+  .PPPPPP
+  .PPPPPP
+  DPPdddd
+  DPPduud
+  DPPduud
+  DPPdddd
+  .PPPPPP
+  .PPPPPP
   .......`)
 // Larper: Elrandil, l'elfo coi capelli biondi lunghi e le orecchie a punta
 talento("Larper", "mix", { mx: true, tieni: "Y" }, `

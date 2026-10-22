@@ -31,7 +31,7 @@ tecnologia("formazione", "log", { dopo: [grid(2, 2, `
   .N......N.
   .N......N.
   .N......N.`)
-// Telematica GPS: il segnaposto rosso piantato sulla mappa
+// Telematica GPS: il segnaposto rosso a goccia
 tecnologia("gps", "log", { mx: true, dopo: [grid(4, 3, `
   W
   W`)] }, `
@@ -129,16 +129,16 @@ tecnologia("sinergia", "log", {}, `
   .DDD..DDD.`)
 // Pick-to-light: scaffale a cassette, la luce accesa su quella giusta
 tecnologia("ptl", "log", {}, `
-  DDDDDDDDDD
-  DBBDBBDBBD
-  DBBDBBDBBD
-  DssDYYDssD
-  DDDDDDDDDD
-  DBBDBBDBBD
-  DBBDBBDBBD
-  DssDssDssD
-  DDDDDDDDDD
-  D........D`)
+  SSSSSSSSSS
+  SBBSBBSBBS
+  SBBSBBSBBS
+  SddSYYSddS
+  SSSSSSSSSS
+  SBBSBBSBBS
+  SBBSBBSBBS
+  SddSddSddS
+  SSSSSSSSSS
+  S........S`)
 // Robot mobili (AMR): robottino arancione che solleva lo scaffale e lo porta in giro
 tecnologia("amr", "log", {}, `
   NNNN.BBBB.
@@ -336,7 +336,7 @@ tecnologia("talpa", "org", { mx: true }, `
   .....
   ...DD
   ..DDD
-  .DKDD
+  .DDKD
   .DDDD
   ..DDF
   FF.DF
