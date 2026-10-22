@@ -37,22 +37,18 @@ bandiera("bandiera_ue", 12, 8, (x, y) => [rect(x, y, 12, 8, "b"), hline(x, y + 7
   ...[[5, 1], [7, 2], [8, 4], [7, 6], [5, 6], [3, 6], [2, 4], [3, 2]].map(([dx, dy]) => px(x + dx, y + dy, "Y"))])
 
 // il funzionario allo sportello: occhiali, maniche della camicia, il timbro su e giù (4 fotogrammi, quattro timbri a giro)
-persona("_funzionario", { testa: "calvo", corpo: "seduto", swap: { B: "L", b: "j", M: "s" } })
+persona("_funzionario", { testa: "calvo", corpo: "seduto", swap: { B: "j", b: "D", M: "s" } })
 anim("funzionario", { w: 16, h: 20, fps: FPS, outline: "K", pivot: [5, 20] }, stamp("__funzionario", 0, 4),
-  hline(2, 9, 6, "K"), px(4, 10, "W"),                                                   // occhiali
-  frame({ hold: 2 }, rect(9, 8, 2, 7, "L"), rect(10, 5, 3, 3, "F"), rect(11, 2, 2, 3, "N"), rect(10, 1, 4, 1, "m"), rect(10, 0, 4, 1, "K")),
-  frame({ hold: 1 }, rect(9, 12, 2, 4, "L"), rect(10, 13, 3, 3, "F"), rect(11, 16, 2, 2, "N"), rect(10, 18, 4, 2, "K")),
-  frame({ hold: 1 }, rect(9, 12, 2, 4, "L"), rect(10, 13, 3, 3, "F"), rect(11, 16, 2, 2, "N"), rect(10, 18, 4, 2, "K"), px(15, 16, "Y"), px(15, 19, "Y"), px(14, 14, "Y")))
+  hline(2, 9, 3, "K"), hline(5, 9, 3, "K"),                                              // occhiali
+  frame({ hold: 2 }, rect(9, 8, 2, 7, "j"), rect(10, 5, 3, 3, "F"), rect(11, 2, 2, 3, "N"), rect(10, 1, 4, 1, "m"), rect(10, 0, 4, 1, "K")),
+  frame({ hold: 1 }, rect(9, 12, 2, 4, "j"), rect(10, 13, 3, 3, "F"), rect(11, 16, 2, 2, "N"), rect(10, 18, 4, 2, "K")),
+  frame({ hold: 1 }, rect(9, 12, 2, 4, "j"), rect(10, 13, 3, 3, "F"), rect(11, 16, 2, 2, "N"), rect(10, 18, 4, 2, "K"), px(15, 16, "Y"), px(15, 19, "Y"), px(14, 14, "Y")))
 // il foglio sotto il timbro: si riempie di timbri rossi
 anim("foglio_timbrato", { w: 8, h: 3, fps: FPS },
   rect(0, 0, 8, 3, "W"), hline(0, 2, 8, "S"),
-  frame({ hold: 3 }), frame({ hold: 1 }, rect(2, 0, 3, 2, "R")))
+  frame({ hold: 2 }, rect(2, 0, 3, 2, "R")), frame({ hold: 2 }))
 sprite("moduli", { outline: "K", pivot: "bottom" }, `
-  ...WWWWW
-  ...SSSSS
   ..WWWWW.
-  ..SSSSS.
-  ...WWWWW
   ...LLLLL
   WWWWWWWWW
   SSSSSSSSS
@@ -70,20 +66,19 @@ sprite("colonna", { w: 10, h: 33, pivot: "bottom" },
 
 scene("ministero", { w: SW, h: SH, bg: "L", world: { light: [-0.6, -1], ground: 66 } },
   layer("palazzo",
-    rect(0, 0, SW, 3, "B"), ellipse(10, 34, 9, 2, "W"),
+    rect(0, 0, SW, 3, "B"), ellipse(60, 7, 10, 2, "W"),
     // timpano, cornicione e fregio col nome
-    poly([30, 16, 95, 2, 160, 16], "K"), poly([34, 15, 95, 4, 156, 15], "C"), poly([50, 14, 95, 6, 140, 14], "z"),
-    circ(95, 10, 2, "Z"), px(95, 10, "C"),
+    poly([30, 16, 95, 3, 160, 16], "C"), poly([48, 15, 95, 7, 142, 15], "z"), line(48, 14, 95, 6, "Z"), line(95, 6, 142, 14, "Z"),
+    line(30, 15, 95, 2, "K"), line(95, 2, 160, 15, "K"),
+    circ(95, 11, 2, "Z"), px(95, 11, "C"),
     rect(30, 15, 130, 3, "C"), hline(30, 15, 130, "K"), hline(30, 17, 130, "Z"),
     rect(32, 18, 128, 6, "q"), text(78, 19, "MINISTERO", "M"),
     rect(30, 24, 130, 2, "C"), hline(30, 25, 130, "Z"), hline(30, 24, 130, "K"),
     rect(32, 26, 128, 29, "q"), ...[31, 38, 45].map((y) => hline(32, y, 128, "y")),
     // lo sportello: targa, vetro, banco di legno
-    rect(63, 27, 63, 28, "K"), rect(64, 28, 61, 6, "b"), text(77, 29, "SPORTELLO", "W"),
+    rect(63, 27, 63, 28, "K"), rect(64, 28, 61, 6, "b"), text(67, 29, "SPORTELLO", "W"), circ(118, 30, 1, "Y"),
     rect(64, 34, 61, 12, "L"), line(66, 44, 74, 36, "W"), line(70, 45, 79, 36, "W"), line(106, 44, 114, 36, "W"),
     rect(64, 46, 61, 8, "k"), hline(64, 46, 61, "q"), hline(64, 53, 61, "N"), rect(88, 44, 14, 2, "K"),
-    // orario sul muro
-    rect(54, 33, 6, 8, "W"), box(54, 33, 6, 8, "K"), hline(55, 35, 4, "s"), hline(55, 37, 4, "s"), hline(55, 39, 3, "R"),
     // scalinata e marciapiede
     rect(30, 54, 130, 4, "S"), hline(30, 54, 130, "W"), hline(30, 57, 130, "s"),
     rect(26, 58, 134, 4, "S"), hline(26, 58, 134, "W"), hline(26, 61, 134, "s"),
@@ -91,12 +86,12 @@ scene("ministero", { w: SW, h: SH, bg: "L", world: { light: [-0.6, -1], ground: 
     rect(0, 66, SW, 6, "j"), ...[4, 20, 36, 52, 68, 84, 100, 116, 132, 148].map((x) => vline(x, 67, 5, "s")), hline(0, 66, SW, "s")),
   layer("colonne", ...[34, 49, 131, 146].map((x) => stamp("colonna", x + 5, 55))),
   layer("sportello",
-    stamp("funzionario", 96, 50),
-    stamp("moduli", 72, 46), stamp("moduli", 116, 46, { flip: "x" }),
-    stamp("foglio_timbrato", 102, 43)),
+    stamp("foglio_timbrato", 114, 45),
+    stamp("funzionario", 112, 50),
+    stamp("moduli", 74, 46), stamp("moduli", 89, 46, { flip: "x" })),
   layer("bandiere", vline(5, 2, 64, "s"), vline(18, 6, 60, "s"), rect(3, 64, 5, 2, "D"), rect(16, 64, 5, 2, "D"),
     stamp("bandiera_it", 4, 2), stamp("bandiera_ue", 17, 6, { delay: 250 })),
-  layer("fila", { sort: "y" }, stamp("fila1", 82, 69), stamp("fila2", 97, 70)),
+  layer("fila", { sort: "y" }, stamp("fila1", 80, 69), stamp("fila2", 95, 70)),
 )
 
 // ================================================================ EDICOLA
@@ -121,7 +116,8 @@ sprite("chiosco", { w: 56, h: 46, outline: "K", pivot: "bottom" },
   ...[[7, 9, "R"], [13, 9, "B"], [19, 9, "Y"], [31, 9, "P"], [37, 9, "O"], [43, 9, "T"], [7, 19, "e"], [13, 19, "h"], [37, 19, "L"], [43, 19, "R"]]
     .map(([x, y, k]) => [rect(x, y, 5, 8, k), hline(x, y + 1, 5, "W"), hline(x + 1, y + 4, 3, "W")]).flat(),
   rect(6, 30, 44, 3, "k"), hline(6, 30, 44, "q"),
-  rect(6, 33, 44, 13, "G"), ...[10, 22, 34].map((x) => rect(x, 35, 10, 9, "g")))
+  rect(6, 33, 44, 13, "G"), rect(8, 35, 8, 9, "g"), rect(40, 35, 8, 9, "g"),
+  rect(18, 35, 20, 9, "W"), rect(18, 35, 20, 2, "R"), text(21, 38, "EURO", "K"), box(18, 35, 20, 9, "K"))   // locandina appesa
 sprite("insegna_giornali", { w: 36, h: 7, outline: "K" }, rect(0, 0, 36, 7, "W"), text(3, 1, "GIORNALI", "g"))
 persona("_edicolante", { testa: "corti", corpo: "seduto", swap: { B: "S", b: "s", M: "K" } })
 sprite("edicolante", { w: 10, h: 16, outline: "K", pivot: "bottom" }, stamp("__edicolante"))
@@ -132,23 +128,24 @@ anim("lettore", { w: 20, h: 26, fps: FPS, outline: "K", pivot: "bottom" },
   rect(0, 4, 20, 14, "W"), vline(10, 4, 14, "S"),                                         // il giornale aperto
   ...[6, 8, 10, 12, 14].map((y) => [hline(2, y, 7, "s"), hline(12, y, 6, "s")]).flat(), rect(12, 6, 6, 4, "j"), hline(2, 5, 7, "K"),
   px(0, 9, "F"), px(19, 9, "F"),
-  frame({ hold: 6 }), frame({ hold: 2 }, grid(16, 4, "____\n.__\n.._\n..._"), grid(16, 4, "...W\n..WS\n.WS.\nWS..")))
+  frame({ hold: 12 }), frame({ hold: 4 }, grid(16, 4, "____\n.__\n.._\n..._"), grid(16, 4, "...W\n..WS\n.WS.\nWS..")))
 // i piccioni che beccano (testa giù, testa su)
 anim("piccione", { w: 8, h: 6, fps: FPS, outline: "K", pivot: "bottom" },
-  grid(0, 2, "..SSSSj\nsSSSSjj\n.ssss..\n..Y.Y.."),
+  grid(0, 2, "..SSSSD\nsSSSSDD\n.ssss..\n..Y.Y.."),
   frame({ hold: 3 }, grid(5, 0, ".s\nTsY")),
   frame({ hold: 1 }, grid(6, 2, "..\n..\n.s\n.Y")))
 // il motorino rosso parcheggiato
 sprite("motorino", { outline: "K", pivot: "bottom" }, `
-  ..........S..
-  .........SS..
-  ..KKKK...R...
-  .RRRRR..RR...
-  RRRRRRRRRR...
-  .RrRRRrrRR...
-  .KKK.....KKK.
-  KsK.......KsK
-  .K.........K.`)
+  .........SSS.
+  ..........R..
+  ..........R..
+  .dddddd...R..
+  RRRRRRR..RRL.
+  RRRRRRRRRRRR.
+  .rRRRRRRRRRr.
+  ..dd.....dd..
+  .dsSd...dsSd.
+  ..dd.....dd..`)
 
 scene("edicola", { w: SW, h: SH, bg: "q", world: { light: [-0.6, -1], ground: 66 } },
   layer("palazzi",
@@ -161,12 +158,12 @@ scene("edicola", { w: SW, h: SH, bg: "q", world: { light: [-0.6, -1], ground: 66
     rect(0, 56, SW, 10, "S"), ...[12, 36, 60, 84, 108, 132, 156].map((x) => vline(x, 57, 9, "s")), hline(0, 56, SW, "s"),
     rect(0, 66, SW, 1, "W"), rect(0, 67, SW, 5, "D")),
   layer("strada", { sort: "y" },
-    stamp("chiosco", 72, 62), stamp("insegna_giornali", 55, 12),
-    stamp("loc_crisi", 31, 66), stamp("loc_gasolio", 117, 66), stamp("loc_euro", 140, 66),
+    stamp("chiosco", 78, 62),
+    stamp("loc_crisi", 38, 66), stamp("loc_gasolio", 124, 66),
     stamp("lettore", 13, 66),
-    stamp("motorino", 150, 68),
-    stamp("piccione", 34, 70), stamp("piccione", 47, 69, { flip: "x", delay: 250 }), stamp("piccione", 100, 70, { delay: 500 })),
-  layer("dentro", stamp("edicolante", 68, 38)),
+    stamp("motorino", 151, 68),
+    stamp("piccione", 63, 70), stamp("piccione", 76, 69, { flip: "x", delay: 250 }), stamp("piccione", 106, 70, { delay: 500 })),
+  layer("dentro", stamp("edicolante", 78, 38), stamp("insegna_giornali", 61, 9)),
 )
 
 // ================================================================ TRATTORIA
@@ -178,9 +175,16 @@ anim("buyer", { w: 10, h: 16, fps: FPS, outline: "K", pivot: "bottom" }, stamp("
   rect(2, 10, 6, 3, "W"), hline(2, 12, 6, "S"), px(4, 9, "W"), px(5, 9, "W"),                   // il tovagliolo al collo
   frame({ hold: 2 }), frame({ hold: 2 }, grid(3, 8, "fmmmf")))                                     // mastica
 persona("_commerciale", { testa: "corti", corpo: "seduto", abito: "completo", swap: { B: "b", b: "d", M: "m" } })
-anim("commerciale", { w: 12, h: 18, fps: FPS, outline: "K", pivot: [5, 18] }, stamp("__commerciale", 0, 2),
-  frame({ hold: 6 }, rect(9, 10, 2, 4, "b"), rect(9, 8, 3, 2, "F"), rect(10, 5, 2, 3, "W"), rect(10, 6, 2, 2, "r")),
-  frame({ hold: 2 }, rect(9, 8, 2, 6, "b"), rect(9, 6, 3, 2, "F"), rect(10, 3, 2, 3, "W"), rect(10, 4, 2, 2, "r")))
+// il commerciale alza il bicchiere: «alla nostra collaborazione!»
+anim("commerciale", { w: 13, h: 18, fps: FPS, outline: "K", pivot: [5, 18] }, stamp("__commerciale", 0, 2),
+  frame({ hold: 6 }, rect(9, 13, 2, 3, "b"), rect(10, 12, 2, 2, "F"), rect(10, 9, 3, 3, "W"), rect(10, 10, 3, 2, "r"), px(11, 12, "S")),
+  frame({ hold: 2 }, rect(9, 11, 2, 5, "b"), rect(10, 10, 2, 2, "F"), rect(10, 7, 3, 3, "W"), rect(10, 8, 3, 2, "r"), px(11, 10, "S")))
+// il tegame in mezzo al tavolo: brasato e polenta
+sprite("tegame", { outline: "K", pivot: "bottom" }, `
+  .YYYMMMNMM.
+  YYiYYMNMMMN
+  oOOOOOOOOOo
+  .ooooooooo.`)
 persona("_cameriere", { testa: "calvo", abito: "completo", swap: { B: "W", b: "S", M: "K", D: "K", d: "K", R: "K" } })
 sprite("cameriere", { w: 12, h: 20, outline: "K", pivot: [5, 20] }, stamp("__cameriere"),
   rect(1, 11, 2, 4, "d"), rect(7, 11, 2, 4, "d"),                                             // il gilet
@@ -197,10 +201,9 @@ sprite("fiasco", { outline: "K", pivot: "bottom" }, `
   yyy`)
 sprite("bicchiere_vino", { outline: "K", pivot: "bottom" }, "WW\nrr\n.S\nSS")
 sprite("piatto_brasato", { outline: "K", pivot: "bottom" }, `
-  ..YYYMMMM..
-  .YYiYMNNMM.
-  SWWWWWWWWWS
-  .SSSSSSSSS.`)
+  ...YYMM...
+  SWWWWWWWWS
+  .SSSSSSSS.`)
 sprite("pane", { outline: "K", pivot: "bottom" }, ".q.q.\nqkqkq\nkkkkk\n.kkk.")
 // la TV sulla mensola in alto: la partita, con la palla e i giocatori che corrono
 anim("tv_partita", { w: 26, h: 20, frames: LOOP, fps: FPS, outline: "K" },
@@ -229,15 +232,16 @@ scene("trattoria", { w: SW, h: SH, bg: "C", world: { light: [-0.6, -1], ground: 
     rect(44, 18, 34, 2, "M"), ...[46, 50, 54, 58, 62, 66, 70, 74].map((x, i) => [rect(x, 11, 2, 7, ["G", "r", "g", "d"][i % 4]), px(x, 10, "K")]).flat(),
     rect(88, 6, 14, 16, "N"), rect(90, 8, 10, 12, "q"), circ(95, 12, 2, "k"), rect(92, 15, 6, 5, "D"), px(94, 12, "K"), px(96, 12, "K"),
     stamp("tv_partita", 124, 3)),
-  layer("commensali", stamp("buyer", 60, 48), stamp("commerciale", 92, 48)),
+  layer("commensali", stamp("buyer", 60, 45), stamp("commerciale", 92, 45)),
   layer("tavolo",
-    rect(36, 46, 82, 3, "W"), hline(36, 46, 82, "W"),
-    rect(38, 49, 78, 9, "W"), ...Array.from({ length: 39 * 5 }, (_, i) => [i % 39, Math.floor(i / 39)]).filter(([x, y]) => (x + y) % 2 === 0)
-      .map(([x, y]) => rect(38 + x * 2, 49 + y * 2, 2, 2, "R")).slice(0, 999),
-    rect(38, 57, 78, 1, "r"), box(37, 46, 80, 12, "K"), rect(40, 58, 3, 8, "M"), rect(111, 58, 3, 8, "M"),
-    stamp("piatto_brasato", 60, 47), stamp("_fumo", 61, 41, { delay: 250 }), stamp("_fumo", 58, 42),
-    stamp("fiasco", 76, 47), stamp("bicchiere_vino", 70, 47), stamp("bicchiere_vino", 84, 47),
-    stamp("pane", 104, 47), stamp("piatto_brasato", 93, 47, { flip: "x" })),
+    rect(36, 44, 82, 3, "W"),
+    rect(38, 47, 78, 9, "W"), ...Array.from({ length: 39 * 5 }, (_, i) => [i % 39, Math.floor(i / 39)]).filter(([x, y]) => (x + y) % 2 === 0)
+      .map(([x, y]) => rect(38 + x * 2, 47 + y * 2, 2, 2, "R")),
+    rect(38, 55, 78, 1, "r"), box(37, 44, 80, 12, "K"), rect(40, 56, 3, 10, "M"), rect(111, 56, 3, 10, "M"),
+    stamp("piatto_brasato", 60, 45), stamp("piatto_brasato", 93, 45, { flip: "x" }),
+    stamp("tegame", 77, 45), stamp("_fumo", 77, 39), stamp("_fumo", 74, 40, { delay: 250 }),
+    stamp("bicchiere_vino", 68, 45), stamp("bicchiere_vino", 86, 45),
+    stamp("fiasco", 104, 45), stamp("pane", 112, 45)),
   layer("cameriere", stamp("cameriere", 136, 66)),
 )
 
@@ -268,18 +272,18 @@ CORPI.golf = [
   ".DDd.",
   ".DDd.",
   ".KKK."]
-persona("_golfista", { testa: "visiera", corpo: "golf", swap: { B: "e", b: "R", D: "S", d: "s", M: "s" } })
+persona("_golfista", { testa: "visiera", corpo: "golf", swap: { B: "B", b: "b", D: "W", d: "S", M: "s" } })
 const SWING = (bx, by, mano, testa, extra = []) => [line(...mano, bx, by, "s"), rect(testa[0], testa[1], 2, 2, "K")].concat(extra)
 anim("golfista", { w: 30, h: 30, fps: FPS, outline: "K", pivot: [15, 30] },
   stamp("__golfista", 10, 10),
   frame({ hold: 5 }, line(15, 26, 19, 28, "s"), rect(19, 28, 2, 2, "K"), px(22, 29, "W"),                      // in posizione
-    line(11, 21, 14, 25, "e"), line(18, 21, 15, 25, "e"), rect(14, 25, 2, 2, "F")),
+    line(11, 21, 14, 25, "F"), line(18, 21, 15, 25, "F"), rect(14, 25, 2, 2, "F")),
   frame({ hold: 4 }, line(8, 13, 3, 3, "s"), rect(2, 2, 2, 2, "K"), px(22, 29, "W"),                           // indietro
-    line(11, 21, 9, 15, "e"), line(18, 21, 10, 15, "e"), rect(8, 13, 2, 2, "F")),
+    line(11, 21, 9, 15, "F"), line(18, 21, 10, 15, "F"), rect(8, 13, 2, 2, "F")),
   frame({ hold: 1 }, line(15, 26, 16, 28, "s"), rect(16, 28, 2, 2, "K"), line(20, 29, 27, 26, "W"),            // la botta
-    line(11, 21, 14, 25, "e"), line(18, 21, 15, 25, "e"), rect(14, 25, 2, 2, "F")),
+    line(11, 21, 14, 25, "F"), line(18, 21, 15, 25, "F"), rect(14, 25, 2, 2, "F")),
   frame({ hold: 6 }, line(21, 13, 26, 3, "s"), rect(26, 2, 2, 2, "K"),                                          // il finale
-    line(11, 21, 20, 15, "e"), line(18, 21, 21, 15, "e"), rect(20, 13, 2, 2, "F")))
+    line(11, 21, 20, 15, "F"), line(18, 21, 21, 15, "F"), rect(20, 13, 2, 2, "F")))
 // il commerciale con la sacca: applaude il colpo
 persona("_portasacca", { testa: "corti", abito: "completo", swap: { B: "D", b: "d", D: "d", M: "K" } })
 anim("portasacca", { w: 12, h: 20, fps: FPS, outline: "K", pivot: [5, 20] }, stamp("__portasacca"),
@@ -326,15 +330,17 @@ scene("golf", { w: SW, h: SH, bg: "L", world: { light: [-0.6, -1], ground: 66 } 
     // la club house in fondo, col tetto rosso
     rect(6, 18, 30, 10, "W"), poly([3, 19, 21, 11, 39, 19], "r"), hline(4, 18, 34, "R"), ...[10, 18, 26].map((x) => rect(x, 21, 4, 4, "b")), rect(19, 23, 3, 5, "N"),
     rect(0, 28, SW, 44, "G"),
-    ...[44, 54, 66, 80, 92, 106, 140, 152].map((x, i) => stamp("_albero", x, 30 + (i % 2))),
+    // il bosco in fondo: chiome tonde una accanto all'altra, luce da sinistra
+    ...Array.from({ length: 21 }, (_, i) => { const x = 42 + i * 6, y = 29 - (i * 7 % 5), r = 4 + (i * 3 % 3)
+      return [circ(x, y, r, "g"), circ(x - 1, y - 1, r - 1, "G"), px(x - 2, y - r + 1, "h"), px(x - 3, y - r + 2, "h")] }).flat(),
     rect(0, 30, SW, 3, "g"),
     rect(0, 33, SW, 10, "h"), rect(0, 43, SW, 2, "G"),
     ellipse(122, 50, 32, 7, "h"), ellipse(122, 50, 32, 7, "G", true), ellipse(122, 51, 3, 1, "K"),
-    ellipse(66, 58, 15, 4, "q"), ellipse(66, 57, 12, 2, "i"), ellipse(66, 58, 15, 4, "y", true),
+    ellipse(48, 55, 11, 3, "q"), ellipse(48, 54, 8, 1, "i"), ellipse(48, 55, 11, 3, "y", true),
     rect(0, 68, SW, 4, "g")),
   layer("pallina", (c) => {
     const f = c.frame; if (f < 9) return
-    const u = (f - 8) / 8, x = Math.round(80 + u * 40), y = Math.round(60 - Math.sin(u * Math.PI) * 38 - u * 8)
+    const u = (f - 8) / 8, x = Math.round(89 + u * 33), y = Math.round(64 - Math.sin(u * Math.PI) * 30 - u * 13)
     c.rect(x, y, 2, 2, "W"); c.px(x + 1, y + 1, "S")
   }),
   layer("gente", { sort: "y" },

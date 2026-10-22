@@ -189,15 +189,15 @@ sprite("_spazzaneve", { w: 50, h: 26, outline: "K", pivot: "bottom" },
   poly([41, 9, 46, 12, 46, 24, 40, 24, 42, 14], "Y"), ...[13, 17, 21].map((y) => line(41, y + 2, 45, y - 2, "K")),   // lama
   rect(20, 2, 5, 2, "d"),
   ...[8, 33].map((x) => [circ(x, 22, 3, "K"), px(x, 22, "s")]).flat())
-anim("lampeggiante_neve", { w: 11, h: 5, fps: FPS },
-  rect(3, 2, 5, 3, "o"),
-  frame({ hold: 1 }, rect(3, 2, 2, 3, "O"), px(1, 2, "a"), px(0, 3, "a")),
-  frame({ hold: 1 }, rect(4, 2, 3, 3, "O"), rect(5, 1, 1, 1, "a"), px(5, 0, "a")),
-  frame({ hold: 1 }, rect(6, 2, 2, 3, "O"), px(9, 2, "a"), px(10, 3, "a")),
+anim("lampeggiante_neve", { w: 15, h: 8, fps: FPS },
+  rect(5, 6, 5, 2, "K"), rect(5, 3, 5, 3, "o"), hline(5, 2, 5, "K"), vline(4, 3, 3, "K"), vline(10, 3, 3, "K"),
+  frame({ hold: 1 }, rect(5, 3, 2, 3, "Y"), px(2, 3, "Y"), px(0, 2, "Y"), px(1, 5, "i")),
+  frame({ hold: 1 }, rect(6, 3, 3, 3, "Y"), px(7, 1, "Y"), px(7, 0, "i"), px(4, 0, "i"), px(10, 0, "i")),
+  frame({ hold: 1 }, rect(8, 3, 2, 3, "Y"), px(12, 3, "Y"), px(14, 2, "Y"), px(13, 5, "i")),
   frame({ hold: 1 }))
 anim("spruzzo", { w: 14, h: 14, fps: FPS },
-  frame({ hold: 2 }, px(2, 10, "W"), px(5, 7, "W"), px(6, 8, "W"), px(9, 5, "W"), px(4, 11, "S"), px(8, 9, "S")),
-  frame({ hold: 2 }, px(3, 9, "W"), px(7, 5, "W"), px(8, 6, "W"), px(11, 3, "W"), px(12, 6, "S"), px(6, 10, "S"), px(1, 11, "W")))
+  frame({ hold: 2 }, rect(1, 9, 2, 2, "W"), px(3, 7, "W"), rect(5, 5, 2, 2, "W"), px(6, 8, "W"), px(9, 4, "W"), px(10, 7, "W"), px(12, 6, "W"), px(4, 11, "W"), px(8, 10, "W")),
+  frame({ hold: 2 }, rect(2, 8, 2, 2, "W"), px(4, 6, "W"), rect(7, 3, 2, 2, "W"), px(8, 6, "W"), px(11, 2, "W"), px(12, 5, "W"), px(13, 8, "W"), px(6, 10, "W"), px(1, 11, "W")))
 // l'autista col berretto di lana e le catene aggrovigliate; il fiato fa la nuvoletta
 persona("_autista", { testa: "berretto", swap: { R: "Y", r: "y", B: "T", b: "t", D: "d", M: "m" } })
 anim("autista", { w: 18, h: 26, fps: FPS, outline: "K", pivot: [5, 26] }, stamp("__autista", 0, 6),
@@ -220,11 +220,86 @@ scene("neve", { w: SW, h: SH, bg: "j", world: { light: [-0.6, -1], ground: 60 } 
     rect(0, 43, SW, 18, "j"), ...[47, 48, 54, 55].map((y) => hline(0, y, SW, "s")),                          // carreggiata con le tracce
     stamp("cartello_catene", 72, 44)),
   layer("mezzi",
-    stamp("_spazzaneve", 26, 61), stamp("lampeggiante_neve", 15, 34), stamp("spruzzo", 47, 39),
+    stamp("_spazzaneve", 26, 61), stamp("lampeggiante_neve", 15, 31), stamp("spruzzo", 47, 39),
     stamp("_bilico", 116, 61, { swap: { B: "R", b: "r" } })),
   layer("davanti",
     rect(0, 61, SW, 11, "W"), ...[16, 48, 80, 112, 144].map((x) => ellipse(x, 61, 12, 2, "W")), ...[64, 67].map((y) => hline(0, y, SW, "S")),
     ...guardrail(60, "S", "s").slice(0, 2),
     stamp("autista", 98, 68)),
   layer("neve che cade", stamp("fiocchi")),
+)
+
+// ================================================================ PIOGGIA
+// Allerta rossa in Liguria, vista dalla cabina: diluvia, i tergicristalli vanno a tutta, le gocce sul vetro,
+// l'auto davanti alza gli spruzzi, il pannello dice «ALLERTA», a sinistra i paesini colorati sul monte,
+// a destra il mare grigio; ogni tanto un lampo (un fotogramma). Dentro: il volante, le mani, l'alberello profumato che dondola.
+
+const VETRO = (x, y) => y >= 6 && y < 52 && x >= 12 - (8 * (y - 6)) / 46 && x < 148 + (8 * (y - 6)) / 46
+const LAMPO = 11                                                     // il fotogramma del lampo
+const rndP = rng(11)
+const GOCCE_FUORI = Array.from({ length: 46 }, () => [Math.floor(rndP() * SW), Math.floor(rndP() * SH)])
+const GOCCE_VETRO = Array.from({ length: 26 }, () => [14 + Math.floor(rndP() * 132), 8 + Math.floor(rndP() * 42), Math.floor(rndP() * 8)])
+anim("_fuori", { w: SW, h: SH, frames: LOOP, fps: FPS }, (c) => {
+  const lampo = c.frame === LAMPO
+  c.rect(0, 0, SW, 18, lampo ? "j" : "D"); c.rect(0, 18, SW, 13, lampo ? "S" : "j")             // cielo di tempesta
+  for (const [x, y, rx] of [[30, 8, 22], [90, 5, 26], [140, 10, 18], [60, 14, 14]]) c.ellipse(x, y, rx, 4, lampo ? "s" : "d")
+  if (lampo) c.line(118, 0, 114, 8, "W"), c.line(114, 8, 121, 14, "W"), c.line(121, 14, 116, 24, "W"), c.line(116, 24, 119, 30, "i")
+  c.rect(80, 30, 80, 12, lampo ? "b" : "d")                                                     // il mare
+  for (const [x, y] of [[96, 33], [120, 35], [140, 32], [108, 38], [132, 39], [150, 36]]) c.hline(x - Math.floor(c.phase * 4) % 4, y, 3, lampo ? "L" : "D")
+  c.poly([0, 52, 0, 12, 14, 10, 30, 16, 48, 22, 66, 28, 82, 31, 60, 52], "t")                  // il monte sul mare
+  c.poly([0, 40, 0, 16, 14, 13, 28, 19, 20, 30], "g")
+  for (const [x, y, k] of [[8, 22, "q"], [13, 20, "a"], [18, 24, "e"], [24, 25, "Y"], [11, 27, "O"], [34, 25, "i"], [40, 27, "a"], [29, 29, "e"]])
+    c.rect(x, y, 3, 3, k), c.px(x + 1, y + 1, "K"), c.hline(x, y - 1, 3, "r")                    // paesini colorati coi tetti rossi
+  c.poly([30, 52, 130, 52, 82, 31, 78, 31], "s")                                                // la strada bagnata
+  c.line(30, 52, 78, 31, "D"); c.line(130, 52, 82, 31, "D")
+  c.line(26, 52, 77, 31, "S"); c.line(134, 52, 83, 31, "S")                                     // guardrail
+  for (const [y0, y1] of [[33, 34], [37, 39], [43, 46], [50, 52]]) c.line(80, y0, 80, y1, "W")
+  // l'auto davanti, con gli stop accesi e gli spruzzi
+  c.rect(75, 34, 11, 6, "K"); c.rect(76, 35, 9, 2, "D"); c.px(76, 38, "R"); c.px(84, 38, "R"); c.px(75, 38, "e"); c.px(85, 38, "e")
+  const sp = c.frame % 2; c.px(74 - sp, 40, "S"); c.px(73, 39 + sp, "S"); c.px(86 + sp, 40, "S"); c.px(87, 39 + sp, "S")
+  // il pannello sopra la strada
+  c.line(66, 31, 66, 20, "K"); c.line(94, 31, 94, 20, "K")
+  c.rect(64, 13, 33, 10, "K"); c.text(67, 15, "ALLERTA", "R")
+  c.px(65, 14, c.frame % 4 < 2 ? "O" : "o"); c.px(95, 14, c.frame % 4 < 2 ? "o" : "O")
+  // la pioggia: righe oblique che cadono di 144 righe in un giro
+  for (const [x0, y0] of GOCCE_FUORI) {
+    const y = (y0 + Math.floor(c.phase * 144)) % SH, x = (x0 + Math.floor(y / 2)) % SW
+    c.px(x, y, "L"); c.px(x + 1, y + 2, "j")
+  }
+})
+// le gocce sul vetro: compaiono e restano finché non passa la spazzola
+anim("_gocce", { w: SW, h: SH, frames: LOOP, fps: FPS }, (c) => {
+  for (const [x, y, t0] of GOCCE_VETRO) if ((c.frame - t0 + 16) % 8 < 5) { c.px(x, y, "L"); c.px(x, y + 1, "B") }
+})
+// i tergicristalli: vanno su e giù in 8 fotogrammi
+const ANGOLI = [186, 208, 238, 266, 282, 266, 238, 208]
+anim("tergicristalli", { w: SW, h: SH, frames: LOOP, fps: FPS }, (c) => {
+  const a = (ANGOLI[c.frame % 8] * Math.PI) / 180
+  for (const [x0, L] of [[44, 40], [100, 42]]) {
+    const x1 = Math.round(x0 + Math.cos(a) * L), y1 = Math.round(52 + Math.sin(a) * L)
+    c.line(x0, 52, x1, y1, "K", 2)
+    c.line(x0 + Math.round(Math.cos(a) * 10), 52 + Math.round(Math.sin(a) * 10), x1, y1, "s")
+  }
+})
+// l'alberello profumato appeso al tetto della cabina, che dondola
+anim("alberello", { w: 9, h: 16, fps: FPS },
+  ...[[0, 2], [1, 2], [0, 2], [-1, 2]].map(([dx, h]) => frame({ hold: h }, line(4, 0, 4 + dx, 6, "S"),
+    grid(2 + dx, 7, "..G..\n.GGG.\nGGgGG\n.GGG.\nGGGgG\n..N.."))))
+// la spia arancione sul cruscotto
+anim("spia", { w: 3, h: 2, fps: FPS }, frame({ hold: 4 }, rect(0, 0, 3, 2, "O")), frame({ hold: 4 }, rect(0, 0, 3, 2, "o")))
+scene("pioggia", { w: SW, h: SH, bg: "d", world: { light: [-0.6, -1] } },
+  layer("fuori", clip(VETRO, stamp("_fuori"), stamp("_gocce"))),
+  layer("tergicristalli", clip((x, y) => y < 54, stamp("tergicristalli"))),
+  layer("cabina",
+    clip((x, y) => !VETRO(x, y), rect(0, 0, SW, SH, "d")),
+    line(12, 6, 4, 52, "K"), line(148, 6, 156, 52, "K"), hline(12, 5, 137, "K"), rect(0, 0, SW, 5, "D"), hline(0, 4, SW, "s"),   // montanti e cielo della cabina
+    rect(116, 4, 9, 2, "K"),                                                                      // il gancio dell'alberello
+    stamp("alberello", 116, 6),
+    rect(0, 52, SW, 20, "D"), hline(0, 52, SW, "j"), hline(0, 53, SW, "s"), rect(0, 66, SW, 6, "d"),   // cruscotto
+    ...[[33, 58], [55, 58]].map(([x, y]) => [circ(x, y, 3, "K"), ring(x, y, 3, "s"), line(x, y, x + 2, y - 2, "W")]).flat(),
+    stamp("spia", 96, 58),
+    rect(108, 56, 22, 7, "K"), rect(110, 58, 12, 3, "u"), px(126, 59, "R"), px(124, 59, "O"),      // la radio CB
+    ring(44, 101, 40, "s"), ring(44, 101, 39, "K"), ring(44, 101, 38, "K"), ring(44, 101, 37, "d"),   // il volante
+    rect(20, 64, 5, 4, "F"), hline(20, 67, 5, "f"), poly([14, 72, 19, 68, 25, 68, 23, 72], "b"),   // le mani sul volante
+    rect(63, 64, 5, 4, "F"), hline(63, 67, 5, "f"), poly([65, 72, 63, 68, 69, 68, 74, 72], "b")),
 )
