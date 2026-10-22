@@ -67,7 +67,7 @@ Finestra `finale` (pulsante «Report della partita» nelle finestre di vittoria,
 - Personale: RAL magazzinieri 18.000, carrellisti 19.500, impiegati di magazzino 22.000, autisti patente B 19.000, autisti patente CE 23.000, × 1,42 di oneri, ÷ 12.
 - Mezzi: km CE × (0,25 l/km × gasolio × riduzione rotte + 0,13) €/km + km B × (0,12 l/km × gasolio × riduzione rotte + 0,06) €/km, più 1.100 € per autista CE, 2.100 € di leasing per ogni autista CE oltre le motrici di proprietà e 900 € di furgone in leasing per autista B.
 - Ogni autista CE copre 6.500 km al mese, ogni autista B 4.000 (traffico e soste in città). Se gli autisti sono troppo pochi, la Puntualità cala.
-- Immobile: (costo fisso + 1.000) × moltiplicatore costi fissi (gestionale −3%, controllo di gestione −4%, direttore finanziario −0,5% per punto di Amministrazione sopra 10) + manutenzione, × talenti di chi guida il magazzino (Braccino corto −5%, Mano larga +5%).
+- Immobile: (costo fisso + bollette + canoni delle dotazioni) × moltiplicatore costi fissi × (1 − 4% con l'antincendio funzionante) (gestionale −3%, controllo di gestione −4%, direttore finanziario −0,5% per punto di Amministrazione sopra 10) + manutenzione, × talenti di chi guida il magazzino (Braccino corto −5%, Mano larga +5%), meno l'incentivo dei pannelli solari (600 €). Bollette (`utenze()`) = 1.000 € × classe (fatiscente 1,6, vecchio 1,3, standard 1, moderno 0,85, innovativo 0,7) × (1 − 35% pannelli − 20% LED, minimo 0,3).
 - Conto economico (`S.cur`): ricavi, personale, mezzi, immobili e fissi, tecnologie (ricerche, installazioni e canoni di Logistica), manager, welfare e benefit (benefit aziendali più installazione e canone dei servizi di welfare), penali, altro. In «Altro» vanno le spese una tantum (assunzioni, buonuscite, aperture, cantieri, head hunter) e tutti i soldi spesi o incassati negli eventi (`ACT.evopt` registra la differenza di cassa).
 - CEO 4.000 €/mese; manager e dirigenti a RAL × 1,42.
 - Prestiti (`S.loans`, `loanRate()`, `loanLimit()`, `loansMonth()`): si chiedono dalla finestra Cassa (50.000, 100.000, 200.000, 400.000 € o il fido residuo; 24, 48 o 72 mesi). Fido = max(60.000, 4 × ricavi mensili, media degli ultimi 3 mesi o ritmo di oggi se maggiore) − debito residuo, arrotondato per difetto a 10.000. Tasso annuo = 6,5 − 0,06·(reputazione − 40) − 0,1·(Amministrazione CEO − 10) − 0,1·(Amministrazione direttore finanziario − 10) + 0,5 oltre 36 mesi + 0,5 oltre 60 mesi, tra 2,5% e 12%. Rata costante alla francese pagata a fine mese prima della chiusura del conto: gli interessi vanno nella voce `int` del conto economico, la quota capitale (`rimb`) e il prestito incassato (`prest`) muovono solo la cassa. Estinzione anticipata: debito residuo + 2% (la penale va negli interessi).
@@ -140,7 +140,7 @@ Finestra `finale` (pulsante «Report della partita» nelle finestre di vittoria,
 
 ## Gare (tender)
 - Le gare arrivano una alla volta: il giorno della prossima è `S.tNext`, l'attesa (`tenderWait()`) è la media `tenderGap()` = 24 giorni / ((1 + 0,2 × avversarie vive) × (4/3 con l'Ufficio commerciale)) × un numero esponenziale tra 0,25 e 3 (media circa 1). Da soli circa 15 gare l'anno (20 con l'Ufficio commerciale), con 3 avversarie circa 24 (32); aperte in media 45 / media: da soli circa 2, a volte nessuna. A inizio partita ne arrivano max(2, 45 / media arrotondato) con scadenze distribuite su 35 giorni (`newTender(age)`); i salvataggi di prima della 0.65 tengono le gare aperte e passano al nuovo ritmo. La committente si estrae con un peso per rank (`TW_RANK`: S 0,7, A 0,8, B 1, C 1,4, D e F 1,7) e la zona con un peso per tipo (`TW_ZONE`: provincia 2,2, gruppo 1,5, regione 1, macroarea 0,6); se non c'è nessuna committente libera la gara salta. Si hanno 45 giorni (6 settimane e mezza) per l'offerta. Alcune richiedono tecnologie o certificazioni (`req`): HACCP (tutti i clienti alimentari e dei mangimi, anche secchi), catena del freddo, EDI, e-commerce. Le certificazioni di magazzino devono essere valide (`certOk`) nel magazzino scelto per l'offerta (`bidEstimate` → `certW`).
-- Punteggio = 50 + (1−moltiplicatore)·150 + margine P·4 + margine A·4 (ciascuno tra −20 e +6) + (reputazione−50)·0,25 + (Negoziazione CEO−10) + direttore commerciale·0,8·(Neg−10) + ISO 3 + talenti (`talGara()`: `gara` del CEO o del direttore commerciale, `naz` del CEO con le committenti S e A). Si confronta con 55 + difficoltà della gara + modificatore del rank, con probabilità logistica (scala 6).
+- Punteggio = 50 + (1−moltiplicatore)·150 + margine P·4 + margine A·4 (ciascuno tra −20 e +6) + (reputazione−50)·0,25 + (Negoziazione CEO−10) + direttore commerciale·0,8·(Neg−10) + ISO 3 + immobile (`whGara()`: classe fatiscente −2, vecchio −1, moderno +1, innovativo +2, giardino +0,5; doppio con le committenti S e A; le committenti S non accettano un magazzino fatiscente) + talenti (`talGara()`: `gara` del CEO o del direttore commerciale, `naz` del CEO con le committenti S e A). Si confronta con 55 + difficoltà della gara + modificatore del rank, con probabilità logistica (scala 6).
 
 ## Personale e recruiting
 - Giorni per assumere = base × clamp(1 + (55 − attrattività)/40; 0,6; 1,8) × (Ufficio del personale 0,8) × (1 − 0,02·(Leadership del direttore HR − 10)).
@@ -213,6 +213,34 @@ Ogni abilità ha un'icona 10×10 e un colore fisso, usati ovunque nel gioco: Ope
 - Sotto 70: posti pallet e produttività −0,6% per ogni punto mancante.
 - Manutenzione straordinaria (serve il facility manager): stato subito a 100, costo = punti mancanti × posti × 0,12 €.
 - Ampliamento (serve il facility manager, max 3): +25% dei posti iniziali del sito, 120 € per posto, 90 giorni di cantiere con produttività −5%; a fine lavori affitto/costo fisso +25% di quello iniziale.
+- Un cantiere alla volta per magazzino (`w.build.k`: `amp` ampliamento, `dot` dotazione, `rist` ristrutturazione), sempre con produttività −5%.
+
+## Classe dell'edificio e dotazioni (`WCLASS`, `DOT`, `EDIL`)
+- Classe `w.cl` (dai dati del sito, `SITES[].cl`): effetti in `immL()` / `immFx()`, sommati a KPI, morale, produttività (moltiplicatore `prF.imm`), posti (`capOf`), km degli autisti, agitazione, costi e gare.
+  | classe | produttività | P | A | morale | bollette | usura | guasti | gare |
+  |---|---|---|---|---|---|---|---|---|
+  | fatiscente | −8% | −1 | −0,5 | −6 | ×1,6 | ×2 | ×2 | −2 |
+  | vecchio | −4% | −0,5 | 0 | −3 | ×1,3 | ×1,4 | ×1,4 | −1 |
+  | standard | 0 | 0 | 0 | 0 | ×1 | ×1 | ×1 | 0 |
+  | moderno | +4% | +0,5 | +0,3 | +2 | ×0,85 | ×0,8 | ×0,7 | +1 |
+  | innovativo | +8% | +1 | +0,6 | +4 | ×0,7 | ×0,6 | ×0,5 | +2 |
+- Usura: lo stato senza facility manager scende di 0,06 × usura × (1 − 15% con l'antincendio) × (1 + occupazione oltre 0,6) al giorno.
+- Dotazioni `w.dot[id]` (quelle del sito all'apertura; le altre si costruiscono: serve il facility manager, nessun altro cantiere, costo `c0 + cp × posti`, giorni `gg`, poi `mese` al mese). Le esterne (`ext:1`) occupano un posto dell'area esterna `w.ext` (1-4 per sito):
+  - ribalte (20.000 + 12 €/posto, 60 gg): senza (portoni a raso) produttività −4% e P −1;
+  - pannelli solari (dal 2005; 30.000 + 10 €/posto, 60 gg): bollette −35%; montati tra il 2007 e il 2012 incentivo di 600 €/mese;
+  - LED (dal 2008; 6.000 + 3 €/posto, 15 gg): bollette −20%, A +0,2;
+  - parcheggio camion (esterna, 25.000, 45 gg, 100 €/mese): morale +2, km a testa degli autisti +3%;
+  - portineria (15.000, 30 gg, 1.500 €/mese): A +0,3;
+  - piazzale esterno (esterna, 20.000, 45 gg): posti +6%;
+  - giardino (esterna, 8.000, 30 gg, 150 €/mese): morale +2, agitazione −3, gare +0,5, reputazione +1 a fine lavori;
+  - mensa esterna (esterna, 40.000, 60 gg, 300 €/mese): morale +2, agitazione −4; il servizio Mensa aziendale del Welfare costa metà da installare (`instCost`);
+  - celle frigo (30.000 + 5 €/posto, 60 gg, 400 €/mese): la Catena del freddo costa il 60% in meno da installare;
+  - antincendio (15.000 + 8 €/posto, 45 gg, 100 €/mese): costi dell'immobile −4%, usura −15%, incendi meno gravi;
+  - ricarica dei muletti: c'è sempre (`base:1`), si può solo rompere.
+- Ristrutturazione (`ristStart`): classe +1 fino a moderno, 45 € per posto, 120 giorni.
+- Guasti (`koMonth()` a fine mese, per magazzino): probabilità 3,5% × guasti della classe × 1,5 se lo stato è sotto 70 × (0,7 con facility manager, 1,2 senza). Si rompe una dotazione presente (o il tetto nei fatiscenti e vecchi): `w.ko[id] = {d, fine}`, la dotazione perde l'effetto e alcune hanno un effetto in più (`ko`): ribalta −2% produttività e P −0,5, piazzale −2%, mensa morale −2, celle frigo A −1,5, ricarica −12%, tetto A −1 e morale −2. Evento giallo `guasto` dell'Ufficio tecnico (`koOpts`): urgente (1,5 × riparazione, subito), programmata (riparazione, 14 giorni con facility manager, 35 senza), ci arrangiamo (resta guasto; «Ripara» dalla scheda Immobile). Riparazione = 12% del costo di costruzione, minimo 1.500 € (tetto 5 €/posto, ricarica 6.000). Incendio (`incendio`, 0,4% × lo stesso moltiplicatore): con l'antincendio poca cosa, senza bonifica 4 €/posto e stato −8, oppure stato −18 e A −2 per 6 settimane. Gli avversari pagano subito la riparazione.
+- Mercato: i siti con `from` arrivano in quell'anno (Castel San Giovanni 2004, Calderara 2008, Landriano 2014, Vigasio 2016); ci sono anche capannoni fatiscenti e vecchi a poco prezzo.
+- Costruzione da zero (`edilStart` / `edilDaily`, `S.cantieri`): sui terreni (`SITES[].lotto`, prezzo `land`, posti al massimo `max`, area esterna `ext`). Costo = terreno + posti × (standard 140, moderno 190, innovativo dal 2008 260 €) + dotazioni scelte, tutto subito; cantiere 240 / 300 / 360 giorni. Alla fine il magazzino è di proprietà con costo fisso 1,10 €/posto al mese.
 
 ## Ricerca dei manager (finestra `manager`)
 - **Manager e dirigenti sono la stessa cosa**: chi è assunto guida un magazzino, siede in Direzione o guida il customer service. I personaggi con una storia (`MANAGERS` + `EXECS`, 23) si trovano solo con l'head hunter; tutti gli altri candidati li crea il gioco (`genPerson()`: nome, biografia `GEN_BIO`, volto `p_v0`…`p_v39`, 1-2 talenti più il 75% delle volte un titolo di studio, effetti dei talenti già sommati alle abilità).
