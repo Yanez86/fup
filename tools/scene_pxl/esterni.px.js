@@ -1,4 +1,4 @@
-// Esterni dei magazzini: quattro tipi (fatiscente, standard, moderno, frigorifero), due versioni per tipo.
+// Esterni dei magazzini: sei tipi (fatiscente, vecchio, standard, moderno, innovativo, frigorifero), due versioni per tipo.
 // Tutte nella stessa pianta, perché sopra ci vanno gli elementi del magazzino (giardino, colonnine, area cani, muletti, pulmino, gru):
 //   il capannone nel riquadro x 24..135, y 6..55 (la base della facciata è la riga 55), il terreno dalla riga 56;
 //   zone lasciate libere (solo erba o asfalto liscio): a sinistra x 0..23 dalla riga 18, a destra x 136..159 dalla riga 30,
@@ -55,10 +55,12 @@ const CREPE = [[30, 56, 36, 57], [62, 57, 70, 56], [92, 56, 97, 57]]
 function crepe(c) { for (const [a, b, x, y] of CREPE) { c.line(a, b, x, y, "d"); erbaccia(c, x, y, a % 3) } }
 
 // ================================================================ IL CAPANNONE (con i parametri)
-// la riga del colmo per ogni colonna: tetto piatto, a capanna, a botte (arco) o a shed (denti di sega)
+// la riga del colmo per ogni colonna: tetto piatto, a capanna, a botte (arco), a shed (denti di sega) o a rampa
+// (una falda sola che sale verso sinistra: «top» è la gronda a destra, a sinistra è più alta di «alza»)
 function profilo(tetto, x0, x1, top, alza, denti) {
   const mid = (x0 + x1) / 2, half = (x1 - x0) / 2, tw = (x1 - x0 + 1) / denti
   return (x) => {
+    if (tetto === "rampa") return top - Math.round(alza * (x1 - x) / (x1 - x0))
     if (tetto === "capanna") return top - Math.round(alza * (1 - Math.abs(x - mid) / half))
     if (tetto === "botte") return top - Math.round(alza * Math.sqrt(Math.max(0, 1 - ((x - mid) / half) ** 2)))
     if (tetto === "shed") return top - alza + Math.round(alza * (((x - x0) % tw) / tw))
@@ -588,3 +590,275 @@ esterno("est_freddo2", { nuvole: [[14, 6, 9], [56, 9, 8], [150, 4, 8]] }, {
   ombre: [rect(75, 56, 29, 2, "K")],
   cose: [stamp("_furgone_frigo", 88, 57)],
   vapore: [(c) => c.plume(90, 6, "WSj", { every: 2, life: 16, rise: 8, size: [2, 4], wind: 0.4 })] })
+
+// ================================================================ VECCHIO
+// Il capannone degli anni Settanta-Ottanta, vecchio ma in piedi: pannelli prefabbricati di cemento ingrigiti con le colature,
+// lucernari in vetroresina ondulata, il tetto basso, i portoni a libro, l'insegna con le lettere colorate, gli uffici con le
+// tapparelle, la caldaia col camino che fuma. Si muovono il fumo, l'insegna al neon (o una tapparella) e un piccione.
+
+// portone a libro: ante strette a fisarmonica coi vetrini in alto e il traverso a metà, il binario sopra, gli stipiti;
+// «piegate» ante già raccolte contro lo stipite sinistro (di taglio: una colonna presa dalla luce e una in ombra),
+// poi il varco aperto sul buio del magazzino, col pallet appena dentro
+function libro(c, x, y, w, { fondo = BASE, col = "O", luce = "a", ombra = "o", vetro = "j", anta = 5, piegate = 0, varco = 0, guida = "D" } = {}) {
+  const h = fondo - y + 1
+  c.rect(x - 1, y - 2, w + 2, 2, guida); c.hline(x - 1, y - 2, w + 2, "s")
+  c.vline(x - 1, y, h, guida); c.vline(x + w, y, h, guida)
+  let ax = x
+  for (let i = 0; i < piegate; i++, ax += 2) { c.vline(ax, y, h, luce); c.vline(ax + 1, y, h, ombra) }
+  if (varco) {
+    c.rect(ax, y, varco, h, "K"); c.hline(ax, fondo, varco, "d")
+    c.rect(ax + 1, fondo - 4, varco - 2, 3, "k"); c.hline(ax + 1, fondo - 4, varco - 2, "q"); c.hline(ax + 1, fondo - 1, varco - 2, "N")
+    ax += varco
+  }
+  for (; ax < x + w; ax += anta) {
+    const lw = Math.min(anta, x + w - ax)
+    c.rect(ax, y, lw, h, col); c.vline(ax, y, h, luce); c.vline(ax + lw - 1, y, h, ombra)
+    c.rect(ax + 1, y + 2, lw - 2, 3, vetro); c.px(ax + 1, y + 2, "S")
+    c.hline(ax + 1, y + Math.floor(h / 2) + 1, lw - 2, ombra)
+  }
+}
+// finestra con la tapparella giù di «giu» righe (stecche chiare e fughe scure, il terminale scuro in fondo), il davanzale
+// di marmo che sporge e, se c'è, la colatura sporca che scende dai due angoli del davanzale
+function tapparella(c, x, y, w, h, giu, { telaio = "S", vetro = "j", stecca = "z", fuga = "Z", davanzale = "W", colatura } = {}) {
+  finestra(c, x, y, w, h, { telaio, vetro, lampo: "S" })
+  for (let i = 0; i < giu; i++) c.hline(x, y + i, w, i % 2 ? fuga : stecca)
+  if (giu > 0 && giu < h) c.hline(x, y + giu - 1, w, fuga)
+  c.hline(x - 2, y + h + 1, w + 4, davanzale)
+  if (colatura) { c.vline(x - 1, y + h + 2, 2, colatura); c.vline(x + w, y + h + 2, 3, colatura) }
+}
+
+const VOLTA = [2, 3, 4, 5, 5, 5, 5, 4, 3, 2]                  // la curva di un lucernario a voltina, 10 colonne
+const TEGOLI = [38, 50, 62, 74, 86, 98, 110]                    // le testate dei tegoli del primo, ogni 12 colonne
+const NEON = ["R", "O", "Y", "h", "B", "l", "e", "a", "i", "u"]  // le lettere dell'insegna, una per colore
+const SFARFALLA3 = "1111011111100101"                           // la Z al neon che fa i capricci
+
+// cemento coi lucernari a voltina, l'insegna al neon, due portoni a libro arancioni (uno mezzo aperto); a sinistra
+// la centrale termica col camino d'acciaio, a destra la palazzina degli uffici in klinker con le tapparelle
+anim("_ed_vecchio1", { w: SW, h: SH, frames: LOOP, fps: FPS, outline: "K" }, (c) => {
+  capannone(c, { x0: 38, x1: 111, top: 25, parete: "z", trama: "vert", passo: 12, giunto: "Z", bordo: "s", zoccolo: ["Z", 2] })
+  // i lucernari a voltina in vetroresina ondulata, ingialliti, con lo sporco in fondo, tra le testate dei tegoli
+  for (const t of TEGOLI.slice(0, -1)) VOLTA.forEach((h, i) => { c.vline(t + 2 + i, 25 - h, h, i % 2 ? "z" : "C"); c.px(t + 2 + i, 24, "q") })
+  for (const t of TEGOLI) { c.rect(t, 22, 2, 4, "S"); c.vline(t + 1, 23, 3, "s") }
+  // le colature: l'acqua che trabocca dalla gronda sotto le testate scende lungo i giunti
+  for (const [x, l] of [[38, 5], [51, 9], [63, 4], [75, 7], [87, 10], [99, 6], [110, 8]]) { c.vline(x, 26, l, "Z"); c.vline(x + 1, 26, l >> 1, "Z") }
+  for (let x = 38; x <= 111; x++) { const t = 52 + Math.round(Math.sin(x / 3) + 0.6 * Math.sin(x / 1.9)); c.vline(x, t, 54 - t, "Z") }   // gli schizzi da terra
+  // l'insegna a cassonetto: lettere al neon, una per colore; la Z sfarfalla. Sotto le staffe la ruggine che cola
+  c.rect(53, 28, 43, 7, "s"); c.hline(53, 28, 43, "S"); c.rect(54, 29, 41, 5, "d")
+  ;[..."SPEDIZIONI"].forEach((ch, i) => c.text(55 + 4 * i, 29, ch, i !== 5 || SFARFALLA3[c.frame] === "1" ? NEON[i] : "D"))
+  for (const x of [57, 91]) c.vline(x, 35, 2 + (x % 3), "k")
+  libro(c, 42, 38, 20)
+  libro(c, 88, 38, 20, { piegate: 2, varco: 6 })
+  // la porta pedonale con l'applique, il cartello dell'estintore
+  c.rect(70, 44, 8, 12, "D"); c.rect(71, 45, 6, 11, "s"); c.rect(72, 46, 4, 3, "j"); c.px(72, 46, "S"); c.px(75, 50, "Y")
+  c.rect(72, 41, 4, 2, "s"); c.hline(73, 42, 2, "C")
+  c.rect(65, 46, 3, 3, "R"); c.px(66, 47, "W")
+  // la centrale termica in blocchetti di cemento: la porta di lamiera con le feritoie, il triangolo giallo del pericolo
+  capannone(c, { x0: 25, x1: 36, top: 41, parete: "S", trama: "oriz", passo: 3, giunto: "s", bordo: "s" })
+  for (let y = 41, r = 0; y < BASE; y += 3, r++) for (let x = 25 + (r % 2) * 3; x <= 36; x += 6) c.vline(x, y + 1, 2, "s")
+  c.rect(28, 45, 6, 11, "j"); c.vline(28, 45, 11, "D"); c.hline(28, 45, 6, "D"); for (let y = 47; y < 53; y += 2) c.hline(29, y, 4, "D"); c.px(32, 53, "Y")
+  c.px(35, 43, "Y"); c.hline(34, 44, 3, "Y"); c.px(35, 44, "K")
+  c.vline(37, 41, 15, "K")
+  // il camino d'acciaio: i collari, la cuffia annerita, la staffa che lo tiene al capannone
+  c.vline(30, 15, 26, "S"); c.vline(31, 15, 26, "s"); for (const y of [22, 32]) c.hline(30, y, 2, "j")
+  c.hline(32, 28, 6, "s")
+  c.rect(29, 13, 4, 2, "D"); c.hline(29, 13, 4, "s"); c.hline(30, 15, 2, "D")
+  // la palazzina degli uffici in klinker marrone: le finestre a nastro con le tapparelle a mezz'asta, la pensilina di cemento
+  capannone(c, { x0: 113, x1: 134, top: 20, parete: "N", trama: "oriz", passo: 3, giunto: "M", fascia: ["z", "Z", 2], zoccolo: ["Z", 2] })
+  c.vline(112, 20, 36, "K")
+  for (const [x, giu] of [[115, 2], [121, 6], [127, 3]]) tapparella(c, x, 26, 5, 6, giu)
+  tapparella(c, 115, 44, 4, 6, 1); tapparella(c, 130, 44, 3, 6, 4)
+  c.rect(121, 45, 6, 11, "S"); c.rect(122, 46, 4, 10, "j"); c.px(122, 46, "L"); c.px(125, 51, "Y")
+  c.rect(119, 42, 10, 2, "z"); c.hline(119, 43, 10, "Z")
+})
+
+const SCIVOLA = [6, 6, 6, 4, 4, 2, 2, 2, 2, 3, 4, 5, 6, 6, 6, 6]     // la tapparella con la cinghia rotta: la tirano su a strattoni, ricade
+const PITTURA = ["R", "O", "G", "B", "P", "r", "o", "g", "b"]          // le lettere dell'insegna sul tetto
+const ARCOBALENO = ["R", "O", "Y", "G", "B"]
+
+// cemento a pannelli orizzontali tra i pilastri, la fascia di lucernari in vetroresina ondulata, due portoni a libro azzurri
+// sul molo, l'insegna sul tetto con le lettere colorate e l'arcobaleno; a sinistra la palazzina intonacata color pesca
+// col comignolo di mattoni e le tapparelle verdi (quella in mezzo ha la cinghia rotta)
+anim("_ed_vecchio2", { w: SW, h: SH, frames: LOOP, fps: FPS, outline: "K" }, (c) => {
+  capannone(c, { x0: 59, x1: 134, top: 25, parete: "S", trama: "nessuna", fascia: ["s", "s", 2], bordo: "S", zoccolo: ["s", 2] })
+  for (const y of [40, 47]) c.hline(59, y, 76, "s")
+  // la fascia di lucernari in vetroresina ondulata: cresta chiara e cavo scuro, lo sporco in fondo, i profili d'alluminio;
+  // una lastra è stata cambiata da poco ed è ancora bianca
+  for (let x = 59; x <= 134; x++) {
+    const nuova = x >= 92 && x < 100
+    c.vline(x, 28, 3, (nuova ? ["W", "W", "C", "z"] : ["C", "C", "z", "q"])[x % 4]); c.px(x, 31, (nuova ? ["C", "C", "z", "q"] : ["z", "z", "q", "Z"])[x % 4])
+  }
+  c.hline(59, 27, 76, "j"); c.hline(59, 32, 76, "s")
+  // il cemento ingrigito: l'acqua scende nei cavi delle onde e cola dal profilo di sotto, una riga ogni cavo; da terra gli schizzi
+  c.hline(59, 33, 76, "j")
+  for (let x = 63; x <= 134; x += 4) { const l = [3, 7, 2, 10, 5, 4, 2, 8][(x >> 2) % 8]; c.vline(x, 33, l, "s"); c.vline(x - 1, 33, l >> 1, "s") }
+  for (let x = 59; x <= 134; x++) { const t = 52 + Math.round(Math.sin(x / 2.7) + 0.6 * Math.sin(x / 1.6)); c.vline(x, t, 54 - t, "s") }
+  for (const x of [59, 84, 109, 132]) { c.rect(x, 27, 3, 29, "S"); c.vline(x, 27, 29, "W"); c.vline(x + 2, 27, 29, "s") }
+  for (const x of [65, 90]) { libro(c, x, 37, 16, { fondo: 49, col: "B", luce: "L", ombra: "b", vetro: "D", anta: 4 }); molo(c, x, 16, 50) }
+  // nella terza campata la porta pedonale con la pensilina e la cassetta rossa dell'idrante
+  c.rect(116, 43, 8, 13, "D"); c.rect(117, 44, 6, 12, "s"); c.rect(118, 45, 4, 3, "j"); c.px(118, 45, "S"); c.px(121, 50, "Y")
+  c.rect(114, 40, 12, 2, "S"); c.hline(114, 41, 12, "s")
+  c.rect(126, 44, 4, 5, "R"); c.rect(127, 45, 2, 2, "L"); c.hline(126, 48, 4, "r")
+  c.circ(120, 36, 3, "K"); c.circ(120, 36, 2, "W"); c.vline(120, 34, 3, "K"); c.px(121, 36, "K")              // l'orologio di fabbrica
+  // l'insegna sul tetto: tavola bianca col bordo di lamiera, lettere colorate e l'arcobaleno, sulle gambe di tubo
+  for (const x of [77, 93, 109]) c.vline(x, 23, 2, "s")
+  c.rect(73, 13, 41, 10, "s"); c.hline(73, 13, 41, "S"); c.rect(74, 14, 39, 8, "W")
+  ;[..."MAGAZZINI"].forEach((ch, i) => c.text(76 + 4 * i, 15, ch, PITTURA[i]))
+  ARCOBALENO.forEach((k, i) => c.hline(76 + 7 * i, 21, 7, k))
+  // la palazzina degli uffici
+  capannone(c, { x0: 25, x1: 57, top: 18, parete: "v", trama: "nessuna", fascia: ["C", "f", 2], bordo: "W", zoccolo: ["S", 3, "s"] })
+  c.vline(58, 18, 38, "K")
+  c.hline(25, 36, 33, "C"); c.hline(25, 37, 33, "f")                                      // il marcapiano
+  const verde = { telaio: "W", stecca: "G", fuga: "g", colatura: "f" }
+  for (const [x, giu] of [[27, 2], [38, SCIVOLA[c.frame]], [49, 4]]) tapparella(c, x, 24, 7, 6, giu, verde)
+  for (const [x, giu] of [[27, 3], [49, 1]]) { tapparella(c, x, 41, 7, 6, giu, verde); for (let xx = x + 1; xx < x + 7; xx += 2) c.vline(xx, 41, 6, "d") }
+  c.rect(38, 43, 7, 13, "S"); c.rect(39, 44, 5, 12, "j"); c.px(39, 44, "L"); c.px(42, 49, "Y")     // la porta d'ingresso
+  c.rect(36, 40, 11, 2, "S"); c.hline(36, 41, 11, "s")
+  c.rect(46, 45, 2, 3, "y"); c.px(46, 45, "Y")                                                    // la targa d'ottone
+  // il comignolo di mattoni della caldaia, col cappello di cemento annerito
+  c.rect(29, 9, 4, 9, "o"); c.vline(32, 9, 9, "r"); for (const y of [11, 14]) c.hline(29, y, 4, "k")
+  c.rect(28, 7, 6, 2, "S"); c.hline(28, 8, 6, "s"); c.hline(30, 9, 2, "d")
+})
+
+esterno("est_vecchio1", { nuvole: [[14, 7, 8], [84, 5, 11], [148, 11, 8]] }, {
+  cose: [stamp("_piccione", 68, 19), stamp("_piccione_fermo", 105, 19, { flip: "x" }), stamp("_piccione_fermo", 128, 19)],
+  vapore: [(c) => c.plume(30, 12, "WSs", { young: "sj", every: 2, life: 16, rise: 11, size: [1, 3], wind: 0.35 })] })
+
+esterno("est_vecchio2", { nuvole: [[10, 9, 7], [58, 4, 9], [146, 7, 10]] }, {
+  cose: [stamp("_piccione", 98, 12), stamp("_piccione_fermo", 50, 17, { flip: "x" })],
+  vapore: [(c) => c.plume(30, 6, "WSs", { young: "sj", every: 2, life: 16, rise: 8, size: [1, 3], wind: 0.3, seed: 3 })] })
+
+// ================================================================ INNOVATIVO
+// Il polo che i clienti vogliono visitare per farci le foto: alto, il tetto verde col prato, la facciata in vetro o a lamelle
+// di legno, i pannelli solari, la pala eolica o il drone, gli schermi LED coi dati, i sensori con le lucine.
+// Si muovono le navette dietro la vetrata (o il drone), la pala, i riflessi, le luci di stato.
+
+// il tetto verde visto da sotto: la terra col prato che sporge dal parapetto (ciuffi d'erba, qualche fiore) e i cespugli
+const FIORI = { 3: "Y", 11: "e", 19: "W", 26: "Y", 34: "l", 41: "e" }
+function prato(c, x0, x1, cima, cespugli = []) {
+  for (let x = x0; x <= x1; x++) {
+    const y = cima(x)
+    c.px(x, y - 1, "g"); c.px(x, y - 2, "G")
+    if ((x * 5) % 7 < 4) c.px(x, y - 3, x % 3 ? "G" : "h")
+    const f = FIORI[(x - x0) % 47]; if (f) c.px(x, y - 3, f)
+  }
+  for (const [x, r] of cespugli) {
+    const y = cima(x) - 2 - r
+    c.ellipse(x, y, r + 1, r, "g"); c.ellipse(x - 1, y - 1, r, Math.max(1, r - 1), "G"); c.px(x - r, y - 1, "h")
+  }
+}
+// i sensori: scatolette scure con la lucina che lampeggia, ognuna al suo momento del giro
+function sensore(c, x, y, d, luce = "R") { c.rect(x, y, 2, 2, "d"); c.px(x + 1, y, (c.frame + d) % 16 < 2 ? luce : "D") }
+
+// la pala eolica piccola: tre pale che fanno due terzi di giro a ciclo (con tre pale il giro si chiude), il mozzo, il palo
+anim("_pala", { w: 9, h: 14, frames: LOOP, fps: FPS, outline: "K" }, (c) => {
+  c.vline(4, 5, 9, "S")
+  for (let i = 0; i < 3; i++) {
+    const a = c.phase * Math.PI * 4 / 3 + i * Math.PI * 2 / 3 - Math.PI / 2
+    c.line(4, 4, 4 + Math.round(4 * Math.cos(a)), 4 + Math.round(4 * Math.sin(a)), "W")
+  }
+  c.px(4, 4, "s")
+})
+
+// le navette del magazzino automatico dietro la vetrata: [primo pixel della corsa, lunghezza, giri a ciclo, fase]
+const NAVETTE = [[38, 26, 1, 0], [66, 30, 2, 0.25], [44, 34, 1, 0.6], [56, 28, 1, 0.3], [40, 22, 2, 0.75], [70, 26, 1, 0.1]]
+const ENERGIA = [1, 2, 2, 3, 2, 3, 4, 3, 3, 4, 4, 3, 2, 2, 1, 1]        // la curva dell'energia prodotta (si ripete ogni 16 colonne)
+
+// vetro e bianco, alto, il tetto verde coi pannelli solari: la grande vetrata col magazzino automatico e le navette,
+// a sinistra l'ingresso con la striscia di LED, a destra lo schermo dell'energia e due baie
+anim("_ed_innovativo1", { w: SW, h: SH, frames: LOOP, fps: FPS, outline: "K" }, (c) => {
+  capannone(c, { x0: 25, x1: 134, top: 12, parete: "W", trama: "nessuna", bordo: "S", zoccolo: ["D", 4, "d"] })
+  for (let y = 21; y < 50; y += 9) { c.hline(25, y, 10, "S"); c.hline(105, y, 30, "S") }
+  solari(c, 56, 99, 6)
+  prato(c, 25, 134, () => 12, [[31, 2], [50, 1], [104, 2], [124, 1]])
+  // la vetrata: dentro sei piani di cassette sulle travi arancioni, le navette gialle che corrono avanti e indietro
+  c.rect(35, 14, 70, 39, "D"); c.rect(36, 15, 68, 37, "d")
+  const R = c.rng(21)
+  for (let p = 0; p < 6; p++) {
+    const yb = 15 + p * 6
+    for (let x = 37; x + 3 <= 103; x += 5) {
+      const r = R(); if (r < 0.15) continue
+      const [k, l] = r < 0.62 ? ["j", "S"] : r < 0.9 ? ["b", "B"] : ["o", "O"]
+      c.rect(x, yb + 1, 4, 3, k); c.hline(x, yb + 1, 4, l)
+    }
+    c.hline(36, yb + 4, 68, "o")
+  }
+  c.rect(36, 50, 68, 2, "D")
+  NAVETTE.forEach(([a, l, giri, fase], p) => {
+    const yb = 15 + p * 6, ang = 2 * Math.PI * (giri * c.phase + fase), x = a + Math.round(l * (1 - Math.cos(ang)) / 2)
+    c.rect(x, yb + 2, 5, 2, "Y"); c.hline(x, yb + 3, 5, "y"); c.px(Math.sin(ang) > 0 ? x + 4 : x, yb + 2, "W")
+  })
+  for (const x of [53, 70, 87]) c.vline(x, 15, 37, "S")
+  riflesso(c, 36, 103, 15, 51, { d: "D", D: "j", j: "S", S: "W", b: "B", B: "L", o: "O", O: "a", Y: "i", y: "Y" })
+  // l'ingresso: porta di vetro sotto la pensilina di legno, sopra la striscia di LED che sale
+  c.rect(27, 45, 6, 11, "D"); c.rect(28, 46, 4, 10, "L"); c.vline(30, 46, 10, "D"); c.px(28, 46, "W")
+  c.rect(25, 43, 10, 2, "k"); c.hline(25, 44, 10, "N")
+  c.vline(30, 15, 26, "S"); for (let y = 15; y < 41; y++) if ((y + c.frame) % 8 < 2) c.px(30, y, "u")
+  // lo schermo dell'energia: i kWh col contatore che sale, sotto la curva che scorre
+  c.rect(106, 14, 28, 15, "K")
+  c.text(108, 16, "KWH", "u"); c.text(121, 16, "81" + (2 + (c.frame >> 2)), "W")
+  for (let j = 0; j < 24; j++) { const v = ENERGIA[(j + c.frame) % 16]; c.vline(108 + j, 27 - v, v, "t"); c.px(108 + j, 26 - v, "h") }
+  baia_moderna(c, 108, 8, 36, { spia: "G" }); baia_moderna(c, 123, 8, 36, { spia: c.frame % 8 < 4 ? "O" : "o" })
+  sensore(c, 26, 14, 0); sensore(c, 118, 31, 6, "u"); sensore(c, 32, 41, 11)
+})
+
+// il drone delle consegne: le eliche che girano (due pose), la lucina che lampeggia, il pacco appeso;
+// fa un otto nel cielo in 16 fotogrammi, dondolando su e giù
+anim("_drone", { w: 30, h: 13, frames: LOOP, fps: FPS, outline: "K" }, (c) => {
+  const t = c.phase * Math.PI * 2, x = 10 + Math.round(9 * Math.sin(t)), y = 2 + Math.round(1.5 + 1.5 * Math.sin(2 * t))
+  c.grid(x, y, (c.frame % 2 ? "SSS...SSS" : ".S.....S.") + `
+    .D.....D.
+    .DDWWWDD.
+    ...SSS...
+    ....D....
+    ...qqk...
+    ...kkN...`)
+  c.px(x + 4, y + 3, c.frame % 4 < 2 ? "R" : "r")
+})
+
+const PAGINE = [["CO2", "-42%"], ["KWH", "+900"]]               // lo schermo cambia pagina ogni 8 fotogrammi
+const FRECCIA = `
+  ..h..
+  ..h..
+  h.h.h
+  .hhh.
+  ..h..`
+const LAMPO = `
+  ...Y.
+  ..Y..
+  .YYY.
+  ..Y..
+  .Y...`
+
+// tetto verde in pendenza e facciata a lamelle di legno; a sinistra il giardino verticale con l'ingresso sotto la pensilina
+// fotovoltaica, sulle lamelle lo schermo coi dati, sotto la trave di legno gli uffici in vetro e tre baie
+anim("_ed_innovativo2", { w: SW, h: SH, frames: LOOP, fps: FPS, outline: "K" }, (c) => {
+  const cima = capannone(c, { x0: 25, x1: 134, top: 21, tetto: "rampa", alza: 13, parete: "M", trama: "nessuna", fascia: ["N", "M", 2], zoccolo: ["D", 2] })
+  prato(c, 25, 134, cima, [[40, 1], [70, 2], [96, 1], [118, 2]])
+  // le lamelle di legno: una faccia presa dalla luce, una in ombra, e dietro il buio
+  for (let x = 51; x <= 134; x++) c.vline(x, cima(x) + 2, 33 - cima(x), ["k", "N", "M"][(x - 51) % 3])
+  // lo schermo coi dati, appeso alle lamelle: due pagine (CO2 che scende, energia del fotovoltaico)
+  c.rect(57, 18, 29, 14, "K")
+  const [a, b] = PAGINE[c.frame >> 3]
+  c.text(59, 20, a, "h"); c.text(59, 26, b, "W"); c.grid(78, 22, c.frame >> 3 ? LAMPO : FRECCIA)
+  // la trave di legno sopra il piano terra; sotto gli uffici in vetro coi montanti di legno e le baie
+  c.rect(51, 35, 84, 2, "N"); c.hline(51, 35, 84, "k")
+  c.rect(51, 37, 84, 17, "D")
+  c.rect(53, 39, 34, 13, "B"); c.hline(53, 39, 34, "b"); for (let x = 59; x < 87; x += 6) c.vline(x, 39, 13, "N")
+  for (let x = 55; x < 87; x += 6) c.px(x, 37, "i")
+  riflesso(c, 53, 86, 39, 51, { B: "L", b: "B", L: "W" })
+  baia_moderna(c, 93, 9, 41); baia_moderna(c, 107, 9, 41, { spia: c.frame % 4 < 2 ? "R" : "r" }); baia_moderna(c, 121, 9, 41)
+  // il giardino verticale a tutta altezza: file di fioriere (le foglie prese dalla luce in cima, l'ombra sotto), i telai di legno
+  for (let x = 25; x <= 50; x++) for (let y = cima(x) + 2; y < 54; y++) {
+    const r = (y - 9) % 5
+    c.px(x, y, r === 0 ? "h" : r === 4 ? "g" : r === 1 && (x + y) % 5 === 0 ? "e" : "G")      // i fiori in fila sotto il bordo della fioriera
+  }
+  for (const x of [25, 33, 41, 50]) c.vline(x, cima(x) + 2, 54 - cima(x) - 2, "N")
+  c.hline(25, 30, 26, "N")
+  c.rect(34, 45, 7, 9, "L"); c.vline(37, 45, 9, "N"); c.px(34, 45, "W")
+  c.rect(27, 42, 23, 2, "b"); c.hline(27, 42, 23, "B"); for (let x = 30; x < 50; x += 4) c.px(x, 43, "L")
+  sensore(c, 88, 38, 0, "h"); sensore(c, 104, 38, 5); sensore(c, 118, 38, 10)
+})
+
+esterno("est_innovativo1", { nuvole: [[12, 10, 7], [74, 4, 10], [148, 9, 9]] }, { dietro: [stamp("_pala", 35, 0)] })
+
+esterno("est_innovativo2", { nuvole: [[12, 12, 8], [46, 3, 8], [148, 8, 9]] }, { cose: [stamp("_drone", 76, -2)] })
