@@ -226,6 +226,12 @@ async def phone(b, w, h, name, errs):
             assert not bad, f'{name}: scelta del manager: {bad}'
             await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_scelta_manager.png'))
             await pg.tap('#modal [data-act=closemodal]')
+        if wn == 'clienti':   # dettagli del primo cliente: trasporti, contratto e inventario fiscale
+            await pg.evaluate("()=>{const F=window.__FUP,c=F.S.clients.find(x=>x.status==='attivo'); F.step(); F.UI.cliOpen={[c.id]:true}; F.renderAll();}")
+            assert 'Previsione dell' in await pg.inner_text('#win-clienti'), f'{name}: la scheda del cliente non mostra la previsione dell\'inventario'
+            bad = await pg.evaluate(NOSIDE, '#win-clienti')
+            assert not bad, f'{name}: dettagli del cliente: {bad}'
+            await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_clienti_dettagli.png'))
         if wn == 'gare':   # scelta del magazzino per la gara
             await pg.tap('#win-gare [data-act=mpopen][data-k=bid]')
             assert await pg.evaluate(FITS, '#modal .modal'), f'{name}: la scelta del magazzino esce dallo schermo'
@@ -935,6 +941,27 @@ async def main():
         assert r['ov'] == 1 and r['st'] == st0 + r['n'], r
         await win(pg, 'customer')
         assert 'In corso' in await pg.inner_text('#win-clienti'), 'picchi e overstock non compaiono nella finestra'
+        await pg.click('#win-clienti [data-act=close]')
+        # inventario fiscale (0.102): il sabato e la domenica, poi conti, soddisfazione e il prossimo; con un brutto punteggio differenze e verifica dopo 13 settimane
+        r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,c=S.clients.find(x=>x.status==='attivo'&&!x.exit),w=S.warehouses.find(x=>x.id===c.wh),o={};
+          F.cardsOff(); document.querySelector('#modal').innerHTML=''; S.notes=S.notes.filter(n=>n.k!=='ev');
+          o.dur=Object.values(F.DUR_RANK).every(a=>a.every(m=>m>=24))&&F.durOf({dur:12})===24;
+          const n0=(c.invLog||[]).length, k0=S.cash, sat0=c.sat; c.inv={d:S.day-1}; c.sat=50; const sc=F.invScore(c,w), tm=sc.tm, fee=F.invFee(c);
+          o.team=tm.n>=2&&tm.cost>0&&fee>0&&sc.L[0][0]==='Base';
+          F.invDaily(); const L=c.invLog[c.invLog.length-1]; o.done=c.invLog.length===n0+1&&L.fee===fee&&Math.abs(S.cash-(k0+L.fee-L.cost-L.diff))<0.01;
+          o.sat=c.sat===Math.max(0,Math.min(100,50+F.invBand(L.v).sat)); o.next=(L.v<50?c.inv.rip&&c.inv.d>=S.day+91:c.inv.d>=S.day+300&&!c.inv.rip)&&new Date(Date.UTC(2002,0,1)+c.inv.d*864e5).getUTCDay()===6;
+          const r0=Math.random, mor=w.morale, cond=w.cond; Math.random=()=>0; w.morale=0; w.cond=0; c.inv={d:S.day-1}; c.sat=50; const k1=S.cash;
+          try{ F.invDo(c,w); } finally{ Math.random=r0; w.morale=mor; w.cond=cond; }
+          const B=c.invLog[c.invLog.length-1]; o.bad=B.v<50&&B.diff>0&&c.sat===42&&c.inv.rip===true&&c.inv.d>=S.day+91&&c.inv.d<S.day+130&&Math.abs(S.cash-(k1+B.fee-B.cost-B.diff))<0.01;
+          o.note=S.notes.some(n=>n.col==='red'&&/differenze inventariali/.test(n.title));
+          c.sat=sat0; o.id=c.id; return o;}''')
+        assert all(v for k, v in r.items() if k != 'id'), f'inventario fiscale: {r}'
+        await win(pg, 'clienti')
+        await pg.evaluate("(id)=>{const F=window.__FUP; F.UI.cliOpen={[id]:true}; F.renderAll(); document.querySelector('#win-clienti .cl-a [aria-expanded=true]').scrollIntoView({block:'start'});}", r['id'])
+        await pg.wait_for_timeout(400)
+        txt = await pg.inner_text('#win-clienti')
+        assert 'Inventario di verifica' in txt and 'Previsione dell' in txt and 'Ultimi inventari' in txt, 'scheda del cliente senza l\'inventario'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_clienti_inventario.png'))
         await pg.click('#win-clienti [data-act=close]')
         # nelle Opzioni si toglie la pausa automatica; senza risposta, dopo due settimane decide il vice
         await pg.click('#top [data-act=options]')

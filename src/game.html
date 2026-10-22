@@ -1534,7 +1534,8 @@ const PEN_PCT={'Saponaria Italia':1,'Supermercati Carrellone':3,'Tuttosubito Ita
  'Supermercati Sporta Piena':3,'Pastificio Sfoglia Tirata':2,'Scarponi Ramponcino':1,'Macchine Avvolgix':2}, PEN_MAX=20;
 const penPct=c=>PEN_PCT[c.name]||0;
 const penTxt=c=>penPct(c)?`${penPct(c)}% del fatturato per ogni punto sotto soglia (max ${PEN_MAX}%)`:'nessuna penale nel contratto';
-const DUR_RANK={S:[24,36,36],A:[24,36],B:[12,24,36],C:[12,24],D:[12,24],F:[12,12,24]}; // durate possibili del contratto (mesi) per rank
+const DUR_RANK={S:[36,48],A:[24,36,48],B:[24,36],C:[24,36],D:[24,24,36],F:[24]}, DUR_MIN=24; // durate possibili del contratto (mesi) per rank: mai sotto i 2 anni
+const durOf=c=>Math.max(DUR_MIN,c.dur||DUR_MIN);   // i contratti da 12 mesi delle partite salvate prima della 0.102 si rinnovano per 24
 const RENEW_CUT=0.05; // al rinnovo il ricarico sul listino scende di 5 punti
 // ritmo delle gare: in media una nuova ogni 24 giorni da soli (circa 15 l'anno), +20% per ogni azienda avversaria viva, un terzo in più con l'Ufficio commerciale
 const tenderGap=()=>24/((1+0.2*rivals().filter(c=>!c.over).length)*(R('commerciale')?4/3:1));
@@ -1683,7 +1684,7 @@ const trSum=(w,k)=>TR_RULES.reduce((a,r)=>a+(trOn(w,r.id)&&r.fx[k]||0),0);
 const trWait=(w,id)=>{const c=w.rules&&w.rules[id]; return c?Math.max(0,c.day+TR_CD-S.day):0;};
 const POL_CD=90;  // giorni prima di poter cambiare di nuovo la stessa policy
 const POLICIES=[
- {id:'zerostra',name:'Zero straordinario',tech:'regolamento',opp:'sabato',fx:{mor:4,staff:1.5},pro:'Morale +4 in tutti i magazzini',con:'I reparti in affanno pesano il 50% in più su puntualità e accuratezza: nessuno resta a coprire i picchi',
+ {id:'zerostra',name:'Zero straordinario',tech:'regolamento',opp:'sabato',fx:{mor:4,staff:1.5},pro:'Morale +4 in tutti i magazzini',con:'I reparti in affanno pesano il 50% in più su puntualità e accuratezza: nessuno resta a coprire i picchi. L\'inventario fiscale del fine settimana lo fanno gli interinali, più cari e meno precisi',
   txt:'Alle 17 si stacca, punto. Chi ha famiglia ringrazia, il bilico che arriva alle 17:30 un po\' meno.'},
  {id:'sabato',name:'Sabato obbligatorio',tech:'regolamento',opp:'zerostra',fx:{mor:-5,staff:0.5,pers:0.08},pro:'I reparti in affanno pesano la metà su puntualità e accuratezza',con:'Costo del personale dei magazzini +8%, morale −5',
   txt:'Il sabato mattina si lavora, a turno ma tutti. I picchi si smaltiscono, le partite di calcetto dei figli un po\' meno.'},
@@ -2449,7 +2450,7 @@ wk('soddisfazione','kpi','Soddisfazione del cliente',`Quanto il cliente è conte
 
 Se il contratto lo prevede, ogni punto sotto soglia costa anche una [[penali|penale]].
 
-Il [[customer_service|customer service]] aggiunge il suo effetto: con la [[qualita_cs|qualità del servizio]] sopra 70 +1 al mese, sotto 35 −1, più i talenti di chi lo guida. Anche le [[richieste_clienti|richieste dei clienti]] la fanno salire o scendere.
+Il [[customer_service|customer service]] aggiunge il suo effetto: con la [[qualita_cs|qualità del servizio]] sopra 70 +1 al mese, sotto 35 −1, più i talenti di chi lo guida. Anche le [[richieste_clienti|richieste dei clienti]] la fanno salire o scendere, e l'[[inventario]] fiscale di ogni anno: da +6 se è perfetto a −8 con le differenze inventariali.
 
 Sotto 25 il cliente se ne va e perdi [[reputazione]] (da 1 a 10 punti secondo il [[rank]]). Alla scadenza del [[contratto]] rinnova solo se la soddisfazione è almeno 50 (40 con il [[tech_kam|Key account management]]).`);
 wk('penali','kpi','Penali',`Multa prevista da alcuni contratti quando i KPI del mese sono sotto la soglia: una percentuale del fatturato del cliente per ogni punto mancante.`,
@@ -2500,7 +2501,7 @@ wk('abilita','abil','Abilità',`Sei numeri che descrivono ogni personaggio. 10 �
 I [[talenti]] sono già compresi nei numeri che vedi.`);
 const STAT_TXT={
  op:`Nel [[manager]] di un magazzino, per ogni punto sopra 10 (e al contrario sotto): [[puntualita]] +0,3, produttività di [[magazzinieri]] e [[carrellisti]] +2,5%, km al mese degli autisti +1,5% e [[saturazione_mezzi|camion più pieni]] di 1 punto. È l'abilità che fa risparmiare più persone e camion. Nel [[dir_op|direttore operativo]] vale +0,15 di puntualità in tutti i magazzini per ogni punto sopra 10.`,
- prec:`Nel [[manager]] di un magazzino alza l'[[accuratezza]]: +0,3 per ogni punto sopra 10, e meno differenze inventariali quando un cliente se ne va. Utile soprattutto con i clienti esigenti come farmaceutica ed elettronica.`,
+ prec:`Nel [[manager]] di un magazzino alza l'[[accuratezza]]: +0,3 per ogni punto sopra 10, e meno differenze inventariali, all'[[inventario]] di ogni anno e quando un cliente se ne va. Utile soprattutto con i clienti esigenti come farmaceutica ed elettronica.`,
  neg:`Quella del [[ceo|CEO]] pesa in ogni [[gare|gara]]: +1 al punteggio per ogni punto sopra 10. Il [[dir_comm|direttore commerciale]] aggiunge +0,8 per punto. Negli [[eventi]] con i clienti apre risposte migliori.`,
  lead:`Nel [[manager]] di un magazzino alza il [[morale]] obiettivo (+0,6 per ogni punto sopra 10) e accorcia le [[assunzioni]] in quel magazzino (−2% per punto). Il [[dir_hr|direttore HR]] lo alza in tutti i magazzini e accorcia le [[assunzioni]]. Negli [[eventi]] con il personale apre risposte migliori.`,
  amm:`Nel [[manager]] di un magazzino taglia i costi dell'immobile dello 0,5% per ogni punto sopra 10. Il [[dir_fin|direttore finanziario]] taglia i [[costi]] fissi dello 0,5% per ogni punto sopra 10. Negli [[eventi]] con fisco, banche e burocrazia apre risposte migliori.`,
@@ -2682,7 +2683,7 @@ Costano 19.000 € lordi l'anno più 900 € al mese di furgone in leasing, e il
 wk('manager','pers','Manager',`Manager e dirigenti sono la stessa cosa: guidano un magazzino, siedono in Direzione o guidano il customer service. In un magazzino le loro abilità decidono KPI, morale, produttività, km degli autisti e costi.`,
 `Ogni [[abilita|abilità]] del manager pesa sul suo magazzino (per ogni punto sopra 10; sotto 10 al contrario):
 • [[st_op|Operazioni]]: produttività di [[magazzinieri]] e [[carrellisti]] +2,5%, km al mese degli autisti +1,5%, [[saturazione_mezzi|camion più pieni]] +1, [[puntualita]] +0,3;
-• [[st_prec|Precisione]]: [[accuratezza]] +0,3 e meno differenze inventariali quando un cliente esce;
+• [[st_prec|Precisione]]: [[accuratezza]] +0,3, inventari migliori e meno differenze inventariali quando un cliente esce;
 • [[st_lead|Leadership]]: [[morale]] +0,6 e [[assunzioni]] più veloci del 2%;
 • [[st_amm|Amministrazione]]: costi dell'immobile −0,5%;
 • [[st_inn|Innovazione]]: apprendimento delle [[tecnologie]] −3%.
@@ -2847,10 +2848,10 @@ Ogni cliente ha un [[rank]] da S a F. Alcuni clienti chiedono [[tech_richieste|t
 Anche le [[avversari|aziende avversarie]] fanno le loro offerte, segrete. Ogni offerta vale exp((punteggio − concorrenza) / 6) e il resto del mercato vale 1: vince un'offerta a sorte, con probabilità proporzionale al suo valore. Con una sola offerta è la probabilità che vedi nella finestra; ogni avversario che partecipa se ne prende una parte. Nella scheda della gara vedi chi ha già fatto un'offerta, ma non a che prezzo.`);
 wk('prezzo','cli','Prezzo rispetto al listino',`Lo sconto o il ricarico che offri in gara, da −20% a +20%. Più basso = più probabilità, meno margine.`,
 `Il listino è calcolato su stoccaggio, [[movimenti]] e trasporto (vedi [[ricavi]]). Il prezzo scelto resta per tutta la durata del [[contratto]]: uno sconto troppo aggressivo può farti lavorare in perdita. Al rinnovo un ricarico scende di 5 punti, perché il buyer rinegozia.`);
-wk('contratto','cli','Contratto',`Dura 12, 24 o 36 mesi (lo dice la gara) e parte 4 settimane dopo la gara vinta. Alla scadenza il cliente rinnova se la soddisfazione è almeno 50.`,
-`Nelle 4 settimane prima dell'avvio prepara il [[magazzino]]: [[assunzioni|assumi]] il [[personale]] che serve. La durata dipende dal [[rank]]: le committenti S e A firmano per 2-3 anni, quelle D e F spesso per uno solo.
+wk('contratto','cli','Contratto',`Dura 2, 3 o 4 anni (lo dice la gara) e parte 4 settimane dopo la gara vinta. Alla scadenza il cliente rinnova se la soddisfazione è almeno 50.`,
+`Nelle 4 settimane prima dell'avvio prepara il [[magazzino]]: [[assunzioni|assumi]] il [[personale]] che serve. La durata dipende dal [[rank]]: le committenti S firmano per 3 o 4 anni, le A da 2 a 4, le B e le C per 2 o 3, le D quasi sempre per 2 e le F sempre per 2. Nessun contratto dura meno di 2 anni. Ogni anno c'è l'[[inventario]] fiscale della merce del cliente.
 
-Due mesi prima della scadenza arriva un avviso. Alla scadenza il rinnovo, per la stessa durata, è automatico se la [[soddisfazione]] è almeno 50 (40 con il [[tech_kam|Key account management]]); altrimenti il cliente passa alla concorrenza. Al rinnovo il buyer rinegozia: se avevi un ricarico sul [[prezzo|listino]], scende di 5 punti (da +15% a +10%, mai sotto il listino); gli sconti restano. Se non ti conviene più, dalla scheda del cliente scegli **Non rinnovare**: alla scadenza se ne va senza penali.
+Due mesi prima della scadenza arriva un avviso. Alla scadenza il rinnovo, per la stessa durata (almeno 2 anni), è automatico se la [[soddisfazione]] è almeno 50 (40 con il [[tech_kam|Key account management]]); altrimenti il cliente passa alla concorrenza. Al rinnovo il buyer rinegozia: se avevi un ricarico sul [[prezzo|listino]], scende di 5 punti (da +15% a +10%, mai sotto il listino); gli sconti restano. Se non ti conviene più, dalla scheda del cliente scegli **Non rinnovare**: alla scadenza se ne va senza penali.
 
 Uscire prima della scadenza si può, ma costa: vedi [[recesso]].`);
 wk('recesso','cli','Recesso anticipato',`Uscire da un contratto prima della scadenza: penale, preavviso e qualche rischio il giorno dell'uscita.`,
@@ -2862,6 +2863,20 @@ wk('recesso','cli','Recesso anticipato',`Uscire da un contratto prima della scad
 Il giorno dell'uscita: 45% tutto liscio; 25% differenze inventariali (da 4 a 10 € per posto pallet, più probabili se l'accuratezza è sotto il 97%); 15% il cliente non paga l'ultima fattura; 10% il nuovo logistico è in ritardo e la merce resta altre tre settimane; 5% causa legale (8.000 € e reputazione −2).
 
 Prima dell'avvio si può **rinunciare** al contratto: 2 mesi di fatturato di penale, nessun preavviso. Il modo gratuito per uscire è non rinnovare alla [[contratto|scadenza]].`);
+wk('inventario','cli','Inventario fiscale',`Una volta l'anno ogni committente fa contare la sua merce: un sabato e una domenica di straordinario, pagati in parte dal cliente. Un buon punteggio lo rende contento, uno brutto costa.`,
+`Ogni committente ha il suo mese (più spesso dicembre e gennaio, poi giugno e luglio, mai agosto); il primo inventario arriva almeno 13 settimane dopo l'avvio del [[contratto]]. Tre settimane prima arriva un avviso. Nella scheda del cliente vedi la data e il punteggio previsto; aprendo i dettagli, le sue voci, la squadra e i conti.
+
+**Punteggio** (da 0 a 100): 65 di base; +3 per ogni punto di [[accuratezza]] del magazzino sopra 96 (sotto, al contrario); +0,25 per ogni punto di [[morale]] sopra 60; la [[produttivita|produttività]], +3 per ogni 10% sopra la normale (al massimo ±12); +1,5 per ogni punto di [[st_prec|Precisione]] sopra 10 di chi guida il magazzino; −0,6 per ogni punto dello [[manutenzione|stato dell'immobile]] sotto 70; −4 per ogni 10% di magazzino pieno oltre l'85%; [[tech_barcode|lettori barcode]] +2, [[tech_wms|WMS]] +5, [[tech_rf|radiofrequenza]] +3 (finito l'apprendimento), ISO 9001 +2. Il fine settimana dell'inventario si aggiungono fino a 14 punti in più o in meno, a caso (di solito pochi).
+
+**Squadra e conti**: una persona conta 25 posti pallet all'ora con la produttività normale (di più se il magazzino è veloce, di meno con i [[canali]] a colli e a pezzo), 16 ore a testa tra sabato e domenica. Lo straordinario costa la paga media del magazzino più il 50%. Se magazzinieri, carrellisti, impiegati e capiturno non bastano, il resto arriva da un'agenzia interinale: il 25% in più e fino a 12 punti in meno. Con la policy [[pol_zerostra|Zero straordinario]] sono tutti interinali. Il cliente paga 0,85 € a posto (con i colli e i pezzi di più): con una produttività normale ci perdi un po', con una buona vai in pari o ci guadagni.
+
+**Risultato**:
+• 85 e oltre, perfetto: [[soddisfazione]] +6 e un po' di [[reputazione]];
+• da 70 a 84, buono: soddisfazione +3;
+• da 50 a 69, qualche differenza: soddisfazione −3 e fino a 2 € a posto da rimborsare;
+• sotto 50, differenze inventariali: soddisfazione −8, da 3 a 8 € a posto da rimborsare e un inventario di verifica 13 settimane dopo.
+
+I clienti in [[recesso|uscita]] non fanno l'inventario dell'anno: c'è quello di chiusura.`);
 wk('stagionalita','cli','Stagionalità',`Ogni committente vende di più o di meno secondo la stagione: i pallet da preparare e consegnare salgono e scendono durante l'anno.`,
 `L'icona accanto alla data, in alto, mostra la stagione in corso: **primavera** (marzo-maggio), **estate** (giugno-agosto), **autunno** (settembre-novembre) e **inverno** (dicembre-febbraio). I volumi però cambiano mese per mese.
 
@@ -4390,6 +4405,103 @@ function globalCosts(){
   const emp=S.warehouses.reduce((a,w)=>a+staffTot(w),0)+S.office.plan+S.office.cs;
   return {ceo:4000,plan:(S.office.plan*RAL.plan+S.office.cs*RAL.cs+((S.qual||{}).n||0)*QUAL.ral)*COEF/12*(riOn()&&S.ri?S.ri.wage:1),mgr:[...S.managers,...S.execs].filter(m=>m.hired).reduce((a,m)=>a+m.ral*COEF/12,0),welf:welfarePts('cost')*emp*(R('welfare2')?0.7:1)};
 }
+/* ---- inventario fiscale: una volta l'anno per ogni committente, il sabato e la domenica, in straordinario ---- */
+// rate: posti contati da una persona in un'ora con la produttività normale; ore: 8 ore il sabato e 8 la domenica; ot: maggiorazione del fine settimana;
+// fee: € per posto pagati dal cliente; tmp: costo in più degli interinali; ann: giorni di preavviso; first: dall'avvio del contratto al primo inventario;
+// rip: inventario di verifica dopo un risultato brutto; mesi: peso di ogni mese (da gennaio) nella scelta del mese della committente (ad agosto si chiude)
+const INV={rate:25,ore:16,ot:1.5,fee:0.85,tmp:1.25,ann:21,first:90,rip:91,mesi:[3,1,1,1,1,2,2,0,1,1,1,3]};
+// fasce del punteggio: soddisfazione, reputazione e differenze da rimborsare (€ per posto del cliente)
+const INV_F=[
+ {min:85,k:'top',t:'perfetto',sat:6,rep:0.3},
+ {min:70,k:'ok',t:'buono',sat:3},
+ {min:50,k:'mid',t:'qualche differenza',sat:-3,pay:v=>2*(70-v)/20},
+ {min:0,k:'bad',t:'differenze inventariali',sat:-8,pay:v=>3+5*(50-v)/50}];
+const INV_TECH=[['barcode',2],['wms',5],['rf',3]];   // sistemi che aiutano a contare (dopo l'apprendimento)
+const INV_TXT={
+ top:['Il revisore del cliente chiude il verbale alle 11 di domenica e chiede dove si fa colazione.','Ogni pallet al suo posto, ogni collo nel suo pallet: il buyer manda i complimenti in copia al suo direttore.','Zero differenze: il revisore riconta due volte la stessa corsia perché non ci crede.'],
+ mid:['Tre referenze non tornano: un pallet di troppo in corsia 12, uno in meno in corsia 14.','Il revisore trova un bancale di merce sotto un telo, nella zona resi. Nessuno sa da quando sia lì.','Le giacenze tornano quasi tutte. Quasi: il revisore lo scrive in grassetto nel verbale.'],
+ bad:['Mancano pallet interi e nessuno sa dove siano finiti. Il revisore del cliente fotografa ogni corsia.','Le giacenze a sistema e quelle in corsia sembrano due magazzini diversi. Il revisore chiama il suo capo, di domenica.','Alle 19 di domenica si conta ancora. Alle 20 il revisore se ne va con un verbale di quattro pagine.']};
+const invBand=v=>INV_F.find(f=>v>=f.min);
+const invCls=v=>v>=70?'ok':v>=50?'warn':'bad';
+const invTmp=tm=>tm.tmp===tm.n?'tutte interinali':tm.tmp===1?'1 interinale':tm.tmp+' interinali';
+const dayOfDate=(y,m,g)=>Math.round((Date.UTC(y,m,g)-DAY0)/86400000);
+const toSat=d=>d+(6-dateOf(d).getUTCDay()+7)%7;
+const noAug=d=>{ while(monthOf(d)===7) d+=7; return d; };
+const invWhen=d=>{const a=dateOf(d), b=dateOf(d+1), ma=MESI[a.getUTCMonth()], mb=MESI[b.getUTCMonth()]; return `sabato ${a.getUTCDate()}${ma!==mb?' '+ma:''} e domenica ${b.getUTCDate()} ${mb}`;};
+// il sabato del prossimo inventario dopo il giorno «dal», nel mese della committente (c.invM, scelto una volta sola),
+// mai nello stesso fine settimana di un'altra committente dello stesso magazzino
+function invNext(c,dal){
+  if(c.invM==null){ let x=Math.random()*INV.mesi.reduce((a,v)=>a+v,0); c.invM=INV.mesi.findIndex(v=>(x-=v)<0); if(c.invM<0) c.invM=11; }
+  const day=y=>toSat(dayOfDate(y,c.invM,1+Math.floor(Math.random()*18)));
+  let y=yearOf(dal), d=day(y); while(d<dal) d=day(++y);
+  while(S.clients.some(x=>x!==c&&x.wh===c.wh&&x.inv&&x.inv.d===d)) d+=7;
+  return d;
+}
+// squadra: ore = posti × lavoro dei canali (i pezzi si contano più piano dei pallet) / (posti all'ora × produttività), 16 ore a testa;
+// chi manca arriva da un'agenzia interinale (tutti, con la policy Zero straordinario); costo orario = paga media del magazzino con la maggiorazione
+function invTeam(c,w,k){
+  k=k||w.kpi||computeWH(w); const st=w.staff, RS=['pick','car','imp','capo'], pi=Math.max(0.5,k.prod/PROD_BASE), h=c.stock*chAvg(c,'pick')/(INV.rate*pi), n=Math.max(2,Math.ceil(h/INV.ore));
+  const cnt=RS.reduce((a,r)=>a+(st[r]||0),0), tmp=Math.max(0,n-(polOn('zerostra')?0:cnt));
+  const ora=(cnt?RS.reduce((a,r)=>a+(st[r]||0)*RAL[r]*wageK(w,r),0)/cnt:RAL.pick)*COEF/1720*INV.ot;
+  return {h,n,tmp,pi,ora,cost:Math.round(h*ora*(n-tmp+tmp*INV.tmp)/n/10)*10};
+}
+const invFee=c=>Math.round(c.stock*chAvg(c,'pick')*INV.fee*tarK()/10)*10;   // il cliente paga a posto (con l'adeguamento al contratto nazionale)
+// punteggio previsto (0-100) con le sue voci; il fine settimana dell'inventario si aggiungono fino a ±14 punti a caso
+function invScore(c,w){
+  w=w||whById(c.wh); const k=w.kpi||computeWH(w), m=mgrStats(w), tm=invTeam(c,w,k), L=[['Base',65]], add=(n,v)=>{ if(Math.abs(v)>=0.05) L.push([n,v]); };
+  add('Accuratezza del magazzino',3*(k.A-96));
+  add('Morale',0.25*(w.morale-60));
+  add('Produttività',clamp(30*(tm.pi-1),-12,12));
+  add(m.none?'Nessun manager':'Precisione di '+m.name.split(' ')[0],1.5*(m.prec-10));
+  add('Stato dell\'immobile',-0.6*Math.max(0,MAINT.soglia-(w.cond==null?100:w.cond)));
+  add('Magazzino pieno oltre l\'85%',-40*Math.max(0,k.sat-0.85));
+  INV_TECH.forEach(([id,v])=>{ const t=TECH.find(x=>x.id===id); if(t&&w.tech[id]&&techFactor(w,t)>0) add(t.name,v); });
+  if(coCertOk('iso')) add('Certificazione ISO 9001',2);
+  if(tm.tmp) add(polOn('zerostra')?'Interinali (Zero straordinario)':'Interinali in squadra',-12*tm.tmp/tm.n);
+  return {v:clamp(L.reduce((a,x)=>a+x[1],0),0,100),L,tm};
+}
+// ogni giorno, dopo i magazzini: fissa gli inventari che mancano, avvisa tre settimane prima e chiude la domenica
+function invDaily(){
+  S.clients.filter(c=>c.status==='attivo'&&!c.exit).forEach(c=>{
+    const w=whById(c.wh); if(!w) return;
+    if(!c.inv) c.inv={d:invNext(c,Math.max(S.day+30,(c.start||0)+INV.first))};
+    if(tutOn()){ if(c.inv.d<=S.day+INV.ann) c.inv.d+=7; return; }   // durante le lezioni del tutorial gli inventari aspettano
+    if(!c.inv.ann&&S.day>=c.inv.d-INV.ann){ c.inv.ann=true; noteVar('cli',`Inventario ${c.inv.rip?'di verifica':'fiscale'} di ${cname(c)} a ${w.name}: ${invWhen(c.inv.d)}`); }
+    if(S.day>=c.inv.d+1) invDo(c,w);
+  });
+}
+// scheda della committente: data e punteggio previsto nella riga dei numeri; nei dettagli le voci della previsione, la squadra, i conti e gli ultimi risultati
+function invChip(c,w){ if(c.status!=='attivo'||c.exit||!c.inv) return ''; const v=Math.round(invScore(c,w).v);
+  return `<span>${kw('inventario','Inventario')} <b>${shortDate(c.inv.d)}</b> · previsto <b class="${invCls(v)}">${v}</b></span>`; }
+function invBox(c,w){
+  const L=(c.invLog||[]).slice().reverse(), last=L.length?`<div class="sm">Ultimi inventari: ${L.map(x=>`${shortDate(x.d)} <b class="${invCls(x.v)}">${x.v}</b>${x.diff?` (differenze ${eur(x.diff)})`:''}`).join(' · ')}</div>`:'';
+  if(c.status!=='attivo'||c.exit||!c.inv) return last;
+  const sc=invScore(c,w), tm=sc.tm, v=Math.round(sc.v), fee=invFee(c);
+  return `<div class="sm">${kw('inventario',c.inv.rip?'Inventario di verifica':'Inventario fiscale')} ${invWhen(c.inv.d)} ${yearOf(c.inv.d+1)}: previsto <b class="${invCls(v)}">${v} su 100</b> (${invBand(v).t}), il giorno stesso fino a 14 punti in più o in meno. Squadra di ${tm.n} persone${tm.tmp?`, ${invTmp(tm)}`:''}: straordinario circa <b>${eur(tm.cost)}</b>, il cliente paga <b>${eur(fee)}</b>.</div>
+   ${rpParts('Previsione dell\'inventario','inventario',sc.L,sc.v,'',0,100)}${last}`;
+}
+function invDo(c,w){
+  const sc=invScore(c,w), tm=sc.tm, v=Math.round(clamp(sc.v+(rnd(-1,1)+rnd(-1,1))*7,0,100)), f=invBand(v), fee=invFee(c), diff=f.pay?Math.round(c.stock*f.pay(v)/50)*50:0;
+  const net=fee-tm.cost-diff, rip=!!c.inv.rip, d=c.inv.d;
+  S.cash+=net; S.cur.ric+=fee; S.cur.pers+=tm.cost; S.cur.pen+=diff;
+  if(w.wk){ w.wk.rev+=fee; w.wk.cost+=tm.cost+diff; }
+  c.sat=clamp(c.sat+f.sat,0,100); if(f.rep) repUp(f.rep);
+  (c.invLog=c.invLog||[]).push({d,v,n:tm.n,tmp:tm.tmp,cost:tm.cost,fee,diff,rip}); if(c.invLog.length>5) c.invLog.shift();
+  // differenze gravi: il cliente vuole un inventario di verifica fra tre mesi; altrimenti il prossimo è fra un anno, nel suo mese
+  c.inv=f.k==='bad'?{d:noAug(toSat(S.day+INV.rip)),rip:true}:{d:invNext(c,S.day+(rip?120:300))};
+  if(S.bot) return;
+  const sq=`Squadra di ${tm.n} persone${tm.tmp?` (${invTmp(tm)})`:''} per due giorni`;
+  const soldi=`straordinario ${eur(tm.cost)}, il cliente paga ${eur(fee)}${diff?`, differenze da rimborsare ${eur(diff)}`:''}: ${net>=0?'guadagno':'perdita'} di ${eur(Math.abs(net))}`;
+  const nm=`${rip?'Inventario di verifica':'Inventario'} di ${cname(c)}`, fl=f.k!=='ok'?pick(INV_TXT[f.k])+' ':'';
+  const txt=`${fl}${sq} a ${w.name}: ${soldi}. Soddisfazione ${f.sat>0?'+':'−'}${Math.abs(f.sat)}.`;
+  if(f.k==='top'){ notify('green','clienti',`Magazzino di ${w.name}`,`${nm}: perfetto, ${v} su 100`,txt+' Anche la reputazione sale un po\'.','clienti',null,'inv'+c.id);
+    news('La Gazzetta del Muletto',`Inventario perfetto a ${w.name}`,`${cname(c)} chiude l'inventario fiscale senza differenze: ${v} su 100.`); chron('clienti',`Primo inventario perfetto: ${c.name} a ${w.name}`,'inv_top'); }
+  else if(f.k==='ok') noteVar('cli',`${nm}: buono, ${v} su 100 (soddisfazione +${f.sat})`);
+  else if(f.k==='mid') notify('yellow','clienti',`Magazzino di ${w.name}`,`${nm}: qualche differenza, ${v} su 100`,txt,'clienti',null,'inv'+c.id);
+  else { notify('red','clienti',`Magazzino di ${w.name}`,`${nm}: differenze inventariali, ${v} su 100`,`${txt} Il cliente vuole un inventario di verifica ${invWhen(c.inv.d)}.`,'clienti',null,'inv'+c.id);
+    news('Il Sole 24 Pallet',`Differenze inventariali da ${c.name}`,`All'inventario a ${w.name} mancano pallet e colli: il cliente addebita ${eur(diff)} e chiede di ricontare tutto fra tre mesi.`);
+    chron('clienti',`Differenze all'inventario di ${c.name}: ${eur(diff)} da rimborsare`); }
+}
 function step(){
   if(S.over) return;
   const d=S.day;
@@ -4424,7 +4536,7 @@ function step(){
   cur.pers+=g.plan/30; cur.fissi+=g.ceo/30; cur.mgr+=g.mgr/30; cur.welf+=g.welf/30;
   dCost+=(g.plan+g.ceo+g.mgr+g.welf)/30;
   S.cash+=dRic-dCost;
-  polDaily(); csDaily(); mgrDaily();
+  polDaily(); csDaily(); mgrDaily(); invDaily();
   // ricerca in corso
   if(S.project){ S.project.left--; if(S.project.left<=0){ const t=TECH.find(x=>x.id===S.project.tech); S.project=null; S.researched[t.id]=true; chron('tecnologia',`Ricerca completata: ${t.name}`);
     if(t.id==='iso'||t.id==='marketing') S.rep=clamp(S.rep+5,0,100);
@@ -4533,8 +4645,8 @@ function monthEnd(){
     else if(c.exit){ /* in uscita: niente rinnovo */ }
     else if(S.day>=c.end&&c.noRenew){c.status='perso';c.ended='scaduto';chron('clienti',`Finisce il contratto con ${c.name}, senza rinnovo`);noteVar('cli',`Contratto con ${c.name} concluso`);news('Il Sole 24 Pallet',`${S.company.name} non rinnova con ${c.name}`,`Il contratto è scaduto e non è stato rinnovato: nessuna penale.`);}
     else if(S.day>=c.end){
-      const dur=c.dur||24;
-      if(c.sat>=(R('kam')?40:50)+(c.rivalLine?15:0)){c.end=S.day+dur*30;c.warned=false;c.rivalLine=null;
+      const dur=durOf(c);
+      if(c.sat>=(R('kam')?40:50)+(c.rivalLine?15:0)){c.end=S.day+dur*30;c.dur=dur;c.warned=false;c.rivalLine=null;
         // al rinnovo il buyer rinegozia: un ricarico sul listino scende di 5 punti (mai sotto il listino)
         const m0=c.mult; if(m0>1) c.mult=Math.max(1,Math.round((m0-RENEW_CUT)*100)/100);
         noteVar('cli',`${c.name} rinnova per altri ${dur} mesi`);
@@ -4661,7 +4773,7 @@ function resolveTender(t){
 }
 // il contratto vinto entra nell'azienda S (il giocatore o un'avversaria)
 function winTender(t,bid){
-  const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,req:[...(t.req||[])],stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,zone:t.zone,src:t.src,mode:t.mode,wh:bid.wh,mult:bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+(t.dur||24)*30,dur:t.dur||24};
+  const c={id:nid('c'),name:t.name,slogan:t.slogan,sector:t.sector,req:[...(t.req||[])],stock:t.stock,pal:t.pal,sP:t.sP,sA:t.sA,zone:t.zone,src:t.src,mode:t.mode,wh:bid.wh,mult:bid.mult,sat:60,status:'avvio',start:S.day+30,end:S.day+30+durOf(t)*30,dur:durOf(t)};
   S.clients.push(c); if(!S.bot) t.result={win:true}; S.tw.win++; repUp(rankOf(c).win); chron('gare',`Vinta la gara di ${t.name} per ${zoneName(t.zone)}`);
   if(S.bot&&HUM) withCo(HUM,()=>{ if(!t.bid) news('Il Sole 24 Pallet',`${t.name} sceglie ${t.result.by}`,`La gara per ${zoneName(t.zone)} va a ${t.result.by}. Noi non avevamo fatto offerte.`); });
   return c;
@@ -6688,6 +6800,8 @@ function fillSave(s){
   // requisiti dei contratti (dalla 0.69): quelli già firmati chiedono solo quello che chiedevano allora; i nuovi capitolati arrivano al rinnovo
   if(s.certMig<3){ const OLD=['haccp','freddo','edi','ecom']; s.clients.forEach(c=>{ if(!c.req) c.req=poolReq(c).filter(r=>OLD.includes(r)); }); s.certMig=3; }
   if(!s.qual) s.qual={n:0};
+  // contratti di almeno 2 anni (dalla 0.102): le gare ancora aperte da 12 mesi diventano da 24
+  (s.tenders||[]).forEach(t=>{ if(!t.done) t.dur=durOf(t); });
   return s;
 }
 // dopo la conversione: gli autisti che servono sui furgoni passano alla patente B
@@ -7495,11 +7609,11 @@ const VIEWS={
      <div class="kpi wh-k ${c.sA?x.cA:''}"><div class="lab">${kw('accuratezza')}</div><b>${f1(x.A)}%</b><div class="sm">${c.sA?'soglia '+f1(c.sA)+'%':'non richiesta'}</div></div>
      <div class="kpi wh-k ${satC(c.sat)}"><div class="lab">${kw('soddisfazione','Soddisf.')}</div><b>${Math.round(c.sat)}</b><div class="bar"><i style="width:${c.sat}%;background:var(--${satC(c.sat)})"></i></div></div>
     </div>
-    <div class="wh-chips"><span><b>${eur(clientRev(c))}</b>/mese</span><span>${kw('contratto','scade')} <b>${shortDate(c.end)}</b> · ${mesi} mesi</span><span class="wr ${c.lastPen>=1?'bad':''}">${kw('penali')}: ${c.lastPen>=1?`<b>${eur(c.lastPen)}</b> il mese scorso`:penTxt(c)}</span></div>`}
+    <div class="wh-chips"><span><b>${eur(clientRev(c))}</b>/mese</span><span>${kw('contratto','scade')} <b>${shortDate(c.end)}</b> · ${mesi} mesi</span><span class="wr ${c.lastPen>=1?'bad':''}">${kw('penali')}: ${c.lastPen>=1?`<b>${eur(c.lastPen)}</b> il mese scorso`:penTxt(c)}</span>${invChip(c,w)}</div>`}
     ${seasChart(c)}
     ${c.exit?`<div class="sm bad">${kw('recesso','In uscita')}: l'ultimo camion parte il <b>${shortDate(c.exit.day)}</b>. Fino ad allora i KPI contano.</div>`:''}
     <div class="cl-a"><button class="btn sm2" data-act="clidet" data-id="${c.id}" aria-expanded="${open}">${open?'▴ Meno dettagli':'▾ Trasporti e contratto'}</button><button class="btn sm2" data-act="mapcli" data-id="${c.id}" aria-pressed="${UI.mapCli===c.id}">${UI.mapCli===c.id?'Nascondi dalla mappa':'Sulla mappa'}</button></div>
-    ${open?`${logInfoList(c,w)}<div class="sm">${kw('contratto','Contratto')} di ${c.dur||24} mesi, scade il <b>${shortDate(c.end)}</b>. ${kw('penali')}: ${penTxt(c)}.</div>
+    ${open?`${logInfoList(c,w)}<div class="sm">${kw('contratto','Contratto')} di ${c.dur||24} mesi, scade il <b>${shortDate(c.end)}</b>. ${kw('penali')}: ${penTxt(c)}.</div>${invBox(c,w)}
      ${c.status==='avvio'?`<div class="cl-a"><button class="btn sm2" data-act="recedi" data-id="${c.id}">Rinuncia al contratto</button></div>`:c.exit?'':`<div class="cl-a"><button class="btn sm2" data-act="norenew" data-id="${c.id}" aria-pressed="${!!c.noRenew}">${c.noRenew?'Rinnova alla scadenza':'Non rinnovare'}</button><button class="btn sm2" data-act="recedi" data-id="${c.id}">Recedi dal contratto</button></div>`}`:''}
    </div>`;}).join('')+(lost.length?`<div class="sm">Clienti persi: ${lost.map(c=>esc(c.name)+(c.ended==='recesso'?' (recesso)':c.ended==='scaduto'?' (non rinnovato)':c.ended==='rinuncia'?' (rinuncia)':'')).join(', ')}</div>`:'')+`<div class="sm">Ogni mese (${kw('soddisfazione','come funziona')}): sopra soglia +3 di soddisfazione; sotto di 2 punti al massimo −4; oltre −10. Sotto 25 il cliente se ne va.</div>`;
  },
@@ -7522,7 +7636,7 @@ const VIEWS={
       ${cell('Volume',n0(sel.pal)+' pallet','al mese in media · '+n0(sel.stock)+' posti')}
       ${cell(kw('puntualita'),'≥ '+f1(sel.sP)+'%',kw('soglie','soglia minima'))}
       ${cell(kw('accuratezza'),sel.sA?'≥ '+f1(sel.sA)+'%':'—',sel.sA?'soglia minima':'non richiesta')}
-      ${cell(kw('contratto','Contratto'),(sel.dur||24)+' mesi','parte '+wks(30)+' dopo')}
+      ${cell(kw('contratto','Contratto'),durOf(sel)+' mesi','parte '+wks(30)+' dopo')}
      </div>
      ${(sel.req||[]).length?`<div class="sm gr-rq">${kw('tech_richieste','Richiede')}: ${sel.req.map(r=>{const q=TECH.find(x=>x.id===r), ok=perWh(q)?certOk(whById(UI.bid.wh),r):q.tree==='cert'?coCertOk(r):R(r); return `<span class="polchip ${ok?'ok':'bad'}">${techIcon(q,16)}${esc(q.name)}</span>`;}).join('')}</div>`:''}
      <div class="sm ${penPct(sel)?'warn':''}">${kw('penali')}: ${penTxt(sel)}</div>
@@ -9154,6 +9268,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+  {v:'0.102',t:'Inventario fiscale e contratti più lunghi',x:['Nessun contratto dura meno di 2 anni: le committenti più grandi firmano per 3 o 4 anni, le più piccole per 2. Nelle partite salvate i contratti da un anno, alla scadenza, si rinnovano per due.','Una volta l\'anno ogni committente fa l\'inventario fiscale della sua merce, un sabato e una domenica. Tre settimane prima arriva l\'avviso; nella scheda del cliente vedi la data e il punteggio previsto, e aprendo i dettagli da cosa dipende.','Il punteggio dipende dall\'accuratezza, dal morale e dalla produttività del magazzino, dalla Precisione di chi lo guida, dallo stato dell\'immobile, da quanto è pieno e dai sistemi (barcode, WMS, radiofrequenza). Un po\' di fortuna conta, ma poco.','Lo straordinario del fine settimana costa, ma il cliente paga a posto pallet: con una buona produttività vai in pari. Se mancano persone arrivano gli interinali, più cari e meno precisi; con la policy Zero straordinario sono tutti interinali.','Un inventario perfetto alza la soddisfazione del cliente di 6 punti (e un po\' la reputazione), uno buono di 3. Con qualche differenza perdi 3 punti e rimborsi poco; con le differenze inventariali ne perdi 8, rimborsi da 3 a 8 € a posto e il cliente vuole ricontare tutto dopo tre mesi.']},
  {v:'0.101',t:'Al massimo tre prestiti',x:['La banca concede al massimo tre prestiti in corso insieme. Con tre prestiti aperti la finestra Cassa e bilancio non ne propone altri: per chiederne uno nuovo devi estinguerne uno o aspettare che finisca. Il riquadro Debito mostra quanti ne hai su tre.','Vale anche per le aziende avversarie.']},
  {v:'0.100',t:'Finestre e notifiche animate',x:['Le finestre si aprono con un piccolo zoom a scatti e si chiudono rimpicciolendosi; sul telefono entrano ed escono scivolando di lato.','Le finestrelle al centro (eventi, conferme, Opzioni) scendono dall\'alto mentre lo sfondo si scurisce piano.','Le tessere nuove delle notifiche entrano da destra con un piccolo rimbalzo, il cartellino scivola dentro e fuori, la schedina si apre con un mini zoom e gli avvisi in basso salgono un poco.','Nelle Opzioni c\'è la casella «Animazioni di finestre e notifiche» per spegnerle: vale per il telefono o il computer che stai usando. Se nel sistema hai attivato «riduci movimento», partono già spente.','Sul computer, quando le notifiche sono tante, la colonna non copre più il pulsante delle lenti: quelle che non ci stanno finiscono in «+N».']},
  {v:'0.99',t:'Il tutorial avanzato',x:['Nella schermata principale il riquadro Tutorial ha due pulsanti: Base e Avanzato. Il tutorial avanzato parte da un\'azienda già grande: due anni di Conti Logistica giocati in pochi secondi (con la barra di avanzamento), sempre uguali, fino a gennaio 2004, con tre magazzini, una decina di clienti, Gino Bertolotti come concorrente e il pacchetto Relazioni industriali.','In nove lezioni la dottoressa Ribalta ti fa nominare il primo direttore, trattare lo stipendio di un manager, scegliere il responsabile del customer service, chiedere l\'audit HACCP in un magazzino, costruire una dotazione nel capannone e accendere una policy. Poi spiega welfare, agitazione e tavolo col sindacato, classifica e vittoria, prestiti e contratti in perdita.','Alla fine arriva l\'attestato del corso «Diventa CEO, secondo livello» e la partita continua da lì.','Il cartellino di una notifica non copre più la cosa che la dottoressa ti chiede di toccare.']},
@@ -9535,6 +9650,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},DUR_RANK,durOf,INV,invScore,invFee,invTeam,invDaily,invDo,invBand,TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>
