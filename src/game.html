@@ -7819,7 +7819,7 @@ function initMapControls(){
   addEventListener('resize',()=>{setMobile();fitMap();fitAllWins();renderNotes();});
 }
 function renderMap(){
-  const g=[], TM=tenMap(), AM=areaMap();
+  const g=[], busy=mapBusy(), TM=tenMap(busy), AM=areaMap(busy);   // prima le puntine delle gare, poi le etichette delle zone
   g.push(...TM.zone,...AM.low);
   CITIES.forEach(([n,lo,la,big,out])=>{const [x,y]=pt(lo,la);const s=big?10:7;
     g.push(`<rect x="${x-s/2}" y="${y-s/2}" width="${s}" height="${s}" fill="${out?'#6b7a8e':'#16202e'}"/><rect x="${x-s/2+2}" y="${y-s/2+2}" width="${s-4}" height="${s-4}" fill="#fff"/>`);
@@ -7889,21 +7889,27 @@ function mapChip(x,y,t,bg=TPAL.K,fg='#fff',fs=13){ const w=chipW(t,fs), X=Math.r
 /* gare d'appalto sulla mappa (dalla 0.106): una puntina col logo per ogni gara aperta, in tutte le lenti, e i giorni che mancano.
    La gara scelta (UI.mapTen, dalla puntina o da «Sulla mappa» nella finestra) colora la sua zona e tira una linea da ogni magazzino,
    col colore della probabilità di vincere a prezzo di listino. Il tooltip si calcola quando lo apri (TIPF.gara). */
+// posti già presi sulla mappa (riquadri [x0, y0, x1, y1]): puntine ed etichette nuove si spostano di lato, a destra e a sinistra
+// a passi di 8 punti, finché non coprono più niente; si parte dai magazzini, tuoi e delle avversarie
+const boxHit=(b,L)=>L.some(o=>b[0]<o[2]+3&&b[2]>o[0]-3&&b[1]<o[3]+3&&b[3]>o[1]-3);
+function freeDx(b,L){ for(let i=0;i<60;i++){ const d=(i%2?1:-1)*Math.ceil(i/2)*8; if(!boxHit([b[0]+d,b[1],b[2]+d,b[3]],L)) return d; } return 0; }
+function mapBusy(){ const L=[];   // il riquadro del magazzino e il suo nome (15 punti i tuoi, 12 quelli delle avversarie)
+  [S,...rivals().filter(c=>!c.over)].forEach(c=>c.warehouses.forEach(w=>{const [x,y]=pt(SITES[w.site].lon,SITES[w.site].lat), f=c===S?15:12;
+    L.push([x-17,y-16,x+19,y+12],[x+18,y-16,x+20+w.name.length*f*.55,y+1]);})); return L; }
 const tenWhen=t=>{const d=t.deadline-S.day; return d<=0?'oggi':d===1?'domani':d<14?d+' giorni':wks(d);};
 const chCol=ch=>ch>=45?'#6fdc8c':ch>=20?TPAL.Y:TPAL.R;
 // perché un magazzino non può fare l'offerta (vuoto se può): lo stesso motivo della finestrella dei magazzini
 const bidWhy=e=>e.naz.length?'Solo per grandi logistiche: manca '+e.naz.join(', '):e.missing.length?'Serve la ricerca '+e.missing.join(', '):e.certW.length?'Il magazzino non ha '+e.certW.join(', '):e.fat?'Committente di rank S: non entra in un capannone fatiscente':!e.fits?`Non c'è spazio: servirebbero ${n0(e.stock)} posti su ${n0(e.cap)}`:'';
-function tenMap(){
-  const zone=[], top=[], pins=[], open=S.tenders.filter(t=>!t.done).sort((a,b)=>a.deadline-b.deadline), at=[];
+function tenMap(busy){
+  const zone=[], top=[], pins=[], open=S.tenders.filter(t=>!t.done).sort((a,b)=>a.deadline-b.deadline);
   const st=UI.mapTen&&open.find(t=>t.id===UI.mapTen);
   if(st){ const col=TPAL[(LOGO[st.name]||{bg:'O'}).bg], c=pt(...zoneLL(st.zone));
     zoneProv(st.zone).forEach(p=>zone.push(`<path d="${provD(p)}" fill="${col}" fill-opacity=".3" stroke="#16202e" stroke-width="2" stroke-opacity=".7" stroke-linejoin="round"/><path d="${provD(p)}" fill="none" stroke="${col}" stroke-width="3" stroke-dasharray="7 5" stroke-linejoin="round"/>`));
     S.warehouses.forEach(w=>{ const e=bidEstimate(st,w.id,1), ok=e&&e.fits, ch=ok?Math.round(e.chance*100):0, a=pt(SITES[w.site].lon,SITES[w.site].lat), cl=ok?chCol(ch):TPAL.S;
       top.push(`<line x1="${a[0]}" y1="${a[1]}" x2="${c[0]}" y2="${c[1]}" stroke="#16202e" stroke-width="7" opacity=".5"/><line x1="${a[0]}" y1="${a[1]}" x2="${c[0]}" y2="${c[1]}" stroke="${cl}" stroke-width="4" stroke-dasharray="10 6"/>`);
       top.push(mapChip((a[0]+c[0])/2,(a[1]+c[1])/2,`${zoneKm(w,st.zone)} km · ${ok?ch+'%':'no'}`,'#fff',TPAL.K)); }); }
-  open.forEach(t=>{ const [x0,y0]=pt(...zoneLL(t.zone)); let x=x0;
-    while(at.some(([ax,ay])=>Math.abs(ax-x)<42&&Math.abs(ay-y0)<54)) x+=44;   // due gare nella stessa zona: una accanto all'altra
-    at.push([x,y0]);
+  open.forEach(t=>{ const [x0,y0]=pt(...zoneLL(t.zone)), h=Math.max(21,chipW(tenWhen(t))/2), b=[x0-h,y0-48,x0+h,y0+25], x=x0+freeDx(b,busy);
+    busy.push([b[0]+x-x0,b[1],b[2]+x-x0,b[3]]);   // puntina ed etichetta coi giorni: due gare nella stessa zona stanno una accanto all'altra
     const on=t===st, fr=on?TPAL.Y:TPAL.K, X=Math.round(x-19), Y=Math.round(y0-46), d=t.deadline-S.day;
     pins.push(`<g class="mk" data-act="mapten" data-id="${t.id}" data-tipf="gara" data-tip="<div class='tt'>${esc(t.name)}</div>Gara d'appalto · ${esc(zoneName(t.zone))}" aria-label="Gara: ${esc(t.name)}">`
       +(x!==x0?`<rect x="${Math.round(x0)-3}" y="${Math.round(y0)-3}" width="6" height="6" fill="${fr}" stroke="#16202e" stroke-width="2"/><line x1="${x0}" y1="${y0}" x2="${x}" y2="${y0}" stroke="#16202e" stroke-width="2"/>`:'')
@@ -7919,7 +7925,7 @@ function tenMap(){
    accanto a ogni tuo magazzino colpito la quota dei suoi viaggi; al centro l'icona, il nome corto e i giorni che restano */
 const AREA_TX={nebbia:[['#e6eef3',.6],['#ffffff',.78]],pioggia:[[TPAL.B,.45],[TPAL.L,.62]],neve:[['#ffffff',.62],[TPAL.L,.72]],
   cantiere:[[TPAL.O,.55],['#ffffff',.6]],giro:[[TPAL.e,.5],['#ffffff',.5]],divieto:[[TPAL.R,.38],['#ffffff',.42]]};
-function areaMap(){
+function areaMap(busy){
   const low=[], top=[], nb=new Map();   // nb: segni già messi accanto a un magazzino (più zone insieme: uno sotto l'altro)
   (S.aree||[]).forEach(a=>{ const A=AREE[a.a]; if(!A) return;
     const G=8, P=A.c.map(([lo,la,r])=>[...pt(lo,la),r*2]), tx=AREA_TX[A.ic]||AREA_TX.nebbia, d=['',''];   // 2 punti della mappa per km
@@ -7936,7 +7942,8 @@ function areaMap(){
       nb.set(w.id,i+1);
       top.push(`<g pointer-events="none">${ICONE.ui['m_'+A.ic]?`<g transform="translate(${Math.round(x-chipW(t,12)/2-48)},${Y-10})">${pxSvg(ICONE.ui['m_'+A.ic],20)}</g>`:''}${mapChip(x-26,Y,t,TPAL.R,'#fff',12)}</g>`); });
     const lab=esc(A.s+(areaLeft(a)?' · '+areaLeft(a):'')), cw=chipW(lab), ic=ICONE.ui['m_'+A.ic]?32:0;
-    const cx=P.reduce((s,p)=>s+p[0],0)/P.length+ic/2, cy=clamp(P.reduce((s,p)=>s+p[1],0)/P.length+12,80,MH-40), ix=Math.round(cx-cw/2-ic-2), iy=Math.round(cy-ic/2-1);
+    const cy=clamp(P.reduce((s,p)=>s+p[1],0)/P.length+12,80,MH-40), c0=P.reduce((s,p)=>s+p[0],0)/P.length+ic/2, b=[c0-cw/2-ic-4,cy-17,c0+cw/2+3,cy+12], cx=c0+freeDx(b,busy), ix=Math.round(cx-cw/2-ic-2), iy=Math.round(cy-ic/2-1);
+    busy.push([b[0]+cx-c0,b[1],b[2]+cx-c0,b[3]]);
     top.push(`<g class="mk" data-tipf="area" data-id="${a.a}" data-tip="<div class='tt'>${esc(A.n)}</div>${esc(areaLeft(a))}" aria-label="${esc(A.n)}">`
       +(ic?`<rect x="${ix+3}" y="${iy+3}" width="${ic}" height="${ic}" fill="#0c131d" opacity=".4"/><g transform="translate(${ix},${iy})">${pxSvg(ICONE.ui['m_'+A.ic],ic)}</g>`:'')
       +mapChip(cx,cy,lab,'#fff',TPAL.K)+'</g>'); });
