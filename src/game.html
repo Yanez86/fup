@@ -140,6 +140,38 @@ html:not(.mob) #dock.wide .dg{height:auto;border:0;overflow:visible;margin:5px 2
 .win{position:fixed;z-index:20;width:440px;max-width:calc(100vw - 32px);max-height:calc(100vh - 110px);display:flex;flex-direction:column;background:var(--panel);border:3px solid var(--ink2);box-shadow:inset 0 0 0 2px #fff, 6px 6px 0 rgba(12,19,29,.55)}
 .win.wide{width:640px}
 .win.xwide{width:960px}
+/* calendario (dalla 0.123): il calendario da parete del gommista, a sinistra il mese e a destra i prossimi 30 giorni */
+.cal{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:10px 16px;align-items:start}
+.cal-l,.cal-r,.cal-sel,.cal-nx{display:flex;flex-direction:column;gap:8px;min-width:0}
+.cal-sel,.cal-nx{gap:4px}
+.cal-h{display:flex;align-items:baseline;justify-content:space-between;gap:4px 8px;flex-wrap:wrap;background:var(--bad);color:#fff;padding:6px 10px;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.cal-h b{font-family:var(--f-disp);font-size:22px;letter-spacing:.5px}
+.cal-h .sm{color:#ffe1e1}
+.cal-s{display:flex;align-items:center;gap:6px}
+.cal-nav{display:flex;gap:6px}.cal-nav .btn{min-width:48px}
+.cal-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;background:#fff;border:2px solid var(--ink);padding:4px;box-shadow:3px 3px 0 var(--ink)}
+.cal-w{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);text-align:center;padding:2px 0}
+.cal-w.rosso,.cal-c.rosso b{color:var(--bad-t)}
+.cal-c{appearance:none;border:1px solid var(--line);background:var(--panel);min-height:48px;padding:4px 2px 3px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:2px;cursor:pointer;font:inherit;color:var(--ink)}
+.cal-c b{font-family:var(--f-disp);font-size:17px;font-weight:600;line-height:1}
+.cal-c.past{background:var(--panel2)}.cal-c.past b{opacity:.6}
+.cal-c.oggi{border:2px solid var(--accent);background:#fff3e8}
+.cal-c.on{outline:3px solid var(--ink);outline-offset:-2px}
+.cal-x{border:0;background:none;min-height:0}
+.cal-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;min-height:8px}
+.cal-dots i,.cal-it>i,.cal-leg i{display:inline-block;width:8px;height:8px;border:1px solid var(--ink);flex:none}
+.cal-dots em{font-style:normal;font-size:10px;line-height:8px;font-weight:700}
+.cal-leg{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--muted)}
+.cal-leg span{display:flex;align-items:center;gap:4px}
+.cal-nd{display:flex;flex-direction:column;gap:3px;padding:6px 0 2px;border-top:1px dashed var(--line)}
+.cal-nd>b{font-family:var(--f-disp);font-size:15px;font-weight:600}
+.cal-it{appearance:none;display:flex;align-items:center;gap:6px;text-align:left;background:#fff;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink);padding:5px 8px;font:inherit;font-size:14px;line-height:1.3;color:var(--ink);cursor:pointer;min-height:38px}
+.cal-it:not([data-none]):hover{background:var(--panel2)}
+.cal-it[data-none]{cursor:default;box-shadow:none;border-color:var(--line)}
+.cal-it span{flex:1;min-width:0}.cal-it svg{flex:none}
+.mob .cal{grid-template-columns:1fr}
+.mob.land .cal{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.mob .cal-c{min-height:46px}
 .stats{display:inline-flex;flex-wrap:wrap;gap:4px}
 .stc{display:inline-flex;align-items:center;gap:4px;padding:2px 6px 2px 3px;background:var(--sb);border:2px solid var(--sc);box-shadow:inset 0 -2px 0 rgba(22,32,46,.1);cursor:help;font-size:14px;line-height:1}
 .stc b{color:var(--ink);font-variant-numeric:tabular-nums}
@@ -1233,7 +1265,7 @@ html,body{overscroll-behavior:none}
   <div class="logo"><span class="lt">FUP</span> <span id="cologo"></span><small id="coname"></small></div>
   <div class="tgrp">
   <div class="wkn num" id="wkn" data-act="wiki" data-id="tempo" role="button">—</div>
-  <div class="date num" id="date" data-act="wiki" data-id="stagionalita" role="button">—</div>
+  <div class="date num" id="date" data-act="toggle" data-id="calendario" role="button" aria-label="Calendario">—</div>
   <div class="clk" id="clk" data-act="wiki" data-id="tempo" role="button" hidden></div>
   <div class="spd" role="group" aria-label="Velocità del tempo">
     <button data-act="speed" data-v="0" aria-label="Pausa (spazio)">II</button>
@@ -2456,9 +2488,13 @@ Gli effetti possono essere immediati (soldi, [[reputazione]], [[soddisfazione]])
 
 Le [[richieste_clienti|richieste dei clienti]] hanno un ritmo tutto loro e arrivano come tessere gialle: le gestisce il [[customer_service|customer service]].
 
-Alcuni eventi succedono in un posto preciso, come la nebbia in Val Padana o un cantiere sull'A1: compaiono sulla mappa e pesano solo sui viaggi che passano di lì. Vedi [[eventi_zona]].`);
+Alcuni eventi succedono in un posto preciso, come la nebbia in Val Padana o un cantiere sull'A1: compaiono sulla mappa e pesano solo sui viaggi che passano di lì. Vedi [[eventi_zona]].
+
+Il maltempo arriva con qualche giorno di preavviso, come un bollettino della radio: scegli prima e gli effetti partono il giorno annunciato. Vedi [[meteo]].
+
+Alcune ricorrenze diventano un evento: il compleanno dell'azienda e i compleanni tondi del CEO. Vedi [[ricorrenze]].`);
 wk('eventi_zona','basi','Eventi sulla mappa',`Nebbia, allerte, cantieri e piene hanno un posto: compaiono sulla mappa come una zona a quadretti e pesano solo sui viaggi che ci passano.`,
-`Alcuni [[eventi]] succedono in un posto preciso: la nebbia in Val Padana, l'allerta rossa in Liguria, il Giro d'Italia nelle Langhe, la ZTL e la settimana della moda a Milano, il cantiere sull'A1 tra Piacenza e Bologna, la coda al Brennero, la piena del Po e la neve al Frejus. Quando arrivano, sulla mappa compare la zona colpita con la sua icona e i giorni che restano. I tuoi viaggi che ci passano sono tratteggiati in rosso e accanto a ogni magazzino colpito c'è la quota dei suoi viaggi. Anche la finestra dell'evento dice quali magazzini tocca.
+`Alcuni [[eventi]] succedono in un posto preciso: la nebbia in Val Padana e nel Polesine, l'allerta rossa in Liguria, il Giro d'Italia nelle Langhe, la ZTL e la settimana della moda a Milano, il cantiere sull'A1 tra Piacenza e Bologna, la coda al Brennero, la piena del Po, la neve al Frejus e sull'A4 tra Torino e Milano, la bora a Trieste, l'alluvione in Romagna, la frana sulla statale 38 in Valtellina, la grandine tra Verona e Padova, il gelicidio sui valichi dell'Appennino e la tempesta tra Nizza e Ventimiglia. Il [[meteo|maltempo]] si vede arrivare: finché è solo annunciato la zona è a scacchi, più chiara. Quando arrivano, sulla mappa compare la zona colpita con la sua icona e i giorni che restano. I tuoi viaggi che ci passano sono tratteggiati in rosso e accanto a ogni magazzino colpito c'è la quota dei suoi viaggi. Anche la finestra dell'evento dice quali magazzini tocca.
 
 L'effetto della risposta pesa su ogni magazzino in proporzione ai suoi viaggi nella zona: se metà dei camion di un magazzino passa nella nebbia, prende metà della penalità; sotto il 3% non se ne accorge. Contano le consegne verso i capoluoghi della [[zona]] di ogni cliente (divise secondo gli abitanti) e i viaggi di [[ritiro]]; la merce che arriva da oltre le Alpi passa dal Brennero o da Chiasso. Per la ZTL e la settimana della moda contano solo le consegne che finiscono a Milano.
 
@@ -2475,6 +2511,38 @@ wk('salvataggio_online','basi','Salvataggio online',`Entrando con Google o come 
 • **Bollini**: la nuvola piena vuol dire «salvata anche online», quella chiara «da caricare». «Solo qui» indica una partita di un altro account, che resta su questo dispositivo.
 • **Copia di sicurezza**: ogni partita si può scaricare su file (pulsante col foglio e la freccia blu, o dalle Opzioni durante il gioco) e ricaricare con **Carica da file**, anche senza account.
 • **Elimina dati online** cancella l'account e tutte le partite online; quelle su questo dispositivo restano.`);
+wk('meteo','basi','Maltempo con preavviso',`Nebbia, neve, bora, grandine, piene e alluvioni arrivano con 3 o 4 giorni di preavviso: la zona è a scacchi sulla mappa e il giorno è nel calendario. Scegli prima: gli effetti partono quel giorno.`,
+`Il maltempo è un [[eventi|evento]] come gli altri, ma lo annuncia la radio qualche giorno prima: Radio Traffico Nord, la Protezione civile o l'Aeronautica dicono il giorno in cui arriva. Da quel momento la zona colpita compare sulla mappa a scacchi, più chiara del solito, e il giorno va nel [[calendario]].
+
+Scegli la risposta quando vuoi, entro il giorno prima del maltempo: dopo decide il tuo vice. Gli effetti e la notifica di com'è andata arrivano il giorno del maltempo, non il giorno dopo la scelta. Il preavviso serve a prepararsi: anticipare i viaggi, montare le catene, spalare i tetti, mettere i sacchi di sabbia davanti alle baie.
+
+Quando e dove: nebbia in Val Padana e nel Polesine da novembre a febbraio; neve al Frejus da dicembre a marzo e sull'A4 tra Torino e Milano da dicembre a febbraio; bora a Trieste da novembre a marzo; gelicidio sull'Appennino da dicembre a febbraio; allerta rossa in Liguria da settembre a novembre; tempesta tra Nizza e Ventimiglia in ottobre e novembre; piena del Po in maggio, ottobre e novembre; alluvione in Romagna in aprile, maggio, ottobre e novembre; frana in Valtellina in primavera e in autunno; grandine tra Verona e Padova da giugno ad agosto; afa a luglio e agosto. Ogni evento arriva solo se tocca i tuoi viaggi (vedi [[eventi_zona]]).
+
+L'afa non ha una zona: pesa su tutti i magazzini, secondo il capannone. Un edificio fatiscente prende una volta e mezza l'effetto, uno vecchio 1,25 volte, uno standard l'effetto pieno, uno moderno la metà (c'è l'aria condizionata), uno innovativo un quarto; in montagna (Aosta, Bolzano, Trento, Sondrio, Belluno) il 40%.
+
+Il maltempo pesante può anche rovinare i capannoni che stanno dentro la zona: vedi [[danni_meteo]].`);
+wk('danni_meteo','basi','Danni del maltempo',`Grandine, neve sul tetto, acqua e vento possono rovinare i capannoni che stanno dentro la zona: di più se l'edificio è vecchio, molto meno se ti prepari.`,
+`Con la grandine, la neve in pianura, l'alluvione, l'allerta rossa in Liguria, la bora e la tempesta in Costa Azzurra, i capannoni che stanno dentro la zona colpita possono avere danni. Quelli che ci mandano solo i camion no: per loro conta solo la [[puntualita]].
+
+Cosa si rompe:
+· grandine: stato dell'immobile −4, pannelli solari (8 volte su 10), 1,5 € di danni per posto pallet (mezzi e lucernari);
+· neve sul tetto: stato −6, il tetto nei capannoni fatiscenti e vecchi (7 volte su 10), 0,8 € a posto;
+· acqua nel capannone: stato −12, le ribalte (6 su 10) e la ricarica dei muletti (4 su 10), 5 € a posto di merce bagnata, [[accuratezza]] −1 per due settimane;
+· vento: stato −5, pannelli solari e tetto dei capannoni vecchi (5 su 10), 1 € a posto.
+
+Tutto si moltiplica per la [[classe_edificio|classe dell'edificio]]: fatiscente ×2, vecchio ×1,4, standard ×1, moderno ×0,7, innovativo ×0,5. Preparare i capannoni (sacchi di sabbia, tetti spalati, mezzi al coperto, portoni legati) costa qualcosa per ogni capannone nella zona e taglia i danni a una parte, dal 15% al 45% secondo l'evento.
+
+Lo stato dell'immobile perso si recupera piano con il facility manager. Le dotazioni rotte restano [[guasti|guaste]] finché non le ripari dalla scheda del magazzino.`);
+wk('calendario','basi','Calendario',`Il calendario da parete del gommista: tutte le date in arrivo in un posto solo. Si apre dalla data in alto o dal menu.`,
+`Il calendario raccoglie le date che il gioco conosce già: chi arriva e chi se ne va, le risposte dei candidati e i profili dell'head hunter, le gare che scadono, i contratti che partono e finiscono, i picchi e gli overstock dei clienti, i cantieri, le riparazioni, i traslochi, gli audit delle certificazioni, gli avvii delle tecnologie, le ricerche, le ordinanze, gli affitti, il maltempo annunciato ([[meteo]]), le decisioni che aspettano una risposta, gli effetti degli eventi che finiscono, le rate dei prestiti e le [[ricorrenze]].
+
+Ogni voce ha il colore del suo gruppo; tocca un giorno per vedere cosa c'è, tocca una voce per aprire la finestra che la riguarda. A destra (sul telefono sotto) ci sono i prossimi 30 giorni. Le feste nazionali e le domeniche hanno il numero rosso, come sui calendari veri, ma nel gioco non cambiano niente.
+
+Il calendario si guarda e basta: non si prenota niente nei giorni e il tempo scorre come sempre. Le date delle ricerche e dei traslochi sono stime: se cambia la squadra, cambia anche il giorno. Ogni anno lo regala un gommista diverso, e ogni mese ha la sua foto.`);
+wk('ricorrenze','basi','Ricorrenze',`Compleanni, anniversari della prima bolla e delle tappe della cronaca. Il compleanno dell'azienda e quelli tondi del CEO diventano un evento.`,
+`Nel [[calendario]] ci sono i compleanni del CEO e dei manager, gli anni dalla nascita dell'azienda (1° gennaio 2002), dalla stampa della prima bolla (il giorno dopo) e dalle tappe della cronaca: il primo mese in utile, la prima pietra di un magazzino, il primo sciopero e le altre prime volte.
+
+Alcune ricorrenze diventano un [[eventi|evento]]. Il compleanno dell'azienda, al primo anno e poi ogni cinque: festa in grande nel piazzale (costa di più quando l'azienda è grande; morale e [[reputazione]]), una cena con i clienti ([[soddisfazione]] di tutti), il calendario aziendale con i magazzinieri in posa sui muletti, oppure una torta in mensa. E i compleanni tondi del CEO, dai 30 agli 80 anni, con la festa a sorpresa del magazzino.`);
 wk('notifiche','basi','Notifiche',`La colonna di tessere a destra della mappa: decisioni da prendere, notizie importanti, problemi aperti e notizie varie.`,
 `Il gioco non apre finestre da solo: quello che succede arriva come tessera nella colonna a destra, e la apri quando vuoi.
 
@@ -3589,13 +3657,17 @@ function birthday(p){
   const ch=UI.chg; UI.chg=null;
   if(mine&&ch.length){ const t=ch.map(c=>`${STATS.find(x=>x.k===c.k).n} ${c.d>0?'+':'−'}${Math.abs(c.d)}`).join(', ');
     plog(p,`${a} anni: ${t}`); news('Ufficio del personale',p===S.boss?`Buon compleanno, capo: ${a} anni`:`${p.name} compie ${a} anni`,`${a<=45?'L\'esperienza si fa sentire':'Gli anni si fanno sentire'}: ${t}.`); }
-  if(p===S.boss){ if(a>=65&&p.retDay==null&&a>=(p.stayTo||0)) p.retAsk=true; }
+  if(p===S.boss){ if(a>=65&&p.retDay==null&&a>=(p.stayTo||0)) p.retAsk=true; if(a%10===0&&a>=30&&a<=80) S.bdAsk=a; }   // compleanno tondo: festa a sorpresa
   else if(p.hired){ if(!p.quit&&a>=(p.stayTo||0)&&Math.random()<retChance(a)) p.retAsk=true; }
   else if(a>=63) p.retired=true;   // chi è sul mercato smette di cercare lavoro
 }
 function lifeDaily(){
   people().forEach(p=>{ if(!p.retired&&S.day>p.bd&&(S.day-p.bd)%365===0) birthday(p); });
+  if(S.day===1) chron('clienti',`Stampata la prima bolla${(S.clients.find(c=>c.storico)||{}).name?': '+S.clients.find(c=>c.storico).name:''}, da ${S.warehouses[0].name}`,'bolla1');
+  if(S.day>0&&S.day%365===0&&ANNI.includes(S.day/365)) S.annAsk=S.day/365;   // compleanno dell'azienda: l'evento arriva appena non c'è altro da decidere
   if(S.over||evBusy()) return;
+  if(S.annAsk&&!S.tut){ const n=S.annAsk; S.annAsk=null; annEvent(n); return; }
+  if(S.bdAsk&&!S.tut){ const a=S.bdAsk; S.bdAsk=null; if(S.boss.retDay==null) bdEvent(a); return; }
   const r=staffPeople().find(p=>p.retAsk); if(r){ r.retAsk=false; if(!r.quit) retireEvent(r); return; }
   const B=S.boss; if(B.retAsk){ B.retAsk=false; bossRetireEvent(); return; }
   if(B.retDay!=null&&S.day>=B.retDay) showSuccession();
@@ -3614,6 +3686,31 @@ function retOpts(ev){ const p=ev.p, a=ev.a; if(!p) return ev;
           {t:'Una targa e una stretta di mano',d:'Una targa in bacheca e gli auguri di rito. Tre mesi e si chiude.',e:'Lascia l\'azienda tra 13 settimane',f:()=>{retire(p,90); plog(p,'Annuncia la pensione');}}];
   return ev;
 }
+/* ricorrenze che diventano eventi (dalla 0.123): il compleanno dell'azienda (1 anno, poi ogni 5, ANNI) e i compleanni tondi del CEO.
+   Si scelgono come gli altri eventi (il risultato il giorno dopo); le risposte si ricostruiscono dagli anni (restore). */
+const ANNI=[1,5,10,15,20,25,30,35,40];
+const dipTot=()=>S.warehouses.reduce((a,w)=>a+staffTot(w),0)+offTot();
+function annEvent(n){ const m=(((S.log||[])[0]||{}).t||'').match(/primo magazzino a (.+)$/), w=m?{name:m[1]}:null;   // dove è nata l'azienda, dalla cronaca
+  showEvent(annOpts({id:'anniversario',src:'La Gazzetta del Muletto',title:n===1?`${S.company.name} compie un anno`:`${S.company.name} compie ${n} anni`,n,
+    text:n===1?`Un anno fa ${S.boss.since?'il fondatore apriva':'aprivi'} il primo magazzino${w?' a '+w.name:''}, e il giorno dopo usciva la prima bolla. In ufficio qualcuno ha appeso un palloncino alla stampante, quella stampante. Oggi i dipendenti sono ${dipTot()}: si festeggia?`
+      :`${n} anni fa, il primo gennaio del ${yearOf(0)}, nasceva ${S.company.name}; il giorno dopo usciva la prima bolla. Oggi ci sono ${S.warehouses.length===1?'un magazzino':S.warehouses.length+' magazzini'}, ${dipTot()} dipendenti e ${S.clients.filter(c=>c.status==='attivo').length} clienti. In magazzino si chiede già cosa si fa per la festa.`}));
+}
+function annOpts(ev){ const n=ev.n||1, dip=Math.max(10,dipTot()), cli=S.clients.filter(c=>c.status==='attivo'), big=Math.round((3000+dip*25*Math.min(2,1+n/20))/100)*100, cena=Math.round((4000+cli.length*800)/100)*100;
+  ev.opts=[{t:'Festa in grande nel piazzale',d:'Palco, grigliata, la banda del paese e le famiglie di tutti. I muletti addobbati fanno la sfilata.',e:`−${eur(big)}, morale +5 per 2 mesi, reputazione +${n>=10?3:2}`,r:'La festa è durata fino a notte. Il capoturno ha cantato, la banda ha suonato l\'inno del magazzino, che nessuno sapeva di avere.',
+     f:()=>{ S.cash-=big; mod('all',{mor:5},60); repUp(n>=10?3:2); }},
+    {t:'Una cena con i clienti migliori',d:'Inviti i buyer delle committenti in un ristorante di quelli con la tovaglia lunga. Si parla di rinnovi tra il risotto e il dolce.',e:`−${eur(cena)}, soddisfazione +6 per ${cli.length===1?'il cliente':'tutti i clienti'}`,r:'I buyer sono arrivati in giacca e se ne sono andati in maniche di camicia. Uno ha chiesto il bis del risotto e il rinnovo del contratto, in quest\'ordine.',
+     f:()=>{ S.cash-=cena; S.clients.filter(c=>c.status==='attivo').forEach(c=>c.sat=clamp(c.sat+6,0,100)); }},
+    {t:'Il calendario aziendale',d:'Dodici mesi, dodici magazzinieri in posa sui muletti, come nei calendari del gommista. Una copia a ogni cliente e una in ogni bagno.',e:'−2.500 €, soddisfazione +3 per tutti i clienti, morale +3 per un mese',r:'Il calendario è andato a ruba. Il magazziniere di agosto, in posa sul transpallet con gli occhiali da sole, ha ricevuto tre proposte di matrimonio.',
+     f:()=>{ S.cash-=2500; S.clients.filter(c=>c.status==='attivo').forEach(c=>c.sat=clamp(c.sat+3,0,100)); mod('all',{mor:3},30); }},
+    {t:'Una torta in mensa',d:'Torta, spumante nei bicchieri di plastica e un brindisi veloce. Poi si torna al lavoro.',e:'−300 €, morale +1 per un mese',r:'La torta è finita in quattro minuti. Il brindisi in sei. Alle dieci si caricava di nuovo.',f:()=>{ S.cash-=300; mod('all',{mor:1},30); }}];
+  return ev; }
+function bdEvent(a){ showEvent(bdOpts({id:'compleanno_ceo',src:'Ufficio del personale',title:`Buon compleanno, capo: ${a} anni`,p:S.boss,a,
+  text:`Entri in ufficio e trovi le luci spente. Poi si accendono tutte insieme: «Sorpresa!». Il magazzino ha fatto la colletta per i tuoi ${a} anni: una torta a forma di bancale, un muletto di cioccolato e un biglietto firmato da tutti, anche da chi di solito non firma niente.`})); }
+function bdOpts(ev){ const a=ev.a||50, B=S.boss;
+  ev.opts=[{t:'Offri tu da bere a tutti',d:'Rilanci: aperitivo per tutto il magazzino, a spese tue. Per un pomeriggio il capo è uno di loro.',e:'−1.200 €, morale +4 per un mese',r:'L\'aperitivo è diventato una cena. Qualcuno ha tirato fuori le foto della festa di dieci anni fa.',f:()=>{ S.cash-=1200; mod('all',{mor:4},30); }},
+    {t:'Prendi il microfono',d:'Il karaoke del magazzino aspettava solo te. Attacca «Azzurro».',e:'Morale +6 per un mese, reputazione +1',req:()=>(B.tal||[]).includes('Re del karaoke'),reqT:'Re del karaoke',r:'Hai cantato «Azzurro» due volte, la seconda a richiesta. Il video gira già nei gruppi dei camionisti.',f:()=>{ mod('all',{mor:6},30); repUp(1); }},
+    {t:'Grazie, ma si lavora',d:'Una fetta di torta in piedi, un grazie veloce e di nuovo al computer. C\'è una gara che scade.',e:'Morale −2 per un mese',r:'La torta è rimasta a metà sul tavolo della mensa. Il biglietto, però, l\'hai messo nel cassetto.',f:()=>mod('all',{mor:-2},30)}];
+  return ev; }
 function bossRetireEvent(){ const B=S.boss, a=ageOf(B);
   showEvent(bossRetOpts({id:'pensione_ceo',auto:1,src:'La Gazzetta del Muletto',title:'Pensare alla pensione?',p:B,a,
     text:`Alla festa per i tuoi ${a} anni il commercialista ti prende da parte: «Hai mai pensato a chi verrà dopo di te?». In magazzino è già partito il toto-successore, con le quote scritte sulla lavagna dei turni.`}));
@@ -6812,7 +6909,16 @@ const AREE={
  moda:{n:'Settimana della moda a Milano',s:'Moda',ic:'divieto',d:7,dest:1,c:[[9.19,45.465,10]]},
  a1:{n:"Cantiere sull'A1",s:'Cantiere A1',ic:'cantiere',d:42,c:[[9.75,45.03,9],[10.05,44.92,9],[10.33,44.81,9],[10.63,44.71,9],[10.92,44.64,9],[11.2,44.55,9]]},
  brennero:{n:'Coda al Brennero',s:'Brennero',ic:'divieto',d:4,c:[[11.5,46.98,11],[11.62,46.8,11],[11.5,46.62,10],[11.36,46.48,10]]},
- po:{n:'Piena del Po',s:'Piena del Po',ic:'pioggia',d:3,c:[[9.69,45.06,8],[10.0,45.12,8],[10.25,45.03,8],[10.48,44.96,8],[10.72,44.93,8],[10.93,45.04,8],[11.14,45.06,8],[11.38,44.98,8],[11.62,44.95,8],[11.88,44.97,8],[12.15,44.96,8],[12.4,44.95,8]]}
+ po:{n:'Piena del Po',s:'Piena del Po',ic:'pioggia',d:3,c:[[9.69,45.06,8],[10.0,45.12,8],[10.25,45.03,8],[10.48,44.96,8],[10.72,44.93,8],[10.93,45.04,8],[11.14,45.06,8],[11.38,44.98,8],[11.62,44.95,8],[11.88,44.97,8],[12.15,44.96,8],[12.4,44.95,8]]},
+ // maltempo su tutto il Nord (dalla 0.123): Friuli, Romagna, Valtellina, Piemonte e Lombardia, Veneto, Appennino, Costa Azzurra, Polesine
+ bora:{n:'Bora a Trieste',s:'Bora',ic:'vento',d:3,c:[[13.77,45.65,13],[13.62,45.76,9],[13.53,45.81,9]]},
+ alluvione:{n:'Alluvione in Romagna',s:'Alluvione',ic:'pioggia',d:6,c:[[11.71,44.35,9],[11.88,44.29,10],[12.04,44.22,11],[12.24,44.14,10],[11.91,44.42,9],[12.2,44.42,11]]},
+ frana:{n:'Frana sulla statale 38',s:'Frana SS38',ic:'divieto',d:7,c:[[9.42,46.14,8],[9.62,46.14,9],[9.87,46.17,10],[10.17,46.21,9]]},
+ nevep:{n:'Neve sull\'A4 tra Torino e Milano',s:'Nevicata',ic:'neve',d:4,c:[[7.68,45.07,17],[7.95,45.2,13],[8.2,45.33,13],[8.42,45.38,12],[8.62,45.45,12],[8.87,45.48,12],[9.12,45.48,15],[9.32,45.51,12]]},
+ grandine:{n:'Grandine tra Verona e Padova',s:'Grandine',ic:'grandine',d:2,c:[[10.99,45.44,12],[11.25,45.45,11],[11.55,45.55,12],[11.88,45.41,12]]},
+ gelo:{n:'Ghiaccio sull\'Appennino',s:'Ghiaccio',ic:'neve',d:3,c:[[8.72,44.5,8],[8.93,44.56,9],[9.95,44.45,10],[11.22,44.15,11]]},
+ tempesta:{n:'Tempesta tra Nizza e Ventimiglia',s:'Tempesta',ic:'vento',d:4,c:[[7.26,43.7,12],[7.42,43.74,8],[7.57,43.79,9],[7.53,43.94,9],[7.75,43.82,8]]},
+ nebbiae:{n:'Nebbia tra Ferrara e Padova',s:'Nebbia',ic:'nebbia',d:4,c:[[11.62,44.84,14],[11.79,45.07,15],[11.88,45.32,12],[11.4,45.05,12],[12.06,45.05,11]]}
 };
 const AREA_MIN=0.03;   // sotto il 3% dei viaggi un magazzino non se ne accorge
 const inArea=(A,lo,la)=>A.c.some(([x,y,r])=>Math.hypot((lo-x)*78.6,(la-y)*111.2)<r);
@@ -6841,10 +6947,47 @@ function modArea(k,o,d){
   (S.aree||[]).filter(a=>a.a===k).forEach(a=>a.until=Math.max(a.until||0,S.day+d)); }
 // la zona compare con l'evento; dopo la risposta resta per la durata dell'effetto (o d giorni); poi sparisce
 function areaStart(ev){ const k=(EVENTS.find(e=>e.id===ev.id)||{}).area; if(!k||!AREE[k]) return false;
-  (S.aree=S.aree||[]).push({a:k,ev:ev.id,day:S.day,until:null}); return true; }
+  (S.aree=S.aree||[]).push({a:k,ev:ev.id,day:S.day,until:null,...(ev.mday?{from:ev.mday}:{})}); return true; }
 function areaDecided(id){ (S.aree||[]).forEach(a=>{ if(a.ev===id&&a.until==null) a.until=S.day+AREE[a.a].d; }); }
 function areaDaily(){ if(S.aree&&S.aree.length) S.aree=S.aree.filter(a=>AREE[a.a]&&(a.until==null?S.day-a.day<=EV_WAIT+3:a.until>S.day)); }
-const areaLeft=a=>{ if(a.until==null) return ''; const d=a.until-S.day; return d<=1?'ultimo giorno':d<14?d+' giorni':wks(d); };
+const areaLeft=a=>{ if(a.from>S.day){ const n=a.from-S.day; return n===1?'domani':'tra '+n+' giorni'; }   // maltempo annunciato
+  if(a.until==null) return ''; const d=a.until-S.day; return d<=1?'ultimo giorno':d<14?d+' giorni':wks(d); };
+/* maltempo con preavviso (dalla 0.123): gli eventi meteo (meteo:1) arrivano 3-4 giorni prima, come un bollettino della radio.
+   Il giorno del maltempo (ev.mday) va nel racconto al posto di {g}, nel calendario e sulla mappa, dove la zona è tratteggiata finché
+   non arriva (a.from). La risposta si sceglie prima e vale da quel giorno: effetti e «com'è andata» arrivano allora (evChoose).
+   Senza risposta, il giorno prima decide il vice. */
+const METEO={lead:[3,4]};
+const GGL=['domenica','lunedì','martedì','mercoledì','giovedì','venerdì','sabato'];
+const mdayTxt=d=>d-S.day<=1?'domani':`${GGL[dateOf(d).getUTCDay()]} ${dateOf(d).getUTCDate()}`;
+function meteoPrep(ev){ if(!ev.meteo||ev.mday!=null) return; ev.mday=S.day+rint(...METEO.lead); if(ev.text) ev.text=ev.text.replace(/\{g\}/g,mdayTxt(ev.mday)); }
+// i capannoni che stanno dentro la zona (non quelli che ci mandano solo i camion): solo loro possono avere danni
+const whInArea=k=>{ const A=AREE[k]; return A&&!A.loc?S.warehouses.filter(w=>{const s=SITES[w.site]; return s&&inArea(A,s.lon,s.lat);}):[]; };
+/* danni del maltempo pesante ai capannoni della zona: secondo la classe dell'edificio (wCl(w).ko: fatiscente 2, vecchio 1,4,
+   standard 1, moderno 0,7, innovativo 0,5) e la protezione p della risposta (0 = nessun danno, 1 = danni pieni).
+   cond: punti di stato dell'immobile; ko: probabilità di rompere una dotazione (il tetto si rompe solo negli edifici fatiscenti e
+   vecchi), da riparare dalla scheda del magazzino; eur: euro di danni per posto pallet (merce bagnata, mezzi ammaccati); A: accuratezza
+   per due settimane (merce da ricontrollare). */
+const DANNI={
+ grandine:{n:'grandine',cond:4,ko:{solare:0.8},eur:1.5},
+ neve:{n:'neve sul tetto',cond:6,ko:{tetto:0.7},eur:0.8},
+ acqua:{n:'acqua nel capannone',cond:12,ko:{ribalte:0.6,ricarica:0.4},eur:5,A:-1},
+ vento:{n:'vento',cond:5,ko:{solare:0.5,tetto:0.5},eur:1}
+};
+function meteoDanni(k,t,p){ const D=DANNI[t]; if(!D||!p) return;
+  whInArea(k).forEach(w=>{ const f=wCl(w).ko*p, L=[];
+    const dc=Math.round(D.cond*f*rnd(0.7,1.3)); if(dc>0){ w.cond=Math.max(0,(w.cond==null?100:w.cond)-dc); L.push(`stato dell'immobile −${dc}`); }
+    Object.entries(D.ko).forEach(([id,q])=>{ if(id==='tetto'?!['fat','vec'].includes(w.cl):!hasDot(w,id)) return;
+      if(isKo(w,id)||Math.random()>=Math.min(1,q*f)) return; (w.ko=w.ko||{})[id]={d:S.day,fine:null}; L.push(koDef(id).n.toLowerCase()+' da riparare'); });
+    const e=Math.round(w.cap*D.eur*f/100)*100; if(e>0){ S.cash-=e; L.push(`${eur(e)} di danni`); }
+    if(D.A) mod(w.id,{A:Math.round(D.A*Math.min(1.5,f)*10)/10},14);
+    if(L.length){ toast(`${D.n[0].toUpperCase()+D.n.slice(1)} a ${w.name} (edificio ${wCl(w).n.toLowerCase()}): ${L.join(', ')}`,'bad'); chron('magazzini',`${AREE[k].s} a ${w.name}: ${L.join(', ')}`); } });
+  kpiNow(); }
+// preparare prima del maltempo i capannoni della zona (sacchi di sabbia, tetti spalati, mezzi al coperto): eu euro per capannone
+function meteoRiparo(k,eu,cosa){ const L=whInArea(k); if(!L.length) return; const c=eu*L.length; S.cash-=c; toast(`${cosa} a ${L.map(w=>w.name).join(', ')}: −${eur(c)}`,''); }
+// afa: pesa secondo il capannone (nei moderni c'è l'aria condizionata, negli innovativi l'isolamento) e meno in montagna
+const AFA_K={fat:1.5,vec:1.25,std:1,mod:0.5,inn:0.25}, MONTI=['AO','BZ','TN','SO','BL'];
+const afaK=w=>(AFA_K[w.cl]||1)*(MONTI.includes(w.prov)?0.4:1);
+function modAfa(o,d){ S.warehouses.forEach(w=>{ const q=afaK(w), m={}; Object.keys(o).forEach(x=>{const v=Math.round(o[x]*q*10)/10; if(v) m[x]=v;}); if(Object.keys(m).length) mod(w.id,m,d); }); }
 const hasTal=n=>ceo().tal.includes(n);
 const actC=()=>{const l=S.clients.filter(c=>c.status==='attivo');return l.length?pick(l):null;};
 // eventi personali: chi può viverli
@@ -6895,7 +7038,7 @@ const SCN_SRC={'La Gazzetta del Muletto':'magazzino','Il Sole 24 Pallet':'edicol
 const SCN_EV={
   guasto:'magazzino',incendio:'magazzino',
   // La Gazzetta del Muletto
-  natale:'festa',superenalotto:'festa',matrimonio:'festa',derby:'festa',pizza:'festa',cesto:'festa',t_derby:'festa',t_pizza:'festa',t_grigliata:'festa',
+  natale:'festa',superenalotto:'festa',anniversario:'festa',compleanno_ceo:'festa',matrimonio:'festa',derby:'festa',pizza:'festa',cesto:'festa',t_derby:'festa',t_pizza:'festa',t_grigliata:'festa',
   t_recita:'festa',t_gratta:'festa',m_festa:'festa',prete:'piazzale',furto:'piazzale',tiktok:'piazzale',t_papa:'piazzale',t_gatto_nero:'piazzale',
   t_epoca:'piazzale',m_spavento:'piazzale',gestionale:'ufficio',stagista:'ufficio',brambilla:'ufficio',t_scenata:'ufficio',t_social:'ufficio',
   t_ipocondria:'ufficio',t_cugino:'ufficio',t_budget:'ufficio',pensione_ceo:'ufficio',klaus:'trattoria',coop_sciopero:'sciopero',ri_bf:'sciopero',
@@ -6908,7 +7051,7 @@ const SCN_EV={
   // Il Mattinale del Ministero
   ispettorato:'ispezione',ztl:'strada',t_multe:'strada',t_rotonda:'strada',t_fumo:'piazzale',
   // Radio Traffico Nord
-  nebbia:'nebbia',neve:'neve',allerta:'pioggia',p_notte:'magazzino',
+  nebbia:'nebbia',neve:'neve',allerta:'pioggia',p_notte:'magazzino',po:'pioggia',nebbiae:'nebbia',nevep:'neve',gelo:'neve',alluvione:'pioggia',grandine:'pioggia',tempesta:'pioggia',
   // Ufficio commerciale, Customer service, Posta elettronica
   t_golf:'golf',d_golf:'golf',m_inglese:'ufficio',t_virgola:'ufficio',p_sonno:'trattativa',aud_buyer:'ispezione',t_ore23:'ufficio_notte',t_insonne:'ufficio_notte'};
 function evScena(id,src){const k=SCN_EV[id]||SCN_SRC[src]||'ufficio'; return SCENE[k]?k:SCENE.ufficio?'ufficio':null;}
@@ -6918,7 +7061,7 @@ const scnHtml=(k,ferma,el=[])=>{if(!k||!SCENE[k]) return ''; el=el.filter(e=>SCE
   return `<div class="ev-scn${ferma?' ferma':''}${k.startsWith('est_')?' est':''}"><i style="background-image:${[...el,k].map(x=>`url(${SCENE[x]})`).join(',')};animation-delay:-${Math.round(performance.now()%2000)}ms" data-scena="${k}" data-el="${el.join(' ')}" aria-hidden="true"></i></div>`;};
 // scene in cima alle finestre (per scheda): la Tecnologia si muove solo con una ricerca in corso. Nell'ufficio del direttore
 // il CEO è uomo o donna come quello della partita; chi porta il caffè (segretaria o segretario) dipende dal nome dell'azienda
-const WSCN={magazzini:()=>estScena(whById(UI.sel.wh)||S.warehouses[0]),personale:'lavoro',tecnologia:'tecnologia',reparti:'sala_server',certificazioni:'audit',clienti:'clienti',customer:'customer',direzione:'consiglio',
+const WSCN={calendario:()=>CAL_SCN[calMonth()[1]],magazzini:()=>estScena(whById(UI.sel.wh)||S.warehouses[0]),personale:'lavoro',tecnologia:'tecnologia',reparti:'sala_server',certificazioni:'audit',clienti:'clienti',customer:'customer',direzione:'consiglio',
   azienda:()=>'direttore_'+(ceo()&&ceo().sx==='f'?'f':'m')+(hashN(S.company.name||'')%2?'f':'m')};
 const scnWin=tab=>{let k=typeof WSCN[tab]==='function'?WSCN[tab]():WSCN[tab]; if(!k) return ''; const el=k.el||[]; if(k.k) k=k.k;
   return scnHtml(k,(tab==='tecnologia'&&!projs().length)||(tab==='reparti'&&!(itOn()&&DEPS.some(k=>depTeam(k)>0))),el);};
@@ -6999,8 +7142,8 @@ const EVENTS=[
              toast('Causa persa: torna al lavoro e incassa dieci mensilità di arretrati','bad'); } }},
         {t:'«Ti trovo io un posto migliore»',d:'Chiami un cliente che cerca personale e gli trovi un lavoro lì, con uno stipendio un po\' più alto. Ritira la causa e ti manda pure un messaggio di ringraziamento.',e:'Nessun costo, reputazione +1',req:()=>ceo().st.neg>=13||ceo().tal.includes('Ex sindacalista'),reqT:'Negoziazione 13 o Ex sindacalista',r:'Nel nuovo posto si trova benissimo, e il cliente pure: ti ha detto che, se hai altre persone così, le prende volentieri.',
          f:function(){ repUp(1); }}]},
- {id:'nebbia',src:'Radio Traffico Nord',title:'Nebbia in Val Padana',area:'nebbia',cond:()=>[10,11,0,1].includes(monthOf(S.day))&&areaW('nebbia').length>0,
-  text:'Stamattina la Val Padana è sparita sotto la nebbia: visibilità sotto i 50 metri da Pavia a Brescia, e la radio parla già di tamponamenti sulla A4. Gli autisti chiamano uno dopo l\'altro: vogliono sapere se possono rallentare, anche a costo di arrivare tardi dai clienti.',
+ {id:'nebbia',src:'Radio Traffico Nord',title:'Nebbia in Val Padana',area:'nebbia',meteo:1,cond:()=>[10,11,0,1].includes(monthOf(S.day))&&areaW('nebbia').length>0,
+  text:'Radio Traffico Nord annuncia per {g} un banco di nebbia fitta su tutta la Val Padana: visibilità sotto i 50 metri da Pavia a Brescia, e sulla A4 si parla già di tamponamenti. Gli autisti chiamano uno dopo l\'altro: vogliono sapere se potranno rallentare, anche a costo di arrivare tardi dai clienti.',
   opts:[{t:'Rallenta tutto',d:'Mandi un messaggio a tutti: velocità ridotta, fari accesi e nessuna fretta. I clienti aspetteranno.',e:'Puntualità fino a −4 per 5 giorni, secondo i viaggi nella nebbia',r:'Gli autisti arrivano tardi ma tutti interi. Qualche cliente brontola, nessuno si fa male.',f:()=>modArea('nebbia',{P:-4},5)},
         {t:'Si viaggia lo stesso',d:'Confermi gli orari: i clienti non pagano per la nebbia. Gli autisti partono, poco convinti.',e:'Puntualità fino a −2 per una settimana, secondo i viaggi nella nebbia; rischio incidente',r:'I camion sono partiti all\'orario solito. In ufficio traffico si è seguita la nebbia alla radio fino a sera.',f:()=>{modArea('nebbia',{P:-2},7); if(Math.random()<0.2){S.cash-=12000;S.rep-=4;toast('Un camion è finito fuori strada: 12.000 € di danni','bad');}}},
         {t:'"Conosco ogni curva"',d:'Prendi tu il telefono e guidi gli autisti curva per curva, come facevi una volta.',e:'Puntualità fino a −1 per una settimana, nessun rischio',req:()=>ceo().tal.includes('Un milione di km al volante'),reqT:'Un milione di km al volante',r:'Hai passato la mattina al telefono, curva dopo curva. Gli autisti dicono che sembravi il navigatore, ma più simpatico.',f:()=>modArea('nebbia',{P:-1},7)}]},
@@ -7043,10 +7186,11 @@ const EVENTS=[
   opts:[{t:'Accetta',d:'Richiami due squadre per il sabato. Il cliente ti ringrazia, le squadre molto meno.',e:'Straordinari −2.000 €, morale −4, soddisfazione +8',r:'Il magazzino ha chiuso alle 23. Il cliente ha scritto «grazie» con tre punti esclamativi.',f:function(){S.cash-=2000;mod('all',{mor:-4},20);const c=this.c;c.sat=clamp(c.sat+8,0,100);}},
         {t:'Rifiuta con cortesia',req:()=>!polOn('cliente'),reqT:'Policy «Il cliente ha sempre ragione» spenta',d:'Gli spieghi che con così poco preavviso non si può fare. Ti saluta in modo freddo.',e:'Soddisfazione −6',r:'Il cliente ha risposto «capisco» e basta. Da un «capisco» così non viene mai niente di buono.',f:function(){const c=this.c;c.sat=clamp(c.sat-6,0,100);}}],
   setup:ev=>{ev.c=pick(S.clients.filter(c=>c.status==='attivo'));ev.title=`Ordine alle 17:58 di venerdì: ${ev.c.name}`;}},
- {id:'afa',src:'Radio Traffico Nord',title:'Afa record',cond:()=>[6,7].includes(monthOf(S.day)),
-  text:'Il termometro in magazzino segna 40 °C. I muletti si surriscaldano, le persone pure, e nel pomeriggio il ritmo del picking crolla. Qualcuno ha già portato un ventilatore da casa.',
-  opts:[{t:'Ventilatori e acqua per tutti',d:'Compri ventilatori industriali e riempi il frigo di bottiglie d\'acqua. Il magazzino respira.',e:'−3.000 €, morale +5',r:'I ventilatori girano a tutta e la scorta d\'acqua è finita entro mezzogiorno. Ma nessuno si è sentito male.',f:()=>{S.cash-=3000;mod('all',{mor:5},30);}},
-        {t:'Turni all\'alba',d:'Sposti i turni alle 5 del mattino per evitare il caldo. Mezzo magazzino lavora a occhi chiusi.',e:'Accuratezza −1 per 2 settimane',r:'Alle cinque del mattino in banchina si sbadiglia parecchio. Qualche collo finisce sullo scaffale sbagliato.',f:()=>mod('all',{A:-1},15)}]},
+ {id:'afa',src:'Radio Traffico Nord',title:'Afa record',meteo:1,cond:()=>[6,7].includes(monthOf(S.day)),
+  text:'L\'Aeronautica annuncia per {g} un\'ondata di calore africano: 38 °C in pianura per una settimana. Nei capannoni vecchi, sotto il tetto di lamiera, si arriverà a 40: i muletti si surriscaldano, le persone pure. Nei magazzini moderni l\'aria condizionata dovrebbe reggere, e in montagna si dorme ancora con la coperta.',
+  opts:[{t:'Ventilatori e acqua per tutti',d:'Compri ventilatori industriali e riempi i frigo di bottiglie d\'acqua, in ogni magazzino.',e:'−1.000 € per magazzino, morale +4 per un mese',r:'I ventilatori girano a tutta e la scorta d\'acqua è finita entro mezzogiorno. Ma nessuno si è sentito male.',f:()=>{S.cash-=1000*S.warehouses.length;mod('all',{mor:4},30);}},
+        {t:'Turni all\'alba',d:'Sposti i turni alle 5 del mattino per evitare il caldo. Mezzo magazzino lavora a occhi chiusi.',e:'Accuratezza fino a −1,5 per 2 settimane, secondo il capannone (meno nei moderni e in montagna)',r:'Alle cinque del mattino in banchina si sbadiglia parecchio. Qualche collo finisce sullo scaffale sbagliato.',f:()=>modAfa({A:-1},15)},
+        {t:'Si lavora come sempre',d:'Orari soliti, portoni aperti e tanta pazienza. Nei capannoni moderni quasi non se ne accorgono.',e:'Morale fino a −6 e puntualità fino a −1,5 per 10 giorni, secondo il capannone (meno nei moderni e in montagna)',r:'Il caldo si è fatto sentire: nel pomeriggio il ritmo del picking è crollato e qualcuno ha portato il ventilatore da casa.',f:()=>modAfa({mor:-4,P:-1},10)}]},
  {id:'decreto',src:'Il Mattinale del Ministero',title:'Decreto Semplificazione',cond:()=>true,
   text:'È uscito il Decreto Semplificazione: 340 pagine che promettono di rendere più semplici le pratiche di trasporto. L\'associazione di categoria ha mandato una circolare di altre 40 pagine per spiegarlo. Nessuno ha ancora capito cosa cambi.',
   opts:[{t:'Studiatelo con calma',d:'Lo fai leggere all\'ufficio traffico, un capitolo al giorno. Nel frattempo le pratiche rallentano.',e:'Puntualità −2 per un mese',r:'Avete letto il decreto riga per riga. Nel frattempo qualche pratica è rimasta sulla scrivania.',f:()=>mod('all',{P:-2},30)},
@@ -7062,14 +7206,15 @@ const EVENTS=[
   text:'Venerdì sera il WMS ha installato da solo un aggiornamento. Lunedì mattina le stampanti non riconoscono più i modelli delle bolle e i camion aspettano in banchina. L\'assistenza risponde con un messaggio registrato.',
   opts:[{t:'Chiama l\'assistenza',d:'Paghi l\'intervento urgente del tecnico. In due giorni le bolle tornano a uscire.',e:'−1.200 €, accuratezza −4 per 2 giorni nei magazzini con il WMS',r:'Il tecnico ha lavorato due giorni. Ha detto che succede spesso, che non è colpa di nessuno.',f:()=>{S.cash-=1200;S.warehouses.filter(w=>w.tech.wms).forEach(w=>mod(w.id,{A:-4},2));}},
         {t:'Bolle a mano',d:'Tiri fuori i blocchetti e si scrivono le bolle a penna. Qualche numero sarà sbagliato.',e:'Accuratezza −8 per 2 giorni nei magazzini con il WMS',r:'Le bolle scritte a mano funzionano, più o meno. Un autista non riesce a leggere la calligrafia del capoturno.',f:()=>S.warehouses.filter(w=>w.tech.wms).forEach(w=>mod(w.id,{A:-8},2))}]},
- {id:'neve',src:'Radio Traffico Nord',title:'Neve al Frejus',area:'neve',cond:()=>[11,0,1,2].includes(monthOf(S.day))&&areaW('neve').length>0,
-  text:'Una nevicata ha chiuso il traforo del Frejus ai mezzi pesanti. La coda arriva fino a Susa e i camion diretti in Francia sono fermi, con gli autisti che chiamano dall\'autogrill. Nessuno sa dire quando riaprirà.',
+ {id:'neve',src:'Radio Traffico Nord',title:'Neve al Frejus',area:'neve',meteo:1,cond:()=>[11,0,1,2].includes(monthOf(S.day))&&areaW('neve').length>0,
+  text:'Il meteo annuncia per {g} una nevicata forte in Val di Susa: il traforo del Frejus chiuderà quasi certamente ai mezzi pesanti. Se succede, la coda arriverà fino a Susa e i camion diretti in Francia resteranno fermi, con gli autisti all\'autogrill e nessuno che sa dire quando si riparte.',
   opts:[{t:'Aspetta che riaprano',d:'Fai aspettare i camion in area di sosta finché il traforo riapre. I clienti francesi aspettano con loro.',e:'Puntualità −4 per 5 giorni',r:'I camion aspettano in fila al piazzale del Frejus. Gli autisti finiscono le scorte di panini.',f:()=>modArea('neve',{P:-4},5)},
+        {t:'Anticipa i viaggi per la Francia',d:'Fai partire prima della neve i carichi della settimana, con gli straordinari.',e:'−2.000 € di straordinari, puntualità −1 per 5 giorni',r:'I camion sono passati sotto il Frejus il giorno prima della neve. In Francia hanno trovato i magazzini dei clienti ancora mezzi vuoti.',f:()=>{S.cash-=2000;modArea('neve',{P:-1},5);}},
         {t:'Devia dal Monte Bianco',d:'Mandi i camion verso il Monte Bianco. Più km e più pedaggi, ma la merce arriva.',e:'−4.000 € di pedaggi, puntualità −1',r:'I camion girano dal Monte Bianco. I pedaggi costano, ma la merce si muove.',f:()=>{S.cash-=4000;modArea('neve',{P:-1},5);}}]},
- {id:'allerta',src:'Radio Traffico Nord',title:'Allerta rossa in Liguria',area:'allerta',cond:()=>[8,9,10].includes(monthOf(S.day))&&areaW('allerta').length>0,
-  text:'La Protezione civile ha diramato l\'allerta rossa sul genovese. Piove da due giorni, le autostrade chiudono e riaprono a singhiozzo e il porto lavora a metà. Gli autisti diretti in Liguria aspettano istruzioni.',
-  opts:[{t:'Ferma i mezzi per due giorni',d:'Tieni i camion in deposito per due giorni. Nessun rischio, ma le consegne slittano.',e:'Puntualità fino a −8 per 4 giorni, secondo i viaggi in Liguria',r:'I camion restano al coperto. Il giorno dopo le strade sono un disastro, ma i mezzi sono tutti interi.',f:()=>modArea('allerta',{P:-8},4)},
-        {t:'Si parte con prudenza',d:'Fai partire i camion con l\'ordine di fermarsi al primo segnale di pericolo. Speri che basti.',e:'Puntualità fino a −3, secondo i viaggi in Liguria; rischio danni seri',r:'Si parte piano, con un occhio al cielo. L\'ufficio traffico segue ogni camion sulla mappa.',f:()=>{modArea('allerta',{P:-3},4); if(Math.random()<0.25){S.cash-=20000;toast('Un rimorchio allagato: 20.000 € di merce rovinata','bad');}}}]},
+ {id:'allerta',src:'Radio Traffico Nord',title:'Allerta rossa in Liguria',area:'allerta',meteo:1,danni:'acqua',cond:()=>[8,9,10].includes(monthOf(S.day))&&areaW('allerta').length>0,
+  text:'La Protezione civile ha diramato l\'allerta rossa sul genovese per {g}: sono attesi due giorni di pioggia fortissima, le autostrade chiuderanno e riapriranno a singhiozzo e il porto lavorerà a metà. Gli autisti diretti in Liguria aspettano istruzioni, e nei capannoni vicino ai torrenti qualcuno guarda già le baie.',
+  opts:[{t:'Ferma i mezzi e prepara i capannoni',d:'Tieni i camion in deposito per due giorni e, nei capannoni della zona, alzi la merce dalle baie e metti i sacchi di sabbia.',e:'Puntualità fino a −8 per 4 giorni, secondo i viaggi in Liguria; 1.500 € per ogni capannone nella zona, con molti meno rischi di danni',r:'I camion sono rimasti al coperto e la merce due ripiani più su. Il giorno dopo le strade erano un disastro, ma i mezzi e i bancali erano tutti interi.',f:()=>{modArea('allerta',{P:-8},4); meteoRiparo('allerta',1500,'Sacchi di sabbia e merce in alto'); meteoDanni('allerta','acqua',0.2);}},
+        {t:'Si parte con prudenza',d:'Fai partire i camion con l\'ordine di fermarsi al primo segnale di pericolo. Speri che basti.',e:'Puntualità fino a −3, secondo i viaggi in Liguria; rischio danni seri, anche ai capannoni della zona',r:'Si parte piano, con un occhio al cielo. L\'ufficio traffico segue ogni camion sulla mappa.',f:()=>{modArea('allerta',{P:-3},4); meteoDanni('allerta','acqua',1); if(Math.random()<0.25){S.cash-=20000;toast('Un rimorchio allagato: 20.000 € di merce rovinata','bad');}}}]},
  {id:'ztl',src:'Il Mattinale del Ministero',title:'Milano lancia "Zero Camion"',area:'ztl',cond:()=>yearOf(S.day)>=2008&&areaW('ztl').length>0,once:true,
   text:'Il Comune di Milano ha presentato "Zero Camion": una nuova ZTL in centro dove entrano solo mezzi Euro 5, e solo dalle 10 alle 12. Metà della tua flotta è più vecchia. I clienti in centro vogliono la merce come prima.',
   opts:[{t:'Rinnova parte della flotta',d:'Compri qualche mezzo nuovo in regola con la ZTL. Una spesa grossa, ma in centro si entra.',e:'−15.000 €',r:'I furgoni nuovi entrano in centro senza problemi. Il commerciale li fotografa per il sito.',f:()=>{S.cash-=15000;}},
@@ -7092,14 +7237,57 @@ const EVENTS=[
         {t:'Tutti sulla via Emilia',d:'Fai uscire i camion e li mandi sulla via Emilia, paese dopo paese. Più lenta, ma senza sorprese.',e:'−3.000 € di gasolio e straordinari, puntualità fino a −1 per 6 settimane',r:'I camion attraversano tutti i paesi della via Emilia. Ora gli autisti sanno dove si mangia il gnocco fritto migliore tra Parma e Modena.',f:()=>{S.cash-=3000;modArea('a1',{P:-1},42);}},
         {t:'Viaggi di notte',d:'Sposti le partenze per l\'Emilia alle quattro del mattino, quando il cantiere è deserto.',e:'Nessun ritardo, ma morale fino a −3 per 6 settimane',r:'Di notte il cantiere è vuoto e i camion passano lisci. Gli autisti un po\' meno: il caffè dell\'autogrill non basta più.',f:()=>modArea('a1',{mor:-3},42)}]},
  {id:'brennero',src:'Radio Traffico Nord',title:'Coda al Brennero',area:'brennero',cond:()=>areaW('brennero').length>0,
+  // la nevicata solo d'inverno; nel resto dell'anno il Tirolo fa passare i camion a contagocce
+  setup:ev=>{ if(![11,0,1,2].includes(monthOf(S.day))) ev.text='Il Tirolo ha deciso un altro blocco a contagocce: al Brennero passano pochi camion all\'ora e la coda in A22 arriva fino a Bolzano. Gli autisti dormono in cabina tra una piazzola e l\'altra. Al telefono, dall\'Austria, rispondono solo in tedesco.'; },
   text:'Una nevicata al passo e i controlli del Tirolo: al Brennero passano pochi camion all\'ora e la coda in A22 arriva fino a Bolzano. Gli autisti dormono in cabina tra una piazzola e l\'altra. Al telefono, dall\'Austria, rispondono solo in tedesco.',
   opts:[{t:'Si aspetta in coda',d:'I camion restano in fila e passano quando tocca a loro. I clienti aspettano con loro.',e:'Puntualità fino a −4 per 4 giorni, secondo i viaggi sull\'A22',r:'La coda si è mossa a passo d\'uomo per quattro giorni. Un autista ha imparato a giocare a scopa con un collega bavarese.',f:()=>modArea('brennero',{P:-4},4)},
         {t:'Giro dal Tarvisio',d:'Mandi i camion per il Friuli e l\'Austria. Più km e più pedaggi, ma la merce si muove.',e:'−5.000 € di pedaggi e gasolio, puntualità fino a −1 per 4 giorni',r:'I camion sono passati dal Tarvisio. Il pedaggio austriaco costa, ma almeno la merce non dorme in A22.',f:()=>{S.cash-=5000;modArea('brennero',{P:-1},4);}},
         {t:'"Ci penso io"',d:'Chiami un vecchio collega di Innsbruck che conosce mezzo ufficio della dogana.',e:'Puntualità fino a −1 per 4 giorni, nessuna spesa',req:()=>ceo().tal.includes('Esperto di dogane'),reqT:'Esperto di dogane',r:'Il tuo contatto di Innsbruck ha fatto due telefonate. I tuoi camion sono passati davanti, tra gli sguardi degli altri autisti.',f:()=>modArea('brennero',{P:-1},4)}]},
- {id:'po',src:'Radio Traffico Nord',title:'Piena del Po',area:'po',cond:()=>[9,10,4].includes(monthOf(S.day))&&areaW('po').length>0,
-  text:'Dopo una settimana di pioggia il Po è salito di sei metri. La Protezione civile chiude i ponti più bassi: tra Piacenza e il Polesine si passa solo dai ponti dell\'autostrada e la coda arriva a Cremona. Gli autisti chiedono se devono provarci lo stesso.',
-  opts:[{t:'Aspetta che riaprano i ponti',d:'Fermi i viaggi che devono passare il Po finché la piena scende. Nessun rischio, ma le consegne slittano.',e:'Puntualità fino a −6 per 3 giorni, secondo i viaggi che passano il Po',r:'La piena è passata senza danni. Per tre giorni i camion sono rimasti da una parte sola del fiume.',f:()=>modArea('po',{P:-6},3)},
+ {id:'po',src:'Radio Traffico Nord',title:'Piena del Po',area:'po',meteo:1,cond:()=>[9,10,4].includes(monthOf(S.day))&&areaW('po').length>0,
+  text:'Dopo una settimana di pioggia il Po sta salendo: l\'agenzia del fiume prevede il colmo della piena per {g}, sei metri sopra il normale. La Protezione civile chiuderà i ponti più bassi e tra Piacenza e il Polesine si passerà solo dai ponti dell\'autostrada, in coda fino a Cremona. Gli autisti chiedono se dovranno provarci lo stesso.',
+  opts:[{t:'Anticipa i viaggi oltre il Po',d:'Nei giorni prima della piena porti dall\'altra parte del fiume tutto quello che si può, con gli straordinari.',e:'−1.500 € di straordinari, puntualità fino a −3 per 3 giorni, secondo i viaggi che passano il Po',r:'I camion hanno passato il Po finché i ponti erano aperti. Il giorno del colmo, sulla sponda giusta c\'era già quasi tutto.',f:()=>{S.cash-=1500;modArea('po',{P:-3},3);}},
+        {t:'Aspetta che riaprano i ponti',d:'Fermi i viaggi che devono passare il Po finché la piena scende. Nessun rischio, ma le consegne slittano.',e:'Puntualità fino a −6 per 3 giorni, secondo i viaggi che passano il Po',r:'La piena è passata senza danni. Per tre giorni i camion sono rimasti da una parte sola del fiume.',f:()=>modArea('po',{P:-6},3)},
         {t:'Tutti dal ponte dell\'autostrada',d:'Mandi i camion sui ponti dell\'A1 e dell\'A13, anche se il giro si allunga parecchio.',e:'−2.500 € di gasolio e pedaggi, puntualità fino a −2 per 3 giorni',r:'I camion hanno passato il Po in autostrada, in coda con mezza Pianura Padana. Lento, ma la merce è arrivata.',f:()=>{S.cash-=2500;modArea('po',{P:-2},3);}}]},
+ // maltempo su tutto il Nord (dalla 0.123): arriva con qualche giorno di preavviso (meteo:1); danni: i capannoni dentro la zona rischiano danni
+ {id:'bora',src:'Radio Traffico Nord',title:'Bora a Trieste',area:'bora',meteo:1,danni:'vento',cond:()=>[10,11,0,1,2].includes(monthOf(S.day))&&areaW('bora').length>0,
+  text:'Per {g} è attesa bora forte su Trieste, con raffiche fino a 150 km/h. Sulla Grande viabilità e sull\'A4 tra Sistiana e Monfalcone chiuderanno ai furgoni e ai telonati vuoti, che con quel vento si piegano come foglie. In porto si ferma tutto quello che ha un telone, e i capannoni vecchi tremano a ogni raffica.',
+  opts:[{t:'Fermi i telonati, si legano i portoni',d:'I mezzi vuoti restano in piazzale; nei capannoni della zona si fissano lamiere, pannelli e portoni prima delle raffiche.',e:'Puntualità fino a −5 per 3 giorni, secondo i viaggi nella zona; 1.000 € per ogni capannone nella zona, con molti meno rischi di danni',r:'La bora ha soffiato per tre giorni. I camion erano fermi, le lamiere legate: in piazzale è volato solo il cappello del portiere.',f:()=>{modArea('bora',{P:-5},3); meteoRiparo('bora',1000,'Lamiere e portoni fissati'); meteoDanni('bora','vento',0.25);}},
+        {t:'Si viaggia solo a pieno carico',d:'Partono solo i bilici pieni, che col peso tengono la strada. Gli altri aspettano, senza fretta.',e:'Puntualità fino a −3 per 3 giorni, secondo i viaggi nella zona; rischio di danni ai capannoni della zona, più forti negli edifici vecchi',r:'I bilici pieni hanno tenuto la strada. Gli altri hanno aspettato in piazzale, sotto raffiche che facevano suonare le ribalte.',f:()=>{modArea('bora',{P:-3},3); meteoDanni('bora','vento',1);}},
+        {t:'Si parte come sempre',d:'Orari soliti per tutti: i clienti non pagano per il vento. Gli autisti triestini scuotono la testa.',e:'Puntualità fino a −1 per 3 giorni; rischio che un telonato si ribalti e di danni ai capannoni della zona',r:'I camion sono partiti all\'orario solito, piegati di lato come barche a vela.',f:()=>{modArea('bora',{P:-1},3); meteoDanni('bora','vento',1); if(Math.random()<0.3){S.cash-=15000;repUp(-2);toast('Un telonato vuoto si è ribaltato in Costiera: 15.000 € di danni e la foto sul giornale','bad');}}}]},
+ {id:'alluvione',src:'Radio Traffico Nord',title:'Alluvione in Romagna',area:'alluvione',meteo:1,danni:'acqua',cond:()=>[3,4,9,10].includes(monthOf(S.day))&&areaW('alluvione').length>0,
+  text:'La Protezione civile ha diramato l\'allerta rossa per {g}: sull\'Appennino romagnolo sono attesi 200 millimetri di pioggia in un giorno e mezzo, e il Lamone, il Montone e il Savio sono già alti. Se gli argini cedono, mezza via Emilia tra Imola e Cesena finirà sott\'acqua, e i capannoni con le baie ribassate per primi.',
+  opts:[{t:'Sacchi di sabbia e merce in alto',d:'Nei capannoni della zona alzi la merce dai ripiani bassi, chiudi le baie con i sacchi e noleggi le pompe. I viaggi in Romagna si fermano finché l\'acqua non scende.',e:'Puntualità fino a −8 per 6 giorni, secondo i viaggi nella zona; 2.500 € per ogni capannone nella zona, con molti meno rischi di danni',r:'L\'acqua è arrivata davvero, color caffellatte. Davanti alle baie ha trovato un muro di sacchi, e la merce era già due ripiani più su.',f:()=>{modArea('alluvione',{P:-8},6); meteoRiparo('alluvione',2500,'Sacchi di sabbia e pompe'); meteoDanni('alluvione','acqua',0.2);}},
+        {t:'Dopo, tutti a spalare il fango',d:'Quando l\'acqua scende mandi i tuoi magazzinieri, con le pale e i furgoni, ad aiutare il paese. I capannoni, intanto, se la cavano da soli.',e:'Puntualità fino a −8 per 6 giorni, reputazione +3, morale +3 per un mese; rischio di danni ai capannoni della zona',r:'I tuoi magazzinieri hanno spalato fango per tre giorni, con gli stivali fino al ginocchio. Il sindaco li ha ringraziati alla radio, uno per uno.',f:()=>{modArea('alluvione',{P:-8},6); meteoDanni('alluvione','acqua',1); repUp(3); mod('all',{mor:3},30);}},
+        {t:'Speriamo che gli argini tengano',d:'Nessuna spesa: gli argini hanno sempre tenuto, dicono in paese. I viaggi in Romagna, intanto, si fermano lo stesso.',e:'Puntualità fino a −8 per 6 giorni, secondo i viaggi nella zona; rischio di danni pesanti ai capannoni della zona, più forti negli edifici vecchi',r:'Gli argini, questa volta, non hanno tenuto. Per due giorni la via Emilia è stata un fiume.',f:()=>{modArea('alluvione',{P:-8},6); meteoDanni('alluvione','acqua',1);}}]},
+ {id:'frana',src:'Radio Traffico Nord',title:'Frana sulla statale 38',area:'frana',meteo:1,cond:()=>[3,4,5,9,10].includes(monthOf(S.day))&&areaW('frana').length>0,
+  text:'Allerta arancione in Valtellina per {g}: tre giorni di pioggia forte sul costone sopra la statale 38, che l\'ANAS sorveglia con i sensori da mesi. Se il versante si muove la strada chiude, e per arrivare a Sondrio resta solo il giro dalla Svizzera. In valle i negozi fanno già scorte.',
+  opts:[{t:'Anticipa le consegne in valle',d:'Fai salire in Valtellina prima della pioggia tutto quello che si può, con gli straordinari.',e:'−1.500 € di straordinari, puntualità fino a −2 per una settimana, secondo i viaggi nella valle',r:'I furgoni sono saliti in valle il giorno prima. Quando la frana è venuta giù, nei negozi di Sondrio gli scaffali erano già pieni.',f:()=>{S.cash-=1500; modArea('frana',{P:-2},7);}},
+        {t:'Giro dalla Svizzera',d:'Mandi i camion dal Maloja e dal Bernina, con la dogana e i passi di montagna. Lungo, ma la merce arriva.',e:'−3.500 € di pedaggi, dogana e gasolio, puntualità fino a −2 per una settimana',r:'I camion hanno fatto il giro della Svizzera, tra passi e dogane. Un autista ha comprato il cioccolato per tutto il magazzino.',f:()=>{S.cash-=3500; modArea('frana',{P:-2},7);}},
+        {t:'«I doganieri li conosco io»',d:'Una telefonata ai doganieri di Castasegna e i tuoi camion passano dalla Svizzera senza perdere mezza giornata.',e:'−1.500 € di gasolio, puntualità fino a −1 per una settimana',req:()=>ceo().tal.includes('Esperto di dogane'),reqT:'Esperto di dogane',r:'Alla dogana di Castasegna ti hanno salutato per nome. I camion sono passati come se fossero di casa.',f:()=>{S.cash-=1500; modArea('frana',{P:-1},7);}},
+        {t:'Si aspetta la riapertura',d:'I viaggi per la valle aspettano che l\'ANAS liberi la strada. I clienti in Valtellina aspetteranno con te.',e:'Puntualità fino a −7 per una settimana, secondo i viaggi nella valle',r:'La statale è rimasta chiusa una settimana. Quando ha riaperto, la coda dei camion arrivava fino a Colico.',f:()=>modArea('frana',{P:-7},7)}]},
+ {id:'nevep',src:'Radio Traffico Nord',title:'Neve in pianura',area:'nevep',meteo:1,danni:'neve',cond:()=>[11,0,1].includes(monthOf(S.day))&&areaW('nevep').length>0,
+  text:'Il meteo annuncia per {g} trenta centimetri di neve tra Torino e Milano, fino in pianura. Sull\'A4 scatterà il divieto per i mezzi pesanti, e i capannoni col tetto vecchio dovranno reggere il peso: nell\'85, a Milano, ne sono venuti giù parecchi.',
+  opts:[{t:'Spalate i tetti e catene a bordo',d:'Nei capannoni della zona una squadra sale sul tetto a spalare; i camion partono con le catene e senza fretta.',e:'Puntualità fino a −3 per 4 giorni, secondo i viaggi nella zona; 1.500 € per ogni capannone nella zona, con molti meno rischi di danni ai tetti',r:'I tetti sono stati spalati due volte al giorno e i camion hanno viaggiato con le catene. A fine nevicata il piazzale sembrava una pista da sci, ma il capannone era intero.',f:()=>{modArea('nevep',{P:-3},4); meteoRiparo('nevep',1500,'Tetti spalati'); meteoDanni('nevep','neve',0.15);}},
+        {t:'Fermi i camion finché non spalano le strade',d:'I camion restano in deposito finché l\'A4 non riapre. Nessun rischio in strada, ma le consegne slittano.',e:'Puntualità fino a −8 per 3 giorni, secondo i viaggi nella zona; rischio di danni ai tetti vecchi della zona',r:'I camion sono rimasti nel piazzale sotto mezzo metro di neve. Gli autisti hanno fatto un pupazzo col gilet catarifrangente.',f:()=>{modArea('nevep',{P:-8},3); meteoDanni('nevep','neve',1);}},
+        {t:'Si parte con le catene',d:'Orari soliti, catene montate e tanta pazienza. Le statali sono aperte, più o meno.',e:'Puntualità fino a −4 per 4 giorni, secondo i viaggi nella zona; rischio di un incidente e di danni ai tetti vecchi della zona',r:'I camion hanno viaggiato a trenta all\'ora tra i fiocchi. In ufficio traffico si è seguita ogni curva sul telefono.',f:()=>{modArea('nevep',{P:-4},4); meteoDanni('nevep','neve',1); if(Math.random()<0.2){S.cash-=10000;toast('Un bilico è finito di traverso in tangenziale: 10.000 € di danni','bad');}}}]},
+ {id:'grandine',src:'Radio Traffico Nord',title:'Allerta grandine',area:'grandine',meteo:1,danni:'grandine',cond:()=>[5,6,7].includes(monthOf(S.day))&&areaW('grandine').length>0,
+  text:'Allerta arancione per {g}: tra Verona e Padova sono attesi temporali con grandine grossa. L\'anno scorso i chicchi erano come noci: in un quarto d\'ora hanno ammaccato mezzo parco auto della zona industriale e bucato i lucernari di tre capannoni.',
+  opts:[{t:'Mezzi al coperto e teli sui lucernari',d:'Nei capannoni della zona i furgoni vanno sotto le tettoie e si coprono i lucernari; per i pannelli solari, più di tanto non si può fare.',e:'Puntualità fino a −2 per 2 giorni, secondo i viaggi nella zona; 800 € per ogni capannone nella zona, con meno rischi di danni',r:'La grandine è arrivata alle quattro del pomeriggio, rumorosa come un camion di ghiaia rovesciato. I furgoni, sotto le tettoie, non si sono accorti di niente.',f:()=>{modArea('grandine',{P:-2},2); meteoRiparo('grandine',800,'Mezzi al coperto'); meteoDanni('grandine','grandine',0.45);}},
+        {t:'Se viene, viene',d:'Nessuna preparazione: magari passa più a nord. I camion viaggiano come sempre.',e:'Puntualità fino a −1 per 2 giorni, secondo i viaggi nella zona; rischio di danni ai mezzi e ai pannelli dei capannoni della zona',r:'Il temporale è passato in un quarto d\'ora. Il rumore sul tetto, chi era in magazzino, se lo ricorderà a lungo.',f:()=>{modArea('grandine',{P:-1},2); meteoDanni('grandine','grandine',1);}}]},
+ {id:'gelo',src:'Radio Traffico Nord',title:'Gelicidio sull\'Appennino',area:'gelo',meteo:1,auto:0,cond:()=>[11,0,1].includes(monthOf(S.day))&&areaW('gelo').length>0,
+  text:'Per {g} il meteo annuncia pioggia che gela appena tocca terra sui valichi dell\'Appennino: il Turchino, i Giovi, la Cisa e la Variante di Valico. Le autostrade preparano gli spargisale, ma con il gelicidio i bilici restano in piazzola finché non passa.',
+  opts:[{t:'Si aspetta in piazzola',d:'I camion che devono passare l\'Appennino si fermano prima dei valichi e aspettano che sciolga.',e:'Puntualità fino a −5 per 3 giorni, secondo i viaggi sui valichi',r:'Il gelicidio è durato una notte e una mattina. I camion hanno aspettato in piazzola, col motore acceso e il termos pieno.',f:()=>modArea('gelo',{P:-5},3)},
+        {t:'Gomme da neve e catene per tutti',d:'Monti le gomme invernali su tutta la flotta e le catene a bordo: chi passa i valichi lo fa in sicurezza.',e:'−3.000 €, puntualità fino a −2 per 3 giorni, secondo i viaggi sui valichi',r:'Con le gomme nuove e le catene i tuoi camion sono passati, piano piano, mentre gli altri aspettavano in piazzola.',f:()=>{S.cash-=3000; modArea('gelo',{P:-2},3);}},
+        {t:'Si passa lo stesso',d:'I clienti non pagano per il ghiaccio: si parte all\'orario solito, con prudenza.',e:'Puntualità fino a −2 per 3 giorni, secondo i viaggi sui valichi; rischio di un incidente',r:'I camion sono partiti all\'orario solito. Sulla Cisa si è visto di tutto, anche un bilico che andava di lato.',f:()=>{modArea('gelo',{P:-2},3); if(Math.random()<0.3){S.cash-=12000;repUp(-2);toast('Un bilico è scivolato sul ghiaccio ai Giovi: 12.000 € di danni','bad');}}}]},
+ {id:'tempesta',src:'Radio Traffico Nord',title:'Tempesta in Costa Azzurra',area:'tempesta',meteo:1,danni:'vento',cond:()=>[9,10].includes(monthOf(S.day))&&areaW('tempesta').length>0,
+  text:'Météo-France ha messo le Alpi Marittime in allerta rossa per {g}: pioggia torrenziale, vento forte e mareggiate sulla costa. La strada del Colle di Tenda è già chiusa, e se l\'autostrada chiude tra Ventimiglia e Nizza i camion per la Francia resteranno dal lato italiano del confine.',
+  opts:[{t:'Consegne anticipate e capannoni chiusi bene',d:'Prima della tempesta porti oltre confine quello che si può, con gli straordinari; nei capannoni della zona si fissano portoni e pannelli.',e:'−2.000 € di straordinari, puntualità fino a −3 per 4 giorni, secondo i viaggi nella zona; 1.000 € per ogni capannone nella zona, con meno rischi di danni',r:'Il giorno della tempesta i camion erano già tornati e i portoni legati. Il mare si è mangiato mezza passeggiata di Mentone, ma non la tua merce.',f:()=>{S.cash-=2000; modArea('tempesta',{P:-3},4); meteoRiparo('tempesta',1000,'Portoni e pannelli fissati'); meteoDanni('tempesta','vento',0.3);}},
+        {t:'Si aspetta dal lato italiano',d:'I camion per Nizza e il Principato aspettano a Ventimiglia che passi la tempesta.',e:'Puntualità fino a −6 per 4 giorni, secondo i viaggi nella zona; rischio di danni ai capannoni della zona',r:'I camion hanno aspettato due giorni all\'autoporto di Ventimiglia. Gli autisti hanno imparato a ordinare il caffè in francese.',f:()=>{modArea('tempesta',{P:-6},4); meteoDanni('tempesta','vento',1);}}]},
+ {id:'nebbiae',src:'Radio Traffico Nord',title:'Nebbia nel Polesine',area:'nebbiae',meteo:1,cond:()=>[10,11,0,1].includes(monthOf(S.day))&&areaW('nebbiae').length>0,
+  text:'Per {g} il meteo dà nebbia fitta tra Ferrara, Rovigo e Padova: sulla Transpolesana e sull\'A13 si vedrà a malapena il camion davanti. Gli autisti del Polesine dicono che è nebbia «da tagliare col coltello», e loro di nebbia se ne intendono.',
+  opts:[{t:'Rallenta tutto',d:'Velocità ridotta, fari accesi e partenze scaglionate. I clienti aspetteranno.',e:'Puntualità fino a −4 per 4 giorni, secondo i viaggi nella nebbia',r:'I camion sono arrivati tardi ma interi. Un autista giura di aver visto un airone attraversare l\'A13.',f:()=>modArea('nebbiae',{P:-4},4)},
+        {t:'Si viaggia lo stesso',d:'Orari soliti: in Polesine la nebbia c\'è da sempre, e i clienti lo sanno.',e:'Puntualità fino a −2 per 4 giorni, secondo i viaggi nella nebbia; rischio incidente',r:'I camion sono partiti all\'orario solito, nel bianco. In ufficio traffico nessuno ha staccato gli occhi dalla mappa.',f:()=>{modArea('nebbiae',{P:-2},4); if(Math.random()<0.2){S.cash-=12000;S.rep-=4;toast('Un camion è finito nel fosso vicino a Rovigo: 12.000 € di danni','bad');}}},
+        {t:'"Conosco ogni curva"',d:'Prendi tu il telefono e guidi gli autisti curva per curva, come facevi una volta.',e:'Puntualità fino a −1 per 4 giorni, nessun rischio',req:()=>ceo().tal.includes('Un milione di km al volante'),reqT:'Un milione di km al volante',r:'Hai passato la mattina al telefono, curva dopo curva. Dicono che conosci la Transpolesana meglio del navigatore.',f:()=>modArea('nebbiae',{P:-1},4)}]},
  {id:'derby',src:'La Gazzetta del Muletto',title:'Derby della Madonnina',cond:()=>!hasTal('Tifo sfegatato'),
   text:'Domenica c\'è stato il derby di Milano e il magazzino è diviso in due: interisti da una parte, milanisti dall\'altra. Stamattina nessuno si rivolge la parola e le liste di picking passano di mano senza un saluto. Qualcuno ha appeso una sciarpa sul muletto avversario.',
   opts:[{t:'Vieta le sciarpe in magazzino',d:'Vieti sciarpe e magliette in magazzino. Le tensioni calano, l\'entusiasmo pure.',e:'Morale −2',r:'Le sciarpe restano negli armadietti. Il derby, però, si discute lo stesso, a voce bassa.',f:()=>mod('all',{mor:-2},20)},
@@ -7754,6 +7942,9 @@ const EVENTS=[
           f:function(){const p=this.p; p.raiseDay=S.day; if(Math.random()<0.67){p.quit={day:S.day+30,why:'Ha scelto la concorrenza per il 20% in più.'}; toast(`${p.name} dà le dimissioni: un mese di preavviso`,'bad');} else toast(`${p.name} resta, ma ci rimane male`,'warn');}}]},
  // controfferta: chi ha firmato tramite l'head hunter, durante il preavviso, riceve un'offerta dal vecchio datore di lavoro (la lancia mgrDaily, fuori dall'estrazione)
  {id:'pensione',solo:true,now:true,src:'Ufficio del personale',title:'Pensione',auto:2,cond:()=>false,text:'',opts:[],restore:ev=>retOpts(ev)},
+ // ricorrenze (dalla 0.123): il compleanno dell'azienda e i compleanni tondi del CEO, lanciati da lifeDaily
+ {id:'anniversario',solo:true,src:'La Gazzetta del Muletto',title:'Compleanno dell\'azienda',auto:3,cond:()=>false,text:'',opts:[],restore:ev=>annOpts(ev)},
+ {id:'compleanno_ceo',solo:true,src:'Ufficio del personale',title:'Compleanno del capo',auto:0,cond:()=>false,text:'',opts:[],restore:ev=>bdOpts(ev)},
  {id:'pensione_ceo',solo:true,now:true,src:'La Gazzetta del Muletto',title:'Pensare alla pensione?',auto:1,cond:()=>false,text:'',opts:[],restore:ev=>bossRetOpts(ev)},
  {id:'ultimatum',solo:true,now:true,src:'Ufficio del personale',title:'Ultimatum',auto:1,cond:()=>false,text:'',opts:[],restore:ev=>ultOpts(ev)},
  // guasti e incendi nei magazzini (koMonth): il racconto si scrive quando succede, le risposte si ricostruiscono dal magazzino
@@ -7950,11 +8141,11 @@ function evReq(reqT,ok){
 }
 function showEvent(ev){
   if(isBot()) return;
-  S.seen[ev.id]=S.day;
+  S.seen[ev.id]=S.day; meteoPrep(ev);   // maltempo: il giorno in cui arriva
   const zona=areaStart(ev);   // eventi con un posto: la zona compare subito sulla mappa
   if(AUTO){ autoEvent(ev); return; }
   if(zona) renderMap();
-  const n=noteAdd({k:'ev',col:ev.col||'red',ic:ev.ic||'evento',src:ev.src,title:ev.title,text:ev.text,due:S.day+EV_WAIT,ev:evPack(ev)});
+  const n=noteAdd({k:'ev',col:ev.col||'red',ic:ev.ic||'evento',src:ev.src,title:ev.title,text:ev.text,due:ev.mday?Math.max(S.day+1,ev.mday-1):S.day+EV_WAIT,ev:evPack(ev)});
   if(!n) return; EVLIVE.set(n,ev);
   // in Classica il tempo si ferma finché non decidi (si può togliere nelle Opzioni), ma la finestra la apri tu dalla colonna
   if(!contMode()&&!(HUM&&HUM.cfg&&HUM.cfg.noPause)&&S.speed){UI.evResume=S.speed; setSpeed(0);}
@@ -7967,10 +8158,12 @@ function openEv(n){
   // chi è coinvolto: il cliente (con logo) e il magazzino, se l'evento ne ha scelto uno
   const w=ev.w||(ev.wh&&S.warehouses.find(x=>x.id===ev.wh));
   const A=ev.area&&AREE[ev.area], aw=A?S.warehouses.map(w=>[w,areaShare(ev.area,w)]).filter(x=>x[1]>=AREA_MIN):[];
-  const zona=A?`<div class="ev-area">${ICONE.ui['m_'+A.ic]?pxSvg(ICONE.ui['m_'+A.ic],32):''}<span>${kw('eventi_zona','Sulla mappa')}: <b>${esc(A.n)}</b>. ${aw.length?'Colpisce '+aw.map(([w,q])=>`${esc(w.name)} (${A.loc?'i camion per la Francia':Math.round(q*100)+'% dei viaggi'})`).join(', ')+'.':'Non tocca i tuoi viaggi.'}</span></div>`:'';
+  const dz=A&&ev.danni?whInArea(ev.area):[];   // maltempo pesante: i capannoni dentro la zona rischiano danni
+  const zona=A?`<div class="ev-area">${ICONE.ui['m_'+A.ic]?pxSvg(ICONE.ui['m_'+A.ic],32):''}<span>${kw('eventi_zona','Sulla mappa')}: <b>${esc(A.n)}</b>${ev.mday?`, ${kw('meteo','previsto')} per ${esc(fmtDate(ev.mday))}`:''}. ${aw.length?'Colpisce '+aw.map(([w,q])=>`${esc(w.name)} (${A.loc?'i camion per la Francia':Math.round(q*100)+'% dei viaggi'})`).join(', ')+'.':'Non tocca i tuoi viaggi.'}${dz.length?` ${kw('danni_meteo','Capannoni dentro la zona')}: ${dz.map(w=>`<b>${esc(w.name)}</b> (${esc(wCl(w).n.toLowerCase())})`).join(', ')}.`:''}</span></div>`
+    :ev.mday?`<div class="ev-area">${pxSvg(ICONE.ui.calendario,32)}<span>${kw('meteo','Previsto')} per <b>${esc(fmtDate(ev.mday))}</b>.</span></div>`:'';
   const who=[ev.p?`<span>${pFace(pImg(ev.p))}${esc(ev.p===S.boss?ev.p.name+' (tu)':ev.p.name)}</span>`:'',ev.c?`<span>${logoSvg(ev.c.name,24)}${esc(ev.c.name)}</span>`:'',w?`<span>${pinIcon()}${esc(w.name)}</span>`:''].join('');
   showModal(`<div class="src"><span>${esc(n.src)}</span><span>${shortDate(n.day)}</span></div><div class="win-b"><h3 class="h3" style="font-size:21px">${esc(n.title)}</h3>${scnHtml(evScena(ev.id,n.src))}${who?`<div class="ev-who">${who}</div>`:''}<p class="ev-x">${esc(n.text)}</p>${zona}<div class="ev-q">Cosa fai?</div>${opts}
-    <button class="btn" data-act="closemodal">Decidi più tardi</button><div class="sm">L'evento resta tra le ${kw('notifiche','notifiche')} ancora ${wks(Math.max(1,n.due-S.day))}, poi sceglie il tuo vice.</div></div>`);
+    <button class="btn" data-act="closemodal">Decidi più tardi</button><div class="sm">${ev.mday?`Il maltempo arriva ${esc(mdayTxt(ev.mday))}: scegli entro ${n.due-S.day<=0?'oggi':n.due-S.day===1?'domani':esc(fmtDate(n.due))}, poi decide il tuo vice. Gli effetti partono dal giorno del maltempo.`:`L'evento resta tra le ${kw('notifiche','notifiche')} ancora ${wks(Math.max(1,n.due-S.day))}, poi sceglie il tuo vice.`}</div></div>`);
   renderNotes();
 }
 // dopo una decisione, se il tempo si era fermato da solo per l'evento, riparte
@@ -8001,8 +8194,8 @@ function evUnpack(p,title,src){
 // la scelta resta in sospeso fino al giorno dopo, così la partita si può salvare nel frattempo
 function evChoose(ev,i){
   const o=ev.opts[i];
-  (S.evPend=S.evPend||[]).push({...evPack(ev),i,day:S.day+1,title:ev.title,src:ev.src});
-  news(ev.src,ev.title,`${ev.text} Scelta: «${o.t}». ${o.d||''} Come andrà lo sapremo domani.`.trim());
+  (S.evPend=S.evPend||[]).push({...evPack(ev),i,day:Math.max(S.day+1,ev.mday||0),title:ev.title,src:ev.src});   // maltempo: il giorno in cui arriva
+  news(ev.src,ev.title,`${ev.text} Scelta: «${o.t}». ${o.d||''} Come andrà lo sapremo ${ev.mday?mdayTxt(ev.mday):'domani'}.`.trim());
 }
 // il giorno dopo: effetti della scelta e notifica azzurra con il racconto (gli avvisi delle scelte finiscono lì dentro)
 function evResolve(p){
@@ -8218,6 +8411,8 @@ function migrateStaff(s){
 // campi aggiunti dopo: capoturno, cooperativa, pianificatori
 function fillSave(s){
   if(!s.office) s.office={plan:0};
+  // prima bolla (dalla 0.123): il giorno dopo la nascita dell'azienda, con il cliente storico; serve al calendario per gli anniversari
+  if(!s.bot&&s.log&&s.day>=1&&!s.log.some(x=>x.k==='bolla1')){ const c=(s.clients||[]).find(x=>x.storico), w=(s.warehouses||[])[0]; s.log.splice(1,0,{d:1,ic:'clienti',t:`Stampata la prima bolla${c?': '+c.name:''}${w?', da '+w.name:''}`,k:'bolla1'}); }
   // customer service (dalla 0.61): addetti in sede e responsabile
   if(s.office.cs==null) s.office.cs=0; if(!s.cs) s.cs={resp:null,q:[],last:-99,log:[]}; if(!s.cs.ov) s.cs.ov=[];
   // pacchetto Reparto IT e Ingegneria (dalla 0.109): reparti, addetti in sede e sesto posto in Direzione (vuoti nelle partite senza pacchetto)
@@ -8546,17 +8741,18 @@ function tenMap(busy){
    più fitti al centro (il cantiere a strisce); i tuoi viaggi che ci passano in rosso tratteggiato, solo dentro la zona;
    accanto a ogni tuo magazzino colpito la quota dei suoi viaggi; al centro l'icona, il nome corto e i giorni che restano */
 const AREA_TX={nebbia:[['#e6eef3',.6],['#ffffff',.78]],pioggia:[[TPAL.B,.45],[TPAL.L,.62]],neve:[['#ffffff',.62],[TPAL.L,.72]],
+  vento:[[TPAL.S,.5],['#ffffff',.62]],grandine:[[TPAL.D,.42],['#ffffff',.66]],
   cantiere:[[TPAL.O,.55],['#ffffff',.6]],giro:[[TPAL.e,.5],['#ffffff',.5]],divieto:[[TPAL.R,.38],['#ffffff',.42]]};
 function areaMap(busy){
   const low=[], top=[], nb=new Map();   // nb: segni già messi accanto a un magazzino (più zone insieme: uno sotto l'altro)
   (S.aree||[]).forEach(a=>{ const A=AREE[a.a]; if(!A) return;
-    const G=8, P=A.c.map(([lo,la,r])=>[...pt(lo,la),r*2]), tx=AREA_TX[A.ic]||AREA_TX.nebbia, d=['',''];   // 2 punti della mappa per km
+    const G=8, P=A.c.map(([lo,la,r])=>[...pt(lo,la),r*2]), tx=AREA_TX[A.ic]||AREA_TX.nebbia, d=['',''], fc=a.from>S.day;   // 2 punti della mappa per km; fc: maltempo annunciato, a scacchi
     const bx=[Math.min(...P.map(p=>p[0]-p[2]*1.2)),Math.max(...P.map(p=>p[0]+p[2]*1.2)),Math.min(...P.map(p=>p[1]-p[2]*1.2)),Math.max(...P.map(p=>p[1]+p[2]*1.2))];
     for(let y=Math.floor(bx[2]/G)*G;y<bx[3];y+=G) for(let x=Math.floor(bx[0]/G)*G;x<bx[1];x+=G){
       const q=Math.min(...P.map(([px,py,r])=>Math.hypot(x+G/2-px,y+G/2-py)/r)), n=((Math.imul(x,73856093)^Math.imul(y,19349663))>>>0)%1000/1000;
-      if(q>0.9+n*0.3) continue;
+      if(q>0.9+n*0.3||fc&&((x+y)/G)&1) continue;
       d[A.ic==='cantiere'?((x+y)/G>>1)&1:q<0.55+n*0.25?1:0]+=`M${x} ${y}h${G}v${G}h-${G}z`; }
-    low.push(`<g pointer-events="none">${d.map((p,i)=>p?`<path d="${p}" fill="${tx[i][0]}" fill-opacity="${tx[i][1]}"/>`:'').join('')}</g>`);
+    low.push(`<g pointer-events="none">${d.map((p,i)=>p?`<path d="${p}" fill="${tx[i][0]}" fill-opacity="${fc?tx[i][1]*0.8:tx[i][1]}"/>`:'').join('')}</g>`);
     if(!A.loc){ const L=new Set(); S.warehouses.forEach(w=>areaTrips(a.a,w).segs.forEach(([u,v])=>{ const [x1,y1]=pt(...u), [x2,y2]=pt(...v);
         L.add(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#16202e" stroke-width="5" opacity=".5"/><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${TPAL.R}" stroke-width="3" stroke-dasharray="6 4"/>`); }));
       if(L.size) top.push(`<clipPath id="arc_${a.a}">${P.map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r*1.1}"/>`).join('')}</clipPath><g clip-path="url(#arc_${a.a})" pointer-events="none">${[...L].join('')}</g>`); }
@@ -8586,7 +8782,8 @@ const TIPF={
 TIPF.area=d=>{ const a=(S.aree||[]).find(x=>x.a===d.id), A=AREE[d.id]; if(!a||!A) return '';
   const ev=EVENTS.find(e=>e.id===a.ev)||{}, L=S.warehouses.map(w=>[w,areaShare(a.a,w)]).filter(x=>x[1]>=AREA_MIN).sort((x,y)=>y[1]-x[1]);
   const eff=w=>S.mods.filter(m=>m.scope===w.id&&m.src===ev.title&&m.until>S.day).map(m=>Object.keys(MOD_N).filter(k=>m[k]).map(k=>`${MOD_N[k].toLowerCase()} ${m[k]>0?'+':'−'}${f1(Math.abs(m[k])).replace(',0','')}`).join(', ')).filter(Boolean).join(', ');
-  return `<div class='tt'>${esc(A.n)}</div>${a.until==null?'Sei ancora da decidere: la risposta è nella colonna delle notifiche.':`Sulla mappa ancora per ${a.until-S.day<=1?'un giorno':wks(a.until-S.day)}.`}<div class='tsep'></div>`
+  const fc=a.from>S.day, dec=(S.evPend||[]).some(p=>p.id===a.ev);
+  return `<div class='tt'>${esc(A.n)}</div>${fc?`Previsto per ${esc(fmtDate(a.from))}. ${dec?'Hai già deciso: gli effetti partono quel giorno.':'La risposta è nella colonna delle notifiche.'}`:a.until==null?'Sei ancora da decidere: la risposta è nella colonna delle notifiche.':`Sulla mappa ancora per ${a.until-S.day<=1?'un giorno':wks(a.until-S.day)}.`}<div class='tsep'></div>`
    +(L.length?L.map(([w,q])=>`<div class='tr'><span>${esc(w.name)}</span><b>${A.loc?'verso la Francia':Math.round(q*100)+'% dei viaggi'}</b></div>${eff(w)?`<div class='sm'>${esc(eff(w))}</div>`:''}`).join(''):'Non tocca i tuoi magazzini.')
    +`<div class='sm' style='margin-top:5px'>${A.loc?'Colpisce i magazzini che lavorano verso la Francia.':A.dest?'Pesa in proporzione alle consegne che finiscono qui.':'Pesa in proporzione ai viaggi che passano di qui: in rosso sulla mappa.'}</div>`; };
 const tipHtml=t=>t.dataset.tipf&&TIPF[t.dataset.tipf]?TIPF[t.dataset.tipf](t.dataset)||t.dataset.tip:t.dataset.tip;
@@ -8697,11 +8894,12 @@ const DOCK=[
  ['espansione','Espansione','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="0" y="4" width="7" height="7" fill="#d8e3ee"/><rect x="0" y="2" width="7" height="2" fill="#8a96a6"/><rect x="8" y="0" width="1" height="5" fill="#ffd23f"/><rect x="6" y="2" width="5" height="1" fill="#ffd23f"/></svg>'],
  ['classifica','Classifica',''],
  ['enciclopedia','Enciclopedia (tasto E)','<svg width="22" height="22" viewBox="0 0 11 11" shape-rendering="crispEdges"><rect x="1" y="0" width="9" height="10" fill="#9b6bff"/><rect x="1" y="0" width="2" height="10" fill="#6f43cf"/><rect x="3" y="9" width="7" height="2" fill="#fff"/><rect x="5" y="2" width="3" height="1" fill="#ffd23f"/><rect x="7" y="3" width="1" height="2" fill="#ffd23f"/><rect x="6" y="5" width="1" height="1" fill="#ffd23f"/><rect x="6" y="7" width="1" height="1" fill="#ffd23f"/></svg>'],
+ ['calendario','Calendario',''],
  ['giornale','Il giornale','<svg width="24" height="20" viewBox="0 0 12 10" shape-rendering="crispEdges"><rect x="0" y="0" width="12" height="10" fill="#f4f1ec"/><rect x="1" y="1" width="10" height="2" fill="#16202e"/><rect x="1" y="4" width="4" height="4" fill="#8a96a6"/><rect x="6" y="4" width="5" height="1" fill="#16202e"/><rect x="6" y="6" width="5" height="1" fill="#16202e"/></svg>']
 ];
-const TITLES={sindacato:'Relazioni industriali',finale:'Report della partita',classifica:'Classifica',policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',traffico:'Ufficio traffico',customer:'Customer service',personale:'Personale',manager:'Manager e direzione',tecnologia:'Tecnologia',certificazioni:'Certificazioni',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP',cassa:'Cassa e bilancio',mese:'Conti del mese scorso',morale:'Morale dei dipendenti',otif:'OTIF e livelli di servizio'};
+const TITLES={calendario:'Calendario',sindacato:'Relazioni industriali',finale:'Report della partita',classifica:'Classifica',policy:'Policy aziendali',azienda:'Azienda e CEO',riepilogo:'Riepilogo dell\'azienda',magazzini:'Magazzini',clienti:'Clienti',gare:'Gare d\'appalto',traffico:'Ufficio traffico',customer:'Customer service',personale:'Personale',manager:'Manager e direzione',tecnologia:'Tecnologia',certificazioni:'Certificazioni',report:'Report KPI settimanale',direzione:'Direzione',espansione:'Espansione',giornale:'Il giornale',enciclopedia:'Enciclopedia di FUP',cassa:'Cassa e bilancio',mese:'Conti del mese scorso',morale:'Morale dei dipendenti',otif:'OTIF e livelli di servizio'};
 // menu a gruppi, uguale su computer e telefono: ogni voce dice in una riga come sta il suo reparto
-const DOCK_G=[['Operazioni',['magazzini','traffico','personale']],['Commerciale',['clienti','gare']],['Azienda',['azienda','manager','tecnologia','sindacato']],['Informazioni',['report','riepilogo','classifica','giornale','enciclopedia']]];
+const DOCK_G=[['Operazioni',['magazzini','traffico','personale']],['Commerciale',['clienti','gare']],['Azienda',['azienda','manager','tecnologia','sindacato']],['Informazioni',['calendario','report','riepilogo','classifica','giornale','enciclopedia']]];
 // finestre unite: le voci di una volta sono schede della finestra madre, con la loro icona del menu
 const WTABS={magazzini:[['magazzini','Magazzini'],['espansione','Nuovo magazzino']],clienti:[['clienti','Clienti'],['customer','Customer service']],
   manager:[['manager','Manager'],['direzione','Direzione']],azienda:[['azienda','CEO e benefit'],['policy','Policy']],tecnologia:[['tecnologia','Ricerca'],['reparti','Reparti tecnici'],['certificazioni','Certificati e audit']]};
@@ -8731,6 +8929,7 @@ const DNOTE={
   tecnologia:()=>{const P=projs(); return P.length>1?['acc',`${P.length} ricerche in corso, la prima finisce tra ${wks(Math.min(...P.map(x=>x[1].left)))}`]:P.length?['acc','Ricerca in corso: ancora '+wks(P[0][1].left)]:['acc','Nessuna ricerca in corso'];},
   certificazioni:()=>certNote(),
   sindacato:()=>riDockNote(),
+  calendario:()=>calNote(),
   report:()=>S.repNew?['acc','Nuovo report del lunedì']:['mut','Arriva ogni lunedì'],
   classifica:()=>rivals().length?['acc',HUM.won?'Partita finita':`Sei ${allCo().filter(c=>!c.over).sort((a,b)=>coValue(b)-coValue(a)).indexOf(HUM)+1}° su ${liveCo().length}`]:null,
   enciclopedia:()=>TOUCH?null:['mut','Si apre anche con il tasto E']};
@@ -8789,7 +8988,7 @@ function otifGap(){ let g=null; S.clients.filter(c=>c.status==='attivo').forEach
   const v=Math.min(k.P-c.sP,c.sA?k.A-c.sA:99); g=g==null?v:Math.min(g,v);}); return g; }
 function renderTop(){
   {const si=seasonOf(S.day), dt=$('#date'), h=seasIcon(si,16)+`<span>${fmtTop(S.day,MOB)}</span>`; if(dt.innerHTML!==h) dt.innerHTML=h;
-   dt.dataset.tip=`<div class='tt'>${SEAS_N[si][1]} ${yearOf(S.day)}</div>${fmtDate(S.day)}. Le committenti vendono di più o di meno secondo la stagione: i volumi da preparare e da consegnare seguono il loro andamento.`;}
+   dt.dataset.tip=`<div class='tt'>${SEAS_N[si][1]} ${yearOf(S.day)}</div>${fmtDate(S.day)}. Le committenti vendono di più o di meno secondo la stagione: i volumi da preparare e da consegnare seguono il loro andamento.<div class='tsep'></div>${TOUCH?'Tocca':'Clic'} per aprire il calendario.`;}
   $('#wkn').textContent=(MOB?'Wk':'Settimana ')+weekOf(S.day); $('#wkn').dataset.tip=`<div class='tt'>Settimana ${weekOf(S.day)} del ${yearOf(S.day)}</div>Il tempo del gioco si conta a settimane: il lunedì arriva il report KPI. ${esc(MODES[modeOf()].d)}`;
   const cm=contMode(); document.querySelector('.spd').hidden=cm; const ck=$('#clk'); ck.hidden=!cm;
   if(cm){const m=modeOf(); ck.innerHTML=`<i></i>${MODES[m].n}${m==='persistente'&&HUM.clock?`<b class="sm" style="color:#c9d3dd">· domani tra ${clockLeft()}</b>`:''}`; ck.dataset.tip=`<div class='tt'>Tempo senza pausa: ${MODES[m].n}</div>${esc(MODES[m].d)} Se non rispondi a un evento entro due settimane, decide il tuo vice.`;}
@@ -8816,7 +9015,7 @@ function openWin(id,opts){
   UI.open[id]=true; if(opts) Object.assign(UI.sel,opts);
   let el=document.getElementById('win-'+id);
   if(!el){
-    el=document.createElement('section'); el.className='win'+(id==='enciclopedia'?' wkw':id==='tecnologia'||id==='report'||id==='riepilogo'||id==='finale'?' xwide':['magazzini','gare','azienda','direzione','manager','certificazioni','cassa','mese','morale','otif','classifica','sindacato'].includes(id)?' wide':''); el.id='win-'+id;
+    el=document.createElement('section'); el.className='win'+(id==='enciclopedia'?' wkw':id==='tecnologia'||id==='report'||id==='riepilogo'||id==='finale'?' xwide':['magazzini','gare','azienda','direzione','manager','certificazioni','cassa','mese','morale','otif','classifica','sindacato','calendario'].includes(id)?' wide':''); el.id='win-'+id;
     el.setAttribute('aria-label',TITLES[id]);
     const i=Object.keys(UI.pos).length, L=MOB?90:Math.round(($('#dock').getBoundingClientRect().right||78)+12);   // a destra del menu
     const p=UI.pos[id]||{x:Math.min(innerWidth-420,L+((i*36)%240)),y:86+((i*30)%180)};
@@ -8970,7 +9169,111 @@ function csRow(){ const n=csNeed(), l=csLoad(), q=S.queue.filter(x=>x.role==='cs
      ${inqHtml(q,'sm')}</div>
     <div class="wh-step"><button class="btn sm2" data-act="fire" data-role="cs" ${S.office.cs<=0?'disabled':''} aria-label="Licenzia: addetto al customer service" data-tip="<div class='tt'>Licenzia</div>Un mese di stipendio di buonuscita, reputazione −0,3. Dal 4° licenziamento in 4 settimane è un'ondata: finisce sul giornale.">−</button><b class="num ${l>1.02?'bad':''}">${S.office.cs}</b><button class="btn sm2 pri" data-act="hire" data-role="cs" aria-label="Assumi: addetto al customer service" data-tip="Assumi">+</button></div></div>`; }
 const CS_HOW={auto:'sistemato dal customer service',manager:'è andato il manager',mail:'risposta per mail',ceo:'ha chiamato il CEO',nessuno:'nessuno ha risposto',tutto:'accettato tutto',supplemento:'con supplemento',meta:'accettato a metà',rifiuto:'rifiutato',magazzino:'accettato',lontano:'troppo lontano, rinuncia',pieno:'nessun magazzino libero',proroga:'prorogato',ritiro:'ritirato'};
+/* ====================== CALENDARIO ====================== */
+// Il calendario da parete «omaggio del gommista» (dalla 0.123): raccoglie in un posto le date che il gioco conosce già (arrivi e
+// partenze, gare e contratti, cantieri, traslochi, audit, avvii, ricerche, maltempo annunciato, decisioni in sospeso, effetti degli
+// eventi, rate, ricorrenze). Si guarda soltanto: nei giorni non si prenota niente (regola: niente agenda).
+// calItems(a,b): voci dal giorno a al giorno b compreso, {d giorno, c categoria (CAL_C), t testo, ic icona, win finestra, sel selezione, cli cliente}
+const CAL_C={pers:['Persone',TPAL.R],cli:['Clienti e gare',TPAL.G],wh:['Magazzini',TPAL.O],tech:['Tecnologia',TPAL.P],meteo:['Maltempo',TPAL.B],ev:['Eventi',TPAL.T],soldi:['Soldi',TPAL.Y],ric:['Ricorrenze',TPAL.e]};
+const CAL_GOMM=['Gommeria Battistrada','Pneumatici Ruotalibera','Gomme e Cerchi F.lli Mescola'];   // chi regala il calendario, uno all'anno
+const CAL_SCN=['neve','nebbia','strada','piazzale','magazzino','trattoria','festa','strada','lavoro','pioggia','nebbia','festa'];   // la foto del mese
+const CAL_MILE=/\bprim[oa]\b|^Nasce|^Addio al consulente|1\.000 giorni|compie 15 anni/i;   // tappe della cronaca che tornano ogni anno
+// feste nazionali: il numero in rosso, come sui calendari veri (non cambiano niente nel gioco)
+const FESTE={'0-1':'Capodanno','0-6':'Epifania','3-25':'Festa della Liberazione','4-1':'Festa del lavoro','5-2':'Festa della Repubblica','7-15':'Ferragosto','10-1':'Ognissanti','11-8':'Immacolata','11-25':'Natale','11-26':'Santo Stefano'};
+function pasqua(y){ const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,
+  i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),x=h+l-7*m+114; return dayOfDate(y,Math.floor(x/31)-1,x%31+1); }
+function festa(d){ const t=dateOf(d), f=FESTE[t.getUTCMonth()+'-'+t.getUTCDate()]; if(f) return f; const p=pasqua(t.getUTCFullYear()); return d===p?'Pasqua':d===p+1?'Pasquetta':''; }
+const calIc=k=>{const r=ICONE.menu[k]||ICONE.ui[k]; return r?pxSvg(r,16):'';};
+function calItems(a,b){ const L=[], add=(d,c,t,o)=>{ if(d!=null&&d>=a&&d<=b) L.push({d,c,t,...(o||{})}); };
+  const yr=(base,f)=>{ for(let k=Math.max(1,Math.ceil((a-base)/365));base+k*365<=b;k++) f(base+k*365,k); };   // ricorrenze: anni di 365 giorni, come i compleanni
+  const B=S.boss, where=w=>w?' a '+w.name:'';
+  // persone
+  S.managers.filter(p=>p.arr!=null&&!p.hired).forEach(p=>add(p.arr,'pers',`Arriva ${p.name}`,{ic:'manager',win:'manager',sel:{mtab:'team'}}));
+  staffPeople().filter(p=>p.quit).forEach(p=>add(p.quit.day,'pers',p.quit.ret?`${p.name} va in pensione`:`${p.name} lascia l'azienda`,{ic:'personale',win:'personale'}));
+  hhList().forEach(h=>add(h.end,'pers',`L'head hunter porta i profili (${statName(h.k)} almeno ${h.min})`,{ic:'manager',win:'manager',sel:{mtab:'hh'}}));
+  Object.values(negs()).filter(n=>n.day!=null).forEach(n=>add(n.day,'pers',`Risponde ${n.nm}`,{ic:'manager',win:'manager',sel:{mtab:'cand'}}));
+  crescL().forEach(g=>add(g.end,'pers',`${g.name} diventa manager`,{ic:'manager',win:'manager',sel:{mtab:'team'}}));
+  if(B.retDay!=null) add(B.retDay,'pers','Vai in pensione: si sceglie chi viene dopo di te',{ic:'azienda',win:'azienda'});
+  if(riOn()) S.warehouses.forEach(w=>{ if(w.tav&&w.tav.next!=null) add(w.tav.next,'pers',`Seduta del tavolo sindacale a ${w.name}`,{ic:'sindacato',win:'sindacato'});
+    if(w.strike) add(w.strike.day,'pers',`Sciopero a ${w.name}`,{ic:'sindacato',win:'sindacato'}); });
+  // clienti e gare
+  S.tenders.filter(t=>!t.done).forEach(t=>add(t.deadline,'cli',`Scade la gara ${cname(t)}${t.bid?' (offerta inviata)':''}`,{ic:'gare',win:'gare',sel:{tender:t.id}}));
+  S.clients.forEach(c=>{ const o={ic:'clienti',win:'clienti',cli:c.id};
+    if(c.status==='avvio') add(c.start,'cli',`Parte il contratto con ${cname(c)}`,o);
+    if(c.status!=='attivo') return;
+    if(c.exit) add(c.exit.day,'cli',`Ultimo camion per ${cname(c)}`,o); else add(c.end,'cli',c.noRenew?`Finisce il contratto con ${cname(c)}, senza rinnovo`:`Scade il contratto con ${cname(c)}`,o);
+    if(c.peak){ add(c.peak.from,'cli',`Inizia il picco di ${cname(c)}`,o); add(c.peak.to,'cli',`Finisce il picco di ${cname(c)}`,o); } });
+  (S.cs.ov||[]).forEach(v=>add(v.to,'cli',`Finisce l'overstock di ${v.cn}`,{ic:'customer',win:'customer'}));
+  // magazzini
+  S.warehouses.forEach(w=>{ const o={ic:'magazzini',win:'magazzini',sel:{wh:w.id}}, b=w.build;
+    if(b) add(S.day+b.left,'wh',b.k==='dot'?`${DOT_ID[b.id].n}: finiscono i lavori a ${w.name}`:b.k==='rist'?`Finisce la ristrutturazione a ${w.name}`:b.k==='wel'?`Finiscono i lavori del welfare a ${w.name}`:`Finisce l'ampliamento a ${w.name}`,o);
+    Object.entries(w.ko||{}).forEach(([id,x])=>{ if(x.fine!=null) add(x.fine,'wh',`${koDef(id).n} riparato a ${w.name}`,o); });
+    if(w.ord) add(w.ord.until,'wh',`Scade l'ordinanza del Comune a ${w.name}`,o); });
+  (S.cantieri||[]).forEach(k=>add(S.day+k.left,'wh',`Apre il nuovo magazzino di ${(SITES[k.site]||{}).name||'cantiere'}`,{ic:'espansione',win:'espansione'}));
+  trList().forEach(T=>{ const o={ic:'magazzini',win:'magazzini',sel:{wh:T.from}}, nm=`${T.nm[0]} → ${T.nm[1]}`;
+    if(T.fase==='prep') add(T.start,'wh',`Parte il trasloco ${nm}`,o);
+    (T.waves||[]).forEach(v=>{ if(v.from>S.day) add(v.from,'wh',`Trasloco ${nm}: ondata di ${v.cli.map(id=>(S.clients.find(c=>c.id===id)||{}).name).filter(Boolean).join(', ')}`,o); });
+    if(T.end) add(T.end,'wh',`Finisce il trasloco ${nm} (stima)`,o); });
+  leases().forEach(x=>add(x.until,'wh',`Finisce l'affitto del capannone di ${x.w.name}`,{ic:'espansione',win:'espansione'}));
+  // certificazioni: audit annuali, rinnovi, straordinari, rilievi da chiudere
+  TECH.forEach(t=>{ if(t.tree!=='cert') return; const one=w=>{ const it=crec(w,t); if(!it) return; const o={ic:'certificazioni',win:'certificazioni',sel:{ctab:w?'mag':'az'}};
+      if(it.pend!=null) return add(it.pend,'wh',`Audit straordinario ${t.name}${where(w)}`,o);
+      if(it.iss==null&&it.susp==null) return add(it.day+t.weeks*7,'wh',`Primo audit ${t.name}${where(w)}`,o);
+      if(it.susp!=null) return; if(it.nc!=null) add(it.nc,'wh',`Rilievi da chiudere: ${t.name}${where(w)}`,o);
+      add(it.next,'wh',`Audit ${it.next>=it.exp?'di rinnovo':'annuale'} ${t.name}${where(w)}`,o); };
+    if(t.site) S.warehouses.forEach(one); else if(R(t.id)) one(null); });
+  // tecnologia: ricerche (stima), avvii, consulenti, Piano Industria 4.0
+  projs().forEach(([k,p])=>{ if(lineStop(k)) return; const t=TECH_ALL.find(x=>x.id===p.tech); if(t) add(S.day+p.left,'tech',`Finisce la ricerca ${t.name}`,{ic:'tecnologia',win:'tecnologia'}); });
+  avvList().filter(x=>!x.esito).forEach(x=>{ const t=TECH_ALL.find(y=>y.id===x.tech), w=whById(x.wh); if(t) add(x.live,'tech',`${x.upd?'Aggiornamento':'Avvio'} di ${t.name}${where(w)}`,{ic:'tecnologia',win:itOn()?'reparti':'tecnologia'}); });
+  if(itOn()&&S.dep) DEPS.forEach(k=>{ const c=S.dep[k].cons; if(c&&c.end!=null) add(c.end,'tech',`Finisce il contratto del consulente di ${DEP[k].n}`,{ic:'reparti',win:'reparti'}); });
+  if(S.i40&&S.i40.until>S.day) add(S.i40.until,'tech','Finisce lo sconto del Piano Industria 4.0',{ic:'tecnologia',win:'tecnologia'});
+  // maltempo annunciato: la zona sulla mappa, oppure l'evento senza zona (l'afa)
+  (S.aree||[]).forEach(x=>{ if(x.from>S.day&&AREE[x.a]) add(x.from,'meteo',AREE[x.a].n,{ic:'m_'+AREE[x.a].ic}); });
+  const noArea=v=>v&&v.vars&&v.vars.mday&&!(EVENTS.find(e=>e.id===v.id)||{}).area;
+  (S.notes||[]).filter(n=>n.k==='ev'&&noArea(n.ev)).forEach(n=>add(n.ev.vars.mday,'meteo',n.title,{ic:'evento'}));
+  (S.evPend||[]).filter(noArea).forEach(p=>add(p.vars.mday,'meteo',p.title,{ic:'evento'}));
+  // eventi: decisioni che aspettano, risultati in arrivo, effetti che finiscono
+  (S.notes||[]).filter(n=>n.k==='ev').forEach(n=>add(n.due,'ev',`Ultimo giorno per decidere: ${n.title}`,{ic:'evento'}));
+  (S.evPend||[]).filter(p=>!(p.vars&&p.vars.mday)).forEach(p=>add(p.day,'ev',`Com'è andata: ${p.title}`,{ic:'evento'}));
+  const fine={}; S.mods.forEach(m=>{ if(m.src&&m.until>S.day) fine[m.src]=Math.max(fine[m.src]||0,m.until); });
+  Object.entries(fine).forEach(([src,d])=>add(d,'ev',`Finisce l'effetto: ${src}`,{ic:'evento'}));
+  // soldi: la rata dei prestiti all'ultimo giorno del mese
+  if((S.loans||[]).length){ const r=S.loans.reduce((x,l)=>x+l.rata,0); for(let d=a;d<=b;d++) if(dateOf(d+1).getUTCDate()===1) add(d,'soldi',`Rata dei prestiti: ${eur(r)}`,{ic:'cassa',win:'cassa'}); }
+  // ricorrenze: compleanni, compleanni dell'azienda (con la festa: ANNI), prima bolla e tappe della cronaca
+  [B,...staffPeople()].forEach(p=>{ if(p.bd!=null&&!p.retired) yr(p.bd,(d,k)=>add(d,'ric',p===B?`Il tuo compleanno: ${k} anni`:`Compleanno di ${p.name}: ${k} anni`,{ic:p===B?'azienda':'personale',win:p===B?'azienda':'personale'})); });
+  yr(0,(d,k)=>add(d,'ric',ANNI.includes(k)?`${S.company.name} compie ${k===1?'un anno':k+' anni'}: si festeggia`:`${k} ${k===1?'anno':'anni'} di ${S.company.name}`,{ic:'azienda'}));
+  (S.log||[]).forEach(x=>{ if(x.d>0&&(x.k||CAL_MILE.test(x.t))) yr(x.d,(d,k)=>add(d,'ric',`${k===1?'Un anno':k+' anni'} fa: ${x.t[0].toLowerCase()+x.t.slice(1)}`,{ic:x.ic})); });
+  return L.sort((x,y)=>x.d-y.d); }
+// la data come sul foglietto: «gio 14» oppure «oggi», «domani»
+const calDayTxt=d=>d===S.day?'Oggi':d===S.day+1?'Domani':`${GG[dateOf(d).getUTCDay()]} ${dateOf(d).getUTCDate()} ${MESI[dateOf(d).getUTCMonth()].slice(0,3)}`;
+const calRow=x=>`<button class="cal-it" data-act="calgo" data-win="${x.win||''}" data-sel='${x.sel?esc(JSON.stringify(x.sel)):''}' data-cli="${x.cli||''}"${x.win||x.cli?'':' data-none="1"'}><i style="background:${CAL_C[x.c][1]}"></i>${calIc(x.ic)}<span>${esc(x.t)}</span></button>`;
+// mese mostrato (UI.sel.calM = [anno, mese]) e giorno scelto (UI.sel.calD)
+function calMonth(){ const t=dateOf(S.day), m=UI.sel.calM||[t.getUTCFullYear(),t.getUTCMonth()]; return m; }
+function calView(){
+  const [y,m]=calMonth(), d0=Math.max(0,dayOfDate(y,m,1)), dN=dayOfDate(y,m+1,0), first=dayOfDate(y,m,1), lead=(dateOf(first).getUTCDay()+6)%7;
+  const sel=UI.sel.calD!=null&&UI.sel.calD>=first&&UI.sel.calD<=dN?UI.sel.calD:(S.day>=first&&S.day<=dN?S.day:first);
+  const items=calItems(d0,dN), by={}; items.forEach(x=>(by[x.d]=by[x.d]||[]).push(x));
+  let cells=''; for(let i=0;i<lead;i++) cells+='<span class="cal-c cal-x"></span>';
+  for(let d=first;d<=dN;d++){ const t=dateOf(d), L=by[d]||[], cs=[...new Set(L.map(x=>x.c))], fe=festa(d), red=t.getUTCDay()===0||!!fe;
+    cells+=`<button class="cal-c${d===S.day?' oggi':''}${d===sel?' on':''}${d<S.day?' past':''}${red?' rosso':''}" data-act="calday" data-d="${d}" aria-pressed="${d===sel}" aria-label="${esc(fmtDate(d))}${fe?', '+esc(fe):''}: ${L.length?L.length+(L.length===1?' cosa':' cose'):'niente'}"${fe?` data-tip="<div class='tt'>${esc(fe)}</div>${esc(fmtDate(d))}"`:''}><b>${t.getUTCDate()}</b><span class="cal-dots">${cs.slice(0,4).map(c=>`<i style="background:${CAL_C[c][1]}"></i>`).join('')}${L.length>4?'<em>+</em>':''}</span></button>`; }
+  const L=by[sel]||[], fe=festa(sel), up=calItems(S.day,S.day+30), nx={}; up.forEach(x=>(nx[x.d]=nx[x.d]||[]).push(x));
+  const gomm=CAL_GOMM[(y-yearOf(0))%CAL_GOMM.length], minM=dateOf(0);
+  const canBack=y>minM.getUTCFullYear()||m>minM.getUTCMonth();
+  return `<div class="cal"><div class="cal-l">
+   <div class="cal-h"><b>${MESI[m][0].toUpperCase()+MESI[m].slice(1)} ${y}</b><span class="sm">Omaggio di ${esc(gomm)} · auguri di buon lavoro</span></div>
+   <div class="sm cal-s">${seasIcon(seasonOf(sel),16)}<span>${kw('stagionalita',SEAS_N[seasonOf(sel)][1])}: le committenti vendono di più o di meno secondo il mese.</span></div>
+   <div class="cal-nav"><button class="btn sm2" data-act="calm" data-v="-1" aria-label="Mese prima" ${canBack?'':'disabled'}>‹</button><button class="btn sm2" data-act="calm" data-v="0"${y===yearOf(S.day)&&m===monthOf(S.day)?' disabled':''}>Oggi</button><button class="btn sm2" data-act="calm" data-v="1" aria-label="Mese dopo">›</button></div>
+   <div class="cal-g" role="group" aria-label="Giorni di ${esc(MESI[m])}">${['lun','mar','mer','gio','ven','sab','dom'].map((g,i)=>`<span class="cal-w${i===6?' rosso':''}">${g}</span>`).join('')}${cells}</div>
+   <div class="cal-leg">${Object.entries(CAL_C).map(([k,[n,c]])=>`<span><i style="background:${c}"></i>${n}</span>`).join('')}</div>
+   <div class="cal-sel"><div class="lab">${esc(fmtDate(sel))}${fe?' · '+esc(fe):''}</div>${L.length?L.map(calRow).join(''):`<div class="sm">${sel<S.day?'Nessuna data da ricordare.':'Niente in programma, per ora.'}</div>`}</div>
+   </div><div class="cal-r"><div class="cal-nx"><div class="lab">${kw('calendario','Prossimi 30 giorni')}</div>${Object.keys(nx).length?Object.entries(nx).map(([d,l])=>`<div class="cal-nd"><b>${calDayTxt(+d)}</b>${l.map(calRow).join('')}</div>`).join(''):'<div class="sm">Niente in vista: un mese tranquillo.</div>'}</div>
+   <div class="sm">Il calendario mostra solo quello che succederà: le decisioni si prendono dalle finestre di ogni reparto.</div>
+  </div></div>`; }
+// riga di stato nel menu: la prossima cosa in calendario (la più vicina, saltando le ricorrenze)
+function calNote(){ const L=calItems(S.day,S.day+14).filter(x=>x.c!=='ric'); if(!L.length) return ['mut','Niente nelle prossime due settimane'];
+  const x=L[0]; return [x.d<=S.day+1?'acc':'mut',`${calDayTxt(x.d)}: ${x.t}`]; }
 const VIEWS={
+ calendario(){ return calView(); },
  azienda(){
   const C=ceo();
   return `<div class="insegna" style="border-color:${S.company.color}">${coLogoSvg(S.company.logo,S.company.color,48)}<div style="min-width:0"><b class="disp">${esc(S.company.name)}</b>${S.company.claim?`<i>${esc(S.company.claim)}</i>`:''}</div></div>
@@ -10252,6 +10555,10 @@ function hireDays(base,wh,r){const att=45+welfarePts('att')+polSum('att')+(S.rep
 const ACT={
  speed(d){setSpeed(+d.v);},
  menu(){setMenu(!UI.menu);},
+ // calendario: mese prima o dopo (0 = torna a oggi), giorno scelto, voce che apre la finestra giusta
+ calm(d){ const v=+d.v; if(!v){ delete UI.sel.calM; delete UI.sel.calD; } else { const [y,m]=calMonth(), t=new Date(Date.UTC(y,m+v,1)); UI.sel.calM=[t.getUTCFullYear(),t.getUTCMonth()]; delete UI.sel.calD; } renderWin('calendario'); },
+ calday(d){ UI.sel.calD=+d.d; renderWin('calendario'); },
+ calgo(d){ if(d.cli){ (UI.cliOpen=UI.cliOpen||{})[d.cli]=true; openWin('clienti'); return; } if(!d.win) return; let s=null; try{ s=d.sel?JSON.parse(d.sel):null; }catch(e){} openWin(d.win,s||undefined); },
  toggle(d){const id=winOf(d.id), el=document.getElementById('win-'+id); if(MOB){setMenu(false); if(el) return openWin(dockGo(id));} UI.open[id]?closeWin(id):openWin(dockGo(id));},
  wtab(d){ (UI.sel.wt=UI.sel.wt||{})[d.p]=d.id; noteSeenWin(d.id); renderWin(d.p); const el=document.getElementById('win-'+d.p); if(el){el.querySelector('.win-b').scrollTop=0; fitWin(el,d.p);} renderDock(); },
  dockw(){ DOCKW=!dockWide(); try{localStorage.setItem('fup-menu-largo',DOCKW?'1':'0');}catch(e){} renderDock(); dockMoveWins(); },
@@ -10531,7 +10838,7 @@ const ACT={
   t.bid=null;renderMap();renderAll();},
  evopt(d){const ev=UI.ev,o=ev&&ev.opts[+d.i]; if(!o) return;
   // gli eventi casuali danno il risultato il giorno dopo; le decisioni sul personale (ultimatum) valgono subito
-  if(EVENTS.some(e=>e.id===ev.id&&!e.now)){ evChoose(ev,+d.i); toast(`«${o.t}»: come andrà lo saprai domani`,'warn'); }
+  if(EVENTS.some(e=>e.id===ev.id&&!e.now)){ evChoose(ev,+d.i); toast(`«${o.t}»: come andrà lo saprai ${ev.mday?mdayTxt(ev.mday):'domani'}`,'warn'); }
   else {evApply(ev,o); news(ev.src,ev.title,`${ev.text} Scelta: «${o.t}». ${o.d||''}`.trim());}
   if(UI.evNote){ noteDel(UI.evNote); UI.evNote=null; }
   closeModal(); evResume(); renderAll();},
@@ -11228,6 +11535,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.123',t:'Calendario e maltempo su tutto il Nord',x:['Nuovo calendario da parete, omaggio del gommista: si apre toccando la data in alto o dal menu. Raccoglie tutte le date in arrivo (manager che arrivano, gare e contratti in scadenza, cantieri, traslochi, audit, ricerche, maltempo annunciato, decisioni da prendere, rate dei prestiti) e le ricorrenze, come i compleanni e l\'anniversario della prima bolla. Tocca una voce e si apre la finestra giusta.','Il maltempo ora si vede arrivare: la radio lo annuncia 3 o 4 giorni prima, la zona compare a scacchi sulla mappa e il giorno va nel calendario. Scegli prima cosa fare (anticipare i viaggi, montare le catene, mettere i sacchi di sabbia): gli effetti partono il giorno del maltempo.','Otto nuovi eventi meteo, così ogni angolo del Nord ha il suo: bora a Trieste, alluvione in Romagna, frana sulla statale 38 in Valtellina, neve sull\'A4 tra Torino e Milano, grandine tra Verona e Padova, gelicidio sui valichi dell\'Appennino, tempesta tra Nizza e Ventimiglia, nebbia nel Polesine.','Il maltempo pesante può rovinare i capannoni che stanno nella zona: pannelli solari, tetti, ribalte e merce bagnata. Gli edifici vecchi soffrono il doppio, quelli innovativi la metà; preparandoti in tempo i danni calano di molto.','L\'afa pesa secondo il capannone: nei moderni c\'è l\'aria condizionata, in montagna si sta freschi. La coda al Brennero per neve arriva solo d\'inverno.','Il compleanno dell\'azienda (al primo anno e poi ogni cinque) e i compleanni tondi del CEO diventano un evento: festa nel piazzale, cena con i clienti, il calendario aziendale con i magazzinieri in posa o una torta in mensa.']},
  {v:'0.122',t:'Testo fermo sul telefono',x:['Su iPhone, girando il telefono in orizzontale e poi di nuovo in verticale, il testo restava più grande del normale. Ora resta sempre della stessa misura.']},
  {v:'0.121',t:'Arriva Marzia Doganali',x:['Sul mercato c\'è un nuovo personaggio speciale, con la stellina: Marzia Doganali, rango A. Viene dalla dogana e dall\'ufficio tecnico di un Comune, è forte in Amministrazione e se la cava bene in Operazioni e Negoziazione.','Tre talenti che ha solo lei. «Cassandra»: nel magazzino che guida guasti e incendi capitano il 30% in meno, perché li vede arrivare, ma nessuno le crede (Leadership −1). «Divisiva»: o la ami o la odi, quindi il morale del magazzino che guida va a +4 o a −4, a seconda del magazzino; da direttore commerciale, nelle gare ogni committente le dà +3 o −3. «Sportello unico»: ampliamenti, dotazioni, ristrutturazioni e lavori del welfare nel suo magazzino durano un quarto in meno, e il ricorso al TAR contro un\'ordinanza va bene due volte su tre.','Accanto a dotazioni, ampliamenti e ristrutturazioni la durata indicata è quella vera, già ridotta dagli ingegneri e da chi guida il magazzino.']},
  {v:'0.120',t:'La scena dei clienti',x:['Anche la scheda Clienti ha la sua scenetta, come il Customer service: l\'ufficio commerciale, con la cartina del Nord dove si accendono le puntine dei clienti, lo scaffale dei campioni (formaggio, vino, panettone, detersivo), la lavagna delle gare con le barre che crescono, la stampante che sputa l\'ordine e il commerciale che stringe la mano al cliente.']},
@@ -11633,6 +11941,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},itOn,itCost,itCeo,depFree,chronMiles,m40Prog,gdprStart,gdprOn,crusRisk,secMiss,frz,avvLive,WINS,POLICIES,genPerson,depAs,ingMag,ingPlan,ingMonth,ingMax,metOf,cantGg,ingTr,welBig,welWhy,welGg,ING,trEst,depRes,itAss,itSys,itNeed,itSupply,itCov,itLoad,itTarget,itTgt,itAff,itKoStart,itKoCands,itMonth,ITS,ITKO,sysObs,sysRec,updDue,avvCost,avvWhy,itFeeK,itFees,whSys,avvBusy,avvList,avvScore,avvProb,avvStart,avvBadOpts,AVV,DEP,DEPS,CONS,IT,depTeam,depOpen,depInn,techLine,lineProj,projs,innWhy,innOk,consSign,consStop,packApply,rentable,edilCls,techWeeks,DIR_ROLES,renderMap,AREE,areaShare,noteAlerts,TR,WV,ORD,trEst,trStart,trList,trDaily,trFx,trBusy,TR_EV,trEvShow,trEvDaily,trDelay,lsRent,lsLet,lsBack,leases,openWin,botMove,botUtil,trKmS,rivalFor,trDests,trClis,whEmpty,wvClose,wvPrice,wvBlock,ordCand,ordDay,ordDaily,DUR_RANK,durOf,INV,invScore,invFee,invTeam,invDaily,invDo,invBand,TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];packApply();},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},TIPF,calItems,calView,calNote,festa,pasqua,whInArea,meteoDanni,DANNI,afaK,annEvent,bdEvent,ANNI,CAL_C,itOn,itCost,itCeo,depFree,chronMiles,m40Prog,gdprStart,gdprOn,crusRisk,secMiss,frz,avvLive,WINS,POLICIES,genPerson,depAs,ingMag,ingPlan,ingMonth,ingMax,metOf,cantGg,ingTr,welBig,welWhy,welGg,ING,trEst,depRes,itAss,itSys,itNeed,itSupply,itCov,itLoad,itTarget,itTgt,itAff,itKoStart,itKoCands,itMonth,ITS,ITKO,sysObs,sysRec,updDue,avvCost,avvWhy,itFeeK,itFees,whSys,avvBusy,avvList,avvScore,avvProb,avvStart,avvBadOpts,AVV,DEP,DEPS,CONS,IT,depTeam,depOpen,depInn,techLine,lineProj,projs,innWhy,innOk,consSign,consStop,packApply,rentable,edilCls,techWeeks,DIR_ROLES,renderMap,AREE,areaShare,noteAlerts,TR,WV,ORD,trEst,trStart,trList,trDaily,trFx,trBusy,TR_EV,trEvShow,trEvDaily,trDelay,lsRent,lsLet,lsBack,leases,openWin,botMove,botUtil,trKmS,rivalFor,trDests,trClis,whEmpty,wvClose,wvPrice,wvBlock,ordCand,ordDay,ordDaily,DUR_RANK,durOf,INV,invScore,invFee,invTeam,invDaily,invDo,invBand,TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];packApply();},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>

@@ -185,7 +185,7 @@ async def phone(b, w, h, name, errs):
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
     await pg.tap('#burger'); await pg.wait_for_timeout(250)
     assert await pg.evaluate(FITS, '#dock'), f'{name}: menu aperto fuori schermo'
-    nv = 12 + (1 if ri else 0) + (1 if await pg.evaluate('window.__FUP.HUM.bots.length') else 0)   # la Classifica c'è solo con gli avversari
+    nv = 13 + (1 if ri else 0) + (1 if await pg.evaluate('window.__FUP.HUM.bots.length') else 0)   # la Classifica c'è solo con gli avversari
     assert len(await pg.query_selector_all('#dock button[data-act=toggle]')) == nv, f'{name}: mancano voci nel menu'
     assert len(await pg.query_selector_all('#dock .dg')) == 4, f'{name}: il menu non ha i 4 gruppi'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_menu.png'))
@@ -225,7 +225,7 @@ async def phone(b, w, h, name, errs):
     await pg.evaluate("()=>{const F=window.__FUP; ['regolamento','barcode'].forEach(t=>F.S.researched[t]=true); F.ACT.hiremgr({id:'chiara'}); if(!F.S.tenders.some(t=>!t.done)) F.newTender();}")
     # un talento in banchina in crescita: la sua scheda nella finestra Manager deve stare nello schermo
     await pg.evaluate("()=>{const S=window.__FUP.S,w=S.warehouses[0]; S.cresc=[{id:'gt1',name:'Mirko Pozzi',sx:'m',bd:S.day-27*365,face:3,role:'pick',wh:w.id,wn:w.name,k:'op',star:0,men:1,day0:S.day-100,end:S.day+265}];}")
-    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','gare','report','personale','manager','giornale','tecnologia','enciclopedia']+(['sindacato'] if ri else []):
+    for wn in ['azienda','riepilogo','magazzini','traffico','clienti','gare','report','personale','manager','giornale','calendario','tecnologia','enciclopedia']+(['sindacato'] if ri else []):
         await menu(pg, wn)
         if wn in TABS: await pg.tap(f'#win-{wn} [data-act=wtab][data-id={wn}]')   # dal menu si apre la scheda con un problema: si riparte dalla prima
         assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn} esce dallo schermo'
@@ -633,7 +633,7 @@ async def main():
         assert await pg.evaluate("document.querySelector('#ov [aria-label=Viaggi]')!==null"), 'lente Viaggi non disegnata'
         await pg.screenshot(path=os.path.join(OUT, 'shot_lente_viaggi.png'))
         await pg.keyboard.press('KeyL')  # torna alla mappa normale
-        for w in ['azienda','magazzini','traffico','clienti','gare','report','personale','manager','giornale','classifica','tecnologia']:
+        for w in ['azienda','magazzini','traffico','clienti','gare','report','personale','manager','giornale','calendario','classifica','tecnologia']:
             await pg.click(f'#dock [data-id={w}]')
             for t in TABS.get(w, []) + ([w] if w in TABS else []):   # ogni scheda, poi di nuovo la prima
                 await pg.click(f'#win-{w} [data-act=wtab][data-id={t}]')
@@ -925,7 +925,7 @@ async def main():
         assert not r['bad'] and r['n'] >= 38, r
         # scene in cima alle finestre: Magazzini, Tecnologia, Reparti tecnici, Certificati e audit, Customer service, Direzione, Azienda e CEO (3× nelle finestre larghe, 2× nelle strette);
         # la Tecnologia è ferma senza ricerca e si muove con una ricerca in corso
-        r = await pg.evaluate('''()=>{const F=window.__FUP,out={},P={magazzini:'magazzini',personale:'personale',tecnologia:'tecnologia',reparti:'tecnologia',certificazioni:'tecnologia',clienti:'clienti',customer:'clienti',direzione:'manager',azienda:'azienda'};F.newGame('marco',null,{mode:'classica',win:{},it:true});F.S.researched.direzione=true;
+        r = await pg.evaluate('''()=>{const F=window.__FUP,out={},P={calendario:'calendario',magazzini:'magazzini',personale:'personale',tecnologia:'tecnologia',reparti:'tecnologia',certificazioni:'tecnologia',clienti:'clienti',customer:'clienti',direzione:'manager',azienda:'azienda'};F.newGame('marco',null,{mode:'classica',win:{},it:true});F.S.researched.direzione=true;
           const apri=tab=>{document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.ACT.toggle({id:P[tab]}); F.ACT.wtab({p:P[tab],id:tab}); return document.querySelector('#wins .win .ev-scn');};
           for(const [tab,w] of Object.entries(F.WSCN)){let k=typeof w==='function'?w():w; k=k.k||k; const d=apri(tab), i=d&&d.querySelector('i'); out[tab]=!!i&&i.dataset.scena===k&&i.offsetWidth===(['clienti','customer','personale'].includes(tab)?320:tab==='magazzini'?432:480);}   // offsetWidth: la misura vera, anche mentre la finestra si apre con lo zoom
           // esterni dei magazzini: il capannone segue la classe dell'edificio (celle frigo: quello frigorifero), sopra le dotazioni dell'area esterna
@@ -1220,7 +1220,7 @@ async def main():
         # eventi con un posto (0.106): la zona compare sulla mappa e la risposta pesa su ogni magazzino in proporzione ai suoi viaggi
         # nella zona. Il giocatore di questa partita non fa offerte: per il controllo gli si presta un cliente in Lombardia (poi si toglie).
         # Si prende l'evento la cui zona tocca di più i suoi viaggi (P0 = puntualità della prima risposta)
-        P0 = {'nebbia': -4, 'allerta': -8, 'moda': -2, 'a1': -2, 'brennero': -4, 'po': -6}
+        P0 = {'nebbia': -4, 'allerta': -8, 'moda': -2, 'a1': -2, 'brennero': -4, 'po': -3}
         ev_id = await pg.evaluate("""(P0)=>{const F=window.__FUP,H=F.HUM; document.querySelectorAll('.win [data-act=close]').forEach(b=>b.click()); F.cardsOff();
           H.notes=H.notes.filter(n=>n.k!=='ev'); H.evPend=[]; H.aree=[];   // un evento con la zona capitato prima per caso non deve contare
           const c0=H.bots.flatMap(b=>b.clients)[0]; H.clients.push({...c0,id:'clzona',req:[],line:null,peak:null,wh:H.warehouses[0].id,status:'attivo',zone:'reg_lom',mode:'consegna',pal:300,stock:250,sat:60});
@@ -1231,7 +1231,7 @@ async def main():
         assert a['aree'] == 1 and a['mappa'] == 1 and 'Sulla mappa' in a['win'], f'zona dell\'evento {ev_id}: {a}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_evento_zona.png'))
         await pg.click('#modal [data-act=evopt][data-i="0"]')
-        a = await pg.evaluate("""([id,p0])=>{const F=window.__FUP,S=F.S,tt=F.EVENTS.find(e=>e.id===id).title; for(let i=0;i<2;i++) F.step();
+        a = await pg.evaluate("""([id,p0])=>{const F=window.__FUP,S=F.S,tt=F.EVENTS.find(e=>e.id===id).title; for(let i=0;i<8&&(S.evPend||[]).length;i++) F.step(); F.step();   // maltempo: la risposta vale dal giorno annunciato
           const q=S.warehouses.map(w=>{const s=F.areaShare(id,w), m=S.mods.find(x=>x.scope===w.id&&x.src===tt); return [Math.round(s*1000)/1000, m?m.P:null];});
           const ok=q.every(([s,p])=>s<0.03?p==null:Math.abs(p-Math.round(p0*s*10)/10)<0.15);
           const all=S.mods.some(x=>x.scope==='all'&&x.src===tt), z=S.aree[0], until=z&&z.until;
@@ -1240,6 +1240,49 @@ async def main():
           return {q,ok,all,until,dopo:S.aree.length,mappa:document.querySelectorAll('#ov [data-tipf=area]').length,hit:q.some(([s])=>s>=0.03)};}""", [ev_id, P0[ev_id]])
         assert a['hit'] and a['ok'] and not a['all'] and a['until'] and a['dopo'] == 0 and a['mappa'] == 0, f'effetto di {ev_id} in proporzione ai viaggi: {a}'
         print(f'evento con un posto «{ev_id}»: quota dei viaggi e puntualità per magazzino', a['q'])
+        # maltempo con preavviso (0.123): arriva 3-4 giorni prima, la zona è a scacchi sulla mappa, il giorno va nel calendario,
+        # la risposta vale dal giorno del maltempo; il maltempo pesante rovina i capannoni dentro la zona secondo la classe dell'edificio
+        await pg.evaluate("""()=>{const F=window.__FUP,H=F.HUM; document.querySelectorAll('.win [data-act=close]').forEach(b=>b.click()); F.cardsOff();
+          H.notes=H.notes.filter(n=>n.k!=='ev'); H.evPend=[]; H.aree=[]; const w=H.warehouses[0], A=F.AREE.grandine;
+          window.__w0={site:w.site,cl:w.cl,dot:w.dot,ko:w.ko,cond:w.cond,prov:w.prov};
+          const sid=Object.keys(F.SITES).find(id=>{const s=F.SITES[id]; return A.c.some(([x,y,r])=>Math.hypot((s.lon-x)*78.6,(s.lat-y)*111.2)<r);});
+          Object.assign(w,{site:sid,prov:F.SITES[sid].prov,cl:'fat',dot:{...(w.dot||{}),solare:{day:0}},ko:{},cond:100});}""")
+        await pg.evaluate(FIRE, 'grandine')
+        m = await pg.evaluate("""()=>{const F=window.__FUP,S=F.S,n=S.notes.find(x=>x.k==='ev'&&x.ev&&x.ev.id==='grandine'), md=n.ev.vars.mday, a=S.aree[0]; F.renderMap(); F.ACT.note({id:n.id});
+          return {lead:md-S.day,due:n.due===md-1,from:a&&a.from===md,cal:F.calItems(S.day,md).some(x=>x.c==='meteo'&&x.d===md),g:/[{]g[}]/.test(n.text),
+            win:document.querySelector('#modal').innerText,tip:F.TIPF.area({id:'grandine'}),cond0:S.warehouses[0].cond};}""")
+        assert m['lead'] in (3, 4) and m['due'] and m['from'] and m['cal'] and not m['g'], f'maltempo annunciato: {m}'
+        assert 'Capannoni dentro la zona' in m['win'] and 'previsto per' in m['win'] and 'Previsto per' in m['tip'], f'maltempo: finestra e tooltip {m["win"][:300]} {m["tip"][:120]}'
+        await pg.wait_for_timeout(450)   # finestre e animazioni ferme
+        await pg.screenshot(path=os.path.join(OUT, 'shot_meteo_preavviso.png'))
+        await pg.click('#modal [data-act=evopt][data-i="1"]')   # «Se viene, viene»: danni pieni
+        m = await pg.evaluate("""()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0],md=S.evPend[0].day,o={};
+          while(S.day<md-1) F.step(); o.prima=!w.ko.solare&&!S.mods.some(x=>x.src==='Allerta grandine'); const c1=w.cond; F.step();
+          const r=S.notes.find(n=>n.k==='res'&&n.title==='Allerta grandine'); o.dopo=w.cond<c1-2&&!!w.ko.solare; o.msg=r?(r.msg||[]).map(x=>x[0]).join(' / '):'';
+          Object.assign(w,window.__w0); return o;}""")
+        assert m['prima'] and m['dopo'] and 'Grandine a' in m['msg'], f'grandine sul capannone fatiscente: {m}'
+        print('maltempo con preavviso: danni al capannone fatiscente', m['msg'])
+        # calendario: si apre dalla data in alto; un giorno mostra le sue voci, una voce apre la finestra giusta; il mese si sfoglia
+        await pg.evaluate("()=>{const F=window.__FUP; F.cardsOff(); document.querySelector('#modal').innerHTML=''; if(!F.S.tenders.some(t=>!t.done)) F.newTender();}")
+        await pg.click('#date')
+        c = await pg.evaluate("""()=>{const F=window.__FUP,S=F.S,t=S.tenders.find(x=>!x.done),o={};
+          o.win=!!document.querySelector('#win-calendario .cal-g'); o.oggi=!!document.querySelector('#win-calendario .cal-c.oggi');
+          o.anni=F.calItems(0,365*5+1).some(x=>x.c==='ric'&&x.t.includes('compie 5 anni')); o.bolla=S.log.some(x=>x.k==='bolla1');
+          o.pasqua=F.festa(F.pasqua(2003))==='Pasqua'&&new Date(Date.UTC(2002,0,1)+F.pasqua(2003)*864e5).getUTCDate()===20;
+          F.ACT.calday({d:t.deadline}); const b=[...document.querySelectorAll('#win-calendario .cal-sel .cal-it')].find(x=>x.innerText.includes('Scade la gara'));
+          o.gara=!!b; if(b) b.click(); o.apre=!!document.querySelector('#win-gare'); F.ACT.calm({v:1}); F.ACT.calm({v:1}); o.mese=document.querySelector('#win-calendario .cal-h b').innerText;
+          F.ACT.calm({v:0}); return o;}""")
+        assert c['win'] and c['oggi'] and c['anni'] and c['bolla'] and c['pasqua'] and c['gara'] and c['apre'], f'calendario: {c}'
+        await pg.evaluate("()=>{document.querySelectorAll('#win-gare [data-act=close]').forEach(b=>b.click());}")
+        await pg.wait_for_timeout(450)   # finestre e animazioni ferme
+        await pg.screenshot(path=os.path.join(OUT, 'shot_calendario.png'))
+        # ricorrenze che diventano eventi: il compleanno dell'azienda e quello tondo del CEO
+        e = await pg.evaluate("""()=>{const F=window.__FUP,S=F.S; document.querySelectorAll('.win [data-act=close]').forEach(b=>b.click()); S.notes=S.notes.filter(n=>n.k!=='ev'); S.evPend=[];
+          F.annEvent(10); const n=S.notes.find(x=>x.k==='ev'&&x.ev&&x.ev.id==='anniversario'); F.ACT.note({id:n.id}); const t=document.querySelector('#modal').innerText, k=document.querySelectorAll('#modal [data-act=evopt]').length;
+          document.querySelector('#modal [data-act=evopt][data-i="2"]').click(); F.step(); const r=S.notes.find(x=>x.k==='res'&&x.title.includes('compie 10 anni'));
+          F.bdEvent(50); const b=S.notes.find(x=>x.k==='ev'&&x.ev&&x.ev.id==='compleanno_ceo'); const ok=!!b&&b.title.includes('50 anni'); if(b) F.ACT.note({id:b.id}); const kb=document.querySelectorAll('#modal [data-act=evopt]').length;
+          document.querySelector('#modal').innerHTML=''; S.notes=S.notes.filter(n=>n.k!=='ev'); return {t:t.slice(0,80),k,res:!!r,ok,kb};}""")
+        assert e['k'] == 4 and e['res'] and e['ok'] and e['kb'] == 3, f'eventi delle ricorrenze: {e}'
         # vittoria: una condizione facile fa comparire la finestra di fine partita
         w = await pg.evaluate('''()=>{const F=window.__FUP,H=F.HUM; document.querySelector('#modal').innerHTML=''; H.cfg.reputazione=1; F.checkWin();
           return {won:H.won,txt:document.querySelector('#modal').innerText};}''')
