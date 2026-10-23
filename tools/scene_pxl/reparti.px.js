@@ -242,3 +242,83 @@ scene("tecnologia", { w: SW, h: SH, bg: "L", world: { light: [-0.6, -1], ground:
     stamp("tec1", 62, 61), stamp("sedia_uff", 62, 72),
     stamp("tec2", 92, 61), stamp("sedia_uff", 92, 72)),
 )
+
+// ================================================================ SALA SERVER (pacchetto Reparto IT e Ingegneria)
+// Per gli eventi della fonte «Sala server» e del Reparto IT, e in cima alla scheda Reparti tecnici: tre armadi coi led
+// (gli stessi dell'ufficio tecnologie), i cavi che salgono nella canalina, il condizionatore con la ventola che gira,
+// il sistemista col portatile, un post-it sull'armadio e la luce d'allarme che lampeggia.
+persona("_sis", { testa: "corti", swap: { B: "T", b: "t", M: "N" } })
+sprite("sistemista", { w: 14, h: 21, outline: "K", pivot: "bottom" }, stamp("__sis", 0, 1),
+  rect(8, 11, 6, 4, "D"), rect(9, 11, 5, 3, "d"), hline(8, 15, 6, "s"))                              // il portatile aperto in mano
+anim("schermo_sis", { w: 4, h: 2, fps: FPS }, frame({ hold: 4 }, rect(0, 0, 4, 2, "u")), frame({ hold: 4 }, rect(0, 0, 2, 2, "u"), rect(2, 0, 2, 2, "G")))
+// il condizionatore a parete: la ventola gira (4 posizioni, un giro ogni 4 fotogrammi), il display segna 18 gradi
+anim("clima_sala", { w: 32, h: 24, frames: LOOP, fps: FPS, outline: "K" }, (c) => {
+  c.rect(0, 0, 32, 24, "S"); c.rect(0, 0, 32, 2, "W"); c.vline(31, 2, 22, "s"); c.hline(0, 23, 32, "s")
+  c.circ(11, 12, 8, "d"); c.circ(11, 12, 7, "D")
+  const p = c.frame % 4, R = [[0, -6, 0, 6], [-4, -4, 4, 4], [-6, 0, 6, 0], [-4, 4, 4, -4]][p]
+  c.line(11 + R[0], 12 + R[1], 11 + R[2], 12 + R[3], "j"); c.line(11 - R[1], 12 + R[0], 11 + R[1], 12 - R[0], "j"); c.px(11, 12, "W")
+  c.rect(22, 5, 8, 6, "K"); c.text(23, 6, "18", "G"); [14, 17, 20].forEach((y) => c.hline(22, y, 8, "s"))
+})
+// la luce d'allarme sopra la porta: lampeggia ogni 8 fotogrammi
+anim("allarme", { w: 6, h: 5, fps: FPS, outline: "K" },
+  frame({ hold: 4 }, rect(0, 0, 6, 4, "r"), hline(0, 4, 6, "D")),
+  frame({ hold: 4 }, rect(0, 0, 6, 4, "R"), rect(1, 1, 2, 1, "e"), hline(0, 4, 6, "D")))
+sprite("postit", { w: 5, h: 5, outline: "K" }, rect(0, 0, 5, 5, "Y"), hline(1, 1, 3, "y"), hline(1, 3, 2, "y"))
+// la piastrella del pavimento flottante sollevata, coi cavi che spuntano
+sprite("piastrella", { w: 14, h: 9, outline: "K", pivot: "bottom" }, rect(0, 0, 14, 3, "S"), hline(0, 2, 14, "s"), rect(1, 3, 2, 6, "d"), rect(11, 3, 2, 6, "d"),
+  curve([4, 9, 6, 4, 9, 9], "Y"), curve([6, 9, 8, 5, 11, 9], "B"))
+
+scene("sala_server", { w: SW, h: SH, bg: "d", world: { light: [-0.6, -1], ground: 66 } },
+  layer("muro",
+    rect(0, 0, SW, 3, "K"), rect(0, 5, SW, 3, "D"), hline(0, 8, SW, "K"),                              // la canalina dei cavi
+    ...[18, 44, 70].map((x) => [vline(x - 4, 8, 4, "Y"), vline(x, 8, 4, "B"), vline(x + 4, 8, 4, "G")]).flat(),
+    rect(0, 46, SW, 26, "j"), ...[52, 58, 64, 70].map((y) => hline(0, y, SW, "s")), ...Array.from({ length: 14 }, (_, i) => vline(i * 12 + 4, 46, 26, "s")),
+    rect(96, 14, 18, 32, "D"), box(96, 14, 18, 32, "K"), rect(99, 17, 5, 3, "L"), px(110, 30, "Y"),    // la porta tagliafuoco
+    stamp("allarme", 102, 9), stamp("clima_sala", 122, 12)),
+  layer("arredi",
+    stamp("server", 18, 66), stamp("server", 44, 66), stamp("server", 70, 66), stamp("postit", 49, 20),
+    stamp("piastrella", 140, 66)),
+  layer("ombre", { shade: true }, ellipse(44, 67, 34, 1, "K"), ellipse(110, 67, 6, 1, "K")),
+  layer("persone", { sort: "y" }, stamp("sistemista", 110, 66), stamp("schermo_sis", 111, 52)),
+)
+
+// ================================================================ UFFICIO TECNICO
+// Per gli eventi della fonte «Ufficio tecnico» e dell'Ingegneria: la pianta del magazzino appesa al muro, l'ingegnere col casco
+// giallo che la indica con la bacchetta, il collega al tavolo da disegno con la lampada, i caschi sul tavolo, il cronometro
+// a muro con la lancetta che fa un giro in 16 fotogrammi, i raccoglitori sullo scaffale.
+persona("_ing", { testa: "casco", swap: { W: "Y", S: "y", B: "O", b: "o" } })
+anim("ingegnere", { w: 16, h: 21, fps: FPS, outline: "K", pivot: "bottom" },
+  frame({ hold: 8 }, stamp("__ing", 0, 1), line(9, 12, 15, 2, "N")),
+  frame({ hold: 8 }, stamp("__ing", 0, 1), line(9, 12, 14, 0, "N")))
+persona("_dis", { testa: "nuca", corpo: "seduto", swap: { B: "B", b: "b", M: "M" } })
+sprite("disegnatore", { w: 10, h: 16, outline: "K", pivot: "bottom" }, stamp("__dis"))
+// la pianta del magazzino: corsie, scaffali, baie e il percorso rosso del prelievo
+sprite("pianta", { w: 52, h: 30, outline: "K" },
+  rect(0, 0, 52, 30, "b"), box(2, 2, 48, 26, "L"),
+  ...[6, 14, 22, 30, 38].map((x) => rect(x, 5, 4, 14, "B")), ...[8, 20, 32, 44].map((x) => rect(x, 23, 4, 4, "L")),
+  line(10, 21, 42, 21, "R"), line(42, 21, 42, 6, "R"), px(41, 7, "R"), px(43, 7, "R"), text(4, 3, "", "W"))
+// il cronometro a muro: la lancetta fa un giro in 16 fotogrammi
+anim("cronometro", { w: 13, h: 15, frames: LOOP, fps: FPS, outline: "K" }, (c) => {
+  c.rect(5, 0, 3, 2, "s"); c.circ(6, 8, 6, "S"); c.circ(6, 8, 5, "W")
+  const a = (c.frame / 16) * 2 * Math.PI; c.line(6, 8, 6 + Math.round(4 * Math.sin(a)), 8 - Math.round(4 * Math.cos(a)), "R"); c.px(6, 8, "K")
+})
+sprite("tavolo_dis", { w: 24, h: 18, outline: "K", pivot: "bottom" }, line(2, 6, 22, 2, "W"), line(2, 7, 22, 3, "S"), rect(3, 7, 2, 11, "D"), rect(19, 4, 2, 14, "D"),
+  vline(20, 0, 4, "s"), rect(18, 0, 4, 2, "Y"))                                                          // il piano inclinato e la lampada
+sprite("casco_giallo", { w: 7, h: 4, outline: "K", pivot: "bottom" }, rect(1, 0, 5, 3, "Y"), hline(0, 3, 7, "y"))
+sprite("tavolo_lungo", { w: 48, h: 14, outline: "K", pivot: "bottom" }, rect(0, 0, 48, 3, "k"), hline(0, 2, 48, "N"), rect(2, 3, 3, 11, "N"), rect(43, 3, 3, 11, "N"))
+sprite("raccoglitori", { w: 22, h: 30, outline: "K" }, rect(0, 0, 22, 30, "k"), ...[9, 19, 29].map((y) => hline(0, y, 22, "N")),
+  ...[[1, "R"], [4, "B"], [7, "G"], [10, "Y"], [13, "P"], [16, "B"]].map(([x, k]) => rect(x, 1, 2, 8, k)),
+  ...[[1, "G"], [4, "Y"], [7, "R"], [12, "B"], [15, "B"], [18, "O"]].map(([x, k]) => rect(x, 11, 2, 8, k)),
+  ...[[2, "S"], [6, "S"], [10, "W"]].map(([x, k]) => rect(x, 21, 3, 8, k)))
+sprite("muletto_mod", { w: 9, h: 6, outline: "K", pivot: "bottom" }, rect(0, 1, 6, 4, "O"), vline(7, 0, 5, "D"), hline(7, 4, 2, "D"), px(1, 5, "K"), px(4, 5, "K"))
+
+scene("ufficio_tecnico", { w: SW, h: SH, bg: "C", world: { light: [-0.6, -1], ground: 66 } },
+  layer("muro",
+    rect(0, 0, SW, 3, "k"), hline(0, 3, SW, "N"), rect(0, 46, SW, 26, "z"), hline(0, 46, SW, "Z"), ...[56, 66].map((y) => hline(0, y, SW, "Z")),
+    stamp("pianta", 56, 7), stamp("cronometro", 122, 8), stamp("raccoglitori", 134, 16)),
+  layer("arredi",
+    stamp("tavolo_lungo", 82, 66), stamp("casco_giallo", 66, 52), stamp("casco_giallo", 74, 52), stamp("muletto_mod", 94, 52),
+    stamp("tavolo_dis", 26, 66), stamp("disegnatore", 18, 62)),
+  layer("ombre", { shade: true }, ellipse(82, 67, 24, 1, "K"), ellipse(26, 67, 12, 1, "K"), ellipse(118, 67, 6, 1, "K")),
+  layer("persone", { sort: "y" }, stamp("ingegnere", 118, 66)),
+)
