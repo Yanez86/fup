@@ -1284,15 +1284,15 @@ const SITES={
  trento:{name:'Interporto Trento',prov:'TN',lon:11.13,lat:46.11,cap:1600,rent:5000,cl:'std',dot:['ribalte','giardino'],ext:2},
  pordenone:{name:'Pordenone',prov:'PN',lon:12.67,lat:45.94,cap:1800,rent:4800,cl:'std',dot:['ribalte','giardino'],ext:2},
  fernetti:{name:'Trieste Fernetti',prov:'TS',lon:13.83,lat:45.70,cap:2000,rent:5500,cl:'vec',dot:['ribalte','parcheggio','portineria'],ext:1},
- /* capannoni che arrivano sul mercato più tardi (from: anno) e vecchi stabilimenti riconvertiti */
+ /* poli logistici nuovi e vecchi stabilimenti riconvertiti */
  sesto:{name:'Sesto San Giovanni ex acciaieria',prov:'MI',lon:9.23,lat:45.54,cap:2400,rent:5200,cl:'fat',dot:['piazzale'],ext:2},
  arquata:{name:'Arquata Scrivia ex fornace',prov:'AL',lon:8.88,lat:44.69,cap:1500,rent:3000,cl:'fat',dot:[],ext:3},
  modena:{name:'Modena Nord',prov:'MO',lon:10.90,lat:44.67,cap:2200,rent:5600,cl:'vec',dot:['ribalte','parcheggio'],ext:2},
  fossano:{name:'Fossano',prov:'CN',lon:7.72,lat:44.55,cap:2000,rent:4800,cl:'std',dot:['ribalte','giardino'],ext:2},
- castelsg:{name:'Castel San Giovanni',prov:'PC',lon:9.43,lat:45.06,cap:4500,rent:12500,cl:'mod',dot:['ribalte','parcheggio','portineria','sprinkler','led'],ext:2,from:2004},
- calderara:{name:'Calderara di Reno',prov:'BO',lon:11.27,lat:44.56,cap:3500,rent:10000,cl:'mod',dot:['ribalte','portineria','sprinkler','led','mensa'],ext:1,from:2008},
- landriano:{name:'Landriano Polo Sud',prov:'PV',lon:9.26,lat:45.31,cap:5000,rent:16000,cl:'inn',dot:['ribalte','solare','parcheggio','portineria','sprinkler','led','mensa','giardino'],ext:1,from:2014},
- vigasio:{name:'Vigasio Green Hub',prov:'VR',lon:10.94,lat:45.32,cap:4500,rent:14500,cl:'inn',dot:['ribalte','solare','parcheggio','portineria','sprinkler','led','giardino'],ext:1,from:2016},
+ castelsg:{name:'Castel San Giovanni',prov:'PC',lon:9.43,lat:45.06,cap:4500,rent:12500,cl:'mod',dot:['ribalte','parcheggio','portineria','sprinkler','led'],ext:2},
+ calderara:{name:'Calderara di Reno',prov:'BO',lon:11.27,lat:44.56,cap:3500,rent:10000,cl:'mod',dot:['ribalte','portineria','sprinkler','led','mensa'],ext:1},
+ landriano:{name:'Landriano Polo Sud',prov:'PV',lon:9.26,lat:45.31,cap:5000,rent:16000,cl:'inn',dot:['ribalte','solare','parcheggio','portineria','sprinkler','led','mensa','giardino'],ext:1},
+ vigasio:{name:'Vigasio Green Hub',prov:'VR',lon:10.94,lat:45.32,cap:4500,rent:14500,cl:'inn',dot:['ribalte','solare','parcheggio','portineria','sprinkler','led','giardino'],ext:1},
  /* terreni edificabili (lotto:1): qui non c'è un capannone, si costruisce da zero (land = prezzo del terreno, max = posti al massimo) */
  l_alessandria:{name:'Alessandria Sud',prov:'AL',lon:8.62,lat:44.91,lotto:1,land:80000,max:5000,ext:4},
  l_vercelli:{name:'Vercelli Nord',prov:'VC',lon:8.42,lat:45.34,lotto:1,land:70000,max:4000,ext:4},
@@ -1327,9 +1327,9 @@ const WCL_ORD=['fat','vec','std','mod','inn'];
 const DOT=[
  {id:'ribalte',n:'Ribalte di carico',ext:0,c0:20000,cp:12,gg:60,mese:0,fx:{},miss:{prod:-0.04,P:-1},missT:'portoni a raso: produttività −4%, Puntualità −1',okT:'Il bilico accosta alla baia e il muletto entra dritto nel cassone: niente portoni a raso.',ko:{prod:-0.02,P:-0.5},desc:'Senza ribalte (portoni a raso): produttività −4% e Puntualità −1.',
   txt:'Le baie di carico con il piano che si alza e si abbassa: il bilico accosta in retromarcia e il muletto entra dritto nel cassone. Con i portoni a raso si carica dal piazzale, un pallet alla volta, sotto la pioggia.'},
- {id:'solare',n:'Pannelli solari',ext:0,c0:30000,cp:10,gg:60,mese:0,from:2005,fx:{util:-0.35},desc:'Bollette −35%. Se li monti tra il 2007 e il 2012 arriva anche l\'incentivo statale: 600 € al mese.',
+ {id:'solare',n:'Pannelli solari',ext:0,c0:30000,cp:10,gg:60,mese:0,fx:{util:-0.35},desc:'Bollette −35%. Se li monti tra il 2007 e il 2012 arriva anche l\'incentivo statale: 600 € al mese.',
   txt:'Il tetto del capannone diventa una centrale elettrica. Di giorno i muletti si ricaricano col sole; di notte resta la bolletta.'},
- {id:'led',n:'Illuminazione LED',ext:0,c0:6000,cp:3,gg:15,mese:0,from:2008,fx:{util:-0.2,A:0.2},desc:'Bollette −20% e Accuratezza +0,2: le etichette si leggono meglio.',
+ {id:'led',n:'Illuminazione LED',ext:0,c0:6000,cp:3,gg:15,mese:0,fx:{util:-0.2,A:0.2},desc:'Bollette −20% e Accuratezza +0,2: le etichette si leggono meglio.',
   txt:'Via le vecchie lampade al sodio che ci mettevano dieci minuti ad accendersi: luce bianca, uniforme, e i codici a barre si leggono anche in fondo alla corsia.'},
  {id:'parcheggio',n:'Parcheggio dei camion',ext:1,c0:25000,cp:0,gg:45,mese:100,fx:{mor:2,km:0.03},desc:'Morale +2, autisti più riposati (+3% di km a testa) e meno furti di gasolio.',
   txt:'Un piazzale recintato e illuminato dove i bilici passano la notte. Gli autisti dormono tranquilli e il gasolio resta nei serbatoi.'},
@@ -1350,7 +1350,7 @@ const DOT=[
 ];
 const DOT_ID=Object.fromEntries(DOT.map(d=>[d.id,d]));
 // costruire un magazzino da zero (terreni con lotto:1) e ristrutturare: euro per posto pallet e giorni di cantiere per classe
-const EDIL={eur:{std:140,mod:190,inn:260},gg:{std:240,mod:300,inn:360},inn:2008,fix:1.1,sizes:[2000,3000,4000,5000,6000],rist:{eur:45,gg:120},inc:600,incDa:2007,incA:2012};
+const EDIL={eur:{std:140,mod:190,inn:260},gg:{std:240,mod:300,inn:360},fix:1.1,sizes:[2000,3000,4000,5000,6000],rist:{eur:45,gg:120},inc:600,incDa:2007,incA:2012};
 const CEOS=[
  {id:'gino',arch:'Vecchia scuola',name:'Gino Bertolotti',age:52,origin:'Ex padroncino',site:'rivalta',cash:180000,motrici:3,fixed:3500,rep:45,company:'Trasporti Bertolotti',
   st:{op:17,prec:9,neg:5,lead:14,amm:6,inn:2},tal:['Un milione di km al volante','Allergico al gestionale','Dialetto stretto'],
@@ -1376,30 +1376,30 @@ const MANAGERS=[
  {id:'davide',name:'Davide Rinaldi',age:39,role:'Ha portato Orio al 99% di accuratezza',tal:['Stacanovista','Braccino corto'],st:{op:15,prec:10,neg:7,lead:6,amm:12,inn:8},ral:52000},
  {id:'luca',name:'Luca Mazzoleni',age:33,role:'Programma di notte, installa di giorno',tal:['Parla con i robot','Insonne'],st:{op:6,prec:8,neg:5,lead:4,amm:8,inn:18},ral:44000},
  {id:'franca',name:'Franca Gallo',sx:'f',age:61,role:'Controlla le fatture a mano, una per una',tal:['Calma olimpica','Braccino corto'],st:{op:7,prec:13,neg:8,lead:8,amm:17,inn:4},ral:45000},
- // nuova generazione: arrivano sul mercato dall'anno «from», per sostituire chi va in pensione
- {id:'giorgio',name:'Giorgio Venturi',age:34,from:2004,role:'Capoturno nella Bassa, poi responsabile di un deposito',tal:['Qualifica professionale','Tifo sfegatato'],st:{op:15,prec:9,neg:6,lead:12,amm:6,inn:6},ral:42000},
- {id:'aisha',name:'Aisha Diallo',sx:'f',age:27,from:2006,role:'Bolle doganali al porto di Genova, in quattro lingue',tal:['Laureato in lingue','Maratoneta'],st:{op:10,prec:13,neg:13,lead:9,amm:11,inn:9},ral:39000},
- {id:'ivan',name:'Ivan Kovač',age:31,from:2008,role:'Ha aperto un magazzino a Fernetti partendo da un container',tal:['Diplomato al nautico','Calma olimpica'],st:{op:14,prec:11,neg:8,lead:12,amm:7,inn:8},ral:43000},
- {id:'andrew',name:'Andrew "Smilzo" Goodheart',age:16,from:2009,role:'Tre magazzini in due anni, tutti lasciati in perfetto ordine. Sappiamo già che prima o poi se ne andrà',tal:['Stacanovista','Job hopper','Maniaco dell\'ordine'],st:{op:11,prec:17,neg:10,lead:16,amm:10,inn:6},ral:41000},
- {id:'sara',name:'Sara Bonetti',sx:'f',age:30,from:2010,role:'Ha digitalizzato il magazzino di famiglia, contro il parere di tutta la famiglia',tal:['Ingegnere gestionale','Guru dei social'],st:{op:9,prec:15,neg:9,lead:7,amm:13,inn:15},ral:44000},
- {id:'nicola',name:'Nicola Ferrero',age:38,from:2012,role:'Vent\'anni di freddo: ortofrutta, latticini e celle a −25',tal:['Laureato in agraria','Cuoco provetto'],st:{op:13,prec:14,neg:9,lead:11,amm:8,inn:7},ral:47000},
- {id:'elena',name:'Elena Russo',sx:'f',age:29,from:2015,role:'Due anni in una multinazionale dell\'e-commerce, a contare i secondi',tal:['Master in supply chain','Ansia da prestazione'],st:{op:14,prec:15,neg:6,lead:7,amm:10,inn:13},ral:46000},
+ // nuova generazione: sul mercato da subito, per sostituire chi va in pensione
+ {id:'giorgio',name:'Giorgio Venturi',age:34,role:'Capoturno nella Bassa, poi responsabile di un deposito',tal:['Qualifica professionale','Tifo sfegatato'],st:{op:15,prec:9,neg:6,lead:12,amm:6,inn:6},ral:42000},
+ {id:'aisha',name:'Aisha Diallo',sx:'f',age:27,role:'Bolle doganali al porto di Genova, in quattro lingue',tal:['Laureato in lingue','Maratoneta'],st:{op:10,prec:13,neg:13,lead:9,amm:11,inn:9},ral:39000},
+ {id:'ivan',name:'Ivan Kovač',age:31,role:'Ha aperto un magazzino a Fernetti partendo da un container',tal:['Diplomato al nautico','Calma olimpica'],st:{op:14,prec:11,neg:8,lead:12,amm:7,inn:8},ral:43000},
+ {id:'andrew',name:'Andrew "Smilzo" Goodheart',age:23,role:'Tre magazzini in due anni, tutti lasciati in perfetto ordine. Sappiamo già che prima o poi se ne andrà',tal:['Stacanovista','Job hopper','Maniaco dell\'ordine'],st:{op:11,prec:17,neg:10,lead:16,amm:10,inn:6},ral:41000},
+ {id:'sara',name:'Sara Bonetti',sx:'f',age:30,role:'Ha digitalizzato il magazzino di famiglia, contro il parere di tutta la famiglia',tal:['Ingegnere gestionale','Guru dei social'],st:{op:9,prec:15,neg:9,lead:7,amm:13,inn:15},ral:44000},
+ {id:'nicola',name:'Nicola Ferrero',age:38,role:'Vent\'anni di freddo: ortofrutta, latticini e celle a −25',tal:['Laureato in agraria','Cuoco provetto'],st:{op:13,prec:14,neg:9,lead:11,amm:8,inn:7},ral:47000},
+ {id:'elena',name:'Elena Russo',sx:'f',age:29,role:'Due anni in una multinazionale dell\'e-commerce, a contare i secondi',tal:['Master in supply chain','Ansia da prestazione'],st:{op:14,prec:15,neg:6,lead:7,amm:10,inn:13},ral:46000},
  {id:'delsasso',name:'Luca "Non il calciatore" Del Sasso',age:31,role:'Compratore di trasporti in una multinazionale: strappa le tariffe al centesimo, poi passa la notte convinto che fossero ancora troppo alte',tal:['Master in supply chain','Ansia da prestazione','Pessimista cosmico'],st:{op:11,prec:13,neg:17,lead:4,amm:13,inn:10},ral:52000},
  {id:'sorrentino',name:'Giuseppe "O\' Mariuolo" Pasqualino',age:54,role:'Ha cominciato vendendo pallet usati fuori dall\'interporto di Nola. Oggi conosce ogni piazzale da Napoli a Verona, e ogni piazzale conosce lui',tal:['Venuto dalla strada','Allergico al gestionale','Mentore'],st:{op:16,prec:8,neg:16,lead:11,amm:7,inn:4},ral:47000},
  {id:'greta',name:'Greta Brambilla',sx:'f',age:35,role:'Capoturno a Lodi a ventidue anni: i carrellisti le danno del lei, anche quelli che hanno il doppio della sua età',tal:['Diplomato ragioniere','Stacanovista','Spirito bellicoso'],st:{op:16,prec:11,neg:8,lead:9,amm:12,inn:4},ral:44000},
- {id:'matteo',name:'Matteo Galli',age:26,from:2018,role:'Ha scritto il WMS del suo ultimo magazzino. In una notte',tal:['Ingegnere informatico','Gatto in ufficio'],st:{op:8,prec:11,neg:5,lead:6,amm:9,inn:19},ral:41000},
+ {id:'matteo',name:'Matteo Galli',age:26,role:'Ha scritto il WMS del suo ultimo magazzino. In una notte',tal:['Ingegnere informatico','Gatto in ufficio'],st:{op:8,prec:11,neg:5,lead:6,amm:9,inn:19},ral:41000},
  // customer service: forti in Negoziazione e Precisione (lo stipendio lo decide il loro rango, come per tutti)
  {id:'mirella',name:'Mirella Cattaneo',sx:'f',age:44,role:'Quindici anni al centralino di un corriere espresso: ha sentito tutte le scuse, due volte',tal:['Voce da call center','Calma olimpica'],st:{op:7,prec:12,neg:15,lead:9,amm:9,inn:6},ral:34000},
  {id:'gianfranco',name:'Gianfranco Lodigiani',age:55,role:'Trent\'anni a vendere carrelli elevatori: non ha mai detto di no a un cliente',tal:['Promette tutto','Cena col buyer'],st:{op:8,prec:6,neg:17,lead:10,amm:7,inn:5},ral:36000},
- {id:'kevin',name:'Kevin Sartori',age:27,from:2005,role:'Assistenza clienti di un operatore telefonico: chiudeva i reclami prima che finisse la musichetta',tal:['Risponde anche alle 23','Guru dei social'],st:{op:6,prec:14,neg:12,lead:6,amm:8,inn:12},ral:31000}
+ {id:'kevin',name:'Kevin Sartori',age:27,role:'Assistenza clienti di un operatore telefonico: chiudeva i reclami prima che finisse la musichetta',tal:['Risponde anche alle 23','Guru dei social'],st:{op:6,prec:14,neg:12,lead:6,amm:8,inn:12},ral:31000}
 ];
 const EXECS=[
  {id:'ottavio',name:'Ottavio Ferri',age:58,role:'Ex direttore finanziario di una banca di provincia',tal:['Calma olimpica','Braccino corto'],st:{op:8,prec:14,neg:9,lead:8,amm:18,inn:7},ral:85000},
  {id:'giulia',name:'Giulia Marchetti',sx:'f',age:45,role:'Vent\'anni di risorse umane nella grande distribuzione',tal:['Conosce tutti al bar','Mano larga'],st:{op:9,prec:10,neg:11,lead:17,amm:10,inn:8},ral:72000},
  {id:'roberto',name:'Roberto "Bob" Colombo',age:50,role:'Ha venduto logistica a mezza Brianza',tal:['Cena col buyer','Sempre al telefono'],st:{op:9,prec:7,neg:18,lead:10,amm:8,inn:7},ral:80000},
- {id:'beatrice',name:'Beatrice Sforzini',sx:'f',age:42,from:2007,role:'Ex direttrice operativa di un corriere espresso',tal:['Ingegnere dei trasporti','Stacanovista'],st:{op:18,prec:12,neg:8,lead:12,amm:9,inn:9},ral:82000},
- {id:'paolo',name:'Paolo Zanetti',age:46,from:2011,role:'Ha risanato i conti di tre aziende. Nessuna lo ha richiamato',tal:['Diplomato ragioniere','Pignolo sulle virgole'],st:{op:7,prec:13,neg:9,lead:8,amm:18,inn:8},ral:84000},
- {id:'federico',name:'Federico Marini',age:40,from:2016,role:'Ha portato online una catena di elettronica',tal:['Ingegnere informatico','Parla con i robot'],st:{op:8,prec:10,neg:9,lead:7,amm:9,inn:19},ral:86000}
+ {id:'beatrice',name:'Beatrice Sforzini',sx:'f',age:42,role:'Ex direttrice operativa di un corriere espresso',tal:['Ingegnere dei trasporti','Stacanovista'],st:{op:18,prec:12,neg:8,lead:12,amm:9,inn:9},ral:82000},
+ {id:'paolo',name:'Paolo Zanetti',age:46,role:'Ha risanato i conti di tre aziende. Nessuna lo ha richiamato',tal:['Diplomato ragioniere','Pignolo sulle virgole'],st:{op:7,prec:13,neg:9,lead:8,amm:18,inn:8},ral:84000},
+ {id:'federico',name:'Federico Marini',age:40,role:'Ha portato online una catena di elettronica',tal:['Ingegnere informatico','Parla con i robot'],st:{op:8,prec:10,neg:9,lead:7,amm:9,inn:19},ral:86000}
 ];
 const sgn=v=>(v>=0?'+':'−')+f1(Math.abs(v)), sgnp=v=>(v>=0?'+':'−')+Math.abs(Math.round(v))+'%';
 const DIR_ROLES=[
@@ -2437,7 +2437,7 @@ Clicca un [[magazzino]] per aprirlo. Dalla finestra Clienti puoi mostrare sulla 
 wk('espansione','basi','Espansione',`Affittare un nuovo magazzino: due mesi di affitto anticipati più 15.000 € di allestimento.`,
 `Un nuovo [[magazzino]] parte vuoto: servono il suo [[personale]] (magazzinieri, carrellisti, impiegati, autisti e un [[facility|facility manager]]), un [[manager]] e soprattutto clienti dalle [[gare]]. Aprirlo dà +3 di [[reputazione]]. Si sceglie nella scheda Nuovo magazzino della finestra Magazzini, o toccando sulla mappa un magazzino libero. Puoi anche [[ampliamento|ampliare]] un magazzino che hai già.
 
-Ogni capannone ha la sua [[classe_edificio|classe]] e le sue [[dotazioni]]; con gli anni arrivano sul mercato poli logistici nuovi. In alternativa si compra un terreno e si [[costruzione|costruisce da zero]].
+Ogni capannone ha la sua [[classe_edificio|classe]] e le sue [[dotazioni]]: sul mercato ci sono vecchi stabilimenti riconvertiti e poli logistici nuovi. In alternativa si compra un terreno e si [[costruzione|costruisce da zero]].
 
 Conviene espandersi quando il magazzino attuale supera l'85% di [[saturazione|occupazione]] o quando una gara importante è in una zona lontana.`);
 wk('magazzino','basi','Magazzino',`Il capannone dove stanno i pallet dei clienti. Ognuno ha i suoi posti, il suo personale e le sue tecnologie.`,
@@ -2643,7 +2643,7 @@ wk('classe_edificio','basi','Classe dell\'edificio',`Ogni capannone è fatiscent
 
 I punti nelle gare valgono il doppio con le committenti di rango S e A, che vengono a vedere il magazzino prima di firmare.
 
-La classe cambia solo con una [[ristrutturazione]] (fino a moderno) oppure [[costruzione|costruendo]] un magazzino nuovo. I capannoni sul mercato cambiano con gli anni: i poli moderni arrivano dal 2004, quelli innovativi dal 2014.`);
+La classe cambia solo con una [[ristrutturazione]] (fino a moderno) oppure [[costruzione|costruendo]] un magazzino nuovo.`);
 wk('dotazioni','basi','Dotazioni',`Quello che c'è attorno e dentro il capannone: ribalte, pannelli solari, parcheggio, portineria, piazzale, giardino, mensa, celle frigo, antincendio, LED, ricarica dei muletti.`,
 `Ogni capannone arriva con le sue dotazioni; le altre si costruiscono dalla scheda Immobile del [[magazzino]]. I lavori li segue il [[facility|facility manager]] (senza di lui non si fanno), uno alla volta, e durante il cantiere la produttività cala del 5%. Si paga tutto subito; alcune dotazioni costano anche qualcosa ogni mese.
 
@@ -2672,7 +2672,7 @@ wk('ristrutturazione','basi','Ristrutturazione',`Porta l'edificio alla classe su
 wk('costruzione','basi','Costruire un magazzino',`Compri un terreno e costruisci il tuo magazzino: scegli posti, classe e dotazioni. Si paga subito, è pronto in 8-12 mesi ed è di proprietà.`,
 `Nella scheda Nuovo magazzino della finestra Magazzini, sotto i capannoni in affitto, ci sono i terreni edificabili (sulla mappa sono i quadratini verdi). Per ognuno scegli:
 • i posti pallet, fino al massimo del terreno;
-• la [[classe_edificio|classe]]: standard (140 € a posto, 8 mesi), moderno (190 €, 10 mesi) o, dal 2008, innovativo (260 €, 12 mesi);
+• la [[classe_edificio|classe]]: standard (140 € a posto, 8 mesi), moderno (190 €, 10 mesi) o innovativo (260 €, 12 mesi);
 • le [[dotazioni]] da costruire subito, nei limiti dell'[[area_esterna|area esterna]].
 
 Si paga tutto all'apertura del cantiere, terreno compreso: se la cassa non basta c'è il [[prestiti|prestito]] della banca. Alla fine il magazzino è tuo: niente affitto, solo un costo fisso di 1,10 € per posto pallet al mese più [[bollette]] e manutenzione. Vale anche nel [[valore|valore dell'azienda]], come gli altri magazzini di proprietà. Parte vuoto, come uno in affitto.`);
@@ -2734,7 +2734,7 @@ wk('ordinanza','basi','Ordinanza',`Dal 2007, prima o poi, l'ASL o il Comune mett
 Le scelte: [[ristrutturazione|ristrutturare]] subito (serve il facility manager), chiudere il magazzino entro sei mesi ([[trasloco|traslochi]] i clienti e poi lo restituisci o lo vendi: vedi [[capannone_vuoto]]) oppure il ricorso al TAR (6.000 €: una volta su tre concede un anno in più). L'ordinanza si chiude quando l'edificio non è più fatiscente o quando il magazzino non è più tuo.
 
 Alla scadenza i lavori li fa il Comune: la ristrutturazione costa il 50% in più, con 20.000 € di multa, reputazione −5 e, finché dura il cantiere, puntualità −3 e accuratezza −2.`);
-DOT.forEach(d=>wk('dot_'+d.id,'basi',d.n,d.desc,`${d.txt}\n\n${d.desc}${d.base?'':`\n\nCostruirla costa ${eur(d.c0)}${d.cp?` più ${eur(d.cp)} per posto pallet`:''} e richiede ${wks(d.gg)} di lavori${d.mese?`; poi ${eur(d.mese)} al mese`:''}.${d.ext?' Occupa un posto dell\'[[area_esterna|area esterna]].':''}${d.from?` Si può costruire dal ${d.from}.`:''}`} Fa parte delle [[dotazioni]] e si può rompere: vedi [[guasti]].`,sz=>dotIcon(d.id,sz)));
+DOT.forEach(d=>wk('dot_'+d.id,'basi',d.n,d.desc,`${d.txt}\n\n${d.desc}${d.base?'':`\n\nCostruirla costa ${eur(d.c0)}${d.cp?` più ${eur(d.cp)} per posto pallet`:''} e richiede ${wks(d.gg)} di lavori${d.mese?`; poi ${eur(d.mese)} al mese`:''}.${d.ext?' Occupa un posto dell\'[[area_esterna|area esterna]].':''}`} Fa parte delle [[dotazioni]] e si può rompere: vedi [[guasti]].`,sz=>dotIcon(d.id,sz)));
 wk('capoturno','pers','Capoturno',`Coordina la squadra di magazzino: ne serve uno ogni 10 tra magazzinieri e carrellisti.`,
 `Sotto i 10 operai il turno lo organizza il [[manager]]. Poi serve un capoturno ogni 10 tra [[magazzinieri]] e [[carrellisti]]. Ognuno che manca toglie 4 punti al [[morale]] obiettivo e 1 punto di [[accuratezza]].
 
@@ -2774,7 +2774,7 @@ Un buon manager operativo fa risparmiare persone e camion; uno scarso li fa cost
 
 All'inizio il manager è il [[ceo|CEO]]. Gli altri si assumono dalla finestra Manager, con una [[trattativa]]: tra le [[candidature|candidature spontanee]] oppure tra i profili trovati da un [[head_hunter|head hunter]]. Chi arriva prende il primo magazzino senza manager; poi lo sposti con il pulsante «Cambia» accanto al manager nella finestra del magazzino: si apre l'elenco di tutta la squadra, sopra chi è libero (dal più adatto) e sotto, in grigio, chi ha già un incarico, con il suo ruolo. Un manager senza magazzino può diventare un [[direzione|direttore]] o il responsabile del [[customer_service|customer service]]: anche lì si sceglie con «Cambia».
 
-Ogni manager ha un [[rango_manager|rango]] da S a F, come le committenti: più è alto, più chiede di stipendio. I manager invecchiano ([[eta|età]]) e prima o poi vanno in [[pensione]]; negli anni arrivano sul mercato personaggi nuovi, che si trovano con l'head hunter. Licenziare un manager costa un mese del suo stipendio (con gli oneri, il prezzo è scritto sul pulsante) e libera il suo posto.`);
+Ogni manager ha un [[rango_manager|rango]] da S a F, come le committenti: più è alto, più chiede di stipendio. I manager invecchiano ([[eta|età]]) e prima o poi vanno in [[pensione]]; quelli liberi si trovano con l'head hunter. Licenziare un manager costa un mese del suo stipendio (con gli oneri, il prezzo è scritto sul pulsante) e libera il suo posto.`);
 wk('rango_manager','pers','Rango dei manager',`Il voto di un manager o di un candidato, da S a F: più è alto, più è bravo e più costa.`,
 `Il rango viene dal punteggio: la somma delle sei [[abilita|abilità]], più 2 punti per ogni punto oltre 12 nell'abilità più forte (gli specialisti valgono di più). Soglie: S da 88 punti, A da 76, B da 66, C da 56, D da 46, F sotto.
 
@@ -3442,7 +3442,7 @@ const siteTaken=id=>liveCo().some(c=>c.warehouses.some(w=>w.site===id)||(c.canti
 const heldElsewhere=id=>liveCo().some(c=>c!==S&&(c.boss&&c.boss.id===id||[...c.managers,...c.execs].some(p=>p.id===id&&(p.hired||p.arr!=null))));   // anche chi è diventato CEO di un'altra azienda
 const rivalNames=()=>{const r=liveCo().filter(c=>c!==S).map(c=>c.company.name); return r.length?r:RIVALS;};
 // manager e dirigenti in partita: copie dei dati (abilità e talenti possono cambiare), con il giorno di nascita
-function newPerson(m){return {...m,st:{...m.st},tal:[...m.tal],bd:bdOf(m.age,hashN(m.id)),hired:false,wh:null,log:[],ann:!m.from||m.from<=2002};}
+function newPerson(m){return {...m,st:{...m.st},tal:[...m.tal],bd:bdOf(m.age,hashN(m.id)),hired:false,wh:null,log:[]};}
 function z(){return {ric:0,pers:0,mezzi:0,fissi:0,tech:0,mgr:0,welf:0,pen:0,altro:0,int:0,prest:0,rimb:0}}
 function addWarehouse(site,own,fixed,motrici,o){
   const s=SITES[site]; o=o||{}; const cap=o.cap||s.cap;   // o: magazzino costruito da zero (posti, classe, dotazioni)
@@ -3490,7 +3490,7 @@ const hashN=s=>[...String(s)].reduce((h,c)=>(h*31+c.charCodeAt(0))%9973,7);
 const bdOf=(age,k)=>-(age*365+(k%365));   // giorno di nascita: il compleanno cade in un giorno qualsiasi dell'anno
 const ageOf=p=>Math.floor((S.day-p.bd)/365);
 const people=()=>[S.boss,...S.managers,...S.execs];
-const avail=p=>!p.gen&&p.arr==null&&!p.retired&&yearOf(S.day)>=(p.from||0)&&!heldElsewhere(p.id);   // personaggio con una storia che l'head hunter può trovare: non in pensione, già arrivato, libero
+const avail=p=>!p.gen&&p.arr==null&&!p.retired&&ageOf(p)>=18&&!heldElsewhere(p.id);   // personaggio con una storia che l'head hunter può trovare: maggiorenne, non in pensione, libero
 const oa=p=>p&&p.sx==='f'?'a':'o';
 const nm1=p=>p.name.split(' ')[0];
 const pImg=p=>p===S.boss?ceoImg(p):mImg(p);
@@ -3651,7 +3651,7 @@ function genPerson(o){ o=o||{};
   tal.forEach(n=>Object.entries(talMods(n)).forEach(([k,v])=>st[k]+=v));
   if(o.k) st[o.k]=Math.max(st[o.k],o.min+(Math.random()<0.4?1:0)+(Math.random()<0.15?1:0));
   STATS.forEach(s=>st[s.k]=clamp(st[s.k],1,20));
-  const p={id:'g'+(uid++),gen:1,name,sx:f?'f':'m',age,bd:S.day-age*365-rint(0,364),role:'',tal,st,face:faceOf(f,age),hired:false,wh:null,log:[],ann:true};
+  const p={id:'g'+(uid++),gen:1,name,sx:f?'f':'m',age,bd:S.day-age*365-rint(0,364),role:'',tal,st,face:faceOf(f,age),hired:false,wh:null,log:[]};
   let bios=GEN_BIO.filter(b=>o.k?b.k===o.k:b.l&&(!b.y||age<30)); if(!bios.length) bios=GEN_BIO.filter(b=>b.l&&!b.y);
   p.role=pick(bios).t.replace(/\{c\}/g,pick(CITIES)[0]).replace(/\{o\}/g,oa(p));
   p.ral=askOf(p); p.mn=+(0.85+Math.random()*0.12).toFixed(3); return p;
@@ -3752,7 +3752,7 @@ function cresDone(x){
   // un fuoriclasse è sempre di rango S: se i dadi non ci arrivano, crescono le abilità più deboli
   if(x.star===2) for(let i=0;i<40&&mScore({st})<MRANK[0].min;i++){ const k=STATS.map(s=>s.k).sort((a,b)=>st[a]-st[b])[0]; st[k]++; }
   const mest=bMest(x.role,x.sx), w0=whById(x.wh);
-  const p={id:x.id,gen:1,int:1,name:x.name,sx:x.sx,bd:x.bd,role:`Cresciut${oa(x)} in casa: ${mest} a ${x.wn||'magazzino'}, poi un anno di affiancamento`,tal,st,face:x.face,hired:true,wh:null,log:[],ann:true};
+  const p={id:x.id,gen:1,int:1,name:x.name,sx:x.sx,bd:x.bd,role:`Cresciut${oa(x)} in casa: ${mest} a ${x.wn||'magazzino'}, poi un anno di affiancamento`,tal,st,face:x.face,hired:true,wh:null,log:[]};
   p.ral=r500(ralOf(mScore(p))*CRESC.ral); p.raiseDay=S.day; p.unh=0; p.quit=null; p.tol={};
   if(w0&&w0.staff[x.role]>0) w0.staff[x.role]--;
   S.managers.push(p); plog(p,`Da ${mest} a manager, dopo un anno di affiancamento`);
@@ -4012,7 +4012,7 @@ const extMax=w=>w.ext==null?2:w.ext;
 // punti nelle gare: le committenti grandi (rango S e A) badano di più all'immobile
 function whGara(w,t){ const v=wCl(w).gara+immFx(w,'gara'), r=rankOf(t).r; return v*(r==='S'||r==='A'?2:1); }
 // perché una dotazione non si può costruire adesso (testo) oppure '' se si può
-function dotNo(w,d){ if(hasDot(w,d.id)) return 'c\'è già'; if(d.from&&yearOf(S.day)<d.from) return 'dal '+d.from;
+function dotNo(w,d){ if(hasDot(w,d.id)) return 'c\'è già';
   if(d.ext&&extUsed(w)>=extMax(w)) return 'area esterna piena'; if(!w.staff.fm) return 'serve il facility manager'; if(w.build) return 'c\'è già un cantiere';
   if(S.cash<dotCost(w.cap,d)) return 'cassa insufficiente'; return ''; }
 const ristCost=w=>Math.round(w.cap*EDIL.rist.eur/1000)*1000;
@@ -4081,9 +4081,9 @@ const KO_EV={
  tetto:{t:'Il tetto perde',e:'Accuratezza −1 e morale −2',x:w=>`Piove dentro il magazzino di ${w.name}: secchi in corsia 4, teli sopra la merce e un rivolo d'acqua che passa proprio sotto la stampante delle etichette.`,r3:'I secchi in corsia sono diventati sei. Qualcuno li ha numerati.'}
 };
 // costruire un magazzino da zero su un terreno: tutto pagato subito, il magazzino arriva a fine cantiere (S.cantieri)
-const siteOpen=id=>{const s=SITES[id]; return !!s&&!siteTaken(id)&&(!s.from||yearOf(S.day)>=s.from);};
+const siteOpen=id=>{const s=SITES[id]; return !!s&&!siteTaken(id);};
 const rentable=id=>!SITES[id].lotto&&siteOpen(id);
-const edilCls=()=>['std','mod',...(yearOf(S.day)>=EDIL.inn?['inn']:[])];
+const edilCls=()=>['std','mod','inn'];
 function edilCost(site,cap,cl,dots){ const s=SITES[site]; return s.land+cap*EDIL.eur[cl]+(dots||[]).reduce((a,id)=>a+dotCost(cap,DOT_ID[id]),0); }
 function edilStart(site,cap,cl,dots){ const s=SITES[site], c=edilCost(site,cap,cl,dots), gg=EDIL.gg[cl];
   S.cash-=c; S.cur.altro+=c; (S.cantieri=S.cantieri||[]).push({id:nid('k'),site,cap,cl,dot:[...dots],left:gg,total:gg,cost:c});
@@ -4096,12 +4096,10 @@ function edilDaily(){ (S.cantieri||[]).forEach(x=>x.left--); const done=(S.canti
     chron('magazzini',`Inaugura il magazzino di ${s.name} (${n0(x.cap)} posti pallet)`); repUp(3);
     if(!isBot()){ notify('green','magazzini','Ufficio tecnico',`Nuovo magazzino a ${s.name}`,`Il cantiere è finito: ${n0(x.cap)} posti pallet, edificio ${wCl(w).n.toLowerCase()}, di proprietà. Parte vuoto: servono personale, un manager e clienti.`,'magazzini',{wh:w.id},'edil'+w.id);
       news('Il Sole 24 Pallet',`${S.company.name} inaugura ${s.name}`,`Taglio del nastro, rinfresco e un prete che benedice i muletti: il nuovo magazzino da ${n0(x.cap)} posti pallet è pronto.`); renderMap(); syncTrucks(); } }); }
-// a gennaio: nuovi capannoni sul mercato e incentivi per i pannelli solari
+// a gennaio: incentivi per i pannelli solari
 function immYear(){ const y=yearOf(S.day);
-  Object.values(SITES).forEach(s=>{ if(s.from===y) news('Il Sole 24 Pallet',`Nuovo polo logistico a ${s.name}`,`Finito il capannone di ${s.name}: ${n0(s.cap)} posti pallet, edificio ${WCLASS[s.cl].n.toLowerCase()}, in affitto a ${eur(s.rent)} al mese.`); });
   if(y===EDIL.incDa) news('Il Mattinale del Ministero','Arriva il Conto Energia',`Lo Stato paga chi monta pannelli solari: chi li installa tra il ${EDIL.incDa} e il ${EDIL.incA} riceve ${eur(EDIL.inc)} al mese per ogni impianto.`);
-  if(y===EDIL.incA+1) news('Il Mattinale del Ministero','Finiti gli incentivi del fotovoltaico','Il Conto Energia chiude ai nuovi impianti. Chi l\'ha già preso se lo tiene.');
-  if(y===EDIL.inn) news('Il Sole 24 Pallet','Magazzini da casa passiva','Le imprese edili propongono capannoni «innovativi»: dodici metri sotto trave, isolamento e sensori. Costano, ma consumano poco.'); }
+  if(y===EDIL.incA+1) news('Il Mattinale del Ministero','Finiti gli incentivi del fotovoltaico','Il Conto Energia chiude ai nuovi impianti. Chi l\'ha già preso se lo tiene.'); }
 function capOf(w){const t=TECH.find(x=>x.id==='verticale'); return Math.round(w.cap*(1+(w.tech.verticale&&techFactor(w,t)>0?t.cap:0)+trSum(w,'cap')+immFx(w,'cap'))*(1-condPen(w)));}
 function perWh(t){return (t.tree==='log'||t.tree==='wel'||!!t.site)&&!t.pol;}
 // ricerche e certificazioni che una committente chiede (i contratti vinti non le copiano: si guarda il modello della gara o il cliente storico)
@@ -4710,14 +4708,12 @@ function chronMiles(){ const H=S.hist, L=H[H.length-1]; if(!L) return;
   MILE_REP.forEach(n=>{ if(S.rep>=n) chron('classifica',`Reputazione a ${n}: i buyer ti chiamano per nome`,'m_rp'+n); }); }
 function monthEnd(){
   S.months++;
-  koMonth(); if(monthOf(S.day+1)===0&&!isBot()) immYear();   // guasti delle dotazioni; a gennaio nuovi capannoni e incentivi
+  koMonth(); if(monthOf(S.day+1)===0&&!isBot()) immYear();   // guasti delle dotazioni; a gennaio gli incentivi
   // guasti nei magazzini senza facility manager
   const GUASTI=['si è bloccato un portone sezionale','una scaffalatura è stata urtata e va scaricata','piove dal tetto sulla baia 4','si è rotta la rampa di carico','il quadro elettrico ha preso fuoco (poco, per fortuna)','il pavimento si è crepato davanti alle baie'];
   S.warehouses.forEach(w=>{ if(!w.staff.fm&&Math.random()<0.18){ w.cond=Math.max(0,(w.cond==null?100:w.cond)-8); const g=GUASTI[Math.floor(Math.random()*GUASTI.length)];
     notify('yellow','magazzini','La Gazzetta del Muletto',`Guasto a ${w.name}`,`Nel magazzino ${g}. Senza un facility manager nessuno ripara: lo stato dell'immobile scende a ${Math.round(w.cond)}%.`,'magazzini',{wh:w.id},'guasto'+w.id); news('La Gazzetta del Muletto',`Guasto a ${w.name}`,`Nel magazzino ${g}. Manca un facility manager che segua la manutenzione: lo stato dell'immobile scende a ${Math.round(w.cond)}%.`);} });
   S.rep=clamp(S.rep+polSum('rep'),0,100);
-  [...S.managers,...S.execs].filter(p=>!p.ann&&avail(p)).forEach(p=>{p.ann=true;
-    news('Il Sole 24 Pallet',`Sul mercato: ${p.name}, ${ageOf(p)} anni`,`${p.role}. Cerca un nuovo incarico: un head hunter lo può trovare se gli chiedi le sue abilità migliori (finestra Manager).`);});
   // carburante
   const y=yearOf(S.day); S.fuel=clamp(0.86+(y-2002)*0.05+rnd(-0.03,0.03),0.8,1.9);
   let pen=0; const csS=csSat(csQ());
@@ -7610,8 +7606,8 @@ function fillSave(s){
   [...MANAGERS,...EXECS].forEach(m=>{if(!s.managers.some(x=>x.id===m.id)) s.managers.push({...m,st:{...m.st},tal:[...m.tal],hired:false,wh:null});});
   if(!s.hh) s.hh=[]; if(!s.cands) s.cands=[]; if(!s.negs) s.negs={};
   [...s.managers,...s.execs].forEach(p=>{const d=[...MANAGERS,...EXECS].find(x=>x.id===p.id)||{};
-    if(p.bd==null) p.bd=bdOf(p.age,hashN(p.id)); if(!p.log) p.log=[]; if(d.from) p.from=d.from; if(d.sx) p.sx=d.sx; if(p.id==='sorrentino') p.name=d.name;  // rinominato dopo l'uscita
-    if(p.ann===undefined) p.ann=!p.from||p.from<=2002; p.st={...p.st}; p.tal=[...(p.tal||[])];});
+    if(p.bd==null) p.bd=bdOf(p.age,hashN(p.id)); if(!p.log) p.log=[]; delete p.from; if(d.sx) p.sx=d.sx; if(p.id==='sorrentino') p.name=d.name;  // rinominato dopo l'uscita
+    p.st={...p.st}; p.tal=[...(p.tal||[])];});
   if(!s.pol) s.pol={};
   if(!s.hist) s.hist=[]; if(!s.tw) s.tw={win:0,lose:0,skip:0};
   // notifiche (dalla 0.36): gli eventi che non si ricostruiscono più tornano a chiedere da soli (pensione, ultimatum e controfferta stanno in EVENTS dalla 0.64)
@@ -9344,7 +9340,7 @@ function siteCard(id){ const s=SITES[id]; if(!s) return '';
   const C=WCLASS[s.cl]||WCLASS.std, cost=2*s.rent+15000, ok=S.cash>=cost&&rentable(id), fw={cl:s.cl,dot:Object.fromEntries((s.dot||[]).map(x=>[x,{}])),ko:{},cap:s.cap,ext:s.ext,staff:{},build:null};
   const ext=DOT.filter(d=>d.ext&&(s.dot||[]).includes(d.id)).length;
   const dRow=d=>{const h=d.base||(s.dot||[]).includes(d.id);
-    return `<div class="es-r dt-r${h?'':' dt-off'}">${dotIcon(d.id,28,!h)}<span class="wh-sm"><b class="wh-nm">${kw('dot_'+d.id,d.n)}</b><span class="sm">${h?esc(d.base?'c\'è in tutti i magazzini':d.okT||d.desc):d.miss?`<span class="bad">${esc(d.missT)}</span>`:`manca: costruirla costa ${eur(dotCost(s.cap,d))}${d.from&&yearOf(S.day)<d.from?` (dal ${d.from})`:''}${d.ext?' e un posto dell\'area esterna':''}`}</span></span></div>`;};
+    return `<div class="es-r dt-r${h?'':' dt-off'}">${dotIcon(d.id,28,!h)}<span class="wh-sm"><b class="wh-nm">${kw('dot_'+d.id,d.n)}</b><span class="sm">${h?esc(d.base?'c\'è in tutti i magazzini':d.okT||d.desc):d.miss?`<span class="bad">${esc(d.missT)}</span>`:`manca: costruirla costa ${eur(dotCost(s.cap,d))}${d.ext?' e un posto dell\'area esterna':''}`}</span></span></div>`;};
   return `${head}<div class="win-b sc">${tit}${estHtml(estOfSite(id))}
     <div class="es-r dt-cl">${clsIcon(s.cl,40)}<span class="wh-sm"><span class="lab">${kw('classe_edificio','Classe dell\'edificio')}</span><b class="wh-nm" style="font-family:var(--f-disp);font-size:19px;color:${s.cl==='std'?'var(--ink)':C.col}">${esc(C.n)}</b><span class="sm">${esc(C.txt)} ${esc(C.desc)}</span></span></div>
     <div class="sc-f">${fact('Posti pallet',n0(s.cap),'amplabile fino a '+n0(s.cap+3*Math.round(s.cap*MAINT.expPct/50)*50))}${fact(kw('espansione','Affitto'),eur(s.rent),'al mese')}${fact(kw('espansione','Apertura'),eur(cost),'2 mesi + allestimento')}${fact(kw('bollette','Bollette'),eur(utenze(fw)),'al mese, previste')}${fact(kw('area_esterna','Area esterna'),`${ext} / ${s.ext}`,'posti usati')}${fact('Dal',s.from||2002,s.from?'sul mercato':'sempre sul mercato')}</div>
@@ -9355,7 +9351,7 @@ function siteCard(id){ const s=SITES[id]; if(!s) return '';
 function edilBox(){ const E=UI.sel.ed; if(!E||!SITES[E.site]||!siteOpen(E.site)) return '';
   const s=SITES[E.site], cls=edilCls(); if(!cls.includes(E.cl)) E.cl='std'; if(E.cap>s.max) E.cap=EDIL.sizes.filter(v=>v<=s.max).pop();
   const ext=E.dot.filter(id=>DOT_ID[id].ext).length, cost=edilCost(E.site,E.cap,E.cl,E.dot), ok=S.cash>=cost;
-  const dl=DOT.filter(d=>!d.base&&(!d.from||yearOf(S.day)>=d.from));
+  const dl=DOT.filter(d=>!d.base);
   return `<div class="card ed-box"><div class="row"><span class="h3">${kw('costruzione','Nuovo magazzino')} a ${esc(s.name)} <span class="wh-prov">${s.prov}</span></span><button class="btn sm2" data-act="edclose" aria-label="Chiudi il progetto">✕</button></div>
    <div class="lab">Posti pallet</div><div class="seg" role="group">${EDIL.sizes.filter(v=>v<=s.max).map(v=>`<button class="btn sm2" data-act="edcap" data-v="${v}" aria-pressed="${E.cap===v}">${n0(v)}</button>`).join('')}</div>
    <div class="lab">${kw('classe_edificio','Classe dell\'edificio')}</div><div class="seg" role="group">${cls.map(c=>`<button class="btn sm2" data-act="edcl" data-v="${c}" aria-pressed="${E.cl===c}" data-tip="<div class='tt'>${esc(WCLASS[c].n)}</div>${esc(WCLASS[c].desc)}<br>${eur(EDIL.eur[c])} a posto pallet, cantiere di ${Math.round(EDIL.gg[c]/30)} mesi.">${clsIcon(c,20)} ${esc(WCLASS[c].n)}</button>`).join('')}</div>
@@ -10355,6 +10351,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.107',t:'Tutto disponibile da subito',x:['Niente più anni d\'attesa: dal primo giorno sul mercato ci sono tutti i capannoni (anche i poli moderni di Castel San Giovanni e Calderara e quelli innovativi di Landriano e Vigasio) e tutti i manager e i dirigenti, che l\'head hunter può trovare subito.','Si possono costruire magazzini innovativi e montare pannelli solari e LED fin dall\'inizio. L\'incentivo statale sui pannelli resta quello di una volta: arriva solo a chi li monta tra il 2007 e il 2012.','Gli eventi restano legati ai loro anni: l\'euro nel 2002, la crisi del 2008, il Black Friday dal 2015 e gli altri.','Andrew «Smilzo» Goodheart è sul mercato da subito, a 23 anni.']},
  {v:'0.106',t:'Gare ed eventi sulla mappa',x:['Ogni gara aperta è una puntina sulla mappa, col logo del cliente sopra la sua zona e i giorni che mancano. Passandoci sopra vedi quanto dista ogni tuo magazzino e quanto è probabile vincerla; un clic apre la gara e colora la zona, con una linea da ogni magazzino.','Nebbia, allerta in Liguria, Giro d\'Italia, ZTL e moda a Milano, neve al Frejus: ora compaiono sulla mappa dove succedono, con i giorni che restano. Pesano solo sui viaggi che passano di lì, in proporzione: un magazzino con un solo cliente da quelle parti se ne accorge appena, uno che ci lavora tutti i giorni prende la penalità intera. Il Frejus resta com\'era: colpisce i magazzini che lavorano verso la Francia.','Tre imprevisti nuovi con il loro posto sulla mappa: il cantiere sull\'A1 tra Piacenza e Bologna, la coda al Brennero e la piena del Po.']},
  {v:'0.105',t:'Affitti, sindacato e traslochi delle avversarie',x:['Un tuo capannone di proprietà rimasto vuoto si può affittare a un\'azienda che non fa logistica: «Cerca un inquilino» nel riquadro Capannone vuoto. Dopo uno o due mesi arrivano le offerte; firmato il contratto, per sei anni incassi il canone ogni mese, meno il 10% di tasse e manutenzione. Lo ritrovi nella scheda Nuovo magazzino e sulla mappa, in grigio: lo puoi rinnovare alla scadenza o riprendere prima pagando sei mesi di canone.','Ogni tanto un inquilino non paga, oppure si affeziona e vuole comprare il capannone.','Col pacchetto Relazioni industriali un trasloco oltre 40 km è una delocalizzazione: nel vecchio magazzino sale l\'agitazione e, se c\'è il sindacato, chiede un accordo di trasferimento (indennità doppia, navetta aziendale, due mesi di buonuscita a chi non viene). Puoi firmarlo, portarlo al tavolo delle trattative o tirare dritto. Se segue almeno metà delle persone, il sindacato arriva con loro nel magazzino nuovo.','Anche le avversarie traslocano: lasciano un capannone vecchio per uno migliore lì vicino, o uniscono due magazzini mezzi vuoti. Sulla mappa vedi la freccia nel loro colore.','Un\'avversaria che cerca spazio può fare un\'offerta per comprare o prendere in affitto un tuo capannone vuoto: paga più del mercato, ma avrà un magazzino vicino ai tuoi clienti.']},
  {v:'0.104',t:'Imprevisti del trasloco',x:['Ogni trasloco porta uno o due imprevisti tutti suoi, con una scenetta nuova: il buyer che vuole vedere il magazzino nuovo, il timbro dei Vigili del Fuoco che manca, il magazziniere storico che non vuole fare la strada, la festa d\'addio, la navetta ribaltata in tangenziale, le ubicazioni che non tornano, il vicino che protesta, la neve, i pallet dimenticati, il manager pendolare, chi non era venuto e vuole tornare, il capoturno che rifà le ubicazioni e il gatto del magazzino.','Con il trasloco lampo gli imprevisti arrivano più spesso nei giorni del trasloco, con le ondate prima e dopo. Non contano per gli eventi normali, che restano rari.','Nel progetto puoi chiedere una franchigia sui KPI: chi accetta non ti fa pagare penali durante il trasloco e si arrabbia la metà, in cambio del 2% di sconto per 13 settimane. Accettano più spesso se chi segue il customer service sa negoziare.','Il capannone vuoto ha i suoi imprevisti: dopo la restituzione il proprietario può contestare i danni, quando vendi il compratore può tirare sul prezzo il giorno del rogito, e ogni tanto ci si installa una compagnia teatrale.']},

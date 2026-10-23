@@ -807,7 +807,7 @@ async def main():
           w.ko.ricarica.fine=S.day+1; F.stepOne(); F.stepOne(); o.fixed=!w.ko.ricarica;
           F.fuocoStart(w); o.fuoco=S.notes.some(n=>n.k==='ev'&&n.ev.id==='incendio');
           w.cl='vec'; F.ACT.rist({wh:w.id,ok:1}); o.rist=!!w.build&&w.build.k==='rist'&&w.build.to==='std'; w.build.left=1; F.stepOne(); o.std=w.cl==='std';
-          o.taken=!F.siteOpen(w.site)&&!F.rentable('l_casale')&&!F.siteOpen('landriano');
+          o.taken=!F.siteOpen(w.site)&&!F.rentable('l_casale')&&F.siteOpen('landriano');
           F.ACT.site({id:'l_casale'}); o.lotto=!!document.querySelector('#modal .sc [data-act=edsel]'); document.querySelector('#modal [data-act=edsel]').click(); o.box=!!document.querySelector('#win-magazzini .ed-box')&&!document.querySelector('#modal').innerHTML;
           F.ACT.edgo({ok:1}); o.cantiere=S.cantieri.length===1&&!F.siteOpen('l_casale');
           S.cantieri[0].left=1; F.stepOne(); const n=S.warehouses.find(x=>x.site==='l_casale'); o.nuovo=!!n&&n.own&&n.cl==='mod'&&!!n.dot.ribalte&&n.cap===3000;
@@ -816,7 +816,7 @@ async def main():
         await pg.screenshot(path=os.path.join(OUT, 'shot_magazzino_dotazioni.png'))
         # elenco dei capannoni a schede e scheda con l'immagine; «Affitta» dalla scheda la chiude e apre il magazzino
         await pg.evaluate("()=>{window.__FUP.ACT.openwh({id:window.__FUP.S.warehouses[0].id}); window.__FUP.ACT.site({id:'castelsg'});}")
-        assert not await pg.query_selector('#modal .ev-scn'), 'Castel San Giovanni non deve esserci prima del 2004'
+        assert await pg.query_selector('#modal .ev-scn'), 'Castel San Giovanni deve esserci da subito (niente anni d\'attesa)'
         await pg.evaluate("()=>{document.querySelector('#modal').innerHTML=''; window.__FUP.ACT.site({id:'orio'});}")
         await pg.screenshot(path=os.path.join(OUT, 'shot_capannone.png'))
         assert await pg.evaluate("()=>{const i=document.querySelector('#modal .ev-scn i'); return !!i&&i.dataset.scena.startsWith('est_')&&i.dataset.el.includes('el_muletti');}"), 'scheda del capannone senza il suo esterno'
@@ -843,7 +843,7 @@ async def main():
           const w=S.warehouses[0]; w.staff={mag:5,aut:3}; S.imp=3; S.queue=[{role:'imp',wh:null,days:5},{role:'aut',wh:w.id,days:9}];
           S.clients.push({...S.clients[0],id:'cx',name:'Tuttosubito Italia',zone:'nordovest',pal:400});
           delete S.boss; delete S.alumni; const EX=['ottavio','giulia','roberto']; S.execs=S.managers.filter(m=>EX.includes(m.id)).map(e=>{const x={...e}; delete x.bd; delete x.log; return x;}); S.execs[0].hired=true;
-          S.managers=S.managers.filter(m=>!m.from&&!EX.includes(m.id)).map(m=>{const x={...m}; delete x.bd; delete x.log; delete x.ann; return x;}); delete S.hh; delete S.cands; delete S.negs; delete S.mkt;
+          S.managers=S.managers.filter(m=>!EX.includes(m.id)).map(m=>{const x={...m}; delete x.bd; delete x.log; delete x.ann; return x;}); delete S.hh; delete S.cands; delete S.negs; delete S.mkt;
           delete S.certMig; S.researched.freddo=true; delete S.researched.haccp; delete w.tech.haccp; delete w.tech.freddo;
           F.save(); return true;}''')
         await reload(pg); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached'); await pg.wait_for_selector('[data-act=continue]')

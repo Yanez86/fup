@@ -21,13 +21,13 @@ Come nei giochi Paradox, niente punti azione: si decidono le persone e le priori
 - **I sistemi invecchiano**: dopo qualche anno un WMS va aggiornato, altrimenti si rompe più spesso.
 - **Il miglioramento continuo**: gli ingegneri che non sono su un progetto girano per i magazzini e alzano piano piano la produttività.
 - **Un sesto posto in Direzione**: il direttore IT e ingegneria.
-- **Storie nuove**: il server sotto la scala che si allaga, il ransomware, la fattura elettronica, gli incentivi per l'automazione.
+- **Storie nuove**: il server sotto la scala che si allaga, il ransomware, la fattura elettronica del 2019, il Piano Industria 4.0, il GDPR.
 
 ## Decisioni prese con Davide
 - **Una ricerca alla volta per reparto**: Direzione (il CEO, come oggi), IT e Ingegneria, quindi fino a tre insieme. È un'eccezione alla regola «una ricerca alla volta», solo col pacchetto. La linea di un reparto si apre quando ha almeno una persona o un consulente a contratto, quindi a inizio partita tutto resta come oggi.
 - **Il welfare non passa all'Ingegneria**: le ricerche del Welfare restano nella linea della Direzione, e nei magazzini i servizi li installa il **facility manager** (§6).
 - **Consulenti esterni sì**: è la prassi partire con un consulente, quindi sono il primo passo di ogni reparto (§9).
-- **Nessuna data minima**: nel pacchetto nessuna ricerca e nessun evento chiede un anno. Le date del gioco base sono una domanda a parte (§20).
+- **Gli anni solo negli eventi**: nessuna ricerca, nessun requisito e nessun personaggio chiede un anno; gli eventi invece hanno i loro anni (il ransomware dal 2016, la fattura elettronica nel 2019). È la stessa regola del gioco base dalla versione 0.107 (§20).
 - **Sesto posto in Direzione**: il **direttore IT e ingegneria** (§2). Il direttore tecnologia resta com'è.
 
 ## 1. Chi fa cosa: le tecnologie divise per reparto
@@ -204,7 +204,7 @@ Nessuna ha un anno minimo: servono solo le ricerche indicate.
 | Ricerca | Reparto | Costo / settimane | Effetto |
 |---|---|---|---|
 | Sala server e backup | IT | 8.000 € / 3 | affidabilità +5; nei guasti e negli eventi i dati si recuperano dal backup di stanotte |
-| Sicurezza informatica | IT | 25.000 € / 6, 300 €/mese (serve la Sala server) | affidabilità +5, ransomware −80%, truffa dell'IBAN smascherata; la chiedono FarmaSpa e le committenti S |
+| Sicurezza informatica | IT | 25.000 € / 6, 300 €/mese (serve la Sala server) | affidabilità +5, ransomware −80%, truffa dell'IBAN smascherata; dopo l'evento del GDPR la chiedono FarmaSpa e le committenti S |
 | Cruscotto dei KPI | IT | 30.000 € / 7 (serve il WMS) | previsione di puntualità e accuratezza a fine mese per ogni cliente, avviso 2 settimane prima di andare sotto soglia; gare +1 |
 | Server in cloud | IT | 40.000 € / 8 (serve la Sicurezza) | canoni dei sistemi −15%, assistenza necessaria −30%, affidabilità +5 |
 | Previsioni con l'intelligenza artificiale | IT | 60.000 € / 11 (servono cruscotto e cloud) | picchi dei clienti annunciati 4 settimane prima, effetto dei picchi sui reparti −30% |
@@ -232,27 +232,27 @@ Sono 11, si possono tagliare (le prime da togliere: Server in cloud ed Esoschele
 - **Nemico delle password** (negativo): Innovazione −1, Precisione −1; da responsabile IT affidabilità −5. *«La password è il nome del gatto, su un post-it attaccato al monitor. Il gatto si chiama Password.»*
 
 ## 13. Eventi (circa 12, dentro la regola di uno ogni 30-55 giorni)
-Due fonti nuove con la loro scenetta: **«Sala server»** (armadi con le lucine, cavi, una ventola che gira) e **«Ufficio tecnico»** (il layout del magazzino sul tavolo, caschi gialli, un cronometro). Nessun evento chiede un anno: le novità di legge arrivano una volta per partita, in un momento a caso.
+Due fonti nuove con la loro scenetta: **«Sala server»** (armadi con le lucine, cavi, una ventola che gira) e **«Ufficio tecnico»** (il layout del magazzino sul tavolo, caschi gialli, un cronometro). Come nel gioco base, gli eventi possono avere i loro anni.
 
 1. **Il WMS si ferma il venerdì prima di Natale** (dicembre, con il WMS): carta e penna (accuratezza −3 per una settimana), tecnico del consulente in reperibilità (soldi), aspetti il sistemista (solo con qualcuno in assistenza: 1 giorno).
 2. **Il server sotto la scala si è allagato** (con un'allerta meteo, senza Sala server): 2 giorni di magazzini al buio, oppure si paga il recupero dei dischi.
-3. **Ransomware: i pallet sono in ostaggio** (più raro con la Sicurezza informatica): pagare il riscatto, ripristinare dal backup (con la Sala server: 1 giorno), ricostruire a mano (7 giorni, accuratezza −3).
-4. **Il fornitore ha cambiato IBAN**: la mail sembra vera. Paghi, telefoni per verificare, oppure con la Sicurezza informatica il filtro l'ha già fermata.
-5. **Arriva la fattura elettronica obbligatoria** (una volta per partita): con il gestionale si passa liscio; senza, consulente o due settimane di caos in amministrazione.
-6. **Il governo incentiva l'automazione** (una volta per partita): per due anni le installazioni di automazione (radiofrequenza, pick-to-light, verticale, AMR) costano il 30% in meno.
-7. **Le nuove regole sulla privacy** (una volta per partita): registro dei trattamenti e informative; consulente della privacy oppure «ci pensa il reparto IT» (una persona ferma per 4 settimane).
+3. **Ransomware: i pallet sono in ostaggio** (dal 2016, più raro con la Sicurezza informatica): pagare il riscatto, ripristinare dal backup (con la Sala server: 1 giorno), ricostruire a mano (7 giorni, accuratezza −3).
+4. **Il fornitore ha cambiato IBAN** (dal 2012): la mail sembra vera. Paghi, telefoni per verificare, oppure con la Sicurezza informatica il filtro l'ha già fermata.
+5. **Arriva la fattura elettronica** (gennaio 2019, storico): con il gestionale si passa liscio; senza, consulente o due settimane di caos in amministrazione.
+6. **Il Piano Industria 4.0** (2017, storico): per due anni le installazioni di automazione (radiofrequenza, pick-to-light, verticale, AMR) costano il 30% in meno.
+7. **Arriva il GDPR** (maggio 2018, storico): registro dei trattamenti e informative; consulente della privacy oppure «ci pensa il reparto IT» (una persona ferma per 4 settimane). Da qui FarmaSpa e le committenti S chiedono la Sicurezza informatica.
 8. **Il navigatore manda il bilico in Città Alta** (con il GPS): l'autista è incastrato tra le mura venete di Bergamo.
 9. **Il robot numero 7 fissa la colonna** (con gli AMR): da tre giorni si ferma davanti alla colonna C14. I colleghi gli hanno dato un nome.
 10. **Il neolaureato vuole rifare tutto il layout** (Ingegneria): lo lasci fare (2 settimane di produttività −5%, poi bonus dei metodi +2), lo freni (se ne va), progetto pilota in una corsia.
-11. **Il sistemista se ne va in banca**: controfferta +20% o lo lasci andare, e trovarne un altro è lungo.
-12. **Un concorrente è fermo per un attacco informatico** (opportunità): i suoi clienti ti chiamano.
+11. **Il sistemista se ne va in banca** (dal 2010): controfferta +20% o lo lasci andare, e trovarne un altro è lungo.
+12. **Un concorrente è fermo per un attacco informatico** (dal 2016, opportunità): i suoi clienti ti chiamano.
 
 Eventi di oggi che cambiano col pacchetto:
 - **Il WMS si aggiorna da solo**: con qualcuno in assistenza arriva la terza risposta «Ci pensa il reparto IT» (gratis, un giorno).
 - **Lo stagista ha cancellato il database**: con la Sala server e backup c'è «Ripristino dal backup di stanotte».
 
 ## 14. Gare, clienti, avversari, vittoria
-- **Clienti**: FarmaSpa e le committenti S chiedono la Sicurezza informatica nelle gare (nuovo requisito; i contratti in corso hanno i 180 giorni di grazia di oggi). Il Cruscotto dei KPI dà +1 in tutte le gare (si presentano i dati, non le promesse).
+- **Clienti**: dopo l'evento del GDPR, FarmaSpa e le committenti S chiedono la Sicurezza informatica nelle gare (nuovo requisito; i contratti in corso hanno i 180 giorni di grazia di oggi). Il Cruscotto dei KPI dà +1 in tutte le gare (si presentano i dati, non le promesse).
 - **Avversari**: stesse regole, semplificate. Partono col consulente e assumono persone IT e Ingegneria in proporzione ai sistemi e ai magazzini; scelgono il big bang secondo lo stile (Prezzo e Spietato sì, Qualità no); subiscono guasti e ransomware.
 - **Vittoria nuova «Magazzino 4.0»**: almeno 3 magazzini con WMS, radiofrequenza e AMR già appresi, affidabilità sopra 85 per 2 anni di fila e nessun avvio disastroso in quei 2 anni.
 - **Cronaca di fine partita**: «Primo big bang andato liscio», «Addio al consulente: nasce il reparto IT», «1.000 giorni senza guasti informatici», «Il WMS più vecchio del Nord» (15 anni senza aggiornamenti).
@@ -303,10 +303,7 @@ Un pezzo per versione, ognuno giocabile da solo:
 5. **Il contorno**: policy, talenti, eventi, vittoria, cronaca.
 6. **Bilanciamento** e pacchetto acceso di base.
 
-## 20. Fuori dal pacchetto: le date nel gioco base (da chiarire)
-Davide vorrebbe togliere tutte le date come richiesta minima. Nel gioco base oggi ci sono:
-- **8 eventi con un anno minimo**: Autista virale su TikTok (dal 2020), Black Friday (2015), Consegne in 2 ore (2014), Milano lancia «Zero Camion» (2008), Il video del muletto (2008), Le nuove regole doganali (2004), Il manager e la macchina pensante (2004), l'ordinanza sui capannoni nelle province del terremoto in Emilia (2012).
-- **18 capannoni** che arrivano sul mercato in un certo anno, e i **manager** che arrivano sul mercato negli anni (2004-2018).
-- **Eventi storici a data fissa**, che non sono richieste minime ma appuntamenti: l'euro (2002), le Olimpiadi di Torino (2006), la crisi finanziaria (2008), l'Expo (2015), il lockdown (2020), il caro gasolio (2022), e «Preventivo in lire» solo fino al 2004.
-
-Da decidere: si tolgono tutte (e gli eventi storici diventano «una volta per partita, a caso») oppure solo le richieste minime, lasciando gli appuntamenti storici? È un lavoro a parte, che si può fare anche prima del pacchetto.
+## 20. Le date nel gioco base (deciso, fatto nella versione 0.107)
+Davide: «lascia solo gli eventi con gli anni». Quindi:
+- **Tolti** gli anni d'arrivo che non sono eventi: i 4 capannoni nuovi (Castel San Giovanni, Calderara, Landriano, Vigasio), la classe innovativa nelle costruzioni, pannelli solari e LED, i 12 manager e dirigenti della «nuova generazione». Sono tutti disponibili dal primo giorno; Andrew «Smilzo» Goodheart passa a 23 anni (nel 2002 ne avrebbe avuti 16).
+- **Restano** gli anni degli eventi e degli appuntamenti del mondo: gli eventi con un anno minimo (Black Friday dal 2015, TikTok dal 2020…), quelli storici (euro, Olimpiadi, crisi, Expo, lockdown, caro gasolio), l'ordinanza sui capannoni, l'incentivo del solare 2007-2012, i rinnovi del contratto nazionale, il gasolio che sale.
