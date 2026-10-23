@@ -179,6 +179,7 @@ async def phone(b, w, h, name, errs):
     await pg.tap('#top [data-act=options]')
     assert await pg.evaluate("document.querySelector('#modal [data-act=animset]').checked===false&&!document.documentElement.classList.contains('anim')"), f'{name}: casella delle animazioni mancante o sbagliata'
     assert await pg.evaluate(FITS, '#modal .modal'), f'{name}: le Opzioni escono dallo schermo'
+    assert await pg.evaluate("document.querySelector('#modal .opt-firma a[href=\"https://happysquid.ink\"] svg')!==null"), f'{name}: manca la firma Happy Squid Inc. (col calamaro) nelle Opzioni'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_opzioni.png'))
     await pg.tap('#modal [data-act=closemodal]')
     assert not await pg.is_visible('#dock [data-id=azienda]'), f'{name}: il menu deve partire chiuso'
