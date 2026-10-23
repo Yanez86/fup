@@ -1,4 +1,5 @@
-// Scenette per la cima delle finestre (non per gli eventi): customer service, consiglio d'amministrazione, ufficio del direttore.
+// Scenette per la cima delle finestre (non per gli eventi): customer service, consiglio d'amministrazione, ufficio del direttore,
+// certificati e audit.
 // Disegnate con pxl (.claude/skills/pxl-pixel-art), lettere di TPAL (src/game.html). Colori e omini in comune.px.js.
 //
 //   python3 tools/scene_pxl/esporta.py     (builda tutti i file e porta le scene in assets/scene/)
@@ -290,4 +291,90 @@ scene("direttore_" + c + g, { w: SW, h: SH, bg: "g", world: { light: [-0.6, -1],
     stamp("scrivania_ceo", 76, 69),
     stamp("pendolo", 99, 47), stamp("tel_ceo", 52, 47), stamp("cartellina", 64, 47)),
   layer("segretaria", stamp("segr_" + g, 124, 68), stamp("_fumo", 132, 57)),
+)
+
+// ================================================================ CERTIFICATI E AUDIT
+// L'ufficio qualità il giorno dell'audit: i certificati appesi (con lo scudo azzurro delle certificazioni), la vetrata sul magazzino,
+// l'armadio dei raccoglitori. L'auditor col timbro che batte, la checklist alla lavagna che si spunta riga per riga
+// (l'ultima con un rilievo rosso) e la responsabile qualità in camice che suda col raccoglitore dell'HACCP in mano.
+
+// lo scudo delle certificazioni con la spunta
+sprite("_scudo", { pivot: [3, 0] }, `
+  .BBBBB.
+  BBBBBBB
+  BBBBBWB
+  BWBBWBB
+  BBWWBBB
+  .BBBBB.
+  ..bbb..
+  ...b...`)
+// il certificato incorniciato: titolo, scudo, firma e bollo rosso
+sprite("certificato", { w: 14, h: 18, outline: "K" }, rect(0, 0, 14, 18, "M"), box(0, 0, 14, 18, "m"), rect(2, 2, 10, 14, "W"),
+  hline(4, 3, 6, "s"), stamp("_scudo", 7, 5), hline(3, 14, 4, "S"), circ(9, 13, 1, "R"), px(9, 13, "e"))
+// la vetrata sul magazzino: scaffalature porta-pallet coi colli, il pavimento con la striscia gialla
+// [x, ripiano (0 in alto, 2 a terra), altezza, colore]: cartoni e colli col film colorato appoggiati sui correnti arancioni
+const COLLI = [[5, 0, 6, "k"], [13, 0, 5, "R"], [24, 0, 7, "Y"], [32, 0, 5, "k"], [5, 1, 6, "O"], [13, 1, 5, "k"], [24, 1, 8, "k"],
+  [32, 1, 6, "P"], [5, 2, 7, "k"], [13, 2, 8, "B"], [24, 2, 5, "k"], [32, 2, 8, "G"]]
+sprite("vetrata_mag", { w: 48, h: 36 },
+  rect(2, 2, 44, 32, "S"), rect(2, 31, 44, 3, "j"), hline(2, 31, 44, "Y"),
+  ...COLLI.map(([x, r, h, k]) => { const y = [12, 22, 31][r] - h; return [rect(x, y, 7, h, k), vline(x + 6, y, h, k === "k" ? "N" : k === "Y" ? "y" : "K"), k === "k" ? vline(x + 3, y, h, "q") : hline(x, y + 1, 6, "W")] }).flat(),
+  ...[3, 21, 40].map((x) => rect(x, 2, 2, 30, "b")), ...[12, 22].map((y) => rect(3, y, 39, 2, "O")), ...[12, 22].map((y) => hline(3, y + 1, 39, "o")),
+  box(0, 0, 48, 36, "K"), box(1, 1, 46, 34, "s"), vline(24, 2, 32, "s"))
+// l'armadio basso coi raccoglitori di tutti i colori (etichetta bianca e foro per tirarli fuori)
+const RACC = ["R", "B", "Y", "G", "B", "O", "R", "P", "T"]
+sprite("armadio_racc", { w: 40, h: 24, outline: "K", pivot: "bottom" },
+  rect(0, 0, 40, 24, "j"), hline(0, 0, 40, "S"), rect(1, 1, 38, 12, "D"),
+  ...RACC.map((k, i) => [rect(2 + i * 4, 2, 4, 11, k), rect(3 + i * 4, 4, 2, 3, "W"), px(3 + i * 4, 9, "K"), vline(5 + i * 4, 2, 11, k === "Y" ? "y" : k === "W" ? "S" : "K")]).flat(),
+  hline(0, 13, 40, "s"), vline(20, 14, 10, "s"), rect(16, 18, 2, 2, "S"), rect(22, 18, 2, 2, "S"), hline(0, 23, 40, "d"))
+// la scrivania dell'audit
+sprite("scrivania_aud", { w: 64, h: 18, pivot: "bottom" },
+  rect(0, 0, 64, 3, "S"), hline(0, 0, 64, "W"), hline(0, 3, 64, "K"),
+  rect(2, 4, 60, 11, "j"), box(2, 4, 60, 11, "K"), hline(3, 13, 58, "s"), rect(2, 15, 3, 3, "d"), rect(59, 15, 3, 3, "d"))
+// la pila di raccoglitori sulla scrivania e la tazzina
+sprite("pila_racc", { w: 14, h: 7, outline: "K", pivot: "bottom" }, rect(0, 0, 13, 3, "B"), rect(1, 3, 13, 4, "R"), hline(1, 3, 13, "e"), rect(2, 4, 3, 2, "W"), rect(2, 1, 3, 1, "W"))
+sprite("tazzina", { outline: "K", pivot: "bottom" }, "mmm.\nWWWS\nWWW.\nSSS.")
+// la ventiquattrore dell'auditor, per terra
+sprite("valigetta", { outline: "K", pivot: "bottom" }, `
+  ..mmmm..
+  ..m..m..
+  MMMMMMMM
+  MMMqqMMM
+  MMMMMMMM
+  mmmmmmmm`)
+// l'auditor in giacca grigia e occhiali, col timbro: lo alza, batte sul verbale (un colpo secco) e lo rialza
+persona("_auditor", { testa: "calvo", corpo: "seduto", abito: "completo", swap: { B: "s", b: "D", M: "S", R: "R" } })
+// il timbro tenuto dall'alto: la mano sul pomello, il manico, la base (y = dove sta la mano)
+const TIMBRO = (y) => [rect(9, y + 1, 2, 19 - y, "s"), rect(11, y + 2, 1, 2, "M"), rect(9, y + 4, 5, 2, "m"), hline(9, y + 5, 5, "K"), rect(10, y, 3, 2, "F")]
+anim("auditor", { w: 16, h: 26, fps: FPS, outline: "K", pivot: [5, 26] }, stamp("__auditor", 0, 10),
+  rect(2, 15, 2, 2, "L"), rect(6, 15, 2, 2, "L"), px(3, 15, "K"), px(6, 15, "K"), hline(4, 15, 2, "s"),            // gli occhiali
+  frame({ hold: 3 }, ...TIMBRO(8)), frame({ hold: 1 }, ...TIMBRO(13)), frame({ hold: 2 }, ...TIMBRO(18)), frame({ hold: 2 }, ...TIMBRO(14)))
+// il colpo del timbro: due trattini ai lati quando batte
+anim("colpo", { w: 11, h: 3, fps: FPS }, frame({ hold: 4 }), frame({ hold: 2 }, px(0, 0, "K"), px(1, 1, "K"), px(10, 0, "K"), px(9, 1, "K")), frame({ hold: 2 }))
+// la responsabile qualità in camice bianco, col raccoglitore dell'HACCP stretto al petto; una goccia di sudore scende sulla tempia
+persona("_rq", { testa: "lunghi", swap: { B: "W", b: "S", M: "N", D: "d" } })
+anim("rq", { w: 12, h: 20, frames: LOOP, fps: FPS, outline: "K", pivot: [5, 20] }, stamp("__rq"),
+  rect(3, 11, 5, 6, "G"), hline(3, 11, 5, "h"), rect(4, 13, 3, 2, "W"), px(2, 14, "F"), px(8, 14, "F"),
+  (c) => { const t = c.frame % 8; if (t < 6) c.px(9, 3 + t, "L") })
+// la checklist alla lavagna: le righe si spuntano una alla volta, l'ultima prende la crocetta rossa del rilievo
+const SPUNTE = [2, 5, 8, 11]
+anim("checklist", { w: 46, h: 36, frames: LOOP, fps: FPS, outline: "K" },
+  rect(0, 0, 46, 32, "W"), box(0, 0, 46, 32, "s"), text(14, 3, "AUDIT", "D"), hline(3, 9, 40, "S"),
+  ...[12, 17, 22, 27].map((y, i) => [box(4, y, 4, 4, "s"), hline(11, y + 1, [28, 22, 30, 18][i], "S"), hline(11, y + 3, [16, 24, 12, 20][i], "S")]).flat(),
+  rect(3, 32, 40, 2, "s"), hline(3, 33, 40, "D"), rect(30, 31, 6, 1, "B"),
+  (c) => {
+    ;[12, 17, 22].forEach((y, i) => { if (c.frame >= SPUNTE[i]) { c.px(4, y + 1, "G"); c.px(5, y + 2, "G"); c.px(6, y + 1, "G"); c.px(7, y, "G"); c.px(8, y - 1, "G") } })
+    if (c.frame >= SPUNTE[3]) { c.line(4, 27, 7, 30, "R"); c.line(7, 27, 4, 30, "R"); c.px(9, 28, "R"); c.px(9, 30, "R") }
+  })
+
+scene("audit", { w: SW, h: SH, bg: "C", world: { light: [-0.6, -1], ground: 66 } },
+  layer("muro",
+    rect(0, 0, SW, 3, "T"), hline(0, 3, SW, "t"),
+    rect(0, 56, SW, 16, "S"), hline(0, 56, SW, "s"), ...[61, 67].map((y) => hline(0, y, SW, "j")), ...Array.from({ length: 10 }, (_, i) => vline(i * 16 + 8, 57, 15, "j")),
+    stamp("vetrata_mag", 4, 6), stamp("certificato", 58, 7), stamp("certificato", 74, 9), stamp("certificato", 90, 7),
+    stamp("checklist", 108, 5)),
+  layer("dietro", stamp("armadio_racc", 26, 62), stamp("auditor", 82, 52)),
+  layer("scrivania",
+    stamp("scrivania_aud", 82, 68), stamp("colpo", 83, 46), hline(85, 49, 10, "W"),
+    stamp("pila_racc", 64, 50), stamp("tazzina", 104, 50), stamp("_fumo", 104, 46)),
+  layer("davanti", stamp("valigetta", 54, 70), stamp("rq", 128, 69), stamp("pianta_ceo", 150, 69)),
 )

@@ -919,9 +919,9 @@ async def main():
           for(const [k,src] of Object.entries(F.SCENE)){const im=new Image(); im.src=src; await im.decode(); if(im.naturalWidth!==(/^(est|el)_/.test(k)?2304:2560)||im.naturalHeight!==72) bad.push(k+': '+im.naturalWidth+'x'+im.naturalHeight);}
           return {bad,n:Object.keys(F.SCENE).length};}''')
         assert not r['bad'] and r['n'] >= 38, r
-        # scene in cima alle finestre: Magazzini, Tecnologia, Customer service, Direzione, Azienda e CEO (3× nelle finestre larghe, 2× nelle strette);
+        # scene in cima alle finestre: Magazzini, Tecnologia, Reparti tecnici, Certificati e audit, Customer service, Direzione, Azienda e CEO (3× nelle finestre larghe, 2× nelle strette);
         # la Tecnologia è ferma senza ricerca e si muove con una ricerca in corso
-        r = await pg.evaluate('''()=>{const F=window.__FUP,out={},P={magazzini:'magazzini',personale:'personale',tecnologia:'tecnologia',reparti:'tecnologia',customer:'clienti',direzione:'manager',azienda:'azienda'};F.newGame('marco',null,{mode:'classica',win:{},it:true});F.S.researched.direzione=true;
+        r = await pg.evaluate('''()=>{const F=window.__FUP,out={},P={magazzini:'magazzini',personale:'personale',tecnologia:'tecnologia',reparti:'tecnologia',certificazioni:'tecnologia',customer:'clienti',direzione:'manager',azienda:'azienda'};F.newGame('marco',null,{mode:'classica',win:{},it:true});F.S.researched.direzione=true;
           const apri=tab=>{document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.ACT.toggle({id:P[tab]}); F.ACT.wtab({p:P[tab],id:tab}); return document.querySelector('#wins .win .ev-scn');};
           for(const [tab,w] of Object.entries(F.WSCN)){let k=typeof w==='function'?w():w; k=k.k||k; const d=apri(tab), i=d&&d.querySelector('i'); out[tab]=!!i&&i.dataset.scena===k&&i.offsetWidth===(['customer','personale'].includes(tab)?320:tab==='magazzini'?432:480);}   // offsetWidth: la misura vera, anche mentre la finestra si apre con lo zoom
           // esterni dei magazzini: il capannone segue la classe dell'edificio (celle frigo: quello frigorifero), sopra le dotazioni dell'area esterna
