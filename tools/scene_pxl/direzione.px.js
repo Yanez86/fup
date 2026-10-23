@@ -295,7 +295,7 @@ scene("direttore_" + c + g, { w: SW, h: SH, bg: "g", world: { light: [-0.6, -1],
 
 // ================================================================ CERTIFICATI E AUDIT
 // L'ufficio qualità il giorno dell'audit: i certificati appesi (con lo scudo azzurro delle certificazioni), la vetrata sul magazzino,
-// l'armadio dei raccoglitori. L'auditor col timbro che batte, la checklist alla lavagna che si spunta riga per riga
+// l'armadio dei raccoglitori. L'auditor (una ragazza col caschetto biondo) col timbro che batte, la checklist alla lavagna che si spunta riga per riga
 // (l'ultima con un rilievo rosso) e la responsabile qualità in camice che suda col raccoglitore dell'HACCP in mano.
 
 // lo scudo delle certificazioni con la spunta
@@ -341,8 +341,20 @@ sprite("valigetta", { outline: "K", pivot: "bottom" }, `
   MMMqqMMM
   MMMMMMMM
   mmmmmmmm`)
-// l'auditor in giacca grigia e occhiali, col timbro: lo alza, batte sul verbale (un colpo secco) e lo rialza
-persona("_auditor", { testa: "calvo", corpo: "seduto", abito: "completo", swap: { B: "s", b: "D", M: "S", R: "R" } })
+// l'auditor: una ragazza col caschetto biondo (frangetta, punte al mento, m per l'ombra dei capelli), giacca grigia,
+// camicetta bianca e occhiali; col timbro: lo alza, batte sul verbale (un colpo secco) e lo rialza
+TESTE.caschetto = [
+  "..MMM",
+  ".MMMM",
+  "MMMMM",
+  "MMMMM",
+  "MMMFF",
+  "MMFKF",
+  "MMFKF",
+  "MMFFF",
+  "mmfFf",
+  "...ff"]
+persona("_auditor", { testa: "caschetto", corpo: "seduto", abito: "completo", swap: { B: "s", b: "D", M: "Y", m: "y", R: "W" } })
 // il timbro tenuto dall'alto: la mano sul pomello, il manico, la base (y = dove sta la mano)
 const TIMBRO = (y) => [rect(9, y + 1, 2, 19 - y, "s"), rect(11, y + 2, 1, 2, "M"), rect(9, y + 4, 5, 2, "m"), hline(9, y + 5, 5, "K"), rect(10, y, 3, 2, "F")]
 anim("auditor", { w: 16, h: 26, fps: FPS, outline: "K", pivot: [5, 26] }, stamp("__auditor", 0, 10),

@@ -3709,7 +3709,7 @@ function genPerson(o){ o=o||{};
   STATS.forEach(s=>st[s.k]=o.k?(top?rint(8,15):rint(5,13)):rint(4,11));
   if(!o.k&&Math.random()<0.15) st[pick(STATS).k]=rint(13,15);
   const tal=[]; if(Math.random()<0.75) tal.push(pick(TAL_EDU));
-  const nt=Math.random()<0.35?2:1; while(tal.length<nt+(tal[0]&&TALENTS[tal[0]].edu?1:0)){ const n=pick(TAL_GEN.filter(n=>(riOn()||!TALENTS[n].ri)&&(itOn()||!TALENTS[n].it))); if(!tal.includes(n)) tal.push(n); }
+  const nt=Math.random()<0.35?2:1; while(tal.length<nt+(tal[0]&&TALENTS[tal[0]].edu?1:0)){ const L=TAL_GEN.filter(n=>!tal.includes(n)&&(riOn()||!TALENTS[n].ri)&&(itOn()||!TALENTS[n].it)); if(!L.length) break; tal.push(pick(L)); }   // solo talenti che non ha già: il ciclo finisce anche con un Math.random fisso (test)
   tal.forEach(n=>Object.entries(talMods(n)).forEach(([k,v])=>st[k]+=v));
   if(o.k) st[o.k]=Math.max(st[o.k],o.min+(Math.random()<0.4?1:0)+(Math.random()<0.15?1:0));
   STATS.forEach(s=>st[s.k]=clamp(st[s.k],1,20));
@@ -11214,7 +11214,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.118',t:'La scena degli audit',x:['La scheda Certificati e audit della finestra Tecnologia ha la sua scenetta, come le altre: l\'ufficio qualità il giorno dell\'audit, con i certificati appesi, l\'auditor che batte il timbro, la checklist che si spunta riga per riga (l\'ultima con un rilievo) e la responsabile qualità che suda col raccoglitore dell\'HACCP.']},
+ {v:'0.118',t:'La scena degli audit',x:['La scheda Certificati e audit della finestra Tecnologia ha la sua scenetta, come le altre: l\'ufficio qualità il giorno dell\'audit, con i certificati appesi, l\'auditor (una ragazza col caschetto biondo) che batte il timbro, la checklist che si spunta riga per riga (l\'ultima con un rilievo) e la responsabile qualità che suda col raccoglitore dell\'HACCP.']},
  {v:'0.117',t:'Gli stemmi in fondo',x:['Nelle schede delle partite salvate gli stemmi dei pacchetti di espansione stanno in fondo, senza il nome: colorati se il pacchetto è attivo in quella partita, grigi se è spento. Il nome compare passandoci sopra o toccandoli.']},
  {v:'0.116',t:'La firma',x:['In fondo alle Opzioni c\'è la firma: «Un gioco Happy Squid Inc.», col calamaro sorridente e il collegamento al sito happysquid.ink.']},
  {v:'0.115',t:'I pacchetti nei salvataggi',x:['Nella schermata principale ogni partita salvata mostra gli stemmi dei pacchetti di espansione accesi (Relazioni industriali, Reparto IT e Ingegneria), oppure «Solo gioco base».']},
