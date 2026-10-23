@@ -152,10 +152,14 @@ async def phone(b, w, h, name, errs):
     await pg.tap('[data-act=stnext]'); await pg.wait_for_timeout(200)
     assert await pg.evaluate("document.querySelector('#start [data-act=lbpack][data-id=ri]').getAttribute('aria-pressed')") == 'true', f'{name}: il pacchetto deve partire acceso'
     if not ri: await pg.tap('[data-act=lbpack][data-id=ri]')
+    # il pacchetto Reparto IT e Ingegneria parte spento: in verticale lo si accende, insieme alle Relazioni industriali
+    assert await pg.evaluate("document.querySelector('#start [data-act=lbpack][data-id=it]').getAttribute('aria-pressed')") == 'false', f'{name}: il pacchetto Reparto IT e Ingegneria deve partire spento'
+    if ri: await pg.tap('[data-act=lbpack][data-id=it]')
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: i pacchetti scorrono di lato'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_pacchetti.png'), full_page=True)
     await pg.tap('[data-act=startgame]'); await pg.tap('[data-act=closemodal]')
     assert await pg.evaluate('!!window.__FUP.HUM.cfg.ri') == ri, f'{name}: pacchetto Relazioni industriali sbagliato'
+    assert await pg.evaluate('!!window.__FUP.HUM.cfg.it') == ri, f'{name}: pacchetto Reparto IT e Ingegneria sbagliato'
     await pg.wait_for_timeout(100)
     # menu: un solo pulsante sulla mappa; aperto, l'elenco sta nello schermo e ha tutte le voci
     assert await pg.evaluate(FITS, '#burger'), f'{name}: pulsante Menu fuori schermo'
@@ -269,7 +273,9 @@ async def phone(b, w, h, name, errs):
             await pg.tap('#win-sindacato [data-act=rireq][data-i="0"][data-v=si]')
             assert await pg.evaluate("window.__FUP.S.warehouses[0].tav.reqs[0].c==='si'"), f'{name}: il pulsante Concedo non funziona'
             await pg.evaluate("()=>{const S=window.__FUP.S; S.warehouses[0].tav=null; S.warehouses[0].ag=20;}")
-        for tb in TABS.get(wn, []):   # le altre schede della finestra
+        if wn == 'tecnologia' and ri:   # col pacchetto Reparto IT e Ingegneria: un consulente e un responsabile, perché la scheda abbia tutto
+            await pg.evaluate("()=>{const F=window.__FUP,S=F.S; S.cash=Math.max(S.cash,500000); F.ACT.consign({id:'gigabancale',ok:1}); F.ACT.hiremgr({id:'sara'}); F.ACT.setdep({k:'ing'},{value:'sara'}); S.office.it=2; F.renderAll();}")
+        for tb in TABS.get(wn, []) + (['reparti'] if wn == 'tecnologia' and ri else []):   # le altre schede della finestra
             await pg.tap(f'#win-{wn} [data-act=wtab][data-id={tb}]')
             assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn}, scheda {tb}, esce dallo schermo'
             bad = await pg.evaluate(NOSIDE, f'#win-{wn}')
@@ -537,7 +543,7 @@ async def main():
         await pg.click('[data-act=lbwin][data-id=reputazione]')
         await pg.screenshot(path=os.path.join(OUT, 'shot_crea_7_lobby.png'), full_page=True)
         await pg.click('[data-act=stnext]')
-        assert await pg.evaluate("document.querySelectorAll('#start .pk').length") == 2, 'passo Pacchetti: gioco base più le espansioni'
+        assert await pg.evaluate("document.querySelectorAll('#start .pk').length") == 3, 'passo Pacchetti: gioco base più le due espansioni'
         await pg.screenshot(path=os.path.join(OUT, 'shot_crea_8_pacchetti.png'), full_page=True)
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
         lb = await pg.evaluate('()=>{const F=window.__FUP,H=F.HUM;return {n:H.bots.length,ids:H.bots.map(b=>b.bot.id),diff:H.bots.find(b=>b.bot.id==="edoardo").bot.diff,sty:Object.fromEntries(H.bots.map(b=>[b.bot.id,b.bot.style])),win:H.cfg.win,mode:H.cfg.mode,cols:[H.company.color,...H.bots.map(b=>b.company.color)]}}')
@@ -807,7 +813,7 @@ async def main():
           w.ko.ricarica.fine=S.day+1; F.stepOne(); F.stepOne(); o.fixed=!w.ko.ricarica;
           F.fuocoStart(w); o.fuoco=S.notes.some(n=>n.k==='ev'&&n.ev.id==='incendio');
           w.cl='vec'; F.ACT.rist({wh:w.id,ok:1}); o.rist=!!w.build&&w.build.k==='rist'&&w.build.to==='std'; w.build.left=1; F.stepOne(); o.std=w.cl==='std';
-          o.taken=!F.siteOpen(w.site)&&!F.rentable('l_casale')&&F.siteOpen('landriano');
+          o.taken=!F.siteOpen(w.site)&&!F.rentable('l_casale')&&F.siteOpen('landriano')&&!F.rentable('landriano')&&!F.edilCls().includes('inn');   // innovativi: solo col pacchetto Reparto IT e Ingegneria
           F.ACT.site({id:'l_casale'}); o.lotto=!!document.querySelector('#modal .sc [data-act=edsel]'); document.querySelector('#modal [data-act=edsel]').click(); o.box=!!document.querySelector('#win-magazzini .ed-box')&&!document.querySelector('#modal').innerHTML;
           F.ACT.edgo({ok:1}); o.cantiere=S.cantieri.length===1&&!F.siteOpen('l_casale');
           S.cantieri[0].left=1; F.stepOne(); const n=S.warehouses.find(x=>x.site==='l_casale'); o.nuovo=!!n&&n.own&&n.cl==='mod'&&!!n.dot.ribalte&&n.cap===3000;
@@ -890,7 +896,7 @@ async def main():
         assert not r['bad'] and r['n'] >= 38, r
         # scene in cima alle finestre: Magazzini, Tecnologia, Customer service, Direzione, Azienda e CEO (3× nelle finestre larghe, 2× nelle strette);
         # la Tecnologia è ferma senza ricerca e si muove con una ricerca in corso
-        r = await pg.evaluate('''()=>{const F=window.__FUP,out={},P={magazzini:'magazzini',personale:'personale',tecnologia:'tecnologia',customer:'clienti',direzione:'manager',azienda:'azienda'};F.newGame('marco');F.S.researched.direzione=true;
+        r = await pg.evaluate('''()=>{const F=window.__FUP,out={},P={magazzini:'magazzini',personale:'personale',tecnologia:'tecnologia',reparti:'tecnologia',customer:'clienti',direzione:'manager',azienda:'azienda'};F.newGame('marco',null,{mode:'classica',win:{},it:true});F.S.researched.direzione=true;
           const apri=tab=>{document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.ACT.toggle({id:P[tab]}); F.ACT.wtab({p:P[tab],id:tab}); return document.querySelector('#wins .win .ev-scn');};
           for(const [tab,w] of Object.entries(F.WSCN)){let k=typeof w==='function'?w():w; k=k.k||k; const d=apri(tab), i=d&&d.querySelector('i'); out[tab]=!!i&&i.dataset.scena===k&&i.offsetWidth===(['customer','personale'].includes(tab)?320:tab==='magazzini'?432:480);}   // offsetWidth: la misura vera, anche mentre la finestra si apre con lo zoom
           // esterni dei magazzini: il capannone segue la classe dell'edificio (celle frigo: quello frigorifero), sopra le dotazioni dell'area esterna
@@ -1274,6 +1280,53 @@ async def main():
         assert await pg.query_selector('#ov [aria-label="Clima sindacale"]'), 'lente del clima sindacale mancante'
         await pg.screenshot(path=os.path.join(OUT, 'shot_ri_lente.png'))
         await pg.evaluate("()=>window.__FUP.ACT.lens({id:'base'})")
+        # pacchetto Reparto IT e Ingegneria (0.109): consulente a contratto, tre ricerche insieme, responsabile, squadra, reparto vuoto,
+        # sesto direttore e capannoni innovativi; poi un anno con tre avversarie e le schermate
+        r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); document.querySelector('#modal').innerHTML='';
+          F.newGame('gino',null,{mode:'classica',win:{},it:true}); const S=F.S, o={}, T=id=>F.TECH.find(t=>t.id===id); S.cash=3e6; S.nextEvent=1e9;
+          o.dir6=F.DIR_ROLES.length===6&&'ing' in S.dirs; o.tech=!!T('edifici');
+          o.lock=!F.rentable('landriano')&&!F.edilCls().includes('inn')&&F.innWhy().includes('Edifici');
+          o.closed=F.techLine(T('wms'))==='dir'&&!F.depOpen('it');
+          F.ACT.consign({id:'gigabancale',ok:1}); o.open=F.depOpen('it')&&F.techLine(T('barcode'))==='it'&&F.techLine(T('regolamento'))==='dir';
+          F.ACT.research({id:'barcode'}); F.ACT.research({id:'regolamento'}); o.two=F.projs().length===2;
+          const w1=F.techWeeks(T('wms'),'it'); S.office.it=3; o.team=F.techWeeks(T('wms'),'it')<w1; S.office.it=0;
+          F.ACT.hiremgr({id:'sara'}); F.ACT.setdep({k:'ing'},{value:'sara'}); o.resp=S.dep.ing.resp==='sara'&&!S.warehouses.some(w=>w.mgr==='sara')&&F.depOpen('ing')&&F.depInn('ing')===S.managers.find(m=>m.id==='sara').st.inn;
+          F.ACT.research({id:'formazione'}); o.three=F.projs().length===3;
+          const c0=S.cash; for(let i=0;i<30;i++){ document.querySelector('#modal').innerHTML=''; F.step(); } o.done=!!S.researched.barcode&&!!S.researched.regolamento&&!!S.researched.formazione;
+          F.ACT.consstop({k:'it',ok:1}); o.notice=!!S.dep.it.cons&&S.dep.it.cons.end>S.day; for(let i=0;i<31;i++){ document.querySelector('#modal').innerHTML=''; F.step(); } o.gone=!S.dep.it.cons&&!F.depOpen('it');
+          // reparto vuoto: la ricerca in corso si ferma
+          S.dep.it.proj={tech:'wms',left:20,total:30,cost:40000}; F.step(); o.stop=S.dep.it.proj.left===20&&F.noteAlerts().some(a=>a.id==='depstopit');
+          // il responsabile licenziato lascia il posto
+          F.ACT.firemgr({id:'sara',ok:1}); o.fired=!S.dep.ing.resp;
+          // capannoni innovativi: ricerca Edifici intelligenti e direttore IT e ingegneria con Innovazione 14
+          S.researched.gestionale=true; S.researched.direzione=true; S.researched.edifici=true; F.ACT.hiremgr({id:'giorgio'}); F.ACT.setdir({role:'ing'},{value:'giorgio'}); o.low=!F.innOk()&&F.innWhy().includes('Innovazione');
+          F.ACT.hiremgr({id:'federico'}); F.ACT.setdir({role:'ing'},{value:'federico'}); o.inn=F.innOk()&&F.rentable('landriano')&&F.edilCls().includes('inn');
+          F.ACT.rent({id:'landriano'}); o.rent=S.warehouses.some(w=>w.site==='landriano');
+          return o;}''')
+        assert all(r.values()), f'pacchetto Reparto IT e Ingegneria: {r}'
+        r = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino',null,{mode:'classica',win:{},it:true}); const H=F.HUM; H.nextEvent=40;
+          H.bots=[['edoardo','espansione'],['valeria','qualita'],['marco','prezzo']].map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],'normale',i));
+          for(let d=0;d<365&&!H.over;d++){ const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}
+            const n=(H.notes||[]).find(x=>x.k==='ev'); if(n&&!m.innerHTML) F.ACT.note({id:n.id}); H.bots.forEach(b=>{b.cash=Math.max(b.cash,800000);}); F.step(); }
+          document.querySelector('#modal').innerHTML='';
+          return {day:H.day,bots:H.bots.map(b=>!!b.dep&&b.office.it!=null),cons:H.bots.filter(b=>b.dep&&(b.dep.it.cons||b.dep.ing.cons)).length,lines:H.bots.reduce((a,b)=>a+(b.dep&&(b.dep.it.proj||b.dep.ing.proj)?1:0),0)};}''')
+        assert r['day'] >= 365 and all(r['bots']), f'avversarie col pacchetto Reparto IT e Ingegneria: {r}'
+        print('reparto IT e ingegneria, avversarie dopo un anno:', r)
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S; document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); S.cash=3e6; F.ACT.consign({id:'paletti',ok:1}); F.ACT.hiremgr({id:'sara'}); F.ACT.setdep({k:'it'},{value:'sara'}); S.office.it=2; F.ACT.research({id:'barcode'}); F.ACT.research({id:'formazione'}); F.ACT.research({id:'regolamento'}); document.querySelectorAll('#toasts > *').forEach(e=>e.remove()); F.cardsOff(); F.openWin('reparti');}"); await pg.wait_for_timeout(600)
+        assert await pg.query_selector('#win-tecnologia .dep-k [data-act=consign]') and await pg.query_selector('#win-tecnologia [data-act=mpopen][data-k=dep]'), 'scheda Reparti tecnici incompleta'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_it_reparti.png'))
+        await pg.evaluate("()=>{window.__FUP.openWin('tecnologia');}"); await pg.wait_for_timeout(600)
+        assert await pg.evaluate("document.querySelectorAll('#win-tecnologia .rbars .rbar').length") == 3, 'col pacchetto la scheda Ricerca deve avere tre barre'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_it_ricerca.png'))
+        await pg.evaluate("()=>{window.__FUP.ACT.mpopen({k:'dep',id:'ing'});}"); await pg.wait_for_timeout(400)
+        assert 'Responsabile IT' in await pg.inner_text('#modal'), 'nella scelta del responsabile chi guida l\'altro reparto deve stare in grigio col suo ruolo'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_it_scelta.png'))
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; S.researched.gestionale=true; S.researched.direzione=true; F.ACT.hiremgr({id:'federico'}); F.ACT.setdir({role:'ing'},{value:'federico'}); document.querySelectorAll('#toasts > *').forEach(e=>e.remove()); document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); F.cardsOff(); F.openWin('direzione');}"); await pg.wait_for_timeout(600)
+        assert await pg.evaluate("document.querySelectorAll('#win-manager .dr-s').length") == 6, 'col pacchetto la Direzione ha sei posti'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_it_direzione.png'))
+        await pg.evaluate("()=>{document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); window.__FUP.openWin('espansione');}"); await pg.wait_for_timeout(600)
+        await pg.screenshot(path=os.path.join(OUT, 'shot_it_capannoni.png'))
+        await pg.evaluate("()=>document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click())")
         # traslochi (0.103): progetto a passi nella finestra del magazzino, conferma, un cliente che si rifiuta, giorni del trasloco,
         # stabilizzazione e fine; capannone vuoto restituito e venduto; ordinanza sul capannone fatiscente e cantiere d'ufficio
         await pg.evaluate('''()=>{const F=window.__FUP; document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); document.querySelector('#modal').innerHTML='';

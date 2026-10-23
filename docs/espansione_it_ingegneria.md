@@ -1,6 +1,6 @@
 # Pacchetto «Reparto IT e Ingegneria» (progetto)
 
-**Stato: proposta con le decisioni di Davide (sotto). Niente è ancora costruito.**
+**Stato: primo pezzo costruito nella versione 0.109** (reparti, consulenti a contratto, tre linee di ricerca, sesto direttore, capannoni innovativi: regole esatte in `docs/design.md`). Il resto è ancora proposta, con le decisioni di Davide (sotto).
 I numeri sono una prima proposta, tarata su quelli già in uso (stipendi, apprendimento, audit, customer service); vanno ritoccati con `tools/bilanciamento.py`.
 
 ## L'idea in breve
@@ -28,7 +28,8 @@ Come nei giochi Paradox, niente punti azione: si decidono le persone e le priori
 - **Il welfare non passa all'Ingegneria**: le ricerche del Welfare restano nella linea della Direzione, e nei magazzini i servizi li installa il **facility manager** (§6).
 - **Consulenti esterni sì**: è la prassi partire con un consulente, quindi sono il primo passo di ogni reparto (§9).
 - **Gli anni solo negli eventi**: nessuna ricerca, nessun requisito e nessun personaggio chiede un anno; gli eventi invece hanno i loro anni (il ransomware dal 2016, la fattura elettronica nel 2019). È la stessa regola del gioco base dalla versione 0.107 (§20).
-- **Sesto posto in Direzione**: il **direttore IT e ingegneria** (§2). Il direttore tecnologia resta com'è.
+- **Sesto posto in Direzione**: il **direttore IT e ingegneria** (§2), con l'**Innovazione** come abilità (Davide: «un direttore ingegneria con alta innovazione»). Il direttore tecnologia resta com'è.
+- **Capannoni innovativi solo col pacchetto**: servono una ricerca specifica, **Edifici intelligenti** («le conoscenze minime per usarli»), e un direttore IT e ingegneria con Innovazione alta (14). Senza pacchetto non si affittano né si costruiscono; chi li ha già li tiene.
 
 ## 1. Chi fa cosa: le tecnologie divise per reparto
 Ogni tecnologia ha un reparto. Quelle «miste» hanno un reparto che guida (capofila) e uno che dà una mano (supporto).
@@ -57,7 +58,7 @@ Funzionano come il customer service: un **responsabile** (uno dei manager, scelt
 | Massimo | 12 persone | 12 persone |
 
 - **Senza responsabile** fa le sue veci il CEO, «tra mille altre cose»: le sue abilità contano 3 punti in meno.
-- **Direttore IT e ingegneria** (sesto posto in Direzione, solo col pacchetto, sbloccato come gli altri dalla Struttura direzionale). Abilità: **Precisione**, l'unica che oggi non ha un direttore; col pacchetto ogni abilità ha il suo. Effetti: esito degli avvii +1,5 per ogni punto di Precisione sopra 10, affidabilità dei sistemi +1 per punto. Va provata la finestra Direzione con sei posti, anche sul telefono.
+- **Direttore IT e ingegneria** (sesto posto in Direzione, solo col pacchetto, sbloccato come gli altri dalla Struttura direzionale). Abilità: **Innovazione**. Effetti (0.109): ricerche dei reparti −2% per ogni punto sopra 10 (al massimo −20%); con Innovazione 14 o più, e la ricerca Edifici intelligenti, apre i capannoni innovativi. Nei pezzi successivi: esito degli avvii +1 e affidabilità dei sistemi +1 per ogni punto sopra 10.
 - **Direttore tecnologia**: resta com'è e vale per la linea della Direzione (si usa l'Innovazione più alta tra CEO e direttore).
 - **Dote iniziale**: Marco («Il nerd del WMS») parte con un sistemista; gli altri CEO partono da zero.
 - Talenti che già esistono e che nel reparto trovano un senso nuovo: *Ingegnere informatico* e *Diplomato perito informatico* (responsabile IT: esito degli avvii +5), *Parla con i robot* (avvii degli AMR +10), *Amante dell'IA* (ricerca sull'intelligenza artificiale −30% di tempo), *Allergico al gestionale* (responsabile IT: esito degli avvii −10; ma chi l'ha messo lì?). I loro testi `fx` vanno aggiornati: il tooltip dice tutto quello che fa un talento.
@@ -103,7 +104,7 @@ Lo stesso di oggi, pagato all'inizio. Con la squadra interna −15% (meno consul
 ### L'esito (come il punteggio di un audit)
 Punteggio = 60
 + 2 × (abilità di chi fa l'avvio − 10): Precisione del responsabile IT, Operazioni del responsabile dell'Ingegneria, oppure la bravura del consulente
-+ 1,5 × (Precisione del direttore IT e ingegneria − 10)
++ 1 × (Innovazione del direttore IT e ingegneria − 10)
 + 5 se nel magazzino c'è la Formazione strutturata, + 5 con l'Academy
 + 0,25 × (morale del magazzino − 60)
 − 15 se un reparto del magazzino è in affanno
@@ -147,7 +148,7 @@ Carico come gli altri reparti: verde fino all'85%, giallo fino al 100%, rosso ol
 
 ### Affidabilità dei sistemi
 Una per l'azienda, da 0 a 100. Ogni giorno si avvicina all'obiettivo del 2% della differenza.
-Obiettivo = 55 + 25 × copertura (persone in assistenza ÷ necessarie, al massimo 1,2) + 1,5 × (Precisione del responsabile IT − 10) + 1 × (Precisione del direttore IT e ingegneria − 10) + 5 Sala server e backup + 5 Sicurezza informatica + 5 Server in cloud − 3 per ogni sistema obsoleto.
+Obiettivo = 55 + 25 × copertura (persone in assistenza ÷ necessarie, al massimo 1,2) + 1,5 × (Precisione del responsabile IT − 10) + 1 × (Innovazione del direttore IT e ingegneria − 10) + 5 Sala server e backup + 5 Sicurezza informatica + 5 Server in cloud − 3 per ogni sistema obsoleto.
 
 ### Guasti informatici
 Ogni mese, per ogni magazzino con sistemi: probabilità = (100 − affidabilità) / 400 × min(1; sistemi del magazzino / 3). Con affidabilità 60 circa un guasto all'anno per magazzino, con 85 uno ogni due anni.
@@ -203,6 +204,7 @@ Nessuna ha un anno minimo: servono solo le ricerche indicate.
 
 | Ricerca | Reparto | Costo / settimane | Effetto |
 |---|---|---|---|
+| Edifici intelligenti (costruita nella 0.109) | Ingegneria | 40.000 € / 9 (serve la Struttura direzionale) | col direttore IT e ingegneria a Innovazione 14 apre affitto e costruzione dei capannoni innovativi |
 | Sala server e backup | IT | 8.000 € / 3 | affidabilità +5; nei guasti e negli eventi i dati si recuperano dal backup di stanotte |
 | Sicurezza informatica | IT | 25.000 € / 6, 300 €/mese (serve la Sala server) | affidabilità +5, ransomware −80%, truffa dell'IBAN smascherata; dopo l'evento del GDPR la chiedono FarmaSpa e le committenti S |
 | Cruscotto dei KPI | IT | 30.000 € / 7 (serve il WMS) | previsione di puntualità e accuratezza a fine mese per ogni cliente, avviso 2 settimane prima di andare sotto soglia; gare +1 |
@@ -215,7 +217,7 @@ Nessuna ha un anno minimo: servono solo le ricerche indicate.
 | Esoscheletri | Ingegneria, per magazzino | 30.000 € / 6 (serve l'ergonomia); 60.000 €, 800 €/mese | morale +2, produttività +5% |
 | Gemello digitale | misto (Ingegneria capofila) | 50.000 € / 10 (servono layout e cruscotto) | esito degli avvii +10, stabilizzazione dei traslochi −30%, cantieri −20% |
 
-Sono 11, si possono tagliare (le prime da togliere: Server in cloud ed Esoscheletri). Ogni ricerca ha `desc`, `txt`, la sua icona e la sua voce nell'enciclopedia.
+Le 11 nuove si possono tagliare (le prime da togliere: Server in cloud ed Esoscheletri). Ogni ricerca ha `desc`, `txt`, la sua icona e la sua voce nell'enciclopedia.
 
 ## 11. Policy
 | Policy | Sblocco | Pro | Contro |
@@ -296,7 +298,7 @@ Con `tools/bilanciamento.py` (partite di 12 anni, 4 aziende guidate dal computer
 
 ## 19. Ordine di costruzione (proposta)
 Un pezzo per versione, ognuno giocabile da solo:
-1. **I reparti**: responsabile, addetti, consulente a contratto, divisione delle tecnologie, linee di ricerca, lavagna, sesto direttore. Scheda «Reparti tecnici».
+1. **I reparti** (fatto nella 0.109): responsabile, addetti, consulente a contratto, divisione delle tecnologie, linee di ricerca, sesto direttore, capannoni innovativi. Scheda «Reparti tecnici». Per ora tutte le persone del reparto lavorano alla ricerca: la lavagna con le colonne Avvii e Magazzini arriva con i pezzi 2-4, quando quelle colonne avranno un lavoro da fare. Le avversarie usano solo i consulenti e non nominano direttori.
 2. **Gli avvii**: preparazione, graduale e big bang, esito, consulente a progetto, evento del go-live.
 3. **L'IT che tiene in piedi**: assistenza, affidabilità, guasti, sistemi che invecchiano.
 4. **L'Ingegneria in magazzino e il welfare al facility manager**: miglioramento continuo, lavori del welfare, collegamenti con traslochi e cantieri, ricerche nuove.

@@ -810,4 +810,44 @@ pulsante("m_divieto", 16, { tieni: "W" }, `
   ..RRRRRRRRRR..
   ....RRRRRR....`)
 
+// Reparti tecnici (scheda della finestra Tecnologia, pacchetto Reparto IT e Ingegneria): il caschetto giallo dell'Ingegneria sul monitor dell'IT
+menu("reparti", { tieni: "b" }, `
+  .....YYYY.....
+  ...YYYYYYYY...
+  ..YYYYYYYYYY..
+  .YYYYYYYYYYYY.
+  DDDDDDDDDDDDDD
+  DbbbbbbbbbbbbD
+  DbiibbbbbbbbbD
+  DbbbbhhhhbbbbD
+  DbbbbbbbbbbbbD
+  DbiiiibbbbbbbD
+  DDDDDDDDDDDDDD
+  ......DD......
+  ....DDDDDD....
+  ..............`)
+// bollini dei reparti tecnici sulle tecnologie: il monitor del Reparto IT e il caschetto dell'Ingegneria (12×12)
+pulsante("dep_it", 12, { tieni: "b", fascia: false }, `
+  ..........
+  DDDDDDDDDD
+  DbbbbbbbbD
+  DbiibbbbbD
+  DbbbhhbbbD
+  DbbbbbbbbD
+  DDDDDDDDDD
+  ....DD....
+  ..DDDDDD..
+  ..........`)
+pulsante("dep_ing", 12, { mx: true }, `
+  .....
+  .....
+  ...YY
+  ..YYY
+  .YYYY
+  .YYYY
+  YYYYY
+  .....
+  .....
+  .....`)
+
 foglio("foglio")

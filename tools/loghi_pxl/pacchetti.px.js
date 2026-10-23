@@ -68,3 +68,20 @@ sprite("_pugno", { outline: "K", pivot: "center" }, `
 
 sprite("pk_base", { w: 30, h: 30, outline: "K" }, ...shield("B", "b", "R", "e"), stamp("_pallet", 15, 13))
 sprite("pk_ri", { w: 30, h: 30, outline: "K" }, ...shield("R", "r", "B", "L"), stamp("_pugno", 15, 13))
+
+// Reparto IT e Ingegneria: il caschetto giallo dell'ufficio tecnico sopra il monitor del reparto IT
+sprite("_reparti", { outline: "K", pivot: "center" }, `
+  ....YYYYY....
+  ..YYYYYYYYY..
+  .YYYYYYYYYYY.
+  YYYYYYYYYYYYY
+  yyyyyyyyyyyyy
+  SSSSSSSSSSSSS
+  SbbbbbbbbbbbS
+  SbiibbbbbbbbS
+  SbbbbLLLbbbbS
+  SbiiiibbbbbbS
+  SSSSSSSSSSSSS
+  .....sss.....
+  ...sssssss...`)
+sprite("pk_it", { w: 30, h: 30, outline: "K" }, ...shield("D", "d", "Y", "i"), stamp("_reparti", 15, 13))

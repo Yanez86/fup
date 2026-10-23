@@ -344,6 +344,19 @@ tecnologia("talpa", "org", { mx: true }, `
   NNNNN
   .NNNN`)
 
+// Edifici intelligenti (pacchetto Reparto IT e Ingegneria): il capannone con l'antenna dei sensori sul tetto
+tecnologia("edifici", "org", { mx: true, tieni: "L" }, `
+  ....R
+  ....D
+  ...DD
+  ..DDD
+  DDDDD
+  .SSSS
+  .SLLS
+  .SLLS
+  .SLLS
+  .SSSS`)
+
 // ================================================================ Mercato (tondo verde)
 // Ufficio commerciale: il telefono rosso dei venditori
 tecnologia("commerciale", "mkt", { dopo: [grid(3, 5, `
