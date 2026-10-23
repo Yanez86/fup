@@ -238,7 +238,7 @@ html:not(.mob) #dock.wide .dg{height:auto;border:0;overflow:visible;margin:5px 2
 .av-sc summary{cursor:pointer;font-size:13px;min-height:32px;display:flex;align-items:center}.av-sc .row{font-size:13px}.av-lg{flex:none;display:inline-flex}.rbar.stop{background:#ffe1d6}.rbar.free{background:#f4f6f9;border-left:8px solid #8a96a6}.rbar .rb-l{font:600 13px var(--f-body);color:#4a5f7a;text-transform:uppercase;letter-spacing:.03em}
 .tdep{display:inline-flex;align-items:center;justify-content:center;font:700 11px var(--f-body);color:var(--ink);background:#dcecfc;border:2px solid var(--ink);padding:1px;line-height:12px;vertical-align:middle}.tdep.ing{background:#fff4c7}.h3 .tdep{padding:2px}
 .tnode .tdep{position:absolute;right:3px;bottom:3px;z-index:1}
-.dep-k .wh-st{margin-top:6px}.lv{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:4px 0}.lv-c{display:flex;flex-direction:column;align-items:center;gap:2px;border:2px solid var(--ink);background:#f4f6f9;padding:6px 4px;text-align:center}.lv-c .num{font-size:22px}.lv-c .wh-step{display:flex;align-items:center;gap:6px}.dep-cl{display:flex;align-items:center;gap:8px;margin-top:4px}
+.dep-k .wh-st{margin-top:6px}.lv{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:4px 0}.lv-c{display:flex;flex-direction:column;align-items:center;gap:2px;border:2px solid var(--ink);background:#f4f6f9;padding:6px 4px;text-align:center}.lv-c .num{font-size:22px}.ing-r .wh-sm{flex:1;min-width:0}.ing-r .bar{margin:3px 0;height:10px;flex:none}.lv-c .wh-step{display:flex;align-items:center;gap:6px}.dep-cl{display:flex;align-items:center;gap:8px;margin-top:4px}
 .rb-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .rbar .num{flex:none;white-space:nowrap}
 .rb-p{display:flex;align-items:center;gap:8px}.rb-p .bar{height:14px;background:#fff;border-width:2px}.rb-p .num{min-width:2.6em;text-align:right}
@@ -1620,6 +1620,9 @@ const TECH=[
  {id:'sinergia',tree:'log',tier:3,row:2,req:['rotte'],name:'Sinergia in pianificazione',cost:45000,wk:9,inst:15000,mese:500,smC:4,smMax:15,weeks:6,desc:'Merce di clienti diversi sullo stesso camion: saturazione dei mezzi +4 per ogni cliente oltre il primo (massimo +15), se servono gli stessi canali.',txt:'I pianificatori mettono insieme la merce di clienti diversi diretta nella stessa zona. Si viaggia più pieni.'},
  {id:'ptl',tree:'log',tier:4,row:0,req:['rf'],name:'Pick-to-light',cost:40000,wk:9,inst:80000,mese:600,A:2,P:0.5,prod:0.15,weeks:4,desc:'Picking guidato dalle luci: produttività +15%.',txt:'Una luce si accende sulla casella da cui prelevare e indica quanti pezzi prendere. Si va veloci e si sbaglia poco.'},
  {id:'amr',tree:'log',tier:5,row:0,req:['ptl','verticale'],name:'Robot mobili (AMR)',cost:150000,wk:21,inst:300000,mese:3000,A:1,P:1,prod:0.4,weeks:12,desc:'Robot che portano gli scaffali agli operatori: produttività +40%.',txt:'Piccoli robot girano per il magazzino e portano gli scaffali a chi prepara gli ordini. Nessuno cammina più per chilometri.'},
+ {id:'ergonomia',tree:'log',tier:1,row:3,it:1,name:'Ergonomia delle postazioni',cost:10000,wk:4,inst:12000,mese:100,mor:2,prod:0.02,weeks:2,desc:'Banchi regolabili, tappetini e carichi all\'altezza giusta: morale +2, produttività +2%.',txt:'Si guarda come lavora la gente: chi si piega cento volte all\'ora, chi alza le braccia sopra la testa, chi sta in piedi sul cemento per otto ore. Poi si alzano i banchi, si abbassano gli scaffali e si mette un tappetino. Meno mal di schiena, meno assenze.'},
+ {id:'esoscheletri',tree:'log',tier:2,row:3,it:1,req:['ergonomia'],name:'Esoscheletri',cost:30000,wk:6,inst:60000,mese:800,mor:2,prod:0.05,weeks:3,desc:'Imbracature che aiutano schiena e spalle a sollevare: morale +2, produttività +5%.',txt:'Un\'imbracatura leggera con molle e cinghie che prende una parte del peso quando ci si piega. I primi giorni sembrano tutti robot dei film; dopo una settimana nessuno la vuole più togliere.'},
+ {id:'layout',tree:'log',tier:2,row:4,it:1,req:['tempi'],name:'Progettazione del layout',cost:20000,wk:5,inst:15000,mese:0,cap:0.05,prod:0.03,weeks:2,desc:'Corsie, baie e scaffali ridisegnati: posti pallet +5%, produttività +3%.',txt:'Si ridisegna il magazzino sulla carta: gli articoli che escono di più vicino alle baie, le corsie a senso unico, gli scaffali dove prima c\'era il bancale dimenticato. Poi una domenica si sposta tutto.'},
  {id:'gestionale',tree:'org',tier:1,row:0,name:'Gestionale amministrativo',cost:15000,wk:4,desc:'Fatture e paghe informatizzate: costi fissi −3%, ogni impiegato regge più volume.',txt:'Un unico programma per fatture, paghe e contabilità. Addio fogli Excel sparsi sulle scrivanie.'},
  {id:'regolamento',tree:'org',tier:1,row:1,name:'Regolamento aziendale',cost:8000,wk:3,desc:'Apre le Policy (scheda della finestra Azienda e CEO) e sblocca le prime tre: Zero straordinario, Sabato obbligatorio e Telefoni nell\'armadietto.',txt:'Un fascicolo di regole scritte e firmate, appeso in bacheca accanto alla macchinetta del caffè. Finalmente si sa chi decide cosa.'},
  {id:'hr',tree:'org',tier:2,row:0,req:['gestionale'],name:'Ufficio del personale',cost:20000,wk:6,desc:'Selezione più rapida: tempi di assunzione −20%. Sblocca la policy «Niente cooperative».',txt:'Un ufficio che si occupa solo di cercare, assumere e seguire le persone.'},
@@ -1629,6 +1632,8 @@ const TECH=[
  {id:'academy',tree:'org',tier:4,row:0,req:['welfare2'],name:'Academy aziendale',cost:60000,wk:13,desc:'Scuola interna per tutta l\'azienda: apprendimento delle tecnologie −30% e attrattività +5 in tutti i magazzini (chi cerca lavoro vede che si può crescere).',txt:'Una scuola interna con aule e formatori. Chi ha esperienza insegna ai nuovi.'},
  // pacchetto Reparto IT e Ingegneria (it:1): nell'albero solo nelle partite col pacchetto (packApply); la ricerca la fa l'Ingegneria (TECH_DEP)
  {id:'edifici',tree:'org',tier:4,row:1,it:1,req:['direzione'],name:'Edifici intelligenti',cost:40000,wk:9,desc:'Sblocca i capannoni innovativi: si possono affittare e costruire, se il direttore IT e ingegneria ha Innovazione 14 o più.',txt:'Sensori, impianti che si regolano da soli e un programma che governa luci, portoni e temperature. Prima di prendere un capannone così bisogna saperlo usare: altrimenti è un frigorifero con le ribalte.'},
+ {id:'tempi',tree:'org',tier:1,row:5,it:1,name:'Studio tempi e metodi',cost:6000,wk:3,desc:'Il miglioramento continuo dell\'Ingegneria va il 50% più veloce: ogni ingegnere sui magazzini alza il bonus dei metodi di 0,75 punti al mese invece di 0,5.',txt:'Cronometro, cartellina e un foglio per ogni gesto: quanti passi per prendere un collo, quanti secondi per fasciare un pallet. Poi si cambia l\'ordine delle cose e si rifà il conto.'},
+ {id:'lean',tree:'org',tier:3,row:5,it:1,req:['layout'],name:'Lean e miglioramento continuo',cost:35000,wk:8,desc:'Il bonus dei metodi di ogni magazzino può arrivare a +10% di produttività invece di +6%.',txt:'Lavagne in reparto, riunioni di dieci minuti a inizio turno, cartellini colorati e la regola che chi vede uno spreco lo dice. All\'inizio sembra un gioco da tavolo; dopo un anno nessuno vuole tornare indietro.'},
  {id:'sala',tree:'org',tier:1,row:4,it:1,name:'Sala server e backup',cost:8000,wk:3,desc:'Affidabilità dei sistemi +5: i server stanno in una stanza fresca e chiusa a chiave, e ogni notte si fa una copia dei dati.',txt:'Fino a ieri il server stava sotto la scala, accanto al secchio del mocio. Ora ha una stanza tutta sua, il condizionatore e un disco che ogni notte copia tutto. Se qualcosa va storto, si riparte dalla copia di stanotte.'},
  {id:'sicurezza',tree:'org',tier:2,row:4,it:1,req:['sala'],name:'Sicurezza informatica',cost:25000,wk:6,mese:300,desc:'Affidabilità dei sistemi +5: antivirus, password vere, aggiornamenti fatti per tempo. Canone di 300 € al mese.',txt:'Antivirus su tutti i computer, una rete separata per i terminali del magazzino e la regola che la password non si scrive sul post-it. Qualcuno si lamenta. Poi legge sul giornale del collega a cui hanno bloccato tutto.'},
  {id:'cloud',tree:'org',tier:3,row:4,it:1,req:['sicurezza'],name:'Server in cloud',cost:40000,wk:8,desc:'Affidabilità dei sistemi +5, assistenza necessaria −30%, canoni dei sistemi nei magazzini −15%.',txt:'I programmi non girano più sul server in sede ma in un centro dati lontano, con i tecnici di turno giorno e notte. Il sistemista non deve più correre in sede alle tre del mattino. Lo fa qualcun altro, a Francoforte.'},
@@ -1679,7 +1684,7 @@ const TECH=[
 ];
 // pacchetto Reparto IT e Ingegneria: il reparto che ricerca ogni tecnologia (le altre restano alla Direzione) e, per quelle miste, il reparto che dà una mano
 const TECH_DEP={barcode:'it',wms:'it',rf:'it',gps:'it',rotte:'it',sinergia:'it',gestionale:'it',edi:'it',portale:'it',ptl:'it',ecom:'it',sala:'it',sicurezza:'it',cloud:'it',
-  formazione:'ing',anticoll:'ing',academy:'ing',verticale:'ing',amr:'ing',edifici:'ing'}, TECH_SUP={ptl:'ing',ecom:'ing',verticale:'it',amr:'it'};
+  tempi:'ing',lean:'ing',ergonomia:'ing',esoscheletri:'ing',layout:'ing',formazione:'ing',anticoll:'ing',academy:'ing',verticale:'ing',amr:'ing',edifici:'ing'}, TECH_SUP={ptl:'ing',ecom:'ing',verticale:'it',amr:'it'};
 TECH.forEach(t=>{ if(TECH_DEP[t.id]) t.dep=TECH_DEP[t.id]; if(TECH_SUP[t.id]) t.sup=TECH_SUP[t.id]; });
 const TREES=[['log','Logistica','Tecnologie da installare in ogni magazzino.'],['org','Sviluppo aziendale','Organizzazione, persone e controllo: valgono per tutta l\'azienda.'],['mkt','Mercato','Accesso a nuovi clienti e gare: valgono per tutta l\'azienda.'],['wel','Welfare','Servizi per chi lavora: si ricercano una volta e poi si installano magazzino per magazzino. Alzano il morale e aiutano ad assumere.'],['cert','Certificazioni','Per magazzino (si ottengono capannone per capannone) o per tutta l\'azienda. Le chiedono i clienti più esigenti; certificati, audit e conformità si seguono nell\'altra scheda di questa finestra.']];
 // benefit aziendali: valgono per tutti i dipendenti e si pagano a testa (le navette per arrivare al lavoro sono i Pulmini dell'albero Welfare)
@@ -2854,7 +2859,7 @@ Il giorno della promozione lascia il suo reparto (una persona in meno nel magazz
 wk('welfare_mag','pers','Servizi di welfare',`Servizi per chi lavora in un magazzino: dai boccioni d'acqua alla mensa, dalla palestra all'asilo, fino all'area cani. Si ricercano nell'albero Welfare e si installano sito per sito.`,
 `Ogni servizio si ricerca una volta nell'albero Welfare della finestra Tecnologia, poi si [[installazione|installa]] nei magazzini che vuoi, con un costo iniziale e un canone al mese. Funziona da subito, senza [[apprendimento]].
 
-Alza il [[morale]] di quel magazzino e la sua [[attrattivita|attrattività]]: le [[assunzioni]] per quel magazzino sono più veloci. Alcuni danno qualcosa in più: mensa e raffrescatori la produttività, i pulmini la [[puntualita|puntualità]], lavanderia, presidio medico e corsi di italiano l'[[accuratezza]]. Con la [[tech_welfare2|Piattaforma welfare]] il canone costa il 30% in meno. Installazione e canone finiscono nella voce Welfare del [[conto|conto economico]].
+Alza il [[morale]] di quel magazzino e la sua [[attrattivita|attrattività]]: le [[assunzioni]] per quel magazzino sono più veloci. Alcuni danno qualcosa in più: mensa e raffrescatori la produttività, i pulmini la [[puntualita|puntualità]], lavanderia, presidio medico e corsi di italiano l'[[accuratezza]]. Con la [[tech_welfare2|Piattaforma welfare]] il canone costa il 30% in meno. Installazione e canone finiscono nella voce Welfare del [[conto|conto economico]]. Col pacchetto [[reparto_it|Reparto IT e Ingegneria]] li installa il facility manager, e i servizi grandi sono un cantiere di qualche settimana ([[lavori_welfare|lavori del welfare]]).
 
 È diverso dai [[welfare|benefit aziendali]] (buoni pasto, assicurazione, premio), che valgono per tutti i dipendenti e si pagano a testa.`);
 wk('attrattivita','pers','Attrattività',`Quanto l'azienda piace a chi cerca lavoro. Più è alta, più le assunzioni sono rapide.`,
@@ -4055,8 +4060,8 @@ function dotNo(w,d){ if(hasDot(w,d.id)) return 'c\'è già';
   if(S.cash<dotCost(w.cap,d)) return 'cassa insufficiente'; return ''; }
 const ristCost=w=>Math.round(w.cap*EDIL.rist.eur/1000)*1000;
 const ristNext=w=>{const i=WCL_ORD.indexOf(w.cl||'std'); return i>=0&&i<WCL_ORD.indexOf('mod')?WCL_ORD[i+1]:null;};
-function dotStart(w,id){ const d=DOT_ID[id], c=dotCost(w.cap,d); S.cash-=c; S.cur.altro+=c; w.build={k:'dot',id,left:d.gg,total:d.gg}; }
-function ristStart(w){ const c=ristCost(w); S.cash-=c; S.cur.altro+=c; w.build={k:'rist',to:ristNext(w),left:EDIL.rist.gg,total:EDIL.rist.gg}; }
+function dotStart(w,id){ const d=DOT_ID[id], c=dotCost(w.cap,d); S.cash-=c; S.cur.altro+=c; const g=cantGg(d.gg); w.build={k:'dot',id,left:g,total:g}; }
+function ristStart(w){ const c=ristCost(w), g=cantGg(EDIL.rist.gg); S.cash-=c; S.cur.altro+=c; w.build={k:'rist',to:ristNext(w),left:g,total:g}; }
 // ogni giorno: stato dell'immobile, cantieri del magazzino e riparazioni programmate
 function immDaily(w,k){
   if(w.cond==null) w.cond=100;
@@ -4065,6 +4070,8 @@ function immDaily(w,k){
     if(b.k==='dot'){ const d=DOT_ID[b.id], y=yearOf(S.day); (w.dot=w.dot||{})[b.id]={day:S.day,inc:b.id==='solare'&&y>=EDIL.incDa&&y<=EDIL.incA};
       if(b.id==='giardino') repUp(1);
       noteVar('wh',`Lavori finiti a ${w.name}: ${d.n.toLowerCase()} in funzione`); chron('magazzini',`${d.n} a ${w.name}`); }
+    else if(b.k==='wel'){ const t=TECH_ALL.find(x=>x.id===b.id); if(t&&!w.tech[t.id]) w.tech[t.id]={day:S.day};
+      noteVar('wh',`Lavori finiti a ${w.name}: ${t?t.name.toLowerCase():'il servizio'} in funzione`); }
     else if(b.k==='rist'){ w.cl=b.to; if(w.ko&&WCL_ORD.indexOf(w.cl)>=2) delete w.ko.tetto;
       noteVar('wh',`Ristrutturazione finita a ${w.name}: ora è un edificio ${wCl(w).n.toLowerCase()}`); chron('magazzini',`Ristrutturato il magazzino di ${w.name}: ${wCl(w).n.toLowerCase()}`);
       news('Il Sole 24 Pallet',`${S.company.name} rinnova ${w.name}`,`Finiti i lavori: il magazzino di ${w.name} passa a edificio ${wCl(w).n.toLowerCase()}.`); }
@@ -4123,7 +4130,7 @@ const siteOpen=id=>{const s=SITES[id]; return !!s&&!siteTaken(id);};
 const rentable=id=>!SITES[id].lotto&&siteOpen(id)&&(SITES[id].cl!=='inn'||innOk());
 const edilCls=()=>['std','mod',...(innOk()?['inn']:[])];
 function edilCost(site,cap,cl,dots){ const s=SITES[site]; return s.land+cap*EDIL.eur[cl]+(dots||[]).reduce((a,id)=>a+dotCost(cap,DOT_ID[id]),0); }
-function edilStart(site,cap,cl,dots){ const s=SITES[site], c=edilCost(site,cap,cl,dots), gg=EDIL.gg[cl];
+function edilStart(site,cap,cl,dots){ const s=SITES[site], c=edilCost(site,cap,cl,dots), gg=cantGg(EDIL.gg[cl]);
   S.cash-=c; S.cur.altro+=c; (S.cantieri=S.cantieri||[]).push({id:nid('k'),site,cap,cl,dot:[...dots],left:gg,total:gg,cost:c});
   chron('magazzini',`Posa la prima pietra a ${s.name}: ${n0(cap)} posti, edificio ${WCLASS[cl].n.toLowerCase()}`);
   news('Il Sole 24 Pallet',`${S.company.name} costruisce a ${s.name}`,`Ruspe al lavoro su un terreno di ${s.name}: tra ${Math.round(gg/30)} mesi ci sarà un magazzino da ${n0(cap)} posti pallet.`); repUp(2); }
@@ -4138,7 +4145,7 @@ function edilDaily(){ (S.cantieri||[]).forEach(x=>x.left--); const done=(S.canti
 function immYear(){ const y=yearOf(S.day);
   if(y===EDIL.incDa) news('Il Mattinale del Ministero','Arriva il Conto Energia',`Lo Stato paga chi monta pannelli solari: chi li installa tra il ${EDIL.incDa} e il ${EDIL.incA} riceve ${eur(EDIL.inc)} al mese per ogni impianto.`);
   if(y===EDIL.incA+1) news('Il Mattinale del Ministero','Finiti gli incentivi del fotovoltaico','Il Conto Energia chiude ai nuovi impianti. Chi l\'ha già preso se lo tiene.'); }
-function capOf(w){const t=TECH.find(x=>x.id==='verticale'); return Math.round(w.cap*(1+(w.tech.verticale&&techFactor(w,t)>0?t.cap:0)+trSum(w,'cap')+immFx(w,'cap'))*(1-condPen(w)));}
+function capOf(w){const v=TECH.reduce((a,t)=>a+(t.cap&&t.tree==='log'&&w.tech[t.id]&&techFactor(w,t)>0?t.cap:0),0); return Math.round(w.cap*(1+v+trSum(w,'cap')+immFx(w,'cap'))*(1-condPen(w)));}   // magazzino verticale, layout
 function perWh(t){return (t.tree==='log'||t.tree==='wel'||!!t.site)&&!t.pol;}
 // ricerche e certificazioni che una committente chiede (i contratti vinti non le copiano: si guarda il modello della gara o il cliente storico)
 const poolReq=c=>(TENDER_POOL.find(x=>x.name===c.name)||(CEOS.find(x=>x.client.name===c.name)||{}).client||{}).req||[];
@@ -4452,8 +4459,8 @@ function computeWH(wh,extra){
   TR_RULES.forEach(r=>{ if(trOn(wh,r.id)&&r.fx.prod) prL.push(['r',r.name,r.fx.prod]); });
   const rf=riFx(wh);   // pacchetto Relazioni industriali: agitazione, scioperi, accordi (neutro senza il pacchetto)
   const tf=trFx(wh,cons);   // trasloco: giorni del trasloco, straordinari e stabilizzazione (neutro senza traslochi)
-  const prF={mor:0.7+0.3*wh.morale/70,add:1+tProd+polSum('prod'),cond:1-condPen(wh),build:wh.build?0.95:1,mgr:mf.prod,tr:1+trSum(wh,'prod'),ri:rf.prod,imm:Math.max(0.5,1+immFx(wh,'prod')),trs:tf.prod,av:avvProdF(wh),it:1+itKoL(wh,'prod').reduce((a,x)=>a+x[1],0),l:prL};
-  const prod=PROD_BASE*prF.mor*prF.add*prF.cond*prF.build*prF.mgr*prF.tr*prF.ri*prF.imm*prF.trs*prF.av*prF.it;
+  const prF={mor:0.7+0.3*wh.morale/70,add:1+tProd+polSum('prod'),cond:1-condPen(wh),build:wh.build?0.95:1,mgr:mf.prod,tr:1+trSum(wh,'prod'),ri:rf.prod,imm:Math.max(0.5,1+immFx(wh,'prod')),trs:tf.prod,av:avvProdF(wh),it:1+itKoL(wh,'prod').reduce((a,x)=>a+x[1],0),met:1+metOf(wh)/100,l:prL};
+  const prod=PROD_BASE*prF.mor*prF.add*prF.cond*prF.build*prF.mgr*prF.tr*prF.ri*prF.imm*prF.trs*prF.av*prF.it*prF.met;
   // carrellisti: tutti i movimenti (doppia produttività col muletto); magazzinieri: preparano i pallet in uscita
   const use=(load,n,per)=>load===0?0:(n>0?load/(n*per):9);
   const uCar=use(mov*tf.load,st.car,2.5*prod), uPick=use(cons*pickF*tf.load,st.pick,prod), uB=use(kmB,st.autB,kmB1), uCE=use(kmCE,st.autCE,kmCE1);
@@ -4744,7 +4751,7 @@ function chronMiles(){ const H=S.hist, L=H[H.length-1]; if(!L) return;
   MILE_REP.forEach(n=>{ if(S.rep>=n) chron('classifica',`Reputazione a ${n}: i buyer ti chiamano per nome`,'m_rp'+n); }); }
 function monthEnd(){
   S.months++;
-  koMonth(); itMonth(); if(monthOf(S.day+1)===0&&!isBot()) immYear();   // guasti delle dotazioni e dei sistemi informatici; a gennaio gli incentivi
+  koMonth(); itMonth(); ingMonth(); if(monthOf(S.day+1)===0&&!isBot()) immYear();   // guasti delle dotazioni e dei sistemi informatici; a gennaio gli incentivi
   // guasti nei magazzini senza facility manager
   const GUASTI=['si è bloccato un portone sezionale','una scaffalatura è stata urtata e va scaricata','piove dal tetto sulla baia 4','si è rotta la rampa di carico','il quadro elettrico ha preso fuoco (poco, per fortuna)','il pavimento si è crepato davanti alle baie'];
   S.warehouses.forEach(w=>{ if(!w.staff.fm&&Math.random()<0.18){ w.cond=Math.max(0,(w.cond==null?100:w.cond)-8); const g=GUASTI[Math.floor(Math.random()*GUASTI.length)];
@@ -4982,6 +4989,7 @@ function trWhen(d,cl,mode,ag){ const min=Math.max(S.day+TR.prep,(d.ready||0)+7),
 function trStabDays(T,d,tot){ const M=TR[T.mode], m=mgrStats(d);
   let k=clamp(1-0.03*(m.op-10),0.7,1.3)*(techOn(d,'wms')?0.8:1)*(techOn(d,'rf')?0.9:1)*(techOn(d,'formazione')?0.85:1)*(R('academy')?0.9:1);
   k*=1+0.5*Math.min(1,((T.log&&T.log.ref)||0)/Math.max(1,tot==null?staffTot(d):tot));   // quota di persone nuove (al posto di chi non è venuto) if(d.mgr!==T.mgr0) k*=1.2; if((d.morale==null?62:d.morale)<45) k*=1.2;
+  if(ingTr()) k*=ING.trStab;   // pacchetto Reparto IT e Ingegneria: l'ufficio tecnico prepara il magazzino di arrivo
   return Math.max(7,Math.round(M.sWk*7*k)); }
 // stima di un progetto (P = UI.sel.tr): clienti, reazioni, calendario, persone, soldi e KPI a regime nel magazzino di arrivo
 function trEst(P){
@@ -5025,7 +5033,7 @@ function trEst(P){
   const wage=f=>['pick','car','capo'].reduce((a,r)=>a+f(r)*RAL[r],0)*COEF/12/30;
   const dW=d.id?wage(r=>d.staff[r]||0):0, mW=wage(r=>e.exp[r]?e.exp[r].f:0), oW=wage(r=>Math.max(0,(o.staff[r]||0)-ppl[r]));
   const r100=v=>Math.round(v/100)*100;
-  e.cost={proj:TR.proj+TR.projCli*cl.length,cert:e.certAuto.reduce((a,t)=>a+r100(instCost(t,d)*0.5),0),mov:e.stock*TR.pal,
+  e.cost={proj:Math.round((TR.proj+TR.projCli*cl.length)*(ingTr()?ING.trCost:1)),cert:e.certAuto.reduce((a,t)=>a+r100(instCost(t,d)*0.5),0),mov:e.stock*TR.pal,
     nav:r100(Math.ceil(e.stock/CAPV)*(2*e.km+20)*kmC*M.nav),stra:r100((P.mode==='lampo'?(dW+mW)*(days+M.post):(dW+mW+oW)*days)*pct),
     tech:e.tech.reduce((a,t)=>a+r100(instCost(t,d)*0.5),0),buon:r100(buon),ind:e.km>TR.indKm?Math.round(fol)*TR.ind:0};
   e.now=e.cost.proj+e.cost.cert; e.tot=Object.values(e.cost).reduce((a,v)=>a+v,0);
@@ -5515,7 +5523,7 @@ function ordOpts(ev){ const w=ev.w; if(!w){ ev.opts=[{t:'Va bene',e:'Nessun effe
   const rc=ristCost(w), sis=ev.k==='sisma', fix=sis?'messo in sicurezza':'bonificato', due=shortDate(S.day+ORD.days);
   ev.text=sis?`Dopo il terremoto in Emilia l'ufficio tecnico del Comune ha controllato i capannoni prefabbricati della zona. Quello di ${w.name} ha le travi appoggiate ai pilastri senza un bullone: «Sta su per abitudine». Entro sei mesi va ${fix} oppure chiuso.`
     :`Due tecnici dell'ASL hanno fatto il giro del tetto di ${w.name} con la mascherina e un metro da sarta: la copertura è di cemento-amianto, ondulata e piena di crepe. Con il nuovo piano regionale l'ordinanza è chiara: entro sei mesi il capannone va ${fix} oppure chiuso.`;
-  ev.opts=[{t:'Ristrutturo subito',d:`Si apre il cantiere: ${eur(rc)} e ${wks(EDIL.rist.gg)} di lavori. L'edificio sale a vecchio e l'ordinanza si chiude a fine lavori.`,e:`−${eur(rc)}, ristrutturazione aperta`,
+  ev.opts=[{t:'Ristrutturo subito',d:`Si apre il cantiere: ${eur(rc)} e ${wks(cantGg(EDIL.rist.gg))} di lavori. L'edificio sale a vecchio e l'ordinanza si chiude a fine lavori.`,e:`−${eur(rc)}, ristrutturazione aperta`,
       req:()=>!!ev.w&&ev.w.staff.fm>0&&!ev.w.build&&S.cash>=ristCost(ev.w),reqT:'Facility manager, nessun cantiere aperto e '+eur(rc)+' in cassa',
       r:'Le ruspe sono arrivate il lunedì. I magazzinieri lavorano con il casco e chiamano il capocantiere «geometra», anche se non lo è.',
       f:function(){ const x=this.w; if(!x) return; x.ord={day:S.day,until:S.day+ORD.days,k:'rist'}; if(x.staff.fm&&!x.build&&S.cash>=ristCost(x)) ristStart(x); }},
@@ -5820,10 +5828,10 @@ const CONS=[
  {id:'gigabancale',dep:'it',n:'Gigabancale Solutions',city:'Bologna',fee:5000,brav:14,prj:1.4,d:'Serio: manda sempre lo stesso tecnico, Ivano, che ormai conosce il cane del capoturno.'},
  {id:'lunedi',dep:'it',n:'Consulenti del Lunedì S.p.A.',city:'Milano',fee:8000,brav:12,prj:1.8,d:'Quattro neolaureati, slide bellissime e un socio che vedrai solo alla cena di fine progetto.'},
  {id:'paletti',dep:'ing',n:'Studio Ing. Paletti & Associati',city:'Bergamo',fee:5500,brav:14,prj:1.3,d:'Layout e scaffalature, con disegni a mano che sembrano quadri.'},
- {id:'cronometrini',dep:'ing',n:'Cronometrini Tempi & Metodi S.a.s.',city:'Torino',fee:3500,brav:10,prj:1,d:'Arrivano col cronometro e la cartellina. Misurano anche quanto ci metti a leggere questa riga.'},
- {id:'schiena',dep:'ing',n:'Schiena Dritta Ergonomia',city:'Padova',fee:4000,brav:11,prj:1.2,d:'Studiano postazioni e movimenti, e fanno fare stretching alle 6 del mattino. Qualcuno ci ha preso gusto.'}];
+ {id:'cronometrini',dep:'ing',n:'Cronometrini Tempi & Metodi S.a.s.',city:'Torino',fee:3500,brav:10,prj:1,fx:'a progetto: bonus dei metodi +1 nel magazzino, morale −3 per un mese',d:'Arrivano col cronometro e la cartellina. Misurano anche quanto ci metti a leggere questa riga.'},
+ {id:'schiena',dep:'ing',n:'Schiena Dritta Ergonomia',city:'Padova',fee:4000,brav:11,prj:1.2,fx:'a progetto: morale +2 per un mese nel magazzino',d:'Studiano postazioni e movimenti, e fanno fare stretching alle 6 del mattino. Qualcuno ci ha preso gusto.'}];
 const consOf=id=>CONS.find(c=>c.id===id)||null;
-const depNew=()=>({it:{resp:null,cons:null,proj:null,as:0,aff:null},ing:{resp:null,cons:null,proj:null}});   // as: persone sull'assistenza, aff: affidabilità dei sistemi
+const depNew=()=>({it:{resp:null,cons:null,proj:null,as:0,aff:null},ing:{resp:null,cons:null,proj:null,as:0,wh:null}});   // as: persone sulla terza colonna, aff: affidabilità dei sistemi, wh: magazzino da seguire per primo
 const depD=k=>S.dep&&S.dep[k]||{resp:null,cons:null,proj:null};
 const depResp=k=>{const id=depD(k).resp; return id&&S.managers.find(m=>m.id===id&&m.hired)||null;};
 const isDep=id=>!!id&&!!S.dep&&DEPS.find(k=>S.dep[k].resp===id)||null;
@@ -5878,7 +5886,7 @@ const consLogo=(id,sz)=>{const L=CLOGO[id]||{bg:'S',ic:[]}; return pxLogo(TPAL[L
 // preparazione (AVV.prep settimane), giorno dell'avvio (graduale o big bang) con un esito a punteggio, poi AVV.care giorni di assistenza.
 // La squadra interna occupa persone del reparto (che non fanno ricerca) e costa il 15% in meno; un consulente a progetto non occupa nessuno
 // e costa il suo prezzo (prj); senza persone interne lo segue il CEO. L'esito cambia l'apprendimento (w.tech[id].lm) e i KPI dei primi giorni.
-const AVV={prep:{barcode:2,formazione:1,gps:2,wms:6,anticoll:2,rotte:3,rf:3,sinergia:2,ptl:4,verticale:8,amr:8,gestionale:4,edi:4,portale:3,ecom:4},two:['wms','ecom','verticale','amr'],
+const AVV={prep:{barcode:2,formazione:1,gps:2,wms:6,anticoll:2,rotte:3,rf:3,sinergia:2,ptl:4,verticale:8,amr:8,ergonomia:2,layout:4,esoscheletri:3,gestionale:4,edi:4,portale:3,ecom:4},two:['wms','ecom','verticale','amr'],
   care:14,disc:0.15,bbDays:3,bbProd:0.2,cd:56,rnd:15,lm:{bb:0.5,liscio:0.7,difficile:1.5,disastro:1.5,duro:2,cons:1.2},back:0.5,fix:0.25};
 const ESITI={liscio:{n:'Liscio come l\'olio',c:'#2e9e48'},intoppi:{n:'Qualche intoppo',c:'#8ed15b'},difficile:{n:'Avvio difficile',c:'#ffc53d'},disastro:{n:'Disastro',c:'#e0393e'}};
 const avvTech=t=>itOn()&&!!t&&!!t.dep&&t.tree==='log';     // tecnologie dei reparti da installare magazzino per magazzino
@@ -5888,10 +5896,11 @@ const avvOf=(w,id)=>avvList().find(a=>a.wh===(w?w.id:null)&&a.tech===id)||null; 
 const avvN=t=>AVV.two.includes(t.id)?2:1;
 const depInt=k=>(S.office[k]||0)+(depResp(k)?1:0);   // persone interne del reparto (addetti e responsabile)
 const avvBusy=k=>avvList().filter(a=>a.dep===k&&a.by==='int').reduce((s,a)=>s+a.n,0);
-// lavagna del reparto: gli avvii prendono le persone interne per primi; nel Reparto IT D.as stanno sull'assistenza ai sistemi, le altre sulla ricerca
+// lavagna del reparto: gli avvii prendono le persone interne per primi; delle altre D.as stanno sulla terza colonna (IT assistenza, Ingegneria magazzini), il resto sulla ricerca
 const depFreeInt=k=>Math.max(0,depInt(k)-avvBusy(k));
-const itAss=()=>itOn()?Math.min(depD('it').as||0,depFreeInt('it')):0;
-const depRes=k=>depFreeInt(k)-(k==='it'?itAss():0);   // persone interne sulla ricerca
+const depAs=k=>itOn()?Math.min(depD(k).as||0,depFreeInt(k)):0;   // la terza colonna: assistenza ai sistemi (IT), miglioramento nei magazzini (Ingegneria)
+const itAss=()=>depAs('it'), ingMag=()=>depAs('ing');
+const depRes=k=>depFreeInt(k)-depAs(k);   // persone interne sulla ricerca
 const depFree=k=>itOn()?depRes(k)+(depD(k).cons?1:0):0;   // chi lavora alla ricerca: il consulente a contratto sta sempre lì
 const avvByN=by=>by==='int'?'la squadra interna':by==='ceo'?'il CEO':(consOf(by)||{}).n||'un consulente';
 // abilità di chi segue l'avvio: Precisione per l'IT, Operazioni per l'Ingegneria (il responsabile, o il CEO con IT.ceo in meno), la bravura per un consulente
@@ -5946,13 +5955,17 @@ function avvGo(a,w,t){ if(a.upd) return updGo(a,w,t); const L=avvScore(t,w,a.by,
   else if(e==='difficile'){ if(ing){ mod(w.id,{mor:-3},30); if(riOn()) S.mods.push({scope:w.id,ag:5,until:S.day+30,src:'Avvio difficile'}); } else mod(w.id,{P:-2,A:-1},14);
     notify('yellow','tecnologia',LINE_N[t.dep],`Avvio difficile: ${nm}`,ing?'Il personale non ci sta: morale −3 per un mese e apprendimento più lungo del 50%.':'Puntualità −2 e accuratezza −1 per due settimane, apprendimento più lungo del 50%.','magazzini',{wh:w.id},'avv'+a.id); }
   else { mod(w.id,ing?{mor:-3}:{P:-2,A:-1},14); avvBad(a,w,t,ing); }
+  if(a.by==='cronometrini'){ w.met=Math.min(ingMax(),(w.met||0)+ING.crono.met); mod(w.id,{mor:ING.crono.mor},30); }
+  else if(a.by==='schiena') mod(w.id,{mor:ING.schiena.mor},30);
   kpiNow(); }
 // il disastro: evento con tre risposte (ricostruite da avvBadOpts dopo un salvataggio)
 const AVV_KO={barcode:'i lettori non leggono metà delle etichette e i magazzinieri tornano alla penna',wms:'il WMS manda i carrellisti a prendere pallet in posti vuoti e mette la merce nuova dove c\'è già altra merce',
   rf:'i terminali perdono il segnale in fondo alle corsie e le liste di prelievo spariscono a metà',gps:'le scatolette segnano tutti i camion fermi a Ventimiglia, compresi quelli in piazzale',
   rotte:'il programma manda tre bilici nello stesso paese e nessuno nell\'altro',sinergia:'la merce di due clienti finisce sullo stesso bancale, con due bolle che si contraddicono',
   ptl:'le lucine si accendono sulle caselle sbagliate, sempre con grande convinzione',verticale:'le torri automatiche si bloccano a metà altezza con i cassetti fuori',amr:'i robot fanno la coda davanti alla stessa colonna e non si muovono più',
-  formazione:'i corsi sono finiti nell\'ora di pausa e in aula si presentano in due, uno per sbaglio',anticoll:'i sensori dei muletti suonano di continuo e qualcuno li ha coperti col nastro adesivo'};
+  formazione:'i corsi sono finiti nell\'ora di pausa e in aula si presentano in due, uno per sbaglio',anticoll:'i sensori dei muletti suonano di continuo e qualcuno li ha coperti col nastro adesivo',
+  ergonomia:'i banchi nuovi sono stati riabbassati con una chiave inglese, «perché prima era meglio»',esoscheletri:'gli esoscheletri sono appesi negli spogliatoi, accanto ai caschi che nessuno mette',
+  layout:'i carrellisti continuano a fare il giro vecchio, e la corsia a senso unico è diventata a doppio senso nel giro di un turno'};
 function avvBad(a,w,t,ing){ if(isBot()) return; const base=EVENTS.find(e=>e.id===(ing?'avv_no':'avv_ko'));
   if(a.upd) return showEvent(avvBadOpts({...base,wid:w.id,tid:t.id,upd:1,old:a.old,cost:avvBase(t,w,1),title:'L\'aggiornamento è andato storto',
     text:`A ${w.name} l'aggiornamento ${t.name} è partito ${a.mode==='bb'?'tutto in un fine settimana':'un reparto alla volta'}, e il lunedì mattina ${AVV_KO[t.id]||'niente funziona'}. La versione nuova ha cambiato tutte le schermate, e nessuno trova più niente.`}));
@@ -6064,6 +6077,31 @@ function updGo(a,w,t){ const L=avvScore(t,w,a.by,a.mode,S.day,1), s=L.reduce((x,
   else { S.sysDay[t.id]=a.old; setCd(null,t.id); D.aff=Math.max(0,D.aff-5);
     notify('red','tecnologia','Reparto IT',`Aggiornamento fallito: ${nm}`,`La versione nuova non parte: si torna a quella vecchia, che resta obsoleta. Affidabilità −5; si riprova dal ${shortDate(S.day+AVV.cd)}.`,'reparti',null,'avv'+a.id); }
   kpiNow(); }
+// ---- l'Ingegneria in magazzino (quarto pezzo): gli ingegneri sulla colonna «Magazzini» della lavagna fanno il miglioramento continuo,
+// cioè alzano il bonus dei metodi di un magazzino (w.met, produttività +w.met%); i magazzini che nessuno segue lo perdono piano piano.
+// Col pacchetto il welfare lo installa il facility manager (i servizi grandi sono lavori, w.build.k = 'wel'); con un ingegnere sui magazzini
+// i cantieri durano meno, col reparto i traslochi costano meno e si stabilizzano prima.
+const ING={gain:0.5,decay:0.2,max:6,lean:10,tempi:1.5,cant:0.8,trCost:0.7,trStab:0.8,wel:5000,agAut:5,crono:{met:1,mor:-3},schiena:{mor:2},
+  welWk:{relax:3,mensa:8,pulmino:2,asilo:12,cani:2,colonnine:3,spogliatoi:4,palestra:6,presidio:3,clima:3,orto:2}};
+const ingMax=()=>R('lean')?ING.lean:ING.max;
+const ingMul=()=>R('tempi')?ING.tempi:1;
+const metOf=w=>itOn()?(w.met||0):0;
+// chi segue quale magazzino: prima quello scelto (D.wh), poi i bonus più bassi; un ingegnere per magazzino, poi si ricomincia il giro
+function ingPlan(){ const n=ingMag(), L=S.warehouses.slice().sort((a,b)=>(a.met||0)-(b.met||0)), p=whById(depD('ing').wh), m={};
+  if(p){ L.splice(L.indexOf(p),1); L.unshift(p); }
+  for(let i=0;i<n&&L.length;i++){ const w=L[i%L.length]; m[w.id]=(m[w.id]||0)+1; } return m; }
+// a fine mese: chi è seguito sale di ING.gain per ingegnere (×1,5 con lo Studio tempi e metodi), chi no scende di ING.decay
+function ingMonth(){ if(!itOn()||!S.dep) return; const m=ingPlan(), mx=ingMax();
+  S.warehouses.forEach(w=>{ const n=m[w.id]||0, v=w.met||0; w.met=n?Math.min(mx,v+ING.gain*n*ingMul()):Math.max(0,v-ING.decay); }); }
+// cantieri del magazzino e costruzioni da zero: −20% con almeno un ingegnere sui magazzini
+const cantGg=gg=>Math.max(1,Math.round(gg*(ingMag()>0?ING.cant:1)));
+const ingTr=()=>itOn()&&depTeam('ing')>0;   // traslochi: progetto −30%, stabilizzazione −20%
+// lavori del welfare: col pacchetto serve il facility manager; dai 5.000 € in su il servizio è un cantiere del magazzino
+const welBig=(t,w)=>itOn()&&!!t&&t.tree==='wel'&&!t.pol&&instCost(t,w)>=ING.wel;
+const welGg=t=>cantGg((ING.welWk[t.id]||3)*7);
+const welIn=(t,w)=>!!w.build&&w.build.k==='wel'&&w.build.id===t.id;
+function welWhy(t,w){ if(!itOn()||t.tree!=='wel') return ''; if(!w.staff.fm) return 'Serve il facility manager'; if(welBig(t,w)&&w.build) return 'C\'è già un cantiere nel magazzino'; return ''; }
+function welStart(t,w){ const c=instCost(t,w), g=welGg(t); S.cash-=c; S.cur.welf+=c; w.build={k:'wel',id:t.id,left:g,total:g}; }
 // enciclopedia del pacchetto (qui perché usa CONS e le costanti dei reparti)
 wk('reparto_it','it','Reparto IT e Ingegneria',`Pacchetto di espansione che si sceglie nel passo «Pacchetti», quando crei la partita (di base è spento): dietro le ricerche ci sono persone vere, il Reparto IT e l'Ingegneria.`,
 `Con il pacchetto le ricerche le fanno due [[reparti_tecnici|reparti tecnici]] in sede. Il **Reparto IT** studia i sistemi informatici: barcode, WMS, radiofrequenza, GPS, rotte, gestionale, EDI, portale ed e-commerce. L'**Ingegneria** studia le novità per il lavoro e per gli impianti: formazione, sicurezza dei muletti, Academy, magazzino verticale, robot ed [[tech_edifici|edifici intelligenti]]. Tutto il resto (organizzazione, mercato, welfare, certificazioni) resta alla Direzione, come prima.
@@ -6078,7 +6116,7 @@ wk('reparti_tecnici','it','Reparti tecnici',`Il Reparto IT e l'Ingegneria: un re
 • **Addetti**: sistemisti e sviluppatori per l'IT (RAL ${eur(RAL.it)}), ingegneri e tecnici dei metodi per l'Ingegneria (RAL ${eur(RAL.ing)}). Si assumono con un annuncio o un'agenzia, come gli altri dipendenti di sede.
 • **[[consulenti|Consulente a contratto]]**: un canone al mese; conta come una persona e porta la sua bravura.
 
-Chi lavora nel reparto sta su una colonna della [[lavagna]]: gli [[avvio|avvii]] nei magazzini, la ricerca o (nel Reparto IT) l'[[assistenza_it|assistenza]] ai sistemi installati. Con almeno una persona sulla ricerca (responsabile, addetto o consulente) il reparto ha la sua [[linee_ricerca|linea di ricerca]]; se non resta nessuno sulla ricerca, la ricerca in corso si ferma e le nuove le studia la Direzione.`);
+Chi lavora nel reparto sta su una colonna della [[lavagna]]: gli [[avvio|avvii]] nei magazzini, la ricerca, oppure l'[[assistenza_it|assistenza]] ai sistemi installati (Reparto IT) o il [[miglioramento|miglioramento continuo]] nei magazzini (Ingegneria). Con almeno una persona sulla ricerca (responsabile, addetto o consulente) il reparto ha la sua [[linee_ricerca|linea di ricerca]]; se non resta nessuno sulla ricerca, la ricerca in corso si ferma e le nuove le studia la Direzione.`);
 wk('linee_ricerca','it','Linee di ricerca',`Col pacchetto Reparto IT e Ingegneria si fanno fino a tre ricerche insieme: una per la Direzione e una per ogni reparto tecnico che ha qualcuno.`,
 `Ogni tecnologia ha un reparto: quelle informatiche l'IT, quelle per il lavoro e gli impianti l'Ingegneria, tutte le altre la Direzione. Se nel reparto della tecnologia nessuno lavora alla ricerca (è vuoto, oppure tutti sono sugli avvii o sull'assistenza), la studia la Direzione, come senza pacchetto. Le tecnologie miste (pick-to-light, e-commerce, magazzino verticale, robot) le studia il reparto capofila.
 
@@ -6105,7 +6143,7 @@ wk('avvio','it','Avvio nei magazzini',`Col pacchetto Reparto IT e Ingegneria le 
 wk('consulenti','it','Consulenti esterni',`Studi e software house che lavorano per un reparto tecnico con un canone al mese: aprono la sua linea di ricerca da subito, senza assumere nessuno.`,
 `Come nella realtà, spesso si comincia con un consulente. Ogni [[reparti_tecnici|reparto]] ne può avere uno a contratto: conta come una persona e, se la sua bravura è più alta dell'Innovazione del responsabile, le ricerche usano la sua. Il canone va nella voce tecnologie del conto economico; si disdice con ${wks(IT.notice)} di preavviso, durante le quali lavora e si paga ancora.
 
-${CONS.map(c=>`• **${c.n}** (${c.city}, ${c.dep==='it'?'IT':'Ingegneria'}): ${eur(c.fee)} al mese, bravura ${c.brav}. ${c.d}`).join('\n')}`);
+${CONS.map(c=>`• **${c.n}** (${c.city}, ${c.dep==='it'?'IT':'Ingegneria'}): ${eur(c.fee)} al mese, bravura ${c.brav}${c.fx?`; ${c.fx}`:''}. ${c.d}`).join('\n')}`);
 wk('lavagna','it','Lavagna del reparto',`Come si dividono le persone di un reparto tecnico: avvii nei magazzini, ricerca e, nel Reparto IT, assistenza ai sistemi.`,
 `Ogni [[reparti_tecnici|reparto tecnico]] ha una lavagna con le sue colonne. Il gioco sposta le persone da solo; chi gioca decide solo come dividere quelle che restano.
 
@@ -6113,7 +6151,9 @@ wk('lavagna','it','Lavagna del reparto',`Come si dividono le persone di un repar
 • **Ricerca**: chi resta lavora alla ricerca del reparto. Il [[consulenti|consulente a contratto]] sta sempre qui.
 • **Assistenza** (solo Reparto IT): con + e − si sposta una persona tra ricerca e [[assistenza_it|assistenza]] ai sistemi installati.
 
-Più gente sulla ricerca vuol dire ricerche più veloci ([[linee_ricerca]]), ma sistemi meno seguiti: l'[[affidabilita|affidabilità]] scende e arrivano più [[guasti_it|guasti]]. Nell'Ingegneria, per ora, chi non è sugli avvii fa ricerca.`);
+• **Magazzini** (solo Ingegneria): con + e − si sposta una persona tra ricerca e [[miglioramento|miglioramento continuo]] nei magazzini.
+
+Più gente sulla ricerca vuol dire ricerche più veloci ([[linee_ricerca]]), ma sistemi meno seguiti (l'[[affidabilita|affidabilità]] scende e arrivano più [[guasti_it|guasti]]) e magazzini che migliorano meno.`);
 wk('assistenza_it','it','Assistenza ai sistemi',`Ogni sistema informatico installato chiede assistenza: una persona del Reparto IT ogni ${ITS.per} punti di sistema.`,
 `Col pacchetto [[reparto_it|Reparto IT e Ingegneria]] i sistemi vanno seguiti. Punti di sistema: in ogni magazzino ${Object.entries(ITS.sys).map(([id,n])=>`${TECH.find(t=>t.id===id).name.toLowerCase()} ${n}`).join(', ')}; per tutta l'azienda ${Object.entries(ITS.co).map(([id,n])=>`${TECH.find(t=>t.id===id).name.toLowerCase()} ${n}`).join(', ')}. Contano anche i sistemi ancora in [[apprendimento]].
 
@@ -6139,6 +6179,20 @@ wk('sistemi_obsoleti','it','Sistemi obsoleti e aggiornamenti',`Ogni sistema info
 Un sistema **obsoleto** toglie ${ITS.obs} punti all'obiettivo dell'[[affidabilita|affidabilità]] e il suo canone sale del ${Math.round(ITS.fee*100)}% (assistenza su una versione che non esiste più).
 
 **Aggiornamento**: dalla scheda Reparti tecnici o da quella della tecnologia, da un anno prima che diventi obsoleto. È un progetto del Reparto IT come un [[avvio]]: si sceglie chi lo segue, costa il ${Math.round(ITS.upd*100)}% dell'installazione (per i sistemi aziendali della ricerca), la preparazione dura la metà, il punteggio ha +${ITS.sc} (il sistema si conosce già) e l'[[apprendimento]] è il ${Math.round(ITS.lm*100)}% del normale. Se va male si torna alla versione vecchia. Meglio non farlo a novembre.`);
+wk('miglioramento','it','Miglioramento continuo',`Gli ingegneri sulla colonna «Magazzini» studiano tempi e percorsi e alzano il bonus dei metodi: la produttività di un magazzino sale fino a +${ING.max}% (+${ING.lean}% col Lean).`,
+`Col pacchetto [[reparto_it|Reparto IT e Ingegneria]] ogni magazzino ha un **bonus dei metodi**, da 0 a +${ING.max}% di [[produttivita|produttività]] (+${ING.lean}% con la ricerca [[tech_lean|Lean e miglioramento continuo]]). Lo alzano gli ingegneri che l'Ingegneria tiene sulla colonna «Magazzini» della [[lavagna]]: rifanno i percorsi di prelievo, spostano vicino alle baie gli articoli che escono di più, tolgono i passi inutili.
+
+• Ogni ingegnere segue un magazzino: prima quello che scegli («Segui per primo» nella scheda Reparti tecnici), poi quelli col bonus più basso; con più ingegneri che magazzini si ricomincia il giro.
+• A fine mese un magazzino seguito sale di ${f1(ING.gain)} punti per ingegnere (${f1(ING.gain*ING.tempi)} con lo [[tech_tempi|Studio tempi e metodi]]); uno che nessuno segue scende di ${f1(ING.decay)}: le vecchie abitudini tornano.
+• Con almeno un ingegnere sui magazzini i cantieri (dotazioni, ampliamenti, ristrutturazioni, costruzioni da zero e [[lavori_welfare|lavori del welfare]]) durano il ${Math.round((1-ING.cant)*100)}% in meno. Col reparto Ingegneria aperto i [[trasloco|traslochi]] costano il ${Math.round((1-ING.trCost)*100)}% in meno di progetto e la stabilizzazione dura il ${Math.round((1-ING.trStab)*100)}% in meno.
+• Col pacchetto [[relazioni_industriali|Relazioni industriali]], nei magazzini dove c'è un [[avvio]] in corso, il magazzino verticale o i robot in arrivo alzano l'[[agitazione]] di ${ING.agAut}, e la Leadership del responsabile dell'Ingegneria la abbassa di 1 per ogni punto sopra 10.`);
+wk('lavori_welfare','it','Lavori del welfare',`Col pacchetto Reparto IT e Ingegneria i servizi di welfare nei magazzini li installa il facility manager; quelli grandi sono un cantiere di qualche settimana.`,
+`Col pacchetto [[reparto_it|Reparto IT e Ingegneria]] i [[welfare_mag|servizi di welfare]] si ricercano come sempre nella linea della Direzione, ma nel magazzino li installa il [[facility|facility manager]]: senza di lui non si installano.
+
+• I servizi piccoli (sotto ${eur(ING.wel)} di installazione: acqua, frutta, caffè, lavanderia, sportello d'ascolto, corsi di italiano) partono subito, come prima.
+• Quelli grandi sono un cantiere del magazzino, uno alla volta come le dotazioni: produttività −5% finché durano i lavori, poi il servizio funziona da subito. Settimane: ${Object.entries(ING.welWk).map(([id,w])=>`${(TECH.find(t=>t.id===id)||{name:id}).name.toLowerCase()} ${w}`).join(', ')}. Con un ingegnere sulla colonna «Magazzini» durano il ${Math.round((1-ING.cant)*100)}% in meno ([[miglioramento]]).
+
+Costo e canone come sempre; si pagano all'apertura del cantiere.`);
 // pacchetti della partita: ricerche, policy e posti in Direzione che esistono solo con un'espansione (ri:1, it:1); la scheda dei reparti si nasconde da sola (WHIDE)
 function packApply(){ const ri=riOn(), it=itOn();
   riPack(ri); TECH.length=0; TECH.push(...TECH_ALL.filter(t=>(ri||!t.ri)&&(it||!t.it)));
@@ -6279,6 +6333,8 @@ function riTens(w){ riW(w); const k=w.kpi||computeWH(w), m=k.m||{}, L=[['Base',R
   if(polOn('porte')) L.push(['Porte aperte',-8]); if(polOn('presenza')) L.push(['Premio di presenza',3]);
   if(T) L.push(['Talenti di chi guida il magazzino',T]);
   if((w.cond==null?100:w.cond)<60) L.push(['Magazzino malandato',5]); L.push(...immL(w,'ag'));
+  if(itOn()){ const av=avvList().filter(a=>a.wh===w.id&&!a.upd); if(av.length){ if(av.some(a=>['verticale','amr'].includes(a.tech))) L.push(['Automazione in arrivo',ING.agAut]);
+    const r=depResp('ing'); if(r&&r.st.lead>10) L.push(['Responsabile dell\'Ingegneria (Leadership)',-(r.st.lead-10)]); } }
   if(overloaded(w,k)) L.push(['Reparti in affanno',10]);
   if(ms) L.push(['Eventi, licenziamenti e scioperi',ms]);
   // contagio: il magazzino più agitato nei dintorni (anche delle altre aziende)
@@ -9161,7 +9217,7 @@ const VIEWS={
   let det='';
   if(sel){const s2=st(sel), reqs=(sel.req||[]).map(r=>TECH.find(x=>x.id===r)).filter(Boolean), next=TECH.filter(x=>(x.req||[]).includes(sel.id));
     const chip=r=>`<button class="tchip${R(r.id)?' ok':''}" data-act="seltech" data-id="${r.id}">${techIcon(r,16,!R(r.id))}<span>${esc(r.name)}</span>${r.tree!==sel.tree?`<small>${esc(trN(r.tree))}</small>`:''}</button>`;
-    const eff=[sel.A?`${kw('accuratezza')} +${f1(sel.A)}`:'',sel.P?`${kw('puntualita')} +${f1(sel.P)}`:'',sel.att?`${kw('attrattivita','attrattività')} +${sel.att}`:'',perWh(sel)&&sel.tree==='cert'?`${kw('certificazioni','audit e attrezzatura')} ${eur(sel.inst)} per magazzino, canone ${eur(sel.mese)}/mese, certificato dopo ${wks(sel.weeks*7)}`:perWh(sel)?`${kw('installazione','installazione')} ${eur(sel.inst)} per magazzino, canone ${eur(welMese(sel))}/mese${sel.weeks?`, ${kw('apprendimento','apprendimento')} ${sel.weeks} ${sel.weeks===1?'settimana':'settimane'}`:', subito attivo'}`:''].filter(Boolean).join(' · ');
+    const eff=[sel.A?`${kw('accuratezza')} +${f1(sel.A)}`:'',sel.P?`${kw('puntualita')} +${f1(sel.P)}`:'',sel.att?`${kw('attrattivita','attrattività')} +${sel.att}`:'',perWh(sel)&&sel.tree==='cert'?`${kw('certificazioni','audit e attrezzatura')} ${eur(sel.inst)} per magazzino, canone ${eur(sel.mese)}/mese, certificato dopo ${wks(sel.weeks*7)}`:perWh(sel)?`${kw('installazione','installazione')} ${eur(sel.inst)} per magazzino${welMese(sel)?`, canone ${eur(welMese(sel))}/mese`:', nessun canone'}${sel.weeks?`, ${kw('apprendimento','apprendimento')} ${sel.weeks} ${sel.weeks===1?'settimana':'settimane'}`:', subito attivo'}`:''].filter(Boolean).join(' · ');
     const pill={done:['ok','Ricercata'],run:['acc','In corso'],open:['','Da ricercare'],lock:['mut','Bloccata']}[s2];
     let act='';
     const lk=techLine(sel), lp=lineProj(lk), lt=lp&&TECH_ALL.find(x=>x.id===lp.tech), rp=pjOf(sel.id);
@@ -9174,7 +9230,7 @@ const VIEWS={
     if(s2==='done'&&perWh(sel)) act=`<div class="lab">${sel.tree==='cert'?'Nei magazzini':'Installazione nei magazzini'}</div>`+S.warehouses.map(w=>{const it=w.tech[sel.id], ce=sel.tree==='cert', learn=it&&(ce?!certOk(w,sel.id):techFactor(w,sel)<0), cs=ce&&it?certState(w,sel):'';
       const av=!it&&avvTech(sel)&&avvOf(w,sel.id), cd=w.avvCd&&w.avvCd[sel.id]>S.day;
       if(!it&&avvTech(sel)) return `<div class="row"><span>${esc(w.name)}</span>${av?`<span class="sm warn">in preparazione · si parte il ${shortDate(av.live)}</span>`:cd?`<span class="sm bad">si riprova dal ${shortDate(w.avvCd[sel.id])}</span>`:`<button class="btn sm2 pri" data-act="avvopen" data-id="${sel.id}" data-wh="${w.id}" ${instReq(sel,w)?'':'disabled'}>Avvia il progetto</button>`}</div>`;
-      return `<div class="row"><span>${esc(w.name)}</span>${it?`<span class="sm ${learn?'warn':'ok'}">${learn?(ce?(cs==='susp'?'sospeso':'primo audit in attesa'):'in apprendimento'):(ce?(cs==='nc'?'certificato, con rilievi':'certificato'):'attiva')}</span>${updCtl(sel,w)}`:`<button class="btn sm2 pri" data-act="install" data-id="${sel.id}" data-wh="${w.id}" ${S.cash>=instCost(sel,w)&&!(sel.tree==='wel'&&polOn('spending'))&&instReq(sel,w)?'':'disabled'}>${ce?certBtn(sel):'Installa'} · ${eur(instCost(sel,w))}</button>`}</div>`;}).join('')+(sel.tree==='wel'&&polOn('spending')?`<div class="sm warn">La policy ${kw('pol_spending','Spending review')} blocca i nuovi servizi di welfare.</div>`:'')+(reqs.length?`<div class="sm">Si installa nei magazzini che hanno già ${reqs.map(r=>esc(r.name)).join(' e ')}.</div>`:'');
+      return `<div class="row"><span>${esc(w.name)}</span>${it?`<span class="sm ${learn?'warn':'ok'}">${learn?(ce?(cs==='susp'?'sospeso':'primo audit in attesa'):'in apprendimento'):(ce?(cs==='nc'?'certificato, con rilievi':'certificato'):'attiva')}</span>${updCtl(sel,w)}`:welIn(sel,w)?`<span class="sm warn">${kw('lavori_welfare','lavori in corso')} · ${wks(w.build.left)}</span>`:`<button class="btn sm2 pri" data-act="install" data-id="${sel.id}" data-wh="${w.id}" ${S.cash>=instCost(sel,w)&&!(sel.tree==='wel'&&polOn('spending'))&&instReq(sel,w)&&!welWhy(sel,w)?'':'disabled'}${welWhy(sel,w)?` data-tip="${esc(welWhy(sel,w))}"`:''}>${ce?certBtn(sel):welBig(sel,w)?`Lavori di ${wks(welGg(sel))}`:'Installa'} · ${eur(instCost(sel,w))}</button>`}</div>`;}).join('')+(sel.tree==='wel'&&polOn('spending')?`<div class="sm warn">La policy ${kw('pol_spending','Spending review')} blocca i nuovi servizi di welfare.</div>`:'')+(reqs.length?`<div class="sm">Si installa nei magazzini che hanno già ${reqs.map(r=>esc(r.name)).join(' e ')}.</div>`:'');
     det=`<div class="tdh">${techIcon(sel,side&&DW<280?48:64,s2==='lock')}<div class="wh-sm"><span class="h3">${esc(sel.name)}</span><span class="sm">${kw('alberi',trN(sel.tree))} · ${perWh(sel)?(sel.tree==='cert'?'da ottenere magazzino per magazzino':'da installare in ogni magazzino'):'vale per tutta l\'azienda'}</span><span class="pill ${pill[0]}">${pill[1]}</span></div></div>
       ${itOn()?(sel.dep?`<div class="sm">${depIc(sel.dep)} La studia ${sel.dep==='it'?'il Reparto IT':'l\'Ingegneria'}${sel.sup?` (con l'aiuto ${sel.sup==='it'?'del Reparto IT':'dell\'Ingegneria'})`:''}${depFree(sel.dep)>0?'':depOpen(sel.dep)?': nel reparto nessuno fa ricerca, per ora la studia la Direzione':': reparto chiuso, per ora la studia la Direzione'}.</div>`:'<div class="sm">La studia la Direzione.</div>'):''}
       ${sel.txt?`<div class="ttxt">${esc(sel.txt)}</div>`:''}<div><b>Effetto:</b> ${esc(sel.desc)}</div>${eff?`<div class="sm">${eff}</div>`:''}
@@ -9191,10 +9247,10 @@ const VIEWS={
  reparti(){
   if(!itOn()) return `<div class="card pend"><span class="h3">Solo col pacchetto Reparto IT e Ingegneria</span><div class="sm">Si sceglie nel passo «Pacchetti», quando crei una partita nuova.</div></div>`;
   const B=ceo();
-  const box=k=>{ const D=S.dep[k], r=depResp(k), c=depCons(k), n=S.office[k]||0, q=S.queue.filter(x=>x.role===k), team=depTeam(k), p=D.proj, t=p&&TECH_ALL.find(x=>x.id===p.tech), stop=lineStop(k), ass=k==='it'?itAss():0, res=depRes(k), busy=avvBusy(k);
-   const inn=depInn(k), base=r?r.st.inn:B.st.inn-IT.ceo, mul=team?IT.team[clamp(team,1,5)]*clamp(1-0.03*(inn-10),0.6,1.5)*dirIngMul():null, pc=p?Math.round((1-p.left/p.total)*100):0;
+  const box=k=>{ const D=S.dep[k], r=depResp(k), c=depCons(k), n=S.office[k]||0, q=S.queue.filter(x=>x.role===k), team=depTeam(k), p=D.proj, t=p&&TECH_ALL.find(x=>x.id===p.tech), stop=lineStop(k), ass=depAs(k), res=depRes(k), busy=avvBusy(k), col3=k==='it'?['assistenza_it','Assistenza','sull\'assistenza']:['miglioramento','Magazzini','sui magazzini'];
+   const inn=depInn(k), base=r?r.st.inn:Math.max(1,B.st.inn-IT.ceo), mul=team?IT.team[clamp(team,1,5)]*clamp(1-0.03*(inn-10),0.6,1.5)*dirIngMul():null, pc=p?Math.round((1-p.left/p.total)*100):0;
    const tiles=`<div class="wh-kpis c3">
-     <div class="kpi wh-k ${team?'ok':'bad'}"><div class="lab">${kw('reparti_tecnici','Persone')}</div><b>${team}</b><div class="sm">${team?(avvBusy(k)||ass?[`${depFree(k)} sulla ricerca`,avvBusy(k)?`${avvBusy(k)} sugli ${kw('avvio','avvii')}`:'',ass?`${ass} ${kw('assistenza_it','sull\'assistenza')}`:''].filter(Boolean).join(', '):'tutte sulla ricerca'):'reparto chiuso'}</div></div>
+     <div class="kpi wh-k ${team?'ok':'bad'}"><div class="lab">${kw('reparti_tecnici','Persone')}</div><b>${team}</b><div class="sm">${team?(avvBusy(k)||ass?[`${depFree(k)} sulla ricerca`,avvBusy(k)?`${avvBusy(k)} sugli ${kw('avvio','avvii')}`:'',ass?`${ass} ${kw(col3[0],col3[2])}`:''].filter(Boolean).join(', '):'tutte sulla ricerca'):'reparto chiuso'}</div></div>
      <div class="kpi wh-k"><div class="lab">${kw('st_inn','Innovazione')}</div><b>${statBadge('inn',inn,20)}</b><div class="sm">${c&&c.brav>base?'del consulente':r?'del responsabile':`del CEO, −${IT.ceo}`}</div></div>
      <div class="kpi wh-k"><div class="lab">${kw('linee_ricerca','Ricerche')}</div><b>${mul?(mul<=1?'−':'+')+Math.abs(Math.round((mul-1)*100))+'%':'—'}</b><div class="sm">${mul?'di durata':'nessuna linea'}</div></div></div>`;
    const ric=t?`<div class="row"><span>${kw('linee_ricerca','In corso')}: <button class="lnk" data-act="opentech" data-tree="${t.tree}" data-id="${t.id}"><b>${esc(t.name)}</b></button></span><b class="num">${wks(p.left)}</b></div>
@@ -9208,12 +9264,12 @@ const VIEWS={
       ${D.cons.end!=null?`<button class="btn sm2" data-act="consback" data-k="${k}">Ritira la disdetta</button>`:`<button class="btn sm2" data-act="consstop" data-k="${k}">Disdici</button>`}</div>`:'';
    const alt=CONS.filter(x=>x.dep===k&&(!c||x.id!==c.id)).map(x=>`<div class="wh-st">${consLogo(x.id,32)}<div class="wh-sm"><b class="wh-nm">${esc(x.n)}</b><span class="sm">${esc(x.city)} · ${eur(x.fee)} al mese · bravura ${x.brav}</span><span class="sm">${esc(x.d)}</span></div>
       <button class="btn sm2${c?'':' pri'}" data-act="consign" data-id="${x.id}">${c?'Cambia':'Firma'}</button></div>`).join('');
-   // lavagna del Reparto IT: avvii (presi per primi), ricerca e assistenza ai sistemi; + e − spostano una persona tra ricerca e assistenza
-   const lav=k==='it'&&depInt(k)?`<div class="lab">${kw('lavagna','Lavagna del reparto')}</div><div class="lv">
+   // lavagna: avvii (presi per primi), ricerca e terza colonna (IT assistenza ai sistemi, Ingegneria miglioramento nei magazzini); + e − spostano una persona
+   const lav=depInt(k)?`<div class="lab">${kw('lavagna','Lavagna del reparto')}</div><div class="lv">
      <div class="lv-c"><span class="sm">${kw('avvio','Avvii')}</span><b class="num">${busy}</b><span class="sm">${busy===1?'persona':'persone'}</span></div>
      <div class="lv-c"><span class="sm">${kw('linee_ricerca','Ricerca')}</span><b class="num">${res}</b><span class="sm">${c?'più il consulente':res===1?'persona':'persone'}</span></div>
-     <div class="lv-c"><span class="sm">${kw('assistenza_it','Assistenza')}</span><div class="wh-step"><button class="btn sm2" data-act="itas" data-v="-1" ${ass<=0?'disabled':''} aria-label="Una persona dall'assistenza alla ricerca">−</button><b class="num">${ass}</b><button class="btn sm2 pri" data-act="itas" data-v="1" ${res<=0?'disabled':''} aria-label="Una persona dalla ricerca all'assistenza">+</button></div></div></div>
-     <div class="sm">Gli avvii prendono le persone per primi. Con + e − sposti chi resta tra la ricerca e l'assistenza ai sistemi installati.</div>`:'';
+     <div class="lv-c"><span class="sm">${kw(col3[0],col3[1])}</span><div class="wh-step"><button class="btn sm2" data-act="itas" data-k="${k}" data-v="-1" ${ass<=0?'disabled':''} aria-label="Una persona dalla colonna ${col3[1]} alla ricerca">−</button><b class="num">${ass}</b><button class="btn sm2 pri" data-act="itas" data-k="${k}" data-v="1" ${res<=0?'disabled':''} aria-label="Una persona dalla ricerca alla colonna ${col3[1]}">+</button></div></div></div>
+     <div class="sm">Gli avvii prendono le persone per primi. Con + e − sposti chi resta tra la ricerca e ${k==='it'?'l\'assistenza ai sistemi installati':'il miglioramento continuo nei magazzini'}.</div>`:'';
    const AV=avvList().filter(a=>a.dep===k), avR=AV.map(a=>{const t=TECH_ALL.find(x=>x.id===a.tech), w=a.wh==null?null:whById(a.wh); if(!t||(a.wh!=null&&!w)) return '';
      return `<div class="wh-st">${techIcon(t,32,!a.esito)}<div class="wh-sm"><b class="wh-nm">${a.upd?'Aggiornamento: ':''}${esc(t.name)} ${w?'a '+esc(w.name):'(tutta l\'azienda)'}</b><span class="sm">${a.esito?`assistenza fino al ${shortDate(a.end)} · <b style="color:${ESITI[a.esito].c}">${ESITI[a.esito].n}</b>`:`preparazione · si parte il ${shortDate(a.live)}${a.mode==='bb'?' (big bang)':''}`} · ${esc(avvByN(a.by))}${a.n?` (${a.n} ${a.n===1?'persona':'persone'})`:''}</span></div>${a.esito?'':`<button class="btn sm2" data-act="avvcancel" data-id="${a.id}">Annulla</button>`}</div>`;}).join('');
    return `<div class="card dep-k"><div class="row"><span class="h3">${depIc(k,24)} ${kw('reparti_tecnici',DEP[k].n)}</span><span class="pill ${team?'ok':''}">${team?'linea di ricerca aperta':'chiuso'}</span></div>
@@ -9244,7 +9300,17 @@ const VIEWS={
      ${ko.length?`<div class="lab">${kw('guasti_it','Guasti in corso')}</div>${ko.map(w=>`<div class="row"><span>${esc(ITKO[w.itko.k].n)} a <b>${esc(w.name)}</b></span><span class="sm bad">fino al ${shortDate(w.itko.to)}</span></div>`).join('')}`:''}
      <div class="lab">${kw('sistemi_obsoleti','Sistemi da aggiornare')}</div>${hot.length?hot.map(row).join(''):`<div class="sm">${srt.length?'Nessuno, per ora: un sistema si può aggiornare da un anno prima che diventi obsoleto.':'Nessun sistema installato.'}</div>`}
      ${rest.length?`<button class="btn sm2" data-act="itall" aria-expanded="${!!UI.sel.itall}">${UI.sel.itall?'Nascondi gli altri sistemi':`Mostra gli altri sistemi (${rest.length})`}</button>${UI.sel.itall?rest.map(row).join(''):''}`:''}</div>`; };
-  return `<div class="sm">Le ricerche le fanno due ${kw('reparti_tecnici','reparti')}: ognuno con almeno una persona ha la sua ${kw('linee_ricerca','linea di ricerca')}, accanto a quella della Direzione. Si parte spesso con un ${kw('consulenti','consulente')}, poi si assume.</div>${box('it')}${itCard()}${box('ing')}${inn}`;
+  // miglioramento continuo (Ingegneria): il bonus dei metodi magazzino per magazzino, chi lo segue e quello da seguire per primo
+  const ingCard=()=>{ const n=ingMag(), P=ingPlan(), mx=ingMax(), pri=depD('ing').wh, g=ING.gain*ingMul();
+    const row=w=>{ const v=metOf(w), f=P[w.id]||0, on=pri===w.id;
+      return `<div class="wh-st ing-r"><div class="wh-sm"><div class="row"><b class="wh-nm">${esc(w.name)}</b><b class="num">+${f1(v)}%</b></div>
+        <div class="bar"><i style="width:${Math.round(v/ING.lean*100)}%;background:${v>=mx?'var(--ok)':'var(--accent)'}"></i></div>
+        <span class="sm">${f?`${f===1?'un ingegnere':f+' ingegneri'}: +${f1(g*f)} al mese${v>=mx?' (al massimo)':''}`:`nessuno lo segue: −${f1(ING.decay)} al mese`}</span></div>
+        <button class="btn sm2${on?' pri':''}" data-act="ingwh" data-id="${w.id}" aria-pressed="${on}">${on?'Seguito per primo':'Segui per primo'}</button></div>`; };
+    return `<div class="card dep-k"><div class="row"><span class="h3">${depIc('ing',24)} ${kw('miglioramento','Miglioramento continuo')}</span><span class="pill">${n} ${n===1?'ingegnere':'ingegneri'} sui magazzini</span></div>
+     <div class="sm">Gli ingegneri sulla colonna «Magazzini» studiano tempi e percorsi e alzano il ${kw('miglioramento','bonus dei metodi')}: produttività fino a +${mx}%${R('lean')?'':` (+${ING.lean}% con la ricerca ${kw('tech_lean','Lean')})`}. Uno per magazzino, partendo da quello scelto e poi dal più indietro; i magazzini che nessuno segue perdono ${f1(ING.decay)} punti al mese. ${n?`Con un ingegnere sui magazzini i ${kw('lavori_welfare','cantieri')} durano il ${Math.round((1-ING.cant)*100)}% in meno.`:''}</div>
+     ${S.warehouses.map(row).join('')}</div>`; };
+  return `<div class="sm">Le ricerche le fanno due ${kw('reparti_tecnici','reparti')}: ognuno con almeno una persona ha la sua ${kw('linee_ricerca','linea di ricerca')}, accanto a quella della Direzione. Si parte spesso con un ${kw('consulenti','consulente')}, poi si assume.</div>${box('it')}${itCard()}${box('ing')}${ingCard()}${inn}`;
  },
  certificazioni(){
   const tab=UI.sel.ctab||'mag';
@@ -9791,6 +9857,8 @@ function prodView(w,k,ld){
     ${F.ri&&F.ri!==1?row(kw('agitazione','Clima sindacale e accordi'),F.ri-1,''):''}
     ${F.trs&&F.trs!==1?row(kw('stabilizzazione','Stabilizzazione dopo il trasloco'),F.trs-1,'scende piano a zero'):''}
     ${F.av&&F.av!==1?row(kw('avvio','Avvio in un fine settimana'),F.av-1,`i primi ${AVV.bbDays} giorni`):''}
+    ${F.it&&F.it!==1?row(kw('guasti_it','Guasto informatico'),F.it-1,w.itko&&ITKO[w.itko.k]?esc(ITKO[w.itko.k].n.toLowerCase())+' fino al '+shortDate(w.itko.to):''):''}
+    ${itOn()?row(kw('miglioramento','Bonus dei metodi'),(F.met||1)-1,`${f1(metOf(w))} su ${ingMax()} · ${ingPlan()[w.id]?'lo segue l\'Ingegneria':'nessuno lo segue'}`):''}
     ${row(`${statIcon('op',12)} Operazioni del ${kw('manager')}`,F.mgr-1,esc(mgr))}
     <div class="row rp-tot"><span>Totale <span class="sm">(le voci si moltiplicano)</span></span><b>${Math.round(idx)}% · ${n0(k.prod)} pallet</b></div>
    </div>
@@ -9834,7 +9902,7 @@ function avvBox(){ const A=UI.sel.avv, t=A&&TECH_ALL.find(x=>x.id===A.t), w=A&&A
     const face=by==='int'?pFace(depResp(k)?mImg(depResp(k)):IMG[DEP[k].img],'m'):by==='ceo'?pFace(ceoImg(ceo()),'m'):`<span class="av-lg">${consLogo(by,48)}</span>`;
     const sub=by==='int'?`${fr<0?0:fr} ${fr===1?'persona libera':'persone libere'} su ${depInt(k)}, ne ${n===1?'serve una':'servono due'} · ${stn} ${statBadge(DEP[k].st2,avvSkill(k,'int'),14)} · costo −15%`
       :by==='ceo'?`Nel reparto non c'è nessuno di interno: lo segui tu, con ${IT.ceo} punti in meno · ${stn} ${statBadge(DEP[k].st2,avvSkill(k,'ceo'),14)}`
-      :`Bravura ${c.brav} · costo ×${f1(c.prj)} · non occupa nessuno${(depCons(k)||{}).id===by?' · già a contratto':''}`;
+      :`Bravura ${c.brav} · costo ×${f1(c.prj)} · non occupa nessuno${(depCons(k)||{}).id===by?' · già a contratto':''}${c.fx&&!U?' · '+esc(c.fx.replace('a progetto: ','')):''}`;
     const inner=`${face}<span class="mp-t"><span class="mp-n"><b>${by==='int'?'Squadra interna':by==='ceo'?'Il CEO':esc(c.n)}</b> <span class="pill">${eur(avvCost(t,w,by,U))}</span>${on?'<span class="pill">scelto</span>':''}</span><span class="sm">${sub}</span></span>`;
     return off?`<div class="mp-r off" aria-disabled="true">${inner}</div>`:`<button class="mp-r${on?' on':''}" data-act="avvset" data-by="${by}" ${on?'aria-current="true"':''}>${inner}</button>`; };
   const modes=avvBB(t)&&w?`<div class="lab">Come partire</div><div class="seg" role="group"><button class="btn sm2" data-act="avvset" data-mode="grad" aria-pressed="${A.mode==='grad'}">Graduale</button><button class="btn sm2" data-act="avvset" data-mode="bb" aria-pressed="${A.mode==='bb'}">Big bang</button></div>
@@ -9865,13 +9933,13 @@ function edilBox(){ const E=UI.sel.ed; if(!E||!SITES[E.site]||!siteOpen(E.site))
    <div class="dt-list">${dl.map(d=>{const on=E.dot.includes(d.id), full=!on&&d.ext&&ext>=s.ext;
      return `<label class="es-r dt-r">${dotIcon(d.id,28,!on)}<span class="wh-sm"><b class="wh-nm">${kw('dot_'+d.id,d.n)}</b><span class="sm wh-nm">${full?'area esterna piena':`${eur(dotCost(E.cap,d))}${d.mese?` · poi ${eur(d.mese)}/mese`:''}`}</span></span><input type="checkbox" class="sw" data-act="eddot" data-id="${d.id}" ${on?'checked':''} ${full?'disabled':''} aria-label="${esc(d.n)}"></label>`;}).join('')}</div>
    <div class="ed-tot"><span>Terreno ${eur(s.land)} · edificio ${eur(E.cap*EDIL.eur[E.cl])} · dotazioni ${eur(cost-s.land-E.cap*EDIL.eur[E.cl])}</span><b>${eur(cost)}</b></div>
-   <div class="sm">Pronto tra ${Math.round(EDIL.gg[E.cl]/30)} mesi. Poi costi fissi di ${eur(Math.round(E.cap*EDIL.fix/100)*100)} al mese più le bollette, invece di un affitto.${ok?'':` <b class="bad">Mancano ${eur(cost-S.cash)}: chiedi un prestito o scegli un progetto più piccolo.</b>`}</div>
+   <div class="sm">Pronto tra ${Math.round(cantGg(EDIL.gg[E.cl])/30)} mesi. Poi costi fissi di ${eur(Math.round(E.cap*EDIL.fix/100)*100)} al mese più le bollette, invece di un affitto.${ok?'':` <b class="bad">Mancano ${eur(cost-S.cash)}: chiedi un prestito o scegli un progetto più piccolo.</b>`}</div>
    <button class="btn pri" data-act="edgo" ${ok?'':'disabled'}>Apri il cantiere<small>${eur(cost)}</small></button></div>`; }
 function strutturaCard(w,k,staffRow){
   const c=Math.round(w.cond==null?100:w.cond), pen=condPen(w), fm=w.staff.fm>0, sc=straordCost(w), ec=expCost(w), full=(w.exp||0)>=MAINT.expMax;
   const col=c>=MAINT.soglia?'var(--ok)':c>=40?'var(--warn)':'var(--bad)';
   const b=w.build, C=wCl(w), nx=ristNext(w), rc=ristCost(w);
-  const bName=b?(b.k==='dot'?DOT_ID[b.id].n:b.k==='rist'?`Ristrutturazione: edificio ${WCLASS[b.to].n.toLowerCase()}`:`${kw('ampliamento','Ampliamento')}: +${n0(b.add)} posti`):'';
+  const bName=b?(b.k==='dot'?DOT_ID[b.id].n:b.k==='wel'?`${kw('lavori_welfare','Lavori')}: ${esc((TECH_ALL.find(x=>x.id===b.id)||{}).name||'')}`:b.k==='rist'?`Ristrutturazione: edificio ${WCLASS[b.to].n.toLowerCase()}`:`${kw('ampliamento','Ampliamento')}: +${n0(b.add)} posti`):'';
   const ko=Object.keys(w.ko||{});
   // una riga per dotazione: icona, nome e stato, a destra il pulsante (costruisci o ripara)
   const dRow=d=>{ const h=hasDot(w,d.id), x=w.ko&&w.ko[d.id], inB=b&&b.k==='dot'&&b.id===d.id, no=h?'':dotNo(w,d), cost=dotCost(w.cap,d);
@@ -10087,7 +10155,9 @@ const ACT={
   UI.sel.avv={t:t.id,w:w?w.id:null,upd:1,mode:'grad',by:depInt('it')-avvBusy('it')>=avvN(t)?'int':depInt('it')>0?CONS.filter(c=>c.dep==='it').sort((a,b)=>a.fee-b.fee)[0].id:'ceo'};
   if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);} showModal(avvBox()); },
  // lavagna del Reparto IT: una persona tra ricerca (−) e assistenza (+)
- itas(d){ const D=S.dep&&S.dep.it; if(!D) return; D.as=clamp(itAss()+(+d.v),0,depFreeInt('it')); kpiNow(); renderAll(); },
+ itas(d){ const k=d.k||'it', D=S.dep&&S.dep[k]; if(!D) return; D.as=clamp(depAs(k)+(+d.v),0,depFreeInt(k)); kpiNow(); renderAll(); },
+ // miglioramento continuo: il magazzino che l'Ingegneria segue per primo (di nuovo: si torna alla scelta del gioco)
+ ingwh(d){ const D=S.dep&&S.dep.ing; if(!D) return; D.wh=D.wh===d.id?null:d.id; renderAll(); },
  itall(){ UI.sel.itall=!UI.sel.itall; renderAll(); },
  avvcancel(d){ const a=avvList().find(x=>x.id===d.id); if(!a||a.esito) return; const t=TECH_ALL.find(x=>x.id===a.tech), w=whById(a.wh);
   if(!d.ok) return askOk(`Annullare il progetto ${t?t.name:''}${w?' a '+w.name:''}?`,`Rientra metà dei soldi, <b>${eur(a.cost*0.5)}</b>, e chi ci lavorava torna libero.`,'Sì, annulla',()=>ACT.avvcancel({...d,ok:1}));
@@ -10177,7 +10247,10 @@ const ACT={
  opentech(d){UI.sel.tree=d.tree;UI.sel.tech=d.id;openWin('tecnologia');},
  research(d){const t=TECH.find(x=>x.id===d.id); if(!t) return; const k=techLine(t); if(lineProj(k)||(k!=='dir'&&depFree(k)<=0)||projOfTech(t.id)||S.cash<t.cost||R(t.id)||!techOpen(t))return; S.cash-=t.cost; S.cur.tech+=t.cost;
   const days=techDays(t,k); setLineProj(k,{tech:t.id,left:days,total:days,cost:t.cost}); toast(`Ricerca avviata${itOn()?` (${LINE_N[k]})`:''}: ${t.name}, pronta tra ${wks(days)}`,'ok'); renderAll();},
- install(d){const t=TECH.find(x=>x.id===d.id), w=whById(d.wh), ic=t&&w&&instCost(t,w); if(avvTech(t)&&!isBot()) return ACT.avvopen(d); if(!R(t.id)||w.tech[t.id]||S.cash<ic||(t.tree==='wel'&&polOn('spending'))||!instReq(t,w))return; S.cash-=ic; S.cur[t.tree==='wel'?'welf':'tech']+=ic; w.tech[t.id]={day:S.day};
+ install(d){const t=TECH.find(x=>x.id===d.id), w=whById(d.wh), ic=t&&w&&instCost(t,w); if(avvTech(t)&&!isBot()) return ACT.avvopen(d); if(!R(t.id)||w.tech[t.id]||S.cash<ic||(t.tree==='wel'&&polOn('spending'))||!instReq(t,w))return;
+  if(t.tree==='wel'&&itOn()){ const y=welWhy(t,w); if(y) return toast(y,'warn');   // pacchetto Reparto IT e Ingegneria: il welfare lo installa il facility manager
+    if(welBig(t,w)){ welStart(t,w); toast(`Lavori aperti a ${w.name}: ${t.name.toLowerCase()} pronto tra ${wks(w.build.total)}`,'ok'); kpiNow(); renderAll(); return; } }
+  S.cash-=ic; S.cur[t.tree==='wel'?'welf':'tech']+=ic; w.tech[t.id]={day:S.day};
   toast(t.tree==='cert'?`${t.name} a ${w.name}: l'audit è fissato, certificato tra ${wks(t.weeks*7)}`:t.weeks?`${t.name} installato a ${w.name}: inizia l'apprendimento`:`${t.name} attivo a ${w.name}`,'ok'); renderAll();},
  canceltech(d){ const k=d.line||'dir', p=lineProj(k); if(!p)return; const t=TECH_ALL.find(x=>x.id===p.tech);
   if(!(d&&d.ok)) return askOk(`Annullare la ricerca ${t?t.name:''}?`,`Ti tornano indietro solo <b>${eur(p.cost*0.5)}</b>, metà del costo, e il lavoro fatto fin qui si perde.`,'Sì, annulla',()=>ACT.canceltech({ok:1,line:k}));
@@ -10224,8 +10297,8 @@ const ACT={
  koripara(d){ const w=whById(d.wh), x=w&&w.ko&&w.ko[d.id], c=w&&ripCost(w,d.id); if(!x||x.fine!=null||S.cash<c) return; S.cash-=c; S.cur.altro+=c; x.fine=S.day+ripDays(w);
   toast(`${w.name}: il tecnico arriva, riparato tra ${wks(ripDays(w))}`,'ok'); renderAll(); },
  rist(d){ const w=whById(d.wh), nx=w&&ristNext(w), c=w&&ristCost(w); if(!nx||!w.staff.fm||w.build||S.cash<c) return;
-  if(!d.ok) return askOk(`Ristrutturare ${w.name}?`,`Lavori per <b>${eur(c)}</b> e ${wks(EDIL.rist.gg)} di cantiere (produttività −5% finché dura). Alla fine l'edificio passa da ${wCl(w).n.toLowerCase()} a <b>${WCLASS[nx].n.toLowerCase()}</b>.${w.own?'':' Il magazzino è in affitto: i lavori li paghi tu, l\'affitto resta uguale.'}`,'Sì, ristruttura',()=>ACT.rist({...d,ok:1}));
-  ristStart(w); toast(`Ristrutturazione aperta a ${w.name}: pronta tra ${wks(EDIL.rist.gg)}`,'ok'); kpiNow(); renderAll(); },
+  if(!d.ok) return askOk(`Ristrutturare ${w.name}?`,`Lavori per <b>${eur(c)}</b> e ${wks(cantGg(EDIL.rist.gg))} di cantiere (produttività −5% finché dura). Alla fine l'edificio passa da ${wCl(w).n.toLowerCase()} a <b>${WCLASS[nx].n.toLowerCase()}</b>.${w.own?'':' Il magazzino è in affitto: i lavori li paghi tu, l\'affitto resta uguale.'}`,'Sì, ristruttura',()=>ACT.rist({...d,ok:1}));
+  ristStart(w); toast(`Ristrutturazione aperta a ${w.name}: pronta tra ${wks(w.build.total)}`,'ok'); kpiNow(); renderAll(); },
  // trasloco: progetto in cima alla finestra del magazzino di partenza (UI.sel.tr), poi conferma
  tropen(d){ const w=whById(d.wh); if(!w||trBusy(w)) return; const ds=trDests(w);
   UI.sel.tr={from:w.id,to:ds.length===1?ds[0]:null,cli:trClis(w).map(c=>c.id),mode:'ondate',ag:false,start:null,ppl:null}; UI.sel.wh=w.id; renderWin('magazzini');
@@ -10278,10 +10351,10 @@ const ACT={
  edcl(d){ if(UI.sel.ed&&edilCls().includes(d.v)){ UI.sel.ed.cl=d.v; renderWin('espansione'); } },
  eddot(d,el){ const E=UI.sel.ed; if(!E) return; E.dot=E.dot.filter(x=>x!==d.id); if(el.checked) E.dot.push(d.id); renderWin('espansione'); },
  edgo(d){ const E=UI.sel.ed; if(!E||!siteOpen(E.site)||!edilCls().includes(E.cl)) return; const s=SITES[E.site], c=edilCost(E.site,E.cap,E.cl,E.dot); if(S.cash<c) return;
-  if(!d.ok) return askOk(`Costruire a ${s.name}?`,`Paghi subito <b>${eur(c)}</b> tra terreno, edificio e dotazioni. Tra ${Math.round(EDIL.gg[E.cl]/30)} mesi avrai un magazzino ${WCLASS[E.cl].n.toLowerCase()} da ${n0(E.cap)} posti pallet, di proprietà.`,'Sì, apri il cantiere',()=>ACT.edgo({ok:1}));
-  edilStart(E.site,E.cap,E.cl,E.dot); UI.sel.ed=null; toast(`Cantiere aperto a ${s.name}: pronto tra ${Math.round(EDIL.gg[E.cl]/30)} mesi`,'ok'); renderMap(); renderAll(); },
+  if(!d.ok) return askOk(`Costruire a ${s.name}?`,`Paghi subito <b>${eur(c)}</b> tra terreno, edificio e dotazioni. Tra ${Math.round(cantGg(EDIL.gg[E.cl])/30)} mesi avrai un magazzino ${WCLASS[E.cl].n.toLowerCase()} da ${n0(E.cap)} posti pallet, di proprietà.`,'Sì, apri il cantiere',()=>ACT.edgo({ok:1}));
+  edilStart(E.site,E.cap,E.cl,E.dot); UI.sel.ed=null; toast(`Cantiere aperto a ${s.name}: pronto tra ${Math.round(cantGg(EDIL.gg[E.cl])/30)} mesi`,'ok'); renderMap(); renderAll(); },
  amplia(d){const w=whById(d.wh), c=expCost(w); if(!w.staff.fm||w.build||(w.exp||0)>=MAINT.expMax||S.cash<c)return; S.cash-=c; S.cur.altro+=c;
-  w.build={left:MAINT.expGg,total:MAINT.expGg,add:expAdd(w),rent:expRent(w)}; toast(`Cantiere aperto a ${w.name}: +${n0(expAdd(w))} posti tra ${wks(MAINT.expGg)}`,'ok'); renderAll();},
+  const g=cantGg(MAINT.expGg); w.build={left:g,total:g,add:expAdd(w),rent:expRent(w)}; toast(`Cantiere aperto a ${w.name}: +${n0(expAdd(w))} posti tra ${wks(g)}`,'ok'); renderAll();},
  bidwh(d,el){UI.bid.wh=el.value;renderWin('gare');},
  bidmult(d,el){UI.bid.mult=(+el.value)/100;const sel=S.tenders.find(t=>t.id===UI.bid.t);$('#bidmv').textContent=(UI.bid.mult>=1?'+':'')+Math.round((UI.bid.mult-1)*100)+'%';$('#bidest').innerHTML=bidEstHtml(sel,bidEstimate(sel,UI.bid.wh,UI.bid.mult));},
  bid(d){const t=S.tenders.find(x=>x.id===d.id);t.bid={wh:UI.bid.wh,mult:UI.bid.mult};toast(`Offerta inviata per ${t.name}`,'ok');renderMap();renderAll();},
@@ -10617,7 +10690,8 @@ TUT.it={n:'Reparto IT e Ingegneria',corso:'Informatica per logistici (e vicevers
   {hi:()=>['#win-tecnologia .lv','#win-tecnologia .dep-k'],t:()=>`Il Reparto IT ha una ${kw('lavagna','lavagna')}: le persone vanno prima sugli avvii, poi tra ricerca e ${kw('assistenza_it','assistenza')} le sposti tu con + e −. L'assistenza tiene in piedi i sistemi installati: serve una persona ogni ${ITS.per} punti di sistema, e il WMS e i robot contano doppio.`},
   {t:()=>`Più giù c'è l'${kw('affidabilita','affidabilità')} dei sistemi, da 0 a 100: sale con l'assistenza coperta e un responsabile preciso, scende con l'assistenza scoperta e i sistemi vecchi. Più è bassa, più arrivano i ${kw('guasti_it','guasti informatici')}: il WMS fermo, i terminali a terra, il GPS muto. E i sistemi invecchiano: dopo 7-10 anni vanno aggiornati, con un progetto del Reparto IT. Meglio non a novembre.`}]},
  {n:'L\'Ingegneria',s:[
-  {hi:()=>'#win-tecnologia [data-act=consign][data-id=paletti]',t:()=>`L'Ingegneria funziona allo stesso modo: un responsabile (per gli avvii conta l'Operazioni), gli ingegneri e i suoi consulenti, come lo Studio Paletti per layout e scaffalature. Le sue tecnologie (formazione, sicurezza dei muletti, magazzino verticale, robot) cambiano il modo di lavorare in reparto.`}]},
+  {hi:()=>'#win-tecnologia [data-act=consign][data-id=paletti]',t:()=>`L'Ingegneria funziona allo stesso modo: un responsabile (per gli avvii conta l'Operazioni), gli ingegneri e i suoi consulenti, come lo Studio Paletti per layout e scaffalature. Le sue tecnologie (formazione, ergonomia, layout, sicurezza dei muletti, magazzino verticale, robot) cambiano il modo di lavorare in reparto.`},
+  {t:()=>`Anche l'Ingegneria ha la sua lavagna, ma al posto dell'assistenza c'è la colonna Magazzini: lì gli ingegneri fanno il ${kw('miglioramento','miglioramento continuo')}, che alza la produttività del magazzino un po' ogni mese (il magazzino che nessuno segue la perde piano piano). E con un ingegnere sui magazzini i cantieri durano meno.`}]},
  {n:'Il direttore IT',s:[
   {hi:()=>tDock('manager'),t:()=>`In Direzione arriva un sesto posto: il ${kw('dir_ing','direttore IT e ingegneria')}, che conta con l'Innovazione. Accorcia le ricerche dei reparti e, con la ricerca Edifici intelligenti e Innovazione 14 o più, apre i capannoni innovativi, i più moderni del Nord.`},
   {f:'occhiolino',t:()=>`Il corso è finito. Ricorda: un consulente per cominciare, poi il reparto; i progetti mai nel pieno del picco; e un sistemista in più costa sempre meno di un WMS fermo.`}]}
@@ -10986,7 +11060,8 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.112',t:'Quattro corsi con la dottoressa',x:['Il riquadro Tutorial della schermata principale ha quattro corsi: Base, Avanzato e, nuovi, uno per ciascun pacchetto di espansione.','Relazioni industriali («Il sindacato spiegato ai CEO»): un magazzino in stato di agitazione col tavolo aperto. Si guarda il clima con la sua lente, si scelgono le concessioni, si vede com\'è andata la prima seduta, poi scioperi, contratto nazionale, fornitori di handling e la vittoria del clima.','Reparto IT («Informatica per logistici (e viceversa)»): i reparti ancora vuoti. Si firma il primo consulente, si sceglie il responsabile IT, si avvia una ricerca nella linea del reparto e il progetto dei lettori barcode in un magazzino; poi lavagna, assistenza, affidabilità, Ingegneria e direttore IT.','Il tutorial avanzato non parla più del sindacato (ha il suo corso) e si gioca senza pacchetti; in cambio l\'ultima lezione spiega anche i traslochi e il capannone vuoto.','Nel tutorial base la gara si apre anche dalla sua puntina sulla mappa.','Il riquadro giallo della dottoressa non indica più cose nascoste sotto una finestra.']},
+ {v:'0.113',t:'Quattro corsi con la dottoressa',x:['Il riquadro Tutorial della schermata principale ha quattro corsi: Base, Avanzato e, nuovi, uno per ciascun pacchetto di espansione.','Relazioni industriali («Il sindacato spiegato ai CEO»): un magazzino in stato di agitazione col tavolo aperto. Si guarda il clima con la sua lente, si scelgono le concessioni, si vede com\'è andata la prima seduta, poi scioperi, contratto nazionale, fornitori di handling e la vittoria del clima.','Reparto IT («Informatica per logistici (e viceversa)»): i reparti ancora vuoti. Si firma il primo consulente, si sceglie il responsabile IT, si avvia una ricerca nella linea del reparto e il progetto dei lettori barcode in un magazzino; poi lavagna, assistenza, affidabilità, Ingegneria e direttore IT.','Il tutorial avanzato non parla più del sindacato (ha il suo corso) e si gioca senza pacchetti; in cambio l\'ultima lezione spiega anche i traslochi e il capannone vuoto.','Nel tutorial base la gara si apre anche dalla sua puntina sulla mappa.','Il riquadro giallo della dottoressa non indica più cose nascoste sotto una finestra.']},
+ {v:'0.112',t:'L\'Ingegneria in magazzino',x:['Col pacchetto Reparto IT e Ingegneria anche l\'Ingegneria ha la sua lavagna: con + e − sposti gli ingegneri tra la ricerca e i magazzini.','Gli ingegneri sui magazzini fanno il miglioramento continuo: ogni magazzino ha un bonus dei metodi che alza la produttività fino al 6% (10% con la ricerca Lean). Si parte dal magazzino che scegli, poi da quelli più indietro; quelli che nessuno segue lo perdono piano piano.','Con un ingegnere sui magazzini i cantieri durano il 20% in meno; col reparto Ingegneria i traslochi costano meno di progetto e si stabilizzano prima.','Il welfare lo installa il facility manager: senza, i servizi non si installano. Quelli piccoli partono subito, quelli grandi (mensa, palestra, asilo, pulmini…) diventano lavori di qualche settimana, come le dotazioni.','Cinque ricerche nuove dell\'Ingegneria: Studio tempi e metodi, Lean e miglioramento continuo, Ergonomia delle postazioni, Esoscheletri e Progettazione del layout (posti pallet +5%).','I consulenti Cronometrini e Schiena Dritta, chiamati per un avvio, lasciano il segno nel magazzino: i primi alzano il bonus dei metodi ma abbassano il morale, i secondi lo alzano.','Nella pagina Produttività del magazzino compaiono anche il bonus dei metodi e i guasti informatici.']},
  {v:'0.111',t:'L\'IT che tiene in piedi',x:['Col pacchetto Reparto IT e Ingegneria i sistemi installati vanno seguiti: ogni sei punti di sistema (il WMS, i robot e i sistemi aziendali contano doppio) serve una persona del Reparto IT sull\'assistenza. Il CEO ne vale mezza, un consulente a contratto pure.','Nella scheda Reparti tecnici c\'è la lavagna del Reparto IT: con + e − sposti le persone tra la ricerca e l\'assistenza. Chi è sugli avvii resta lì.','Nuova affidabilità dei sistemi, da 0 a 100, col suo grafico: sale con l\'assistenza coperta, la Precisione del responsabile IT e il direttore IT e ingegneria, scende con l\'assistenza scoperta e i sistemi vecchi.','Arrivano i guasti informatici: il WMS fermo, i terminali a terra, il GPS muto, le luci del pick-to-light spente, i robot fermi, l\'EDI inceppato. Più l\'affidabilità è bassa, più sono frequenti; con l\'assistenza al completo durano la metà.','I sistemi invecchiano: dopo 7-10 anni diventano obsoleti, tolgono affidabilità e costano il 30% in più di canone. Si aggiornano con un progetto del Reparto IT, come un avvio ma più corto ed economico; meglio non a novembre.','Tre ricerche nuove del Reparto IT: Sala server e backup, Sicurezza informatica e Server in cloud.','Se nel Reparto IT nessuno lavora alla ricerca, le sue tecnologie le studia la Direzione.']},
  {v:'0.110',t:'Avvii nei magazzini',x:['Col pacchetto Reparto IT e Ingegneria le tecnologie dei reparti (barcode, WMS, radiofrequenza, GPS, rotte, pick-to-light, formazione, sicurezza dei muletti, magazzino verticale, robot…) non si installano più con un clic: dalla scheda della tecnologia si avvia un progetto nel magazzino.','Si sceglie chi lo segue: la squadra interna (costa il 15% in meno, ma chi lavora all\'avvio intanto non fa ricerca), un consulente a progetto oppure, se nel reparto non c\'è nessuno, il CEO. Per i sistemi informatici e l\'automazione si sceglie anche come partire: graduale o tutto in un fine settimana.','Dopo la preparazione arriva il giorno dell\'avvio, con un esito: liscio come l\'olio, qualche intoppo, avvio difficile o disastro. La finestrella mostra le probabilità prima di partire e da cosa dipendono (chi lo segue, il morale, i picchi, i reparti in affanno).','Se va storto arriva un evento: tornare indietro, tenere duro o chiamare i consulenti. L\'esito allunga o accorcia l\'apprendimento della tecnologia.','Nella scheda Reparti tecnici si vedono gli avvii in corso e chi ci lavora; durante la preparazione un progetto si può annullare.']},
  {v:'0.109',t:'Reparto IT e Ingegneria',x:['Nuovo pacchetto di espansione «Reparto IT e Ingegneria», da accendere nel passo «Pacchetti» quando crei una partita: dietro le ricerche ci sono persone vere.','Due reparti in sede, nella nuova scheda «Reparti tecnici» della finestra Tecnologia: il Reparto IT studia i sistemi informatici, l\'Ingegneria le novità per il lavoro e gli impianti. Ognuno ha un responsabile scelto tra i manager, gli addetti da assumere e, se vuoi, un consulente a contratto.','Ogni reparto con almeno una persona ha la sua linea di ricerca: si fanno fino a tre ricerche insieme, una per la Direzione e una per reparto. Più persone e più Innovazione, ricerche più corte; se un reparto si svuota, la sua ricerca si ferma.','Sei consulenti per cominciare senza assumere nessuno, da Software Nebbia (costa poco, ma sparisce per settimane) allo Studio Ing. Paletti & Associati.','In Direzione arriva un sesto posto, il direttore IT e ingegneria: accorcia le ricerche dei reparti.','Marco, il nerd del WMS, parte con un sistemista già assunto.','I capannoni innovativi (Landriano, Vigasio e la costruzione innovativa) si possono avere solo col pacchetto, dopo la ricerca Edifici intelligenti e con un direttore IT e ingegneria che abbia Innovazione 14 o più. Chi li ha già se li tiene.']},
@@ -11378,6 +11453,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},itOn,depFree,depRes,itAss,itSys,itNeed,itSupply,itCov,itLoad,itTarget,itTgt,itAff,itKoStart,itKoCands,itMonth,ITS,ITKO,sysObs,sysRec,updDue,avvCost,avvWhy,itFeeK,itFees,whSys,avvBusy,avvList,avvScore,avvProb,avvStart,avvBadOpts,AVV,DEP,DEPS,CONS,IT,depTeam,depOpen,depInn,techLine,lineProj,projs,innWhy,innOk,consSign,consStop,packApply,rentable,edilCls,techWeeks,DIR_ROLES,renderMap,AREE,areaShare,noteAlerts,TR,WV,ORD,trEst,trStart,trList,trDaily,trFx,trBusy,TR_EV,trEvShow,trEvDaily,trDelay,lsRent,lsLet,lsBack,leases,openWin,botMove,botUtil,trKmS,rivalFor,trDests,trClis,whEmpty,wvClose,wvPrice,wvBlock,ordCand,ordDay,ordDaily,DUR_RANK,durOf,INV,invScore,invFee,invTeam,invDaily,invDo,invBand,TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];packApply();},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},itOn,depFree,depAs,ingMag,ingPlan,ingMonth,ingMax,metOf,cantGg,ingTr,welBig,welWhy,welGg,ING,trEst,depRes,itAss,itSys,itNeed,itSupply,itCov,itLoad,itTarget,itTgt,itAff,itKoStart,itKoCands,itMonth,ITS,ITKO,sysObs,sysRec,updDue,avvCost,avvWhy,itFeeK,itFees,whSys,avvBusy,avvList,avvScore,avvProb,avvStart,avvBadOpts,AVV,DEP,DEPS,CONS,IT,depTeam,depOpen,depInn,techLine,lineProj,projs,innWhy,innOk,consSign,consStop,packApply,rentable,edilCls,techWeeks,DIR_ROLES,renderMap,AREE,areaShare,noteAlerts,TR,WV,ORD,trEst,trStart,trList,trDaily,trFx,trBusy,TR_EV,trEvShow,trEvDaily,trDelay,lsRent,lsLet,lsBack,leases,openWin,botMove,botUtil,trKmS,rivalFor,trDests,trClis,whEmpty,wvClose,wvPrice,wvBlock,ordCand,ordDay,ordDaily,DUR_RANK,durOf,INV,invScore,invFee,invTeam,invDaily,invDo,invBand,TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];packApply();},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>
