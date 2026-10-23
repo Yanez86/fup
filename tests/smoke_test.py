@@ -152,9 +152,9 @@ async def phone(b, w, h, name, errs):
     await pg.tap('[data-act=stnext]'); await pg.wait_for_timeout(200)
     assert await pg.evaluate("document.querySelector('#start [data-act=lbpack][data-id=ri]').getAttribute('aria-pressed')") == 'true', f'{name}: il pacchetto deve partire acceso'
     if not ri: await pg.tap('[data-act=lbpack][data-id=ri]')
-    # il pacchetto Reparto IT e Ingegneria parte spento: in verticale lo si accende, insieme alle Relazioni industriali
-    assert await pg.evaluate("document.querySelector('#start [data-act=lbpack][data-id=it]').getAttribute('aria-pressed')") == 'false', f'{name}: il pacchetto Reparto IT e Ingegneria deve partire spento'
-    if ri: await pg.tap('[data-act=lbpack][data-id=it]')
+    # anche il pacchetto Reparto IT e Ingegneria parte acceso (dalla 0.119): in orizzontale si spengono tutti e due
+    assert await pg.evaluate("document.querySelector('#start [data-act=lbpack][data-id=it]').getAttribute('aria-pressed')") == 'true', f'{name}: il pacchetto Reparto IT e Ingegneria deve partire acceso'
+    if not ri: await pg.tap('[data-act=lbpack][data-id=it]')
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: i pacchetti scorrono di lato'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_pacchetti.png'), full_page=True)
     await pg.tap('[data-act=startgame]'); await pg.tap('[data-act=closemodal]')
@@ -441,7 +441,9 @@ async def tutorial(b, errs, mob, tid='base'):
             continue
         if await pg.evaluate('()=>window.__FUP.S.tut.i') != last: continue
         nx = await pg.query_selector('#tut [data-act=tutnext]')
+        # il passo si ricontrolla dopo aver trovato «Avanti»: un passo con «Avanti» non va avanti da solo, quindi il pulsante è proprio il suo
         if nx and await nx.is_visible():
+            if await pg.evaluate('()=>window.__FUP.S.tut.i') != last: continue
             await (nx.tap() if mob else nx.click()); await pg.wait_for_timeout(80); continue
         if st['run'] and st['speed'] > 0:   # tempo che scorre: un giorno in più a ogni giro
             await pg.evaluate("()=>{const F=window.__FUP; if(F.S.speed>0){F.step(); F.renderAll();}}")
