@@ -1168,6 +1168,36 @@ async def main():
         assert r['board'] == 3 and (r['gm'] >= 1 or not r['more']), f'le avversarie non assumono dalle candidature spontanee: {r}'
         print('avversari dopo 2 anni:', r)
         assert r['sizeKB'] < 2500, f'salvataggio troppo grande: {r}'
+        # gare sulla mappa (0.106): una puntina per ogni gara aperta, tooltip calcolato all'apertura, il clic apre la gara e la evidenzia
+        g = await pg.evaluate("""()=>{const F=window.__FUP,H=F.HUM; document.querySelector('#modal').innerHTML=''; document.querySelectorAll('.win [data-act=close]').forEach(b=>b.click());
+          if(!H.tenders.some(t=>!t.done)) F.newTender(); F.renderMap();
+          const pins=[...document.querySelectorAll('#ov [data-act=mapten]')], t=H.tenders.find(x=>!x.done&&x.id===pins[0].dataset.id);
+          pins[0].dispatchEvent(new MouseEvent('mouseover',{bubbles:true})); const tip=document.querySelector('#tip').innerText;
+          F.ACT.mapten({id:t.id}); const on=!!document.querySelector('#win-gare')&&document.querySelectorAll('#ov path[stroke-dasharray="7 5"]').length>0;
+          const sel=document.querySelector('#ov [data-act=mapten][data-id="'+t.id+'"] .mk-ring').getAttribute('fill');
+          document.querySelector('#win-gare [data-act=mapten][data-tog]').click(); const off=document.querySelectorAll('#ov path[stroke-dasharray="7 5"]').length===0;
+          return {n:pins.length,open:H.tenders.filter(x=>!x.done).length,tip,on,sel,off};}""")
+        assert g['n'] == g['open'] and g['n'] > 0, f'puntine delle gare sulla mappa: {g}'
+        assert ' km · ' in g['tip'] and 'probabilità' in g['tip'].lower(), f'tooltip della puntina: {g}'
+        assert g['on'] and g['sel'] == '#ffd23f' and g['off'], f'gara evidenziata sulla mappa: {g}'
+        await pg.evaluate("()=>{const F=window.__FUP; F.ACT.mapten({id:F.HUM.tenders.find(x=>!x.done).id});}")
+        await pg.screenshot(path=os.path.join(OUT, 'shot_gare_mappa.png'))
+        # eventi con un posto (0.106): la nebbia compare sulla mappa e pesa su ogni magazzino in proporzione ai suoi viaggi nella zona
+        await pg.evaluate("()=>{const F=window.__FUP; document.querySelectorAll('.win [data-act=close]').forEach(b=>b.click()); F.cardsOff(); F.HUM.notes=F.HUM.notes.filter(n=>n.k!=='ev'); F.HUM.evPend=[];}")
+        await pg.evaluate(FIRE, 'nebbia')
+        a = await pg.evaluate("""()=>{const F=window.__FUP,S=F.S,n=S.notes.find(x=>x.k==='ev'&&x.ev&&x.ev.id==='nebbia'); F.ACT.note({id:n.id});
+          return {aree:S.aree.length, mappa:document.querySelectorAll('#ov [data-tipf=area]').length, win:document.querySelector('#modal').innerText};}""")
+        assert a['aree'] == 1 and a['mappa'] == 1 and 'Sulla mappa' in a['win'], f'zona della nebbia: {a}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_evento_zona.png'))
+        await pg.click('#modal [data-act=evopt][data-i="0"]')
+        a = await pg.evaluate("""()=>{const F=window.__FUP,S=F.S; for(let i=0;i<2;i++) F.step();
+          const q=S.warehouses.map(w=>{const s=F.areaShare('nebbia',w), m=S.mods.find(x=>x.scope===w.id&&x.src==='Nebbia in Val Padana'); return [Math.round(s*1000)/1000, m?m.P:null];});
+          const ok=q.every(([s,p])=>s<0.03||Math.round(-4*s*10)/10===0?p==null:Math.abs(p-Math.round(-4*s*10)/10)<0.15);
+          const all=S.mods.some(x=>x.scope==='all'&&x.src==='Nebbia in Val Padana'), z=S.aree[0];
+          for(let i=0;i<10;i++) F.step();
+          return {q,ok,all,until:z&&z.until,dopo:S.aree.length,mappa:document.querySelectorAll('#ov [data-tipf=area]').length};}""")
+        assert a['ok'] and not a['all'] and a['until'] and a['dopo'] == 0 and a['mappa'] == 0, f'effetto della nebbia in proporzione ai viaggi: {a}'
+        print('nebbia: quota dei viaggi e puntualità per magazzino', a['q'])
         # vittoria: una condizione facile fa comparire la finestra di fine partita
         w = await pg.evaluate('''()=>{const F=window.__FUP,H=F.HUM; document.querySelector('#modal').innerHTML=''; H.cfg.reputazione=1; F.checkWin();
           return {won:H.won,txt:document.querySelector('#modal').innerText};}''')
