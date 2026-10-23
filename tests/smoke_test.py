@@ -1,7 +1,8 @@
 """Test automatico: apre il gioco in Chromium headless, clicca tutti i menu, prova alberi tecnologici e direzione,
 crea un CEO personalizzato, prova il gioco su un telefono (verticale e orizzontale: finestre, tocchi, zoom con due dita),
 poi fa giocare un bot semplice 3 anni con ognuno dei 4 CEO e con uno creato, e una partita col pacchetto Relazioni industriali.
-Prova anche un trasloco completo (con un cliente che si rifiuta), il capannone vuoto restituito e venduto e l'ordinanza sui capannoni fatiscenti.
+Prova anche un trasloco completo (con un cliente che si rifiuta), gli imprevisti del trasloco e la franchigia, il capannone vuoto restituito,
+venduto e affittato a un inquilino, il trasloco col sindacato, i traslochi e le offerte delle avversarie e l'ordinanza sui capannoni fatiscenti.
 Percorre anche i due tutorial della dottoressa Ribalta (base e avanzato), sul computer e sul telefono.
 Fallisce se ci sono errori JavaScript.
 Uso: python3 tools/build.py && python3 tests/smoke_test.py   (richiede: pip install playwright && playwright install chromium)"""
@@ -306,6 +307,14 @@ async def phone(b, w, h, name, errs):
     bad = await pg.evaluate(NOSIDE, '#win-magazzini')
     assert not bad, f'{name}: capannone vuoto: {bad}'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_capannone_vuoto.png'))
+    # capannoni affittati ad altri (0.105): il riquadro della scheda Nuovo magazzino sta nello schermo
+    await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,w=JSON.parse(JSON.stringify(S.warehouses.find(x=>x.id===window.__nw))); S.leases=[{id:'lsT',w,by:'Mobilificio Divanoni',amt:5000,from:S.day,until:S.day+60,bot:null}];
+      F.ACT.leases(); document.querySelector('#win-magazzini [data-act=lsback]').closest('.card').scrollIntoView({block:'center'});}''')
+    assert await pg.query_selector('#win-magazzini [data-act=lsren]'), f'{name}: manca il rinnovo dell\'affitto'
+    bad = await pg.evaluate(NOSIDE, '#win-magazzini')
+    assert not bad, f'{name}: capannoni affittati: {bad}'
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_affittati.png'))
+    await pg.evaluate("()=>{window.__FUP.S.leases=[]; window.__FUP.renderAll();}")
     await pg.tap('#win-magazzini [data-act=close]')
     # parola chiave: primo tocco = tooltip, secondo tocco = enciclopedia
     await menu(pg, 'magazzini')
@@ -1287,7 +1296,8 @@ async def main():
         assert r['gone'] and r['free'] and r['paid'] >= 2 * 6500, f'capannone restituito: {r}'
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S,o=S.warehouses[0],d=S.warehouses[1],out={}; S.clients.filter(c=>c.wh===o.id).forEach(c=>c.wh=d.id);
           F.ACT.openwh({id:o.id}); document.querySelector('#win-magazzini [data-act=wvsale]').click(); out.sale=!!o.sale;
-          o.sale.next=S.day; F.stepOne(); out.off=!!o.sale.off&&S.notes.some(n=>n.k==='info'&&n.title.startsWith('Offerta per'));
+          let k=0; do{ o.sale.next=S.day; F.stepOne(); }while(!o.sale.off&&k++<20);   // una volta su cinque arriva il compratore che tira sul prezzo (wv_prezzo)
+          out.off=!!o.sale.off&&S.notes.some(n=>n.k==='info'&&n.title.startsWith('Offerta per'));
           const amt=o.sale.off.amt, c0=S.cash; F.ACT.wvsell({wh:o.id,ok:1}); out.sold=!S.warehouses.includes(o)&&S.cash>c0+amt*0.9; return out;}''')
         assert all(r.values()), f'capannone venduto: {r}'
         r = await pg.evaluate('''()=>{const F=window.__FUP,S=F.S; document.querySelector('#modal').innerHTML=''; F.ACT.rent({id:'mortara'}); document.querySelector('#modal').innerHTML='';
@@ -1332,6 +1342,64 @@ async def main():
         await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.trEvShow('tr_navetta',{c:S.clients[0],n:3000,tr:'x'}); F.ACT.note({id:S.notes.filter(n=>n.k==='ev').pop().id});}")
         await pg.wait_for_timeout(400); await pg.screenshot(path=os.path.join(OUT, 'shot_trasloco_evento.png'))
         await pg.evaluate("()=>{document.querySelector('#modal').innerHTML=''; window.__FUP.S.notes=[];}")
+        # affitto a un inquilino (0.105): annuncio, offerte, firma, canone nei conti del mese, mappa, rinnovo e ripresa; eventi dell'inquilino
+        r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('gino'); const S=F.S; S.cash=3e6; S.speed=0;
+          F.ACT.rent({id:'piacenza'}); document.querySelector('#modal').innerHTML=''; const o=S.warehouses[0], d=S.warehouses[1], out={}; S.clients.forEach(c=>c.wh=d.id);
+          F.ACT.openwh({id:o.id}); out.btn=!!document.querySelector('#win-magazzini [data-act=wvlet]:not([disabled])'); F.ACT.wvlet({wh:o.id}); o.let.next=S.day; F.stepOne();
+          out.offs=o.let.offs.length>=1&&o.let.offs.every(x=>x.amt>0)&&S.notes.some(n=>n.key==='let'+o.id); F.ACT.openwh({id:o.id}); out.card=!!document.querySelector('#win-magazzini [data-act=lslet]');
+          const amt=o.let.offs[0].amt; F.ACT.lslet({wh:o.id,i:0,ok:1}); const a=S.leases[0]; out.let=!S.warehouses.includes(o)&&!!a&&a.amt===amt&&!F.rentable(o.site);
+          F.renderMap(); out.mk=!!document.querySelector('#ov [data-act=leases]');
+          const h0=(S.hist||[]).length; let k=0; while((S.hist||[]).length===h0&&k++<40){ S.notes=[]; F.stepOne(); } out.aff=S.hist[S.hist.length-1].aff===Math.round(amt*0.9);
+          F.ACT.open({id:'mese'}); out.mese=document.querySelector('#win-mese')?document.querySelector('#win-mese').innerText.includes('Affitti dei capannoni'):document.body.innerText.includes('Affitti dei capannoni');
+          a.until=S.day+90; F.ACT.leases(); out.ren=!!document.querySelector('#win-magazzini [data-act=lsren]'); F.ACT.lsren({id:a.id}); out.renOk=a.until>S.day+2000&&a.amt>amt;
+          const c0=S.cash; F.ACT.lsback({id:a.id,ok:1}); out.back=S.warehouses.includes(o)&&!S.leases.length&&Math.round(c0-S.cash)===6*a.amt;
+          // gli eventi dell'inquilino: il moroso e quello che vuole comprare
+          F.lsLet(o,{by:'Vivaio Pollice Verde',amt:4000}); const b=S.leases[0]; b.from=S.day-400; const bad=[];
+          for(const [id,i] of [['ls_moroso',2],['ls_compra',0]]){ const base=F.EVENTS.find(e=>e.id===id); if(!base.cond(base)){ bad.push(id+': cond'); continue; } const ev={...base}; base.setup(ev); F.trEvShow(id,ev);
+            const n=S.notes.filter(q=>q.k==='ev'&&q.ev.id===id).pop(); if(!n){ bad.push(id+': notifica'); continue; } S.notes=JSON.parse(JSON.stringify(S.notes)); F.ACT.note({id:n.id});
+            const bt=document.querySelectorAll('#modal [data-act=evopt]'); if(bt.length!==3||!document.querySelector('#modal .ev-x').textContent.includes('Vivaio')) bad.push(id+': finestra'); bt[i].click(); document.querySelector('#modal').innerHTML=''; F.stepOne(); S.notes=[]; }
+          out.ev=!bad.length&&!S.leases.length&&b.skip===2; out.bad=bad; return out;}''')
+        assert all(v for k, v in r.items() if k != 'bad'), f'affitto a un inquilino: {r}'
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S; S.leases=[{id:'lsT',w:JSON.parse(JSON.stringify(S.warehouses[0])),by:'Palestra CrossPallet',amt:5200,from:S.day,until:S.day+60,bot:null}]; F.ACT.leases(); document.querySelector('#win-magazzini [data-act=lsback]').closest('.card').scrollIntoView({block:'center'});}")
+        await pg.evaluate("()=>{const F=window.__FUP; F.S.notes=[]; document.querySelector('#notecard')&&document.querySelector('#notecard').classList.add('out'); F.renderAll();}")
+        await pg.wait_for_timeout(400)
+        card = await pg.evaluate_handle("()=>document.querySelector('#win-magazzini [data-act=lsback]').closest('.card')")
+        await card.as_element().screenshot(path=os.path.join(OUT, 'shot_capannoni_affittati.png'))
+        # col pacchetto Relazioni industriali (0.105): trasloco oltre 40 km da un magazzino col sindacato = delocalizzazione; il tavolo con l'accordo
+        # di trasferimento, firmato, raddoppia l'indennità; a fine trasloco il sindacato arriva nel magazzino nuovo con chi ha seguito
+        r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('gino',null,{mode:'classica',ri:true}); const S=F.S; S.cash=3e6; S.speed=0;
+          const o=S.warehouses[0]; F.ACT.rent({id:'voltri'}); document.querySelector('#modal').innerHTML=''; const d=S.warehouses[1], out={}; Object.assign(d.staff,{pick:4,car:4,imp:2,autCE:3,autB:2,fm:1});
+          o.sind=true; o.rsu={name:'Rocco Prova',sx:'m',face:1,lead:10,neg:10,tal:null}; S.notes=[];
+          F.ACT.openwh({id:o.id}); F.ACT.tropen({wh:o.id}); F.UI.sel.tr.mode='lampo'; F.renderAll(); out.warn=document.querySelector('#win-magazzini .tr-box').innerText.includes('delocalizzazione');
+          const R=Math.random; Math.random=()=>0.99; F.ACT.trgo({ok:1}); Math.random=R; const T=F.trList()[0]; T.evs=[];
+          out.mod=S.mods.some(m=>m.scope===o.id&&m.src==='Delocalizzazione'&&m.ag===20); const n=S.notes.find(q=>q.k==='ev'&&q.ev.id==='tr_sind'); out.note=!!n;
+          F.ACT.note({id:n.id}); out.scn=!!document.querySelector('#modal .ev-scn'); document.querySelectorAll('#modal [data-act=evopt]')[1].click(); document.querySelector('#modal').innerHTML=''; F.stepOne();
+          out.tav=!!o.tav&&o.tav.reqs[0].id==='trasf'; o.tav.reqs.forEach(q=>q.c='si'); o.tav.next=S.day; F.stepOne(); out.acc=T.acc===1&&!!o.deal;
+          let k=0; while(T.fase!=='stab'&&k++<300){ document.querySelector('#modal').innerHTML=''; S.notes=S.notes.filter(q=>q.k!=='ev'); F.stepOne(); }
+          out.sind=T.log.fol<T.log.ref||d.sind&&d.rsu===o.rsu; return out;}''')
+        assert all(r.values()), f'trasloco col sindacato: {r}'
+        # avversarie (0.105): comprano un capannone del giocatore pagando più del mercato, lo prendono in affitto (e se ne vanno pagando
+        # due mesi), traslocano da un capannone vecchio a uno migliore e poi chiudono quello vuoto
+        r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('gino',null,{mode:'classica',win:{reputazione:true},reputazione:200});
+          const H=F.HUM, out={}; H.bots=[['edoardo','espansione'],['valeria','qualita'],['marco','prezzo']].map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],'normale',i));
+          H.cash=3e6; H.bots.forEach(b=>{ b.cash=2e6; b.hist=Array.from({length:6},(_,i)=>({d:i,util:20000,tech:0,ric:1e5})); });
+          F.ACT.rent({id:'piacenza'}); document.querySelector('#modal').innerHTML=''; const o=H.warehouses[0], d=H.warehouses[1]; H.clients.forEach(c=>c.wh=d.id);
+          F.ACT.wvsale({wh:o.id}); let k=0; do{ o.sale.off=null; o.sale.next=H.day; F.stepOne(); H.notes=[]; }while(!(o.sale.off&&o.sale.off.bot)&&k++<60);
+          const off=o.sale.off, b0=H.bots.find(b=>b.bot.id===off.bot); out.price=off.amt>F.wvPrice(o); const n0=b0.warehouses.length;
+          F.ACT.wvsell({wh:o.id,ok:1}); out.sold=!H.warehouses.includes(o)&&b0.warehouses.length===n0+1&&b0.warehouses[n0].own&&b0.warehouses[n0].site===o.site;
+          // in affitto: il capannone nuovo, svuotato e reso di proprietà per la prova
+          d.own=true; F.ACT.rent({id:'lodi'}); document.querySelector('#modal').innerHTML=''; H.clients.forEach(c=>c.wh=H.warehouses[1].id);
+          F.ACT.wvlet({wh:d.id}); k=0; do{ d.let.offs=[]; d.let.next=H.day; F.stepOne(); H.notes=[]; }while(!d.let.offs.some(x=>x.bot)&&k++<60);
+          const i=d.let.offs.findIndex(x=>x.bot); F.ACT.lslet({wh:d.id,i,ok:1}); const a=H.leases[0], b1=H.bots.find(b=>b.bot.id===a.bot), nw=b1.warehouses.find(w=>w.lease&&w.lease.id===a.id);
+          out.lease=!!nw&&nw.fixed===a.amt; F.withCo(b1,()=>{ F.S.warehouses=F.S.warehouses.filter(w=>w!==nw); }); const c0=H.cash; F.stepOne(); out.left=H.warehouses.includes(d)&&!H.leases.length&&H.cash>c0+a.amt;
+          // trasloco di un'avversaria: capannone vecchio, un sito migliore vicino, cassa e conti in ordine
+          const b2=H.bots.find(b=>b.warehouses.length===1&&b.warehouses[0].site==='pioltello')||H.bots[0]; H.day=400; H.bots.forEach(b=>b.day=400);
+          const site0=b2.warehouses[0].site; F.withCo(b2,()=>{ const S=F.S, w=S.warehouses[0]; w.cl='vec'; S.clients.filter(c=>c.wh===w.id).forEach(c=>c.stock=Math.min(c.stock,600)); F.botMove(); out.move=(S.tras||[]).length===1&&S.tras[0].mode==='ondate'; });
+          out.news=H.news.some(x=>JSON.stringify(x).includes('trasloca a'));
+          k=0; while((b2.tras||[]).length&&k++<400){ document.querySelector('#modal').innerHTML=''; H.notes=[]; F.step(); }
+          for(let j=0;j<10;j++){ document.querySelector('#modal').innerHTML=''; H.notes=[]; F.step(); }
+          out.closed=!(b2.tras||[]).length&&!b2.warehouses.some(w=>w.site===site0)&&b2.warehouses.length>=1; if(!out.closed) out.dbg=JSON.stringify(b2.warehouses.map(w=>[w.site,w.trLeft,b2.clients.filter(c=>c.wh===w.id).map(c=>c.status)])); return out;}''')
+        assert all(r.values()), f'avversarie e capannoni: {r}'
         # senza il pacchetto la partita resta com'era: niente ricerche, voce di menu e lente del pacchetto
         off = await pg.evaluate("()=>{const F=window.__FUP; F.newGame('gino'); F.renderAll(); return {tech:F.TECH.some(t=>t.ri),pol:F.POLICIES.some(p=>p.ri),dock:!!document.querySelector('#dock [data-id=sindacato]'),lens:F.lensL().some(l=>l.ri)};}")
         assert not any(off.values()), f'senza pacchetto restano pezzi del pacchetto: {off}'

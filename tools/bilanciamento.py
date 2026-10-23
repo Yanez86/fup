@@ -34,6 +34,8 @@ SIM = r'''async (o)=>{
      tech:s('tech'),mgr:s('mgr'),welf:s('welf'),pen:s('pen'),altro:s('altro'),
      cli:c.clients.filter(x=>x.status==='attivo').length,wh:c.warehouses.length,rep:c.rep,mor:h.length?h.reduce((x,r)=>x+r.mor,0)/h.length:0,
      staff:c.warehouses.reduce((x,w)=>x+Object.values(w.staff).reduce((p,q)=>p+q,0),0),
+     tr:c.trSt?c.trSt.n:0,trOk:c.trSt?c.trSt.ok:0,trLost:c.trSt?c.trSt.lost:0,trCost:c.trSt?c.trSt.cost:0,trCli:c.trSt?c.trSt.cli:0,
+     v1:F.withCo(c,()=>{const w=c.warehouses.find(x=>x.own); return w?F.wvPrice(w):0;}),
      wage:R?R.wage:1,strikes:R?R.strikes||0:0,deals:R?R.deals||0:0,fails:R?(R.hist||[]).filter(x=>!x.ok).length:0,hdl:c.warehouses.filter(w=>w.hdl).length,conf:R&&R.conf?1:0}; };
  for(let d=0; d<o.years*365; d++){
    if(cos.every((c,i)=>c.over||(i===0&&hDead!=null))) break;
@@ -87,9 +89,18 @@ def report(res):
             g = lambda k: mean([r[k] for r in rows]); T = max(1, sum(r['ric'] for r in rows)); pc = lambda k: 100 * sum(r[k] for r in rows) / T
             line = (f" anno {y:2d}: vive {100*len(rows)/N:3.0f}% · cassa {g('cash')/1e3:4.0f}k debiti {g('debt')/1e3:3.0f}k · ricavi {g('ric')/1e3:5.0f}k margine {pc('util'):5.1f}%"
                     f" · personale {pc('pers'):4.1f} mezzi {pc('mezzi'):4.1f} immobili {pc('fissi'):4.1f} tecnologie {pc('tech'):3.1f} manager {pc('mgr'):3.1f} altro {pc('altro'):3.1f}"
-                    f" · clienti {g('cli'):4.1f} magazzini {g('wh'):3.1f} dipendenti {g('staff'):4.1f} morale {g('mor'):3.0f}")
+                    f" · clienti {g('cli'):4.1f} magazzini {g('wh'):3.1f} dipendenti {g('staff'):4.1f} morale {g('mor'):3.0f} · traslochi {g('tr'):3.2f}")
             if ri: line += f" · stipendi {g('wage'):.3f} scioperi {g('strikes'):3.1f} accordi {g('deals'):3.1f} tavoli saltati {g('fails'):3.1f} Confpallet {g('conf'):3.1f}"
             print(line)
+        # traslochi: quanti ne fanno le aziende in tutta la partita, quanti riescono, clienti persi e costo; valore del primo magazzino di proprietà
+        last = [c['acc']['yr'][-1] for c in allc if c['acc']['yr']]
+        trn = sum(r['tr'] for r in last)
+        if trn:
+            print(f" traslochi: {trn} in {len(last)} aziende ({100*sum(1 for r in last if r['tr'])/len(last):.0f}% ne fa almeno uno) · riusciti {sum(r['trOk'] for r in last)}"
+                  f" · clienti spostati {sum(r['trCli'] for r in last)}, persi {sum(r['trLost'] for r in last)} · costo medio {sum(r['trCost'] for r in last)/max(1,sum(r['trOk'] for r in last) or trn)/1e3:.0f}k")
+        else: print(' traslochi: nessuno')
+        v1 = [(y, mean([c['acc']['yr'][y-1]['v1'] for c in allc if len(c['acc']['yr']) >= y and c['acc']['yr'][y-1]['v1']])) for y in (1, 6, years)]
+        print(' primo magazzino di proprietà, prezzo di vendita: ' + ' · '.join(f'anno {y} {v/1e3:.0f}k' for y, v in v1 if v == v))
         if ri:
             F = [sum(c['acc']['f'][k] for c in allc) for k in range(5)]; T = sum(F) or 1
             print(' fasce: ' + ', '.join(f'{n} {100*v/T:.1f}%' for n, v in zip(FASCE, F))
