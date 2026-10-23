@@ -1200,7 +1200,7 @@ async def main():
         # Si prende l'evento la cui zona tocca di più i suoi viaggi (P0 = puntualità della prima risposta)
         P0 = {'nebbia': -4, 'allerta': -8, 'moda': -2, 'a1': -2, 'brennero': -4, 'po': -6}
         ev_id = await pg.evaluate("""(P0)=>{const F=window.__FUP,H=F.HUM; document.querySelectorAll('.win [data-act=close]').forEach(b=>b.click()); F.cardsOff();
-          H.notes=H.notes.filter(n=>n.k!=='ev'); H.evPend=[];
+          H.notes=H.notes.filter(n=>n.k!=='ev'); H.evPend=[]; H.aree=[];   // un evento con la zona capitato prima per caso non deve contare
           const c0=H.bots.flatMap(b=>b.clients)[0]; H.clients.push({...c0,id:'clzona',req:[],line:null,peak:null,wh:H.warehouses[0].id,status:'attivo',zone:'reg_lom',mode:'consegna',pal:300,stock:250,sat:60});
           const best=Object.keys(P0).map(k=>[k,Math.max(0,...H.warehouses.map(w=>F.areaShare(k,w)))]).sort((a,b)=>b[1]-a[1])[0]; return best[0];}""", P0)
         await pg.evaluate(FIRE, ev_id)
@@ -1342,12 +1342,35 @@ async def main():
           o.why=!!F.avvWhy(T('gps'),w,'int',1);
           F.ACT.updopen({id:'wms',wh:w.id}); o.modal=document.querySelector('#modal').innerText.includes('Aggiornamento');
           F.ACT.avvset({by:'gigabancale'}); F.ACT.avvgo(); const a=S.avv.find(x=>x.upd); o.upd=!!a&&a.dep==='it'&&a.n===0&&a.cost===10500;
-          a.live=S.day; const R0=Math.random; Math.random=()=>0.99; F.step(); Math.random=R0; o.done=!!a.esito&&S.day-w.tech.wms.day<=1&&!F.sysObs(F.sysRec('wms',w))&&w.tech.wms.lm<1;
+          a.live=S.day; F.step(); o.done=!!a.esito&&S.day-w.tech.wms.day<=1&&!F.sysObs(F.sysRec('wms',w))&&w.tech.wms.lm<1;
           S.sysDay.gestionale=S.day-3700; F.ACT.updopen({id:'gestionale'}); F.ACT.avvgo(); const g=S.avv.find(x=>x.tech==='gestionale'); o.co=!!g&&g.wh===null&&g.by==='int';
-          g.live=S.day; Math.random=()=>0.99; F.step(); Math.random=R0; o.coDone=!!g.esito&&!F.sysObs(F.sysRec('gestionale',null));
+          g.live=S.day; F.step(); o.coDone=!!g.esito&&!F.sysObs(F.sysRec('gestionale',null));
           const tg=F.itTgt(), nd=F.itNeed(); ['sala','sicurezza','cloud'].forEach(id=>S.researched[id]=true); o.res=F.itTgt()>=Math.min(100,tg+10)&&F.itNeed()<nd&&F.itFees()===300;
           return o;}''')
         assert all(r.values()), f'assistenza, affidabilità, guasti e aggiornamenti del Reparto IT: {r}'
+        # Ingegneria in magazzino e welfare del facility manager (0.112): colonna Magazzini della lavagna, bonus dei metodi (sale, tetto, Studio tempi
+        # e metodi, Lean, scende senza nessuno), cantieri più corti, welfare piccolo e grande col facility manager, traslochi, Cronometrini a progetto
+        r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('gino',null,{mode:'classica',win:{},it:true}); const S=F.S,o={},w=S.warehouses[0]; S.cash=3e6; S.nextEvent=1e9; const T=id=>F.TECH.find(t=>t.id===id);
+ o.techs=['tempi','lean','ergonomia','esoscheletri','layout'].every(T)&&T('layout').dep==='ing';
+ S.office.ing=2; o.lav0=F.ingMag()===0&&F.depFree('ing')===2;
+ F.ACT.itas({k:'ing',v:1}); o.lav=F.ingMag()===1&&F.depFree('ing')===1&&F.ingPlan()[w.id]===1;
+ F.step(); const p0=w.kpi.prod; w.met=0; F.ingMonth(); o.met=w.met===0.5; S.researched.tempi=true; F.ingMonth(); o.tempi=w.met===1.25; F.step(); o.prod=w.kpi.prod>p0;
+ w.met=6; F.ingMonth(); o.cap=w.met===6; S.researched.lean=true; F.ingMonth(); o.lean=w.met===6.75;
+ F.ACT.itas({k:'ing',v:-1}); F.ingMonth(); o.decay=Math.abs(w.met-6.55)<1e-9;
+ // cantieri più corti con un ingegnere sui magazzini
+ const g0=F.cantGg(70); F.ACT.itas({k:'ing',v:1}); o.cant=F.cantGg(70)===56&&g0===70;
+ // welfare: senza facility manager no; la mensa è un cantiere
+ S.researched.spogliatoi=true; S.researched.acqua=true; w.staff.fm=0; o.nofm=!!F.welWhy(T('spogliatoi'),w); F.ACT.install({id:'acqua',wh:w.id}); o.nofm2=!w.tech.acqua;
+ w.staff.fm=1; F.ACT.install({id:'acqua',wh:w.id}); o.small=!!w.tech.acqua&&!w.build;
+ F.ACT.install({id:'spogliatoi',wh:w.id}); o.big=!w.tech.spogliatoi&&!!w.build&&w.build.k==='wel'&&w.build.total===F.cantGg(28);
+ for(let i=0;i<50;i++){ document.querySelector('#modal').innerHTML=''; F.step(); } o.done=!!w.tech.spogliatoi&&!w.build;
+ // traslochi: progetto −30%
+ o.tr=F.ingTr();
+ // agitazione e consulenti: Cronometrini a progetto
+ S.researched.ergonomia=true; F.ACT.avvopen({id:'ergonomia',wh:w.id}); F.ACT.avvset({by:'cronometrini'}); F.ACT.avvgo(); const a=S.avv.find(x=>x.tech==='ergonomia'); o.avv=!!a&&a.by==='cronometrini';
+ const m0=w.met; a.live=S.day; document.querySelector('#modal').innerHTML=''; F.step(); o.crono=!!w.tech.ergonomia&&w.met>m0;
+ return o;}''')
+        assert all(r.values()), f'Ingegneria in magazzino e lavori del welfare: {r}'
         r = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino',null,{mode:'classica',win:{},it:true}); const H=F.HUM; H.nextEvent=40;
           H.bots=[['edoardo','espansione'],['valeria','qualita'],['marco','prezzo']].map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],'normale',i));
           for(let d=0;d<365&&!H.over;d++){ const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}
@@ -1373,6 +1396,9 @@ async def main():
         assert await pg.query_selector('#modal [data-act=avvgo]') and 'Aggiornamento' in await pg.inner_text('#modal'), 'finestrella dell\'aggiornamento incompleta'
         await pg.screenshot(path=os.path.join(OUT, 'shot_it_aggiorna.png'))
         await pg.evaluate("()=>{document.querySelector('#modal').innerHTML='';}")
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S; S.office.ing=2; S.dep.ing.as=1; S.warehouses.forEach((w,i)=>w.met=2+i); document.querySelectorAll('#toasts > *').forEach(e=>e.remove()); F.openWin('reparti'); [...document.querySelectorAll('#win-tecnologia .dep-k')].pop().scrollIntoView();}"); await pg.wait_for_timeout(400)
+        assert await pg.query_selector('#win-tecnologia [data-act=ingwh]') and await pg.query_selector('#win-tecnologia [data-act=itas][data-k=ing]'), 'scheda del miglioramento continuo incompleta'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_it_miglioramento.png'))
         await pg.evaluate("()=>{window.__FUP.ACT.mpopen({k:'dep',id:'ing'});}"); await pg.wait_for_timeout(400)
         assert 'Responsabile IT' in await pg.inner_text('#modal'), 'nella scelta del responsabile chi guida l\'altro reparto deve stare in grigio col suo ruolo'
         await pg.screenshot(path=os.path.join(OUT, 'shot_it_scelta.png'))

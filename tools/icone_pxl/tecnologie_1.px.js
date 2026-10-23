@@ -153,6 +153,43 @@ tecnologia("amr", "log", {}, `
   ..........`)
 
 // ================================================================ Sviluppo aziendale (ottagono viola)
+// Ergonomia delle postazioni (pacchetto Reparto IT e Ingegneria): il banco regolabile con la freccia su e giù
+tecnologia("ergonomia", "log", {}, `
+  ........Y.
+  .......YYY
+  ........Y.
+  ........Y.
+  NNNNNN..Y.
+  .D..D...Y.
+  .D..D..YYY
+  .DD.DD..Y.
+  .D..D.....
+  DDD.DDD...`)
+// Esoscheletri: la schiena con l'imbracatura e le molle
+tecnologia("esoscheletri", "log", { mx: true }, `
+  ...FF
+  ...FF
+  .OOBB
+  O..BB
+  O.DBB
+  O..BB
+  .OOBB
+  ...BB
+  ...DD
+  ...D.`)
+// Progettazione del layout: la pianta del magazzino con le corsie e la freccia del percorso
+tecnologia("layout", "log", { tieni: "W" }, `
+  WWWWWWWWWW
+  WDDW.WDDWW
+  WDDWRWDDWW
+  WDDWRWDDWW
+  WDDWRWDDWW
+  WWWWRWWWWW
+  WRRRRWDDWW
+  WRWWWWDDWW
+  WRWWWWWWWW
+  WWWWWWWWWW`)
+
 // Gestionale amministrativo: portatile con l'euro sullo schermo
 tecnologia("gestionale", "org", { tieni: "W", dopo: [grid(2, 0, `
   ...GGG
@@ -357,6 +394,30 @@ tecnologia("edifici", "org", { mx: true, tieni: "L" }, `
   .SLLS
   .SSSS`)
 
+// Studio tempi e metodi (pacchetto Reparto IT e Ingegneria): il cronometro
+tecnologia("tempi", "org", {}, `
+  ...SSSS...
+  ....SS....
+  ..SSSSSS..
+  .SWWWWWWS.
+  SWWWWRWWWS
+  SWWWWRWWWS
+  SWWWWWRRWS
+  SWWWWWWWWS
+  .SWWWWWWS.
+  ..SSSSSS..`)
+// Lean e miglioramento continuo: la freccia che sale sui gradini
+tecnologia("lean", "org", {}, `
+  ......GGGG
+  .......GGG
+  ......GGGG
+  .....GG.GG
+  ....GG...Y
+  ...GG...YY
+  ..GG...YYY
+  .......YYY
+  ....YYYYYY
+  .YYYYYYYYY`)
 // Sala server e backup (pacchetto Reparto IT e Ingegneria): l'armadio con le lucine e il disco della copia di stanotte
 tecnologia("sala", "org", {}, `
   DDDDD.....
