@@ -2673,7 +2673,18 @@ wk('trasloco','basi','Trasloco',`Spostare uno o più clienti da un tuo magazzino
 
 **I soldi**: progetto 5.000 € più 2.000 € a cliente, 6 € per pallet di movimentazione, le navette (un bilico pieno ogni 33 pallet), gli straordinari, le buonuscite e le indennità. Se il vecchio magazzino resta vuoto, le [[tecnologie]] che mancano di là si rimontano a metà prezzo (l'[[apprendimento]] dura la metà); le certificazioni di magazzino si rifanno con un [[audit]] a metà prezzo. Le [[dotazioni]] restano nell'edificio.
 
-All'arrivo di ogni cliente c'è l'inventario: tutto bene, differenze inventariali da pagare, merce danneggiata o pallet che spariscono per qualche settimana (meglio con il [[wms|WMS]] e un'accuratezza alta). Se alla fine i KPI sono sopra soglia il trasloco è riuscito: reputazione +1 e soddisfazione +3 a chi ha guadagnato un capannone migliore o più vicino. Il magazzino lasciato vuoto si tiene, si restituisce o si vende: vedi [[capannone_vuoto]].`);
+All'arrivo di ogni cliente c'è l'inventario: tutto bene, differenze inventariali da pagare, merce danneggiata o pallet che spariscono per qualche settimana (meglio con il [[wms|WMS]] e un'accuratezza alta). Se alla fine i KPI sono sopra soglia il trasloco è riuscito: reputazione +1 e soddisfazione +3 a chi ha guadagnato un capannone migliore o più vicino. Il magazzino lasciato vuoto si tiene, si restituisce o si vende: vedi [[capannone_vuoto]].
+
+**La franchigia**: nel progetto puoi chiedere alle committenti una [[franchigia]] sui KPI: chi accetta non ti fa pagare [[penali]] durante il trasloco, in cambio di uno sconto.
+
+**Gli imprevisti**: ogni trasloco porta uno o due [[eventi]] tutti suoi, con la scenetta del trasloco, fuori dall'estrazione normale. Il lampo li porta più spesso nei giorni del trasloco, le ondate in preparazione e in stabilizzazione: il buyer che vuole vedere il magazzino nuovo, il timbro dei Vigili del Fuoco che manca (se il capannone non ha l'antincendio), il magazziniere storico che non vuole fare la strada, la festa d'addio al vecchio capannone, la navetta ribaltata in tangenziale, le ubicazioni che non tornano, il vicino che protesta per i camion di notte, la neve (d'inverno), i pallet dimenticati dietro una scaffalatura, il manager che fa il pendolare (oltre gli 80 km), chi non era venuto che chiede di tornare, il capoturno che vuole rifare le ubicazioni (accorcia la [[stabilizzazione]]) e il gatto del magazzino. Mai lo stesso due volte nello stesso trasloco.`);
+wk('franchigia','basi','Franchigia sui KPI',`Un accordo con la committente: durante il trasloco niente penali e metà della rabbia se i KPI vanno sotto soglia, in cambio di uno sconto.`,
+`Si chiede nel progetto del [[trasloco]], al passo «Come». Ogni committente decide alla conferma: accetta più spesso se la [[st_neg|Negoziazione]] di chi guida il [[customer_service|customer service]] è alta (50% con 10, ±5% per punto) e se è contenta (+0,5% per ogni punto di [[soddisfazione]] sopra 60, meno sotto). Chi dice no perde 1 di soddisfazione.
+
+Chi accetta, dalla partenza della sua ondata fino a metà [[stabilizzazione]]:
+• non applica [[penali]] per i KPI sotto [[soglie|soglia]];
+• a fine mese perde metà della soddisfazione per i KPI sotto soglia (−2 invece di −4, −5 invece di −10).
+In cambio ha il 2% di sconto sulla tariffa per 13 settimane dalla partenza. Conviene con il trasloco lampo e con i clienti che hanno penali alte.`);
 wk('stabilizzazione','basi','Stabilizzazione',`Le settimane dopo un trasloco in cui nessuno sa ancora dove sono le cose: KPI e produttività sotto, che risalgono piano.`,
 `Parte all'arrivo di ogni cliente nel magazzino nuovo. Al primo giorno: dopo un trasloco lampo puntualità −5, accuratezza −4 e produttività −20% per 8 settimane; dopo un'ondata −3, −2 e −10% per 5 settimane. I malus pesano quanto il lavoro arrivato (minimo un quarto: la confusione la sentono tutti) e scendono a zero un po' alla volta, come l'[[apprendimento]] delle tecnologie. Il morale obiettivo resta −2 finché dura.
 
@@ -2684,7 +2695,9 @@ wk('capannone_vuoto','basi','Capannone vuoto',`Un magazzino senza clienti lo pag
 • **Restituirlo** (in affitto): 2 mesi di affitto di disdetta più il ripristino, (100 − stato) × posti × 0,15 €: chi ha trascurato la [[manutenzione]] paga adesso.
 • **Venderlo** (di proprietà): lo metti in vendita e dopo 2-6 mesi arrivano le offerte, una alla volta, ognuna valida 30 giorni. Il prezzo gira attorno a posti × 120 € per la classe (fatiscente ×0,5, vecchio ×0,75, standard ×1, moderno ×1,2, innovativo ×1,4), meno l'1% per ogni punto di stato sotto 70, più basso negli anni della crisi (2009-2013). Venduto, esce dal [[bilancio]].
 
-Chi ci lavora ancora si può spostare in un altro magazzino (segue con le stesse percentuali del [[trasloco]]); chiudendo, chi resta se ne va con un mese di buonuscita. Non si può chiudere il tuo unico magazzino, né uno con un trasloco in programma o un cantiere aperto.`);
+Chi ci lavora ancora si può spostare in un altro magazzino (segue con le stesse percentuali del [[trasloco]]); chiudendo, chi resta se ne va con un mese di buonuscita. Non si può chiudere il tuo unico magazzino, né uno con un trasloco in programma o un cantiere aperto.
+
+Dopo una restituzione, a volte (più spesso se lo stato era basso) il proprietario contesta i danni con un perito. Quando vendi, una volta su cinque il compratore tira sul prezzo il giorno del rogito: accetti il 12% in meno, tieni il punto (una volta su due cede, altrimenti se ne va) o ritiri il capannone dalla vendita. E un capannone vuoto, ogni tanto, attira una compagnia teatrale.`);
 wk('ordinanza','basi','Ordinanza',`Dal 2007, prima o poi, l'ASL o il Comune mettono gli occhi su un capannone fatiscente: entro sei mesi va ristrutturato o chiuso.`,
 `Un evento raro, per i magazzini di [[classe_edificio|classe]] fatiscente che hai da almeno un anno: ognuno ha una data sua tra il 2007 e il 2009, poi l'evento può arrivare. Di solito è il tetto di cemento-amianto da bonificare; dopo il terremoto del 2012, nelle province emiliane, è la messa in sicurezza antisismica dei prefabbricati.
 
@@ -4676,11 +4689,12 @@ function monthEnd(){
     const w=whById(c.wh); const P=w.acc.n?w.acc.P/w.acc.n:w.kpi.P, A=w.acc.n?w.acc.A/w.acc.n:w.kpi.A;
     const wP=P-c.sP, wA=c.sA?A-c.sA:9, wv=Math.min(wP,wA);
     c.lastP=P; c.lastA=A; c.sat+=polSum('sat')+trSum(w,'sat')+(vanSh(c)>0?trSum(w,'satB'):0)+csS;
+    const fr=frOn(c);   // franchigia del trasloco: niente penali e metà della rabbia
     if(wv>=0){c.sat+=3+(R('edi')?1:0)+(R('kam')?1:0); repUp(0.15);}
-    else if(wv>=-2){c.sat-=4;}
-    else {c.sat-=10;}
+    else if(wv>=-2){c.sat-=fr?2:4;}
+    else {c.sat-=fr?5:10;}
     // penale da contratto: per ogni punto sotto soglia, se il cliente la prevede
-    const miss=Math.max(0,-wP)+(c.sA?Math.max(0,-wA):0), p=clientRev(c)*Math.min(PEN_MAX,penPct(c)*miss)/100; c.lastPen=p; pen+=p;
+    const miss=Math.max(0,-wP)+(c.sA?Math.max(0,-wA):0), p=fr?0:clientRev(c)*Math.min(PEN_MAX,penPct(c)*miss)/100; c.lastPen=p; pen+=p;
     if(p>=1) news('Il Sole 24 Pallet',`Penale da ${c.name}`,`KPI sotto soglia di ${f1(miss)} punti: il contratto prevede ${eur(p)} di penale.`);
     if(certMiss(c).length) c.sat-=6;   // certificato sospeso (o mancante) nel magazzino che lo serve
     c.sat=clamp(c.sat,0,100);
@@ -4839,6 +4853,10 @@ const TR={prep:30,maxWk:26,share:0.25,proj:5000,projCli:2000,pal:6,ind:1000,indK
   ondate:{n:'A ondate',pal:250,min:7,max:14,P:-5,A:-1.5,orig:-1,load:0.15,stra:0.2,post:0,mor:-4,nav:1,sP:-3,sA:-2,sProd:0.1,sWk:5,inv:[65,20,10,5]},
   ag:{cost:1.3,dur:1.5,A:-1},disc:0.03,discDays:365,cls:2,km:3,fastidio:-3,picco:-4,picMul:1.15,cert:-3,refSat:35,refP:0.05,refNaz:0.1,stay:-2,cancel:-2,wait:-1,ok:3,okRep:1};
 const TR_ROLES=['pick','car','capo','imp','autCE','autB'];
+// franchigia sui KPI: chi accetta non applica penali e si arrabbia la metà dalla partenza fino a metà stabilizzazione; in cambio lo sconto
+const TR_FR={disc:0.02,days:90,ref:-1,stab:0.5};
+const trFrP=c=>clamp(csOdds(csWho().st.neg)+(c.sat-60)/200,0.1,0.95);   // probabilità che un cliente accetti la franchigia
+const frOn=c=>!!c.fr&&c.fr.on!=null&&(c.fr.until==null||S.day<=c.fr.until);
 const TR_INV=['tutto in ordine','differenze inventariali','merce danneggiata nelle navette','pallet spariti'];
 const trList=()=>(S&&S.tras)||[];
 const trById=id=>trList().find(T=>T.id===id);
@@ -4894,7 +4912,7 @@ function trEst(P){
   const cl=(P.cli||[]).map(id=>S.clients.find(c=>c.id===id)).filter(c=>c&&c.wh===o.id&&c.status==='attivo'&&!c.exit&&!c.tr); e.cl=cl;
   if(!d){ e.why='Scegli dove portare i clienti.'; return e; }
   if(!cl.length){ e.why='Scegli almeno un cliente da spostare.'; return e; }
-  e.km=trKm(o,d); e.agF=trAgForced(o); e.ag=e.agF||!!P.ag; const M=TR[P.mode]; e.M=M;
+  e.km=trKm(o,d); e.agF=trAgForced(o); e.ag=e.agF||!!P.ag; const M=TR[P.mode]; e.M=M; e.fr=!!P.fr; e.frN=cl.reduce((a,c)=>a+trFrP(c),0);
   const W=trWhen(d,cl,P.mode,e.ag); e.min=W.min; e.max=W.max; e.best=W.best;
   e.start=clamp(P.start||W.best,W.min,W.max); e.waves=trWaves(cl,e.start,P.mode,e.ag); e.end=e.waves[e.waves.length-1].to;
   e.full=!S.clients.some(c=>c.wh===o.id&&c.status!=='perso'&&!cl.includes(c));
@@ -4953,12 +4971,16 @@ function trStart(P){ const e=trEst(P); if(!e.ok) return null; const o=e.o, d=e.d
   S.cash-=e.cost.proj; S.cur.altro+=e.cost.proj;
   e.certAuto.forEach(t=>{ const c=Math.round(instCost(t,d)*0.5/100)*100; S.cash-=c; S.cur.tech+=c; d.tech[t.id]={day:S.day}; T.log.cost+=c; });
   e.cli.forEach(x=>{ x.c.sat=clamp(x.c.sat+x.react,0,100); x.c.tr=T.id; if(x.gain) T.gain[x.c.id]=1; });
+  if(e.fr){ T.fr=1; e.cl.forEach(c=>{ if(Math.random()<trFrP(c)) c.fr={tr:T.id}; else { delete c.fr; c.sat=clamp(c.sat+TR_FR.ref,0,100); } }); }
   (S.tras=S.tras||[]).push(T);
   if(e.km>TR.vociKm){ UI.modSrc='Voci sul trasloco'; mod(o.id,{mor:TR.vociMor},Math.max(1,T.start-S.day)); UI.modSrc=null; }
   const who=e.cl.length===1?e.cl[0].name:e.cl.length+' clienti';
   chron('magazzini',`Annuncia il trasloco di ${who} da ${o.name} a ${d.name}`);
   news('Il Sole 24 Pallet',`${S.company.name} trasloca a ${d.name}`,`Dal ${shortDate(T.start)} ${who} ${e.cl.length===1?'passa':'passano'} da ${o.name} a ${d.name}. «Più spazio e più servizio», assicura ${ceo().name}. In banchina, per ora, si fanno i conti con la strada.`);
   e.cli.forEach(x=>{ if(Math.random()<x.pr){ T.ref.push(x.c.id); trRefEvent(T,x.c,x.fat); } });
+  // gli eventi del trasloco: 1 o 2, il lampo più spesso nei giorni del trasloco, le ondate prima e dopo
+  T.used=[]; T.evs=Array.from({length:Math.random()<0.5?1:2},()=>{ const W=TR_EVW[T.mode], ph=wpick(Object.keys(W),k=>W[k]);
+    return {ph,at:ph==='prep'?rint(4,Math.max(4,T.start-S.day-6)):ph==='move'?rint(0,Math.max(0,e.end-e.start-1)):rint(5,Math.max(5,Math.round(e.stab*7*0.6)))}; });
   return T; }
 function trRefEvent(T,c,fat){ if(isBot()) return; const base=EVENTS.find(e=>e.id==='tr_rifiuto'), ev={...base,c,tr:T.id,fat:!!fat}; base.restore(ev); showEvent(ev); }
 // risposte al cliente che non vuole traslocare, ricostruite dal progetto anche dopo un salvataggio
@@ -4980,20 +5002,23 @@ function trRefOpts(ev){ const c=ev.c, T=trById(ev.tr), o=T&&whById(T.from), nm=c
   return ev; }
 const trIn=(T,c)=>!!T&&!!c&&T.fase==='prep'&&T.cli.includes(c.id);
 // un cliente esce dal progetto: le persone e le motrici da portare calano con la sua parte di lavoro
-function trOut(T,c){ T.cli=T.cli.filter(x=>x!==c.id); T.ref=T.ref.filter(x=>x!==c.id); delete c.tr; const k=T.pal>0?Math.max(0,1-c.pal/T.pal):0;
+function trOut(T,c){ T.cli=T.cli.filter(x=>x!==c.id); T.ref=T.ref.filter(x=>x!==c.id); delete c.tr; if(c.fr&&c.fr.on==null) delete c.fr; const k=T.pal>0?Math.max(0,1-c.pal/T.pal):0;
   TR_ROLES.forEach(r=>T.ppl[r]=Math.round((T.ppl[r]||0)*k)); T.mot=Math.round(T.mot*k); T.pal=Math.max(0,T.pal-c.pal);
   if(!T.cli.length) trDrop(T,'nessun cliente da spostare'); }
 function trLeave(T,c){ const lost=Math.ceil(rankOf(c).lost/2); S.rep=clamp(S.rep-lost,0,100); c.exit={day:Math.max(T.start,S.day+1),tr:1};
   chron('clienti',`${c.name} non vuole traslocare e lascia il contratto`); trOut(T,c); }
 // progetto annullato (pen: annullato da te, i clienti avvisati si arrabbiano un po')
 function trDrop(T,why,pen){ S.tras=trList().filter(x=>x!==T);
-  [...T.cli,...T.ref].forEach(id=>{ const c=S.clients.find(x=>x.id===id); if(!c||c.tr!==T.id) return; delete c.tr; if(pen) c.sat=clamp(c.sat+TR.cancel,0,100); });
+  [...T.cli,...T.ref].forEach(id=>{ const c=S.clients.find(x=>x.id===id); if(!c||c.tr!==T.id) return; delete c.tr; if(c.fr&&c.fr.on==null) delete c.fr; if(pen) c.sat=clamp(c.sat+TR.cancel,0,100); });
   (S.notes||[]).filter(n=>n.k==='ev'&&n.ev&&n.ev.id==='tr_rifiuto'&&n.ev.vars&&n.ev.vars.tr===T.id).forEach(n=>noteDel(n.id));
   if(why) noteVar('wh',`Trasloco da ${T.nm[0]} a ${T.nm[1]} annullato: ${why}`); }
 // ogni giorno (solo il giocatore): partenze, ondate, stabilizzazione; poi vendite dei capannoni e ordinanze
 function trDaily(){ if(S.bot) return;
-  trList().slice().forEach(T=>{ if(T.fase==='prep'&&S.day>=T.start) trBegin(T); if(T.fase==='move') trMove(T); if(T.fase==='stab') trStab(T); });
-  S.clients.forEach(c=>{ if(c.trDisc!=null&&S.day>=c.trDisc){ c.mult=Math.round((c.mult+TR.disc)*100)/100; delete c.trDisc; } });
+  trList().slice().forEach(T=>{ if(T.fase==='prep'&&S.day>=T.start) trBegin(T); if(T.fase==='move') trMove(T); if(T.fase==='stab') trStab(T); trEvDaily(T); });
+  (S.wvDanni||[]).filter(x=>S.day>=x.day).forEach(x=>{ S.wvDanni=S.wvDanni.filter(y=>y!==x); trEvShow('tr_danni',{nm:x.nm,n:x.n}); });
+  S.clients.forEach(c=>{ if(c.trDisc!=null&&S.day>=c.trDisc){ c.mult=Math.round((c.mult+TR.disc)*100)/100; delete c.trDisc; }
+    if(c.frDisc!=null&&S.day>=c.frDisc){ c.mult=Math.round((c.mult+TR_FR.disc)*100)/100; delete c.frDisc; }
+    if(c.fr&&(c.fr.until!=null&&S.day>c.fr.until||c.fr.on==null&&!trById(c.fr.tr))) delete c.fr; });
   wvDaily(); ordDaily(); }
 function trBegin(T){ const o=whById(T.from), d=T.to?whById(T.to):null;
   if(!o){ trDrop(T,'il magazzino di partenza non c\'è più'); return; }
@@ -5007,23 +5032,26 @@ function trBegin(T){ const o=whById(T.from), d=T.to?whById(T.to):null;
   const cl=T.cli.map(id=>S.clients.find(c=>c.id===id)).filter(c=>c&&c.status==='attivo'&&c.wh===o.id&&!c.exit);
   if(!cl.length){ trDrop(T,'nessun cliente da spostare'); return; }
   T.cli=cl.map(c=>c.id); T.waves=trWaves(cl,S.day,T.mode,T.ag); T.end=T.waves[T.waves.length-1].to; T.palB=cl.reduce((a,c)=>a+c.pal,0); T.cum=0;
-  T.full=!S.clients.some(c=>c.wh===o.id&&c.status!=='perso'&&!T.cli.includes(c.id)); T.mgr0=d.mgr; T.fase='move';
+  T.full=!S.clients.some(c=>c.wh===o.id&&c.status!=='perso'&&!T.cli.includes(c.id)); T.mgr0=d.mgr; T.fase='move'; T.mvDay=S.day;
+  if(T.vvf&&Math.random()<0.4){ S.cash-=8000; S.cur.altro+=8000; S.rep=clamp(S.rep-1,0,100);
+    notify('red','magazzini','Trasloco',`Controllo dei Vigili del Fuoco a ${d.name}`,'Il primo giorno di trasloco passano i Vigili del Fuoco: il certificato non è aggiornato. Multa di 8.000 € e reputazione −1.','magazzini',{wh:d.id}); }
   notify('yellow','magazzini','Ufficio traffico',`Inizia il trasloco a ${d.name}`,`${T.mode==='lampo'?`Lampo: ${cl.length===1?cl[0].name:cl.length+' clienti'} in ${T.end-S.day} giorni.`:`A ondate: ${cl.length===1?cl[0].name:cl.length+' clienti, uno alla volta,'} fino al ${shortDate(T.end)}.`} Nei giorni del trasloco puntualità e accuratezza scendono e ${T.ag?'lavora un\'agenzia esterna':'si fanno tanti straordinari'}; poi qualche settimana di stabilizzazione.`,'magazzini',{wh:d.id},'tr'+T.id); }
 function trMove(T){ const o=whById(T.from), d=whById(T.to); if(!o||!d){ trDrop(T,'un magazzino non c\'è più'); return; }
   T.waves.forEach((w,i)=>{ if(!w.on&&S.day>=w.from){ w.on=1; trWaveGo(T,w,i,o,d); } if(w.on&&!w.done&&S.day>=w.to){ w.done=1; trWaveEnd(T,w,o,d); } });
   if(!T.waves.every(w=>w.done)) return;
-  T.fase='stab'; T.mgrS=d.mgr; if(T.full) trTechMove(T,o,d);
+  T.fase='stab'; T.stDay=S.day; T.mgrS=d.mgr; if(T.full) trTechMove(T,o,d);
   if(whEmpty(o)) notify('yellow','magazzini','Ufficio tecnico',`${o.name} è vuoto`,`Il trasloco è finito e nel capannone non resta nessun cliente. Lo paghi comunque: dalla finestra del magazzino puoi tenerlo per una gara futura${o.own?' o metterlo in vendita':' o restituirlo al proprietario'}.`,'magazzini',{wh:o.id},'vuoto'+o.id); }
 // partenza di un'ondata: i clienti cambiano magazzino, con la loro parte di persone e di motrici; si pagano navette, movimentazione e buonuscite
 function trWaveGo(T,w,i,o,d){
   const cl=w.cli.map(id=>S.clients.find(c=>c.id===id)).filter(c=>c&&c.status==='attivo'&&c.wh===o.id&&!c.exit); w.cli=cl.map(c=>c.id);
   if(!cl.length){ w.done=1; return; }
+  cl.forEach(c=>{ if(!c.fr||c.fr.tr!==T.id||c.fr.on!=null) return; c.fr.on=S.day; if(c.frDisc==null) c.mult=Math.round((c.mult-TR_FR.disc)*100)/100; c.frDisc=S.day+TR_FR.days; });
   w.pal=cl.reduce((a,c)=>a+palOf(c),0); w.stock=cl.reduce((a,c)=>a+c.stock,0); w.A0=(o.kpi||computeWH(o)).A;
   const sh0=T.cum||0, sh1=i===T.waves.length-1?1:Math.min(1,sh0+cl.reduce((a,c)=>a+c.pal,0)/Math.max(1,T.palB)); T.cum=sh1;
   let fol=0,ref=0,buon=0; const coop=trCoopGo(o,d), part=n=>Math.round(n*sh1)-Math.round(n*sh0);
   TR_ROLES.forEach(r=>{ const n=Math.min(o.staff[r]||0,part(T.ppl[r]||0)); for(let k=0;k<n;k++){ o.staff[r]--;
     if(isCoop(o,r)){ if(coop) d.staff[r]++; continue; }
-    if(Math.random()<trFollow(o,T.km,r)){ d.staff[r]++; fol++; } else { ref++; buon+=RAL[r]*COEF/12; } } });
+    if(Math.random()<trFollow(o,T.km,r)||(T.sure>0&&(r==='pick'||r==='car')&&T.sure--)){ d.staff[r]++; fol++; } else { ref++; buon+=RAL[r]*COEF/12; } } });
   const mot=Math.min(o.motrici,part(T.mot)); o.motrici-=mot; d.motrici+=mot;
   const M=TR[T.mode], nav=Math.round(Math.ceil(w.stock/CAPV)*(2*T.km+20)*(0.25*S.fuel+0.13+TR.navKm)*M.nav/100)*100, mov=w.stock*TR.pal, ind=T.km>TR.indKm?fol*TR.ind:0;
   const tot=nav+mov+ind+Math.round(buon/100)*100; S.cash-=tot; S.cur.altro+=tot; T.log.cost+=tot; T.log.fol+=fol; T.log.ref+=ref;
@@ -5039,7 +5067,9 @@ function trWaveEnd(T,w,o,d){ if(!w.cli.length) return; const M=TR[T.mode], sh=te
     else if(k===2){ v=Math.round(rnd(2000,6000)/100)*100; c.sat=clamp(c.sat-3,0,100); }
     else if(k===3){ UI.modSrc='Pallet spariti nel trasloco'; mod(d.id,{A:-1},28); UI.modSrc=null; }
     if(v){ S.cash-=v; S.cur.pen+=v; T.log.cost+=v; } res.push({c,k,v}); });
-  w.st=S.day; w.dur=trStabDays(T,d); if(!res.length) return;
+  w.st=S.day; w.dur=trStabDays(T,d);
+  w.cli.forEach(id=>{ const c=S.clients.find(x=>x.id===id); if(c&&c.fr&&c.fr.tr===T.id) c.fr.until=S.day+Math.round(w.dur*TR_FR.stab); });
+  if(!res.length) return;
   notify(res.some(x=>x.k)?'yellow':'green','magazzini','Ufficio traffico',res.length===1?`${res[0].c.name} è arrivato a ${d.name}`:`${res.length} clienti arrivati a ${d.name}`,
     `Inventario: ${res.map(x=>`${x.c.name}, ${TR_INV[x.k]}${x.v?` (${eur(x.v)}${x.k===2?', soddisfazione −3':''})`:x.k===3?' (accuratezza −1 per 4 settimane)':''}`).join('; ')}. Ora ${wks(w.dur)} di stabilizzazione: tutto qualche punto sotto, poi torna normale.`,'magazzini',{wh:d.id}); }
 // il vecchio magazzino resta vuoto: le tecnologie e i servizi di welfare che mancano di là si smontano e si rimontano a metà prezzo
@@ -5062,6 +5092,188 @@ function trDone(T){ const d=whById(T.to); S.tras=trList().filter(x=>x!==T);
   if(ok){ cl.forEach(c=>{ if(T.gain[c.id]) c.sat=clamp(c.sat+TR.ok,0,100); }); repUp(TR.okRep); chron('magazzini',`Trasloco riuscito: ${cl.length===1?cl[0].name:cl.length+' clienti'} da ${T.nm[0]} a ${d.name}`);
     notify('green','magazzini','Ufficio traffico',`Trasloco riuscito: ${d.name} è a regime`,`La stabilizzazione è finita e puntualità e accuratezza sono sopra soglia per tutti i clienti arrivati. ${Object.keys(T.gain).length?'Chi ha guadagnato un capannone migliore o più vicino è più contento (soddisfazione +3). ':''}Reputazione +${TR.okRep}. Il trasloco è costato in tutto ${eur(T.log.cost)}.`,'magazzini',{wh:d.id},'tr'+T.id); }
   else notify('yellow','magazzini','Ufficio traffico',`Trasloco finito a ${d.name}, ma i KPI zoppicano`,`La stabilizzazione è finita, però puntualità o accuratezza sono ancora sotto la soglia di qualche cliente: guarda il carico dei reparti. Il trasloco è costato in tutto ${eur(T.log.cost)}.`,'magazzini',{wh:d.id},'tr'+T.id); }
+/* --- eventi del trasloco (fonte «Trasloco», scena trasloco): 1 o 2 per trasloco, fuori dall'estrazione normale, come i guasti.
+   Alla conferma trStart() fissa in T.evs le fasi e i giorni (il lampo più spesso nei giorni del trasloco, le ondate prima e dopo);
+   trEvDaily() li fa arrivare pescando un evento valido di quella fase (TR_EV, uno diverso per volta). Le voci senza ph non
+   arrivano coi traslochi: tr_danni dopo una restituzione, wv_prezzo da una vendita, wv_teatro nell'estrazione normale --- */
+const TR_EVW={lampo:{prep:1,move:2,stab:1},ondate:{prep:2,move:1,stab:2}}, TR_FASI=['prep','move','stab'];
+const trMgrW=T=>whById(T.to)||whById(T.from);
+// con le navette ferme o più lente l'ondata in corso si allunga e le successive slittano; in preparazione slitta la partenza
+function trDelay(T,days){ if(!T) return; if(T.fase==='prep'){ T.start+=days; return; } if(T.fase!=='move'||!T.waves) return;
+  T.waves.forEach(w=>{ if(w.on&&!w.done) w.to+=days; else if(!w.on){ w.from+=days; w.to+=days; } }); T.end=T.waves[T.waves.length-1].to; }
+const trWaveCli=T=>{ const w=T&&T.waves&&T.waves.find(x=>x.on&&!x.done); return w?w.cli.map(id=>S.clients.find(c=>c.id===id)).filter(c=>c&&c.status==='attivo'):[]; };
+const trMoving=T=>trWaveCli(T).length>0;
+const TR_EV=[
+ {id:'tr_buyer',ph:'prep',t:'Il buyer vuole vedere il magazzino nuovo',cond:(T,o,d)=>!!d&&T.cli.length>0,
+  setup:(ev,T)=>{ const L=T.cli.map(id=>S.clients.find(c=>c.id===id)).filter(Boolean); ev.c=L.find(isNaz)||pick(L); ev.cant=T.to?0:1; },
+  text:(ev,T)=>`Il buyer di ${ev.c?ev.c.name:'un cliente'} vuole vedere con i suoi occhi dove finirà la sua merce: arriva giovedì a ${T?T.nm[1]:'il magazzino nuovo'}, con il responsabile qualità e un metro laser. Per ora ${ev.cant?'è ancora un cantiere':'è mezzo vuoto e pieno di imballi'}.`,
+  opts:ev=>[{t:'Visita preparata',d:'Pulizie straordinarie, segnaletica nuova, un caffè vero e una presentazione di dodici slide.',e:`−${eur(3000)}, soddisfazione +3`,
+      r:'Il buyer ha fotografato le corsie, ha annuito tre volte e ha chiesto la password del Wi-Fi. Buon segno.',f:function(){ S.cash-=3000; if(this.c) this.c.sat=clamp(this.c.sat+3,0,100); }},
+    {t:'Così com\'è',d:'Lo accompagna chi guida il magazzino: si mostra quello che c\'è, con onestà.',e:'Prova di Precisione di chi guida il magazzino: soddisfazione +2 se va bene, −3 se va male',
+      r:'Il buyer ha camminato per le corsie in silenzio, poi ha tirato fuori il taccuino.',
+      f:function(){ if(!this.c) return; const T=trById(this.tr), w=T&&trMgrW(T), ok=Math.random()<csOdds(w?mgrStats(w).prec:10); this.c.sat=clamp(this.c.sat+(ok?2:-3),0,100);
+        toast(ok?'Visita andata bene: il buyer è convinto (soddisfazione +2)':'Il buyer ha visto troppi imballi (soddisfazione −3)',ok?'ok':'bad'); }},
+    {t:'Rimandi la visita',d:'«Meglio dopo il trasloco, quando sarà tutto in ordine.» Il buyer non ama aspettare.',e:'Soddisfazione −2',
+      r:'Il buyer ha segnato la nuova data in rosso. Sottolineata due volte.',f:function(){ if(this.c) this.c.sat=clamp(this.c.sat-2,0,100); }}]},
+ {id:'tr_vvf',ph:'prep',t:'Manca il timbro dei Vigili del Fuoco',cond:(T,o,d)=>!!d&&!!d.id&&!hasDot(d,'sprinkler'),
+  setup:(ev,T,o,d)=>{ ev.w=d; ev.n=Math.round((2500+d.cap)/100)*100; },
+  text:ev=>`Il tecnico della sicurezza ha guardato le carte di ${ev.w?ev.w.name:'il magazzino nuovo'}: con la merce che arriva col trasloco serve l'aggiornamento del certificato di prevenzione incendi, e i Vigili del Fuoco non hanno ancora messo il timbro. Il capannone non ha l'impianto antincendio, quindi niente scorciatoie.`,
+  opts:ev=>[{t:'Consulente urgente',d:'Un ingegnere che conosce tutti al comando provinciale: pratica chiusa in tempo, a tariffa d\'urgenza.',e:`−${eur(ev.n)}`,
+      r:'Il consulente ha passato due notti sulle planimetrie. Il timbro è arrivato il venerdì alle 17:58.',f:function(){ S.cash-=this.n; }},
+    {t:'Fai slittare il trasloco',d:'Si parte due settimane dopo, con le carte in regola. I clienti ricevono la seconda lettera.',e:'Il trasloco parte 2 settimane dopo; soddisfazione −1 ai clienti del trasloco',
+      r:'I clienti hanno ricevuto la seconda lettera in un mese. Qualcuno l\'ha letta ad alta voce, con un certo tono.',
+      f:function(){ const T=trById(this.tr); if(!T||T.fase!=='prep') return; trDelay(T,14); T.cli.forEach(id=>{const c=S.clients.find(x=>x.id===id); if(c) c.sat=clamp(c.sat-1,0,100);}); }},
+    {t:'Si parte lo stesso',d:'Le carte arriveranno. Nel frattempo si lavora e si spera che nessuno passi a controllare.',e:'4 volte su 10 un controllo nei primi giorni del trasloco: multa di 8.000 € e reputazione −1',
+      r:'Si parte lo stesso. In ufficio qualcuno tiene il numero dei Vigili del Fuoco attaccato al monitor, per sicurezza.',f:function(){ const T=trById(this.tr); if(T) T.vvf=1; }}]},
+ {id:'tr_storico',ph:'prep',t:'Il magazziniere storico non viene',cond:(T,o)=>!!o&&T.km>15&&((T.ppl.pick||0)+(T.ppl.car||0))>0,
+  setup:(ev,T)=>{ const x=pick(IMP_NOMI); ev.nm=x[0]; ev.sx=x[1]; ev.km=T.km; if(ev.sx) ev.title='La magazziniera storica non viene'; },
+  text:(ev,T)=>`${ev.nm} lavora a ${T?T.nm[0]:'magazzino'} da ventidue anni: conosce ogni pallet per nome e ogni muletto per vizio. Ma ${ev.km} km di strada ogni mattina non li vuole fare, e l'ha detto davanti a tutto il turno: ${ev.sx?'lei':'lui'} resta a casa.`,
+  opts:ev=>[{t:'Un premio per convincerl'+(ev.sx?'a':'o'),d:'Un premio di trasferimento e il rimborso della benzina per un anno. Si fa vedere che chi resta conta.',e:`−${eur(2000)}; ${ev.nm} viene con voi`,
+      r:`${ev.nm} ha preso il premio, ha chiesto il posto auto vicino all'ingresso e ha portato con sé la sua sedia.`,f:function(){ S.cash-=2000; const T=trById(this.tr); if(T) T.sure=(T.sure||0)+1; }},
+    {t:'Una festa d\'addio',d:'Se non viene, almeno lo si saluta come si deve. Il turno apprezza.',e:`−${eur(800)}, morale +3 per 4 settimane nel vecchio magazzino`,
+      r:'Torta, discorsi e una maglietta firmata da tutto il turno. Si sono commossi anche i carrellisti.',f:function(){ S.cash-=800; const T=trById(this.tr); if(T&&whById(T.from)) mod(T.from,{mor:3},28); }},
+    {t:'Lasci perdere',d:'Nessuno è indispensabile. In banchina però la prendono male.',e:'Morale −2 per 4 settimane nel vecchio magazzino',
+      r:`${ev.nm} ha svuotato l'armadietto in silenzio. In banchina se ne parla ancora.`,f:function(){ const T=trById(this.tr); if(T&&whById(T.from)) mod(T.from,{mor:-2},28); }}]},
+ {id:'tr_festa',ph:'prep',t:'La festa d\'addio al vecchio capannone',cond:T=>!!T.full,
+  setup:(ev,T,o)=>{ ev.n=Math.round((500+20*staffTot(o))/100)*100; },
+  text:(ev,T)=>`Tra poco ${T?T.nm[0]:'il vecchio magazzino'} si svuota per sempre. In banchina qualcuno propone una festa d'addio: «Tutti questi bancali non si salutano con una mail».`,
+  opts:ev=>[{t:'Grigliata in piazzale',d:'Salsicce, radio accesa e una foto di gruppo davanti al portone.',e:`−${eur(ev.n)}, morale +4 nel vecchio magazzino e +2 nel nuovo per 6 settimane`,
+      r:'Salsicce, musica dalla radio del muletto e una foto di gruppo davanti al portone. Qualcuno ha portato il vino di suo zio.',
+      f:function(){ S.cash-=this.n; const T=trById(this.tr); if(!T) return; if(whById(T.from)) mod(T.from,{mor:4},42); if(whById(T.to)) mod(T.to,{mor:2},42); }},
+    {t:'Una targa ricordo',d:'Una targa da appendere nel magazzino nuovo, con il nome di quello vecchio.',e:`−${eur(300)}, morale +1 per 4 settimane`,
+      r:'La targa dice «Qui abbiamo movimentato un sacco di roba». L\'hanno scritta i magazzinieri.',f:function(){ S.cash-=300; const T=trById(this.tr); if(T&&whById(T.from)) mod(T.from,{mor:1},28); }},
+    {t:'Niente feste: si lavora',d:'C\'è un trasloco da fare, non c\'è tempo per la nostalgia.',e:'Morale −1 per 4 settimane',
+      r:'Si è lavorato. Qualcuno ha attaccato al portone un cartello scritto a pennarello: «Ciao capannone».',f:function(){ const T=trById(this.tr); if(T&&whById(T.from)) mod(T.from,{mor:-1},28); }}]},
+ {id:'tr_navetta',ph:'move',t:'La navetta si ribalta in tangenziale',cond:T=>trMoving(T),
+  setup:(ev,T)=>{ ev.c=pick(trWaveCli(T)); ev.n=Math.max(3000,Math.round(ev.c.stock*2/100)*100); },
+  text:ev=>`Una navetta del trasloco ha preso male la rotonda della tangenziale: il bilico è sul fianco, i pallet di ${ev.c?ev.c.name:'un cliente'} sparsi sull'asfalto e la Polstrada che dirige il traffico. L'autista sta bene. La merce, un po' meno.`,
+  opts:ev=>[{t:'Apri il sinistro con l\'assicurazione',d:'Si fa tutto per bene: perito, moduli, attesa. Il cliente aspetta i rimborsi.',e:`−${eur(1000)} di franchigia, soddisfazione −4`,
+      r:'Il perito arriverà, dicono, entro trenta giorni lavorativi. Il cliente ha già chiamato quattro volte.',f:function(){ S.cash-=1000; if(this.c) this.c.sat=clamp(this.c.sat-4,0,100); }},
+    {t:'Rimborsi subito il cliente',d:'Paghi tu la merce rovinata, oggi stesso. All\'assicurazione ci penserai dopo.',e:`−${eur(ev.n)}, soddisfazione +1`,
+      r:'Il buyer ha ricevuto il bonifico prima ancora della foto dell\'incidente. Si è quasi commosso.',f:function(){ S.cash-=this.n; if(this.c) this.c.sat=clamp(this.c.sat+1,0,100); }},
+    {t:'Dai la colpa al trasportatore',d:'La navetta era a noleggio: che paghi chi guidava. Il padroncino non è d\'accordo.',e:'Prova di Negoziazione del CEO: se va bene paga il trasportatore (soddisfazione −1); altrimenti causa, reputazione −1 e soddisfazione −3',
+      r:'La telefonata con il padroncino è stata lunga e colorita. Gli avvocati, per ora, stanno a guardare.',
+      f:function(){ const ok=Math.random()<csOdds(ceo().st.neg); if(ok){ if(this.c) this.c.sat=clamp(this.c.sat-1,0,100); }
+        else { S.cash-=Math.round(this.n*1.5/100)*100; S.rep=clamp(S.rep-1,0,100); if(this.c) this.c.sat=clamp(this.c.sat-3,0,100); }
+        toast(ok?'Il trasportatore paga il danno':'Si finisce davanti al giudice di pace',ok?'ok':'bad'); }}]},
+ {id:'tr_wms',ph:'move',t:'Le ubicazioni non tornano',cond:T=>trMoving(T),
+  setup:(ev,T)=>{ const d=whById(T.to); ev.w=d; ev.wms=d&&techOn(d,'wms')?1:0; ev.n=Math.max(1500,Math.round((d?computeWH(d).stock:1000)/100)*100); },
+  text:ev=>`Primo giorno a ${ev.w?ev.w.name:'il magazzino nuovo'}: ${ev.wms?'il WMS manda i carrellisti in corsie che non esistono ancora e cerca i pallet nel vecchio magazzino':'il foglio delle ubicazioni è quello del vecchio magazzino, e nessuno l\'ha rifatto'}. Il capoturno gira con un evidenziatore e la faccia di chi non dorme.`,
+  opts:ev=>[{t:'Inventario straordinario',d:'Si ferma tutto e si conta, si etichetta, si riconta. Il trasloco va più piano, ma niente errori.',e:`−${eur(ev.n)}, il trasloco dura 3 giorni in più, morale −1 per 2 settimane`,
+      r:'Tre giorni a contare, etichettare e ricontare. Alla fine ogni pallet ha un indirizzo.',f:function(){ S.cash-=this.n; trDelay(trById(this.tr),3); if(this.w) mod(this.w.id,{mor:-1},14); }},
+    {t:'Ci arrangiamo',d:'Si va a memoria e a intuito: i carrellisti esperti sanno dove guardare. Più o meno.',e:'Accuratezza −2 per 4 settimane nel magazzino nuovo',
+      r:'Si va a memoria. Il carrellista più anziano ha disegnato una mappa sul retro di un DDT.',f:function(){ if(this.w) mod(this.w.id,{A:-2},28); }}]},
+ {id:'tr_vicino',ph:'move',t:'Il vicino protesta per i camion di notte',cond:T=>trMoving(T),
+  setup:(ev,T)=>{ ev.w=whById(T.to); },
+  text:ev=>`Il vicino di ${ev.w?ev.w.name:'casa'} ha contato i camion passati sotto le sue finestre stanotte: diciannove. Ha scritto al sindaco, al giornale locale e al prete. Vuole sapere se «andrà avanti così per sempre».`,
+  opts:ev=>[{t:'Niente navette di notte',d:'Si viaggia solo di giorno: il vicino dorme, il trasloco va più piano.',e:'Il trasloco dura qualche giorno in più',
+      r:'Di notte, silenzio. Di giorno, i camion fanno la coda al cancello.',f:function(){ const T=trById(this.tr); trDelay(T,T&&T.mode==='lampo'?2:3); }},
+    {t:'Un regalo al vicino',d:'Un cesto, l\'auto lavata e una visita guidata del magazzino. Spesso basta.',e:`−${eur(1500)}`,
+      r:'Cesto natalizio fuori stagione, lavaggio dell\'auto e una visita guidata. Il vicino ora saluta.',f:function(){ S.cash-=1500; }},
+    {t:'Tiri dritto',d:'È una zona industriale: i camion ci passano da sempre.',e:'35 volte su 100 la multa del Comune: 3.000 € e reputazione −1',
+      r:'Il sindaco ha ricevuto la lettera. Si vedrà.',f:function(){ if(Math.random()<0.35){ S.cash-=3000; S.rep=clamp(S.rep-1,0,100); toast('Il Comune multa il trasporto notturno','bad'); } }}]},
+ {id:'tr_neve',ph:'move',t:'Nevica sul trasloco',cond:T=>trMoving(T)&&[11,0,1].includes(monthOf(S.day)),
+  setup:(ev,T)=>{ ev.n=Math.round(rnd(2000,5000)/100)*100; },
+  text:()=>'Nevica forte su tutta la pianura: tangenziale imbiancata, spartineve in ritardo e mezzi pesanti fermi ai caselli. Le navette del trasloco sono cariche e pronte, gli autisti un po\' meno.',
+  opts:ev=>[{t:'Si ferma tutto due giorni',d:'Si aspetta che passino gli spartineve. Il trasloco slitta.',e:'Il trasloco dura 2 giorni in più',
+      r:'Due giorni a guardare la neve dalla ribalta. Qualcuno ha fatto un pupazzo con l\'elmetto del capoturno.',f:function(){ trDelay(trById(this.tr),2); }},
+    {t:'Si va lo stesso',d:'Catene montate, prudenza e via. I clienti aspettano.',e:`Una volta su due qualche pallet danneggiato: ${eur(ev.n)} e soddisfazione −2 ai clienti in viaggio`,
+      r:'Le navette sono partite con le catene. Il resto lo racconta la bolla di consegna.',
+      f:function(){ if(Math.random()>=0.5) return; S.cash-=this.n; trWaveCli(trById(this.tr)).forEach(c=>c.sat=clamp(c.sat-2,0,100)); toast('Qualche pallet è arrivato ammaccato','bad'); }}]},
+ {id:'tr_pallet',ph:'move',t:'Trovati 40 pallet dimenticati',cond:(T,o)=>!!o,
+  setup:(ev,T,o)=>{ ev.w=o; ev.n=Math.round(rnd(2000,4000)/100)*100; },
+  text:ev=>`Svuotando l'ultima corsia di ${ev.w?ev.w.name:'il vecchio magazzino'}, dietro una scaffalatura, saltano fuori 40 pallet di merce che nessuno ricorda: etichette sbiadite, un cliente che non lavora più con voi da anni.`,
+  opts:ev=>[{t:'Li restituisci al proprietario',d:'Si cerca il vecchio cliente e gli si riporta la merce, a spese tue.',e:`−${eur(600)}, reputazione +1`,
+      r:'Il vecchio cliente non ci credeva. Ha mandato un camion e una scatola di cioccolatini.',f:function(){ S.cash-=600; repUp(1); }},
+    {t:'Li vendi a un rigattiere',d:'Nessuno li reclama da anni: qualcosa valgono.',e:`+${eur(ev.n)}; 3 volte su 10 il proprietario si fa vivo: 8.000 € e reputazione −2`,
+      r:'Il rigattiere ha pagato in contanti e non ha fatto domande. Tu, nemmeno.',
+      f:function(){ S.cash+=this.n; if(Math.random()<0.3){ S.cash-=8000; S.rep=clamp(S.rep-2,0,100); toast('Il proprietario della merce si è fatto vivo, con l\'avvocato','bad'); } }},
+    {t:'In discarica',d:'Smaltimento regolare, formulario in tre copie. Fine della storia.',e:`−${eur(1200)}`,
+      r:'Smaltimento regolare, formulario compilato in tre copie. Il mistero resta.',f:function(){ S.cash-=1200; }}]},
+ {id:'tr_pendolare',ph:'stab',t:'Il manager fa il pendolare',cond:(T,o,d)=>T.km>80&&!!d&&!!d.mgr&&d.mgr!=='ceo'&&!!personById(d.mgr)&&!personById(d.mgr).quit,
+  setup:(ev,T,o,d)=>{ ev.p=personById(d.mgr); ev.w=d; ev.km=T.km; },
+  text:ev=>`${ev.p?ev.p.name:'Il manager'} ora fa ${ev.km*2} km al giorno tra casa e ${ev.w?ev.w.name:'il magazzino'}. Arriva alle 9:40 con la faccia di chi ha visto l'alba in tangenziale, e ha chiesto di parlarti «di una cosa».`,
+  opts:ev=>[{t:'Auto aziendale',d:'Una station wagon con il telepass: la strada resta, ma pesa meno.',e:`−${eur(6000)}`,
+      r:'Station wagon grigia, cruise control e telepass. Arriva alle 8:15, sorridendo.',f:function(){ S.cash-=6000; }},
+    {t:'Una foresteria vicino al magazzino',d:'Un bilocale a cinque minuti: dal lunedì al venerdì vive lì.',e:`−${eur(3000)}`,
+      r:'Un bilocale a cinque minuti dal magazzino. Il lunedì arriva con la valigia, il venerdì riparte.',f:function(){ S.cash-=3000; }},
+    {t:'Niente',d:'La strada fa parte del lavoro. Ci si abitua.',e:'4 volte su 10 si dimette: lascia l\'azienda tra un mese',
+      r:'Hai detto che la strada fa parte del lavoro. Ha annuito, piano.',
+      f:function(){ const p=this.p; if(!p||!p.hired||p.quit||Math.random()>=0.4) return; p.quit={day:S.day+30,why:`Troppa strada: dopo il trasloco a ${this.w?this.w.name:'il magazzino nuovo'} ${p.name} ha trovato un posto vicino a casa.`}; toast(`${p.name} ha dato le dimissioni`,'bad'); }}]},
+ {id:'tr_ritorno',ph:'stab',t:'Chi non era venuto vuole tornare',cond:(T,o,d)=>!!d&&!!d.id&&T.log.ref>=2,
+  setup:(ev,T,o,d)=>{ ev.w=d; ev.n=Math.min(3,T.log.ref); },
+  text:ev=>`${ev.n} magazzinieri che non avevano seguito il trasloco bussano al cancello di ${ev.w?ev.w.name:'il magazzino nuovo'}: il posto vicino a casa non era quello che sembrava, e la strada adesso non fa più paura. Conoscono la merce e i clienti meglio di chiunque.`,
+  opts:ev=>[{t:'Li riprendi tutti',d:'Chi conosce la merce accorcia la confusione. E in banchina si festeggia.',e:`${ev.n} magazzinieri in più, morale +2 per 4 settimane`,
+      r:'Pacche sulle spalle, armadietti riassegnati e un caffè offerto dal capoturno. Sembra che non se ne siano mai andati.',f:function(){ const w=this.w; if(!w) return; w.staff.pick=(w.staff.pick||0)+this.n; mod(w.id,{mor:2},28); }},
+    {t:'Solo il più bravo',d:'Uno sì, perché serve. Gli altri, la prossima volta, ci pensano due volte.',e:'Un magazziniere in più',
+      r:'Il più bravo è tornato con la sua sedia e il suo taglierino. Gli altri hanno capito.',f:function(){ if(this.w) this.w.staff.pick=(this.w.staff.pick||0)+1; }},
+    {t:'La porta è chiusa',d:'Chi se n\'è andato ha fatto la sua scelta.',e:'Morale −1 per 4 settimane',
+      r:'Il cancello è rimasto chiuso. In banchina qualcuno ha borbottato «potevamo essere noi».',f:function(){ if(this.w) mod(this.w.id,{mor:-1},28); }}]},
+ {id:'tr_layout',ph:'stab',t:'Il capoturno vuole ridisegnare le ubicazioni',cond:(T,o,d)=>!!d&&!!d.id&&T.waves.some(w=>w.st!=null&&S.day<w.st+w.dur*0.7),
+  setup:(ev,T,o,d)=>{ ev.w=d; ev.n=Math.max(1500,Math.round(capOf(d)*0.8/100)*100); },
+  text:ev=>`Il capoturno di ${ev.w?ev.w.name:'il magazzino nuovo'} si presenta in ufficio con una pianta piena di frecce colorate: «Abbiamo messo la merce dove capitava. Se rifacciamo le ubicazioni per rotazione, i carrellisti fanno metà strada».`,
+  opts:ev=>[{t:'Rifate tutto per bene',d:'Una settimana di lavoro con l\'aiuto di un consulente: poi il magazzino gira.',e:`−${eur(ev.n)}, la stabilizzazione si accorcia di un quinto`,
+      r:'Una settimana di frecce, etichette e scaffali spostati. Ora i pallet che girano di più stanno vicino alle ribalte.',
+      f:function(){ S.cash-=this.n; const T=trById(this.tr); if(T) T.waves.forEach(w=>{ if(w.st!=null&&S.day<w.st+w.dur) w.dur=Math.round(w.dur*0.8); }); }},
+    {t:'Di notte, in straordinario',d:'Costa meno, ma la squadra è già stanca.',e:`−${eur(Math.round(ev.n*0.4/100)*100)}, la stabilizzazione si accorcia di un decimo, morale −2 per 3 settimane`,
+      r:'Tre notti di lavoro, con le pizze della rosticceria di fronte come unico rifornimento. Il risultato c\'è, gli occhi gonfi pure.',
+      f:function(){ S.cash-=Math.round(this.n*0.4/100)*100; const T=trById(this.tr); if(T) T.waves.forEach(w=>{ if(w.st!=null&&S.day<w.st+w.dur) w.dur=Math.round(w.dur*0.9); }); if(this.w) mod(this.w.id,{mor:-2},21); }},
+    {t:'Non adesso',d:'Prima si finisce di sistemare, poi si vedrà.',e:'Nessun effetto',
+      r:'La pianta con le frecce è finita appesa in bacheca. Qualcuno ci ha aggiunto un cuore.',f:()=>{}}]},
+ {id:'tr_gatto',ph:'any',t:'Il gatto del magazzino non vuole traslocare',cond:(T,o)=>!!o,
+  setup:(ev,T,o)=>{ ev.w=o; },
+  text:ev=>`Il gatto del magazzino di ${ev.w?ev.w.name:'sempre'}, arrivato anni fa da solo e mai più ripartito, si è piazzato sopra l'ultimo scatolone e soffia a chiunque si avvicini. In banchina si è aperto il dibattito.`,
+  opts:()=>[{t:'Lo porti nel magazzino nuovo',d:'Trasportino, crocchette e una coperta che sa di casa.',e:'Morale +2 per 8 settimane nel magazzino nuovo',
+      r:'Ha ispezionato il nuovo capannone e scelto come cuccia la scrivania del capoturno.',f:function(){ const T=trById(this.tr); if(T&&whById(T.to)) mod(T.to,{mor:2},56); }},
+    {t:'Resta col proprietario del capannone',d:'Il gatto è del posto, non dell\'azienda.',e:'Nessun effetto',
+      r:'Il proprietario ha detto che lo tiene lui. Il gatto non ha detto niente: ha soffiato.',f:()=>{}},
+    {t:'Adozione in ufficio',d:'Diventa la mascotte dell\'azienda: ciotola col logo e foto sul giornalino.',e:'Morale +1 in tutti i magazzini per 8 settimane',
+      r:'Ora vive in ufficio, dorme sulla stampante e ha una ciotola con il logo aziendale.',f:function(){ mod('all',{mor:1},56); }}]},
+ // dopo una restituzione (wvClose): il proprietario fa il giro col perito
+ {id:'tr_danni',t:'Il proprietario contesta i danni',src:'Agenzia immobiliare',
+  text:ev=>`Il proprietario del capannone di ${ev.nm} ha fatto il giro con un perito: crepe nel pavimento, una ribalta ammaccata, i segni dei muletti sui pilastri. Chiede ${eur(ev.n)} e minaccia di trattenere il deposito cauzionale.`,
+  opts:ev=>[{t:'Paghi',d:'Non vale la pena litigare.',e:`−${eur(ev.n)}`,r:'Bonifico fatto, chiavi restituite per la seconda volta. Stavolta con una stretta di mano.',f:function(){ S.cash-=this.n; }},
+    {t:'Perizia di parte',d:'Un tuo perito rifà il giro e conta i graffi uno per uno.',e:`−${eur(1500)} e prova di Amministrazione del CEO: se va bene paghi il 30%, altrimenti tutto`,
+      r:'Due periti, due metri e una giornata di sopralluogo. Il verbale finale ha quattordici pagine.',
+      f:function(){ const ok=Math.random()<csOdds(ceo().st.amm); S.cash-=1500+Math.round(this.n*(ok?0.3:1)/100)*100; toast(ok?'La perizia regge: paghi solo il 30%':'La perizia non convince: paghi tutto',ok?'ok':'bad'); }},
+    {t:'Avvocato',d:'Che ci pensi il tribunale. Ci vorrà tempo.',e:`−${eur(3000)}; una volta su due perdi la causa: ${eur(ev.n)} e reputazione −1`,
+      r:'L\'avvocato è ottimista. Gli avvocati sono sempre ottimisti.',
+      f:function(){ S.cash-=3000; if(Math.random()<0.5){ S.cash-=this.n; S.rep=clamp(S.rep-1,0,100); toast('Causa persa','bad'); } }}]},
+ // un compratore che, il giorno del rogito, tira sul prezzo (wvDaily)
+ {id:'wv_prezzo',t:'Il compratore tira sul prezzo',src:'Agenzia immobiliare',
+  text:ev=>`${ev.by?ev.by[0].toUpperCase()+ev.by.slice(1):'Il compratore'} era pronto a firmare per ${eur(ev.n)} il capannone di ${ev.w?ev.w.name:'magazzino'}. Il giorno del rogito il suo tecnico ha «scoperto» che il tetto è da rifare: ora l'offerta è di ${eur(Math.round(ev.n*0.88/1000)*1000)}.`,
+  opts:ev=>[{t:'Accetti il ribasso',d:'Meglio un capannone venduto oggi che uno vuoto per un altro anno.',e:`Vendi a ${eur(Math.round(ev.n*0.88/1000)*1000)}`,
+      r:'Firmato. Il notaio ha sorriso: lo vede succedere tutti i giorni.',f:function(){ const w=this.w; if(w&&w.sale&&!wvBlock(w)) wvClose(w,'sold',Math.round(this.n*0.88/1000)*1000); else if(w&&w.sale) w.sale.next=S.day+30; }},
+    {t:'Tieni il punto',d:'Il tetto era così anche la settimana scorsa. Il prezzo resta quello.',e:'Una volta su due il compratore cede e paga il prezzo pieno; altrimenti se ne va',
+      r:'Hai guardato il compratore negli occhi per un minuto intero. Poi ha parlato lui.',
+      f:function(){ const w=this.w; if(!w||!w.sale) return; if(Math.random()<0.5&&!wvBlock(w)){ wvClose(w,'sold',this.n); toast('Il compratore cede: venduto al prezzo pieno','ok'); }
+        else { w.sale.next=S.day+rint(WV.again[0],WV.again[1]); toast('Il compratore se ne va: si aspetta un\'altra offerta','warn'); } }},
+    {t:'Ritiri il capannone dalla vendita',d:'Se il mercato è questo, il capannone resta tuo.',e:'Il capannone non è più in vendita',
+      r:'Il cartello «vendesi» è tornato in magazzino, arrotolato.',f:function(){ if(this.w) delete this.w.sale; }}]},
+ // un capannone vuoto attira artisti (estrazione normale: raro)
+ {id:'wv_teatro',t:'Una compagnia teatrale nel capannone vuoto',src:'La Gazzetta del Muletto',normal:true,
+  cond0:()=>S.warehouses.length>1&&S.warehouses.some(w=>whEmpty(w)&&!trBusy(w)),
+  setup0:ev=>{ ev.w=pick(S.warehouses.filter(w=>whEmpty(w)&&!trBusy(w)))||null; },
+  text:ev=>`Nel capannone vuoto di ${ev.w?ev.w.name:'magazzino'} si è trasferita una compagnia di teatro sperimentale: dicono che «lo spazio industriale ha un'anima». Hanno già montato le luci e provano «Aspettando il bilico».`,
+  opts:()=>[{t:'Sgombero con l\'avvocato',d:'Il capannone è tuo, gli artisti no.',e:`−${eur(2000)}, reputazione −1`,
+      r:'La compagnia è uscita cantando. Il giornale locale ha messo la foto in prima pagina, non a tuo favore.',f:function(){ S.cash-=2000; S.rep=clamp(S.rep-1,0,100); }},
+    {t:'Li lasci provare fino a fine mese',d:'Tanto è vuoto. E un po\' di cultura non fa male a nessuno.',e:'Reputazione +1, stato del capannone −5',
+      r:'La prima è stata un successo: tre minuti di applausi e una recensione che cita «l\'eco delle scaffalature».',
+      f:function(){ repUp(1); if(this.w) this.w.cond=Math.max(0,(this.w.cond==null?100:this.w.cond)-5); }},
+    {t:'Biglietti omaggio ai dipendenti',d:'Se proprio devono restare, che ci vada anche il turno di notte.',e:'Morale +2 in tutti i magazzini per 4 settimane, stato del capannone −3',
+      r:'Mezzo turno di notte è andato a teatro. Qualcuno ha pianto. Un carrellista si è iscritto al corso.',
+      f:function(){ mod('all',{mor:2},28); if(this.w) this.w.cond=Math.max(0,(this.w.cond==null?100:this.w.cond)-3); }}]}];
+const trEvDef=id=>TR_EV.find(x=>x.id===id);
+// racconto e risposte, ricostruiti dalle variabili salvate (anche se il trasloco nel frattempo è finito)
+function trEvBuild(ev){ const x=trEvDef(ev.id); if(!x) return ev; const T=trById(ev.tr); ev.text=x.text(ev,T); ev.opts=x.opts(ev,T); return ev; }
+function trEvShow(id,vars){ if(isBot()) return; const base=EVENTS.find(e=>e.id===id); if(!base) return; const ev={...base,...vars}; trEvBuild(ev); showEvent(ev); }
+// all'ora fissata: un evento valido della fase, mai lo stesso due volte nello stesso trasloco
+function trEvDaily(T){ if(!T.evs||!trList().includes(T)) return;
+  T.evs.forEach(x=>{ if(x.done) return; if(T.fase!==x.ph){ if(TR_FASI.indexOf(T.fase)>TR_FASI.indexOf(x.ph)) x.done=1; return; }
+    const st={prep:T.d0,move:T.mvDay,stab:T.stDay}[x.ph]; if(st==null||S.day<st+x.at) return;
+    x.done=1; const o=whById(T.from), d=T.to?whById(T.to):trDest(trDestId(T));
+    const L=TR_EV.filter(e=>(e.ph===x.ph||e.ph==='any')&&!(T.used||[]).includes(e.id)&&e.cond(T,o,d)); if(!L.length) return;
+    const e=pick(L), ev={tr:T.id}; (T.used=T.used||[]).push(e.id); if(e.setup) e.setup(ev,T,o,d); trEvShow(e.id,ev); }); }
 // a fine mese: con le ondate i clienti che aspettano il loro turno si innervosiscono
 function trMonth(){ if(S.bot) return; trList().forEach(T=>{ if(T.fase!=='move'||T.mode!=='ondate') return;
   T.waves.forEach(w=>{ if(w.on) return; w.cli.forEach(id=>{ const c=S.clients.find(x=>x.id===id); if(c&&c.status==='attivo') c.sat=clamp(c.sat+TR.wait,0,100); }); }); }); }
@@ -5093,7 +5305,8 @@ function wvPrice(w){ const y=yearOf(S.day), c=w.cond==null?100:w.cond;
   return Math.round(w.cap*BAL_PAL*(WV.cls[w.cl]||1)*(1-0.01*Math.max(0,MAINT.soglia-c))*(y>=WV.crisi[0]&&y<=WV.crisi[1]?WV.crisiK:1)/1000)*1000; }
 // chiusura: chi ci lavora ancora se ne va con un mese di buonuscita, le motrici passano a un altro magazzino
 function wvClose(w,how,amt){ const b=wvBuon(w); S.cash-=b; S.cur.altro+=b;
-  if(how==='rent'){ const c=WV.penM*w.fixed+wvRip(w); S.cash-=c; S.cur.altro+=c; }
+  if(how==='rent'){ const c=WV.penM*w.fixed+wvRip(w); S.cash-=c; S.cur.altro+=c;
+    if(!isBot()&&Math.random()<0.25+0.01*Math.max(0,90-(w.cond==null?100:w.cond))) (S.wvDanni=S.wvDanni||[]).push({nm:w.name,day:S.day+rint(20,60),n:Math.max(3000,Math.round(w.cap*rnd(1,3)/100)*100)}); }
   if(how==='sold'){ S.cash+=amt; S.cur.vend=(S.cur.vend||0)+amt; }
   S.queue=S.queue.filter(q=>q.wh!==w.id); S.managers.forEach(m=>{ if(m.wh===w.id) m.wh=null; });
   S.tenders.forEach(t=>{ if(t.bid&&t.bid.wh===w.id){ t.bid=null; noteVar('gare',`Offerta per ${t.name} ritirata: il magazzino di ${w.name} non c'è più`); } });
@@ -5106,7 +5319,9 @@ function wvClose(w,how,amt){ const b=wvBuon(w); S.cash-=b; S.cur.altro+=b;
 function wvDaily(){ S.warehouses.forEach(w=>{ const s=w.sale; if(!s) return;
   if(!whEmpty(w)){ delete w.sale; noteVar('wh',`${w.name} non è più in vendita: ci sono di nuovo clienti`); return; }
   if(s.off&&S.day>s.off.until){ noteVar('wh',`${w.name}: l'offerta di ${s.off.by} è scaduta`); s.off=null; s.next=S.day+rint(WV.again[0],WV.again[1]); return; }
-  if(!s.off&&S.day>=s.next){ const amt=Math.round(wvPrice(w)*rnd(0.85,1.15)/1000)*1000, by=pick(WV_BUY); s.off={amt,by,until:S.day+WV.offer};
+  if(!s.off&&S.day>=s.next){ const amt=Math.round(wvPrice(w)*rnd(0.85,1.15)/1000)*1000, by=pick(WV_BUY);
+    if(Math.random()<0.2&&!isBot()&&!AUTO){ s.next=S.day+WV.offer; trEvShow('wv_prezzo',{w,n:amt,by}); return; }
+    s.off={amt,by,until:S.day+WV.offer};
     notify('yellow','magazzini','Agenzia immobiliare',`Offerta per ${w.name}: ${eur(amt)}`,`${by[0].toUpperCase()+by.slice(1)} offre ${eur(amt)} per il capannone di ${w.name}. L'offerta vale fino al ${shortDate(s.off.until)}: accetta o rifiuta dalla finestra del magazzino.`,'magazzini',{wh:w.id},'sale'+w.id); } }); }
 // sposta chi lavora ancora in un capannone vuoto in un altro magazzino: segue con le stesse probabilità di un trasloco
 function wvMove(w,d){ const km=trKm(w,d), coop=trCoopGo(w,d); let fol=0,ref=0,buon=0;
@@ -5911,7 +6126,7 @@ const SCENE={{SCENE}};
 const SCN_SRC={'La Gazzetta del Muletto':'magazzino','Il Sole 24 Pallet':'edicola','Ufficio del personale':'ufficio','Il Mattinale del Ministero':'ministero',
   'Radio Traffico Nord':'strada','Ufficio commerciale':'trattoria','Customer service':'ufficio','Ufficio amministrazione':'ufficio','Posta elettronica':'ufficio',
   'Ufficio qualità':'ispezione','Ufficio traffico':'piazzale','Ufficio acquisti':'ufficio','Il Politecnico della Bassa':'ufficio',
-  'Ambulatorio di medicina del lavoro':'ufficio','Ufficio tecnico':'magazzino','TeleBassa':'edicola','ASL':'ispezione','NAS':'ispezione','Ispettorato del lavoro':'ispezione'};
+  'Ambulatorio di medicina del lavoro':'ufficio','Ufficio tecnico':'magazzino','TeleBassa':'edicola','ASL':'ispezione','NAS':'ispezione','Ispettorato del lavoro':'ispezione','Trasloco':'trasloco','Agenzia immobiliare':'edicola'};
 const SCN_EV={
   // La Gazzetta del Muletto
   natale:'festa',superenalotto:'festa',matrimonio:'festa',derby:'festa',pizza:'festa',cesto:'festa',t_derby:'festa',t_pizza:'festa',t_grigliata:'festa',
@@ -6866,6 +7081,8 @@ const EVENTS=[
          f:function(){const co=rivals().find(c=>c.bot&&c.bot.id===this.co); if(co){const x=co.clients.find(x=>x.name===this.cn&&x.status==='attivo'); if(x) x.sat=Math.max(0,x.sat-35);} repUp(-1);}},
         {t:'Solidarietà al collega',d:'Non ti approfitti della disgrazia altrui. Tra logistici ci si rispetta, almeno in pubblico.',e:'Reputazione +1',r:'Il CEO della concorrenza ti ha mandato un messaggio di ringraziamento. Un po\' sorpreso.',f:()=>repUp(1)}]}
 ];
+TR_EV.forEach(x=>EVENTS.push({id:x.id,src:x.src||'Trasloco',title:x.t,auto:x.auto==null?(x.ph||x.normal?1:0):x.auto,solo:!x.normal,cond:x.cond0||(()=>false),text:'',opts:[],
+  ...(x.setup0?{setup:ev=>{ x.setup0(ev); trEvBuild(ev); }}:{}),restore:ev=>trEvBuild(ev)}));
 function fireEvent(){
   const el=EVENTS.filter(e=>!e.cs&&!e.solo&&(!e.once||!S.seen[e.id])&&(S.seen[e.id]===undefined||S.day-S.seen[e.id]>240)&&e.cond());
   if(!el.length) return;
@@ -8842,7 +9059,8 @@ function trBox(w){ const P=UI.sel.tr; if(!P||P.from!==w.id) return ''; const e=t
   let how='', who='', when='', sum='';
   if(d&&e.cl.length){
     how=`<div class="seg" role="group">${['lampo','ondate'].map(k=>`<button class="btn sm2" data-act="trmode" data-v="${k}" aria-pressed="${P.mode===k}">${TR[k].n}</button>`).join('')}</div><div class="sm">${MODE_T[P.mode]}</div>
-      <label class="wh-sw"><span class="wh-sm"><span>Agenzia esterna al posto degli straordinari</span><span class="sm">${e.agF?`<b class="warn">obbligatoria: ${polOn('zerostra')?'c\'è la policy Zero straordinario':'il magazzino è in stato di agitazione'}</b>`:'niente calo di morale, ma costa il 30% in più, dura una volta e mezza e sbaglia di più'}</span></span><input type="checkbox" class="sw" data-act="trag" ${e.ag?'checked':''} ${e.agF?'disabled':''} aria-label="Agenzia esterna"></label>`;
+      <label class="wh-sw"><span class="wh-sm"><span>Agenzia esterna al posto degli straordinari</span><span class="sm">${e.agF?`<b class="warn">obbligatoria: ${polOn('zerostra')?'c\'è la policy Zero straordinario':'il magazzino è in stato di agitazione'}</b>`:'niente calo di morale, ma costa il 30% in più, dura una volta e mezza e sbaglia di più'}</span></span><input type="checkbox" class="sw" data-act="trag" ${e.ag?'checked':''} ${e.agF?'disabled':''} aria-label="Agenzia esterna"></label>
+      <label class="wh-sw"><span class="wh-sm"><span>Chiedi una ${kw('franchigia','franchigia sui KPI')}</span><span class="sm">niente penali e metà della rabbia se i KPI vanno sotto soglia, dalla partenza a metà ${kw('stabilizzazione','stabilizzazione')}; in cambio ${Math.round(TR_FR.disc*100)}% di sconto per ${wks(TR_FR.days)}. Chi dice no perde ${-TR_FR.ref} di soddisfazione. ${e.cl.length===1?`Accetta ${Math.round(e.frN*10)} volte su 10`:`Ne accettano circa ${Math.round(e.frN)} su ${e.cl.length}`}: dipende dalla ${kw('st_neg','Negoziazione')} ${csWho()===ceo()?'tua, perché il customer service lo segui tu':'di '+esc(csWho().name)}</span></span><input type="checkbox" class="sw" data-act="trfr" ${e.fr?'checked':''} aria-label="Franchigia sui KPI"></label>`;
     who=TR_ROLES.filter(r=>(o.staff[r]||0)>0).map(r=>{ const x=e.exp[r]||{n:0,f:0};
       return `<div class="es-r"><span class="wh-sm"><b class="wh-nm">${ROLE[r]}</b><span class="sm">${x.n} su ${o.staff[r]}${x.n?` · ${x.coop?(x.f?'arrivano col fornitore':'li riprende il fornitore'):`viene il ${Math.round(x.p*100)}%${x.n>1?`, circa ${Math.round(x.f)}`:''}`}`:''}</span></span>
         <div class="wh-step"><button class="btn sm2" data-act="trppl" data-r="${r}" data-v="-1" ${x.n<=0?'disabled':''} aria-label="Una persona in meno: ${esc(ROLE1[r])}">−</button><b class="num">${x.n}</b><button class="btn sm2" data-act="trppl" data-r="${r}" data-v="1" ${x.n>=(o.staff[r]||0)?'disabled':''} aria-label="Una persona in più: ${esc(ROLE1[r])}">+</button></div></div>`; }).join('')
@@ -8871,7 +9089,8 @@ function trCard(w){ const T=trOf(w); if(!T||T.from===w.id&&T.fase==='stab') retu
   const pc=Math.round(clamp((S.day-ph[2])/Math.max(1,ph[3]-ph[2]),0,1)*100);
   const cs=T.cli.map(id=>{ const c=S.clients.find(x=>x.id===id); if(!c) return ''; const wv=T.waves&&T.waves.find(x=>x.cli.includes(id));
     const s=T.ref.includes(id)?'<b class="bad">non vuole traslocare: rispondi nella notifica</b>':!wv?'aspetta la partenza':!wv.on?`parte il ${shortDate(wv.from)}`:!wv.done?'<b class="warn">in viaggio</b>':`<span class="ok">arrivato</span>`;
-    return `<div class="wh-cl">${logoSvg(c.name,28)}<span class="wh-sm"><b class="wh-nm">${esc(c.name)}</b><span class="sm">${s}</span></span></div>`; }).join('');
+    const fr=c.fr&&c.fr.tr===T.id?` · ${kw('franchigia','franchigia')}${c.fr.until!=null?' fino al '+shortDate(c.fr.until):''}`:T.fr?' · senza franchigia':'';
+    return `<div class="wh-cl">${logoSvg(c.name,28)}<span class="wh-sm"><b class="wh-nm">${esc(c.name)}</b><span class="sm">${s}${fr}</span></span></div>`; }).join('');
   return `<div class="card tr-box"><div class="row"><span class="h3">${kw('trasloco','Trasloco')} ${out?'verso '+esc(d?d.name:T.nm[1]):'da '+esc(T.nm[0])}</span><span class="sm">${TR[T.mode].n}${T.ag?' · agenzia':''}</span></div>
    <div><div class="row"><span class="lab">${ph[0]}</span><span class="sm">${ph[1]}</span></div><div class="bar wh-bar"><i style="width:${pc}%;background:var(--accent)"></i></div></div>
    ${cs}${T.fase==='prep'?`<button class="btn sm2" data-act="trstop" data-id="${T.id}">Annulla il trasloco</button>`:''}</div>`; }
@@ -9117,6 +9336,7 @@ const ACT={
  trcli(d,el){ const P=UI.sel.tr; if(!P) return; P.cli=P.cli.filter(x=>x!==d.id); if(el.checked) P.cli.push(d.id); P.start=null; P.ppl=null; renderWin('magazzini'); },
  trmode(d){ const P=UI.sel.tr; if(!P||!TR[d.v]) return; P.mode=d.v; P.start=null; renderWin('magazzini'); },
  trag(d,el){ const P=UI.sel.tr; if(!P) return; P.ag=el.checked; P.start=null; renderWin('magazzini'); },
+ trfr(d,el){ const P=UI.sel.tr; if(!P) return; P.fr=el.checked; renderWin('magazzini'); },
  trppl(d){ const P=UI.sel.tr, e=P&&trEst(P), w=P&&whById(P.from); if(!e||!e.ppl||!w) return; P.ppl={...e.ppl}; P.ppl[d.r]=clamp((P.ppl[d.r]||0)+(+d.v),0,w.staff[d.r]||0); renderWin('magazzini'); },
  trwk(d){ const P=UI.sel.tr, e=P&&trEst(P); if(!e||e.start==null) return; P.start=d.v==='best'?e.best:clamp(e.start+(+d.v),e.min,e.max); renderWin('magazzini'); },
  trgo(d){ const P=UI.sel.tr, e=P&&trEst(P); if(!e||!e.ok) return;
@@ -9753,6 +9973,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.104',t:'Imprevisti del trasloco',x:['Ogni trasloco porta uno o due imprevisti tutti suoi, con una scenetta nuova: il buyer che vuole vedere il magazzino nuovo, il timbro dei Vigili del Fuoco che manca, il magazziniere storico che non vuole fare la strada, la festa d\'addio, la navetta ribaltata in tangenziale, le ubicazioni che non tornano, il vicino che protesta, la neve, i pallet dimenticati, il manager pendolare, chi non era venuto e vuole tornare, il capoturno che rifà le ubicazioni e il gatto del magazzino.','Con il trasloco lampo gli imprevisti arrivano più spesso nei giorni del trasloco, con le ondate prima e dopo. Non contano per gli eventi normali, che restano rari.','Nel progetto puoi chiedere una franchigia sui KPI: chi accetta non ti fa pagare penali durante il trasloco e si arrabbia la metà, in cambio del 2% di sconto per 13 settimane. Accettano più spesso se chi segue il customer service sa negoziare.','Il capannone vuoto ha i suoi imprevisti: dopo la restituzione il proprietario può contestare i danni, quando vendi il compratore può tirare sul prezzo il giorno del rogito, e ogni tanto ci si installa una compagnia teatrale.']},
  {v:'0.103',t:'Traslochi',x:['Nel riquadro Clienti di un magazzino c\'è il pulsante «Trasloca clienti»: sposti uno o più clienti in un altro tuo magazzino, anche appena affittato o ancora in costruzione. Il progetto ha sei passi: dove, quali clienti, come, chi viene, quando e quanto costa.','Due modi: lampo (tutti insieme in pochi giorni, con tanti straordinari e il caos in banchina) oppure a ondate (un cliente alla volta: meno danni ogni volta, ma settimane di doppio lavoro e clienti che aspettano il loro turno). Dopo, qualche settimana di stabilizzazione con i KPI che risalgono piano.','Le committenti ricevono la lettera e reagiscono: contente di un capannone migliore o più vicino, scontente se il trasloco cade nel loro picco o se manca una certificazione. Qualcuna può rifiutarsi: la convinci con uno sconto, la lasci dov\'è o la lasci andare.','Più il magazzino nuovo è lontano, meno persone ti seguono: chi non viene se ne va con un mese di buonuscita e va sostituito.','Un magazzino rimasto senza clienti ha il riquadro «Capannone vuoto»: lo tieni (con le bollette ridotte), lo restituisci al proprietario o, se è tuo, lo metti in vendita e aspetti le offerte.','Dal 2007 un capannone fatiscente può ricevere un\'ordinanza (tetto di amianto o, dopo il terremoto del 2012 in Emilia, la messa in sicurezza): entro sei mesi va ristrutturato o chiuso, altrimenti i lavori li fa il Comune, a spese tue e con la multa.']},
   {v:'0.102',t:'Inventario fiscale e contratti più lunghi',x:['Nessun contratto dura meno di 2 anni: le committenti più grandi firmano per 3 o 4 anni, le più piccole per 2. Nelle partite salvate i contratti da un anno, alla scadenza, si rinnovano per due.','Una volta l\'anno ogni committente fa l\'inventario fiscale della sua merce, un sabato e una domenica. Tre settimane prima arriva l\'avviso; nella scheda del cliente vedi la data e il punteggio previsto, e aprendo i dettagli da cosa dipende.','Il punteggio dipende dall\'accuratezza, dal morale e dalla produttività del magazzino, dalla Precisione di chi lo guida, dallo stato dell\'immobile, da quanto è pieno e dai sistemi (barcode, WMS, radiofrequenza). Un po\' di fortuna conta, ma poco.','Lo straordinario del fine settimana costa, ma il cliente paga a posto pallet: con una buona produttività vai in pari. Se mancano persone arrivano gli interinali, più cari e meno precisi; con la policy Zero straordinario sono tutti interinali.','Un inventario perfetto alza la soddisfazione del cliente di 6 punti (e un po\' la reputazione), uno buono di 3. Con qualche differenza perdi 3 punti e rimborsi poco; con le differenze inventariali ne perdi 8, rimborsi da 3 a 8 € a posto e il cliente vuole ricontare tutto dopo tre mesi.']},
  {v:'0.101',t:'Al massimo tre prestiti',x:['La banca concede al massimo tre prestiti in corso insieme. Con tre prestiti aperti la finestra Cassa e bilancio non ne propone altri: per chiederne uno nuovo devi estinguerne uno o aspettare che finisca. Il riquadro Debito mostra quanti ne hai su tre.','Vale anche per le aziende avversarie.']},
@@ -10136,6 +10357,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},renderMap,noteAlerts,TR,WV,ORD,trEst,trStart,trList,trDaily,trFx,trBusy,trDests,trClis,whEmpty,wvClose,wvPrice,wvBlock,ordCand,ordDay,ordDaily,DUR_RANK,durOf,INV,invScore,invFee,invTeam,invDaily,invDo,invBand,TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},renderMap,noteAlerts,TR,WV,ORD,trEst,trStart,trList,trDaily,trFx,trBusy,TR_EV,trEvShow,trEvDaily,trDelay,trDests,trClis,whEmpty,wvClose,wvPrice,wvBlock,ordCand,ordDay,ordDaily,DUR_RANK,durOf,INV,invScore,invFee,invTeam,invDaily,invDo,invBand,TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];riPack(riOn());},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>

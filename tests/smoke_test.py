@@ -1303,6 +1303,35 @@ async def main():
           w.ord.until=S.day+1; const c0=S.cash, r0=S.rep; F.stepOne(); F.stepOne(); out.uff=!!w.build&&w.build.k==='rist'&&!!w.build.uff&&S.cash<c0-20000&&S.rep<r0;
           w.build.left=1; F.stepOne(); F.stepOne(); out.chiusa=!w.ord&&w.cl==='vec'; return out;}''')
         assert all(r.values()), f'ordinanza: {r}'
+        # imprevisti del trasloco (0.104): alla conferma 1 o 2 appuntamenti e la franchigia sui KPI; ogni evento del trasloco e del
+        # capannone vuoto ha la scena, le risposte con il testo del risultato e si risolve il giorno dopo; dopo un salvataggio si ricostruisce
+        r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('gino'); const S=F.S; S.cash=3e6; S.speed=0;
+          F.ACT.rent({id:'piacenza'}); document.querySelector('#modal').innerHTML=''; const o=S.warehouses[0], d=S.warehouses[1], c=S.clients[0], bad=[];
+          Object.assign(d.staff,{pick:4,car:4,imp:2,autCE:3,autB:2,fm:1}); F.TR_EV.forEach(x=>x.opts({},null).forEach(q=>{ if(!q.r) bad.push(x.id+': testo del risultato'); }));
+          F.ACT.openwh({id:o.id}); F.ACT.tropen({wh:o.id}); F.UI.sel.tr.mode='lampo'; F.UI.sel.tr.fr=true; F.renderAll(); const sw=!!document.querySelector('#win-magazzini [data-act=trfr]:checked');
+          let k=0; const R=Math.random; Math.random=()=>k++===0?0.01:0.99; F.ACT.trgo({ok:1}); Math.random=R; const T=F.trList()[0];
+          const plan=!!T&&T.evs.length>=1&&T.evs.length<=2&&T.evs.every(x=>['prep','move','stab'].includes(x.ph)&&x.at>=0);
+          T.evs=[]; T.start=S.day+200; S.notes=S.notes.filter(n=>n.k!=='ev'); const done=[];
+          const fire=(x,i)=>{ const v={tr:T.id}; if(x.ph&&x.setup) x.setup(v,T,o,d);
+            if(x.id==='tr_danni') Object.assign(v,{nm:'Lodi',n:4200}); if(x.id==='wv_prezzo') Object.assign(v,{w:o,n:300000,by:'un fondo immobiliare'}); if(x.id==='wv_teatro') v.w=o;
+            F.trEvShow(x.id,v); let n=S.notes.filter(q=>q.k==='ev'&&q.ev.id===x.id).pop(); if(!n){ bad.push(x.id+': nessuna notifica'); return; }
+            S.notes=JSON.parse(JSON.stringify(S.notes)); n=S.notes.find(q=>q.id===n.id);   // come dopo un salvataggio
+            F.ACT.note({id:n.id}); const b=document.querySelectorAll('#modal [data-act=evopt]'); if(b.length<2||!document.querySelector('#modal .ev-scn')||!document.querySelector('#modal .ev-x').textContent) bad.push(x.id+': finestra');
+            if(x.ph&&F.evScena(x.id,n.src)!=='trasloco') bad.push(x.id+': scena'); b[i%b.length].click(); document.querySelector('#modal').innerHTML=''; F.stepOne();
+            if(!S.notes.some(q=>q.k==='res'&&q.title===n.title)) bad.push(x.id+": com'è andata"); S.notes=S.notes.filter(q=>q.k!=='res'&&q.k!=='ev'); done.push(x.id); };
+          let i=0; F.TR_EV.filter(x=>x.ph==='prep'||x.ph==='any').forEach(x=>fire(x,i++));
+          T.start=S.day; while(T.fase==='prep'){ document.querySelector('#modal').innerHTML=''; S.notes=S.notes.filter(n=>n.k!=='ev'); F.stepOne(); }
+          const frGo=!!c.fr&&c.fr.on!=null&&c.mult===0.98; T.waves.forEach(w=>{w.to+=40;}); T.end+=40;
+          F.TR_EV.filter(x=>x.ph==='move').forEach(x=>fire(x,i++));
+          const fr=[]; let g=0; while(c.fr&&g++<200){ c.lastPen=-1; const on=c.fr.on!=null&&(c.fr.until==null||S.day<=c.fr.until); document.querySelector('#modal').innerHTML=''; S.notes=S.notes.filter(n=>n.k!=='ev'); F.stepOne(); if(c.lastPen!==-1) fr.push([on,c.lastPen]); }
+          T.waves.forEach(w=>{ if(!w.done) w.to=S.day; }); g=0; while(T.fase==='move'&&g++<60){ document.querySelector('#modal').innerHTML=''; S.notes=S.notes.filter(n=>n.k!=='ev'); F.stepOne(); }
+          const m=S.managers.find(p=>!p.hired); if(m&&T.fase==='stab'){ m.hired=true; m.wh=d.id; d.mgr=m.id; T.mgrS=m.id; }
+          F.TR_EV.filter(x=>x.ph==='stab'||!x.ph).forEach(x=>fire(x,i++));
+          return {bad,sw,plan,frGo,fr:fr.length>0&&fr.every(x=>!x[0]||x[1]===0),n:done.length,all:F.TR_EV.length};}''')
+        assert not r['bad'] and r['sw'] and r['plan'] and r['frGo'] and r['fr'] and r['n'] == r['all'], f'imprevisti del trasloco e franchigia: {r}'
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.trEvShow('tr_navetta',{c:S.clients[0],n:3000,tr:'x'}); F.ACT.note({id:S.notes.filter(n=>n.k==='ev').pop().id});}")
+        await pg.wait_for_timeout(400); await pg.screenshot(path=os.path.join(OUT, 'shot_trasloco_evento.png'))
+        await pg.evaluate("()=>{document.querySelector('#modal').innerHTML=''; window.__FUP.S.notes=[];}")
         # senza il pacchetto la partita resta com'era: niente ricerche, voce di menu e lente del pacchetto
         off = await pg.evaluate("()=>{const F=window.__FUP; F.newGame('gino'); F.renderAll(); return {tech:F.TECH.some(t=>t.ri),pol:F.POLICIES.some(p=>p.ri),dock:!!document.querySelector('#dock [data-id=sindacato]'),lens:F.lensL().some(l=>l.ri)};}")
         assert not any(off.values()), f'senza pacchetto restano pezzi del pacchetto: {off}'

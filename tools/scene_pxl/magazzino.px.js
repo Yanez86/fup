@@ -1,4 +1,4 @@
-// Scenette degli eventi dentro il magazzino: un giorno normale (Gazzetta del Muletto), l'ispezione, la festa.
+// Scenette degli eventi dentro il magazzino: un giorno normale (Gazzetta del Muletto), l'ispezione, la festa, il talento, il trasloco.
 // Le tre scene condividono il capannone: lucernari, scaffalature porta-pallet blu e arancio, pavimento con le strisce gialle.
 // Disegnate con pxl (.claude/skills/pxl-pixel-art), lettere di TPAL (src/game.html). Colori e omini in comune.px.js.
 //
@@ -368,4 +368,96 @@ scene("talento", { w: SW, h: SH, bg: "S", world: { light: [-0.6, -1], ground: 66
     stamp("scintille", 92, 31),
     stamp("lampadina", 92, 34),
     stamp("fumetto", 45, 44)),
+)
+
+// ================================================================ TRASLOCO
+// Il capannone che si svuota: a sinistra le scaffalature smontate (i montanti nudi, i correnti a terra), in mezzo i pallet
+// avvolti nel film pronti a partire, a destra il portone aperto con la navetta accostata alla ribalta (le quattro frecce accese).
+// Il muletto carica, un magazziniere avvolge un pallet col rotolo di film, il capoturno suda, e il gatto del magazzino
+// guarda tutto dall'alto degli scatoloni muovendo la coda. Per gli eventi della fonte «Trasloco».
+
+const PORTA = { x: 104, y: 8, w: 48 }      // il portone sezionale aperto sulla parete di fondo
+// un pallet avvolto nel film: il carico un po' azzurrino, le fasce del film più chiare, il riflesso sul lato in luce
+function filmato(x, y, alto) {
+  const top = y + 10 - alto
+  return [rect(x, y + 10, 16, 2, "k"), hline(x, y + 11, 16, "N"), px(x + 1, y + 11, "m"), px(x + 7, y + 11, "m"), px(x + 14, y + 11, "m"),
+    rect(x + 1, top, 14, alto, "L"), ...Array.from({ length: Math.floor(alto / 3) }, (_, i) => hline(x + 1, top + 1 + i * 3, 14, "W")),
+    vline(x + 13, top, alto, "B"), vline(x + 14, top, alto, "B"), vline(x + 3, top + 1, alto - 2, "W"), hline(x + 1, top + alto - 1, 14, "B")]
+}
+sprite("_vuoto", { w: SW, h: SH },
+  rect(0, 0, SW, PAV, "S"),                                                    // parete di fondo
+  rect(0, 0, SW, 3, "d"), ...[10, 50, 90, 130].map((x) => [rect(x, 0, 20, 2, "L"), hline(x, 0, 20, "W")]).flat(),  // lucernari
+  // le scaffalature smontate: restano i montanti, e sulla parete i segni più chiari dove poggiavano i correnti
+  ...LIVELLI.map((yb) => hline(0, yb + 3, 78, "W")),
+  ...[0, 38, 76].map((x) => [rect(x, 0, 2, PAV, "b"), vline(x, 0, PAV, "B"), ...[8, 16, 24, 32, 40].map((y) => px(x + 1, y, "d"))]).flat(),
+  rect(38, LIVELLI[0] + 2, 40, 2, "O"), hline(38, LIVELLI[0] + 3, 40, "o"),   // l'ultimo corrente ancora su
+  ...filmato(41, LIVELLI[0] - 10, 8),                                           // e l'ultimo pallet da tirare giù
+  // il portone aperto: il telo arrotolato in alto, le guarnizioni scure, dentro il bilico della navetta col cassone aperto
+  rect(PORTA.x - 2, PORTA.y - 2, PORTA.w + 4, PAV - PORTA.y + 2, "D"),
+  rect(PORTA.x, PORTA.y, PORTA.w, PAV - PORTA.y, "K"),
+  rect(PORTA.x, PORTA.y, PORTA.w, 4, "s"), hline(PORTA.x, PORTA.y + 1, PORTA.w, "S"), hline(PORTA.x, PORTA.y + 3, PORTA.w, "j"),
+  rect(PORTA.x, PORTA.y + 4, PORTA.w, 5, "L"), hline(PORTA.x, PORTA.y + 8, PORTA.w, "B"),   // fuori, sopra il bilico, il cielo
+  rect(PORTA.x + 2, PORTA.y + 9, PORTA.w - 4, PAV - PORTA.y - 12, "S"),        // il telaio posteriore del cassone
+  hline(PORTA.x + 2, PORTA.y + 9, PORTA.w - 4, "W"), vline(PORTA.x + PORTA.w - 3, PORTA.y + 9, PAV - PORTA.y - 12, "j"),
+  rect(PORTA.x + 5, PORTA.y + 11, PORTA.w - 10, PAV - PORTA.y - 16, "d"),      // dentro il cassone, al buio
+  ...[12, 20, 28, 36].map((x) => vline(PORTA.x + x, PORTA.y + 11, PAV - PORTA.y - 16, "D")),   // le centine
+  ...filmato(PORTA.x + 7, PAV - 17, 8), ...filmato(PORTA.x + 24, PAV - 17, 6),  // i pallet già caricati
+  rect(PORTA.x + 2, PAV - 5, PORTA.w - 4, 2, "j"), hline(PORTA.x + 2, PAV - 5, PORTA.w - 4, "s"),   // il pianale e la traversa paracolpi
+  // la ribalta: il piano abbassato giallo e nero sul bordo, i respingenti neri ai lati
+  ...Array.from({ length: 12 }, (_, i) => rect(PORTA.x + 4 * i, PAV - 3, 2, 3, i % 2 ? "K" : "Y")),
+  rect(PORTA.x - 2, PAV - 7, 3, 5, "K"), rect(PORTA.x + PORTA.w - 1, PAV - 7, 3, 5, "K"),
+  rect(0, PAV, SW, SH - PAV, "S"), hline(0, PAV, SW, "s"),                    // pavimento in cemento
+  rect(0, 50, SW, 1, "Y"), rect(0, 69, SW, 1, "Y"),                          // strisce gialle della corsia
+  ...[0, 4, 8, 12, 16, 20].map((d) => line(PORTA.x + 6 + d, PAV + 1, PORTA.x + 2 + d, PAV + 4, "y")))   // la zona di carico tratteggiata
+
+// i correnti delle scaffalature smontati, impilati a terra
+sprite("correnti", { w: 30, h: 7, outline: "K", pivot: "bottom" },
+  ...[0, 2, 4].map((y, i) => [rect(i, y, 30 - 2 * i, 2, "O"), hline(i, y + 1, 30 - 2 * i, "o"), px(i, y, "d"), px(29 - i, y, "d")]).flat(),
+  rect(4, 6, 2, 1, "N"), rect(24, 6, 2, 1, "N"))
+// la pila di scatoloni del trasloco, con le frecce «alto» e il nastro marrone
+sprite("scatoloni", { w: 20, h: 21, outline: "K", pivot: "bottom" },
+  rect(0, 11, 20, 10, "k"), vline(9, 11, 10, "N"), hline(0, 11, 20, "q"), rect(3, 14, 1, 3, "K"), px(2, 15, "K"), px(4, 15, "K"),
+  rect(3, 0, 14, 11, "k"), vline(9, 0, 11, "N"), hline(3, 0, 14, "q"), vline(16, 1, 10, "N"), rect(12, 3, 1, 3, "K"), px(11, 4, "K"), px(13, 4, "K"),
+  vline(19, 12, 9, "N"))
+// il gatto del magazzino, seduto sugli scatoloni: muove la coda (giro di 4)
+anim("gatto", { w: 12, h: 11, fps: FPS, outline: "K", pivot: "bottom" }, `
+  .O...O......
+  .OO.OO......
+  .OOOOO......
+  .OKOKO......
+  .OOWOO......
+  ..oWo.......
+  ..OOOO......
+  .OoOOOO.....
+  .OoOOOOO....
+  .OoOOOOO....
+  .WW.WWoo....`,
+  frame({ hold: 2 }, px(8, 9, "o"), px(9, 8, "O"), px(10, 7, "O"), px(10, 6, "O")),
+  frame({ hold: 2 }, px(8, 10, "o"), px(9, 10, "O"), px(10, 9, "O"), px(11, 8, "O")))
+// il magazziniere che avvolge il pallet: il rotolo di film sale e scende lungo il carico (giro di 8)
+anim("avvolge", { w: 34, h: 22, frames: LOOP, fps: FPS, outline: "K", pivot: [17, 22] },
+  stamp("__magazziniere", 0, 2),
+  ...filmato(16, 10, 10).map((o) => o),
+  (c) => {
+    const y = [9, 8, 7, 6, 6, 7, 8, 9][c.frame % 8] + 4
+    c.rect(12, y, 3, 4, "W"); c.vline(14, y, 4, "S"); c.px(12, y - 1, "s"); c.px(12, y + 4, "s")   // il rotolo
+    c.line(15, y + 2, 17, y + 1, "W")                                                               // il film che si tende
+    c.rect(9, y + 1, 3, 2, "F")                                                                     // le mani sul rotolo
+  })
+// la navetta: le quattro frecce che lampeggiano ai lati del cassone (giro di 8)
+anim("frecce", { w: 46, h: 3, fps: FPS, pivot: [0, 0] },
+  frame({ hold: 4 }, rect(0, 0, 2, 2, "O"), px(0, 0, "Y"), rect(44, 0, 2, 2, "O"), px(45, 0, "Y")),
+  frame({ hold: 4 }, rect(0, 0, 2, 2, "o"), rect(44, 0, 2, 2, "o")))
+
+scene("trasloco", { w: SW, h: SH, bg: "S", world: { light: [-0.6, -1], ground: 66 } },
+  layer("fondo", stamp("_vuoto"), stamp("frecce", PORTA.x + 1, PAV - 8)),
+  layer("ombre", { shade: true }, ellipse(14, 67, 11, 1, "K"), ellipse(36, 67, 15, 1, "K"), ellipse(62, 67, 17, 2, "K"), ellipse(95, 66, 17, 2, "K"),
+    ellipse(132, 67, 6, 1, "K"), ellipse(149, 67, 9, 1, "K")),
+  layer("cose", { sort: "y" },
+    stamp("scatoloni", 14, 67),
+    stamp("correnti", 36, 67),
+    stamp("avvolge", 58, 67),
+    stamp("muletto", 95, 66),
+    stamp("capoturno", 132, 67)),
+  layer("sopra", stamp("gatto", 13, 46), ...filmato(141, 55, 9)),
 )

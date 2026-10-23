@@ -1,6 +1,6 @@
 # Traslochi (progetto)
 
-**Stato: fase 1 costruita nella versione 0.103** (le formule esatte sono in `docs/design.md`, sezioni «Traslochi», «Capannone vuoto e vendita» e «Ordinanza sui capannoni fatiscenti»). Restano da fare le fasi 2-4.
+**Stato: fase 1 costruita nella versione 0.103, fase 2 nella 0.104** (le formule esatte sono in `docs/design.md`, sezioni «Traslochi», «Capannone vuoto e vendita» e «Ordinanza sui capannoni fatiscenti»). Restano da fare le fasi 3-4.
 I numeri sono una prima proposta, da ritoccare con `tools/bilanciamento.py`.
 
 Differenze rispetto al progetto, decise durante la costruzione:
@@ -10,7 +10,7 @@ Differenze rispetto al progetto, decise durante la costruzione:
 - La stima del progetto mostra i KPI a regime con la squadra al completo e quante persone assumere nel magazzino di arrivo.
 - Il capannone vuoto paga le bollette al 30%; tenerlo è la scelta di base. Venderlo è nella fase 1 (le offerte vengono da compratori qualsiasi); restano per dopo l'affitto a un inquilino e le offerte delle avversarie.
 - In più, chiesto da Davide: l'**ordinanza sui capannoni fatiscenti**, un evento raro dal 2007 (ogni capannone ha una data sua tra il 2007 e il 2009, e serve averlo da almeno un anno): entro sei mesi va ristrutturato o chiuso, altrimenti cantiere d'ufficio del Comune, multa e reputazione.
-- Gli eventi del trasloco della fase 2 non ci sono ancora: per ora l'unico evento è il rifiuto del cliente.
+- Fase 2 (0.104): 14 eventi del trasloco con la scenetta «Trasloco» (camion alla ribalta, scaffali smontati, il gatto sugli scatoloni). Rispetto alla tabella del punto 7: la «fuga di notizie» resta fuori (la reazione dei clienti è già alla conferma), il «furto nel caos» è diventato «i pallet dimenticati», la «merce sbagliata alla ribalta» è dentro «le ubicazioni non tornano»; in più il gatto del magazzino, la festa d'addio, il vicino che protesta, chi non era venuto e vuole tornare, il capoturno che rifà le ubicazioni. Sul capannone vuoto: danni contestati dopo la restituzione, il compratore che tira sul prezzo, la compagnia teatrale. La franchigia sui KPI è un interruttore del progetto; l'«accordo di trasferimento» col sindacato resta per la fase 3.
 
 ## Decisioni prese con Davide
 - Il trasloco è sempre un **trasferimento di clienti**: si sceglie quali clienti spostare e in quale dei propri magazzini. Per traslocare tutto si apre prima il capannone nuovo (affitto o costruzione) e poi ci si spostano tutti i clienti.
