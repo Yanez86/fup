@@ -929,8 +929,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .cl-t{display:flex;flex-direction:column;gap:3px;min-width:0;font-size:14px}.cl-t b{font-family:var(--f-disp);font-size:19px;font-weight:600;overflow-wrap:anywhere}.cl-t>span{color:var(--muted)}.cl-t .cl-st{color:var(--ink);font-weight:500}
 .cl-a{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.cl-a .btn{display:inline-flex;align-items:center;gap:8px;min-height:44px}
 .cl-p{margin-left:auto;font-size:14px;color:var(--muted)}.cl-p a{color:var(--ink)}
-.sv-pk{display:flex;flex-wrap:wrap;gap:6px}
-.sv-pc{display:inline-flex;align-items:center;gap:6px;padding:0 8px 0 0;background:var(--panel);border:2px solid var(--line);font-size:13px;font-weight:600}.sv-pc svg{display:block;flex:none}.sv-pc.base{color:var(--muted);font-weight:400}
+.sv-pk{flex-basis:100%;grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;padding-top:8px;border-top:2px dashed var(--line)}
+.sv-pc{display:block}.sv-pc svg{display:block}.sv-pc.off{filter:grayscale(1);opacity:.4}
 .sv-cl{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:var(--muted)}.sv-cl.up svg{opacity:.4}.sv-cl.loc{padding:0 5px;border:2px solid var(--line)}
 .sv-ask.cl-x{background:#fff9e0;border-color:var(--warn-t)}
 .hm-cred{display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;color:var(--muted)}.hm-cred svg{width:24px;height:28px;flex:none}
@@ -11214,6 +11214,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.117',t:'Gli stemmi in fondo',x:['Nelle schede delle partite salvate gli stemmi dei pacchetti di espansione stanno in fondo, senza il nome: colorati se il pacchetto è attivo in quella partita, grigi se è spento. Il nome compare passandoci sopra o toccandoli.']},
  {v:'0.116',t:'La firma',x:['In fondo alle Opzioni c\'è la firma: «Un gioco Happy Squid Inc.», col calamaro sorridente e il collegamento al sito happysquid.ink.']},
  {v:'0.115',t:'I pacchetti nei salvataggi',x:['Nella schermata principale ogni partita salvata mostra gli stemmi dei pacchetti di espansione accesi (Relazioni industriali, Reparto IT e Ingegneria), oppure «Solo gioco base».']},
  {v:'0.114',t:'Quattro corsi con la dottoressa',x:['Il riquadro Tutorial della schermata principale ha quattro corsi: Base, Avanzato e, nuovi, uno per ciascun pacchetto di espansione.','Relazioni industriali («Il sindacato spiegato ai CEO»): un magazzino in stato di agitazione col tavolo aperto. Si guarda il clima con la sua lente, si scelgono le concessioni, si vede com\'è andata la prima seduta, poi scioperi, contratto nazionale, fornitori di handling e la vittoria del clima.','Reparto IT («Informatica per logistici (e viceversa)»): i reparti ancora vuoti. Si firma il primo consulente, si sceglie il responsabile IT, si avvia una ricerca nella linea del reparto e il progetto dei lettori barcode in un magazzino; poi lavagna, assistenza, affidabilità, Ingegneria e direttore IT.','Il tutorial avanzato non parla più del sindacato (ha il suo corso) e si gioca senza pacchetti; in cambio l\'ultima lezione spiega anche i traslochi e il capannone vuoto.','Nel tutorial base la gara si apre anche dalla sua puntina sulla mappa.','Il riquadro giallo della dottoressa non indica più cose nascoste sotto una finestra.']},
@@ -11399,8 +11400,9 @@ function slotInfo(n,sv){const s=sv.S, B=s.boss||s.custom||CEOS.find(c=>c.id===s.
     date:`${MESI[t.getUTCMonth()]} ${t.getUTCFullYear()}`,mode:(MODES[s.cfg&&s.cfg.mode]||MODES.classica).n+(nb?` · ${nb} ${nb===1?'avversario':'avversari'}`:''),
     wh:(s.warehouses||[]).length,cl:act.length,kpi:h?[['Puntualità',h.P,thr('sP')],['Accuratezza',h.A,thr('sA')]]:null,
     pk:PACKS.filter(p=>s.cfg&&s.cfg[p.id]),tag:s.over?['bad','Fallita']:won==='me'?['ok','Partita vinta']:won?['warn','Ha vinto un avversario']:s.cash<0?['bad','Cassa in rosso']:null,cloud:cloudTag(n,sv)};}
-// pacchetti di espansione accesi nel salvataggio, con lo stemma
-const svPk=x=>`<div class="sv-pk">${x.pk.length?x.pk.map(p=>`<span class="sv-pc" data-tip="Pacchetto di espansione attivo in questa partita">${packIc(p.id,32)}${esc(p.n)}</span>`).join(''):`<span class="sv-pc base">${packIc('base',32)}Solo gioco base</span>`}</div>`;
+// in fondo alla scheda gli stemmi delle espansioni: colorati se accese nel salvataggio, grigi se spente
+const svPk=x=>`<div class="sv-pk">${PACKS.map(p=>{const on=x.pk.includes(p), t=`${esc(p.n)}: ${on?'attivo':'spento'} in questa partita`;
+  return `<span class="sv-pc${on?'':' off'}" role="img" aria-label="${t}" data-tip="${t}">${packIc(p.id,32)}</span>`;}).join('')}</div>`;
 const svTile=(ic,lab,v,cls)=>`<div class="sv-tile"><span>${hmIc(ic,16)}${lab}</span><b class="${cls||''}">${v}</b></div>`;
 const svKpi=([n,v,t])=>`<div class="sv-k" data-tip="${n} media dell'ultimo mese${t?` · la soglia più alta dei tuoi clienti è ${f1(t)}%`:''}"><span>${n}</span><span class="t"><i style="width:${clamp(v,0,100)}%;background:var(--${v>=t?'ok':'bad'})"></i></span><b>${f1(v)}%</b></div>`;
 function slotCard(x,top){const {n,s}=x, nm=esc(s.company.name), go=`${s.over?'Rivedi':'Continua'} ›`, ct=x.cloud, C=CL.clash[n],
@@ -11411,13 +11413,13 @@ function slotCard(x,top){const {n,s}=x, nm=esc(s.company.name), go=`${s.over?'Ri
     return `<div class="sv-ask cl-x" role="alert"><span><b>Due versioni diverse di questa partita.</b> Su questo dispositivo: ${x.date}${x.last?`, giocata ${x.last}`:''}. Online: ${MESI[ct.getUTCMonth()]} ${ct.getUTCFullYear()}, salvata ${agoTxt(C.at)}${C.dev?` dal ${esc(C.dev)}`:''}.</span><span class="sv-act"><button class="btn${cl?'':' pri'}" data-act="clkeep" data-slot="${n}" data-w="here">Tieni questa</button><button class="btn${cl?' pri':''}" data-act="clkeep" data-slot="${n}" data-w="cloud">Tieni quella online</button></span></div>`;})()
    :startSel.del===n?`<div class="sv-ask" role="alert"><span><b>Cancellare per sempre ${nm}?</b> La partita sparisce e non si può recuperare.</span><span class="sv-act"><button class="btn" data-act="delno">No, tienila</button><button class="btn del" data-act="delsave" data-slot="${n}">Sì, cancella</button></span></div>`:'';
   if(top) return `<div class="sv top" style="--tint:${x.tint}">${pic}
-   <div class="sv-hd"><div class="sv-nm"><span class="sv-last">ULTIMA PARTITA</span>${tag}<span class="sv-sub">${x.last?`giocata ${x.last} · `:''}${esc(x.mode)}</span></div><span class="sv-co">${nm}</span><span class="sv-sub">CEO <b>${esc(x.B.name)}</b></span>${svPk(x)}</div>
+   <div class="sv-hd"><div class="sv-nm"><span class="sv-last">ULTIMA PARTITA</span>${tag}<span class="sv-sub">${x.last?`giocata ${x.last} · `:''}${esc(x.mode)}</span></div><span class="sv-co">${nm}</span><span class="sv-sub">CEO <b>${esc(x.B.name)}</b></span></div>
    <div class="sv-bd"><div class="sv-tiles">${svTile('calendario','Data',x.date)}${svTile('cassa','Cassa',eur(s.cash),s.cash<0?'bad':'ok')}${svTile('magazzini','Magazzini',x.wh)}${svTile('clienti','Clienti',x.cl)}</div>
     ${x.kpi?`<div class="sv-kpi">${x.kpi.map(svKpi).join('')}</div>`:''}
-    ${ask||`<div class="sv-act"><button class="btn" data-act="delask" data-slot="${n}">${hmIc('cestino',16)}Cancella</button>${fileBt}<button class="btn pri sv-go" data-act="continue" data-slot="${n}">${go}</button></div>`}</div></div>`;
+    ${ask||`<div class="sv-act"><button class="btn" data-act="delask" data-slot="${n}">${hmIc('cestino',16)}Cancella</button>${fileBt}<button class="btn pri sv-go" data-act="continue" data-slot="${n}">${go}</button></div>`}</div>${svPk(x)}</div>`;
   return `<div class="sv" style="--tint:${x.tint}">${pic}<div class="sv-m"><div class="sv-nm"><span class="sv-co">${nm}</span>${tag}</div><span class="sv-sub">${esc(x.B.name)} · ${esc(x.mode)}</span>
-   <span class="sv-ln"><b>${x.date}</b><span>Cassa <b class="${s.cash<0?'bad':'ok'}">${eur(s.cash)}</b></span><span>${x.wh} ${x.wh===1?'magazzino':'magazzini'} · ${x.cl} ${x.cl===1?'cliente':'clienti'}</span>${x.last?`<span class="sv-sub">giocata ${x.last}</span>`:''}</span>${svPk(x)}</div>
-   ${ask||`<div class="sv-act"><button class="btn sv-del" data-act="delask" data-slot="${n}" aria-label="Cancella la partita ${nm}">${hmIc('cestino',32)}</button>${fileBt}<button class="btn sv-go2" data-act="continue" data-slot="${n}">${go}</button></div>`}</div>`;}
+   <span class="sv-ln"><b>${x.date}</b><span>Cassa <b class="${s.cash<0?'bad':'ok'}">${eur(s.cash)}</b></span><span>${x.wh} ${x.wh===1?'magazzino':'magazzini'} · ${x.cl} ${x.cl===1?'cliente':'clienti'}</span>${x.last?`<span class="sv-sub">giocata ${x.last}</span>`:''}</span></div>
+   ${ask||`<div class="sv-act"><button class="btn sv-del" data-act="delask" data-slot="${n}" aria-label="Cancella la partita ${nm}">${hmIc('cestino',32)}</button>${fileBt}<button class="btn sv-go2" data-act="continue" data-slot="${n}">${go}</button></div>`}${svPk(x)}</div>`;}
 // riquadro «Salvataggio online»: accesso con Google o come ospite, stato dell'allineamento, file
 function cloudCard(){
   const bt=(act,ic,t,cls,x)=>`<button class="btn${cls?' '+cls:''}" data-act="${act}"${x||''}>${ic?hmIc(ic,16):''}${t}</button>`,
