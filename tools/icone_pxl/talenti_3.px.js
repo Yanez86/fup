@@ -657,4 +657,56 @@ talento("Cresciuto in banchina", "pos", {}, `
   NN..NN..NN..NN
   NNNNNNNNNNNNNN`)
 
+// Come un treno: il muso rosso della locomotiva, coi fari accesi (Operazioni)
+talento("Come un treno", "pos", { tieni: "L" }, `
+  ..............
+  ..RRRRRRRRRR..
+  .RRRRRRRRRRRR.
+  .RLLLLLLLLLLR.
+  .RLLLLLLLLLLR.
+  .RLLLLLLLLLLR.
+  .RRRRRRRRRRRR.
+  .RRRRRRRRRRRR.
+  .RYYRRRRRRYYR.
+  .RYYRRRRRRYYR.
+  .RRRRRRRRRRRR.
+  .SSSSSSSSSSSS.
+  ..DD......DD..
+  ..............`)
+// Fatto!: la spunta verde, data prima ancora che finisca la domanda
+talento("Fatto!", "pos", {}, `
+  ..............
+  ...........GGG
+  ..........GGGG
+  .........GGGG.
+  ........GGGG..
+  .......GGGG...
+  GGG...GGGG....
+  GGGG.GGGG.....
+  .GGGGGGGG.....
+  ..GGGGGG......
+  ...GGGG.......
+  ....GG........
+  ..............
+  ..............`)
+// Lamentoso: il fumetto pieno di brontolii
+talento("Lamentoso", "neg", { tieni: "W", dopo: [grid(2, 4, `
+  R...R...R.
+  .R.R.R.R.R
+  ..R...R...`)] }, `
+  ..............
+  ..WWWWWWWWWW..
+  .WWWWWWWWWWWW.
+  WWWWWWWWWWWWWW
+  WWWWWWWWWWWWWW
+  WWWWWWWWWWWWWW
+  WWWWWWWWWWWWWW
+  WWWWWWWWWWWWWW
+  .WWWWWWWWWWWW.
+  ..WWWWWWWWWW..
+  ...WWW........
+  ..WW..........
+  .W............
+  ..............`)
+
 foglio("foglio")

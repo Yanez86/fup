@@ -608,6 +608,7 @@ ritratto("p_kevin", { pelle: "media", capelli: "spettinati", cap: ["#2c2420", "#
 ritratto("p_delsasso", { pelle: "media", capelli: "riccetti", cap: ["#2c2420", "#4a3c34"], bocca: "sorriso", vest: NAVY })
 ritratto("p_sorrentino", { pelle: "media", capelli: "stempiato", cap: ["#4a4644", "#9aa0a8"], viso: ["naso", "stretti"], abito: "polo", vest: ["#2f5f9e", "#1f4377", "#4a7fc0"] })
 ritratto("p_greta", { capelli: "riccioni", cap: ["#e8c25a", "#fbe39a", "#b08a2e"], bocca: "ridente", labbra: "#c85a62", viso: ["occhioni", "orecchini"], abito: "polo", vest: ["#ff7a3d", "#c8551f", "#ffb07a"] })
+ritratto("p_daniele", { capelli: "corti", cap: ["#1c1a22", "#3a3848"], viso: ["occhiali"], vest: ["#2a2a33", "#16161c", "#4a4a56"] })
 
 // --- la dottoressa Ornella Ribalta, insegnante dei tutorial: tre espressioni (spiega, contenta, occhiolino)
 const ORNELLA = { pelle: "media", capelli: "caschetto", cap: ["#1c1a22", "#3a3848"], viso: ["occhiali", "orecchini"], occhiali: "#e0393e",
