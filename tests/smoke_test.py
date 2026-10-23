@@ -1354,8 +1354,8 @@ async def main():
         r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('marco',null,{mode:'classica',win:{},it:true}); const S=F.S,o={},w=S.warehouses[0]; S.cash=3e6; S.nextEvent=1e9;
           S.office.it=1; S.dep.it.as=1; const T=id=>F.TECH.find(t=>t.id===id);
           o.techs=['sala','sicurezza','cloud'].every(T);
-          o.pts=F.itSys().reduce((a,x)=>a+x.n,0)===6&&Math.abs(F.itNeed()-1)<1e-9&&F.itSupply()===1.5&&F.depFree('it')===0&&F.techLine(T('rf'))==='dir';
-          F.ACT.itas({v:-1}); o.lav=S.dep.it.as===0&&F.depFree('it')===1&&F.itSupply()===0.5&&F.noteAlerts().some(a=>a.id==='itload');
+          o.pts=F.itSys().reduce((a,x)=>a+x.n,0)===6&&Math.abs(F.itNeed()-1)<1e-9&&Math.abs(F.itSupply()-1-F.itCeo())<1e-9&&F.depFree('it')===0&&F.techLine(T('rf'))==='dir';
+          F.ACT.itas({v:-1}); o.lav=S.dep.it.as===0&&F.depFree('it')===1&&Math.abs(F.itSupply()-F.itCeo())<1e-9&&F.noteAlerts().some(a=>a.id==='itload');
           F.ACT.itas({v:1}); o.back=S.dep.it.as===1&&!F.noteAlerts().some(a=>a.id==='itload');
           const t0=F.itTgt(); S.dep.it.aff=50; F.step(); o.aff=S.dep.it.aff>50&&S.dep.it.aff<t0;
           F.step(); const k0=w.kpi; F.itKoStart(w,'wms'); const k1=w.kpi; o.ko=!!w.itko&&k1.prod<k0.prod*0.7&&k1.pP.some(x=>x[0].includes('Guasto informatico'))&&S.notes.some(n=>n.key==='itko'+w.id);
