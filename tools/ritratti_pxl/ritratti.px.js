@@ -465,6 +465,17 @@ const ABITO = {
     "..................W...",
     "......................"]]],
 }
+// poncho a righe sopra la camicetta bianca (Marzia): una riga di colore per riga di pixel (r), motivi a puntini nelle bande,
+// scollo a V da cui spunta il colletto, orlo in diagonale con le frange gialle, la camicetta resta sulle braccia
+const poncho = r => {
+  const da = [12, 8, 5, 3, 2, 1, 1, 0, 0, 0, 0, 3, 6, 9, 11, 13, 15], a = [13, 14, 15, 16, 17, 18, 19, 20]
+  const mot = { 4: [1, "W"], 8: [3, "Y"], 12: [1, "R"] }
+  return da.map((x0, y) => [...Array(22)].map((_, x) => {
+    if (x >= x0 && x <= (a[y] ?? 21)) return mot[y] && x % 4 === mot[y][0] ? mot[y][1] : r[y]
+    return y && x < x0 && x >= da[y - 1] && x % 2 === 0 ? "Y" : "."
+  }).join(""))
+}
+ABITO.poncho = [...ABITO.camicetta, [3, poncho("RRYTTTYPPPYOOOYRR")]]
 function busto(nome, abito) {
   let g = [...COLLO, ...BUSTO]
   for (const [y, r] of ABITO[abito]) g = merge(g, r, y + COLLO.length)
@@ -609,6 +620,8 @@ ritratto("p_delsasso", { pelle: "media", capelli: "riccetti", cap: ["#2c2420", "
 ritratto("p_sorrentino", { pelle: "media", capelli: "stempiato", cap: ["#4a4644", "#9aa0a8"], viso: ["naso", "stretti"], abito: "polo", vest: ["#2f5f9e", "#1f4377", "#4a7fc0"] })
 ritratto("p_greta", { capelli: "riccioni", cap: ["#e8c25a", "#fbe39a", "#b08a2e"], bocca: "ridente", labbra: "#c85a62", viso: ["occhioni", "orecchini"], abito: "polo", vest: ["#ff7a3d", "#c8551f", "#ffb07a"] })
 ritratto("p_daniele", { capelli: "corti", cap: ["#1c1a22", "#3a3848"], viso: ["occhiali"], vest: ["#2a2a33", "#16161c", "#4a4a56"] })
+ritratto("p_marzia", { capelli: "lunghi", cap: ["#5d4a3e", "#8a7466", "#3d2f26"], bocca: "rossetto", labbra: "#b0505a", viso: ["occhiali", "orecchini"], occhiali: "#7a3220",
+  orecchini: "#e2b84a", abito: "poncho", vest: ["#e9edf2", "#c3d0dc", "#ffffff"] })
 
 // --- la dottoressa Ornella Ribalta, insegnante dei tutorial: tre espressioni (spiega, contenta, occhiolino)
 const ORNELLA = { pelle: "media", capelli: "caschetto", cap: ["#1c1a22", "#3a3848"], viso: ["occhiali", "orecchini"], occhiali: "#e0393e",

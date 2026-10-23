@@ -1267,7 +1267,7 @@ html,body{overscroll-behavior:none}
 (function(){
 'use strict';
 /* ====================== DATI ====================== */
-const IMG={anon:'{{Q_anonimo}}',v0:'{{Q_v0}}',v1:'{{Q_v1}}',v2:'{{Q_v2}}',v3:'{{Q_v3}}',v4:'{{Q_v4}}',v5:'{{Q_v5}}',v6:'{{Q_v6}}',v7:'{{Q_v7}}',v8:'{{Q_v8}}',v9:'{{Q_v9}}',v10:'{{Q_v10}}',v11:'{{Q_v11}}',v12:'{{Q_v12}}',v13:'{{Q_v13}}',v14:'{{Q_v14}}',v15:'{{Q_v15}}',v16:'{{Q_v16}}',v17:'{{Q_v17}}',v18:'{{Q_v18}}',v19:'{{Q_v19}}',v20:'{{Q_v20}}',v21:'{{Q_v21}}',v22:'{{Q_v22}}',v23:'{{Q_v23}}',v24:'{{Q_v24}}',v25:'{{Q_v25}}',v26:'{{Q_v26}}',v27:'{{Q_v27}}',v28:'{{Q_v28}}',v29:'{{Q_v29}}',v30:'{{Q_v30}}',v31:'{{Q_v31}}',v32:'{{Q_v32}}',v33:'{{Q_v33}}',v34:'{{Q_v34}}',v35:'{{Q_v35}}',v36:'{{Q_v36}}',v37:'{{Q_v37}}',v38:'{{Q_v38}}',v39:'{{Q_v39}}',fm:'{{Q_facility}}',car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',cs:'{{Q_operatore}}',m_mirella:'{{Q_mirella}}',m_gianfranco:'{{Q_gianfranco}}',m_kevin:'{{Q_kevin}}',m_delsasso:'{{Q_delsasso}}',m_sorrentino:'{{Q_sorrentino}}',m_greta:'{{Q_greta}}',m_daniele:'{{Q_daniele}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',m_giorgio:'{{Q_giorgio}}',m_aisha:'{{Q_aisha}}',m_ivan:'{{Q_ivan}}',m_sara:'{{Q_sara}}',m_nicola:'{{Q_nicola}}',m_elena:'{{Q_elena}}',m_matteo:'{{Q_matteo}}',m_beatrice:'{{Q_beatrice}}',m_paolo:'{{Q_paolo}}',m_federico:'{{Q_federico}}',m_andrew:'{{Q_andrew}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}',u_cup:'{{Q_u_cup}}',u_sam:'{{Q_u_sam}}',u_coba:'{{Q_u_coba}}',ornella:'{{Q_ornella}}',ornella_contenta:'{{Q_ornella_contenta}}',ornella_occhiolino:'{{Q_ornella_occhiolino}}'};
+const IMG={anon:'{{Q_anonimo}}',v0:'{{Q_v0}}',v1:'{{Q_v1}}',v2:'{{Q_v2}}',v3:'{{Q_v3}}',v4:'{{Q_v4}}',v5:'{{Q_v5}}',v6:'{{Q_v6}}',v7:'{{Q_v7}}',v8:'{{Q_v8}}',v9:'{{Q_v9}}',v10:'{{Q_v10}}',v11:'{{Q_v11}}',v12:'{{Q_v12}}',v13:'{{Q_v13}}',v14:'{{Q_v14}}',v15:'{{Q_v15}}',v16:'{{Q_v16}}',v17:'{{Q_v17}}',v18:'{{Q_v18}}',v19:'{{Q_v19}}',v20:'{{Q_v20}}',v21:'{{Q_v21}}',v22:'{{Q_v22}}',v23:'{{Q_v23}}',v24:'{{Q_v24}}',v25:'{{Q_v25}}',v26:'{{Q_v26}}',v27:'{{Q_v27}}',v28:'{{Q_v28}}',v29:'{{Q_v29}}',v30:'{{Q_v30}}',v31:'{{Q_v31}}',v32:'{{Q_v32}}',v33:'{{Q_v33}}',v34:'{{Q_v34}}',v35:'{{Q_v35}}',v36:'{{Q_v36}}',v37:'{{Q_v37}}',v38:'{{Q_v38}}',v39:'{{Q_v39}}',fm:'{{Q_facility}}',car:'{{Q_carrellista}}',capo:'{{Q_capoturno}}',plan:'{{Q_pianificatore}}',cs:'{{Q_operatore}}',m_mirella:'{{Q_mirella}}',m_gianfranco:'{{Q_gianfranco}}',m_kevin:'{{Q_kevin}}',m_delsasso:'{{Q_delsasso}}',m_sorrentino:'{{Q_sorrentino}}',m_greta:'{{Q_greta}}',m_daniele:'{{Q_daniele}}',m_marzia:'{{Q_marzia}}',autB:'{{Q_corriere}}',pick:'{{Q_magazziniere}}',autCE:'{{Q_autista}}',gino:'{{P_gino}}',edoardo:'{{P_edoardo}}',valeria:'{{P_valeria}}',marco:'{{P_marco}}',m_rosa:'{{Q_rosa}}',m_toto:'{{Q_toto}}',m_chiara:'{{Q_chiara}}',m_davide:'{{Q_davide}}',m_luca:'{{Q_luca}}',m_franca:'{{Q_franca}}',imp:'{{Q_impiegata}}',m_ottavio:'{{Q_ottavio}}',m_giulia:'{{Q_giulia}}',m_roberto:'{{Q_roberto}}',m_giorgio:'{{Q_giorgio}}',m_aisha:'{{Q_aisha}}',m_ivan:'{{Q_ivan}}',m_sara:'{{Q_sara}}',m_nicola:'{{Q_nicola}}',m_elena:'{{Q_elena}}',m_matteo:'{{Q_matteo}}',m_beatrice:'{{Q_beatrice}}',m_paolo:'{{Q_paolo}}',m_federico:'{{Q_federico}}',m_andrew:'{{Q_andrew}}',cc1:'{{Q_cc1}}',cc2:'{{Q_cc2}}',cc3:'{{Q_cc3}}',cc4:'{{Q_cc4}}',cc5:'{{Q_cc5}}',cc6:'{{Q_cc6}}',cc7:'{{Q_cc7}}',cc8:'{{Q_cc8}}',cc9:'{{Q_cc9}}',cc10:'{{Q_cc10}}',u_cup:'{{Q_u_cup}}',u_sam:'{{Q_u_sam}}',u_coba:'{{Q_u_coba}}',ornella:'{{Q_ornella}}',ornella_contenta:'{{Q_ornella_contenta}}',ornella_occhiolino:'{{Q_ornella_occhiolino}}'};
 const LON0=4.81, LAT1=47.0, KX=78.29*2, KY=111.111*2;
 const pt=(lon,lat)=>[ (lon-LON0)*KX, (LAT1-lat)*KY ];
 const CITIES=[
@@ -1400,6 +1400,7 @@ const MANAGERS=[
  {id:'sorrentino',name:'Giuseppe "O\' Mariuolo" Pasqualino',age:54,role:'Ha cominciato vendendo pallet usati fuori dall\'interporto di Nola. Oggi conosce ogni piazzale da Napoli a Verona, e ogni piazzale conosce lui',tal:['Venuto dalla strada','Allergico al gestionale','Mentore'],st:{op:16,prec:8,neg:16,lead:11,amm:7,inn:4},ral:47000},
  {id:'greta',name:'Greta Brambilla',sx:'f',age:35,role:'Capoturno a Lodi a ventidue anni: i carrellisti le danno del lei, anche quelli che hanno il doppio della sua età',tal:['Diplomato ragioniere','Stacanovista','Spirito bellicoso'],st:{op:16,prec:11,neg:8,lead:9,amm:12,inn:4},ral:44000},
  {id:'daniele',name:'Daniele "Il Treno" Alighieri',age:36,role:'Responsabile di un magazzino di ricambi: centomila codici, nessun errore e almeno tre lamentele al giorno',tal:['Come un treno','Fatto!','Lamentoso'],st:{op:12,prec:17,neg:8,lead:4,amm:10,inn:8},ral:50000},
+ {id:'marzia',name:'Marzia Doganali',sx:'f',age:49,role:'Quindici anni alla dogana di Fernetti, poi l\'ufficio tecnico di un Comune della Bassa: ha previsto ogni disastro, firmato ogni permesso e litigato con chiunque',tal:['Cassandra','Divisiva','Sportello unico'],st:{op:14,prec:11,neg:14,lead:9,amm:17,inn:5},ral:60000},
  {id:'matteo',name:'Matteo Galli',age:26,role:'Ha scritto il WMS del suo ultimo magazzino. In una notte',tal:['Ingegnere informatico','Gatto in ufficio'],st:{op:8,prec:11,neg:5,lead:6,amm:9,inn:19},ral:41000},
  // customer service: forti in Negoziazione e Precisione (lo stipendio lo decide il loro rango, come per tutti)
  {id:'mirella',name:'Mirella Cattaneo',sx:'f',age:44,role:'Quindici anni al centralino di un corriere espresso: ha sentito tutte le scuse, due volte',tal:['Voce da call center','Calma olimpica'],st:{op:7,prec:12,neg:15,lead:9,amm:9,inn:6},ral:34000},
@@ -1931,6 +1932,12 @@ const TALENTS={
  'Come un treno':{t:'pos',wh:{P:0.5},fx:'Operazioni +2 · Puntualità +0,5 nel magazzino che guida',fl:'Parte alle sei, non si ferma in nessuna stazione e arriva sempre in orario. Al contrario dei treni veri.'},
  'Fatto!':{t:'pos',fx:'Precisione +1 · Amministrazione +1',fl:'Gli chiedi una cosa e risponde «Fatto!» prima che tu finisca la frase. Il bello è che è vero.'},
  'Lamentoso':{t:'neg',wh:{mor:-2},fx:'Leadership −2 · Morale −2 nel magazzino che guida',fl:'Il caffè è freddo, il muletto è lento, il cliente è strano, fa caldo, fa freddo. Intanto, però, il lavoro lo finisce.'},
+ /* talenti di Marzia Doganali (uni:1): solo suoi, non escono tra i candidati né nella creazione del CEO.
+    ko = guasti e incendi nel magazzino che guida; div = o la ami o la odi (morale ± nel magazzino, gare ± da direttore commerciale, segno fisso: divSign);
+    cant = durata dei cantieri nel magazzino che guida (cantGg); tar = probabilità del ricorso al TAR contro l'ordinanza */
+ 'Cassandra':{t:'mix',uni:1,ko:0.7,fx:'Precisione +1 · Leadership −1 · Guasti e incendi −30% nel magazzino che guida',fl:'Aveva scritto a tutti, in rosso, che il compressore della cella 3 avrebbe ceduto ad agosto. Ha ceduto il 14 agosto. La mail è ancora da leggere.'},
+ 'Divisiva':{t:'mix',uni:1,div:{mor:4,gara:3},fx:'Negoziazione +1 · Leadership +1 · O la ami o la odi: nel magazzino che guida morale +4 oppure −4, secondo il magazzino · Da direttore commerciale: nelle gare +3 oppure −3, secondo la committente',fl:'Metà del magazzino le ha regalato una torta per il compleanno. L\'altra metà ha firmato una petizione per spostarle il parcheggio.'},
+ 'Sportello unico':{t:'pos',uni:1,cant:0.75,tar:2,fx:'Amministrazione +2 · Nel magazzino che guida: ampliamenti, dotazioni, ristrutturazioni e lavori del welfare −25% di tempo, ricorso al TAR contro un\'ordinanza vinto due volte su tre',fl:'Sa in quale ufficio si ritira il modulo per chiedere il modulo, e a che ora la signora del protocollo torna dal caffè.'},
 };
 const TTYPE={pos:['Positivo','#eaf6ec','#6fdc8c'],neg:['Negativo','#fbecec','#ff8a8d'],mix:['Misto','#fff6dc','#ffd23f']};
 const TFRAME={log:{c:'#ff7a3d',bg:'#ffe8d9',bg2:'#ffd6bd',cut:[0,0,0],shape:'Quadrato arancione'},org:{c:'#9b6bff',bg:'#ece3ff',bg2:'#dccdff',cut:[3,2,1],shape:'Ottagono viola'},mkt:{c:'#2e9e48',bg:'#dff3d6',bg2:'#c9e9bd',cut:[5,3,2,1,1],shape:'Tondo verde'},wel:{c:'#e0393e',bg:'#ffe1e1',bg2:'#ffcaca',cut:[2,1],shape:'Quadrato smussato rosso'},
@@ -1945,7 +1952,7 @@ function pxRects(g){let r='';g.forEach((row,y)=>{let x=0;while(x<row.length){con
 const pxGrid=rows=>rows.map(row=>[...row].map(ch=>ch==='.'?null:TPAL[ch]||null));
 function pxSvg(rows,sz,extra){const n=rows.length;return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" aria-hidden="true" style="flex:none;${extra||''}">${pxRects(pxGrid(rows))}</svg>`;}
 // stellina accanto al nome dei manager speciali (MSTAR, id di MANAGERS): mStar(p) nelle schede e nella finestrella di scelta
-const MSTAR=new Set(['andrew','delsasso','sorrentino','greta','daniele']);
+const MSTAR=new Set(['andrew','delsasso','sorrentino','greta','daniele','marzia']);
 const STAR_PX=['....KK....','...KYYK...','...KYYK...','KKKKYYKKKK','KYYYYYYYYK','.KYYYYYYK.','..KYYYYK..','.KYYyyYYK.','.KyK..KyK.','.KK....KK.'];
 const mStar=p=>MSTAR.has(p.id)?`<span class="mstar" data-tip="Personaggio speciale" role="img" aria-label="Personaggio speciale">${pxSvg(STAR_PX,20)}</span>`:'';
 // tessera: bordo scuro, filetto (rim), fondo con la fascia in basso; il disegno al centro con la sua ombra netta (1 pixel in basso a destra)
@@ -2711,7 +2718,7 @@ Dotazioni: ${DOT.map(d=>'[[dot_'+d.id+'|'+d.n.toLowerCase()+']]').join(', ')}.`)
 wk('area_esterna','basi','Area esterna',`Il terreno attorno al capannone: ogni posto ospita una dotazione esterna (parcheggio, piazzale, giardino o mensa).`,
 `Ogni sito ha da 1 a 4 posti di area esterna; i terreni dove [[costruzione|costruisci da zero]] ne hanno di più. Parcheggio dei camion, piazzale esterno, giardino e mensa esterna ne occupano uno a testa: quando è piena bisogna scegliere. Le altre [[dotazioni]] stanno dentro il capannone o sul tetto e non occupano spazio.`);
 wk('guasti','basi','Guasti',`Ogni mese una dotazione può rompersi: più spesso nei magazzini vecchi, malandati o senza facility manager. Finché resta guasta perde il suo effetto.`,
-`Ogni mese ogni magazzino ha circa il 3,5% di probabilità di un guasto, moltiplicato per la [[classe_edificio|classe]] (fatiscente ×2, innovativo ×0,5), per 1,5 se lo [[manutenzione|stato]] è sotto il 70% e per 0,7 con il [[facility|facility manager]] (1,2 senza). Si rompe una delle [[dotazioni]] presenti; nei capannoni fatiscenti e vecchi può anche piovere dal tetto.
+`Ogni mese ogni magazzino ha circa il 3,5% di probabilità di un guasto, moltiplicato per la [[classe_edificio|classe]] (fatiscente ×2, innovativo ×0,5), per 1,5 se lo [[manutenzione|stato]] è sotto il 70%, per 0,7 con il [[facility|facility manager]] (1,2 senza) e per 0,7 se il magazzino lo guida chi ha il talento Cassandra. Si rompe una delle [[dotazioni]] presenti; nei capannoni fatiscenti e vecchi può anche piovere dal tetto.
 
 Arriva un avviso dell'Ufficio tecnico con tre scelte:
 • Intervento urgente: costa una volta e mezzo la riparazione, ed è tutto a posto subito.
@@ -2787,7 +2794,7 @@ I capannoni affittati stanno nella scheda «Nuovo magazzino» e sulla mappa, gri
 wk('ordinanza','basi','Ordinanza',`Dal 2007, prima o poi, l'ASL o il Comune mettono gli occhi su un capannone fatiscente: entro sei mesi va ristrutturato o chiuso.`,
 `Un evento raro, per i magazzini di [[classe_edificio|classe]] fatiscente che hai da almeno un anno: ognuno ha una data sua tra il 2007 e il 2009, poi l'evento può arrivare. Di solito è il tetto di cemento-amianto da bonificare; dopo il terremoto del 2012, nelle province emiliane, è la messa in sicurezza antisismica dei prefabbricati.
 
-Le scelte: [[ristrutturazione|ristrutturare]] subito (serve il facility manager), chiudere il magazzino entro sei mesi ([[trasloco|traslochi]] i clienti e poi lo restituisci o lo vendi: vedi [[capannone_vuoto]]) oppure il ricorso al TAR (6.000 €: una volta su tre concede un anno in più). L'ordinanza si chiude quando l'edificio non è più fatiscente o quando il magazzino non è più tuo.
+Le scelte: [[ristrutturazione|ristrutturare]] subito (serve il facility manager), chiudere il magazzino entro sei mesi ([[trasloco|traslochi]] i clienti e poi lo restituisci o lo vendi: vedi [[capannone_vuoto]]) oppure il ricorso al TAR (6.000 €: una volta su tre concede un anno in più, due volte su tre se il magazzino lo guida chi ha il talento Sportello unico). L'ordinanza si chiude quando l'edificio non è più fatiscente o quando il magazzino non è più tuo.
 
 Alla scadenza i lavori li fa il Comune: la ristrutturazione costa il 50% in più, con 20.000 € di multa, reputazione −5 e, finché dura il cantiere, puntualità −3 e accuratezza −2.`);
 DOT.forEach(d=>wk('dot_'+d.id,'basi',d.n,d.desc,`${d.txt}\n\n${d.desc}${d.base?'':`\n\nCostruirla costa ${eur(d.c0)}${d.cp?` più ${eur(d.cp)} per posto pallet`:''} e richiede ${wks(d.gg)} di lavori${d.mese?`; poi ${eur(d.mese)} al mese`:''}.${d.ext?' Occupa un posto dell\'[[area_esterna|area esterna]].':''}`} Fa parte delle [[dotazioni]] e si può rompere: vedi [[guasti]].`,sz=>dotIcon(d.id,sz)));
@@ -3698,7 +3705,7 @@ const GEN_BIO=[
  {k:'lead',t:'Responsabile del personale di un gruppo con duemila magazzinieri'},{k:'lead',t:'Ha rimesso in piedi un magazzino di {c} dopo tre scioperi di fila'},{k:'lead',t:'Ha allenato una squadra di basket, poi un reparto: i turni li gestisce come un time-out'},
  {k:'amm',t:'Controller di un gruppo del freddo a {c}: conosce ogni centesimo'},{k:'amm',t:'Responsabile amministrativ{o} di una cooperativa di {c}: tre bilanci in attivo di fila'},{k:'amm',t:'Ex revisore dei conti: legge un conto economico come un romanzo giallo'},
  {k:'inn',t:'Ha progettato tre magazzini automatici in Emilia'},{k:'inn',t:'Ha portato il WMS in un deposito di {c} che usava ancora i fogli a quadretti'},{k:'inn',t:'Consulente informatic{o} per vent\'anni: parla di robot e sensori come di vecchi amici'}];
-const TAL_EDU=Object.keys(TALENTS).filter(n=>TALENTS[n].edu), TAL_GEN=Object.keys(TALENTS).filter(n=>!TALENTS[n].edu&&!['Papà ha sempre ragione','Esaurito','Golfista','Consigliere comunale','Cresciuto in banchina'].includes(n));
+const TAL_EDU=Object.keys(TALENTS).filter(n=>TALENTS[n].edu), TAL_GEN=Object.keys(TALENTS).filter(n=>!TALENTS[n].edu&&!TALENTS[n].uni&&!['Papà ha sempre ragione','Esaurito','Golfista','Consigliere comunale','Cresciuto in banchina'].includes(n));
 // un candidato nuovo: o.k / o.min = abilità e valore minimo chiesti all'head hunter; senza, una candidatura spontanea (rango basso)
 // nome e cognome che nessuno ha già (manager in partita, candidati, chi sta crescendo in banchina)
 function genName(f){ const used=new Set([...liveCo().flatMap(c=>c.managers.map(p=>p.name)),...mkt().l.map(p=>p.name),...cands().map(c=>c.p?c.p.name:''),...(S.cresc||[]).map(x=>x.name)]);
@@ -3863,7 +3870,10 @@ function mgrFx(m){const d=k=>(m[k]==null?10:m[k])-10;
     hire:clamp(1-MGR_K.hire*d('lead'),0.8,1.2),fix:clamp(1-MGR_K.fix*d('amm'),0.95,1.05),learn:clamp(1-MGR_K.learn*d('inn'),0.7,1.3),inv:clamp(1-MGR_K.inv*d('prec'),0.5,1.5)};}
 // talenti di chi guida il magazzino (il CEO o il manager): gli effetti «nel magazzino che guida» valgono solo lì
 function mgrTal(wh){ if(wh.mgr==='ceo') return ceo().tal||[]; const m=S.managers.find(x=>x.id===wh.mgr); return m?(m.tal||[]):[]; }
-function talWh(wh,k){return mgrTal(wh).reduce((a,n)=>a+(((TALENTS[n]||{}).wh||{})[k]||0),0);}
+// Divisiva: +1 o −1, deciso una volta per sempre dalla coppia (persona, magazzino o committente)
+const divSign=(a,b)=>hashN(a+'|'+b)%2?1:-1;
+function talWh(wh,k){return mgrTal(wh).reduce((a,n)=>{const x=TALENTS[n]||{}; return a+((x.wh||{})[k]||0)+(x.div&&x.div[k]?x.div[k]*divSign(wh.mgr,wh.id):0);},0);}
+const talMul=(wh,k)=>wh?mgrTal(wh).reduce((a,n)=>a*((TALENTS[n]||{})[k]||1),1):1;   // Cassandra (ko), Sportello unico (cant, tar)
 const fireMul=wh=>mgrTal(wh).some(n=>(TALENTS[n]||{}).fire)?0.5:1;  // Ex sindacalista: licenziamenti e cooperativa pesano la metà sul morale
 // licenziamenti, stesse regole per il giocatore e per gli avversari: buonuscita di un mese, morale del magazzino −4 per 30 giorni, reputazione −0,3.
 // Dal 4° licenziamento in 30 giorni è un'ondata: reputazione −0,8 in più a testa, morale −2 in tutti i magazzini e la notizia sul giornale
@@ -3890,7 +3900,7 @@ function fireOne(w,r){
 // talenti che contano nelle gare: quelli del CEO (alcuni solo con le committenti S e A) e quelli del direttore commerciale
 function talGara(t){ const C=ceo().tal, dc=dirStat('comm')!=null?personById(S.dirs.comm):null; let v=0;
   C.forEach(n=>{const x=TALENTS[n]; if(x) v+=(x.gara||0)+(isNaz(t)?(x.naz||0):0);});
-  if(dc) (dc.tal||[]).forEach(n=>{const x=TALENTS[n]; if(x&&x.gara&&!C.includes(n)) v+=x.gara;}); return v; }
+  if(dc) (dc.tal||[]).forEach(n=>{const x=TALENTS[n]; if(x&&x.gara&&!C.includes(n)) v+=x.gara; if(x&&x.div&&x.div.gara) v+=x.div.gara*divSign(dc.id,t.name);}); return v; }
 const R=id=>!!(S&&S.researched[id]);
 // reputazione guadagnata col lavoro (clienti contenti, gare vinte, nuovi magazzini): sopra 50 sale sempre più piano, perché farsi un nome costa meno che restare i migliori
 function repUp(v){S.rep=clamp(S.rep+(v>0?v*clamp((100-S.rep)/50,0,1):v),0,100);}
@@ -4081,8 +4091,8 @@ function dotNo(w,d){ if(hasDot(w,d.id)) return 'c\'è già';
   if(S.cash<dotCost(w.cap,d)) return 'cassa insufficiente'; return ''; }
 const ristCost=w=>Math.round(w.cap*EDIL.rist.eur/1000)*1000;
 const ristNext=w=>{const i=WCL_ORD.indexOf(w.cl||'std'); return i>=0&&i<WCL_ORD.indexOf('mod')?WCL_ORD[i+1]:null;};
-function dotStart(w,id){ const d=DOT_ID[id], c=dotCost(w.cap,d); S.cash-=c; S.cur.altro+=c; const g=cantGg(d.gg); w.build={k:'dot',id,left:g,total:g}; }
-function ristStart(w){ const c=ristCost(w), g=cantGg(EDIL.rist.gg); S.cash-=c; S.cur.altro+=c; w.build={k:'rist',to:ristNext(w),left:g,total:g}; }
+function dotStart(w,id){ const d=DOT_ID[id], c=dotCost(w.cap,d); S.cash-=c; S.cur.altro+=c; const g=cantGg(d.gg,w); w.build={k:'dot',id,left:g,total:g}; }
+function ristStart(w){ const c=ristCost(w), g=cantGg(EDIL.rist.gg,w); S.cash-=c; S.cur.altro+=c; w.build={k:'rist',to:ristNext(w),left:g,total:g}; }
 // ogni giorno: stato dell'immobile, cantieri del magazzino e riparazioni programmate
 function immDaily(w,k){
   if(w.cond==null) w.cond=100;
@@ -4105,7 +4115,7 @@ const KO={p:0.035,fuoco:0.004,fm:14,nofm:35,urg:1.5};
 function ripCost(w,id){ if(id==='tetto') return Math.round(w.cap*5/100)*100; if(id==='ricarica') return 6000; return Math.max(1500,Math.round(dotCost(w.cap,DOT_ID[id])*0.12/100)*100); }
 const ripDays=w=>w.staff.fm?KO.fm:KO.nofm;
 function koCands(w){ const L=DOT.filter(d=>KO_EV[d.id]&&hasDot(w,d.id)&&!isKo(w,d.id)).map(d=>d.id); if(['fat','vec'].includes(w.cl)&&!isKo(w,'tetto')) L.push('tetto'); return L; }
-function koMonth(){ S.warehouses.forEach(w=>{ const c=wCl(w), f=c.ko*((w.cond==null?100:w.cond)<MAINT.soglia?1.5:1)*(w.staff.fm?0.7:1.2);
+function koMonth(){ S.warehouses.forEach(w=>{ const c=wCl(w), f=c.ko*((w.cond==null?100:w.cond)<MAINT.soglia?1.5:1)*(w.staff.fm?0.7:1.2)*talMul(w,'ko');
   if(Math.random()<KO.fuoco*f){ if(isBot()){ botPay(Math.round(w.cap*(dotOn(w,'sprinkler')?1:4))); w.cond=Math.max(0,w.cond-(dotOn(w,'sprinkler')?3:15)); } else fuocoStart(w); return; }
   if(Math.random()>=KO.p*f) return; const L=koCands(w); if(!L.length) return; const id=pick(L);
   if(isBot()){ botPay(ripCost(w,id)); return; }   // gli avversari riparano subito
@@ -5549,16 +5559,16 @@ function ordOpts(ev){ const w=ev.w; if(!w){ ev.opts=[{t:'Va bene',e:'Nessun effe
   const rc=ristCost(w), sis=ev.k==='sisma', fix=sis?'messo in sicurezza':'bonificato', due=shortDate(S.day+ORD.days);
   ev.text=sis?`Dopo il terremoto in Emilia l'ufficio tecnico del Comune ha controllato i capannoni prefabbricati della zona. Quello di ${w.name} ha le travi appoggiate ai pilastri senza un bullone: «Sta su per abitudine». Entro sei mesi va ${fix} oppure chiuso.`
     :`Due tecnici dell'ASL hanno fatto il giro del tetto di ${w.name} con la mascherina e un metro da sarta: la copertura è di cemento-amianto, ondulata e piena di crepe. Con il nuovo piano regionale l'ordinanza è chiara: entro sei mesi il capannone va ${fix} oppure chiuso.`;
-  ev.opts=[{t:'Ristrutturo subito',d:`Si apre il cantiere: ${eur(rc)} e ${wks(cantGg(EDIL.rist.gg))} di lavori. L'edificio sale a vecchio e l'ordinanza si chiude a fine lavori.`,e:`−${eur(rc)}, ristrutturazione aperta`,
+  ev.opts=[{t:'Ristrutturo subito',d:`Si apre il cantiere: ${eur(rc)} e ${wks(cantGg(EDIL.rist.gg,w))} di lavori. L'edificio sale a vecchio e l'ordinanza si chiude a fine lavori.`,e:`−${eur(rc)}, ristrutturazione aperta`,
       req:()=>!!ev.w&&ev.w.staff.fm>0&&!ev.w.build&&S.cash>=ristCost(ev.w),reqT:'Facility manager, nessun cantiere aperto e '+eur(rc)+' in cassa',
       r:'Le ruspe sono arrivate il lunedì. I magazzinieri lavorano con il casco e chiamano il capocantiere «geometra», anche se non lo è.',
       f:function(){ const x=this.w; if(!x) return; x.ord={day:S.day,until:S.day+ORD.days,k:'rist'}; if(x.staff.fm&&!x.build&&S.cash>=ristCost(x)) ristStart(x); }},
     {t:'Lo chiudo',d:`Hai sei mesi: sposta i clienti in un altro magazzino (Trasloca clienti) e poi ${w.own?'vendi':'restituisci'} il capannone. Puoi sempre cambiare idea e ristrutturare.`,
       e:`Entro il ${due}: capannone chiuso o ristrutturazione partita`,r:'Hai firmato la presa d\'atto. In ufficio qualcuno ha già aperto la mappa dei capannoni in affitto.',
       f:function(){ if(this.w) this.w.ord={day:S.day,until:S.day+ORD.days,k:'chiudi'}; }},
-    {t:'Ricorso al TAR',d:'Un avvocato amministrativista prova a prendere tempo. A volte ci riesce.',e:`−${eur(ORD.tar)}; una volta su tre il TAR concede un anno in più`,
+    {t:'Ricorso al TAR',d:'Un avvocato amministrativista prova a prendere tempo. A volte ci riesce.',e:`−${eur(ORD.tar)}; ${talMul(w,'tar')>1?'col talento Sportello unico di chi guida il magazzino, due volte su tre':'una volta su tre'} il TAR concede un anno in più`,
       r:'L\'avvocato ha depositato il ricorso in tre copie, con la marca da bollo storta.',
-      f:function(){ S.cash-=ORD.tar; if(!this.w) return; const ok=Math.random()<ORD.odds; this.w.ord={day:S.day,until:S.day+ORD.days+(ok?ORD.more:0),k:'tar'};
+      f:function(){ S.cash-=ORD.tar; if(!this.w) return; const ok=Math.random()<ORD.odds*talMul(this.w,'tar'); this.w.ord={day:S.day,until:S.day+ORD.days+(ok?ORD.more:0),k:'tar'};
         toast(ok?'Il TAR sospende l\'ordinanza: hai un anno in più':'Il TAR respinge il ricorso: la scadenza resta quella',ok?'ok':'bad'); }}];
   return ev; }
 // ogni giorno: l'ordinanza si chiude quando l'edificio non è più fatiscente; alla scadenza il Comune apre il cantiere d'ufficio
@@ -6166,14 +6176,14 @@ function ingPlan(){ const n=ingMag(), L=S.warehouses.slice().sort((a,b)=>(a.met|
 function ingMonth(){ if(!itOn()||!S.dep) return; const m=ingPlan(), mx=ingMax();
   S.warehouses.forEach(w=>{ const n=m[w.id]||0, v=w.met||0; w.met=n?Math.min(mx,v+ING.gain*n*ingMul()):Math.max(0,v-ING.decay); }); }
 // cantieri del magazzino e costruzioni da zero: −20% con almeno un ingegnere sui magazzini
-const cantGg=gg=>Math.max(1,Math.round(gg*(ingMag()>0?ING.cant:1)*(itOn()&&R('gemello')?0.8:1)));
+const cantGg=(gg,w)=>Math.max(1,Math.round(gg*(ingMag()>0?ING.cant:1)*(itOn()&&R('gemello')?0.8:1)*talMul(w,'cant')));   // w: il magazzino del cantiere (Sportello unico di chi lo guida)
 const ingTr=()=>itOn()&&depTeam('ing')>0;   // traslochi: progetto −30%, stabilizzazione −20%
 // lavori del welfare: col pacchetto serve il facility manager; dai 5.000 € in su il servizio è un cantiere del magazzino
 const welBig=(t,w)=>itOn()&&!!t&&t.tree==='wel'&&!t.pol&&instCost(t,w)>=ING.wel;
-const welGg=t=>cantGg((ING.welWk[t.id]||3)*7);
+const welGg=(t,w)=>cantGg((ING.welWk[t.id]||3)*7,w);
 const welIn=(t,w)=>!!w.build&&w.build.k==='wel'&&w.build.id===t.id;
 function welWhy(t,w){ if(!itOn()||t.tree!=='wel') return ''; if(!w.staff.fm) return 'Serve il facility manager'; if(welBig(t,w)&&w.build) return 'C\'è già un cantiere nel magazzino'; return ''; }
-function welStart(t,w){ const c=instCost(t,w), g=welGg(t); S.cash-=c; S.cur.welf+=c; w.build={k:'wel',id:t.id,left:g,total:g}; }
+function welStart(t,w){ const c=instCost(t,w), g=welGg(t,w); S.cash-=c; S.cur.welf+=c; w.build={k:'wel',id:t.id,left:g,total:g}; }
 // enciclopedia del pacchetto (qui perché usa CONS e le costanti dei reparti)
 wk('reparto_it','it','Reparto IT e Ingegneria',`Pacchetto di espansione che si sceglie nel passo «Pacchetti», quando crei la partita (di base è acceso): dietro le ricerche ci sono persone vere, il Reparto IT e l'Ingegneria.`,
 `Con il pacchetto le ricerche le fanno due [[reparti_tecnici|reparti tecnici]] in sede. Il **Reparto IT** studia i sistemi informatici: barcode, WMS, radiofrequenza, GPS, rotte, gestionale, EDI, portale ed e-commerce. L'**Ingegneria** studia le novità per il lavoro e per gli impianti: formazione, sicurezza dei muletti, Academy, magazzino verticale, robot ed [[tech_edifici|edifici intelligenti]]. Tutto il resto (organizzazione, mercato, welfare, certificazioni) resta alla Direzione, come prima.
@@ -9386,7 +9396,7 @@ const VIEWS={
     if(s2==='done'&&perWh(sel)) act=`<div class="lab">${sel.tree==='cert'?'Nei magazzini':'Installazione nei magazzini'}</div>`+S.warehouses.map(w=>{const it=w.tech[sel.id], ce=sel.tree==='cert', learn=it&&(ce?!certOk(w,sel.id):techFactor(w,sel)<0), cs=ce&&it?certState(w,sel):'';
       const av=!it&&avvTech(sel)&&avvOf(w,sel.id), cd=w.avvCd&&w.avvCd[sel.id]>S.day;
       if(!it&&avvTech(sel)) return `<div class="row"><span>${esc(w.name)}</span>${av?`<span class="sm warn">in preparazione · si parte il ${shortDate(av.live)}</span>`:cd?`<span class="sm bad">si riprova dal ${shortDate(w.avvCd[sel.id])}</span>`:`<button class="btn sm2 pri" data-act="avvopen" data-id="${sel.id}" data-wh="${w.id}" ${instReq(sel,w)?'':'disabled'}>Avvia il progetto</button>`}</div>`;
-      return `<div class="row"><span>${esc(w.name)}</span>${it?`<span class="sm ${learn?'warn':'ok'}">${learn?(ce?(cs==='susp'?'sospeso':'primo audit in attesa'):'in apprendimento'):(ce?(cs==='nc'?'certificato, con rilievi':'certificato'):'attiva')}</span>${updCtl(sel,w)}`:welIn(sel,w)?`<span class="sm warn">${kw('lavori_welfare','lavori in corso')} · ${wks(w.build.left)}</span>`:`<button class="btn sm2 pri" data-act="install" data-id="${sel.id}" data-wh="${w.id}" ${S.cash>=instCost(sel,w)&&!(sel.tree==='wel'&&polOn('spending'))&&instReq(sel,w)&&!welWhy(sel,w)?'':'disabled'}${welWhy(sel,w)?` data-tip="${esc(welWhy(sel,w))}"`:''}>${ce?certBtn(sel):welBig(sel,w)?`Lavori di ${wks(welGg(sel))}`:'Installa'} · ${eur(instCost(sel,w))}</button>`}</div>`;}).join('')+(sel.tree==='wel'&&polOn('spending')?`<div class="sm warn">La policy ${kw('pol_spending','Spending review')} blocca i nuovi servizi di welfare.</div>`:'')+(reqs.length?`<div class="sm">Si installa nei magazzini che hanno già ${reqs.map(r=>esc(r.name)).join(' e ')}.</div>`:'');
+      return `<div class="row"><span>${esc(w.name)}</span>${it?`<span class="sm ${learn?'warn':'ok'}">${learn?(ce?(cs==='susp'?'sospeso':'primo audit in attesa'):'in apprendimento'):(ce?(cs==='nc'?'certificato, con rilievi':'certificato'):'attiva')}</span>${updCtl(sel,w)}`:welIn(sel,w)?`<span class="sm warn">${kw('lavori_welfare','lavori in corso')} · ${wks(w.build.left)}</span>`:`<button class="btn sm2 pri" data-act="install" data-id="${sel.id}" data-wh="${w.id}" ${S.cash>=instCost(sel,w)&&!(sel.tree==='wel'&&polOn('spending'))&&instReq(sel,w)&&!welWhy(sel,w)?'':'disabled'}${welWhy(sel,w)?` data-tip="${esc(welWhy(sel,w))}"`:''}>${ce?certBtn(sel):welBig(sel,w)?`Lavori di ${wks(welGg(sel,w))}`:'Installa'} · ${eur(instCost(sel,w))}</button>`}</div>`;}).join('')+(sel.tree==='wel'&&polOn('spending')?`<div class="sm warn">La policy ${kw('pol_spending','Spending review')} blocca i nuovi servizi di welfare.</div>`:'')+(reqs.length?`<div class="sm">Si installa nei magazzini che hanno già ${reqs.map(r=>esc(r.name)).join(' e ')}.</div>`:'');
     det=`<div class="tdh">${techIcon(sel,side&&DW<280?48:64,s2==='lock')}<div class="wh-sm"><span class="h3">${esc(sel.name)}</span><span class="sm">${kw('alberi',trN(sel.tree))} · ${perWh(sel)?(sel.tree==='cert'?'da ottenere magazzino per magazzino':'da installare in ogni magazzino'):'vale per tutta l\'azienda'}</span><span class="pill ${pill[0]}">${pill[1]}</span></div></div>
       ${itOn()?(sel.dep?`<div class="sm">${depIc(sel.dep)} La studia ${sel.dep==='it'?'il Reparto IT':'l\'Ingegneria'}${sel.sup?` (con l'aiuto ${sel.sup==='it'?'del Reparto IT':'dell\'Ingegneria'})`:''}${depFree(sel.dep)>0?'':depOpen(sel.dep)?': nel reparto nessuno fa ricerca, per ora la studia la Direzione':': reparto chiuso, per ora la studia la Direzione'}.</div>`:'<div class="sm">La studia la Direzione.</div>'):''}
       ${sel.txt?`<div class="ttxt">${esc(sel.txt)}</div>`:''}<div><b>Effetto:</b> ${esc(sel.desc)}</div>${eff?`<div class="sm">${eff}</div>`:''}
@@ -10102,7 +10112,7 @@ function strutturaCard(w,k,staffRow){
     const st=x?`<span class="bad">guasto${x.fine!=null?` · riparato tra ${wks(x.fine-S.day)}`:''}</span>`:inB?`<span class="warn">in costruzione · ${wks(b.left)}</span>`:h?(d.base?'c\'è in tutti i magazzini':`<span class="ok">c'è</span>${d.id==='solare'&&w.dot.solare&&w.dot.solare.inc?` · incentivo ${eur(EDIL.inc)}/mese`:''}`)
       :d.miss?`<span class="bad">${esc(d.missT)}</span>`:`<span class="sm">${d.ext?'area esterna · ':''}${d.mese?eur(d.mese)+'/mese':'nessun costo al mese'}</span>`;
     const btn=x?(x.fine==null?`<button class="btn sm2 pri es-b" data-act="koripara" data-wh="${w.id}" data-id="${d.id}" ${S.cash>=ripCost(w,d.id)?'':'disabled'}>Ripara<small>${eur(ripCost(w,d.id))}</small></button>`:'')
-      :h||inB||d.base?'':`<button class="btn sm2 ${no?'':'pri'} es-b" data-act="dotbuild" data-wh="${w.id}" data-id="${d.id}" ${no?'disabled':''} data-tip="<div class='tt'>${esc(d.n)}</div>${esc(d.desc)}<br>Lavori: ${wks(d.gg)}${d.mese?`, poi ${eur(d.mese)} al mese`:''}.${no?`<br><b>${esc(no)}</b>`:''}">Costruisci<small>${no&&no!=='cassa insufficiente'?esc(no):eur(cost)}</small></button>`;
+      :h||inB||d.base?'':`<button class="btn sm2 ${no?'':'pri'} es-b" data-act="dotbuild" data-wh="${w.id}" data-id="${d.id}" ${no?'disabled':''} data-tip="<div class='tt'>${esc(d.n)}</div>${esc(d.desc)}<br>Lavori: ${wks(cantGg(d.gg,w))}${d.mese?`, poi ${eur(d.mese)} al mese`:''}.${no?`<br><b>${esc(no)}</b>`:''}">Costruisci<small>${no&&no!=='cassa insufficiente'?esc(no):eur(cost)}</small></button>`;
     return `<div class="es-r dt-r${h&&!x?'':' dt-off'}">${dotIcon(d.id,32,!h&&!inB)}<span class="wh-sm"><b class="wh-nm">${kw('dot_'+d.id,d.n)}</b><span class="sm wh-nm">${st}</span></span>${btn}</div>`; };
   const tetto=w.ko&&w.ko.tetto;
   return `<div class="card"><div class="row"><span class="h3">${kw('manutenzione','Immobile')}</span><span class="sm">${n0(w.cap)} posti${w.exp?` · ${w.exp} ${w.exp>1?'ampliamenti':'ampliamento'}`:''}</span></div>
@@ -10117,8 +10127,8 @@ function strutturaCard(w,k,staffRow){
    <div class="sm">${kw('bollette','Bollette')} ${eur(utenze(w))}/mese${dotMese(w)?` · dotazioni ${eur(dotMese(w))}/mese`:''}${incentivo(w)?` · <span class="ok">incentivo −${eur(incentivo(w))}</span>`:''}. I lavori li segue il facility manager, uno alla volta.</div>
    <div class="wh-acts">
     <div><button class="btn" data-act="straord" data-wh="${w.id}" ${fm&&c<95&&S.cash>=sc?'':'disabled'}>Manutenzione<small>${eur(sc)}</small></button><span class="sm">Stato al 100% subito</span></div>
-    ${b?'':full?`<div><span class="sm">Già ampliato ${MAINT.expMax} volte: non c'è più terreno.</span></div>`:`<div><button class="btn pri" data-act="amplia" data-wh="${w.id}" ${fm&&S.cash>=ec?'':'disabled'}>Amplia<small>${eur(ec)}</small></button><span class="sm">+${n0(expAdd(w))} posti in ${wks(MAINT.expGg)}, ${w.own?'costi fissi':'affitto'} +${eur(expRent(w))}/mese</span></div>`}
-    ${b||!nx?'':`<div><button class="btn" data-act="rist" data-wh="${w.id}" ${fm&&S.cash>=rc?'':'disabled'}>Ristruttura<small>${eur(rc)}</small></button><span class="sm">Da ${C.n.toLowerCase()} a ${WCLASS[nx].n.toLowerCase()} in ${wks(EDIL.rist.gg)}</span></div>`}
+    ${b?'':full?`<div><span class="sm">Già ampliato ${MAINT.expMax} volte: non c'è più terreno.</span></div>`:`<div><button class="btn pri" data-act="amplia" data-wh="${w.id}" ${fm&&S.cash>=ec?'':'disabled'}>Amplia<small>${eur(ec)}</small></button><span class="sm">+${n0(expAdd(w))} posti in ${wks(cantGg(MAINT.expGg,w))}, ${w.own?'costi fissi':'affitto'} +${eur(expRent(w))}/mese</span></div>`}
+    ${b||!nx?'':`<div><button class="btn" data-act="rist" data-wh="${w.id}" ${fm&&S.cash>=rc?'':'disabled'}>Ristruttura<small>${eur(rc)}</small></button><span class="sm">Da ${C.n.toLowerCase()} a ${WCLASS[nx].n.toLowerCase()} in ${wks(cantGg(EDIL.rist.gg,w))}</span></div>`}
    </div>
    </div>`;
 }
@@ -10450,11 +10460,11 @@ const ACT={
   riTavFail(w); renderAll(); },
  riconf(){ const R0=riCo(); R0.conf=!R0.conf; toast(R0.conf?'Iscritto a Confpallet: quota ogni mese, rate più leggere e agitazione −5':'Esci da Confpallet: niente quota, ma niente sconti sulle rate','ok'); renderAll(); },
  straord(d){const w=whById(d.wh), c=straordCost(w); if(!w.staff.fm||S.cash<c||w.cond>=95)return; S.cash-=c; S.cur.altro+=c; w.cond=100; kpiNow(); toast(`${w.name}: manutenzione straordinaria fatta, stato al 100%`,'ok'); renderAll();},
- dotbuild(d){ const w=whById(d.wh), D=DOT_ID[d.id]; if(!w||!D||dotNo(w,D)) return; dotStart(w,d.id); toast(`Lavori aperti a ${w.name}: ${D.n.toLowerCase()} pronto tra ${wks(D.gg)}`,'ok'); kpiNow(); renderAll(); },
+ dotbuild(d){ const w=whById(d.wh), D=DOT_ID[d.id]; if(!w||!D||dotNo(w,D)) return; dotStart(w,d.id); toast(`Lavori aperti a ${w.name}: ${D.n.toLowerCase()} pronto tra ${wks(w.build.total)}`,'ok'); kpiNow(); renderAll(); },
  koripara(d){ const w=whById(d.wh), x=w&&w.ko&&w.ko[d.id], c=w&&ripCost(w,d.id); if(!x||x.fine!=null||S.cash<c) return; S.cash-=c; S.cur.altro+=c; x.fine=S.day+ripDays(w);
   toast(`${w.name}: il tecnico arriva, riparato tra ${wks(ripDays(w))}`,'ok'); renderAll(); },
  rist(d){ const w=whById(d.wh), nx=w&&ristNext(w), c=w&&ristCost(w); if(!nx||!w.staff.fm||w.build||S.cash<c) return;
-  if(!d.ok) return askOk(`Ristrutturare ${w.name}?`,`Lavori per <b>${eur(c)}</b> e ${wks(cantGg(EDIL.rist.gg))} di cantiere (produttività −5% finché dura). Alla fine l'edificio passa da ${wCl(w).n.toLowerCase()} a <b>${WCLASS[nx].n.toLowerCase()}</b>.${w.own?'':' Il magazzino è in affitto: i lavori li paghi tu, l\'affitto resta uguale.'}`,'Sì, ristruttura',()=>ACT.rist({...d,ok:1}));
+  if(!d.ok) return askOk(`Ristrutturare ${w.name}?`,`Lavori per <b>${eur(c)}</b> e ${wks(cantGg(EDIL.rist.gg,w))} di cantiere (produttività −5% finché dura). Alla fine l'edificio passa da ${wCl(w).n.toLowerCase()} a <b>${WCLASS[nx].n.toLowerCase()}</b>.${w.own?'':' Il magazzino è in affitto: i lavori li paghi tu, l\'affitto resta uguale.'}`,'Sì, ristruttura',()=>ACT.rist({...d,ok:1}));
   ristStart(w); toast(`Ristrutturazione aperta a ${w.name}: pronta tra ${wks(w.build.total)}`,'ok'); kpiNow(); renderAll(); },
  // trasloco: progetto in cima alla finestra del magazzino di partenza (UI.sel.tr), poi conferma
  tropen(d){ const w=whById(d.wh); if(!w||trBusy(w)) return; const ds=trDests(w);
@@ -10511,7 +10521,7 @@ const ACT={
   if(!d.ok) return askOk(`Costruire a ${s.name}?`,`Paghi subito <b>${eur(c)}</b> tra terreno, edificio e dotazioni. Tra ${Math.round(cantGg(EDIL.gg[E.cl])/30)} mesi avrai un magazzino ${WCLASS[E.cl].n.toLowerCase()} da ${n0(E.cap)} posti pallet, di proprietà.`,'Sì, apri il cantiere',()=>ACT.edgo({ok:1}));
   edilStart(E.site,E.cap,E.cl,E.dot); UI.sel.ed=null; toast(`Cantiere aperto a ${s.name}: pronto tra ${Math.round(cantGg(EDIL.gg[E.cl])/30)} mesi`,'ok'); renderMap(); renderAll(); },
  amplia(d){const w=whById(d.wh), c=expCost(w); if(!w.staff.fm||w.build||(w.exp||0)>=MAINT.expMax||S.cash<c)return; S.cash-=c; S.cur.altro+=c;
-  const g=cantGg(MAINT.expGg); w.build={left:g,total:g,add:expAdd(w),rent:expRent(w)}; toast(`Cantiere aperto a ${w.name}: +${n0(expAdd(w))} posti tra ${wks(g)}`,'ok'); renderAll();},
+  const g=cantGg(MAINT.expGg,w); w.build={left:g,total:g,add:expAdd(w),rent:expRent(w)}; toast(`Cantiere aperto a ${w.name}: +${n0(expAdd(w))} posti tra ${wks(g)}`,'ok'); renderAll();},
  bidwh(d,el){UI.bid.wh=el.value;renderWin('gare');},
  bidmult(d,el){UI.bid.mult=(+el.value)/100;const sel=S.tenders.find(t=>t.id===UI.bid.t);$('#bidmv').textContent=(UI.bid.mult>=1?'+':'')+Math.round((UI.bid.mult-1)*100)+'%';$('#bidest').innerHTML=bidEstHtml(sel,bidEstimate(sel,UI.bid.wh,UI.bid.mult));},
  bid(d){const t=S.tenders.find(x=>x.id===d.id);t.bid={wh:UI.bid.wh,mult:UI.bid.mult};toast(`Offerta inviata per ${t.name}`,'ok');renderMap();renderAll();},
@@ -11099,7 +11109,7 @@ function talCard(n,on,act,dis){const t=TALENTS[n], c=talCost(n);
    <span class="pcost ${c>0?'neg':c<0?'pos':'zero'}" aria-label="${c>0?`Costa ${c} punti`:c<0?`Restituisce ${-c} punti`:'Non costa punti'}">${c>0?'−'+c:c<0?'+'+(-c):'0'}<small>${c===0?'gratis':Math.abs(c)===1?'punto':'punti'}</small></span></button>`;}
 function stepCC3(){
   const cc=startSel.cc, full=cc.tal.length>=CC_TRAITS;
-  const edu=Object.keys(TALENTS).filter(n=>TALENTS[n].edu), tr=Object.keys(TALENTS).filter(n=>!TALENTS[n].edu);
+  const edu=Object.keys(TALENTS).filter(n=>TALENTS[n].edu), tr=Object.keys(TALENTS).filter(n=>!TALENTS[n].edu&&!TALENTS[n].uni);
   return `<div class="card ccbox"><div class="row"><span class="h3">Studi e carattere</span>${ccPoints()}</div>
    <div>${statChips(ccStats(cc),14)}</div>
    <div class="lab">${kw('titoli','Titolo di studio')} <span class="sm">· obbligatorio, uno solo${cc.edu?` · scelto: <b>${esc(cc.edu)}</b>`:''}</span></div>
@@ -11217,6 +11227,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.121',t:'Arriva Marzia Doganali',x:['Sul mercato c\'è un nuovo personaggio speciale, con la stellina: Marzia Doganali, rango A. Viene dalla dogana e dall\'ufficio tecnico di un Comune, è forte in Amministrazione e se la cava bene in Operazioni e Negoziazione.','Tre talenti che ha solo lei. «Cassandra»: nel magazzino che guida guasti e incendi capitano il 30% in meno, perché li vede arrivare, ma nessuno le crede (Leadership −1). «Divisiva»: o la ami o la odi, quindi il morale del magazzino che guida va a +4 o a −4, a seconda del magazzino; da direttore commerciale, nelle gare ogni committente le dà +3 o −3. «Sportello unico»: ampliamenti, dotazioni, ristrutturazioni e lavori del welfare nel suo magazzino durano un quarto in meno, e il ricorso al TAR contro un\'ordinanza va bene due volte su tre.','Accanto a dotazioni, ampliamenti e ristrutturazioni la durata indicata è quella vera, già ridotta dagli ingegneri e da chi guida il magazzino.']},
  {v:'0.120',t:'La scena dei clienti',x:['Anche la scheda Clienti ha la sua scenetta, come il Customer service: l\'ufficio commerciale, con la cartina del Nord dove si accendono le puntine dei clienti, lo scaffale dei campioni (formaggio, vino, panettone, detersivo), la lavagna delle gare con le barre che crescono, la stampante che sputa l\'ordine e il commerciale che stringe la mano al cliente.']},
  {v:'0.119',t:'Reparto IT e Ingegneria acceso di base',x:['Il pacchetto Reparto IT e Ingegneria è finito e bilanciato: nelle partite nuove parte acceso, come le Relazioni industriali (si può sempre spegnere nel passo Pacchetti).','Nelle partite simulate col pacchetto falliscono quasi le stesse aziende che senza (47% contro 49% in 12 anni), si fanno l\'11% di ricerche in più e i guasti informatici sono circa uno ogni due anni per magazzino.','Il CEO dà una mano all\'assistenza ai sistemi secondo la sua Innovazione: da 0,3 persone a 0,9 (Marco, il nerd del WMS, arriva a 0,85).','Le aziende del computer assumono un sistemista solo quando manca almeno tre quarti di persona sull\'assistenza: con un solo magazzino non conviene.']},
  {v:'0.118',t:'La scena degli audit',x:['La scheda Certificati e audit della finestra Tecnologia ha la sua scenetta, come le altre: l\'ufficio qualità il giorno dell\'audit, con i certificati appesi, l\'auditor (una ragazza col caschetto biondo) che batte il timbro, la checklist che si spunta riga per riga (l\'ultima con un rilievo) e la responsabile qualità che suda col raccoglitore dell\'HACCP.']},
