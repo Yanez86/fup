@@ -28,6 +28,7 @@
 }
 /* sfondo scuro come la barra e il menu: su iPhone si vede sotto la barra di stato e sotto il menu, dove la mappa non arriva */
 html{background:var(--ink);font-variant-ligatures:none}  /* Pixelify Sans unisce «fi» in un solo segno: «file» diventava «Ale» */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}  /* Safari su iPhone ingrandisce il testo in orizzontale e a volte non lo rimette a posto tornando in verticale */
 html,body{height:100%}
 /* web app installata su iPhone (iOS 26): lo schermo «utile» risulta più corto dell'altezza della barra di stato e in fondo resta una banda vuota; allungando la pagina gli elementi fissi tornano fino al bordo */
 @media (display-mode:standalone), (display-mode:fullscreen){html{min-height:calc(100% + env(safe-area-inset-top, 0px))}}
@@ -11225,6 +11226,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.117',t:'Testo fermo sul telefono',x:['Su iPhone, girando il telefono in orizzontale e poi di nuovo in verticale, il testo restava più grande del normale. Ora resta sempre della stessa misura.']},
  {v:'0.116',t:'La firma',x:['In fondo alle Opzioni c\'è la firma: «Un gioco Happy Squid Inc.», col calamaro sorridente e il collegamento al sito happysquid.ink.']},
  {v:'0.115',t:'I pacchetti nei salvataggi',x:['Nella schermata principale ogni partita salvata mostra gli stemmi dei pacchetti di espansione accesi (Relazioni industriali, Reparto IT e Ingegneria), oppure «Solo gioco base».']},
  {v:'0.114',t:'Quattro corsi con la dottoressa',x:['Il riquadro Tutorial della schermata principale ha quattro corsi: Base, Avanzato e, nuovi, uno per ciascun pacchetto di espansione.','Relazioni industriali («Il sindacato spiegato ai CEO»): un magazzino in stato di agitazione col tavolo aperto. Si guarda il clima con la sua lente, si scelgono le concessioni, si vede com\'è andata la prima seduta, poi scioperi, contratto nazionale, fornitori di handling e la vittoria del clima.','Reparto IT («Informatica per logistici (e viceversa)»): i reparti ancora vuoti. Si firma il primo consulente, si sceglie il responsabile IT, si avvia una ricerca nella linea del reparto e il progetto dei lettori barcode in un magazzino; poi lavagna, assistenza, affidabilità, Ingegneria e direttore IT.','Il tutorial avanzato non parla più del sindacato (ha il suo corso) e si gioca senza pacchetti; in cambio l\'ultima lezione spiega anche i traslochi e il capannone vuoto.','Nel tutorial base la gara si apre anche dalla sua puntina sulla mappa.','Il riquadro giallo della dottoressa non indica più cose nascoste sotto una finestra.']},
