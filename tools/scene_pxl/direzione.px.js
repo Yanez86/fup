@@ -378,3 +378,66 @@ scene("audit", { w: SW, h: SH, bg: "C", world: { light: [-0.6, -1], ground: 66 }
     stamp("pila_racc", 64, 50), stamp("tazzina", 104, 50), stamp("_fumo", 104, 46)),
   layer("davanti", stamp("valigetta", 54, 70), stamp("rq", 128, 69), stamp("pianta_ceo", 150, 69)),
 )
+
+// ================================================================ CLIENTI (UFFICIO COMMERCIALE)
+// L'ufficio commerciale: la cartina del Nord con le puntine dei clienti che si accendono una dopo l'altra, lo scaffale
+// dei campioni che mandano i clienti (la forma di formaggio, il vino, il panettone, il detersivo), la lavagna delle gare
+// con le barre che crescono. Davanti il commerciale stringe la mano al cliente, e sulla scrivania la stampante sputa l'ordine.
+
+// la cartina del Nord Italia: Alpi innevate, la pianura, il mar Ligure e l'Adriatico; le puntine si accendono a turno
+const PUNTINE = [[11, 19, 0], [20, 15, 2], [27, 21, 4], [35, 14, 6], [42, 17, 8], [16, 24, 10], [31, 25, 12], [38, 22, 14]]
+anim("cartina", { w: 50, h: 32, frames: LOOP, fps: FPS, outline: "K" },
+  rect(0, 0, 50, 32, "W"), box(0, 0, 50, 32, "S"), rect(2, 2, 46, 28, "B"),
+  poly([2, 2, 48, 2, 48, 12, 44, 20, 46, 29, 40, 29, 36, 24, 26, 26, 18, 28, 10, 26, 4, 28, 2, 26], "h"),           // la terraferma
+  poly([2, 2, 48, 2, 48, 9, 40, 11, 30, 9, 22, 12, 12, 10, 2, 13], "g"),                                               // le Alpi
+  ...[[8, 5], [17, 4], [26, 6], [35, 4], [43, 5]].map(([x, y]) => [px(x, y, "W"), px(x - 1, y + 1, "W"), px(x + 1, y + 1, "W")]).flat(),
+  line(6, 18, 44, 18, "b"), line(44, 18, 46, 20, "b"),                                                                   // il Po
+  (c) => PUNTINE.forEach(([x, y, f]) => { if (c.frame >= f) { const k = c.frame - f < 2 ? "Y" : "R"; c.vline(x, y + 1, 2, "K"); c.rect(x - 1, y - 1, 2, 2, k); c.px(x, y - 1, k === "R" ? "e" : "i") } }))
+// la forma di formaggio, la bottiglia di vino, il panettone, il flacone di detersivo, il cartone del cliente
+sprite("formaggio", { outline: "K", pivot: "bottom" }, ".YYYYY.\nYiiiiiY\nYYYYYYY\nyYYYYYy\n.yyyyy.")
+sprite("vino", { outline: "K", pivot: "bottom" }, ".r.\n.g.\n.g.\ngGg\ngWg\ngWg\nggg")
+sprite("panettone", { outline: "K", pivot: "bottom" }, "..kkk..\n.kkqkk.\nkkkkkqk\nBBBBBBB\nBbBBBbB\nBBBBBBB")
+sprite("detersivo", { outline: "K", pivot: "bottom" }, ".RR..\n.uu..\nTTTT.\nTWWT.\nTWWTt\nTTTT.")
+sprite("cartone", { outline: "K", pivot: "bottom" }, "kkkkkkk\nkkkYkkk\nNkkYkkN\nkkkkkkk\nNNNNNNN")
+// lo scaffale dei campioni
+sprite("scaffale_camp", { w: 44, h: 3, outline: "K" }, rect(0, 0, 44, 3, "N"), hline(0, 0, 44, "k"), hline(0, 2, 44, "m"))
+// la lavagna delle gare: quattro barre che crescono, l'ultima arriva in cima e prende la spunta
+const BARRE = [[5, 7, "B"], [15, 11, "Y"], [25, 9, "O"], [35, 15, "G"]]
+anim("lavagna_gare", { w: 44, h: 34, frames: LOOP, fps: FPS, outline: "K" },
+  rect(0, 0, 44, 30, "W"), box(0, 0, 44, 30, "s"), text(12, 3, "GARE", "D"), hline(3, 26, 38, "D"), vline(3, 9, 18, "D"),
+  rect(3, 30, 38, 2, "s"), hline(3, 31, 38, "D"), rect(30, 29, 6, 1, "R"),
+  (c) => BARRE.forEach(([x, h, k]) => {
+    const n = Math.max(1, Math.round(h * Math.min(1, (c.frame + 1) / 12)))
+    c.rect(x, 26 - n, 6, n, k)
+    if (k === "G" && c.frame >= 12) { c.px(38, 7, "G"); c.px(39, 8, "G"); c.px(40, 7, "G"); c.px(41, 6, "G"); c.px(42, 5, "G") }
+  }))
+// il commerciale (giacca blu) e il cliente (giacca marrone e baffi) che si stringono la mano: le mani vanno su e giù
+persona("_comm", { testa: "corti", abito: "completo", swap: { B: "b", b: "d", M: "m" } })
+persona("_cliente", { testa: "calvo", abito: "completo", swap: { B: "N", b: "m", M: "s", D: "m", R: "Y", F: "c", f: "x" } })
+const STRETTA = [0, -1, 0, 1, 0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+anim("stretta", { w: 32, h: 22, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
+  stamp("__comm", 0, 1), stamp("__cliente", 22, 1),
+  (c) => {
+    const dy = STRETTA[c.frame]
+    c.rect(9, 14, 2, 3, "b"); c.rect(11, 13 + dy, 4, 3, "b"); c.rect(17, 13 + dy, 4, 3, "N"); c.rect(21, 14, 2, 3, "N")
+    c.rect(15, 13 + dy, 2, 3, "F"); c.px(15, 14 + dy, "f"); c.rect(16, 13 + dy, 1, 3, "c")
+  })
+// la scrivania del commerciale con la stampante che sputa l'ordine (il foglio esce, poi ricomincia)
+sprite("scrivania_comm", { w: 40, h: 18, pivot: "bottom" },
+  rect(0, 0, 40, 3, "S"), hline(0, 0, 40, "W"), hline(0, 3, 40, "K"),
+  rect(2, 4, 36, 11, "j"), box(2, 4, 36, 11, "K"), box(22, 6, 14, 7, "s"), rect(28, 9, 2, 1, "S"), rect(2, 15, 3, 3, "d"), rect(35, 15, 3, 3, "d"))
+anim("stampante", { w: 14, h: 16, frames: LOOP, fps: FPS, outline: "K", pivot: "bottom" },
+  rect(0, 9, 14, 7, "z"), hline(0, 9, 14, "C"), rect(2, 12, 10, 1, "K"), hline(0, 15, 14, "Z"), px(11, 10, "G"),
+  (c) => { const n = Math.min(8, Math.floor(c.frame / 1.5)); if (n > 0) { c.rect(3, 12 - n, 8, n, "W"); if (n > 3) c.hline(4, 13 - n, 5, "S"); if (n > 5) c.hline(4, 15 - n, 4, "S") } })
+
+scene("clienti", { w: SW, h: SH, bg: "C", world: { light: [-0.6, -1], ground: 66 } },
+  layer("muro",
+    rect(0, 0, SW, 3, "O"), hline(0, 3, SW, "o"),
+    rect(0, 56, SW, 16, "D"), hline(0, 56, SW, "d"), ...[61, 67].map((y) => hline(0, y, SW, "d")),                     // moquette
+    stamp("cartina", 6, 6), stamp("orologio_cs", 62, 8),
+    stamp("scaffale_camp", 60, 34),
+    stamp("formaggio", 66, 34), stamp("vino", 76, 34), stamp("panettone", 85, 34), stamp("detersivo", 94, 34), stamp("cartone", 100, 34),
+    stamp("lavagna_gare", 112, 5)),
+  layer("dietro", stamp("scrivania_comm", 132, 66), stamp("stampante", 124, 48), stamp("tazza_n1", 140, 48), stamp("_fumo", 139, 43)),
+  layer("persone", stamp("stretta", 78, 70), stamp("pianta_ceo", 12, 69), stamp("valigetta", 104, 70)),
+)
