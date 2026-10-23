@@ -3,11 +3,12 @@
 Anche l'azienda del giocatore è guidata dal computer (con lo stile Standard, `botThink()` come le avversarie);
 i suoi eventi li decide subito il vice. Se fallisce esce dal gioco come un'avversaria e il mondo va avanti.
 Ogni partita ha il suo seme: con lo stesso seme e lo stesso codice esce la stessa partita.
-Le partite si confrontano con e senza il pacchetto Relazioni industriali.
+Le partite si confrontano con e senza i pacchetti (Relazioni industriali con --ri, Reparto IT e Ingegneria con --it).
 
 Uso:
   python3 tools/build.py && python3 tools/bilanciamento.py                  # 12 anni, 32 partite per lato
   python3 tools/bilanciamento.py --anni 6 --semi 16 --ri on                 # solo col pacchetto
+  python3 tools/bilanciamento.py --ri on --it both                          # Reparto IT e Ingegneria: con e senza, sempre con le Relazioni industriali
   python3 tools/bilanciamento.py --sub 'vecchio|||nuovo'                    # prova al volo una modifica del codice (senza ricompilare)
   python3 tools/bilanciamento.py --riepilogo tools/out/bil_*.json           # rilegge risultati già salvati
 Cosa guardare: «vive» = aziende ancora in piedi (senza pacchetti, al 12° anno: 43%); margine = utile / ricavi;
@@ -24,7 +25,7 @@ SIM = r'''async (o)=>{
  // generatore con seme: la stessa partita a ogni lancio
  let a=o.seed>>>0; Math.random=function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; };
  if(o.pre) eval(o.pre);   // --pre: modifiche ai dati prima della partita (per esempio F.CEOS)
- F.newGame(o.human,null,{mode:'classica',win:{},ri:o.ri});
+ F.newGame(o.human,null,{mode:'classica',win:{},ri:o.ri,it:!!o.it});
  const H=F.HUM; H.cfg.noPause=true;
  H.bots=o.rivals.map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],o.diff,i));
  const cos=[H,...H.bots], acc=cos.map(()=>({f:[0,0,0,0,0],ag:0,n:0,strDays:0,presDays:0,yr:[]}));
@@ -36,6 +37,8 @@ SIM = r'''async (o)=>{
      staff:c.warehouses.reduce((x,w)=>x+Object.values(w.staff).reduce((p,q)=>p+q,0),0),
      tr:c.trSt?c.trSt.n:0,trOk:c.trSt?c.trSt.ok:0,trLost:c.trSt?c.trSt.lost:0,trCost:c.trSt?c.trSt.cost:0,trCli:c.trSt?c.trSt.cli:0,
      v1:F.withCo(c,()=>{const w=c.warehouses.find(x=>x.own); return w?F.wvPrice(w):0;}),
+     res:Object.values(c.researched||{}).filter(Boolean).length,itc:12*F.withCo(c,()=>F.itCost()),aff:c.dep&&c.dep.it.aff!=null?c.dep.it.aff:null,ko:c.dep?c.dep.it.ko||0:0,
+     itp:c.office.it||0,ingp:c.office.ing||0,cons:c.dep?['it','ing'].filter(k=>c.dep[k].cons).length:0,ransom:c.ransom!=null?1:0,
      wage:R?R.wage:1,strikes:R?R.strikes||0:0,deals:R?R.deals||0:0,fails:R?(R.hist||[]).filter(x=>!x.ok).length:0,hdl:c.warehouses.filter(w=>w.hdl).length,conf:R&&R.conf?1:0}; };
  for(let d=0; d<o.years*365; d++){
    if(cos.every((c,i)=>c.over||(i===0&&hDead!=null))) break;
@@ -68,15 +71,16 @@ FASCE = ['calma', 'mugugno', 'agitazione', 'sciopero', 'presidio']
 
 def report(res):
     mean = lambda x: st.mean(x) if x else float('nan')
-    for ri in (False, True):
-        R = [x for x in res if x['o']['ri'] == ri]
+    for ri, it in ((False, False), (True, False), (False, True), (True, True)):
+        R = [x for x in res if x['o']['ri'] == ri and bool(x['o'].get('it')) == it]
         if not R: continue
         years = max(x['o']['years'] for x in R)
         by = defaultdict(list)
         for x in R:
             for i, c in enumerate(x['r']): by[('giocatore ' if i == 0 else '') + c['style']].append(c)
         allc = [c for v in by.values() for c in v]; N = len(allc)
-        print(f"===== {'CON il pacchetto Relazioni industriali' if ri else 'SENZA pacchetti'}: {len(R)} partite, {N} aziende")
+        nome = ' e '.join([n for n, on in (('Relazioni industriali', ri), ('Reparto IT e Ingegneria', it)) if on])
+        print(f"===== {'CON ' + nome if nome else 'SENZA pacchetti'}: {len(R)} partite, {N} aziende")
         print('fallite %d/%d · per stile: %s' % (sum(c['over'] for c in allc), N, ', '.join(f"{k} {sum(c['over'] for c in v)}/{len(v)}" for k, v in by.items())))
         byc = defaultdict(list)
         for c in allc: byc[c['ceo']].append(c)
@@ -91,6 +95,12 @@ def report(res):
                     f" · personale {pc('pers'):4.1f} mezzi {pc('mezzi'):4.1f} immobili {pc('fissi'):4.1f} tecnologie {pc('tech'):3.1f} manager {pc('mgr'):3.1f} altro {pc('altro'):3.1f}"
                     f" · clienti {g('cli'):4.1f} magazzini {g('wh'):3.1f} dipendenti {g('staff'):4.1f} morale {g('mor'):3.0f} · traslochi {g('tr'):3.2f}")
             if ri: line += f" · stipendi {g('wage'):.3f} scioperi {g('strikes'):3.1f} accordi {g('deals'):3.1f} tavoli saltati {g('fails'):3.1f} Confpallet {g('conf'):3.1f}"
+            line += f" · ricerche {g('res'):4.1f}"
+            if it:
+                af = [r['aff'] for r in rows if r.get('aff') is not None]
+                ko = [r['ko'] for r in rows]
+                line += (f" · reparti {pc('itc'):3.1f}% dei ricavi · IT {g('itp'):3.1f} ING {g('ingp'):3.1f} consulenti {g('cons'):3.1f}"
+                         f" · affidabilità {mean(af):4.1f} · guasti in tutto {g('ko'):4.1f} · ransomware {100*g('ransom'):3.0f}%")
             print(line)
         # traslochi: quanti ne fanno le aziende in tutta la partita, quanti riescono, clienti persi e costo; valore del primo magazzino di proprietà
         last = [c['acc']['yr'][-1] for c in allc if c['acc']['yr']]
@@ -125,7 +135,8 @@ async def simulate(a):
     for s in range(a.semi):
         human, rivals = ROT[(s + a.seed0) % len(ROT)]
         for ri in ([False, True] if a.ri == 'both' else [a.ri == 'on']):
-            jobs.append(dict(seed=1000 + (s + a.seed0) * 7919, ri=ri, years=a.anni, human=human, hstyle='standard', rivals=rivals, diff=a.diff, hook=a.hook, pre=a.pre))
+            for it in ([False, True] if a.it == 'both' else [a.it == 'on']):
+                jobs.append(dict(seed=1000 + (s + a.seed0) * 7919, ri=ri, it=it, years=a.anni, human=human, hstyle='standard', rivals=rivals, diff=a.diff, hook=a.hook, pre=a.pre))
     async with async_playwright() as p:
         br = await p.chromium.launch(); sem = asyncio.Semaphore(a.par); done = [0]
         async def one(o):
@@ -148,6 +159,7 @@ def main():
     ap.add_argument('--semi', type=int, default=32, help='partite per lato (ogni partita ha 4 aziende)')
     ap.add_argument('--seed0', type=int, default=0, help='primo seme: per aggiungere partite nuove a quelle già fatte')
     ap.add_argument('--ri', choices=['on', 'off', 'both'], default='both')
+    ap.add_argument('--it', choices=['on', 'off', 'both'], default='off', help='pacchetto Reparto IT e Ingegneria')
     ap.add_argument('--diff', default='normale', help='difficoltà delle avversarie')
     ap.add_argument('--par', type=int, default=os.cpu_count() or 2, help='partite in parallelo')
     ap.add_argument('--sub', action='append', default=[], help="prova una modifica senza ricompilare: 'vecchio|||nuovo'")

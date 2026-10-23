@@ -152,9 +152,9 @@ async def phone(b, w, h, name, errs):
     await pg.tap('[data-act=stnext]'); await pg.wait_for_timeout(200)
     assert await pg.evaluate("document.querySelector('#start [data-act=lbpack][data-id=ri]').getAttribute('aria-pressed')") == 'true', f'{name}: il pacchetto deve partire acceso'
     if not ri: await pg.tap('[data-act=lbpack][data-id=ri]')
-    # il pacchetto Reparto IT e Ingegneria parte spento: in verticale lo si accende, insieme alle Relazioni industriali
-    assert await pg.evaluate("document.querySelector('#start [data-act=lbpack][data-id=it]').getAttribute('aria-pressed')") == 'false', f'{name}: il pacchetto Reparto IT e Ingegneria deve partire spento'
-    if ri: await pg.tap('[data-act=lbpack][data-id=it]')
+    # anche il pacchetto Reparto IT e Ingegneria parte acceso (dalla 0.119): in orizzontale si spengono tutti e due
+    assert await pg.evaluate("document.querySelector('#start [data-act=lbpack][data-id=it]').getAttribute('aria-pressed')") == 'true', f'{name}: il pacchetto Reparto IT e Ingegneria deve partire acceso'
+    if not ri: await pg.tap('[data-act=lbpack][data-id=it]')
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: i pacchetti scorrono di lato'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_pacchetti.png'), full_page=True)
     await pg.tap('[data-act=startgame]'); await pg.tap('[data-act=closemodal]')
@@ -441,7 +441,9 @@ async def tutorial(b, errs, mob, tid='base'):
             continue
         if await pg.evaluate('()=>window.__FUP.S.tut.i') != last: continue
         nx = await pg.query_selector('#tut [data-act=tutnext]')
+        # il passo si ricontrolla dopo aver trovato «Avanti»: un passo con «Avanti» non va avanti da solo, quindi il pulsante è proprio il suo
         if nx and await nx.is_visible():
+            if await pg.evaluate('()=>window.__FUP.S.tut.i') != last: continue
             await (nx.tap() if mob else nx.click()); await pg.wait_for_timeout(80); continue
         if st['run'] and st['speed'] > 0:   # tempo che scorre: un giorno in più a ogni giro
             await pg.evaluate("()=>{const F=window.__FUP; if(F.S.speed>0){F.step(); F.renderAll();}}")
@@ -568,8 +570,12 @@ async def main():
         await pg.click('[data-act=stnext]')
         assert await pg.evaluate("document.querySelectorAll('#start .pk').length") == 3, 'passo Pacchetti: gioco base più le due espansioni'
         await pg.screenshot(path=os.path.join(OUT, 'shot_crea_8_pacchetti.png'), full_page=True)
+        # i due pacchetti partono accesi; qui si spegne il Reparto IT, che ha le sue prove: con lui le tecnologie si avviano invece di installarsi subito
+        assert await pg.evaluate("[...document.querySelectorAll('#start [data-act=lbpack]')].map(b=>b.dataset.id+':'+b.getAttribute('aria-pressed')).sort().join()") == 'it:true,ri:true', 'i pacchetti devono partire accesi'
+        await pg.click('[data-act=lbpack][data-id=it]')
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
         lb = await pg.evaluate('()=>{const F=window.__FUP,H=F.HUM;return {n:H.bots.length,ids:H.bots.map(b=>b.bot.id),diff:H.bots.find(b=>b.bot.id==="edoardo").bot.diff,sty:Object.fromEntries(H.bots.map(b=>[b.bot.id,b.bot.style])),win:H.cfg.win,mode:H.cfg.mode,cols:[H.company.color,...H.bots.map(b=>b.company.color)]}}')
+        assert await pg.evaluate('()=>window.__FUP.HUM.cfg.ri===true&&window.__FUP.HUM.cfg.it===false'), 'pacchetti della partita principale'
         assert lb['n'] == 2 and 'gino' not in lb['ids'] and 'marco' not in lb['ids'] and lb['diff'] == 'spietato' and lb['sty'] == {'edoardo': 'standard', 'valeria': 'prezzo'}, lb
         assert lb['win']['reputazione'] and lb['mode'] == 'classica' and len(set(lb['cols'])) == 3, lb
         c = await pg.evaluate('()=>{const S=window.__FUP.S;return {id:S.ceoId,n:S.custom.name,tal:S.custom.tal,st:S.custom.st,co:S.company.name,logo:S.company.logo,claim:S.company.claim,nick:S.custom.nick,wh:S.warehouses[0].site,cl:S.clients[0].name}}')
@@ -1348,8 +1354,8 @@ async def main():
         r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('marco',null,{mode:'classica',win:{},it:true}); const S=F.S,o={},w=S.warehouses[0]; S.cash=3e6; S.nextEvent=1e9;
           S.office.it=1; S.dep.it.as=1; const T=id=>F.TECH.find(t=>t.id===id);
           o.techs=['sala','sicurezza','cloud'].every(T);
-          o.pts=F.itSys().reduce((a,x)=>a+x.n,0)===6&&Math.abs(F.itNeed()-1)<1e-9&&F.itSupply()===1.5&&F.depFree('it')===0&&F.techLine(T('rf'))==='dir';
-          F.ACT.itas({v:-1}); o.lav=S.dep.it.as===0&&F.depFree('it')===1&&F.itSupply()===0.5&&F.noteAlerts().some(a=>a.id==='itload');
+          o.pts=F.itSys().reduce((a,x)=>a+x.n,0)===6&&Math.abs(F.itNeed()-1)<1e-9&&Math.abs(F.itSupply()-1-F.itCeo())<1e-9&&F.depFree('it')===0&&F.techLine(T('rf'))==='dir';
+          F.ACT.itas({v:-1}); o.lav=S.dep.it.as===0&&F.depFree('it')===1&&Math.abs(F.itSupply()-F.itCeo())<1e-9&&F.noteAlerts().some(a=>a.id==='itload');
           F.ACT.itas({v:1}); o.back=S.dep.it.as===1&&!F.noteAlerts().some(a=>a.id==='itload');
           const t0=F.itTgt(); S.dep.it.aff=50; F.step(); o.aff=S.dep.it.aff>50&&S.dep.it.aff<t0;
           F.step(); const k0=w.kpi; F.itKoStart(w,'wms'); const k1=w.kpi; o.ko=!!w.itko&&k1.prod<k0.prod*0.7&&k1.pP.some(x=>x[0].includes('Guasto informatico'))&&S.notes.some(n=>n.key==='itko'+w.id);
