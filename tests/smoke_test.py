@@ -1327,6 +1327,27 @@ async def main():
         await pg.click('#modal [data-act=evopt][data-i="0"]')
         r = await pg.evaluate("()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; document.querySelector('#modal').innerHTML=''; F.step(); return {gone:!w.tech.wms,cd:!!(w.avvCd&&w.avvCd.wms>S.day),back:S.cash>window.__cash};}")
         assert all(r.values()), f'avvio disastroso, marcia indietro: {r}'
+        # assistenza, affidabilità, guasti e sistemi obsoleti (0.111): lavagna, carico, guasto forzato con i suoi effetti e la sua fine,
+        # sistema obsoleto (avviso, canone, obiettivo), aggiornamento come progetto del Reparto IT, sistema aziendale, ricerche nuove dell'IT
+        r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('marco',null,{mode:'classica',win:{},it:true}); const S=F.S,o={},w=S.warehouses[0]; S.cash=3e6; S.nextEvent=1e9;
+          S.office.it=1; S.dep.it.as=1; const T=id=>F.TECH.find(t=>t.id===id);
+          o.techs=['sala','sicurezza','cloud'].every(T);
+          o.pts=F.itSys().reduce((a,x)=>a+x.n,0)===6&&Math.abs(F.itNeed()-1)<1e-9&&F.itSupply()===1.5&&F.depFree('it')===0&&F.techLine(T('rf'))==='dir';
+          F.ACT.itas({v:-1}); o.lav=S.dep.it.as===0&&F.depFree('it')===1&&F.itSupply()===0.5&&F.noteAlerts().some(a=>a.id==='itload');
+          F.ACT.itas({v:1}); o.back=S.dep.it.as===1&&!F.noteAlerts().some(a=>a.id==='itload');
+          const t0=F.itTgt(); S.dep.it.aff=50; F.step(); o.aff=S.dep.it.aff>50&&S.dep.it.aff<t0;
+          F.step(); const k0=w.kpi; F.itKoStart(w,'wms'); const k1=w.kpi; o.ko=!!w.itko&&k1.prod<k0.prod*0.7&&k1.pP.some(x=>x[0].includes('Guasto informatico'))&&S.notes.some(n=>n.key==='itko'+w.id);
+          for(let i=0;i<4;i++){ document.querySelector('#modal').innerHTML=''; F.step(); } o.fixed=!w.itko;
+          const c0=w.kpi.tCan; w.tech.wms.day=S.day-3700; F.step(); o.old=F.sysObs(F.sysRec('wms',w))&&F.noteAlerts().some(a=>a.id==='itold')&&w.kpi.tCan>c0&&F.itTarget().some(x=>x[0].includes('obsolet'));
+          o.why=!!F.avvWhy(T('gps'),w,'int',1);
+          F.ACT.updopen({id:'wms',wh:w.id}); o.modal=document.querySelector('#modal').innerText.includes('Aggiornamento');
+          F.ACT.avvset({by:'gigabancale'}); F.ACT.avvgo(); const a=S.avv.find(x=>x.upd); o.upd=!!a&&a.dep==='it'&&a.n===0&&a.cost===10500;
+          a.live=S.day; const R0=Math.random; Math.random=()=>0.99; F.step(); Math.random=R0; o.done=!!a.esito&&S.day-w.tech.wms.day<=1&&!F.sysObs(F.sysRec('wms',w))&&w.tech.wms.lm<1;
+          S.sysDay.gestionale=S.day-3700; F.ACT.updopen({id:'gestionale'}); F.ACT.avvgo(); const g=S.avv.find(x=>x.tech==='gestionale'); o.co=!!g&&g.wh===null&&g.by==='int';
+          g.live=S.day; Math.random=()=>0.99; F.step(); Math.random=R0; o.coDone=!!g.esito&&!F.sysObs(F.sysRec('gestionale',null));
+          const tg=F.itTgt(), nd=F.itNeed(); ['sala','sicurezza','cloud'].forEach(id=>S.researched[id]=true); o.res=F.itTgt()>=Math.min(100,tg+10)&&F.itNeed()<nd&&F.itFees()===300;
+          return o;}''')
+        assert all(r.values()), f'assistenza, affidabilità, guasti e aggiornamenti del Reparto IT: {r}'
         r = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino',null,{mode:'classica',win:{},it:true}); const H=F.HUM; H.nextEvent=40;
           H.bots=[['edoardo','espansione'],['valeria','qualita'],['marco','prezzo']].map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],'normale',i));
           for(let d=0;d<365&&!H.over;d++){ const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}
@@ -1344,6 +1365,13 @@ async def main():
         await pg.evaluate("()=>{const F=window.__FUP,S=F.S; S.researched.barcode=true; F.openWin('reparti'); const w=S.warehouses.find(x=>!x.tech.barcode)||S.warehouses[0]; F.ACT.avvopen({id:'barcode',wh:w.id});}"); await pg.wait_for_timeout(400)
         assert await pg.query_selector('#modal [data-act=avvgo]') and await pg.query_selector('#modal .av-pb'), 'finestrella dell\'avvio incompleta'
         await pg.screenshot(path=os.path.join(OUT, 'shot_it_avvio.png'))
+        await pg.evaluate("()=>{document.querySelector('#modal').innerHTML='';}")
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; w.tech.wms={day:S.day-3700}; S.dep.it.as=1; F.itKoStart(w,'wms'); F.step(); document.querySelector('#modal').innerHTML=''; document.querySelectorAll('#toasts > *').forEach(e=>e.remove()); F.cardsOff(); F.openWin('reparti'); document.querySelectorAll('#win-tecnologia .dep-k')[1].scrollIntoView();}"); await pg.wait_for_timeout(500)
+        assert await pg.query_selector('#win-tecnologia .lv [data-act=itas]') and await pg.query_selector('#win-tecnologia [data-act=updopen]'), 'scheda Reparti tecnici senza lavagna o senza aggiornamenti'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_it_sistemi.png'))
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S; F.ACT.updopen({id:'wms',wh:S.warehouses[0].id});}"); await pg.wait_for_timeout(400)
+        assert await pg.query_selector('#modal [data-act=avvgo]') and 'Aggiornamento' in await pg.inner_text('#modal'), 'finestrella dell\'aggiornamento incompleta'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_it_aggiorna.png'))
         await pg.evaluate("()=>{document.querySelector('#modal').innerHTML='';}")
         await pg.evaluate("()=>{window.__FUP.ACT.mpopen({k:'dep',id:'ing'});}"); await pg.wait_for_timeout(400)
         assert 'Responsabile IT' in await pg.inner_text('#modal'), 'nella scelta del responsabile chi guida l\'altro reparto deve stare in grigio col suo ruolo'

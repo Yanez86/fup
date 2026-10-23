@@ -357,6 +357,43 @@ tecnologia("edifici", "org", { mx: true, tieni: "L" }, `
   .SLLS
   .SSSS`)
 
+// Sala server e backup (pacchetto Reparto IT e Ingegneria): l'armadio con le lucine e il disco della copia di stanotte
+tecnologia("sala", "org", {}, `
+  DDDDD.....
+  DhddD.....
+  DDDDD.....
+  DiddD.....
+  DDDDD.....
+  DhddD.....
+  DDDDD..BB.
+  DiddD.BLLB
+  DDDDD.BLLB
+  .D.D...BB.`)
+// Sicurezza informatica: il lucchetto, che la password non sta più sul post-it
+tecnologia("sicurezza", "org", { mx: true }, `
+  ...SS
+  ..S..
+  ..S..
+  ..S..
+  .YYYY
+  .YYYY
+  .YYYd
+  .YYYd
+  .YYYY
+  .YYYY`)
+// Server in cloud: la nuvola, e sotto il server che non sta più in sede
+tecnologia("cloud", "org", { tieni: "W" }, `
+  ...WWW....
+  .WWWWWWW..
+  WWWWWWWWW.
+  WWWWWWWWWW
+  .WWWWWWWW.
+  ...s..s...
+  ...s..s...
+  .DDDDDDDD.
+  .DhddddiD.
+  .DDDDDDDD.`)
+
 // ================================================================ Mercato (tondo verde)
 // Ufficio commerciale: il telefono rosso dei venditori
 tecnologia("commerciale", "mkt", { dopo: [grid(3, 5, `
