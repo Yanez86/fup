@@ -1168,6 +1168,43 @@ async def main():
         assert r['board'] == 3 and (r['gm'] >= 1 or not r['more']), f'le avversarie non assumono dalle candidature spontanee: {r}'
         print('avversari dopo 2 anni:', r)
         assert r['sizeKB'] < 2500, f'salvataggio troppo grande: {r}'
+        # gare sulla mappa (0.106): una puntina per ogni gara aperta, tooltip calcolato all'apertura, il clic apre la gara e la evidenzia
+        g = await pg.evaluate("""()=>{const F=window.__FUP,H=F.HUM; document.querySelector('#modal').innerHTML=''; document.querySelectorAll('.win [data-act=close]').forEach(b=>b.click());
+          if(!H.tenders.some(t=>!t.done)) F.newTender(); F.renderMap();
+          const pins=[...document.querySelectorAll('#ov [data-act=mapten]')], t=H.tenders.find(x=>!x.done&&x.id===pins[0].dataset.id);
+          pins[0].dispatchEvent(new MouseEvent('mouseover',{bubbles:true})); const tip=document.querySelector('#tip').innerText;
+          F.ACT.mapten({id:t.id}); const on=!!document.querySelector('#win-gare')&&document.querySelectorAll('#ov path[stroke-dasharray="7 5"]').length>0;
+          const sel=document.querySelector('#ov [data-act=mapten][data-id="'+t.id+'"] .mk-ring').getAttribute('fill');
+          document.querySelector('#win-gare [data-act=mapten][data-tog]').click(); const off=document.querySelectorAll('#ov path[stroke-dasharray="7 5"]').length===0;
+          return {n:pins.length,open:H.tenders.filter(x=>!x.done).length,tip,on,sel,off};}""")
+        assert g['n'] == g['open'] and g['n'] > 0, f'puntine delle gare sulla mappa: {g}'
+        assert ' km · ' in g['tip'] and 'probabilità' in g['tip'].lower(), f'tooltip della puntina: {g}'
+        assert g['on'] and g['sel'] == '#ffd23f' and g['off'], f'gara evidenziata sulla mappa: {g}'
+        await pg.evaluate("()=>{const F=window.__FUP; F.ACT.mapten({id:F.HUM.tenders.find(x=>!x.done).id});}")
+        await pg.screenshot(path=os.path.join(OUT, 'shot_gare_mappa.png'))
+        # eventi con un posto (0.106): la zona compare sulla mappa e la risposta pesa su ogni magazzino in proporzione ai suoi viaggi
+        # nella zona. Il giocatore di questa partita non fa offerte: per il controllo gli si presta un cliente in Lombardia (poi si toglie).
+        # Si prende l'evento la cui zona tocca di più i suoi viaggi (P0 = puntualità della prima risposta)
+        P0 = {'nebbia': -4, 'allerta': -8, 'moda': -2, 'a1': -2, 'brennero': -4, 'po': -6}
+        ev_id = await pg.evaluate("""(P0)=>{const F=window.__FUP,H=F.HUM; document.querySelectorAll('.win [data-act=close]').forEach(b=>b.click()); F.cardsOff();
+          H.notes=H.notes.filter(n=>n.k!=='ev'); H.evPend=[];
+          const c0=H.bots.flatMap(b=>b.clients)[0]; H.clients.push({...c0,id:'clzona',req:[],line:null,peak:null,wh:H.warehouses[0].id,status:'attivo',zone:'reg_lom',mode:'consegna',pal:300,stock:250,sat:60});
+          const best=Object.keys(P0).map(k=>[k,Math.max(0,...H.warehouses.map(w=>F.areaShare(k,w)))]).sort((a,b)=>b[1]-a[1])[0]; return best[0];}""", P0)
+        await pg.evaluate(FIRE, ev_id)
+        a = await pg.evaluate("""(id)=>{const F=window.__FUP,S=F.S,n=S.notes.find(x=>x.k==='ev'&&x.ev&&x.ev.id===id); F.ACT.note({id:n.id});
+          return {aree:S.aree.length, mappa:document.querySelectorAll('#ov [data-tipf=area]').length, win:document.querySelector('#modal').innerText};}""", ev_id)
+        assert a['aree'] == 1 and a['mappa'] == 1 and 'Sulla mappa' in a['win'], f'zona dell\'evento {ev_id}: {a}'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_evento_zona.png'))
+        await pg.click('#modal [data-act=evopt][data-i="0"]')
+        a = await pg.evaluate("""([id,p0])=>{const F=window.__FUP,S=F.S,tt=F.EVENTS.find(e=>e.id===id).title; for(let i=0;i<2;i++) F.step();
+          const q=S.warehouses.map(w=>{const s=F.areaShare(id,w), m=S.mods.find(x=>x.scope===w.id&&x.src===tt); return [Math.round(s*1000)/1000, m?m.P:null];});
+          const ok=q.every(([s,p])=>s<0.03?p==null:Math.abs(p-Math.round(p0*s*10)/10)<0.15);
+          const all=S.mods.some(x=>x.scope==='all'&&x.src===tt), z=S.aree[0], until=z&&z.until;
+          for(let i=0;until&&S.day<=until&&i<60;i++) F.step();
+          S.clients=S.clients.filter(c=>c.id!=='clzona');
+          return {q,ok,all,until,dopo:S.aree.length,mappa:document.querySelectorAll('#ov [data-tipf=area]').length,hit:q.some(([s])=>s>=0.03)};}""", [ev_id, P0[ev_id]])
+        assert a['hit'] and a['ok'] and not a['all'] and a['until'] and a['dopo'] == 0 and a['mappa'] == 0, f'effetto di {ev_id} in proporzione ai viaggi: {a}'
+        print(f'evento con un posto «{ev_id}»: quota dei viaggi e puntualità per magazzino', a['q'])
         # vittoria: una condizione facile fa comparire la finestra di fine partita
         w = await pg.evaluate('''()=>{const F=window.__FUP,H=F.HUM; document.querySelector('#modal').innerHTML=''; H.cfg.reputazione=1; F.checkWin();
           return {won:H.won,txt:document.querySelector('#modal').innerText};}''')
