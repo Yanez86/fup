@@ -1337,6 +1337,7 @@ async def main():
           for(let i=0;i<16&&!a.esito;i++){ document.querySelector('#modal').innerHTML=''; F.step(); } o.live=!!a.esito&&!!w.tech.barcode&&w.tech.barcode.lm>0;
           for(let i=0;i<16;i++){ document.querySelector('#modal').innerHTML=''; F.step(); } o.care=!S.avv.includes(a)&&F.depFree('it')===2;
           F.ACT.avvopen({id:'wms',wh:w.id}); F.ACT.avvset({by:'nebbia',mode:'bb'}); F.ACT.avvgo(); const b=S.avv.find(x=>x.tech==='wms'); o.cons=!!b&&b.n===0&&F.depFree('it')===2;
+          F.mktList().forEach(p=>p.until=S.day+99);  // col caso fermo a 0 un candidato nuovo pescherebbe all'infinito lo stesso talento
           b.live=S.day; const R0=Math.random; Math.random=()=>0; F.step(); Math.random=R0; o.bad=b.esito==='disastro'&&!!w.tech.wms;
           const n=S.notes.find(x=>x.k==='ev'&&x.ev.id==='avv_ko'); o.ev=!!n; if(n) F.ACT.note({id:n.id}); window.__cash=S.cash; return o;}''')
         assert all(r.values()), f'avvii del pacchetto Reparto IT e Ingegneria: {r}'
