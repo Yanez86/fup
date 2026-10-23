@@ -850,4 +850,25 @@ pulsante("dep_ing", 12, { mx: true }, `
   .....
   .....`)
 
+// Happy Squid Inc.: calamaro sorridente (firma in fondo alle Opzioni); occhi, guance e bocca dopo la fascia
+pulsante("squid", 16, { mx: true, dopo: [grid(3, 6, `
+  .K....K.
+  e......e
+  ..K..K..
+  ...KK...`)] }, `
+  ......P
+  .....PP
+  ....PPP
+  ..PPPPP
+  PPPPPPP
+  .PPPPPP
+  ..PPPPP
+  ..PPPPP
+  ..PPPPP
+  ..PPPPP
+  ..PPPPP
+  ..PP.PP
+  .PP..P.
+  P....P.`)
+
 foglio("foglio")
