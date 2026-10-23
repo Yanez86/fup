@@ -418,6 +418,42 @@ tecnologia("lean", "org", {}, `
   .......YYY
   ....YYYYYY
   .YYYYYYYYY`)
+// Cruscotto dei KPI (pacchetto Reparto IT e Ingegneria): lo schermo con le barre e la soglia rossa
+tecnologia("cruscotto", "org", {}, `
+  DDDDDDDDDD
+  DddddddddD
+  DdRRRRRRdD
+  DddddGdddD
+  DddYdGdBdD
+  DdGYdGdBdD
+  DdGYdGdBdD
+  DDDDDDDDDD
+  ....SS....
+  ..SSSSSS..`)
+// Previsioni con l'intelligenza artificiale: il chip con la curva che sale
+tecnologia("ai", "org", {}, `
+  .S.S.S.S..
+  SPPPPPPPPS
+  .PllllllP.
+  SPllllGGPS
+  .PlllGllP.
+  SPGlGlllPS
+  .PlGllllP.
+  SPPPPPPPPS
+  .S.S.S.S..
+  ..........`)
+// Gemello digitale: il magazzino vero e la sua copia al computer, in fil di ferro
+tecnologia("gemello", "org", { tieni: "L" }, `
+  ..N.......
+  .NNN...B..
+  NNNNN.B.B.
+  NWNWN.BLB.
+  NNNNNB...B
+  NNWNNBLBLB
+  NNWNNB...B
+  NNNNNBBBBB
+  ..........
+  ..........`)
 // Sala server e backup (pacchetto Reparto IT e Ingegneria): l'armadio con le lucine e il disco della copia di stanotte
 tecnologia("sala", "org", {}, `
   DDDDD.....

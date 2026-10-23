@@ -1386,6 +1386,43 @@ async def main():
  const m0=w.met; a.live=S.day; document.querySelector('#modal').innerHTML=''; F.step(); o.crono=!!w.tech.ergonomia&&w.met>m0;
  return o;}''')
         assert all(r.values()), f'Ingegneria in magazzino e lavori del welfare: {r}'
+        # contorno (0.113): ricerche, policy e talenti solo col pacchetto, congelamento, reperibilità, GDPR, i 12 eventi (setup e risposte),
+        # vittoria Magazzino 4.0 (e i disastri che la bloccano), bollino rosso del guasto sulla mappa, tappa della cronaca
+        r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML='';
+ const o={}, PT=['Ha il server in cantina','Cintura nera del Lean','Cronometro facile','Nemico delle password'];
+ F.newGame('gino',null,{mode:'classica',win:{},it:false}); let S=F.S;
+ o.offPol=!F.POLICIES.some(p=>['congelamento','reperibilita','cronometro','leanp'].includes(p.id))&&!F.TECH.some(t=>t.id==='gemello');
+ o.offTal=!Array.from({length:300},()=>F.genPerson()).some(p=>p.tal.some(n=>PT.includes(n)));
+ F.newGame('gino',null,{mode:'classica',win:{},it:true}); S=F.S; S.cash=5e6; S.nextEvent=1e9; const w=S.warehouses[0], T=id=>F.TECH.find(t=>t.id===id);
+ o.onPol=['congelamento','reperibilita','cronometro','leanp'].every(id=>F.POLICIES.some(p=>p.id===id))&&['cruscotto','ai','gemello'].every(T);
+ o.onTal=Array.from({length:400},()=>F.genPerson()).some(p=>p.tal.some(n=>PT.includes(n)));
+ // congelamento: un avvio che cadrebbe a novembre aspetta il 15 gennaio
+ S.pol=S.pol||{}; S.pol.congelamento={on:true}; const nov=Math.round((Date.UTC(2002,10,10)-Date.UTC(2002,0,1))/864e5), gen=Math.round((Date.UTC(2003,0,15)-Date.UTC(2002,0,1))/864e5);
+ o.frz=F.frz(nov)&&F.avvLive(nov)===gen&&F.avvLive(100)===100;
+ // reperibilità: guasti a metà
+ S.researched.barcode=true; w.tech.barcode={day:-100}; S.pol.reperibilita={on:true}; S.dep.it.as=0; const k=F.itKoStart(w,'term'); o.rep=k.to-k.from<=3; delete w.itko;
+ // GDPR: il cliente S e FarmaSpa chiedono la Sicurezza; gara nuova con il requisito
+ F.gdprStart(); o.gdpr=F.gdprOn()&&F.HUM.gdpr!=null;
+ // eventi del pacchetto: setup e tutte le risposte senza errori
+ S.office.it=2; S.office.ing=1; S.dep.it.as=1; ['wms','gps','amr'].forEach(id=>{S.researched[id]=true; w.tech[id]={day:-500};});
+ const ids=F.EVENTS.filter(e=>e.id.startsWith('it_')).map(e=>e.id); o.nev=ids.length;
+ let err=''; ids.forEach(id=>{ try{ const b=F.EVENTS.find(e=>e.id===id), ev={...b}; if(id==='it_concorrente'){ F.HUM.bots=[F.newRival('valeria','#3dd6c4','camion','qualita','normale',0)]; F.HUM.bots[0].ransom=S.day; }
+   if(ev.setup) ev.setup(ev); ev.opts.forEach(op=>{ if(op.f) op.f.call(ev); }); }catch(e){ err+=id+': '+e.message+'; '; } }); o.err=err||true;
+ // Magazzino 4.0
+ F.ACT.rent({id:'piacenza'}); F.ACT.rent({id:'lodi'}); document.querySelector('#modal').innerHTML='';
+ ['rf'].forEach(id=>S.researched[id]=true); S.warehouses.forEach(x=>['wms','rf','amr'].forEach(id=>x.tech[id]={day:-2000}));
+ S.hist=Array.from({length:26},(_,i)=>({d:i*30,rel:90,ric:0,util:0})); S.dep.it.dis=null; o.m40=F.m40Prog(F.HUM)>=1&&S.warehouses.length>=3;
+ S.dep.it.dis=S.day-100; o.m40dis=F.m40Prog(F.HUM)<1;
+ // bollino del guasto sulla mappa, tappa della cronaca
+ S.dep.it.sys0=-2000; S.dep.it.lastKo=null; S.log=[]; F.chronMiles(); o.chron=S.log.some(x=>x.k==='m_it1000');
+ F.HUM.bots=[]; F.itKoStart(S.warehouses[0],'wms'); document.querySelector('#modal').innerHTML=''; F.renderMap(); o.badge=!!document.querySelector('#ov rect[fill="#e0393e"]');
+ return o;}''')
+        assert r.pop('err') is True and all(r.values()) and r['nev'] == 12, f'contorno del pacchetto Reparto IT e Ingegneria: {r}'
+        await pg.evaluate(FIRE, 'it_ransom')
+        await pg.evaluate("()=>{const F=window.__FUP,n=F.S.notes.find(x=>x.k==='ev'); if(n) F.ACT.note({id:n.id}); F.cardsOff();}"); await pg.wait_for_timeout(400)
+        assert await pg.evaluate("!!document.querySelector('#modal .ev-scn i')&&document.querySelector('#modal .ev-scn i').dataset.scena==='sala_server'"), 'evento del ransomware senza la scenetta della sala server'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_it_evento.png'))
+        await pg.evaluate("()=>{document.querySelector('#modal').innerHTML='';}")
         r = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino',null,{mode:'classica',win:{},it:true}); const H=F.HUM; H.nextEvent=40;
           H.bots=[['edoardo','espansione'],['valeria','qualita'],['marco','prezzo']].map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],'normale',i));
           for(let d=0;d<365&&!H.over;d++){ const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}
