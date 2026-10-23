@@ -1,6 +1,6 @@
 # Pacchetto «Reparto IT e Ingegneria» (progetto)
 
-**Stato: primo pezzo costruito nella versione 0.109** (reparti, consulenti a contratto, tre linee di ricerca, sesto direttore, capannoni innovativi: regole esatte in `docs/design.md`). Il resto è ancora proposta, con le decisioni di Davide (sotto).
+**Stato: primo pezzo costruito nella versione 0.109** (reparti, consulenti a contratto, tre linee di ricerca, sesto direttore, capannoni innovativi), **secondo pezzo nella 0.110** (avvii nei magazzini); regole esatte in `docs/design.md`. Il resto è ancora proposta, con le decisioni di Davide (sotto).
 I numeri sono una prima proposta, tarata su quelli già in uso (stipendi, apprendimento, audit, customer service); vanno ritoccati con `tools/bilanciamento.py`.
 
 ## L'idea in breve
@@ -299,7 +299,7 @@ Con `tools/bilanciamento.py` (partite di 12 anni, 4 aziende guidate dal computer
 ## 19. Ordine di costruzione (proposta)
 Un pezzo per versione, ognuno giocabile da solo:
 1. **I reparti** (fatto nella 0.109): responsabile, addetti, consulente a contratto, divisione delle tecnologie, linee di ricerca, sesto direttore, capannoni innovativi. Scheda «Reparti tecnici». Per ora tutte le persone del reparto lavorano alla ricerca: la lavagna con le colonne Avvii e Magazzini arriva con i pezzi 2-4, quando quelle colonne avranno un lavoro da fare. Le avversarie usano solo i consulenti e non nominano direttori.
-2. **Gli avvii**: preparazione, graduale e big bang, esito, consulente a progetto, evento del go-live.
+2. **Gli avvii** (fatto nella 0.110): preparazione, graduale e big bang, esito, consulente a progetto, eventi «Il go-live è andato storto» e «Nessuno usa la novità». Come previsto: la squadra interna occupa persone che intanto non fanno ricerca; il big bang c'è per le tecnologie informatiche, il magazzino verticale e i robot. Le avversarie installano ancora con un clic. Gli eventi usano per ora le scene che esistono già (l'ufficio tecnologie e il magazzino): la «Sala server» e l'«Ufficio tecnico» arrivano col pezzo degli eventi.
 3. **L'IT che tiene in piedi**: assistenza, affidabilità, guasti, sistemi che invecchiano.
 4. **L'Ingegneria in magazzino e il welfare al facility manager**: miglioramento continuo, lavori del welfare, collegamenti con traslochi e cantieri, ricerche nuove.
 5. **Il contorno**: policy, talenti, eventi, vittoria, cronaca.

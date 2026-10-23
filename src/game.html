@@ -233,7 +233,9 @@ html:not(.mob) #dock.wide .dg{height:auto;border:0;overflow:visible;margin:5px 2
 /* scheda Ricerca: barra della ricerca in corso, numeri in una riga, albero e scheda della tecnologia */
 .rbar{display:flex;align-items:center;gap:12px;padding:8px 10px;background:#fff4c7;border:2px solid var(--ink);box-shadow:2px 2px 0 var(--ink)}
 .rbar.idle{background:#ffe1d6;border-left:8px solid var(--bad)}
-.rbars{display:grid;gap:8px}.rbar.stop{background:#ffe1d6}.rbar.free{background:#f4f6f9;border-left:8px solid #8a96a6}.rbar .rb-l{font:600 13px var(--f-body);color:#4a5f7a;text-transform:uppercase;letter-spacing:.03em}
+.rbars{display:grid;gap:8px}
+.av-pb{display:flex;height:16px;border:2px solid var(--ink);background:#f4f6f9}.av-pb i{display:block;height:100%}.av-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px}.av-leg i{display:inline-block;width:10px;height:10px;border:2px solid var(--ink);margin-right:4px;vertical-align:-1px}
+.av-sc summary{cursor:pointer;font-size:13px;min-height:32px;display:flex;align-items:center}.av-sc .row{font-size:13px}.av-lg{flex:none;display:inline-flex}.rbar.stop{background:#ffe1d6}.rbar.free{background:#f4f6f9;border-left:8px solid #8a96a6}.rbar .rb-l{font:600 13px var(--f-body);color:#4a5f7a;text-transform:uppercase;letter-spacing:.03em}
 .tdep{display:inline-flex;align-items:center;justify-content:center;font:700 11px var(--f-body);color:var(--ink);background:#dcecfc;border:2px solid var(--ink);padding:1px;line-height:12px;vertical-align:middle}.tdep.ing{background:#fff4c7}.h3 .tdep{padding:2px}
 .tnode .tdep{position:absolute;right:3px;bottom:3px;z-index:1}
 .dep-k .wh-st{margin-top:6px}.dep-cl{display:flex;align-items:center;gap:8px;margin-top:4px}
@@ -3441,7 +3443,7 @@ function newGame(ceoId,coName,color,custom,co){
   const C=custom||CEOS.find(c=>c.id===ceoId); if(custom) ceoId='custom';
   if(!HUM||S===HUM){UI.mq=[]; UI.auto=null;}  // nuova partita: niente finestre rimaste in coda dalla precedente
   S={v:1,day:0,speed:0,ceoId,custom:custom||null,company:{name:coName||C.company,color,logo:(co&&co.logo)||'camion',claim:(co&&co.claim)||''},cash:C.cash,rep:C.rep,fuel:0.86,
-     warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0,cs:0,it:0,ing:0},dep:depNew(),cs:{resp:null,q:[],last:-99,log:[],ov:[]},managers:[...MANAGERS,...EXECS].map(newPerson),hh:[],cands:[],negs:{},boss:{...JSON.parse(JSON.stringify(C)),bd:bdOf(C.age,hashN(C.name)),since:0,log:[]},alumni:[],
+     warehouses:[],clients:[],tenders:[],queue:[],office:{plan:0,cs:0,it:0,ing:0},dep:depNew(),avv:[],cs:{resp:null,q:[],last:-99,log:[],ov:[]},managers:[...MANAGERS,...EXECS].map(newPerson),hh:[],cands:[],negs:{},boss:{...JSON.parse(JSON.stringify(C)),bd:bdOf(C.age,hashN(C.name)),since:0,log:[]},alumni:[],
      welfare:{},researched:{},mods:[],news:[],cur:z(),last:null,months:0,nextEvent:25,project:null,seen:{},over:false,uid:1,
      execs:[],dirs:{op:null,comm:null,hr:null,fin:null,tech:null,ing:null},weeks:[],repNew:false,hist:[],tw:{win:0,lose:0,skip:0},pol:{},notes:[],noteId:0,certMig:3,certCo:{},qual:{n:0}};
   const wh=addWarehouse(C.site,true,C.fixed,C.motrici); wh.mgr='ceo'; wh.staff={pick:1,car:1,capo:0,autB:0,autCE:1,imp:1,fm:0};
@@ -3754,7 +3756,7 @@ function unsign(p){ delete p.arr; delete p.cof; delete p.cofPend; if(p.gen) S.ma
 function arrive(p){ delete p.arr; delete p.cof; delete p.cofPend; p.hired=true; p.raiseDay=S.day; p.unh=0; p.quit=null; p.tol={};
   let w=null; if(p.csTo&&!csPers()){ S.cs.resp=p.id; } else { w=S.warehouses.find(x=>!x.mgr); if(w){ w.mgr=p.id; p.wh=w.id; } } delete p.csTo;
   plog(p,`Entra in ${S.company.name}`);
-  notify('green','manager','Ufficio del personale',`${p.name} entra in azienda`,w?`Da oggi guida il magazzino di ${w.name}. Puoi spostarl${oa(p)} dalla finestra del magazzino, in Direzione o al customer service.`:`Non c'è un magazzino senza manager: assegnal${oa(p)} a un magazzino, alla Direzione o al customer service.`,'manager',{mtab:'team'});
+  notify('green','manager','Ufficio del personale',`${p.name} entra in azienda`,w?`Da oggi guida il magazzino di ${w.name}. Puoi spostarl${oa(p)} dalla finestra del magazzino, in Direzione, al customer service${itOn()?' o a un reparto tecnico':''}.`:`Non c'è un magazzino senza manager: assegnal${oa(p)} a un magazzino, alla Direzione, al customer service${itOn()?' o a un reparto tecnico':''}.`,'manager',{mtab:'team'});
   if(!isBot()) news('La Gazzetta del Muletto',`${p.name} entra in ${S.company.name}`,`${p.role}. ${ageOf(p)} anni, rango ${mRank(p)}.`);
 }
 // talenti in banchina: un magazziniere o un impiegato di magazzino si fa notare (eventi b_*); con un anno di affiancamento diventa manager.
@@ -3785,7 +3787,7 @@ function cresDone(x){
   S.managers.push(p); plog(p,`Da ${mest} a manager, dopo un anno di affiancamento`);
   const w=w0&&!w0.mgr?w0:S.warehouses.find(v=>!v.mgr); if(w){ w.mgr=p.id; p.wh=w.id; }
   const rk=mRank(p), best=STATS.reduce((a,s)=>p.st[s.k]>p.st[a.k]?s:a,STATS[0]), top=x.star===2;
-  const dove=w?`Da oggi guida il magazzino di ${w.name}.`:`Non c'è un magazzino senza manager: assegnal${oa(p)} a un magazzino, alla Direzione o al customer service.`;
+  const dove=w?`Da oggi guida il magazzino di ${w.name}.`:`Non c'è un magazzino senza manager: assegnal${oa(p)} a un magazzino, alla Direzione, al customer service${itOn()?' o a un reparto tecnico':''}.`;
   notify('green','manager','Ufficio del personale',top?`${p.name}: un fuoriclasse cresciuto in casa`:`${p.name} diventa manager`,
     (top?`Un anno fa ${p.sx==='f'?'la':'lo'} trovavi in banchina a ${x.wn}. Alla prima riunione da manager ha messo in fila tutti: rango ${rk}, ${best.n} ${p.st[best.k]}. `
       :`Dopo un anno di affiancamento ${nm1(p)} lascia il posto da ${mest} e passa dall'altra parte della scrivania: rango ${rk}, forte in ${best.n}. `)
@@ -4248,7 +4250,7 @@ function whAtt(wh){return wh?TECH.filter(t=>t.tree==='wel'&&wh.tech[t.id]).reduc
 function techFactor(wh,t){
   const it=wh.tech[t.id]; if(!it) return 0;
   let weeks=t.weeks;
-  mgrTal(wh).forEach(n=>{const l=TALENTS[n]&&TALENTS[n].learn; if(l) weeks*=l;}); if(R('academy')) weeks*=0.7; weeks*=polMul('learn'); weeks*=mgrFx(mgrStats(wh)).learn;
+  mgrTal(wh).forEach(n=>{const l=TALENTS[n]&&TALENTS[n].learn; if(l) weeks*=l;}); if(R('academy')) weeks*=0.7; weeks*=polMul('learn'); weeks*=mgrFx(mgrStats(wh)).learn; weeks*=it.lm||1;   // lm: esito dell'avvio (pacchetto Reparto IT e Ingegneria)
   return (S.day-it.day)<weeks*7 ? -0.5 : 1;
 }
 // pianificatori del traffico, in sede: il CEO regge da solo fino a 150 viaggi al mese (PLAN_TRIPS)
@@ -4442,8 +4444,8 @@ function computeWH(wh,extra){
   TR_RULES.forEach(r=>{ if(trOn(wh,r.id)&&r.fx.prod) prL.push(['r',r.name,r.fx.prod]); });
   const rf=riFx(wh);   // pacchetto Relazioni industriali: agitazione, scioperi, accordi (neutro senza il pacchetto)
   const tf=trFx(wh,cons);   // trasloco: giorni del trasloco, straordinari e stabilizzazione (neutro senza traslochi)
-  const prF={mor:0.7+0.3*wh.morale/70,add:1+tProd+polSum('prod'),cond:1-condPen(wh),build:wh.build?0.95:1,mgr:mf.prod,tr:1+trSum(wh,'prod'),ri:rf.prod,imm:Math.max(0.5,1+immFx(wh,'prod')),trs:tf.prod,l:prL};
-  const prod=PROD_BASE*prF.mor*prF.add*prF.cond*prF.build*prF.mgr*prF.tr*prF.ri*prF.imm*prF.trs;
+  const prF={mor:0.7+0.3*wh.morale/70,add:1+tProd+polSum('prod'),cond:1-condPen(wh),build:wh.build?0.95:1,mgr:mf.prod,tr:1+trSum(wh,'prod'),ri:rf.prod,imm:Math.max(0.5,1+immFx(wh,'prod')),trs:tf.prod,av:avvProdF(wh),l:prL};
+  const prod=PROD_BASE*prF.mor*prF.add*prF.cond*prF.build*prF.mgr*prF.tr*prF.ri*prF.imm*prF.trs*prF.av;
   // carrellisti: tutti i movimenti (doppia produttività col muletto); magazzinieri: preparano i pallet in uscita
   const use=(load,n,per)=>load===0?0:(n>0?load/(n*per):9);
   const uCar=use(mov*tf.load,st.car,2.5*prod), uPick=use(cons*pickF*tf.load,st.pick,prod), uB=use(kmB,st.autB,kmB1), uCE=use(kmCE,st.autCE,kmCE1);
@@ -4659,7 +4661,7 @@ function step(){
   S.cash+=dRic-dCost;
   polDaily(); csDaily(); mgrDaily(); invDaily();
   // ricerche in corso: una per linea (la Direzione e, col pacchetto Reparto IT e Ingegneria, i reparti); quella di un reparto rimasto vuoto resta ferma
-  depDaily();
+  depDaily(); avvDaily();
   projs().forEach(([k,p])=>{ if(lineStop(k)) return; p.left--; if(p.left<=0){ setLineProj(k,null); const t=TECH_ALL.find(x=>x.id===p.tech); if(t) techDone(t); } });
   // certificazioni: audit, rilievi e scadenze
   certDaily();
@@ -5832,8 +5834,8 @@ const lineProj=k=>k==='dir'?S.project:depD(k).proj;
 function setLineProj(k,v){ if(k==='dir') S.project=v; else S.dep[k].proj=v; }
 const projs=()=>['dir',...(itOn()&&S.dep?DEPS:[])].map(k=>[k,lineProj(k)]).filter(x=>x[1]);
 const projOfTech=id=>projs().find(x=>x[1].tech===id)||null;
-const lineStop=k=>k!=='dir'&&!!lineProj(k)&&!depOpen(k);   // ricerca di un reparto rimasto senza nessuno: ferma
-const lineIdle=k=>(k==='dir'||depOpen(k))&&!lineProj(k)&&TECH.some(t=>techOpen(t)&&!projOfTech(t.id)&&techLine(t)===k);
+const lineStop=k=>k!=='dir'&&!!lineProj(k)&&depFree(k)<=0;   // ricerca di un reparto senza nessuno libero (vuoto o tutto sugli avvii): ferma
+const lineIdle=k=>(k==='dir'||depFree(k)>0)&&!lineProj(k)&&TECH.some(t=>techOpen(t)&&!projOfTech(t.id)&&techLine(t)===k);
 // capannoni innovativi (affitto e costruzione): pacchetto, ricerca e direttore con Innovazione alta; '' = si può
 function innWhy(){ if(!itOn()) return 'Solo col pacchetto Reparto IT e Ingegneria';
   if(!R('edifici')) return 'Serve la ricerca Edifici intelligenti';
@@ -5857,6 +5859,92 @@ const depIc=(k,sz=12)=>ICONE.ui&&ICONE.ui['dep_'+k]?`<span class="tdep ${k}" dat
 // loghi dei consulenti: disegno 12x12 sul riquadro 16x16 come quelli dei clienti; si disegnano in tools/loghi_pxl/consulenti.px.js e tools/loghi_pxl/esporta.py li riporta qui
 const CLOGO={"nebbia":{"bg":"D","ic":["............","...WWWWWW...",".WWWWWWWWW..","............",".....LLLLLLL","..LLLLLLLL..","............","WWWWW...WWW.","............","..SSSSSSSS..","....SSSS....","............"]},"gigabancale":{"bg":"Y","ic":["............","............","..KK.KK.KK..",".KBBKBBKBBK.",".KBBKBBKBBK.",".KbbKbbKbbK.","KNNNNNNNNNNK","KNKKNKKNKKNK","KNNNNNNNNNNK",".KKKKKKKKKK.","............","............"]},"lunedi":{"bg":"B","ic":["............",".KKK....KKK.","KWWWKKKKWWWK",".KWWWRRWWWK.","..KWRRRRWK..","...KRRRRK...","...KRRRRK...","..KRRRRRRK..","..KRRRRRRK..","...KRRRRK...","....KRRK....",".....KK....."]},"paletti":{"bg":"P","ic":["............","..K.........",".KYK........",".KYYK.......",".KYYYK......",".KYYYYK.....",".KYYKYYK....",".KYYKKYYK...",".KYYKKKYYK..",".KYYYYYYYYK.",".KyyyyyyyyyK","..KKKKKKKKK."]},"cronometrini":{"bg":"O","ic":["............","....KKKK....","...KSSSSK...","...KKSSKK...","..KSSSSSSK..",".KSWWWWWWSK.","KSWWWWRWWWSK","KSWWWWRWWWSK","KSWWWWWWWWSK",".KSWWWWWWSK.","..KssssssK..","...KKKKKK..."]},"schiena":{"bg":"G","ic":["....KKKK....","...KWWWWK...","..KWWWWWWK..","...KffffK...","...KWWWWK...","..KWWWWWWK..","...KffffK...","...KWWWWK...","..KWWWWWWK..","...KffffK...","...KWWWWK...","....KKKK...."]}};
 const consLogo=(id,sz)=>{const L=CLOGO[id]||{bg:'S',ic:[]}; return pxLogo(TPAL[L.bg],L.ic,sz,'Logo '+((consOf(id)||{}).n||''));};
+// ---- avvii (secondo pezzo): col pacchetto le tecnologie dei reparti non si installano con un clic ma con un progetto (S.avv):
+// preparazione (AVV.prep settimane), giorno dell'avvio (graduale o big bang) con un esito a punteggio, poi AVV.care giorni di assistenza.
+// La squadra interna occupa persone del reparto (che non fanno ricerca) e costa il 15% in meno; un consulente a progetto non occupa nessuno
+// e costa il suo prezzo (prj); senza persone interne lo segue il CEO. L'esito cambia l'apprendimento (w.tech[id].lm) e i KPI dei primi giorni.
+const AVV={prep:{barcode:2,formazione:1,gps:2,wms:6,anticoll:2,rotte:3,rf:3,sinergia:2,ptl:4,verticale:8,amr:8},two:['wms','ecom','verticale','amr'],
+  care:14,disc:0.15,bbDays:3,bbProd:0.2,cd:56,rnd:15,lm:{bb:0.5,liscio:0.7,difficile:1.5,disastro:1.5,duro:2,cons:1.2},back:0.5,fix:0.25};
+const ESITI={liscio:{n:'Liscio come l\'olio',c:'#2e9e48'},intoppi:{n:'Qualche intoppo',c:'#8ed15b'},difficile:{n:'Avvio difficile',c:'#ffc53d'},disastro:{n:'Disastro',c:'#e0393e'}};
+const avvTech=t=>itOn()&&!!t&&!!t.dep&&t.tree==='log';     // tecnologie dei reparti da installare magazzino per magazzino
+const avvBB=t=>t.dep==='it'||['verticale','amr'].includes(t.id);   // si può partire tutto in un fine settimana (big bang)
+const avvList=()=>itOn()&&S.avv?S.avv:[];
+const avvOf=(w,id)=>avvList().find(a=>a.wh===w.id&&a.tech===id)||null;
+const avvN=t=>AVV.two.includes(t.id)?2:1;
+const depInt=k=>(S.office[k]||0)+(depResp(k)?1:0);   // persone interne del reparto (addetti e responsabile)
+const avvBusy=k=>avvList().filter(a=>a.dep===k&&a.by==='int').reduce((s,a)=>s+a.n,0);
+const depFree=k=>Math.max(0,depTeam(k)-avvBusy(k));   // chi resta sulla ricerca: le persone sugli avvii non fanno ricerca
+const avvByN=by=>by==='int'?'la squadra interna':by==='ceo'?'il CEO':(consOf(by)||{}).n||'un consulente';
+// abilità di chi segue l'avvio: Precisione per l'IT, Operazioni per l'Ingegneria (il responsabile, o il CEO con IT.ceo in meno), la bravura per un consulente
+function avvSkill(k,by){ const s=DEP[k].st2; if(by==='int'){ const r=depResp(k); return r?r.st[s]:ceo().st[s]-IT.ceo; } if(by==='ceo') return ceo().st[s]-IT.ceo; return (consOf(by)||{brav:10}).brav; }
+const avvCost=(t,w,by)=>Math.round(instCost(t,w)*(by==='int'?1-AVV.disc:by==='ceo'?1:(consOf(by)||{prj:1}).prj)/100)*100;
+const avvPeak=(w,d)=>[10,11].includes(monthOf(d))||S.clients.some(c=>c.wh===w.id&&c.status==='attivo'&&c.peak&&d>=c.peak.from&&d<c.peak.to);
+// punteggio dell'avvio senza la parte a caso (±AVV.rnd): le voci, per la finestrella e per l'esito
+function avvScore(t,w,by,mode,d){ const k=t.dep, L=[['Base',60]], sk=avvSkill(k,by), dv=dirStat('ing');
+  L.push([by==='int'?(depResp(k)?`${STATS.find(x=>x.k===DEP[k].st2).n} del responsabile`:`${STATS.find(x=>x.k===DEP[k].st2).n} del CEO (fa le veci, −${IT.ceo})`):by==='ceo'?`${STATS.find(x=>x.k===DEP[k].st2).n} del CEO (−${IT.ceo})`:`Bravura di ${consOf(by).n}`,2*(sk-10)]);
+  if(dv!=null) L.push(['Direttore IT e ingegneria',dv-10]);
+  if(w.tech.formazione) L.push(['Formazione strutturata nel magazzino',5]); if(R('academy')) L.push(['Academy aziendale',5]);
+  L.push(['Morale del magazzino',0.25*(w.morale-60)]);
+  if(w.kpi&&overloaded(w,w.kpi)) L.push(['Reparti del magazzino in affanno',-15]);
+  if(avvPeak(w,d)) L.push(['Periodo di picco',-15]);
+  if(mode==='bb') L.push(['Tutto in un fine settimana',-15]);
+  if(t.sup&&depFree(t.sup)<=0) L.push([`Nessuno libero ${t.sup==='it'?'nel Reparto IT':'in Ingegneria'} per dare una mano`,-10]);
+  return L.map(([n,v])=>[n,Math.round(v*10)/10]); }
+const avvEsito=v=>v>=75?'liscio':v>=50?'intoppi':v>=30?'difficile':'disastro';
+// probabilità di ogni esito col punteggio s (la parte a caso è uniforme tra −AVV.rnd e +AVV.rnd)
+function avvProb(s){ const r=AVV.rnd, P=x=>clamp((s+r-x)/(2*r),0,1); return {liscio:P(75),intoppi:P(50)-P(75),difficile:P(30)-P(50),disastro:1-P(30)}; }
+// cosa impedisce di partire con quella scelta ('' = si può)
+function avvWhy(t,w,by){ if(!R(t.id)) return 'Prima va ricercata'; if(w.tech[t.id]) return 'C\'è già'; if(avvOf(w,t.id)) return 'Il progetto è già partito';
+  if(!instReq(t,w)) return 'Nel magazzino manca una tecnologia che serve prima'; if(w.avvCd&&w.avvCd[t.id]>S.day) return `Dopo il disastro si riprova dal ${shortDate(w.avvCd[t.id])}`;
+  if(by==='int'&&depInt(t.dep)-avvBusy(t.dep)<avvN(t)) return `Servono ${avvN(t)===1?'una persona libera':'due persone libere'} del reparto`;
+  if(S.cash<avvCost(t,w,by)) return `Costa ${eur(avvCost(t,w,by))}: in cassa non bastano`;
+  return ''; }
+function avvStart(t,w,by,mode){ if(!avvTech(t)||avvWhy(t,w,by)) return null; if(!avvBB(t)) mode='grad';
+  const c=avvCost(t,w,by), wk=AVV.prep[t.id]||2; S.cash-=c; S.cur.tech+=c;
+  const a={id:nid('av'),wh:w.id,tech:t.id,dep:t.dep,by,mode,n:by==='int'?avvN(t):0,start:S.day,live:S.day+wk*7,end:null,cost:c,esito:null};
+  (S.avv=S.avv||[]).push(a); return a; }
+function avvCancel(a){ S.avv=(S.avv||[]).filter(x=>x!==a); const r=Math.round(a.cost*0.5); S.cash+=r; S.cur.tech-=r; }
+// fattore di produttività: i primi AVV.bbDays giorni di un big bang
+const avvProdF=w=>avvList().filter(a=>a.wh===w.id&&a.mode==='bb'&&a.esito&&S.day>=a.live&&S.day<a.live+AVV.bbDays).reduce((f)=>f*(1-AVV.bbProd),1);
+// il giorno dell'avvio: esito, apprendimento, KPI e avvisi
+function avvGo(a,w,t){ const L=avvScore(t,w,a.by,a.mode,S.day), s=L.reduce((x,y)=>x+y[1],0), e=avvEsito(s+rnd(-AVV.rnd,AVV.rnd)), ing=t.dep==='ing'&&!avvBB(t);
+  a.esito=e; a.end=S.day+AVV.care;
+  w.tech[t.id]={day:S.day,lm:(a.mode==='bb'?AVV.lm.bb:1)*(AVV.lm[e]||1)};
+  const nm=`${t.name} a ${w.name}`;
+  if(e==='liscio'){ notify('green','tecnologia',LINE_N[t.dep],`Avvio liscio come l'olio: ${nm}`,`Tutto è partito come doveva: l'apprendimento sarà più corto del 30%.`,'magazzini',{wh:w.id},'avv'+a.id); chron('tecnologia',`Avvio liscio: ${nm}`,'avvliscio'); }
+  else if(e==='intoppi') noteVar('tech',`${nm}: avvio con qualche intoppo, apprendimento normale`);
+  else if(e==='difficile'){ if(ing){ mod(w.id,{mor:-3},30); if(riOn()) S.mods.push({scope:w.id,ag:5,until:S.day+30,src:'Avvio difficile'}); } else mod(w.id,{P:-2,A:-1},14);
+    notify('yellow','tecnologia',LINE_N[t.dep],`Avvio difficile: ${nm}`,ing?'Il personale non ci sta: morale −3 per un mese e apprendimento più lungo del 50%.':'Puntualità −2 e accuratezza −1 per due settimane, apprendimento più lungo del 50%.','magazzini',{wh:w.id},'avv'+a.id); }
+  else { mod(w.id,ing?{mor:-3}:{P:-2,A:-1},14); avvBad(a,w,t,ing); }
+  kpiNow(); }
+// il disastro: evento con tre risposte (ricostruite da avvBadOpts dopo un salvataggio)
+const AVV_KO={barcode:'i lettori non leggono metà delle etichette e i magazzinieri tornano alla penna',wms:'il WMS manda i carrellisti a prendere pallet in posti vuoti e mette la merce nuova dove c\'è già altra merce',
+  rf:'i terminali perdono il segnale in fondo alle corsie e le liste di prelievo spariscono a metà',gps:'le scatolette segnano tutti i camion fermi a Ventimiglia, compresi quelli in piazzale',
+  rotte:'il programma manda tre bilici nello stesso paese e nessuno nell\'altro',sinergia:'la merce di due clienti finisce sullo stesso bancale, con due bolle che si contraddicono',
+  ptl:'le lucine si accendono sulle caselle sbagliate, sempre con grande convinzione',verticale:'le torri automatiche si bloccano a metà altezza con i cassetti fuori',amr:'i robot fanno la coda davanti alla stessa colonna e non si muovono più',
+  formazione:'i corsi sono finiti nell\'ora di pausa e in aula si presentano in due, uno per sbaglio',anticoll:'i sensori dei muletti suonano di continuo e qualcuno li ha coperti col nastro adesivo'};
+function avvBad(a,w,t,ing){ if(isBot()) return; const base=EVENTS.find(e=>e.id===(ing?'avv_no':'avv_ko'));
+  const ev={...base,wid:w.id,tid:t.id,cost:instCost(t,w),text:ing?`A ${w.name} la ${t.name.toLowerCase()} doveva cambiare il modo di lavorare. Dopo una settimana ${AVV_KO[t.id]||'nessuno la usa'}. Il capoturno allarga le braccia: «Si è sempre fatto così».`
+    :`A ${w.name} il progetto ${t.name} è partito ${a.mode==='bb'?'tutto in un fine settimana':'un reparto alla volta'}, e il lunedì mattina ${AVV_KO[t.id]||'niente funziona'}. In banchina i camion aspettano, al telefono i clienti pure.`};
+  avvBadOpts(ev); showEvent(ev); }
+function avvBadOpts(ev){ const w=whById(ev.wid), t=TECH_ALL.find(x=>x.id===ev.tid), ing=ev.id==='avv_no'; if(!w||!t||!w.tech[t.id]){ ev.opts=[{t:'Va bene',e:'Nessun effetto',f:()=>{}}]; return ev; }
+  const c=ev.cost||instCost(t,w), back=Math.round(c*AVV.back/100)*100, fix=Math.round(c*AVV.fix/100)*100;
+  const lmX=(x)=>function(){ const it=whById(this.wid)&&whById(this.wid).tech[this.tid]; if(it) it.lm=(it.lm||1)*x; };
+  ev.opts=[{t:'Torna indietro',d:`Si smonta tutto e si torna come prima. Una parte dei soldi rientra, il resto è perso; si potrà riprovare tra ${wks(AVV.cd)}.`,e:`+${eur(back)}, tecnologia tolta, morale −3`,r:'Si è tornati alla carta e alle vecchie abitudini. Nessuno ne parla, ma il cartone del nuovo sistema resta in un angolo del magazzino.',
+     f:function(){ const w=whById(this.wid); if(!w) return; delete w.tech[this.tid]; (w.avvCd=w.avvCd||{})[this.tid]=S.day+AVV.cd; S.cash+=back; S.cur.tech-=back; mod(w.id,{mor:-3},30); }},
+    ing?{t:'Si va avanti così',d:'Niente marcia indietro: prima o poi ci si abitua. Intanto in reparto si mugugna.',e:`Apprendimento ×2, morale −4 per un mese${riOn()?', agitazione +5':''}`,r:'Si va avanti. Il nastro adesivo sui sensori sparisce piano piano, un pezzo alla volta.',
+        f:function(){ lmX(2).call(this); mod(this.wid,{mor:-4},30); if(riOn()) S.mods.push({scope:this.wid,ag:5,until:S.day+30,src:'Nessuno usa la novità'}); }}
+      :{t:'Tieni duro',d:'Niente marcia indietro: la squadra lavora di notte finché non va. I clienti se ne accorgono.',e:'Apprendimento ×2, puntualità −3 e accuratezza −2 per 4 settimane, soddisfazione −2 ai clienti del magazzino',r:'Tre settimane di notti in bianco. Alla fine il sistema gira, e il caffè della macchinetta è finito due volte.',
+        f:function(){ lmX(2).call(this); mod(this.wid,{P:-3,A:-2},28); S.clients.filter(c=>c.wh===this.wid&&c.status==='attivo').forEach(c=>{ c.sat=clamp(c.sat-2,0,100); }); }},
+    {t:ing?'Corso di recupero':'Chiama i consulenti',d:ing?`Un formatore esterno rifà tutto da capo, in orario di lavoro: ${eur(fix)}.`:`Un intervento d'urgenza di chi conosce il sistema: ${eur(fix)}.`,e:`−${eur(fix)}, apprendimento ×1,2, KPI −1 per 2 settimane`,r:ing?'Il formatore ha rifatto il corso con le brioche. In aula erano in venti.':'In due giorni i consulenti hanno sistemato tutto. Il conto, invece, è arrivato in uno solo.',
+     f:function(){ S.cash-=fix; S.cur.tech+=fix; lmX(1.2).call(this); mod(this.wid,{P:-1,A:-1},14); }}];
+  return ev; }
+// ogni giorno: avvii che partono e fine dell'assistenza
+function avvDaily(){ if(!itOn()||!S.avv||!S.avv.length) return;
+  S.avv.slice().forEach(a=>{ const w=whById(a.wh), t=TECH_ALL.find(x=>x.id===a.tech);
+    if(!w||!t){ S.avv=S.avv.filter(x=>x!==a); return; }
+    if(!a.esito){ if(S.day>=a.live) avvGo(a,w,t); }
+    else if(S.day>=a.end) S.avv=S.avv.filter(x=>x!==a); }); }
 // enciclopedia del pacchetto (qui perché usa CONS e le costanti dei reparti)
 wk('reparto_it','it','Reparto IT e Ingegneria',`Pacchetto di espansione che si sceglie nel passo «Pacchetti», quando crei la partita (di base è spento): dietro le ricerche ci sono persone vere, il Reparto IT e l'Ingegneria.`,
 `Con il pacchetto le ricerche le fanno due [[reparti_tecnici|reparti tecnici]] in sede. Il **Reparto IT** studia i sistemi informatici: barcode, WMS, radiofrequenza, GPS, rotte, gestionale, EDI, portale ed e-commerce. L'**Ingegneria** studia le novità per il lavoro e per gli impianti: formazione, sicurezza dei muletti, Academy, magazzino verticale, robot ed [[tech_edifici|edifici intelligenti]]. Tutto il resto (organizzazione, mercato, welfare, certificazioni) resta alla Direzione, come prima.
@@ -5871,7 +5959,7 @@ wk('reparti_tecnici','it','Reparti tecnici',`Il Reparto IT e l'Ingegneria: un re
 • **Addetti**: sistemisti e sviluppatori per l'IT (RAL ${eur(RAL.it)}), ingegneri e tecnici dei metodi per l'Ingegneria (RAL ${eur(RAL.ing)}). Si assumono con un annuncio o un'agenzia, come gli altri dipendenti di sede.
 • **[[consulenti|Consulente a contratto]]**: un canone al mese; conta come una persona e porta la sua bravura.
 
-Con almeno una persona (responsabile, addetto o consulente) il reparto ha la sua [[linee_ricerca|linea di ricerca]]. Se il reparto si svuota, la ricerca in corso si ferma finché non torna qualcuno.`);
+Con almeno una persona (responsabile, addetto o consulente) il reparto ha la sua [[linee_ricerca|linea di ricerca]]. Chi segue un [[avvio]] nei magazzini intanto non fa ricerca: se nel reparto non resta nessuno sulla ricerca (è vuoto o tutto sugli avvii), la ricerca in corso si ferma.`);
 wk('linee_ricerca','it','Linee di ricerca',`Col pacchetto Reparto IT e Ingegneria si fanno fino a tre ricerche insieme: una per la Direzione e una per ogni reparto tecnico che ha qualcuno.`,
 `Ogni tecnologia ha un reparto: quelle informatiche l'IT, quelle per il lavoro e gli impianti l'Ingegneria, tutte le altre la Direzione. Se il reparto della tecnologia non ha nessuno, la studia la Direzione, come senza pacchetto. Le tecnologie miste (pick-to-light, e-commerce, magazzino verticale, robot) le studia il reparto capofila.
 
@@ -5879,7 +5967,22 @@ Una ricerca alla volta per linea. Nella linea della Direzione la durata è quell
 
 settimane = settimane di base × (1 − 3% per ogni punto di Innovazione sopra 10, tra −40% e +50%) × persone al lavoro × [[dir_ing|direttore IT e ingegneria]] (−2% per ogni punto di Innovazione sopra 10, al massimo −20%)
 
-L'Innovazione è la migliore tra quella del responsabile (o del CEO con ${IT.ceo} punti in meno) e la bravura del [[consulenti|consulente]]. Persone al lavoro (responsabile, addetti e consulente): 1 → ×1,3, 2 → ×1, 3 → ×0,85, 4 → ×0,75, 5 o più → ×0,7. Oltre un certo numero aggiungere persone serve a poco: nove donne non fanno un bambino in un mese. La durata si fissa quando la ricerca parte.`);
+L'Innovazione è la migliore tra quella del responsabile (o del CEO con ${IT.ceo} punti in meno) e la bravura del [[consulenti|consulente]]. Persone al lavoro (responsabile, addetti e consulente, meno chi è sugli [[avvio|avvii]]): 1 → ×1,3, 2 → ×1, 3 → ×0,85, 4 → ×0,75, 5 o più → ×0,7. Oltre un certo numero aggiungere persone serve a poco: nove donne non fanno un bambino in un mese. La durata si fissa quando la ricerca parte.`);
+wk('avvio','it','Avvio nei magazzini',`Col pacchetto Reparto IT e Ingegneria le tecnologie dei reparti non si installano con un clic: si avvia un progetto, che ha una preparazione, un giorno di partenza e un esito.`,
+`Vale per le tecnologie di Logistica dei due [[reparti_tecnici|reparti]] (barcode, WMS, radiofrequenza, GPS, rotte, sinergia, pick-to-light, formazione, sicurezza dei muletti, magazzino verticale, robot). Dalla scheda della tecnologia, «Avvia il progetto» accanto al magazzino.
+
+**Chi lo segue**: la squadra interna (${AVV.disc*100}% in meno sul costo; occupa una persona del reparto, due per WMS, e-commerce, magazzino verticale e robot, che intanto non fanno ricerca), un [[consulenti|consulente]] a progetto (costa il suo prezzo, da ×1 a ×1,8, e non occupa nessuno) oppure, se nel reparto non c'è nessuno di interno, il CEO.
+
+**Le fasi**: preparazione (da 1 a 8 settimane secondo la tecnologia), il giorno dell'avvio, poi ${wks(AVV.care)} di assistenza in cui la squadra resta sul progetto. Durante la preparazione si può annullare: rientra metà dei soldi.
+
+**Come partire** (tecnologie informatiche, magazzino verticale e robot): graduale, un reparto o un cliente alla volta, oppure big bang, tutto in un fine settimana: l'[[apprendimento]] dura la metà, ma il punteggio scende di 15 e la produttività cala del 20% per ${AVV.bbDays} giorni.
+
+**L'esito** è un punteggio: 60, più 2 per ogni punto sopra 10 di chi segue l'avvio (Precisione del responsabile IT, Operazioni del responsabile dell'Ingegneria, la bravura del consulente; il CEO con ${IT.ceo} punti in meno), più 1 per punto del [[dir_ing|direttore IT e ingegneria]], +5 con la Formazione strutturata nel magazzino, +5 con l'Academy, ±0,25 per punto di [[morale]] sopra o sotto 60; −15 con i reparti del magazzino in affanno, −15 nel periodo di picco (novembre, dicembre o un picco di un cliente del magazzino), −15 col big bang, −10 se nelle tecnologie miste l'altro reparto non ha nessuno libero; più o meno ${AVV.rnd} a caso. La finestrella mostra le probabilità prima di partire.
+
+• 75 o più, **liscio come l'olio**: apprendimento −30%.
+• 50-74, **qualche intoppo**: tutto normale.
+• 30-49, **avvio difficile**: apprendimento +50%; puntualità −2 e accuratezza −1 per due settimane (formazione e sicurezza dei muletti: morale −3 per un mese).
+• Sotto 30, **disastro**: arriva un evento. Tornare indietro (si smonta, rientra metà del costo, si riprova dopo ${wks(AVV.cd)}), tenere duro (apprendimento doppio e KPI giù per un mese) o chiamare i consulenti (un quarto del costo, apprendimento ×1,2).`);
 wk('consulenti','it','Consulenti esterni',`Studi e software house che lavorano per un reparto tecnico con un canone al mese: aprono la sua linea di ricerca da subito, senza assumere nessuno.`,
 `Come nella realtà, spesso si comincia con un consulente. Ogni [[reparti_tecnici|reparto]] ne può avere uno a contratto: conta come una persona e, se la sua bravura è più alta dell'Innovazione del responsabile, le ricerche usano la sua. Il canone va nella voce tecnologie del conto economico; si disdice con ${wks(IT.notice)} di preavviso, durante le quali lavora e si paga ancora.
 
@@ -6484,7 +6587,7 @@ const SCENE={{SCENE}};
 const SCN_SRC={'La Gazzetta del Muletto':'magazzino','Il Sole 24 Pallet':'edicola','Ufficio del personale':'ufficio','Il Mattinale del Ministero':'ministero',
   'Radio Traffico Nord':'strada','Ufficio commerciale':'trattoria','Customer service':'ufficio','Ufficio amministrazione':'ufficio','Posta elettronica':'ufficio',
   'Ufficio qualità':'ispezione','Ufficio traffico':'piazzale','Ufficio acquisti':'ufficio','Il Politecnico della Bassa':'ufficio',
-  'Ambulatorio di medicina del lavoro':'ufficio','Ufficio tecnico':'magazzino','TeleBassa':'edicola','ASL':'ispezione','NAS':'ispezione','Ispettorato del lavoro':'ispezione','Trasloco':'trasloco','Agenzia immobiliare':'edicola'};
+  'Ambulatorio di medicina del lavoro':'ufficio','Ufficio tecnico':'magazzino','TeleBassa':'edicola','ASL':'ispezione','NAS':'ispezione','Ispettorato del lavoro':'ispezione','Trasloco':'trasloco','Agenzia immobiliare':'edicola','Reparto IT':'tecnologia','Ingegneria':'magazzino'};
 const SCN_EV={
   // La Gazzetta del Muletto
   natale:'festa',superenalotto:'festa',matrimonio:'festa',derby:'festa',pizza:'festa',cesto:'festa',t_derby:'festa',t_pizza:'festa',t_grigliata:'festa',
@@ -7347,6 +7450,9 @@ const EVENTS=[
  {id:'pensione_ceo',solo:true,now:true,src:'La Gazzetta del Muletto',title:'Pensare alla pensione?',auto:1,cond:()=>false,text:'',opts:[],restore:ev=>bossRetOpts(ev)},
  {id:'ultimatum',solo:true,now:true,src:'Ufficio del personale',title:'Ultimatum',auto:1,cond:()=>false,text:'',opts:[],restore:ev=>ultOpts(ev)},
  // guasti e incendi nei magazzini (koMonth): il racconto si scrive quando succede, le risposte si ricostruiscono dal magazzino
+ // pacchetto Reparto IT e Ingegneria: un avvio finito in disastro (avvBad); risposte ricostruite da avvBadOpts
+ {id:'avv_ko',solo:true,col:'yellow',ic:'tecnologia',src:'Reparto IT',title:'Il go-live è andato storto',auto:1,cond:()=>false,text:'',opts:[],restore:ev=>avvBadOpts(ev)},
+ {id:'avv_no',solo:true,col:'yellow',ic:'tecnologia',src:'Ufficio tecnico',title:'Nessuno usa la novità',auto:1,cond:()=>false,text:'',opts:[],restore:ev=>avvBadOpts(ev)},
  {id:'guasto',solo:true,col:'yellow',ic:'magazzini',src:'Ufficio tecnico',title:'Guasto',auto:1,cond:()=>false,text:'',opts:[],restore:ev=>koOpts(ev)},
  {id:'incendio',solo:true,src:'Ufficio tecnico',title:'Principio d\'incendio',auto:0,cond:()=>false,text:'',opts:[],restore:ev=>fuocoOpts(ev)},
  // trasloco: il cliente che non vuole seguirti (arriva subito, fuori dall'estrazione: trRefEvent); risposte da trRefOpts
@@ -7625,7 +7731,7 @@ function noteAlerts(){
   { const idle=['dir',...(itOn()?DEPS:[])].filter(lineIdle), one=idle.length===1&&idle[0]!=='dir';
     if(idle.length) a.push({id:'research',col:'yellow',ic:'tecnologia',title:one?`${LINE_N[idle[0]]}: nessuna ricerca`:'Nessuna ricerca in corso',
       text:itOn()?`Linee di ricerca ferme: ${idle.map(k=>LINE_N[k]).join(', ')}. Scegli la prossima tecnologia da studiare.`:'L\'ufficio ricerca è fermo: scegli la prossima tecnologia da studiare.',win:'tecnologia'});
-    if(itOn()) DEPS.filter(lineStop).forEach(k=>a.push({id:'depstop'+k,col:'red',ic:'tecnologia',title:`${LINE_N[k]}: ricerca ferma`,text:`Nel reparto non lavora più nessuno: la ricerca in corso non va avanti. Assumi un addetto, nomina un responsabile o firma con un consulente.`,win:'reparti'})); }
+    if(itOn()) DEPS.filter(lineStop).forEach(k=>a.push({id:'depstop'+k,col:'red',ic:'tecnologia',title:`${LINE_N[k]}: ricerca ferma`,text:`Nel reparto non resta nessuno sulla ricerca (è vuoto o tutto sugli avvii): la ricerca in corso non va avanti. Assumi un addetto, nomina un responsabile o firma con un consulente.`,win:'reparti'})); }
   // posti liberi in Direzione: l'avviso compare solo se c'è un manager senza incarico da nominare
   if(R('direzione')&&Object.values(S.dirs).some(v=>!v)&&S.managers.some(m=>m.hired&&!m.wh&&!seatOf(m.id)&&!isCs(m.id)&&!isDep(m.id))) a.push({id:'dir',col:'yellow',ic:'direzione',title:'Posti da dirigente liberi',text:'Hai un manager senza incarico: nella scheda Direzione della finestra Manager puoi nominarlo direttore.',win:'direzione'});
   return a;
@@ -7736,7 +7842,7 @@ function fillSave(s){
   // customer service (dalla 0.61): addetti in sede e responsabile
   if(s.office.cs==null) s.office.cs=0; if(!s.cs) s.cs={resp:null,q:[],last:-99,log:[]}; if(!s.cs.ov) s.cs.ov=[];
   // pacchetto Reparto IT e Ingegneria (dalla 0.109): reparti, addetti in sede e sesto posto in Direzione (vuoti nelle partite senza pacchetto)
-  if(s.office.it==null) s.office.it=0; if(s.office.ing==null) s.office.ing=0; if(!s.dep) s.dep=depNew(); if(s.dirs&&!('ing' in s.dirs)) s.dirs.ing=null;
+  if(s.office.it==null) s.office.it=0; if(s.office.ing==null) s.office.ing=0; if(!s.dep) s.dep=depNew(); if(!s.avv) s.avv=[]; if(s.dirs&&!('ing' in s.dirs)) s.dirs.ing=null;
   // personaggi che invecchiano (dalla 0.24): il CEO diventa una copia modificabile, tutti hanno un giorno di nascita e arrivano i nuovi candidati
   if(!s.boss){ const C=s.custom||CEOS.find(c=>c.id===s.ceoId); s.boss={...JSON.parse(JSON.stringify(C)),since:0,log:[]}; }
   if(s.boss.bd==null) s.boss.bd=bdOf(s.boss.age,hashN(s.boss.name));
@@ -8241,7 +8347,7 @@ const DNOTE={
   policy:()=>{const P=staffPeople(); return P.some(p=>p.quit&&!p.quit.ret)?['bad','Un manager ha dato le dimissioni']:P.some(p=>!p.quit&&(p.unh||0)>=20)?['acc','Un manager è scontento delle policy']:!R('regolamento')?['mut','Si sblocca con la ricerca Regolamento aziendale']:null;},
   manager:()=>mgrNote(),
   direzione:()=>!R('direzione')?['mut','Si sblocca con la ricerca Struttura direzionale']:Object.values(S.dirs).some(v=>!v)?['bad','Ci sono posti da dirigente liberi']:null,
-  reparti:()=>itOn()?(DEPS.some(lineStop)?['bad','Una ricerca è ferma: un reparto è rimasto vuoto']:['mut',DEPS.map(k=>`${LINE_N[k]}: ${depOpen(k)?depTeam(k)+(depTeam(k)===1?' persona':' persone'):'chiuso'}`).join(' · ')]):null,
+  reparti:()=>itOn()?(DEPS.some(lineStop)?['bad','Una ricerca è ferma: un reparto è rimasto vuoto']:['mut',DEPS.map(k=>`${LINE_N[k]}: ${depOpen(k)?depTeam(k)+(depTeam(k)===1?' persona':' persone'):'chiuso'}`).join(' · ')+(avvList().length?` · ${avvList().length} ${avvList().length===1?'avvio':'avvii'}`:'')]):null,
   tecnologia:()=>{const P=projs(); return P.length>1?['acc',`${P.length} ricerche in corso, la prima finisce tra ${wks(Math.min(...P.map(x=>x[1].left)))}`]:P.length?['acc','Ricerca in corso: ancora '+wks(P[0][1].left)]:['acc','Nessuna ricerca in corso'];},
   certificazioni:()=>certNote(),
   sindacato:()=>riDockNote(),
@@ -8673,7 +8779,7 @@ const VIEWS={
     <div><span class="lab">Mezzi</span><b>${eur(k.mezzi)}</b></div>
     <div ${k.manut?`data-tip="Di cui manutenzione ${eur(k.manut)}"`:''}><span class="lab">Immobile</span><b>${eur(k.fissi)}</b></div>
    </div>
-   <div class="wh-tech"><span class="lab">${kw('installazione','Tecnologie')}</span><span class="wh-ics">${TECH.filter(t=>w.tech[t.id]).map(t=>{const l=techFactor(w,t)<0;return `<span role="img" aria-label="${esc(t.name)}" data-act="wiki" data-id="tech_${t.id}" data-tip="<div class='tt'>${esc(t.name)}</div><div>${esc(t.desc)}</div>${l?"<div style='color:#ffd23f'>In apprendimento: per qualche settimana peggiora i KPI</div>":''}${wikiHint()}" style="cursor:help;display:inline-flex">${techIcon(t,30,l)}</span>`;}).join('')||'<span class="sm">nessuna installata</span>'}</span><button class="btn sm2" data-act="opentech" data-tree="log" data-id="">Installa</button></div>
+   <div class="wh-tech"><span class="lab">${kw('installazione','Tecnologie')}</span><span class="wh-ics">${TECH.filter(t=>w.tech[t.id]).map(t=>{const l=techFactor(w,t)<0;return `<span role="img" aria-label="${esc(t.name)}" data-act="wiki" data-id="tech_${t.id}" data-tip="<div class='tt'>${esc(t.name)}</div><div>${esc(t.desc)}</div>${l?"<div style='color:#ffd23f'>In apprendimento: per qualche settimana peggiora i KPI</div>":''}${wikiHint()}" style="cursor:help;display:inline-flex">${techIcon(t,30,l)}</span>`;}).join('')}${avvList().filter(a=>a.wh===w.id&&!a.esito).map(a=>{const t=TECH_ALL.find(x=>x.id===a.tech); return t?`<span role="img" aria-label="${esc(t.name)}, in preparazione" data-act="wiki" data-id="avvio" data-tip="<div class='tt'>${esc(t.name)}</div>In preparazione: si parte il ${shortDate(a.live)} (${esc(avvByN(a.by))})." style="cursor:help;display:inline-flex;opacity:.45">${techIcon(t,30,true)}</span>`:'';}).join('')}${TECH.some(t=>w.tech[t.id])||avvList().some(a=>a.wh===w.id&&!a.esito)?'':'<span class="sm">nessuna installata</span>'}</span><button class="btn sm2" data-act="opentech" data-tree="log" data-id="">Installa</button></div>
   </div>`;
  },
  clienti(){
@@ -8907,6 +9013,8 @@ const VIEWS={
     if(s2==='run') act=`<div class="bar"><i style="width:${Math.round((1-rp.left/rp.total)*100)}%;background:var(--accent)"></i></div><div class="sm">Finisce il ${shortDate(S.day+rp.left)}, tra ${wks(rp.left)}${lineStop(projOfTech(sel.id)[0])?' (ora è ferma: il reparto è vuoto)':''}.</div>`;
     if(s2==='done'&&!perWh(sel)) act=`<div class="sm ok">Vale già per tutta l'azienda.</div>`;
     if(s2==='done'&&perWh(sel)) act=`<div class="lab">${sel.tree==='cert'?'Nei magazzini':'Installazione nei magazzini'}</div>`+S.warehouses.map(w=>{const it=w.tech[sel.id], ce=sel.tree==='cert', learn=it&&(ce?!certOk(w,sel.id):techFactor(w,sel)<0), cs=ce&&it?certState(w,sel):'';
+      const av=!it&&avvTech(sel)&&avvOf(w,sel.id), cd=w.avvCd&&w.avvCd[sel.id]>S.day;
+      if(!it&&avvTech(sel)) return `<div class="row"><span>${esc(w.name)}</span>${av?`<span class="sm warn">in preparazione · si parte il ${shortDate(av.live)}</span>`:cd?`<span class="sm bad">si riprova dal ${shortDate(w.avvCd[sel.id])}</span>`:`<button class="btn sm2 pri" data-act="avvopen" data-id="${sel.id}" data-wh="${w.id}" ${instReq(sel,w)?'':'disabled'}>Avvia il progetto</button>`}</div>`;
       return `<div class="row"><span>${esc(w.name)}</span>${it?`<span class="sm ${learn?'warn':'ok'}">${learn?(ce?(cs==='susp'?'sospeso':'primo audit in attesa'):'in apprendimento'):(ce?(cs==='nc'?'certificato, con rilievi':'certificato'):'attiva')}</span>`:`<button class="btn sm2 pri" data-act="install" data-id="${sel.id}" data-wh="${w.id}" ${S.cash>=instCost(sel,w)&&!(sel.tree==='wel'&&polOn('spending'))&&instReq(sel,w)?'':'disabled'}>${ce?certBtn(sel):'Installa'} · ${eur(instCost(sel,w))}</button>`}</div>`;}).join('')+(sel.tree==='wel'&&polOn('spending')?`<div class="sm warn">La policy ${kw('pol_spending','Spending review')} blocca i nuovi servizi di welfare.</div>`:'')+(reqs.length?`<div class="sm">Si installa nei magazzini che hanno già ${reqs.map(r=>esc(r.name)).join(' e ')}.</div>`:'');
     det=`<div class="tdh">${techIcon(sel,side&&DW<280?48:64,s2==='lock')}<div class="wh-sm"><span class="h3">${esc(sel.name)}</span><span class="sm">${kw('alberi',trN(sel.tree))} · ${perWh(sel)?(sel.tree==='cert'?'da ottenere magazzino per magazzino':'da installare in ogni magazzino'):'vale per tutta l\'azienda'}</span><span class="pill ${pill[0]}">${pill[1]}</span></div></div>
       ${itOn()?(sel.dep?`<div class="sm">${depIc(sel.dep)} La studia ${sel.dep==='it'?'il Reparto IT':'l\'Ingegneria'}${sel.sup?` (con l'aiuto ${sel.sup==='it'?'del Reparto IT':'dell\'Ingegneria'})`:''}${depOpen(sel.dep)?'':': reparto chiuso, per ora la studia la Direzione'}.</div>`:'<div class="sm">La studia la Direzione.</div>'):''}
@@ -8927,7 +9035,7 @@ const VIEWS={
   const box=k=>{ const D=S.dep[k], r=depResp(k), c=depCons(k), n=S.office[k]||0, q=S.queue.filter(x=>x.role===k), team=depTeam(k), p=D.proj, t=p&&TECH_ALL.find(x=>x.id===p.tech), stop=lineStop(k);
    const inn=depInn(k), base=r?r.st.inn:B.st.inn-IT.ceo, mul=team?IT.team[clamp(team,1,5)]*clamp(1-0.03*(inn-10),0.6,1.5)*dirIngMul():null, pc=p?Math.round((1-p.left/p.total)*100):0;
    const tiles=`<div class="wh-kpis c3">
-     <div class="kpi wh-k ${team?'ok':'bad'}"><div class="lab">${kw('reparti_tecnici','Persone')}</div><b>${team}</b><div class="sm">${team?'al lavoro':'reparto chiuso'}</div></div>
+     <div class="kpi wh-k ${team?'ok':'bad'}"><div class="lab">${kw('reparti_tecnici','Persone')}</div><b>${team}</b><div class="sm">${team?(avvBusy(k)?`${depFree(k)} sulla ricerca, ${avvBusy(k)} sugli ${kw('avvio','avvii')}`:'tutte sulla ricerca'):'reparto chiuso'}</div></div>
      <div class="kpi wh-k"><div class="lab">${kw('st_inn','Innovazione')}</div><b>${statBadge('inn',inn,20)}</b><div class="sm">${c&&c.brav>base?'del consulente':r?'del responsabile':`del CEO, −${IT.ceo}`}</div></div>
      <div class="kpi wh-k"><div class="lab">${kw('linee_ricerca','Ricerche')}</div><b>${mul?(mul<=1?'−':'+')+Math.abs(Math.round((mul-1)*100))+'%':'—'}</b><div class="sm">${mul?'di durata':'nessuna linea'}</div></div></div>`;
    const ric=t?`<div class="row"><span>${kw('linee_ricerca','In corso')}: <button class="lnk" data-act="opentech" data-tree="${t.tree}" data-id="${t.id}"><b>${esc(t.name)}</b></button></span><b class="num">${wks(p.left)}</b></div>
@@ -8941,8 +9049,10 @@ const VIEWS={
       ${D.cons.end!=null?`<button class="btn sm2" data-act="consback" data-k="${k}">Ritira la disdetta</button>`:`<button class="btn sm2" data-act="consstop" data-k="${k}">Disdici</button>`}</div>`:'';
    const alt=CONS.filter(x=>x.dep===k&&(!c||x.id!==c.id)).map(x=>`<div class="wh-st">${consLogo(x.id,32)}<div class="wh-sm"><b class="wh-nm">${esc(x.n)}</b><span class="sm">${esc(x.city)} · ${eur(x.fee)} al mese · bravura ${x.brav}</span><span class="sm">${esc(x.d)}</span></div>
       <button class="btn sm2${c?'':' pri'}" data-act="consign" data-id="${x.id}">${c?'Cambia':'Firma'}</button></div>`).join('');
+   const AV=avvList().filter(a=>a.dep===k), avR=AV.map(a=>{const t=TECH_ALL.find(x=>x.id===a.tech), w=whById(a.wh); if(!t||!w) return '';
+     return `<div class="wh-st">${techIcon(t,32,!a.esito)}<div class="wh-sm"><b class="wh-nm">${esc(t.name)} a ${esc(w.name)}</b><span class="sm">${a.esito?`assistenza fino al ${shortDate(a.end)} · <b style="color:${ESITI[a.esito].c}">${ESITI[a.esito].n}</b>`:`preparazione · si parte il ${shortDate(a.live)}${a.mode==='bb'?' (big bang)':''}`} · ${esc(avvByN(a.by))}${a.n?` (${a.n} ${a.n===1?'persona':'persone'})`:''}</span></div>${a.esito?'':`<button class="btn sm2" data-act="avvcancel" data-id="${a.id}">Annulla</button>`}</div>`;}).join('');
    return `<div class="card dep-k"><div class="row"><span class="h3">${depIc(k,24)} ${kw('reparti_tecnici',DEP[k].n)}</span><span class="pill ${team?'ok':''}">${team?'linea di ricerca aperta':'chiuso'}</span></div>
-     <div class="sm">${esc(DEP[k].d)}</div>${tiles}${ric}${resp}${add}${cn}
+     <div class="sm">${esc(DEP[k].d)}</div>${tiles}${ric}${AV.length?`<div class="lab">${kw('avvio','Avvii nei magazzini')}</div>${avR}`:''}${resp}${add}${cn}
      <div class="lab">${kw('consulenti',c?'Altri consulenti':'Consulenti: si parte spesso da qui')}</div>${alt}</div>`; };
   const dv=dirStat('ing'), dp=R('direzione')&&personById(S.dirs.ing);
   const chk=(ok,txt)=>`<div class="dep-cl"><b class="${ok?'ok':'bad'}">${ok?'✓':'✗'}</b><span>${txt}</span></div>`;
@@ -9496,6 +9606,7 @@ function prodView(w,k,ld){
     ${row(kw('ampliamento','Cantiere in corso'),F.build-1,w.build?'finché durano i lavori':'nessun cantiere')}
     ${F.ri&&F.ri!==1?row(kw('agitazione','Clima sindacale e accordi'),F.ri-1,''):''}
     ${F.trs&&F.trs!==1?row(kw('stabilizzazione','Stabilizzazione dopo il trasloco'),F.trs-1,'scende piano a zero'):''}
+    ${F.av&&F.av!==1?row(kw('avvio','Avvio in un fine settimana'),F.av-1,`i primi ${AVV.bbDays} giorni`):''}
     ${row(`${statIcon('op',12)} Operazioni del ${kw('manager')}`,F.mgr-1,esc(mgr))}
     <div class="row rp-tot"><span>Totale <span class="sm">(le voci si moltiplicano)</span></span><b>${Math.round(idx)}% · ${n0(k.prod)} pallet</b></div>
    </div>
@@ -9529,6 +9640,33 @@ function siteCard(id){ const s=SITES[id]; if(!s) return '';
     <div class="lab">${kw('dotazioni','Dotazioni')}</div><div class="dt-list">${[...DOT.filter(d=>d.base||(s.dot||[]).includes(d.id)),...DOT.filter(d=>!d.base&&!(s.dot||[]).includes(d.id))].map(dRow).join('')}</div>
     <div class="row sc-a"><button class="btn" data-act="closemodal">Chiudi</button><button class="btn pri" data-act="rent" data-id="${id}" ${ok?'':'disabled'}>Affitta · ${eur(cost)}</button></div>
     ${S.cash<cost?`<div class="sm bad">In cassa ci sono ${eur(S.cash)}: ne servono ${eur(cost)}.</div>`:''}</div>`; }
+// finestrella dell'avvio (pacchetto Reparto IT e Ingegneria): chi lo segue, come partire, costo, quando, probabilità di ogni esito e le voci del punteggio
+function avvBox(){ const A=UI.sel.avv, t=A&&TECH_ALL.find(x=>x.id===A.t), w=A&&whById(A.w); if(!t||!w) return '';
+  const k=t.dep, wkP=AVV.prep[t.id]||2, live=S.day+wkP*7, n=avvN(t), fr=depInt(k)-avvBusy(k);
+  const opts=[depInt(k)>0?'int':'ceo',...CONS.filter(c=>c.dep===k).map(c=>c.id)];
+  if(!opts.includes(A.by)) A.by=opts[0]; if(!avvBB(t)) A.mode='grad';
+  const L=avvScore(t,w,A.by,A.mode,live), sc=L.reduce((a,x)=>a+x[1],0), P=avvProb(sc), why=avvWhy(t,w,A.by), cost=avvCost(t,w,A.by), stn=STATS.find(x=>x.k===DEP[k].st2).n;
+  const row=by=>{ const c=consOf(by), on=A.by===by, off=by==='int'&&fr<n;
+    const face=by==='int'?pFace(depResp(k)?mImg(depResp(k)):IMG[DEP[k].img],'m'):by==='ceo'?pFace(ceoImg(ceo()),'m'):`<span class="av-lg">${consLogo(by,48)}</span>`;
+    const sub=by==='int'?`${fr<0?0:fr} ${fr===1?'persona libera':'persone libere'} su ${depInt(k)}, ne ${n===1?'serve una':'servono due'} · ${stn} ${statBadge(DEP[k].st2,avvSkill(k,'int'),14)} · costo −15%`
+      :by==='ceo'?`Nel reparto non c'è nessuno di interno: lo segui tu, con ${IT.ceo} punti in meno · ${stn} ${statBadge(DEP[k].st2,avvSkill(k,'ceo'),14)}`
+      :`Bravura ${c.brav} · costo ×${f1(c.prj)} · non occupa nessuno${(depCons(k)||{}).id===by?' · già a contratto':''}`;
+    const inner=`${face}<span class="mp-t"><span class="mp-n"><b>${by==='int'?'Squadra interna':by==='ceo'?'Il CEO':esc(c.n)}</b> <span class="pill">${eur(avvCost(t,w,by))}</span>${on?'<span class="pill">scelto</span>':''}</span><span class="sm">${sub}</span></span>`;
+    return off?`<div class="mp-r off" aria-disabled="true">${inner}</div>`:`<button class="mp-r${on?' on':''}" data-act="avvset" data-by="${by}" ${on?'aria-current="true"':''}>${inner}</button>`; };
+  const modes=avvBB(t)?`<div class="lab">Come partire</div><div class="seg" role="group"><button class="btn sm2" data-act="avvset" data-mode="grad" aria-pressed="${A.mode==='grad'}">Graduale</button><button class="btn sm2" data-act="avvset" data-mode="bb" aria-pressed="${A.mode==='bb'}">Big bang</button></div>
+    <div class="sm">${A.mode==='bb'?`Tutto in un fine settimana: apprendimento lungo la metà, ma −15 sul punteggio e produttività −20% per ${AVV.bbDays} giorni.`:'Un reparto o un cliente alla volta: apprendimento normale, nessun rischio in più.'}</div>`:'';
+  const E=['liscio','intoppi','difficile','disastro'];
+  const stop=A.by==='int'&&lineProj(k)&&depFree(k)-n<=0;
+  return `<div class="src"><span>${kw('avvio','Avvio')}: ${esc(t.name)}</span><span>${esc(w.name)}</span></div><div class="win-b mp">
+    <div class="mp-h">${techIcon(t,32)}<span class="sm">${depIc(k)} ${esc(LINE_N[k])} · preparazione ${wks(wkP*7)}, si parte il <b>${shortDate(live)}</b>, poi ${wks(AVV.care)} di assistenza</span></div>
+    <div class="lab">Chi lo segue</div>${opts.map(row).join('')}${modes}
+    <div class="lab">${kw('avvio','Come può andare')}</div>
+    <div class="av-pb" role="img" aria-label="Probabilità degli esiti">${E.map(e=>P[e]>0.001?`<i style="width:${(P[e]*100).toFixed(1)}%;background:${ESITI[e].c}"></i>`:'').join('')}</div>
+    <div class="av-leg">${E.map(e=>`<span><i style="background:${ESITI[e].c}"></i>${ESITI[e].n} <b>${Math.round(P[e]*100)}%</b></span>`).join('')}</div>
+    <details class="av-sc"><summary>Punteggio ${Math.round(sc)} (± ${AVV.rnd} a caso): da cosa dipende</summary>${L.map(([nm,v])=>`<div class="row"><span>${esc(nm)}</span><b class="${v>0?'ok':v<0?'bad':''}">${v>0?'+':v<0?'−':''}${f1(Math.abs(v))}</b></div>`).join('')}</details>
+    ${stop?`<div class="sm warn">Con tutta la squadra sull'avvio, la ricerca in corso del reparto si ferma finché dura il progetto.</div>`:''}
+    ${why?`<div class="sm bad">${esc(why)}.</div>`:''}
+    <div class="row"><button class="btn" data-act="closemodal">Annulla</button><button class="btn pri" data-act="avvgo" ${why?'disabled':''}>Avvia il progetto · ${eur(cost)}</button></div></div>`; }
 // progetto di un magazzino da costruire su un terreno (finestra Espansione): posti, classe e dotazioni, con il conto in fondo
 function edilBox(){ const E=UI.sel.ed; if(!E||!SITES[E.site]||!siteOpen(E.site)) return '';
   const s=SITES[E.site], cls=edilCls(); if(!cls.includes(E.cl)) E.cl='std'; if(E.cap>s.max) E.cap=EDIL.sizes.filter(v=>v<=s.max).pop();
@@ -9684,7 +9822,7 @@ function innUsed(){const d=dirStat('tech');return Math.max(ceo().st.inn,d==null?
 // durata di una ricerca in giorni di gioco: le tecnologie hanno una durata in settimane (wk), accorciata dall'Innovazione e sempre a settimane intere
 // col pacchetto Reparto IT e Ingegneria la linea k di un reparto usa l'Innovazione del reparto (depInn), le persone al lavoro (IT.team) e il direttore IT e ingegneria
 function techWeeks(t,k){ k=k||techLine(t); if(k==='dir') return Math.max(3,Math.round(t.wk*clamp(1-0.03*(innUsed()-10),0.6,1.5)));
-  return Math.max(3,Math.round(t.wk*clamp(1-0.03*(depInn(k)-10),0.6,1.5)*IT.team[clamp(depTeam(k),1,5)]*dirIngMul())); }
+  return Math.max(3,Math.round(t.wk*clamp(1-0.03*(depInn(k)-10),0.6,1.5)*IT.team[clamp(depFree(k),1,5)]*dirIngMul())); }
 function techDays(t,k){return techWeeks(t,k)*7;}
 function hireDays(base,wh,r){const att=45+welfarePts('att')+polSum('att')+(S.rep-50)*0.5+whAtt(wh)+(R('academy')?5:0)+(coCertOk('parita')?3:0);const h=dirStat('hr');
   const drv=r==='autB'||r==='autCE'?ceo().tal.reduce((a,n)=>a*((TALENTS[n]||{}).drv||1),1):1;  // Un milione di km al volante: il CEO conosce tutti gli autisti
@@ -9751,6 +9889,16 @@ const ACT={
  // pacchetto Reparto IT e Ingegneria: responsabile del reparto, consulente a contratto (firma e disdetta)
  setdep(d,el){const v=el.value||null, D=S.dep&&S.dep[d.k]; if(!D) return; if(v){S.warehouses.forEach(w=>{if(w.mgr===v)w.mgr=null;}); Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===v)S.dirs[k]=null;}); if(isCs(v)) S.cs.resp=null; depClear(v);
    const m=S.managers.find(x=>x.id===v); if(m){m.wh=null; toast(`${m.name} guida ${DEP[d.k].n==='Ingegneria'?'l\'Ingegneria':'il '+DEP[d.k].n}`,'ok');}} D.resp=v; kpiNow(); renderAll();},
+ // avvii: apri la finestrella, cambia chi lo segue o come partire, parti, annulla durante la preparazione
+ avvopen(d){ const t=TECH_ALL.find(x=>x.id===d.id), w=whById(d.wh); if(!t||!w||!avvTech(t)||$('#modal').innerHTML) return;
+  const k=t.dep; UI.sel.avv={t:t.id,w:w.id,mode:'grad',by:depInt(k)-avvBusy(k)>=avvN(t)?'int':depInt(k)>0?CONS.filter(c=>c.dep===k).sort((a,b)=>a.fee-b.fee)[0].id:'ceo'};
+  if(!S.over&&S.speed){UI.evSpeed=S.speed;setSpeed(0);} showModal(avvBox()); },
+ avvset(d){ const A=UI.sel.avv; if(!A) return; if(d.by) A.by=d.by; if(d.mode) A.mode=d.mode; showModal(avvBox()); },
+ avvgo(){ const A=UI.sel.avv, t=A&&TECH_ALL.find(x=>x.id===A.t), w=A&&whById(A.w); if(!t||!w) return; const a=avvStart(t,w,A.by,A.mode); if(!a) return;
+  UI.sel.avv=null; closeModal(); toast(`Progetto avviato: ${t.name} a ${w.name}, si parte il ${shortDate(a.live)}`,'ok'); renderAll(); },
+ avvcancel(d){ const a=avvList().find(x=>x.id===d.id); if(!a||a.esito) return; const t=TECH_ALL.find(x=>x.id===a.tech), w=whById(a.wh);
+  if(!d.ok) return askOk(`Annullare il progetto ${t?t.name:''}${w?' a '+w.name:''}?`,`Rientra metà dei soldi, <b>${eur(a.cost*0.5)}</b>, e chi ci lavorava torna libero.`,'Sì, annulla',()=>ACT.avvcancel({...d,ok:1}));
+  avvCancel(a); toast('Progetto annullato: rientra metà dei soldi','warn'); renderAll(); },
  consign(d){ const c=consOf(d.id); if(!c||!itOn()) return; const D=S.dep[c.dep];
   if(!d.ok) return askOk(`Contratto con ${c.n}?`,`Canone di <b>${eur(c.fee)} al mese</b> (voce tecnologie del conto). ${D.cons?'Prende il posto del consulente di adesso, che se ne va subito. ':''}Apre la linea di ricerca di ${esc(DEP[c.dep].n)} da oggi, con la sua bravura ${c.brav} al posto dell'Innovazione del responsabile, se è più alta. Si disdice con ${wks(IT.notice)} di preavviso.`,'Firma',()=>ACT.consign({...d,ok:1}));
   if(D.cons) D.cons=null; consSign(c.dep,c.id); toast(`${c.n} lavora per ${DEP[c.dep].n}`,'ok'); renderAll(); },
@@ -9834,9 +9982,9 @@ const ACT={
    return askOk(`${on?'Accendere':'Spegnere'} la policy ${P.name}?`,`Una volta ${on?'accesa':'spenta'} non si può cambiare per ${wks(POL_CD)}.${on&&P.opp&&polOn(P.opp)?` Si spegne «${esc(POL[P.opp].name)}», che va contro.`:''}${ang.length?` <b class="bad">Non piacerà a ${esc(ang.join(', '))}.</b>`:''}`,on?'Sì, accendi':'Sì, spegni',()=>ACT.poltog({...d,ok:1})); }
   polSet(d.id,on); toast(`Policy ${on?'accesa':'spenta'}: ${POL[d.id].name}`,on?'ok':'warn'); renderAll();},
  opentech(d){UI.sel.tree=d.tree;UI.sel.tech=d.id;openWin('tecnologia');},
- research(d){const t=TECH.find(x=>x.id===d.id); if(!t) return; const k=techLine(t); if(lineProj(k)||projOfTech(t.id)||S.cash<t.cost||R(t.id)||!techOpen(t))return; S.cash-=t.cost; S.cur.tech+=t.cost;
+ research(d){const t=TECH.find(x=>x.id===d.id); if(!t) return; const k=techLine(t); if(lineProj(k)||(k!=='dir'&&depFree(k)<=0)||projOfTech(t.id)||S.cash<t.cost||R(t.id)||!techOpen(t))return; S.cash-=t.cost; S.cur.tech+=t.cost;
   const days=techDays(t,k); setLineProj(k,{tech:t.id,left:days,total:days,cost:t.cost}); toast(`Ricerca avviata${itOn()?` (${LINE_N[k]})`:''}: ${t.name}, pronta tra ${wks(days)}`,'ok'); renderAll();},
- install(d){const t=TECH.find(x=>x.id===d.id), w=whById(d.wh), ic=t&&w&&instCost(t,w); if(!R(t.id)||w.tech[t.id]||S.cash<ic||(t.tree==='wel'&&polOn('spending'))||!instReq(t,w))return; S.cash-=ic; S.cur[t.tree==='wel'?'welf':'tech']+=ic; w.tech[t.id]={day:S.day};
+ install(d){const t=TECH.find(x=>x.id===d.id), w=whById(d.wh), ic=t&&w&&instCost(t,w); if(avvTech(t)&&!isBot()) return ACT.avvopen(d); if(!R(t.id)||w.tech[t.id]||S.cash<ic||(t.tree==='wel'&&polOn('spending'))||!instReq(t,w))return; S.cash-=ic; S.cur[t.tree==='wel'?'welf':'tech']+=ic; w.tech[t.id]={day:S.day};
   toast(t.tree==='cert'?`${t.name} a ${w.name}: l'audit è fissato, certificato tra ${wks(t.weeks*7)}`:t.weeks?`${t.name} installato a ${w.name}: inizia l'apprendimento`:`${t.name} attivo a ${w.name}`,'ok'); renderAll();},
  canceltech(d){ const k=d.line||'dir', p=lineProj(k); if(!p)return; const t=TECH_ALL.find(x=>x.id===p.tech);
   if(!(d&&d.ok)) return askOk(`Annullare la ricerca ${t?t.name:''}?`,`Ti tornano indietro solo <b>${eur(p.cost*0.5)}</b>, metà del costo, e il lavoro fatto fin qui si perde.`,'Sì, annulla',()=>ACT.canceltech({ok:1,line:k}));
@@ -10547,6 +10695,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.110',t:'Avvii nei magazzini',x:['Col pacchetto Reparto IT e Ingegneria le tecnologie dei reparti (barcode, WMS, radiofrequenza, GPS, rotte, pick-to-light, formazione, sicurezza dei muletti, magazzino verticale, robot…) non si installano più con un clic: dalla scheda della tecnologia si avvia un progetto nel magazzino.','Si sceglie chi lo segue: la squadra interna (costa il 15% in meno, ma chi lavora all\'avvio intanto non fa ricerca), un consulente a progetto oppure, se nel reparto non c\'è nessuno, il CEO. Per i sistemi informatici e l\'automazione si sceglie anche come partire: graduale o tutto in un fine settimana.','Dopo la preparazione arriva il giorno dell\'avvio, con un esito: liscio come l\'olio, qualche intoppo, avvio difficile o disastro. La finestrella mostra le probabilità prima di partire e da cosa dipendono (chi lo segue, il morale, i picchi, i reparti in affanno).','Se va storto arriva un evento: tornare indietro, tenere duro o chiamare i consulenti. L\'esito allunga o accorcia l\'apprendimento della tecnologia.','Nella scheda Reparti tecnici si vedono gli avvii in corso e chi ci lavora; durante la preparazione un progetto si può annullare.']},
  {v:'0.109',t:'Reparto IT e Ingegneria',x:['Nuovo pacchetto di espansione «Reparto IT e Ingegneria», da accendere nel passo «Pacchetti» quando crei una partita: dietro le ricerche ci sono persone vere.','Due reparti in sede, nella nuova scheda «Reparti tecnici» della finestra Tecnologia: il Reparto IT studia i sistemi informatici, l\'Ingegneria le novità per il lavoro e gli impianti. Ognuno ha un responsabile scelto tra i manager, gli addetti da assumere e, se vuoi, un consulente a contratto.','Ogni reparto con almeno una persona ha la sua linea di ricerca: si fanno fino a tre ricerche insieme, una per la Direzione e una per reparto. Più persone e più Innovazione, ricerche più corte; se un reparto si svuota, la sua ricerca si ferma.','Sei consulenti per cominciare senza assumere nessuno, da Software Nebbia (costa poco, ma sparisce per settimane) allo Studio Ing. Paletti & Associati.','In Direzione arriva un sesto posto, il direttore IT e ingegneria: accorcia le ricerche dei reparti.','Marco, il nerd del WMS, parte con un sistemista già assunto.','I capannoni innovativi (Landriano, Vigasio e la costruzione innovativa) si possono avere solo col pacchetto, dopo la ricerca Edifici intelligenti e con un direttore IT e ingegneria che abbia Innovazione 14 o più. Chi li ha già se li tiene.']},
  {v:'0.108',t:'Arriva «Il Treno»',x:['Sul mercato c\'è un nuovo manager di rango B: Daniele "Il Treno" Alighieri, precisissimo, svelto il giusto e pessimo a guidare le persone.','Tre talenti nuovi: «Come un treno» (Operazioni +2 e un po\' di puntualità nel magazzino che guida), «Fatto!» (Precisione e Amministrazione +1) e «Lamentoso» (Leadership −2 e morale più basso nel magazzino che guida).','Una stellina gialla accanto al nome segna i personaggi speciali: Andrew Goodheart, Luca Del Sasso, Giuseppe Pasqualino, Greta Brambilla e Daniele Alighieri.']},
  {v:'0.107',t:'Tutto disponibile da subito',x:['Niente più anni d\'attesa: dal primo giorno sul mercato ci sono tutti i capannoni (anche i poli moderni di Castel San Giovanni e Calderara; quelli innovativi di Landriano e Vigasio arrivano col pacchetto Reparto IT e Ingegneria) e tutti i manager e i dirigenti, che l\'head hunter può trovare subito.','Si possono montare pannelli solari e LED fin dall\'inizio. L\'incentivo statale sui pannelli resta quello di una volta: arriva solo a chi li monta tra il 2007 e il 2012.','Gli eventi restano legati ai loro anni: l\'euro nel 2002, la crisi del 2008, il Black Friday dal 2015 e gli altri.','Andrew «Smilzo» Goodheart è sul mercato da subito, a 23 anni.']},
@@ -10936,6 +11085,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
 function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
-window.__FUP={get S(){return S;},itOn,DEP,DEPS,CONS,IT,depTeam,depOpen,depInn,techLine,lineProj,projs,innWhy,innOk,consSign,consStop,packApply,rentable,edilCls,techWeeks,DIR_ROLES,renderMap,AREE,areaShare,noteAlerts,TR,WV,ORD,trEst,trStart,trList,trDaily,trFx,trBusy,TR_EV,trEvShow,trEvDaily,trDelay,lsRent,lsLet,lsBack,leases,openWin,botMove,botUtil,trKmS,rivalFor,trDests,trClis,whEmpty,wvClose,wvPrice,wvBlock,ordCand,ordDay,ordDaily,DUR_RANK,durOf,INV,invScore,invFee,invTeam,invDaily,invDo,invBand,TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];packApply();},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
+window.__FUP={get S(){return S;},itOn,depFree,avvBusy,avvList,avvScore,avvProb,avvStart,avvBadOpts,AVV,DEP,DEPS,CONS,IT,depTeam,depOpen,depInn,techLine,lineProj,projs,innWhy,innOk,consSign,consStop,packApply,rentable,edilCls,techWeeks,DIR_ROLES,renderMap,AREE,areaShare,noteAlerts,TR,WV,ORD,trEst,trStart,trList,trDaily,trFx,trBusy,TR_EV,trEvShow,trEvDaily,trDelay,lsRent,lsLet,lsBack,leases,openWin,botMove,botUtil,trKmS,rivalFor,trDests,trClis,whEmpty,wvClose,wvPrice,wvBlock,ordCand,ordDay,ordDaily,DUR_RANK,durOf,INV,invScore,invFee,invTeam,invDaily,invDo,invBand,TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];packApply();},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();
 </script>

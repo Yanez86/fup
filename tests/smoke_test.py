@@ -275,6 +275,13 @@ async def phone(b, w, h, name, errs):
             await pg.evaluate("()=>{const S=window.__FUP.S; S.warehouses[0].tav=null; S.warehouses[0].ag=20;}")
         if wn == 'tecnologia' and ri:   # col pacchetto Reparto IT e Ingegneria: un consulente e un responsabile, perché la scheda abbia tutto
             await pg.evaluate("()=>{const F=window.__FUP,S=F.S; S.cash=Math.max(S.cash,500000); F.ACT.consign({id:'gigabancale',ok:1}); F.ACT.hiremgr({id:'sara'}); F.ACT.setdep({k:'ing'},{value:'sara'}); S.office.it=2; F.renderAll();}")
+        if wn == 'tecnologia' and ri:   # finestrella dell'avvio di una tecnologia nel magazzino
+            await pg.evaluate("()=>{const F=window.__FUP,S=F.S; S.researched.barcode=true; F.ACT.avvopen({id:'barcode',wh:S.warehouses[0].id});}")
+            assert await pg.evaluate(FITS, '#modal .modal'), f'{name}: la finestrella dell\'avvio esce dallo schermo'
+            bad = await pg.evaluate(NOSIDE, '#modal .modal')
+            assert not bad, f'{name}: finestrella dell\'avvio: {bad}'
+            await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_avvio.png'))
+            await pg.tap('#modal [data-act=closemodal]')
         for tb in TABS.get(wn, []) + (['reparti'] if wn == 'tecnologia' and ri else []):   # le altre schede della finestra
             await pg.tap(f'#win-{wn} [data-act=wtab][data-id={tb}]')
             assert await pg.evaluate(FITS, f'#win-{wn}'), f'{name}: finestra {wn}, scheda {tb}, esce dallo schermo'
@@ -1304,6 +1311,22 @@ async def main():
           F.ACT.rent({id:'landriano'}); o.rent=S.warehouses.some(w=>w.site==='landriano');
           return o;}''')
         assert all(r.values()), f'pacchetto Reparto IT e Ingegneria: {r}'
+        # avvii (0.110): la squadra interna lascia la ricerca, giorno dell'avvio con esito e apprendimento, fine dell'assistenza;
+        # un consulente a progetto non occupa nessuno; disastro forzato, evento e marcia indietro
+        r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('gino',null,{mode:'classica',win:{},it:true}); const S=F.S,o={},w=S.warehouses[0]; S.cash=3e6; S.nextEvent=1e9;
+          ['barcode','wms'].forEach(t=>S.researched[t]=true); S.office.it=1; F.ACT.hiremgr({id:'sara'}); F.ACT.setdep({k:'it'},{value:'sara'});
+          F.ACT.install({id:'barcode',wh:w.id}); o.modal=!!document.querySelector('#modal [data-act=avvgo]');
+          F.ACT.avvset({by:'int',mode:'grad'}); F.ACT.avvgo(); const a=S.avv[0]; o.start=!!a&&a.by==='int'&&a.n===1&&F.depFree('it')===1&&!w.tech.barcode&&a.cost===10200&&!document.querySelector('#modal').innerHTML;
+          F.ACT.research({id:'rf'}); o.res=!!S.dep.it.proj;
+          for(let i=0;i<16&&!a.esito;i++){ document.querySelector('#modal').innerHTML=''; F.step(); } o.live=!!a.esito&&!!w.tech.barcode&&w.tech.barcode.lm>0;
+          for(let i=0;i<16;i++){ document.querySelector('#modal').innerHTML=''; F.step(); } o.care=!S.avv.includes(a)&&F.depFree('it')===2;
+          F.ACT.avvopen({id:'wms',wh:w.id}); F.ACT.avvset({by:'nebbia',mode:'bb'}); F.ACT.avvgo(); const b=S.avv.find(x=>x.tech==='wms'); o.cons=!!b&&b.n===0&&F.depFree('it')===2;
+          b.live=S.day; const R0=Math.random; Math.random=()=>0; F.step(); Math.random=R0; o.bad=b.esito==='disastro'&&!!w.tech.wms;
+          const n=S.notes.find(x=>x.k==='ev'&&x.ev.id==='avv_ko'); o.ev=!!n; if(n) F.ACT.note({id:n.id}); window.__cash=S.cash; return o;}''')
+        assert all(r.values()), f'avvii del pacchetto Reparto IT e Ingegneria: {r}'
+        await pg.click('#modal [data-act=evopt][data-i="0"]')
+        r = await pg.evaluate("()=>{const F=window.__FUP,S=F.S,w=S.warehouses[0]; document.querySelector('#modal').innerHTML=''; F.step(); return {gone:!w.tech.wms,cd:!!(w.avvCd&&w.avvCd.wms>S.day),back:S.cash>window.__cash};}")
+        assert all(r.values()), f'avvio disastroso, marcia indietro: {r}'
         r = await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino',null,{mode:'classica',win:{},it:true}); const H=F.HUM; H.nextEvent=40;
           H.bots=[['edoardo','espansione'],['valeria','qualita'],['marco','prezzo']].map((x,i)=>F.newRival(x[0],['#ff4f9a','#3dd6c4','#9b6bff'][i],'camion',x[1],'normale',i));
           for(let d=0;d<365&&!H.over;d++){ const m=document.querySelector('#modal'); if(m.innerHTML){const b=m.querySelector('[data-act=evopt]:not([disabled])')||m.querySelector('[data-act=closemodal]'); if(b) b.click();}
@@ -1318,6 +1341,10 @@ async def main():
         await pg.evaluate("()=>{window.__FUP.openWin('tecnologia');}"); await pg.wait_for_timeout(600)
         assert await pg.evaluate("document.querySelectorAll('#win-tecnologia .rbars .rbar').length") == 3, 'col pacchetto la scheda Ricerca deve avere tre barre'
         await pg.screenshot(path=os.path.join(OUT, 'shot_it_ricerca.png'))
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S; S.researched.barcode=true; F.openWin('reparti'); const w=S.warehouses.find(x=>!x.tech.barcode)||S.warehouses[0]; F.ACT.avvopen({id:'barcode',wh:w.id});}"); await pg.wait_for_timeout(400)
+        assert await pg.query_selector('#modal [data-act=avvgo]') and await pg.query_selector('#modal .av-pb'), 'finestrella dell\'avvio incompleta'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_it_avvio.png'))
+        await pg.evaluate("()=>{document.querySelector('#modal').innerHTML='';}")
         await pg.evaluate("()=>{window.__FUP.ACT.mpopen({k:'dep',id:'ing'});}"); await pg.wait_for_timeout(400)
         assert 'Responsabile IT' in await pg.inner_text('#modal'), 'nella scelta del responsabile chi guida l\'altro reparto deve stare in grigio col suo ruolo'
         await pg.screenshot(path=os.path.join(OUT, 'shot_it_scelta.png'))
