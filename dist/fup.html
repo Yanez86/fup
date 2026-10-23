@@ -718,6 +718,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .mp-r.off .mp-n b{color:var(--muted)}.mp-u{color:var(--ink)}
 .mp-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .mp-n{font-size:16px}
+.mstar{display:inline-flex;vertical-align:middle;flex:none;margin-left:6px}
 .mp-n .rank{vertical-align:-3px;margin-right:6px}
 .mp-n .pill{margin-left:6px;vertical-align:2px;background:var(--yellow)}
 .mp-r .stc{cursor:inherit}.mp-r .stc.mp-lo{opacity:.4}
@@ -1907,6 +1908,10 @@ const pxSz=(sz,n)=>n*Math.max(1,Math.round(sz/n));
 function pxRects(g){let r='';g.forEach((row,y)=>{let x=0;while(x<row.length){const c=row[x];let e=x+1;while(e<row.length&&row[e]===c)e++;if(c)r+=`<rect x="${x}" y="${y}" width="${e-x}" height="1" fill="${c}"/>`;x=e;}});return r;}
 const pxGrid=rows=>rows.map(row=>[...row].map(ch=>ch==='.'?null:TPAL[ch]||null));
 function pxSvg(rows,sz,extra){const n=rows.length;return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" aria-hidden="true" style="flex:none;${extra||''}">${pxRects(pxGrid(rows))}</svg>`;}
+// stellina accanto al nome dei manager speciali (MSTAR, id di MANAGERS): mStar(p) nelle schede e nella finestrella di scelta
+const MSTAR=new Set(['andrew','delsasso','sorrentino','greta','daniele']);
+const STAR_PX=['....KK....','...KYYK...','...KYYK...','KKKKYYKKKK','KYYYYYYYYK','.KYYYYYYK.','..KYYYYK..','.KYYyyYYK.','.KyK..KyK.','.KK....KK.'];
+const mStar=p=>MSTAR.has(p.id)?`<span class="mstar" data-tip="Personaggio speciale" role="img" aria-label="Personaggio speciale">${pxSvg(STAR_PX,20)}</span>`:'';
 // tessera: bordo scuro, filetto (rim), fondo con la fascia in basso; il disegno al centro con la sua ombra netta (1 pixel in basso a destra)
 function tileGrid(n,ins,rim,bg,bg2,art,off,sh){
   const edge=(x,y)=>ins(x,y)&&!(ins(x-1,y)&&ins(x+1,y)&&ins(x,y-1)&&ins(x,y+1)), g=[];
@@ -3881,7 +3886,7 @@ function leaveCo(p,why){ const n=p.name, ret=p.quit&&p.quit.ret; if(ret){ p.reti
 function personCard(m,where,btn,bad,busy){
   const best=STATS.reduce((a,s)=>m.st[s.k]>m.st[a.k]?s:a,STATS[0]);
   return `<div class="card pr-m${bad?' cl-bad':''}"><div class="pf-h"><img class="px mport" src="${mImg(m)}" alt="Ritratto di ${esc(m.name)}" width="80" height="94">
-    <div class="wh-sm"><b class="pf-n">${mRankIcon(m,28)}<span>${esc(m.name)}</span></b><span class="pf-r">${kw('eta',ageOf(m)+' anni')} · ${esc(m.role)}</span>
+    <div class="wh-sm"><b class="pf-n">${mRankIcon(m,28)}<span>${esc(m.name)}</span>${mStar(m)}</b><span class="pf-r">${kw('eta',ageOf(m)+' anni')} · ${esc(m.role)}</span>
      <span class="pf-tags">${where!=null?`<span class="pill ${busy?'':'pr-free'}">${where}</span>`:`<span class="pill pf-ral">${m.hired||m.arr!=null?'':'chiede '}${eur(m.ral)} l'anno</span>`}<span class="pill pf-best" style="background:${best.bg};border-color:${best.c}">${statIcon(best.k,12)} forte in ${best.n}</span></span></div></div>
     <div class="pf-st">${statRadar(m.st,124)}${statBars(m.st)}</div>
     ${(m.tal||[]).length?`<div class="lab">${kw('talenti','Talenti')}</div>${talentRows(m.tal)}`:''}
@@ -3901,7 +3906,7 @@ const mpTask=m=>{const r=seatOf(m.id), w=m.wh&&whById(m.wh); return r?DIR_ROLES.
 const mpBtn=(k,id,name,lab)=>`<button class="btn mp-b" data-act="mpopen" data-k="${k}" data-id="${id}" aria-label="${esc(lab)}"><span>${esc(name)}</span><span class="mp-c">Cambia ›</span></button>`;
 const mpQuiet=h=>h.replace(/ data-(act|id|tip)="[^"]*"/g,'');  // dentro una riga ogni tocco sceglie: niente tooltip né enciclopedia
 // una riga della finestrella: pulsante se si può scegliere, in grigio (off) se no; on = la scelta di adesso
-const mpRow=(k,id,cur,o)=>{const on=o.v===cur, inner=`${o.face}<span class="mp-t"><span class="mp-n">${o.medal||''}<b>${esc(o.name)}</b>${o.tag||''}${on?`<span class="pill">${o.onT||'in carica'}</span>`:''}</span><span class="sm">${o.sub}</span>${o.more||''}</span>`;
+const mpRow=(k,id,cur,o)=>{const on=o.v===cur, inner=`${o.face}<span class="mp-t"><span class="mp-n">${o.medal||''}<b>${esc(o.name)}</b>${o.star||''}${o.tag||''}${on?`<span class="pill">${o.onT||'in carica'}</span>`:''}</span><span class="sm">${o.sub}</span>${o.more||''}</span>`;
   return o.off?`<div class="mp-r off" aria-disabled="true">${inner}</div>`:`<button class="mp-r${on?' on':''}${o.none?' none':''}" data-act="mpick" data-k="${k}" data-id="${id}" data-v="${o.v}" ${on?'aria-current="true"':''}>${inner}</button>`;};
 function mgrPick(k,id){
   const w=k==='wh'&&whById(id), r=k==='dir'&&DIR_ROLES.find(x=>x.id===id), B=ceo();
@@ -3911,7 +3916,7 @@ function mgrPick(k,id){
   // le abilità di ognuno; per il customer service e la Direzione quelle che non contano restano sbiadite
   const chips=st=>`<span class="stats">${STATS.map(x=>mpQuiet(statBadge(x.k,st[x.k],14)).replace('class="stc"',`class="stc${k!=='wh'&&!ks.includes(x.k)?' mp-lo':''}"`)).join('')}</span>`;
   const row=o=>mpRow(k,id,cur,{...o,face:pFace(o.img,'m'),more:o.st?chips(o.st):'',onT:o.none&&k!=='cs'?'adesso':'in carica'});
-  const man=(m,off)=>({v:m.id,img:mImg(m),name:m.name,medal:mpQuiet(mRankIcon(m,20)),st:m.st,off,
+  const man=(m,off)=>({v:m.id,img:mImg(m),name:m.name,star:mStar(m),medal:mpQuiet(mRankIcon(m,20)),st:m.st,off,
     sub:off?`<b class="mp-u">${esc(mpTask(m))}</b>`:k==='dir'?esc(r.eff(m.st[r.stat])):`${ageOf(m)} anni · ${esc(m.role)}`});
   const all=S.managers.filter(m=>m.hired||m.arr!=null), free=m=>m.hired&&(m.id===cur||!m.wh&&!seatOf(m.id)&&!isCs(m.id));
   const ok=all.filter(free).sort((a,b)=>score(b)-score(a)).map(m=>man(m,false)), no=all.filter(m=>!free(m)).sort((a,b)=>!a.hired-!b.hired).map(m=>man(m,true));
@@ -10366,7 +10371,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
- {v:'0.108',t:'Arriva «Il Treno»',x:['Sul mercato c\'è un nuovo manager di rango B: Daniele "Il Treno" Alighieri, precisissimo, svelto il giusto e pessimo a guidare le persone.','Tre talenti nuovi: «Come un treno» (Operazioni +2 e un po\' di puntualità nel magazzino che guida), «Fatto!» (Precisione e Amministrazione +1) e «Lamentoso» (Leadership −2 e morale più basso nel magazzino che guida).']},
+ {v:'0.108',t:'Arriva «Il Treno»',x:['Sul mercato c\'è un nuovo manager di rango B: Daniele "Il Treno" Alighieri, precisissimo, svelto il giusto e pessimo a guidare le persone.','Tre talenti nuovi: «Come un treno» (Operazioni +2 e un po\' di puntualità nel magazzino che guida), «Fatto!» (Precisione e Amministrazione +1) e «Lamentoso» (Leadership −2 e morale più basso nel magazzino che guida).','Una stellina gialla accanto al nome segna i personaggi speciali: Andrew Goodheart, Luca Del Sasso, Giuseppe Pasqualino, Greta Brambilla e Daniele Alighieri.']},
  {v:'0.107',t:'Tutto disponibile da subito',x:['Niente più anni d\'attesa: dal primo giorno sul mercato ci sono tutti i capannoni (anche i poli moderni di Castel San Giovanni e Calderara e quelli innovativi di Landriano e Vigasio) e tutti i manager e i dirigenti, che l\'head hunter può trovare subito.','Si possono costruire magazzini innovativi e montare pannelli solari e LED fin dall\'inizio. L\'incentivo statale sui pannelli resta quello di una volta: arriva solo a chi li monta tra il 2007 e il 2012.','Gli eventi restano legati ai loro anni: l\'euro nel 2002, la crisi del 2008, il Black Friday dal 2015 e gli altri.','Andrew «Smilzo» Goodheart è sul mercato da subito, a 23 anni.']},
  {v:'0.106',t:'Gare ed eventi sulla mappa',x:['Ogni gara aperta è una puntina sulla mappa, col logo del cliente sopra la sua zona e i giorni che mancano. Passandoci sopra vedi quanto dista ogni tuo magazzino e quanto è probabile vincerla; un clic apre la gara e colora la zona, con una linea da ogni magazzino.','Nebbia, allerta in Liguria, Giro d\'Italia, ZTL e moda a Milano, neve al Frejus: ora compaiono sulla mappa dove succedono, con i giorni che restano. Pesano solo sui viaggi che passano di lì, in proporzione: un magazzino con un solo cliente da quelle parti se ne accorge appena, uno che ci lavora tutti i giorni prende la penalità intera. Il Frejus resta com\'era: colpisce i magazzini che lavorano verso la Francia.','Tre imprevisti nuovi con il loro posto sulla mappa: il cantiere sull\'A1 tra Piacenza e Bologna, la coda al Brennero e la piena del Po.']},
  {v:'0.105',t:'Affitti, sindacato e traslochi delle avversarie',x:['Un tuo capannone di proprietà rimasto vuoto si può affittare a un\'azienda che non fa logistica: «Cerca un inquilino» nel riquadro Capannone vuoto. Dopo uno o due mesi arrivano le offerte; firmato il contratto, per sei anni incassi il canone ogni mese, meno il 10% di tasse e manutenzione. Lo ritrovi nella scheda Nuovo magazzino e sulla mappa, in grigio: lo puoi rinnovare alla scadenza o riprendere prima pagando sei mesi di canone.','Ogni tanto un inquilino non paga, oppure si affeziona e vuole comprare il capannone.','Col pacchetto Relazioni industriali un trasloco oltre 40 km è una delocalizzazione: nel vecchio magazzino sale l\'agitazione e, se c\'è il sindacato, chiede un accordo di trasferimento (indennità doppia, navetta aziendale, due mesi di buonuscita a chi non viene). Puoi firmarlo, portarlo al tavolo delle trattative o tirare dritto. Se segue almeno metà delle persone, il sindacato arriva con loro nel magazzino nuovo.','Anche le avversarie traslocano: lasciano un capannone vecchio per uno migliore lì vicino, o uniscono due magazzini mezzi vuoti. Sulla mappa vedi la freccia nel loro colore.','Un\'avversaria che cerca spazio può fare un\'offerta per comprare o prendere in affitto un tuo capannone vuoto: paga più del mercato, ma avrà un magazzino vicino ai tuoi clienti.']},
