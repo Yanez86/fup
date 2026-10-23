@@ -882,7 +882,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .hm-new:disabled{background:var(--panel2);box-shadow:inset 0 -5px 0 var(--line),4px 4px 0 var(--ink);cursor:not-allowed}.hm-new:disabled .hm-plus,.hm-new:disabled .ar{opacity:.4}
 .hm-tut{background:#bfe6ff;box-shadow:inset 0 -5px 0 #5fb4f0,inset 0 3px 0 #e6f5ff,4px 4px 0 var(--ink)}
 .hm-orn{width:52px;height:60px;flex:none;align-self:flex-start;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--ink)}.hm-tut.off .hm-orn{opacity:.4}
-.hm-tut{cursor:default;box-sizing:border-box}.hm-tut.off{background:var(--panel2);box-shadow:inset 0 -5px 0 var(--line),4px 4px 0 var(--ink)}.hm-tut .hm-tb{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}.hm-tut .hm-tb .btn{flex:1 1 11em;display:flex;flex-direction:column;align-items:flex-start;font-family:var(--f-disp);font-size:18px;padding:6px 12px;text-align:left}.hm-tut .hm-tb small{font-family:var(--f-body);font-size:13px}
+.hm-tut{cursor:default;box-sizing:border-box;flex-wrap:wrap}.hm-tut.off{background:var(--panel2);box-shadow:inset 0 -5px 0 var(--line),4px 4px 0 var(--ink)}.hm-tut .hm-tb{flex:1 1 100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.hm-tut .hm-tb .btn{min-width:0;display:flex;flex-direction:column;align-items:flex-start;font-family:var(--f-disp);font-size:18px;padding:6px 12px;text-align:left}.hm-tut .hm-tb small{font-family:var(--f-body);font-size:13px}
 /* tutorial: il fumetto della dottoressa Ribalta (#tut) e il riquadro che lampeggia sulla cosa da toccare (#tuthi) */
 #tut{position:fixed;z-index:60;left:96px;bottom:16px;width:min(520px, calc(100vw - 32px));display:flex;gap:10px;align-items:flex-end;pointer-events:none}
 #tut:empty{display:none}
@@ -3062,14 +3062,18 @@ wk('ritiro','cli','Ritiro o consegna',`Da dove arriva la merce: la consegna il c
 `Con "consegna" la merce arriva al magazzino gratis. Con "ritiro" mandi un bilico da 33 pallet fino allo stabilimento del cliente: servono più [[autisti_ce|autisti CE]] e più gasolio, ma il cliente paga 1,5 € per ogni km di ritiro.`);
 wk('concorrenti','cli','Concorrenti',`Gruppo Bartolazzi, Logistix Global, F.lli Brambilla e la Cooperativa La Fatica: il resto del mercato, che si prende le gare che nessuno vince.`,
 `Non li vedi lavorare, ma ci sono: una [[gare|gara]] che non va né a te né a un'[[avversari|azienda avversaria]] finisce a uno di loro, di solito con uno sconto aggressivo. Le aziende avversarie vere, quelle degli altri CEO, le trovi in [[classifica]].`);
-wk('tutorial','basi','Tutorial',`Due partite guidate dalla dottoressa Ornella Ribalta: il tutorial base sulle prime cose e quello avanzato su un'azienda già grande.`,
+wk('tutorial','basi','Tutorial',`Quattro partite guidate dalla dottoressa Ornella Ribalta: il tutorial base sulle prime cose, quello avanzato su un'azienda già grande e uno per ciascun pacchetto di espansione.`,
 `Si avviano dalla schermata principale, dal riquadro Tutorial, e occupano un posto di salvataggio come una partita normale. Si gioca con Valeria Conti a Novara, con il [[tempo]] in Classica.
 
 **Base** (circa 15 minuti, senza avversari):
 
-La dottoressa Ribalta, docente del corso regionale «Diventa CEO in 9 lezioni», spiega una cosa alla volta in un fumetto e indica con un riquadro giallo cosa toccare: la [[mappa]], il [[magazzino]] con [[saturazione|occupazione]], [[puntualita]] e [[accuratezza]], il [[carico|carico di lavoro]] del personale e il [[facility|facility manager]] da assumere, una [[gare|gara d'appalto]] preparata apposta, la prima [[ricerca]], i [[manager]], le [[notifiche]] e gli [[eventi]], il [[report]] del lunedì e la [[cassa]].
+La dottoressa Ribalta, docente del corso regionale «Diventa CEO in 9 lezioni», spiega una cosa alla volta in un fumetto e indica con un riquadro giallo cosa toccare: la [[mappa]], il [[magazzino]] con [[saturazione|occupazione]], [[puntualita]] e [[accuratezza]], il [[carico|carico di lavoro]] del personale e il [[facility|facility manager]] da assumere, una [[gare|gara d'appalto]] preparata apposta, con la sua puntina sulla mappa, la prima [[ricerca]], i [[manager]], le [[notifiche]] e gli [[eventi]], il [[report]] del lunedì e la [[cassa]].
 
-**Avanzato** (circa 20 minuti): la partita parte da gennaio 2004, dopo due anni giocati in fretta e sempre uguali: tre magazzini, una decina di clienti, un'azienda [[avversari|avversaria]] e il pacchetto [[relazioni_industriali|Relazioni industriali]]. Le lezioni: la [[direzione|Direzione]], la [[trattativa]] con un candidato, il [[customer_service|customer service]], le [[certificazioni]] e l'[[audit]], le dotazioni del capannone, le [[policy]] e il welfare, l'[[agitazione]] e il [[tavolo]], la classifica e la [[vittoria]], i [[prestiti]] e i contratti in perdita.
+**Avanzato** (circa 20 minuti): la partita parte da gennaio 2004, dopo due anni giocati in fretta e sempre uguali: tre magazzini, una decina di clienti e un'azienda [[avversari|avversaria]], senza pacchetti. Le lezioni: la [[direzione|Direzione]], la [[trattativa]] con un candidato, il [[customer_service|customer service]], le [[certificazioni]] e l'[[audit]], le dotazioni del capannone, le [[policy]] e il welfare, la classifica e la [[vittoria]], i [[prestiti]], i contratti in perdita, il [[trasloco]] e il [[capannone_vuoto|capannone vuoto]].
+
+**Relazioni industriali** (circa 10 minuti, corso «Il sindacato spiegato ai CEO»): la stessa azienda di gennaio 2004, col pacchetto [[relazioni_industriali|Relazioni industriali]]. Il magazzino più grande ha il sindacato, è in [[agitazione|stato di agitazione]] e il [[tavolo]] è aperto. Le lezioni: l'agitazione e la lente del clima, il [[contagio]], i [[sindacati]] e il [[delegato]], le richieste e la [[contropartita]], una seduta vera, [[sciopero|scioperi]] e [[presidio|presidi]], il [[contratto_nazionale|contratto nazionale]] e [[confpallet|Confpallet]], i [[fornitori|fornitori di handling]], le ricerche e la vittoria del clima.
+
+**Reparto IT** (circa 10 minuti, corso «Informatica per logistici (e viceversa)»): la stessa azienda col pacchetto [[reparto_it|Reparto IT e Ingegneria]], i reparti ancora vuoti e un magazzino senza lettori barcode. Le lezioni: i [[reparti_tecnici|reparti]], il primo [[consulenti|consulente]], il responsabile e gli addetti, le [[linee_ricerca|tre linee di ricerca]], l'[[avvio]] di una tecnologia in un magazzino, la [[lavagna]], l'[[assistenza_it|assistenza]], l'[[affidabilita|affidabilità]] e i [[guasti_it|guasti informatici]], l'Ingegneria e il [[dir_ing|direttore IT e ingegneria]].
 
 Mentre parla il tempo resta fermo: si riparte quando lo dice lei. Finché dura il corso non arrivano altre gare né eventi a caso. Il fumetto si rimpicciolisce toccando il ritratto o ▾, e il tutorial si può saltare in qualsiasi momento: la partita continua normale. Alla fine arriva l'attestato di partecipazione e si continua a giocare la stessa partita.`);
 wk('lobby','basi','Lobby',`L'ultimo passaggio prima di iniziare: le quattro aziende in gara, il ritmo del tempo e le condizioni di vittoria.`,
@@ -10435,6 +10439,7 @@ const tGara=()=>S.tenders.find(t=>t.tut);
 const tEvN=()=>(S.notes||[]).find(n=>n.k==='ev'&&n.ev&&n.ev.id==='ordine');
 const tResN=()=>(S.notes||[]).find(n=>n.k==='res'&&S.tut.evt&&n.title===S.tut.evt);
 const tNote=n=>n?`#notes [data-act=note][data-id="${n.id}"]`:null;
+const tIl=d=>{const x=shortDate(d); return (/^(8|11) /.test(x)?'l\'':'il ')+x;}, tAl=d=>{const x=shortDate(d); return (/^(8|11) /.test(x)?'all\'':'al ')+x;};   // «l'8 gen», «all'11 mar»
 const TUT={base:{n:'Tutorial base',corso:'Diventa CEO in 9 lezioni',L:[
  {n:'Benvenuta',s:[
   {f:'contenta',t:()=>`Buongiorno! Sono la dottoressa Ornella Ribalta, docente del corso regionale «Diventa CEO in 9 lezioni», pagato coi fondi europei. Oggi tu sei ${esc(ceo().name)}: ex manager di multinazionale, hai appena aperto ${esc(S.company.name)}. Io ti spiego le basi, le scelte le fai tu.`},
@@ -10451,10 +10456,11 @@ const TUT={base:{n:'Tutorial base',corso:'Diventa CEO in 9 lezioni',L:[
    t:()=>`Ogni reparto ha la sua barra del ${kw('carico','carico di lavoro')}: verde va bene, rossa vuol dire gente in affanno. Ti manca il ${kw('facility','facility manager')}: senza di lui nessuno fa manutenzione e il capannone si rovina.`},
   {f:'contenta',t:()=>{const q=S.queue.find(q=>q.role==='fm'); return `Fatto! ${q?`Arriva tra ${wks(q.days)}`:'È già al lavoro'}: le persone non arrivano il giorno dopo. L'annuncio costa meno, l'agenzia fa prima. Regola d'oro: quando vinci un cliente, assumi subito, prima che parta il contratto.`;}}]},
  {n:'Le gare',s:[
-  {go:()=>tutTender(),hi:()=>tDock('gare'),ok:()=>!!UI.open.gare,w:()=>tMenu('Gare d\'appalto'),t:()=>`I clienti nuovi arrivano dalle ${kw('gare','gare d\'appalto')}. Guarda caso ne è appena uscita una: ${esc((tGara()||{}).name||'')}.`},
+  {go:()=>{tutTender(); if(MOB) Object.keys(UI.open).forEach(closeWin);},hi:()=>[tGara()&&`#map .mk[data-act=mapten][data-id="${tGara().id}"] .mk-ring`,tDock('gare')],ok:()=>!!UI.open.gare,w:()=>`${tTap()} la puntina della gara sulla mappa, oppure «Gare d'appalto» nel menu`,
+   t:()=>`I clienti nuovi arrivano dalle ${kw('gare','gare d\'appalto')}. Guarda caso ne è appena uscita una: ${esc((tGara()||{}).name||'')}. Sulla mappa ogni gara aperta ha la sua puntina, piantata nella zona del cliente.`},
   {hi:()=>'#win-gare .gr-req',t:()=>`Qui c'è quello che chiede: pallet al mese, posti in magazzino, soglie di puntualità e accuratezza e durata del ${kw('contratto','contratto')}. Le soglie sono più basse dei numeri che fai oggi: si può fare.`},
   {hi:()=>'#win-gare [data-act=bid]',ok:()=>!!(tGara()||{}).bid,w:()=>`${tTap()} «Invia offerta»`,t:()=>`Sotto c'è la tua offerta: il magazzino, il ${kw('prezzo','prezzo')} rispetto al listino e la probabilità di vincere. Più sconti, più è facile vincere e meno guadagni. Per stavolta lascia il prezzo com'è.`},
-  {f:'occhiolino',t:()=>`Offerta inviata! La gara si chiude il ${shortDate((tGara()||{}).deadline||S.day)}. Detto tra noi: col responsabile acquisti ho già parlato io.`}]},
+  {f:'occhiolino',t:()=>`Offerta inviata! La gara si chiude ${tIl((tGara()||{}).deadline||S.day)}. Detto tra noi: col responsabile acquisti ho già parlato io.`}]},
  {n:'La tecnologia',s:[
   {hi:()=>tDock('tecnologia'),ok:()=>!!UI.open.tecnologia,w:()=>tMenu('Tecnologia'),t:()=>`Ora la ${kw('ricerca','ricerca')}. Le ${kw('tecnologie','tecnologie')} stanno in cinque ${kw('alberi','alberi')} e se ne ricerca una alla volta.`},
   {go:()=>{if(UI.open.tecnologia&&!S.project){UI.sel.tree='log';renderWin('tecnologia');}},hi:()=>UI.open.tecnologia?'#win-tecnologia [data-act=seltech][data-id=barcode]':tDock('tecnologia'),ok:()=>UI.sel.tech==='barcode'||!!S.project,w:()=>`${tTap()} «Lettori barcode» nell'albero Logistica`,
@@ -10477,12 +10483,12 @@ const TUT={base:{n:'Tutorial base',corso:'Diventa CEO in 9 lezioni',L:[
   {hi:()=>tDock('report'),ok:()=>!!UI.open.report,w:()=>tMenu('Report KPI'),t:()=>`È arrivato lunedì, e con lui il report.`},
   {hi:()=>'#win-report .xl',t:()=>`Sembra Excel, ed è voluto. C'è una riga per magazzino con la puntualità e l'accuratezza della settimana, il confronto con quella prima, l'occupazione, il morale e il margine. Una cella verde è sopra la soglia del cliente, gialla è al limite, rossa è sotto: lì il cliente se n'è già accorto.`},
   {hi:()=>'#stats',t:()=>`In alto hai sempre la ${kw('cassa','cassa')}, il risultato del mese scorso, il ${kw('morale','morale')} e l'${kw('otif','OTIF')}: ${TOUCH?'toccali':'cliccali'} per i dettagli. Se a fine mese la cassa è sotto i −50.000 €, l'azienda fallisce. E il corso non te lo rimborso.`},
-  {go:()=>{if(MOB) Object.keys(UI.open).forEach(closeWin);},hi:()=>S.speed?null:tPlay(),ok:()=>!!(tGara()||{done:1}).done,run:1,w:()=>`Fai scorrere il tempo fino al ${shortDate((tGara()||{}).deadline||S.day)}`,t:()=>`Ultima cosa: la gara per ${esc((tGara()||{}).name||'')}. Fai scorrere il tempo fino a quando si chiude.`},
+  {go:()=>{if(MOB) Object.keys(UI.open).forEach(closeWin);},hi:()=>S.speed?null:tPlay(),ok:()=>!!(tGara()||{done:1}).done,run:1,w:()=>`Fai scorrere il tempo fino ${tAl((tGara()||{}).deadline||S.day)}`,t:()=>`Ultima cosa: la gara per ${esc((tGara()||{}).name||'')}. Fai scorrere il tempo fino a quando si chiude.`},
   {f:'contenta',hi:()=>tDock('magazzini'),t:()=>{const g=tGara(), c=g&&S.clients.find(x=>x.name===g.name&&x.status!=='perso');
-    return c?`Gara vinta! Il contratto parte il ${shortDate(c.start)}: da quel giorno il magazzino lavora di più. Apri il magazzino, guarda le barre del carico e assumi chi serve prima che parta. Il resto lo impari giocando: in bocca al lupo!`
+    return c?`Gara vinta! Il contratto parte ${tIl(c.start)}: da quel giorno il magazzino lavora di più. Apri il magazzino, guarda le barre del carico e assumi chi serve prima che parta. Il resto lo impari giocando: in bocca al lupo!`
      :`Stavolta la gara non è andata. Succede: ne arriveranno altre, una ogni poche settimane. Tieni d'occhio le Gare d'appalto e, quando ne vinci una, assumi chi serve prima che parta il contratto. Il resto lo impari giocando: in bocca al lupo!`;}}]}
 ]}};
-// tutorial avanzato: l'azienda ha già due anni di storia (tutPrep()), con tre magazzini, un'azienda avversaria e il pacchetto Relazioni industriali
+// tutorial avanzato: l'azienda ha già due anni di storia (tutPrep()), con tre magazzini e un'azienda avversaria, senza pacchetti
 const tRiv=()=>rivals()[0]||null;
 const tFree=()=>S.managers.filter(m=>m.hired&&!m.wh&&!seatOf(m.id)&&!isCs(m.id)&&!isDep(m.id));
 const tPick=k=>$('#modal').innerHTML?'*#modal .mp-r[data-act=mpick]:not(.none)':`[data-act=mpopen][data-k=${k}]`;
@@ -10491,7 +10497,7 @@ const tTab=(p,c,n)=>!UI.open[p]?tDock(p):`#win-${p} [data-act=wtab][data-id=${c}
 TUT.avanzato={n:'Tutorial avanzato',corso:'Diventa CEO, secondo livello',L:[
  {n:'La Direzione',s:[
   {f:'contenta',t:()=>{const r=tRiv(), d=dateOf(S.day);
-    return `Benvenuta al secondo livello! Facciamo un salto in avanti: è ${MESI[d.getUTCMonth()]} ${d.getUTCFullYear()} e ${esc(S.company.name)} ha ${S.warehouses.length} magazzini (${S.warehouses.map(w=>esc(w.name)).join(', ')}), ${S.clients.filter(c=>c.status==='attivo').length} clienti e ${eur(S.cash)} in cassa.${r?` In gara c'è anche ${esc(r.boss.name)} con ${esc(r.company.name)}.`:''} E c'è il pacchetto Relazioni industriali. Oggi le cose da azienda grande.`;}},
+    return `Benvenuta al secondo livello! Facciamo un salto in avanti: è ${MESI[d.getUTCMonth()]} ${d.getUTCFullYear()} e ${esc(S.company.name)} ha ${S.warehouses.length} magazzini (${S.warehouses.map(w=>esc(w.name)).join(', ')}), ${S.clients.filter(c=>c.status==='attivo').length} clienti e ${eur(S.cash)} in cassa.${r?` In gara c'è anche ${esc(r.boss.name)} con ${esc(r.company.name)}.`:''} Oggi le cose da azienda grande.`;}},
   {hi:()=>tDock('manager'),ok:()=>!!UI.open.manager,w:()=>tMenu('Manager'),t:()=>`Con la ricerca Struttura direzionale si apre la ${kw('direzione','Direzione')}: cinque posti da direttore, nella finestra Manager.`},
   {hi:()=>tTab('manager','direzione'),ok:()=>!!UI.open.manager&&wtabOf('manager')==='direzione',w:()=>`${tTap()} la scheda «Direzione»`,t:()=>`La Direzione è una scheda della finestra Manager.`},
   {hi:()=>UI.open.manager&&wtabOf('manager')==='direzione'?tPick('dir'):tTab('manager','direzione'),ok:()=>DIR_ROLES.some(r=>S.dirs[r.id]),w:()=>`${tTap()} «Cambia» accanto a un posto e scegli un manager libero`,
@@ -10534,11 +10540,6 @@ TUT.avanzato={n:'Tutorial avanzato',corso:'Diventa CEO, secondo livello',L:[
    ok:()=>POLICIES.some(P=>polOn(P.id)!==!!S.tut.pol0[P.id])||!!UI.open.azienda&&wtabOf('azienda')==='policy'&&!$('#modal').innerHTML&&!$('#win-azienda [data-act=poltog]:not([disabled])'),
    w:()=>`${tTap()} «Accendi» su una policy e conferma`,t:()=>`Ognuna ha un vantaggio e un prezzo. Occhio ai manager: c'è chi ne pretende una e chi non ne sopporta un'altra, e chi resta scontento per un mese ti dà l'ultimatum. Dopo un cambio la policy resta così per 13 settimane.`},
   {t:()=>`Il welfare invece sta nell'albero Welfare della Tecnologia: caffè, spogliatoi, pulmini, mensa... Si ricerca una volta e si installa magazzino per magazzino: alza il morale, aiuta a trovare personale e tiene bassa l'agitazione.`}]},
- {n:'Relazioni industriali',s:[
-  {hi:()=>tDock('sindacato'),ok:()=>!!UI.open.sindacato,w:()=>tMenu('Relazioni industriali'),t:()=>`Con il pacchetto Relazioni industriali il personale non è più solo un numero in busta paga.`},
-  {hi:()=>'#win-sindacato .ri-w',t:()=>`Ogni magazzino ha la sua ${kw('agitazione','agitazione')}, da 0 a 100: sale con il morale basso, i licenziamenti e i fornitori, scende con il welfare, un buon manager e gli accordi. Dove arriva il sindacato c'è un delegato, e oltre certe soglie arrivano ${kw('sciopero','scioperi')} e ${kw('presidio','presidi')}.`},
-  {hi:()=>'#win-sindacato [data-act=ritab][data-id=tav]',ok:()=>!!UI.open.sindacato&&UI.sel.ritab==='tav',w:()=>`${tTap()} la scheda «Tavolo»`,t:()=>`Quando un magazzino entra in agitazione si apre il tavolo delle trattative.`},
-  {t:()=>`Al ${kw('tavolo','tavolo')} il sindacato porta le sue richieste, una seduta a settimana, e per ognuna dici sì, tratti o no. Se si firma l'agitazione scende e resta giù finché dura l'accordo; se salta, il tavolo non si riapre per tre mesi. Nella scheda Contratto ci sono gli aumenti nazionali, in Fornitori le alternative alla cooperativa.`}]},
  {n:'Avversari e vittoria',s:[
   {hi:()=>tDock('classifica'),ok:()=>!!UI.open.classifica,w:()=>tMenu('Classifica'),t:()=>`E poi c'è la concorrenza.`},
   {hi:()=>'#win-classifica .cls-l',t:()=>{const r=tRiv(), cfg=HUM.cfg||{win:{}}, on=Object.keys(WINS).filter(k=>cfg.win&&cfg.win[k]&&(!WINS[k].ri||cfg.ri));
@@ -10547,19 +10548,105 @@ TUT.avanzato={n:'Tutorial avanzato',corso:'Diventa CEO, secondo livello',L:[
   {hi:()=>'#stats [data-id=cassa]',ok:()=>!!UI.open.cassa,w:()=>`${tTap()} la cassa in alto`,t:()=>`Ultima lezione: i soldi.`},
   {hi:()=>'#win-cassa [data-act=loantake]',t:()=>`Qui ci sono il ${kw('bilancio','bilancio')} e la banca: presta fino a quattro mesi di ricavi, con al massimo tre prestiti insieme, a un tasso che scende con la reputazione, l'Amministrazione del CEO e il direttore finanziario. Un ${kw('prestiti','prestito')} serve per crescere (un magazzino nuovo, una ricerca cara), non per tappare i buchi. Se vuoi prova, altrimenti «Avanti».`},
   {hi:()=>tDock('clienti'),t:()=>`E se un cliente ti fa perdere soldi? Nella finestra Clienti puoi non rinnovargli il contratto alla scadenza, oppure recedere subito pagando la penale. Prima però guarda se il problema è il prezzo o i KPI: a volte basta un manager migliore.`},
+  {hi:()=>tDock('magazzini'),t:()=>`E se a non rendere è un magazzino intero? Dal riquadro Clienti del magazzino, con «Trasloca clienti», li sposti in un altro tuo magazzino: ci vogliono settimane di ${kw('trasloco','trasloco')}, e intanto i KPI ballano. Il ${kw('capannone_vuoto','capannone rimasto vuoto')} si restituisce, si vende se è tuo, oppure si affitta a un inquilino.`},
   {f:'occhiolino',t:()=>{const r=tRiv(); return `Il corso è finito: hai visto tutto quello che serve per guidare un'azienda grande. ${esc(S.company.name)} adesso è tua: in bocca al lupo${r?`, e salutami ${esc(r.boss.name.split(' ')[0])}`:''}!`;}}]}
+]};
+// tutorial del pacchetto Relazioni industriali: la partita preparata ha un magazzino in stato di agitazione col tavolo aperto (S.tut.tw)
+const tTw=()=>whById(S.tut.tw);
+const tTav=()=>(tTw()||{}).tav||null;
+const tMese=()=>{const d=dateOf(S.day); return `${MESI[d.getUTCMonth()]} ${d.getUTCFullYear()}`;};
+const tRiTab=(id,n)=>!UI.open.sindacato?tDock('sindacato'):`#win-sindacato [data-act=ritab][data-id=${id}]`;
+TUT.ri={n:'Relazioni industriali',corso:'Il sindacato spiegato ai CEO',L:[
+ {n:'Il clima',s:[
+  {f:'contenta',t:()=>{const w=tTw(); return `Benvenuta al corso sulle relazioni industriali! È ${tMese()}: ${esc(S.company.name)} ha ${S.warehouses.length} magazzini e ${S.warehouses.reduce((a,x)=>a+staffTot(x),0)} persone in reparto. Con questo pacchetto il personale non è più solo un numero in busta paga.${w?` E a ${esc(w.name)} gli animi si sono scaldati: vediamo perché.`:''}`;}},
+  {hi:()=>tDock('sindacato'),ok:()=>!!UI.open.sindacato,go:()=>{UI.sel.ritab='clima';},w:()=>tMenu('Relazioni industriali'),t:()=>`Il sindacato abita nella finestra Relazioni industriali.`},
+  {hi:()=>UI.open.sindacato?'#win-sindacato .ri-w':tDock('sindacato'),t:()=>`Ogni magazzino ha la sua ${kw('agitazione','agitazione')}, da 0 a 100: sale con il morale basso, i licenziamenti, i ritmi in affanno e i fornitori, scende con il welfare, un buon manager e gli accordi. Secondo il valore il magazzino è calmo, brontola, entra in stato di agitazione, sciopera o finisce col presidio ai cancelli. La tacca sulla barra dice dove sta andando.`},
+  {go:()=>{if(MOB) Object.keys(UI.open).forEach(closeWin);},hi:()=>MOB&&Object.keys(UI.open).length?'#wins .win .xbtn':UI.lensOpen?'#lenses [data-act=lens][data-id=clima]':'#lenses [data-act=lensmenu]',ok:()=>UI.lens==='clima',
+   w:()=>`${tTap()} «Lenti» in basso a destra e scegli «Clima sindacale»`,t:()=>`L'agitazione si sente anche dai vicini, pure dai magazzini della concorrenza: è il ${kw('contagio','contagio')}. Sulla mappa la vedi con la lente del clima sindacale.`},
+  {f:'occhiolino',t:()=>`Verde calma, giallo agitazione, rosso presidio: a colpo d'occhio vedi dove si scalda l'aria, anche dalle parti dei tuoi concorrenti. Quando vuoi tornare alla mappa di sempre, scegli la prima lente.`}]},
+ {n:'Il sindacato',s:[
+  {hi:()=>tDock('sindacato'),ok:()=>!!UI.open.sindacato,go:()=>{UI.sel.ritab='clima';},w:()=>tMenu('Relazioni industriali'),t:()=>`Torniamo alla finestra del sindacato.`},
+  {hi:()=>UI.open.sindacato?`#win-sindacato [data-act=ritavgo][data-id="${S.tut.tw}"]`:tDock('sindacato'),t:()=>{const w=tTw(), U=w&&UNIONS[unionOf(w)];
+    return `Il ${kw('sindacati','sindacato')} arriva in un magazzino quando il morale resta sotto 45 per circa un mese, e lì elegge un delegato con le sue abilità e il suo carattere. I sindacati sono tre: ${Object.values(UNIONS).map(x=>esc(x.n)).join(', ')}, ognuno con le sue richieste e la sua pazienza.${w&&w.rsu&&U?` A ${esc(w.name)} c'è ${esc(U.n)}, e il delegato è ${esc(w.rsu.name)}.`:''}`;}}]},
+ {n:'Il tavolo',s:[
+  {hi:()=>UI.open.sindacato?`#win-sindacato [data-act=ritavgo][data-id="${S.tut.tw}"]`:tDock('sindacato'),ok:()=>!!UI.open.sindacato&&UI.sel.ritab==='tav'||!tTav(),w:()=>`${tTap()} «Al tavolo» sotto ${esc((tTw()||{}).name||'')}`,
+   t:()=>{const T=tTav(); return `A ${esc((tTw()||{}).name||'')} il magazzino è in stato di agitazione e il sindacato ha chiesto il ${kw('tavolo','tavolo delle trattative')}${T?`: ${T.reqs.length} richieste, una seduta a settimana`:''}.`;}},
+  {hi:()=>'#win-sindacato .ri-req .seg',ok:()=>!tTav()||tTav().reqs.some(r=>r.c!=='no'),w:()=>`Per una o più richieste scegli «Concedo» o «Tratto»`,
+   t:()=>`Ogni richiesta ha un peso: «Quanto concedi» sale con quelle che accetti, a metà se tratti. Se arriva alla soglia del sindacato, si firma. Quanto basta lo sa solo il sindacato, a meno che tu non abbia una talpa...`},
+  {hi:()=>'*#win-sindacato [data-act=ricp]',t:()=>`La ${kw('contropartita','contropartita')} è una carta in più per la prossima seduta: abbassa le pretese, ma ha il suo prezzo. Ogni seduta il sindacato cala un po' le richieste e perde un po' di ${kw('pazienza','pazienza')}: se la pazienza finisce, o se ti alzi dal tavolo, parte lo sciopero.`}]},
+ {n:'La seduta',s:[
+  {go:()=>{const T=tTav(); if(S.tut.tn==null) S.tut.tn=T?T.n:0; if(MOB) Object.keys(UI.open).forEach(closeWin);},hi:()=>S.speed?null:tPlay(),ok:()=>!tTav()||tTav().n>S.tut.tn,run:1,
+   w:()=>`Fai scorrere il tempo fino ${tAl((tTav()||{}).next||S.day)}`,t:()=>`La prossima seduta è ${tIl((tTav()||{}).next||S.day)}: fai scorrere il tempo e vediamo come va.`},
+  {hi:()=>tRiTab('tav'),t:()=>{const w=tTw(), T=tTav();
+    if(w&&w.deal&&!T) return `Firmato! A ${esc(w.name)} l'agitazione scende di 15 e il tavolo non si riapre finché dura l'accordo, fino ${tAl(w.deal.until)}. Quello che hai concesso però si paga ogni mese, in busta paga.`;
+    if(T) return `Niente firma, per ora: ${esc((T.log[T.log.length-1]||'').replace(/^Seduta \d+: /,'').split('. ')[0])}. La prossima seduta è ${tIl(T.next)}: puoi concedere qualcosa in più, mettere una contropartita o tenere duro e sperare che la pazienza duri.`;
+    return `Il sindacato si è alzato dal tavolo: parte uno sciopero, e il tavolo non si riapre per tre mesi. Succede: la prossima volta concedi qualcosa in più, o metti una contropartita.`;}}]},
+ {n:'Scioperi e presidi',s:[
+  {t:()=>`Se la tensione sale ancora arriva lo ${kw('sciopero','sciopero')}: per qualche giorno il magazzino lavora molto meno, e puntualità e accuratezza crollano. Se dura, il sindacato pianta le tende davanti ai cancelli: è il ${kw('presidio','presidio')}, e il magazzino lavora al 20%. Le committenti attente alla pace sociale, poi, nelle gare ti guardano storto.`},
+  {t:()=>`Con le ricerche arrivano due policy opposte: «Porte aperte» (più dialogo, meno agitazione) e «Linea dura» (gli scioperi falliscono una volta su due, ma il rancore resta e prima o poi esplode). Non possono stare accese insieme: scegli che tipo di azienda vuoi essere.`}]},
+ {n:'Il contratto nazionale',s:[
+  {hi:()=>tRiTab('ccnl'),ok:()=>!!UI.open.sindacato&&UI.sel.ritab==='ccnl',w:()=>`${tTap()} la scheda «Contratto»`,t:()=>`Poi c'è Roma: il ${kw('contratto_nazionale','contratto nazionale')} della logistica.`},
+  {hi:()=>'#win-sindacato [data-act=riconf]',t:()=>`Si rinnova ogni tre anni, con un aumento a rate ogni sei mesi che vale per tutti, concorrenza compresa; con la clausola di adeguamento i clienti ne pagano metà. Con ${kw('confpallet','Confpallet')}, l'associazione delle aziende, ogni rata costa un po' meno e l'agitazione scende, in cambio di una quota al mese.`}]},
+ {n:'I fornitori di handling',s:[
+  {hi:()=>tRiTab('hdl'),ok:()=>!!UI.open.sindacato&&UI.sel.ritab==='hdl',w:()=>`${tTap()} la scheda «Fornitori»`,t:()=>`Con il pacchetto la cooperativa lascia il posto a undici fornitori di handling.`},
+  {hi:()=>'#win-sindacato .ri-h',t:()=>`I ${kw('fornitori','fornitori')} prendono magazzinieri e carrellisti di un intero magazzino: costano meno e mandano le persone in pochi giorni, ma lavorano peggio e portano più agitazione. Si scelgono con una gara dalla finestra del magazzino: i locali costano poco ma rischiano di fallire, i globali sono più cari e più tranquilli. E si può sempre riportare tutto in casa.`}]},
+ {n:'Ricerche e vittoria',s:[
+  {hi:()=>tDock('tecnologia'),t:()=>`Nell'albero Sviluppo aziendale ci sono le ricerche del pacchetto: Relazioni sindacali (al tavolo vedi la pazienza), Vendor management (i rischi veri dei fornitori), Contenimento sindacale e la Talpa nel sindacato (sai da quanto firmano). Ma il welfare e un buon manager tengono bassa l'agitazione meglio di qualsiasi avvocato.`},
+  {f:'occhiolino',t:()=>{const w=tTw(); return `E c'è una vittoria tutta sua: «L'azienda dove tutti vogliono lavorare», cinque anni senza scioperi con il morale medio sopra 75 e almeno 150 dipendenti. Il corso è finito: in bocca al lupo${w&&w.rsu?`, e salutami ${esc(w.rsu.name.split(' ')[0])}`:''}!`;}}]}
+]};
+// tutorial del pacchetto Reparto IT e Ingegneria: reparti vuoti, due manager liberi, i lettori barcode da avviare in un magazzino (S.tut.aw)
+const tAw=()=>whById(S.tut.aw);
+const tFreeInn=()=>tFree().sort((a,b)=>b.st.inn-a.st.inn);
+const tRt=()=>TECH.find(t=>t.id===S.tut.rt)||null;   // la ricerca da dare al Reparto IT
+TUT.it={n:'Reparto IT e Ingegneria',corso:'Informatica per logistici (e viceversa)',L:[
+ {n:'I reparti tecnici',s:[
+  {f:'contenta',t:()=>`Benvenuta al corso sul Reparto IT e Ingegneria! È ${tMese()} e ${esc(S.company.name)} ha ${S.warehouses.length} magazzini. Finora le ricerche le faceva un ufficio invisibile: con questo pacchetto dietro ogni ricerca e ogni installazione ci sono persone vere.`},
+  {hi:()=>tTab('tecnologia','reparti'),ok:()=>!!UI.open.tecnologia&&wtabOf('tecnologia')==='reparti',w:()=>`${tMenu('Tecnologia')}, poi la scheda «Reparti tecnici»`,t:()=>`I due reparti stanno nella finestra Tecnologia.`},
+  {hi:()=>'#win-tecnologia .dep-k',t:()=>`Il Reparto IT studia e porta nei magazzini i sistemi informatici: barcode, WMS, radiofrequenza, GPS, gestionale. L'Ingegneria le novità per il lavoro e gli impianti: formazione, sicurezza, magazzino verticale, robot. Ogni reparto con almeno una persona ha la sua ${kw('linee_ricerca','linea di ricerca')}: fino a tre ricerche insieme, con quella della Direzione. Per ora sono tutti e due chiusi.`}]},
+ {n:'Il consulente',s:[
+  {hi:()=>$('#modal').innerHTML?'#modal [data-act=okgo]':UI.open.tecnologia&&wtabOf('tecnologia')==='reparti'?'#win-tecnologia [data-act=consign][data-id=gigabancale]':tTab('tecnologia','reparti'),ok:()=>!!S.dep.it.cons,
+   w:()=>`${tTap()} «Firma» accanto a Gigabancale Solutions e conferma`,t:()=>`Come nella realtà, si parte quasi sempre da un ${kw('consulenti','consulente')}: niente assunzioni, un canone al mese, e la linea di ricerca del reparto si apre subito. Ti consiglio Gigabancale: costa un po' di più, ma manda sempre lo stesso tecnico.`}]},
+ {n:'Il responsabile',s:[
+  {hi:()=>$('#modal').innerHTML?'*#modal .mp-r[data-act=mpick]:not(.none)':UI.open.tecnologia&&wtabOf('tecnologia')==='reparti'?'#win-tecnologia [data-act=mpopen][data-k=dep][data-id=it]':tTab('tecnologia','reparti'),ok:()=>!!S.dep.it.resp,
+   w:()=>`${tTap()} «Cambia» sotto il responsabile IT e scegli un manager libero`,t:()=>{const L=tFreeInn(); return `Poi serve un responsabile, scelto tra i manager: conta la sua Innovazione per la ricerca e la Precisione per gli avvii. Senza, fa le sue veci il CEO, con 3 punti in meno.${L.length?` In squadra senza incarico c'è ${L.map(m=>`${esc(m.name)} (Innovazione ${m.st.inn})`).join(' e ')}.`:''}`;}},
+  {hi:()=>'#win-tecnologia [data-act=hire][data-role=it]',t:()=>`Gli addetti, sistemisti e sviluppatori, si assumono con il +, come il resto del personale: con l'annuncio ci vuole un mese. Più persone, ricerche più corte; ma ogni stipendio si paga, anche quando non c'è niente da studiare.`}]},
+ {n:'Tre ricerche insieme',s:[
+  {hi:()=>tTab('tecnologia','tecnologia'),ok:()=>!!UI.open.tecnologia&&wtabOf('tecnologia')==='tecnologia',w:()=>`${tTap()} la scheda «Ricerca»`,t:()=>`Adesso il Reparto IT ha la sua linea di ricerca.`},
+  {go:()=>{const t=tRt(); if(UI.open.tecnologia&&t&&!S.dep.it.proj){UI.sel.tree=t.tree;renderWin('tecnologia');}},hi:()=>tRt()?`#win-tecnologia [data-act=seltech][data-id=${S.tut.rt}]`:null,ok:()=>!tRt()||UI.sel.tech===S.tut.rt||!!S.dep.it.proj,
+   w:()=>`${tTap()} «${esc((tRt()||{}).name||'')}» nell'albero ${esc((TREES.find(x=>x[0]===(tRt()||{}).tree)||['',''])[1])}`,
+   t:()=>{const t=tRt(); return t?`Ti propongo ${esc(t.name)}: ${esc(t.desc.charAt(0).toLowerCase()+t.desc.slice(1))} Ha il bollino del Reparto IT, quindi la studia lui.`:'';}},
+  {hi:()=>`#win-tecnologia [data-act=research][data-id=${S.tut.rt}]`,ok:()=>!tRt()||!!S.dep.it.proj,w:()=>`${tTap()} «Avvia la ricerca»`,t:()=>`Avviala: finisce nella linea del Reparto IT, e la Direzione resta libera per un'altra ricerca.`},
+  {f:'contenta',t:()=>`In cima alla finestra ci sono le linee: Direzione, Reparto IT e, quando avrà qualcuno, Ingegneria. Quelle dei reparti vanno più veloci con più persone e con l'Innovazione del responsabile (o la bravura del consulente, se è più alta).`}]},
+ {n:'L\'avvio nel magazzino',s:[
+  {go:()=>{if(UI.open.tecnologia&&tAw()&&!avvList().some(a=>a.wh===S.tut.aw)){UI.sel.tree='log';UI.sel.tech='barcode';renderWin('tecnologia');}},
+   hi:()=>$('#modal').innerHTML?'#modal [data-act=avvgo]':UI.open.tecnologia&&wtabOf('tecnologia')==='tecnologia'?`#win-tecnologia [data-act=avvopen][data-id=barcode][data-wh="${S.tut.aw}"]`:tTab('tecnologia','tecnologia'),
+   ok:()=>!tAw()||avvList().some(a=>a.wh===S.tut.aw),w:()=>`${tTap()} «Avvia il progetto» accanto a ${esc((tAw()||{}).name||'')}, poi conferma`,
+   t:()=>`Con il pacchetto una tecnologia non si installa più con un clic: nel magazzino parte un ${kw('avvio','progetto')}. I lettori barcode sono già ricercati e funzionano altrove, ma a ${esc((tAw()||{}).name||'')} no.`},
+  {t:()=>`Nella finestrella si sceglie chi segue il progetto: la squadra interna costa il 15% in meno ma intanto non fa ricerca, un consulente a progetto non occupa nessuno, il CEO se nel reparto non c'è nessuno. Per i sistemi grossi si sceglie anche come partire: un pezzo alla volta o tutto in un fine settimana. Dopo la preparazione arriva il giorno dell'avvio, con il suo esito: liscio come l'olio, qualche intoppo, avvio difficile o disastro.`}]},
+ {n:'Sistemi e assistenza',s:[
+  {hi:()=>tTab('tecnologia','reparti'),ok:()=>!!UI.open.tecnologia&&wtabOf('tecnologia')==='reparti',w:()=>`${tTap()} la scheda «Reparti tecnici»`,t:()=>`Torniamo ai Reparti tecnici.`},
+  {hi:()=>['#win-tecnologia .lv','#win-tecnologia .dep-k'],t:()=>`Il Reparto IT ha una ${kw('lavagna','lavagna')}: le persone vanno prima sugli avvii, poi tra ricerca e ${kw('assistenza_it','assistenza')} le sposti tu con + e −. L'assistenza tiene in piedi i sistemi installati: serve una persona ogni ${ITS.per} punti di sistema, e il WMS e i robot contano doppio.`},
+  {t:()=>`Più giù c'è l'${kw('affidabilita','affidabilità')} dei sistemi, da 0 a 100: sale con l'assistenza coperta e un responsabile preciso, scende con l'assistenza scoperta e i sistemi vecchi. Più è bassa, più arrivano i ${kw('guasti_it','guasti informatici')}: il WMS fermo, i terminali a terra, il GPS muto. E i sistemi invecchiano: dopo 7-10 anni vanno aggiornati, con un progetto del Reparto IT. Meglio non a novembre.`}]},
+ {n:'L\'Ingegneria',s:[
+  {hi:()=>'#win-tecnologia [data-act=consign][data-id=paletti]',t:()=>`L'Ingegneria funziona allo stesso modo: un responsabile (per gli avvii conta l'Operazioni), gli ingegneri e i suoi consulenti, come lo Studio Paletti per layout e scaffalature. Le sue tecnologie (formazione, sicurezza dei muletti, magazzino verticale, robot) cambiano il modo di lavorare in reparto.`}]},
+ {n:'Il direttore IT',s:[
+  {hi:()=>tDock('manager'),t:()=>`In Direzione arriva un sesto posto: il ${kw('dir_ing','direttore IT e ingegneria')}, che conta con l'Innovazione. Accorcia le ricerche dei reparti e, con la ricerca Edifici intelligenti e Innovazione 14 o più, apre i capannoni innovativi, i più moderni del Nord.`},
+  {f:'occhiolino',t:()=>`Il corso è finito. Ricorda: un consulente per cominciare, poi il reparto; i progetti mai nel pieno del picco; e un sistemista in più costa sempre meno di un WMS fermo.`}]}
 ]};
 // numeri casuali con un seme: la preparazione dà sempre la stessa partita
 const tutRand=s=>()=>{s=s+0x6D2B79F5|0; let t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296;};
-const TUT_PREP={days:730,seed:10,open:[250,500],cash:250000,fatt:6000000,style:'prezzo',tech:['gestionale','regolamento','barcode','formazione','commerciale','gps','haccp'],riv:'normale'};
+// la partita preparata è la stessa per i tre corsi, cambiano il seme e i pacchetti accesi
+const TUT_PREP={days:730,open:[250,500],cash:250000,fatt:6000000,style:'prezzo',tech:['gestionale','regolamento','barcode','formazione','commerciale','gps','haccp'],riv:'normale',
+  avanzato:{seed:1},ri:{seed:11,ri:1},it:{seed:20,it:1}};
 // due anni giocati in fretta: l'azienda del giocatore decide come un'avversaria (personale, manager, offerte, ricerca, prestiti, sindacato)
 // e apre due magazzini; gli eventi li decide il vice (AUTO). Intanto una finestra con la barra di avanzamento.
-function tutPrep(n){
+function tutPrep(n,id){
+  const C=TUT_PREP[id];
   slot=n; cMetaSet(slot,{}); uid=1; startSel.ceo='valeria'; startSel.color=COLORS[0][0];
-  const rnd0=Math.random, rand=tutRand(TUT_PREP.seed), seeded=f=>{Math.random=rand; AUTO=true; try{f();}finally{Math.random=rnd0; AUTO=false;}};
+  const rnd0=Math.random, rand=tutRand(C.seed), seeded=f=>{Math.random=rand; AUTO=true; try{f();}finally{Math.random=rnd0; AUTO=false;}};
   UI.catching=true;
   seeded(()=>{ newGame('valeria','',COLORS[0][0],null,{logo:'camion',claim:''});
-    HUM=S; S.cfg={mode:'classica',win:{ultimo:true,fatturato:true},fatturato:TUT_PREP.fatt,reputazione:90,traguardo:2012,ri:true}; packApply();
+    HUM=S; S.cfg={mode:'classica',win:{ultimo:true,fatturato:true},fatturato:TUT_PREP.fatt,reputazione:90,traguardo:2012,ri:!!C.ri,it:!!C.it}; packApply();
     S.bots=[newRival('gino',COLORS[1][0],'camion','standard',TUT_PREP.riv,0)];
     // le ricerche dei primi mesi, già fatte e installate nel primo magazzino
     const w0=S.warehouses[0]; TUT_PREP.tech.forEach(id=>{const t=TECH_ALL.find(x=>x.id===id); if(!t) return; S.researched[id]=true; if(!perWh(t)) return; w0.tech[id]={day:-60}; if(t.tree==='cert') certNew(0,w0.tech[id]);});
@@ -10570,12 +10657,12 @@ function tutPrep(n){
     try{ seeded(()=>{ const t0=performance.now(); while(S.day<TUT_PREP.days&&!S.over&&performance.now()-t0<40){ if(TUT_PREP.open.includes(S.day)) tutOpenWh(); if(S.day%7===0) tutBot(); stepWorld(); } }); fine=S.day>=TUT_PREP.days||S.over; }
     catch(e){ UI.catching=false; ov.remove(); throw e; }
     show(); if(!fine) return setTimeout(chunk,0);
-    UI.catching=false; ov.remove(); tutReady(); };
+    UI.catching=false; ov.remove(); tutReady(id); };
   show(); setTimeout(chunk,30);
 }
 function tutBot(){
   const st=BOT_STYLE[TUT_PREP.style], df=BOT_DIFF.normale; S.bot={id:'tut',style:TUT_PREP.style,diff:'normale',k:0};
-  try{ botStaff(df); botMgr(); botBids(st,df); botTech(st); botMoney(st); S.bot.style='standard'; botRI(BOT_STYLE.standard); } finally { delete S.bot; }
+  try{ botStaff(df); botMgr(); botBids(st,df); botTech(st); botMoney(st); S.bot.style='standard'; if(riOn()) botRI(BOT_STYLE.standard); } finally { delete S.bot; }
   S.tenders.forEach(t=>{ const b=t.bids&&t.bids.tut; if(!b) return; if(!t.bid&&!t.done) t.bid={wh:b.wh,mult:b.mult}; delete t.bids.tut; });
   if(S.cash<30000) tutSoci(100000);
 }
@@ -10588,20 +10675,31 @@ function tutOpenWh(){
   S.cash-=cost; S.cur.altro+=cost; addWarehouse(id,false,0,0); repUp(3); chron('magazzini',`Apre il magazzino di ${s.name} (${n0(s.cap)} posti pallet)`);
   news('Il Sole 24 Pallet',`${S.company.name} apre a ${s.name}`,`Nuovo magazzino da ${n0(s.cap)} posti pallet.`);
 }
-// gli ultimi ritocchi per le lezioni: Struttura direzionale e Regolamento ricercati, due manager in squadra senza incarico
-// (nessuno al customer service), un magazzino senza HACCP, i conti in ordine e la colonna delle notifiche pulita
-function tutReady(){
+// gli ultimi ritocchi per le lezioni: le ricerche che servono, due manager in squadra senza incarico, i conti in ordine e la colonna delle notifiche pulita.
+// Avanzato: nessuno al customer service, un magazzino senza HACCP (S.tut.cw). Relazioni industriali: un magazzino col sindacato in stato di agitazione
+// e il tavolo aperto (S.tut.tw). Reparto IT: reparti vuoti, una ricerca dell'IT da avviare (S.tut.rt) e un magazzino senza lettori barcode (S.tut.aw)
+function tutReady(id){
   const res=id=>{const t=TECH_ALL.find(x=>x.id===id); if(!t) return; (t.req||[]).forEach(res); S.researched[id]=true;};
-  ['direzione','regolamento','haccp'].forEach(res); projs().forEach(([k,p])=>{ if(R(p.tech)) setLineProj(k,null); });
-  if(S.cs.resp) S.cs.resp=null; S.managers.forEach(m=>{delete m.csTo;});
-  const sc=m=>m.st.op*2+m.st.neg*2+m.st.prec+m.st.lead+m.st.amm, pool=S.managers.filter(m=>!m.gen&&!m.hired&&avail(m)&&ageOf(m)<60).sort((a,b)=>sc(b)-sc(a));
-  while(tFree().length<2&&pool.length){ const m=pool.shift(); m.hired=true; m.ral=askOf(m); m.raiseDay=S.day; m.unh=0; m.quit=null; m.wh=null; m.tol={}; plog(m,`Entra in ${S.company.name} per ${eur(m.ral)} l'anno`); }
-  const noH=w=>!S.clients.some(c=>c.wh===w.id&&c.status!=='perso'&&cliReq(c).includes('haccp')), cw=[...S.warehouses].reverse().find(noH);
-  if(cw) delete cw.tech.haccp;
+  ({avanzato:['direzione','regolamento','haccp'],ri:['relsind'],it:['direzione']})[id].forEach(res); projs().forEach(([k,p])=>{ if(R(p.tech)) setLineProj(k,null); });
+  const T={id,i:0};
+  if(id==='avanzato'){ if(S.cs.resp) S.cs.resp=null; S.managers.forEach(m=>{delete m.csTo;}); }
+  if(id!=='ri'){ const sc=id==='it'?m=>m.st.inn*3+m.st.prec*2+m.st.op:m=>m.st.op*2+m.st.neg*2+m.st.prec+m.st.lead+m.st.amm, pool=S.managers.filter(m=>!m.gen&&!m.hired&&avail(m)&&ageOf(m)<60).sort((a,b)=>sc(b)-sc(a));
+    while(tFree().length<2&&pool.length){ const m=pool.shift(); m.hired=true; m.ral=askOf(m); m.raiseDay=S.day; m.unh=0; m.quit=null; m.wh=null; m.tol={}; plog(m,`Entra in ${S.company.name} per ${eur(m.ral)} l'anno`); } }
+  if(id==='avanzato'){ const noH=w=>!S.clients.some(c=>c.wh===w.id&&c.status!=='perso'&&cliReq(c).includes('haccp')), cw=[...S.warehouses].reverse().find(noH);
+    if(cw) delete cw.tech.haccp; T.cw=cw?cw.id:null; }
+  if(id==='ri'){ const ws=S.warehouses, tw=[...ws].sort((a,b)=>staffTot(b)-staffTot(a))[0];
+    ws.forEach(w=>{ riW(w); const th=UNIONS[unionOf(w)].th; w.tav=null; w.strike=null; w.strikeOn=0; w.pres=false; w.ranc=0; if(w!==tw) w.ag=w.agT=Math.min(w.ag,th[1]-6); });
+    if(!tw.sind) riUnionize(tw); tw.deal=null; tw.tavCd=0; tw.tavFail=null;
+    const th=UNIONS[unionOf(tw)].th; tw.ag=tw.agT=Math.round(th[1]+(th[2]-th[1])*0.4); riTavOpen(tw); T.tw=tw.id; }
+  if(id==='it'){ S.dep=depNew(); S.office.it=0; S.office.ing=0; S.queue=S.queue.filter(q=>q.role!=='it'&&q.role!=='ing'); S.avv=[];
+    if(S.dirs.ing) S.dirs.ing=null;
+    const busy=projs().map(([k,p])=>p.tech), rt=['wms','edi','rotte','portale','gps','rf','sala','sicurezza','sinergia','ptl','cloud','ecom'].find(x=>{const t=TECH.find(q=>q.id===x); return t&&TECH_DEP[x]==='it'&&!R(x)&&(t.req||[]).every(R)&&!busy.includes(x);});
+    const aw=[...S.warehouses].reverse().find(w=>w.tech.barcode&&!TECH.some(t=>(t.req||[]).includes('barcode')&&w.tech[t.id]))||S.warehouses.find(w=>!w.tech.barcode);
+    if(aw){ delete aw.tech.barcode; if(aw.avvCd) delete aw.avvCd.barcode; } T.rt=rt||null; T.aw=aw?aw.id:null; }
   if(S.cash<TUT_PREP.cash) tutSoci(r500(TUT_PREP.cash-S.cash));
   S.notes=[]; S.evPend=[]; S.cs.q=[]; S.negs={}; S.repNew=false;
-  S.tut={id:'avanzato',i:0,cw:cw?cw.id:null}; S.nextEvent=1e9; S.tNext=1e9;
-  startSel.step='home'; startSel.stamp=false; boot(); tutEnter(); save();
+  S.tut=T; S.nextEvent=1e9; S.tNext=1e9;
+  startSel.step='home'; startSel.stamp=false; boot(); if(UI.card) hideCard(); tutEnter(); save();
 }
 const tutSteps=id=>(TUT[id]||TUT.base).L.flatMap((l,li)=>l.s.map(s=>({...s,li})));
 const tutStep=()=>tutOn()?tutSteps(S.tut.id)[S.tut.i]:null;
@@ -10616,10 +10714,10 @@ function tutTender(){
     S.tenders.push({id:nid('t'),...tpl,zone,src:ci.src,mode:ci.mode,open:S.day,deadline:S.day+21,dur:24,bid:null,done:false,result:null,tut:1});
     news('Il Sole 24 Pallet',`Gara d'appalto: ${tpl.name}, ${zoneName(zone)}`,`${n0(tpl.pal)} pallet al mese, ${n0(tpl.stock)} posti. Offerte entro il ${shortDate(S.day+21)}. Contratto di 24 mesi.`);
   } else if(newTender()){ const t=S.tenders[S.tenders.length-1]; t.tut=1; t.deadline=S.day+21; }
-  renderDock();
+  renderDock(); renderMap();
 }
 function tutStart(id,n){
-  if(id==='avanzato') return tutPrep(n);
+  if(TUT_PREP[id]) return tutPrep(n,id);
   slot=n; cMetaSet(slot,{}); uid=1; startSel.ceo='valeria'; startSel.color=COLORS[0][0];
   newGame('valeria','',COLORS[0][0],null,{logo:'camion',claim:''});
   HUM=S; S.cfg={mode:'classica',win:{},ri:false}; packApply(); S.bots=[];
@@ -10660,10 +10758,14 @@ function tutTarget(s){
     const es=[...document.querySelectorAll(q)].slice(0,all?99:1).filter(e=>e.getClientRects().length), e=es[0]; if(!e) continue;
     const r=e.getBoundingClientRect(); if(!r.width||r.right<=0||r.left>=innerWidth) continue;
     if((r.bottom<=56||r.bottom>innerHeight-(MOB?84:8))&&UI.tutSc!==S.tut.i){ UI.tutSc=S.tut.i; e.scrollIntoView({block:'center'}); }   // sul telefono in fondo ci sono Menu e ›
+    else if(!all&&tutHidden(e,r)) continue;
     const R=es.map(x=>x.getBoundingClientRect()), l=Math.min(...R.map(x=>x.left)), t=Math.min(...R.map(x=>x.top));
     return {left:l,top:t,right:Math.max(...R.map(x=>x.right)),bottom:Math.max(...R.map(x=>x.bottom)),width:Math.max(...R.map(x=>x.right))-l,height:Math.max(...R.map(x=>x.bottom))-t}; }
   return null;
 }
+// coperto da qualcos'altro (una finestra sopra la mappa, una finestrella sopra la finestra): il fumetto e i cartellini non contano
+function tutHidden(e,r){ const x=r.left+r.width/2, y=r.top+r.height/2; if(x<0||y<0||x>=innerWidth||y>=innerHeight) return false;
+  const h=document.elementFromPoint(x,y), a=e.closest('[data-act]')||e; return !!h&&!a.contains(h)&&!h.closest('#tut,#notecard,#tip'); }
 function tutPaint(){
   const el=$('#tut'), hi=$('#tuthi'), s=tutStep(); if(!s) return;
   const r=tutTarget(s);
@@ -10895,6 +10997,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.112',t:'Quattro corsi con la dottoressa',x:['Il riquadro Tutorial della schermata principale ha quattro corsi: Base, Avanzato e, nuovi, uno per ciascun pacchetto di espansione.','Relazioni industriali («Il sindacato spiegato ai CEO»): un magazzino in stato di agitazione col tavolo aperto. Si guarda il clima con la sua lente, si scelgono le concessioni, si vede com\'è andata la prima seduta, poi scioperi, contratto nazionale, fornitori di handling e la vittoria del clima.','Reparto IT («Informatica per logistici (e viceversa)»): i reparti ancora vuoti. Si firma il primo consulente, si sceglie il responsabile IT, si avvia una ricerca nella linea del reparto e il progetto dei lettori barcode in un magazzino; poi lavagna, assistenza, affidabilità, Ingegneria e direttore IT.','Il tutorial avanzato non parla più del sindacato (ha il suo corso) e si gioca senza pacchetti; in cambio l\'ultima lezione spiega anche i traslochi e il capannone vuoto.','Nel tutorial base la gara si apre anche dalla sua puntina sulla mappa.','Il riquadro giallo della dottoressa non indica più cose nascoste sotto una finestra.']},
  {v:'0.111',t:'L\'IT che tiene in piedi',x:['Col pacchetto Reparto IT e Ingegneria i sistemi installati vanno seguiti: ogni sei punti di sistema (il WMS, i robot e i sistemi aziendali contano doppio) serve una persona del Reparto IT sull\'assistenza. Il CEO ne vale mezza, un consulente a contratto pure.','Nella scheda Reparti tecnici c\'è la lavagna del Reparto IT: con + e − sposti le persone tra la ricerca e l\'assistenza. Chi è sugli avvii resta lì.','Nuova affidabilità dei sistemi, da 0 a 100, col suo grafico: sale con l\'assistenza coperta, la Precisione del responsabile IT e il direttore IT e ingegneria, scende con l\'assistenza scoperta e i sistemi vecchi.','Arrivano i guasti informatici: il WMS fermo, i terminali a terra, il GPS muto, le luci del pick-to-light spente, i robot fermi, l\'EDI inceppato. Più l\'affidabilità è bassa, più sono frequenti; con l\'assistenza al completo durano la metà.','I sistemi invecchiano: dopo 7-10 anni diventano obsoleti, tolgono affidabilità e costano il 30% in più di canone. Si aggiornano con un progetto del Reparto IT, come un avvio ma più corto ed economico; meglio non a novembre.','Tre ricerche nuove del Reparto IT: Sala server e backup, Sicurezza informatica e Server in cloud.','Se nel Reparto IT nessuno lavora alla ricerca, le sue tecnologie le studia la Direzione.']},
  {v:'0.110',t:'Avvii nei magazzini',x:['Col pacchetto Reparto IT e Ingegneria le tecnologie dei reparti (barcode, WMS, radiofrequenza, GPS, rotte, pick-to-light, formazione, sicurezza dei muletti, magazzino verticale, robot…) non si installano più con un clic: dalla scheda della tecnologia si avvia un progetto nel magazzino.','Si sceglie chi lo segue: la squadra interna (costa il 15% in meno, ma chi lavora all\'avvio intanto non fa ricerca), un consulente a progetto oppure, se nel reparto non c\'è nessuno, il CEO. Per i sistemi informatici e l\'automazione si sceglie anche come partire: graduale o tutto in un fine settimana.','Dopo la preparazione arriva il giorno dell\'avvio, con un esito: liscio come l\'olio, qualche intoppo, avvio difficile o disastro. La finestrella mostra le probabilità prima di partire e da cosa dipendono (chi lo segue, il morale, i picchi, i reparti in affanno).','Se va storto arriva un evento: tornare indietro, tenere duro o chiamare i consulenti. L\'esito allunga o accorcia l\'apprendimento della tecnologia.','Nella scheda Reparti tecnici si vedono gli avvii in corso e chi ci lavora; durante la preparazione un progetto si può annullare.']},
  {v:'0.109',t:'Reparto IT e Ingegneria',x:['Nuovo pacchetto di espansione «Reparto IT e Ingegneria», da accendere nel passo «Pacchetti» quando crei una partita: dietro le ricerche ci sono persone vere.','Due reparti in sede, nella nuova scheda «Reparti tecnici» della finestra Tecnologia: il Reparto IT studia i sistemi informatici, l\'Ingegneria le novità per il lavoro e gli impianti. Ognuno ha un responsabile scelto tra i manager, gli addetti da assumere e, se vuoi, un consulente a contratto.','Ogni reparto con almeno una persona ha la sua linea di ricerca: si fanno fino a tre ricerche insieme, una per la Direzione e una per reparto. Più persone e più Innovazione, ricerche più corte; se un reparto si svuota, la sua ricerca si ferma.','Sei consulenti per cominciare senza assumere nessuno, da Software Nebbia (costa poco, ma sparisce per settimane) allo Studio Ing. Paletti & Associati.','In Direzione arriva un sesto posto, il direttore IT e ingegneria: accorcia le ricerche dei reparti.','Marco, il nerd del WMS, parte con un sistemista già assunto.','I capannoni innovativi (Landriano, Vigasio e la costruzione innovativa) si possono avere solo col pacchetto, dopo la ricerca Edifici intelligenti e con un direttore IT e ingegneria che abbia Innovazione 14 o più. Chi li ha già se li tiene.']},
@@ -11117,8 +11220,8 @@ function stepHome(){const L=[]; for(let n=1;n<=SLOTS;n++){const sv=load(n); if(s
   return `<div class="hm-h">${hmIc('salva',32)}<h2>Partite salvate</h2><span class="hm-n" aria-label="${L.length} posti occupati su ${SLOTS}">${L.length}/${SLOTS}</span></div>
    ${L.length?L.map((x,i)=>slotCard(x,!i)).join(''):'<div class="hm-empty"><b>Nessuna partita salvata</b><span>Il piazzale è vuoto: è il momento di scaricare il primo pallet.</span></div>'}
    <button class="hm-new" data-act="newgame" ${full?'disabled':''}><span class="hm-plus">${hmIc('nuova',32)}</span><span class="t"><b>Crea nuova partita</b><span>${full?`Tutti e ${SLOTS} i posti sono occupati: cancella una partita per iniziarne un'altra.`:'Scegli il CEO, dai un nome all\'azienda e apri il primo magazzino a gennaio 2002.'}</span></span><span class="ar" aria-hidden="true">›</span></button>
-   <div class="hm-new hm-tut${full?' off':''}"><span class="hm-orn"><img class="px" src="${IMG.ornella_contenta}" alt="" width="48" height="56"></span><span class="t"><b>Tutorial</b><span>${full?`Per il tutorial serve un posto libero: cancella una partita.`:'La dottoressa Ornella Ribalta ti insegna il gioco, giocando.'}</span>
-    <span class="hm-tb"><button class="btn" data-act="tutorial" data-id="base" ${full?'disabled':''}>Base<small>le prime cose · circa 15 minuti</small></button><button class="btn" data-act="tutorial" data-id="avanzato" ${full?'disabled':''}>Avanzato<small>un'azienda già grande · circa 20 minuti</small></button></span></span></div>
+   <div class="hm-new hm-tut${full?' off':''}"><span class="hm-orn"><img class="px" src="${IMG.ornella_contenta}" alt="" width="48" height="56"></span><span class="t"><b>Tutorial</b><span>${full?`Per il tutorial serve un posto libero: cancella una partita.`:'La dottoressa Ornella Ribalta ti insegna il gioco, giocando.'}</span></span>
+    <span class="hm-tb">${[['base','Base','le prime cose · 15 minuti'],['avanzato','Avanzato','un\'azienda già grande · 20 minuti'],['ri','Relazioni industriali','sindacato e scioperi · 10 minuti'],['it','Reparto IT','reparti e avvii · 10 minuti']].map(([id,n,d])=>`<button class="btn" data-act="tutorial" data-id="${id}" ${full?'disabled':''}>${n}<small>${d}</small></button>`).join('')}</span></div>
    ${cloudCard()}${newsCard()}<div class="hm-cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></div>`;}
 function showStart(){
   setSpeedSafe(0); WIKI_ON=false; const k=startSel.step;

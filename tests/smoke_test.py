@@ -404,8 +404,8 @@ async def phone(b, w, h, name, errs):
 TUT_ST = """()=>{const F=window.__FUP,S=F.S,L=F.tutSteps(S.tut.id),s=L[S.tut.i]||{};return {i:S.tut.i,n:L.length,done:S.tut.done||0,run:!!s.run,speed:S.speed}}"""
 TUT_HI = """()=>{const h=document.querySelector('#tuthi');if(!h||h.hidden)return null;const r=h.getBoundingClientRect();return [r.left+Math.min(r.width/2,26),r.top+Math.min(r.height/2,26)]}"""
 async def tutorial(b, errs, mob, tid='base'):
-    av = tid == 'avanzato'
-    name = ('tel_' if mob else '') + ('tutorial_avanzato' if av else 'tutorial')
+    av = tid != 'base'   # avanzato e pacchetti partono da una partita preparata
+    name = ('tel_' if mob else '') + ('tutorial' if tid == 'base' else 'tutorial_' + tid)
     ctx = await (b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, is_mobile=True, has_touch=True) if mob else b.new_context(viewport={'width': 1440, 'height': 860}))
     await ctx.add_init_script(ANIM_OFF)
     pg = await ctx.new_page(); pg.on('pageerror', lambda e: errs.append(f'{name}: {e}'))
@@ -413,11 +413,13 @@ async def tutorial(b, errs, mob, tid='base'):
     await (pg.tap if mob else pg.click)('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
     await pg.screenshot(path=os.path.join(OUT, f'shot_{name}_avvio.png'))
     await (pg.tap if mob else pg.click)(f'#start [data-act=tutorial][data-id={tid}]')
-    if av:   # la partita avanzata parte da due anni giocati in fretta, con la barra di avanzamento
+    if av:   # la partita preparata parte da due anni giocati in fretta, con la barra di avanzamento
         await pg.wait_for_selector('#tutprep'); await pg.screenshot(path=os.path.join(OUT, f'shot_{name}_preparazione.png'))
     await pg.wait_for_selector('#tut .tut-b', timeout=60000)
-    shots = {0: 'benvenuto', 3: 'direzione', 6: 'trattativa', 10: 'customer', 14: 'audit', 17: 'capannone', 20: 'policy', 23: 'sindacato', 27: 'classifica', 29: 'prestito', 31: 'fine'} if av else \
-        {0: 'benvenuto', 6: 'personale', 10: 'offerta', 13: 'ricerca', 20: 'evento', 21: 'risposte', 26: 'report', 29: 'fine'}
+    shots = {'avanzato': {0: 'benvenuto', 3: 'direzione', 6: 'trattativa', 10: 'customer', 14: 'audit', 17: 'capannone', 20: 'policy', 23: 'classifica', 25: 'prestito', 28: 'fine'},
+             'ri': {0: 'benvenuto', 2: 'clima', 4: 'lente', 6: 'sindacato', 8: 'richieste', 11: 'seduta', 15: 'contratto', 17: 'fornitori', 19: 'fine'},
+             'it': {0: 'benvenuto', 2: 'reparti', 3: 'consulente', 4: 'responsabile', 7: 'ricerca', 10: 'avvio', 13: 'lavagna', 17: 'fine'},
+             'base': {0: 'benvenuto', 6: 'personale', 8: 'gara', 10: 'offerta', 13: 'ricerca', 20: 'evento', 21: 'risposte', 26: 'report', 29: 'fine'}}[tid]
     last, seen, held, idle = -1, set(), False, 0
     for _ in range(600):
         st = await pg.evaluate(TUT_ST)
@@ -451,12 +453,24 @@ async def tutorial(b, errs, mob, tid='base'):
     await pg.wait_for_selector('#modal .attest')
     await pg.screenshot(path=os.path.join(OUT, f'shot_{name}_attestato.png'))
     if av:
-        # due anni dopo: tre magazzini, un avversario, il pacchetto; e le scelte delle lezioni fatte davvero
+        # due anni dopo: tre magazzini, un avversario, i pacchetti del corso; e le scelte delle lezioni fatte davvero
         r = await pg.evaluate("""()=>{const F=window.__FUP,S=F.S,w=S.warehouses.find(x=>x.id===S.tut.cw);
-          return {done:S.tut.done, anno:new Date(Date.UTC(2002,0,1)+S.day*864e5).getUTCFullYear(), wh:S.warehouses.length, riv:S.bots.length, ri:!!S.cfg.ri,
-            dir:Object.values(S.dirs).some(Boolean), cs:!!S.cs.resp, tratta:!!S.tut.ng, audit:!w||!!w.tech.haccp, dot:S.warehouses.some(x=>x.build&&x.build.k==='dot'),
-            pol:F.POLICIES.some(P=>!!(S.pol[P.id]&&S.pol[P.id].on)!==!!S.tut.pol0[P.id]), ev:S.nextEvent<1e8, gare:S.tNext<1e8}}""")
-        assert len(seen) >= st['n'] - 3 and r == {'done': 1, 'anno': 2004, 'wh': 3, 'riv': 1, 'ri': True, 'dir': True, 'cs': True, 'tratta': True, 'audit': True, 'dot': True, 'pol': True, 'ev': True, 'gare': True}, (sorted(set(range(st['n'])) - seen), r)
+          return {done:S.tut.done, anno:new Date(Date.UTC(2002,0,1)+S.day*864e5).getUTCFullYear(), wh:S.warehouses.length, riv:S.bots.length, ri:!!S.cfg.ri, it:!!S.cfg.it, ev:S.nextEvent<1e8, gare:S.tNext<1e8}}""")
+        ok = {'done': 1, 'anno': 2004, 'wh': 3, 'riv': 1, 'ri': tid == 'ri', 'it': tid == 'it', 'ev': True, 'gare': True}
+        if tid == 'avanzato':
+            r.update(await pg.evaluate("""()=>{const F=window.__FUP,S=F.S,w=S.warehouses.find(x=>x.id===S.tut.cw);
+              return {dir:Object.values(S.dirs).some(Boolean), cs:!!S.cs.resp, tratta:!!S.tut.ng, audit:!w||!!w.tech.haccp, dot:S.warehouses.some(x=>x.build&&x.build.k==='dot'),
+                pol:F.POLICIES.some(P=>!!(S.pol[P.id]&&S.pol[P.id].on)!==!!S.tut.pol0[P.id])}}"""))
+            ok.update({'dir': True, 'cs': True, 'tratta': True, 'audit': True, 'dot': True, 'pol': True})
+        if tid == 'ri':   # il tavolo della lezione: qualcosa concesso e almeno una seduta, firmata o no
+            r.update(await pg.evaluate("""()=>{const S=window.__FUP.S,w=S.warehouses.find(x=>x.id===S.tut.tw),h=(S.ri.hist||[]).slice(-1)[0];
+              return {seduta:w.tav?w.tav.n>=1&&w.tav.reqs.some(r=>r.c!=='no'):!!h&&h.n>=1, lente:window.__FUP.UI.lens==='clima'}}"""))
+            ok.update({'seduta': True, 'lente': True})
+        if tid == 'it':   # consulente, responsabile, ricerca nella linea dell'IT e progetto dei barcode nel magazzino della lezione
+            r.update(await pg.evaluate("""()=>{const S=window.__FUP.S,D=S.dep.it;
+              return {cons:!!D.cons, resp:!!D.resp, ricerca:!!D.proj&&D.proj.tech===S.tut.rt, avvio:(S.avv||[]).some(a=>a.wh===S.tut.aw&&a.tech==='barcode')}}"""))
+            ok.update({'cons': True, 'resp': True, 'ricerca': True, 'avvio': True})
+        assert len(seen) >= st['n'] - 3 and r == ok, (tid, sorted(set(range(st['n'])) - seen), r)
         await (pg.tap if mob else pg.click)('#modal [data-act=closemodal]')
         await ctx.close(); return
     r = await pg.evaluate("""()=>{const F=window.__FUP,S=F.S,g=S.tenders.find(t=>t.tut);
@@ -479,8 +493,9 @@ async def main():
         errs = []
         await tutorial(b, errs, False)
         await tutorial(b, errs, True)
-        await tutorial(b, errs, False, 'avanzato')
-        await tutorial(b, errs, True, 'avanzato')
+        for tid in ('avanzato', 'ri', 'it'):
+            await tutorial(b, errs, False, tid)
+            await tutorial(b, errs, True, tid)
         await phone(b, 390, 844, 'verticale', errs)
         await phone(b, 844, 390, 'orizzontale', errs)
         # «riduci movimento» nel sistema: finché non si sceglie nelle Opzioni, le animazioni partono spente
