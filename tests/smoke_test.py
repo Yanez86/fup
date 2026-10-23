@@ -570,8 +570,12 @@ async def main():
         await pg.click('[data-act=stnext]')
         assert await pg.evaluate("document.querySelectorAll('#start .pk').length") == 3, 'passo Pacchetti: gioco base più le due espansioni'
         await pg.screenshot(path=os.path.join(OUT, 'shot_crea_8_pacchetti.png'), full_page=True)
+        # i due pacchetti partono accesi; qui si spegne il Reparto IT, che ha le sue prove: con lui le tecnologie si avviano invece di installarsi subito
+        assert await pg.evaluate("[...document.querySelectorAll('#start [data-act=lbpack]')].map(b=>b.dataset.id+':'+b.getAttribute('aria-pressed')).sort().join()") == 'it:true,ri:true', 'i pacchetti devono partire accesi'
+        await pg.click('[data-act=lbpack][data-id=it]')
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
         lb = await pg.evaluate('()=>{const F=window.__FUP,H=F.HUM;return {n:H.bots.length,ids:H.bots.map(b=>b.bot.id),diff:H.bots.find(b=>b.bot.id==="edoardo").bot.diff,sty:Object.fromEntries(H.bots.map(b=>[b.bot.id,b.bot.style])),win:H.cfg.win,mode:H.cfg.mode,cols:[H.company.color,...H.bots.map(b=>b.company.color)]}}')
+        assert await pg.evaluate('()=>window.__FUP.HUM.cfg.ri===true&&window.__FUP.HUM.cfg.it===false'), 'pacchetti della partita principale'
         assert lb['n'] == 2 and 'gino' not in lb['ids'] and 'marco' not in lb['ids'] and lb['diff'] == 'spietato' and lb['sty'] == {'edoardo': 'standard', 'valeria': 'prezzo'}, lb
         assert lb['win']['reputazione'] and lb['mode'] == 'classica' and len(set(lb['cols'])) == 3, lb
         c = await pg.evaluate('()=>{const S=window.__FUP.S;return {id:S.ceoId,n:S.custom.name,tal:S.custom.tal,st:S.custom.st,co:S.company.name,logo:S.company.logo,claim:S.company.claim,nick:S.custom.nick,wh:S.warehouses[0].site,cl:S.clients[0].name}}')
