@@ -775,6 +775,13 @@ async def main():
           out.cof=!!ev; if(ev){ F.ACT.note({id:ev.id}); const bt=document.querySelectorAll('#modal [data-act=evopt]'); bt[2].click(); for(let i=0;i<3;i++){clr(); F.step();} }
           out.gone=!S.managers.some(m=>m.id===q.id&&(m.hired||m.arr!=null));
           F.ACT.mtab({id:'hh'}); out.hhTab=!!document.querySelector('#win-manager [data-act=hhgo]');
+          // due abilità: costa di più, i profili le hanno tutte e due
+          S.cash=400000; F.ACT.hhk({k:'op'}); F.ACT.hhk2({k:'lead'}); for(let i=0;i<3;i++) F.ACT.hhmin2({v:1});
+          out.k2Btn=!!document.querySelector('#win-manager [data-act=hhmin2]'); out.fee2=F.hhFee(14,15)>F.hhFee(14);
+          F.ACT.hhgo(); const h2=S.hh[0]; out.k2=!!h2&&h2.k2==='lead'&&h2.min2===15;
+          for(let i=0;i<200&&S.hh.length;i++){clr(); F.step();} const c2=S.cands.filter(c=>c.k2).map(x=>x.p||S.managers.find(m=>m.id===x.ref));
+          out.found2=c2.length===3&&c2.every(p=>p.st.op>=14&&p.st.lead>=15);
+          F.ACT.hhk2({k:''}); F.ACT.hhk2({k:'lead'});
           return out;}""")
         assert all(r.values()), f'ricerca dei manager: {r}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_manager_hh.png'))

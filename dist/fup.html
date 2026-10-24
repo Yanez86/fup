@@ -2928,12 +2928,14 @@ wk('candidature','pers','Candidature spontanee',`Tre persone in cerca di lavoro,
 `Ci sono sempre tre candidature spontanee, di [[rango_manager|rango]] basso (quasi sempre D o F, ogni tanto un C). Ognuna resta sul mercato da 3 a 5 settimane, poi trova un altro posto e ne arriva una nuova.
 
 Sono le stesse per tutte le aziende in partita: un'[[avversari|azienda avversaria]] le può assumere prima di te, anche mentre stai trattando. Per assumerne una fai un'offerta ([[trattativa]]); se firma, entra in azienda dopo una settimana.`);
-wk('head_hunter','pers','Head hunter',`Un cacciatore di teste: scegli un'abilità e il valore minimo, lui trova tre profili. Costa e ci mette un po', ma trova anche manager di rango alto.`,
+wk('head_hunter','pers','Head hunter',`Un cacciatore di teste: scegli un'abilità (o due) e il valore minimo, lui trova tre profili. Costa e ci mette un po', ma trova anche manager di rango alto.`,
 `Nella finestra Manager scegli l'[[abilita|abilità]] che ti serve e il valore minimo (da 8 a 20). L'head hunter cerca per 2-3 settimane se chiedi 12, 4-5 per un 15, 7-8 per un 18 e 10-12 per un 20 (più il minimo è alto, più si allunga), con un po' di fortuna in più o in meno; il [[dir_hr|direttore HR]] accorcia i tempi del 2% per ogni punto di Leadership sopra 10.
+
+Puoi chiedere anche una seconda abilità, col suo minimo: i tre profili le avranno tutte e due. La ricerca dura in più la metà del tempo che servirebbe per cercare solo la seconda abilità, e la parcella sale dal 30% (seconda abilità a 8) al 60% (a 20).
 
 La parcella è il 25% dello stipendio atteso per quel minimo: metà subito, che non torna indietro, e l'altra metà per ogni persona che assumi da quella ricerca. Si fa una ricerca alla volta, due con il direttore HR.
 
-Alla fine arrivano tre profili, tutti con l'abilità chiesta almeno al minimo; le altre abilità sono quelle che sono. Ogni profilo ha una probabilità su tre di essere un personaggio con una storia (i manager e i dirigenti storici del gioco). I profili restano validi 4 settimane: poi accettano altre offerte. Lo stipendio si tratta ([[trattativa]]) e chi firma entra dopo il [[preavviso]].
+Alla fine arrivano tre profili, tutti con l'abilità chiesta (o le due abilità) almeno al minimo; le altre abilità sono quelle che sono. Ogni profilo ha una probabilità su tre di essere un personaggio con una storia (i manager e i dirigenti storici del gioco). I profili restano validi 4 settimane: poi accettano altre offerte. Lo stipendio si tratta ([[trattativa]]) e chi firma entra dopo il [[preavviso]].
 
 Le aziende avversarie con lo stile Qualità usano anche loro l'head hunter.`);
 wk('trattativa','pers','Trattativa',`Per assumere un manager fai un'offerta di stipendio: risponde in 3-7 giorni. Può accettare, fare una controproposta, chiedere di più o offendersi.`,
@@ -3828,6 +3830,7 @@ function genPerson(o){ o=o||{};
   const nt=Math.random()<0.35?2:1; while(tal.length<nt+(tal[0]&&TALENTS[tal[0]].edu?1:0)){ const L=TAL_GEN.filter(n=>!tal.includes(n)&&(riOn()||!TALENTS[n].ri)&&(itOn()||!TALENTS[n].it)); if(!L.length) break; tal.push(pick(L)); }   // solo talenti che non ha già: il ciclo finisce anche con un Math.random fisso (test)
   tal.forEach(n=>Object.entries(talMods(n)).forEach(([k,v])=>st[k]+=v));
   if(o.k) st[o.k]=Math.max(st[o.k],o.min+(Math.random()<0.4?1:0)+(Math.random()<0.15?1:0));
+  if(o.k2) st[o.k2]=Math.max(st[o.k2],o.min2+(Math.random()<0.4?1:0)+(Math.random()<0.15?1:0));
   STATS.forEach(s=>st[s.k]=clamp(st[s.k],1,20));
   const p={id:'g'+(uid++),gen:1,name,sx:f?'f':'m',age,bd:S.day-age*365-rint(0,364),role:'',tal,st,face:faceOf(f,age),hired:false,wh:null,log:[]};
   let bios=GEN_BIO.filter(b=>o.k?b.k===o.k:b.l&&(!b.y||age<30)); if(!bios.length) bios=GEN_BIO.filter(b=>b.l&&!b.y);
@@ -3847,20 +3850,24 @@ function candById(id){ const m=mkt().l.find(p=>p.id===id); if(m) return {p:m,src
   const p=c.p||S.managers.find(x=>x.id===c.ref); return p&&!p.hired&&!p.retired&&p.arr==null?{p,src:'hh',c}:null; }
 function dropCand(id){ const M=mkt(); M.l=M.l.filter(p=>p.id!==id); S.cands=cands().filter(c=>candId(c)!==id); }
 // head hunter: parcella e tempi secondo il valore minimo chiesto; il direttore HR fa prima e permette due ricerche insieme
-const hhScore=min=>45+min+2*Math.max(0,min-12);
-const hhFee=min=>r500(MGR.hh*ralOf(hhScore(min)));
+// con una seconda abilità (k2, min2) la ricerca costa dal 30% al 60% in più e dura in più metà del tempo che servirebbe per cercare solo quella
+const hhScore=(min,min2)=>45+min+(min2?Math.max(0,min2-9):0)+2*Math.max(0,Math.max(min,min2||0)-12);
+const hhFee=(min,min2)=>r500(MGR.hh*ralOf(hhScore(min))*(min2?1.3+0.3*clamp((min2-MGR.minK)/(MGR.maxK-MGR.minK),0,1):1));
 const hrMul=()=>{const v=dirStat('hr'); return v==null?1:clamp(1-0.02*(v-10),0.8,1.2);};
-const hhDays=min=>Math.round((10+0.45*Math.pow(min-8,2))*hrMul());
+const hhD0=min=>10+0.45*Math.pow(min-8,2);
+const hhDays=(min,min2)=>Math.round((hhD0(min)+(min2?hhD0(min2)/2:0))*hrMul());
+// la richiesta in parole: «Operazioni almeno 14 e Leadership almeno 12»
+const hhReq=o=>`${statName(o.k)} almeno ${o.min}${o.k2?` e ${statName(o.k2)} almeno ${o.min2}`:''}`;
 const hhMax=()=>dirStat('hr')!=null?2:1;
-function hhStart(k,min){ const fee=hhFee(min), up=r500(fee/2); if(S.cash<up||hhList().length>=hhMax()) return null;
-  S.cash-=up; S.cur.altro+=up; const h={id:nid('h'),k,min,day0:S.day,end:S.day+Math.max(7,Math.round(hhDays(min)*rnd(0.85,1.15))),fee}; hhList().push(h); return h; }
+function hhStart(k,min,k2,min2){ if(!k2||k2===k){ k2=null; min2=null; } const fee=hhFee(min,min2), up=r500(fee/2); if(S.cash<up||hhList().length>=hhMax()) return null;
+  S.cash-=up; S.cur.altro+=up; const h={id:nid('h'),k,min,day0:S.day,end:S.day+Math.max(7,Math.round(hhDays(min,min2)*rnd(0.85,1.15))),fee}; if(k2){ h.k2=k2; h.min2=min2; } hhList().push(h); return h; }
 function hhDone(h){
-  const pool=S.managers.filter(p=>!p.gen&&!p.hired&&p.arr==null&&avail(p)&&ageOf(p)<62&&p.st[h.k]>=h.min&&!cands().some(c=>c.ref===p.id));
-  const exp=S.day+MGR.valid, fee2=h.fee-r500(h.fee/2);
+  const pool=S.managers.filter(p=>!p.gen&&!p.hired&&p.arr==null&&avail(p)&&ageOf(p)<62&&p.st[h.k]>=h.min&&(!h.k2||p.st[h.k2]>=h.min2)&&!cands().some(c=>c.ref===p.id));
+  const exp=S.day+MGR.valid, fee2=h.fee-r500(h.fee/2), q={k:h.k,min:h.min}; if(h.k2){ q.k2=h.k2; q.min2=h.min2; }
   for(let i=0;i<3;i++){
-    if(pool.length&&Math.random()<MGR.named){ const p=pool.splice(Math.floor(Math.random()*pool.length),1)[0]; p.ral=askOf(p); p.mn=+(0.85+Math.random()*0.12).toFixed(3); cands().push({ref:p.id,exp,fee2,k:h.k,min:h.min}); }
-    else cands().push({p:genPerson({k:h.k,min:h.min}),exp,fee2,k:h.k,min:h.min}); }
-  notify('green','manager',HH_NAME,'L\'head hunter ha tre profili',`Cercavi ${statName(h.k)} almeno ${h.min}: ecco tre profili. Restano disponibili ${wks(MGR.valid)}, poi accettano altre offerte. Fai la tua offerta dalla finestra Manager.`,'manager',{mtab:'cand'});
+    if(pool.length&&Math.random()<MGR.named){ const p=pool.splice(Math.floor(Math.random()*pool.length),1)[0]; p.ral=askOf(p); p.mn=+(0.85+Math.random()*0.12).toFixed(3); cands().push({ref:p.id,exp,fee2,...q}); }
+    else cands().push({p:genPerson(q),exp,fee2,...q}); }
+  notify('green','manager',HH_NAME,'L\'head hunter ha tre profili',`Cercavi ${hhReq(h)}: ecco tre profili. Restano disponibili ${wks(MGR.valid)}, poi accettano altre offerte. Fai la tua offerta dalla finestra Manager.`,'manager',{mtab:'cand'});
 }
 // trattativa: quanto vuole davvero (minimo nascosto, policy sgradite, reputazione, Negoziazione del CEO o del direttore HR)
 function candGriev(p){ const d=polDem(p); return [...d.want.filter(id=>polOpen(id)&&!polOn(id)).map(id=>({id,want:true})),...d.hate.filter(id=>polOn(id)).map(id=>({id,want:false}))]; }
@@ -9208,7 +9215,7 @@ function calItems(a,b){ const L=[], add=(d,c,t,o)=>{ if(d!=null&&d>=a&&d<=b) L.p
   // persone
   S.managers.filter(p=>p.arr!=null&&!p.hired).forEach(p=>add(p.arr,'pers',`Arriva ${p.name}`,{ic:'manager',win:'manager',sel:{mtab:'team'}}));
   staffPeople().filter(p=>p.quit).forEach(p=>add(p.quit.day,'pers',p.quit.ret?`${p.name} va in pensione`:`${p.name} lascia l'azienda`,{ic:'personale',win:'personale'}));
-  hhList().forEach(h=>add(h.end,'pers',`L'head hunter porta i profili (${statName(h.k)} almeno ${h.min})`,{ic:'manager',win:'manager',sel:{mtab:'hh'}}));
+  hhList().forEach(h=>add(h.end,'pers',`L'head hunter porta i profili (${hhReq(h)})`,{ic:'manager',win:'manager',sel:{mtab:'hh'}}));
   Object.values(negs()).filter(n=>n.day!=null).forEach(n=>add(n.day,'pers',`Risponde ${n.nm}`,{ic:'manager',win:'manager',sel:{mtab:'cand'}}));
   crescL().forEach(g=>add(g.end,'pers',`${g.name} diventa manager`,{ic:'manager',win:'manager',sel:{mtab:'team'}}));
   if(B.retDay!=null) add(B.retDay,'pers','Vai in pensione: si sceglie chi viene dopo di te',{ic:'azienda',win:'azienda'});
@@ -9613,18 +9620,22 @@ const VIEWS={
     body=`<div class="lab">${kw('candidature','Candidature spontanee')}</div><div class="sm">Tre persone in cerca di lavoro, di ${kw('rango_manager','rango')} basso: cambiano ogni qualche settimana e le aziende avversarie le possono assumere prima di te. Chi firma entra in azienda dopo una settimana.</div>
      ${board.map(p=>personCard(p,null,`<div class="ngw">${negBox(p,'mkt')}<div class="sm">Resta sul mercato fino al ${shortDate(p.until)}.</div></div>`)).join('')}
      <div class="lab">${kw('head_hunter','Profili dell\'head hunter')}</div>
-     ${C.length?C.map(x=>personCard(x.p,null,`<div class="ngw">${negBox(x.p,'hh')}<div class="sm">Ricerca: ${statName(x.c.k)} almeno ${x.c.min} · profilo valido fino al ${shortDate(x.c.exp)}${x.c.exp-S.day<=7?` <span class="warn">(scade tra ${wks(x.c.exp-S.day)})</span>`:''}${x.c.fee2?` · se firma, all'head hunter vanno altri ${eur(x.c.fee2)}`:''}.</div></div>`)).join(''):`<div class="card"><div>${H.length?`L'head hunter è al lavoro: i profili arrivano tra ${wks(H[0].end-S.day)}.`:'Nessun profilo. Un head hunter cerca tre persone con l\'abilità che ti serve, anche di rango alto.'}</div><div><button class="btn sm2 pri" data-act="mtab" data-id="hh">${H.length?'Vedi la ricerca':'Chiedi all\'head hunter'}</button></div></div>`}`;
+     ${C.length?C.map(x=>personCard(x.p,null,`<div class="ngw">${negBox(x.p,'hh')}<div class="sm">Ricerca: ${hhReq(x.c)} · profilo valido fino al ${shortDate(x.c.exp)}${x.c.exp-S.day<=7?` <span class="warn">(scade tra ${wks(x.c.exp-S.day)})</span>`:''}${x.c.fee2?` · se firma, all'head hunter vanno altri ${eur(x.c.fee2)}`:''}.</div></div>`)).join(''):`<div class="card"><div>${H.length?`L'head hunter è al lavoro: i profili arrivano tra ${wks(H[0].end-S.day)}.`:'Nessun profilo. Un head hunter cerca tre persone con l\'abilità che ti serve, anche di rango alto.'}</div><div><button class="btn sm2 pri" data-act="mtab" data-id="hh">${H.length?'Vedi la ricerca':'Chiedi all\'head hunter'}</button></div></div>`}`;
   } else {
-    const k=(UI.hh&&UI.hh.k)||'op', min=(UI.hh&&UI.hh.min)||14, fee=hhFee(min), up=r500(fee/2), d=hhDays(min), full=H.length>=hhMax(), rk=rankAt(hhScore(min));
+    const k=(UI.hh&&UI.hh.k)||'op', min=(UI.hh&&UI.hh.min)||14, k2=UI.hh&&UI.hh.k2!==k?UI.hh.k2||null:null, min2=k2?UI.hh.min2||12:null;
+    const fee=hhFee(min,min2), up=r500(fee/2), d=hhDays(min,min2), full=H.length>=hhMax(), rk=rankAt(hhScore(min,min2));
+    const step=(a,kk,v,lo)=>`<div class="lab">${lo}</div><div class="row" style="justify-content:flex-start;gap:12px"><div class="wh-step"><button class="btn sm2" data-act="${a}" data-v="-1" ${v<=MGR.minK?'disabled':''} aria-label="Minimo più basso">−</button>${statBadge(kk,v,20)}<button class="btn sm2" data-act="${a}" data-v="1" ${v>=MGR.maxK?'disabled':''} aria-label="Minimo più alto">+</button></div><span class="sm">almeno ${v} in ${statName(kk)}</span></div>`;
     body=`<div class="card"><div class="row"><span class="h3">${kw('head_hunter',HH_NAME)}</span><span class="sm">cacciatori di teste dal 1987</span></div>
-     <div class="sm">Scegli l'abilità che ti serve e il valore minimo: l'head hunter cerca tre profili e te li propone. Poi tocca a te trattare lo stipendio. Più alto è il minimo, più ci vuole e più costa.</div>
+     <div class="sm">Scegli l'abilità che ti serve e il valore minimo: l'head hunter cerca tre profili e te li propone. Poi tocca a te trattare lo stipendio. Più alto è il minimo, più ci vuole e più costa. Puoi chiedere anche una seconda abilità: i profili le avranno tutte e due, ma la ricerca è più lunga e più cara.</div>
      <div class="lab">Abilità</div><div class="hh-k">${STATS.map(s=>`<button class="btn hh-b" data-act="hhk" data-k="${s.k}" aria-pressed="${k===s.k}">${statIcon(s.k,20)}<span>${s.n}</span></button>`).join('')}</div>
-     <div class="lab">Valore minimo</div><div class="row" style="justify-content:flex-start;gap:12px"><div class="wh-step"><button class="btn sm2" data-act="hhmin" data-v="-1" ${min<=MGR.minK?'disabled':''} aria-label="Minimo più basso">−</button>${statBadge(k,min,20)}<button class="btn sm2" data-act="hhmin" data-v="1" ${min>=MGR.maxK?'disabled':''} aria-label="Minimo più alto">+</button></div><span class="sm">almeno ${min} in ${statName(k)}</span></div>
+     ${step('hhmin',k,min,'Valore minimo')}
+     <div class="lab">Seconda abilità <span class="sm">(facoltativa)</span></div><div class="hh-k"><button class="btn hh-b" data-act="hhk2" data-k="" aria-pressed="${!k2}"><span>Nessuna</span></button>${STATS.filter(s=>s.k!==k).map(s=>`<button class="btn hh-b" data-act="hhk2" data-k="${s.k}" aria-pressed="${k2===s.k}">${statIcon(s.k,20)}<span>${s.n}</span></button>`).join('')}</div>
+     ${k2?step('hhmin2',k2,min2,'Valore minimo della seconda abilità'):''}
      <div class="hh-sum"><div><span class="sm">Tempo</span><b>circa ${wks(d)}</b></div><div><span class="sm">Parcella</span><b>${eur(up)} subito</b><span class="sm">+ ${eur(fee-up)} a ogni assunzione</span></div><div><span class="sm">Rango atteso</span><b>${medalSvg(rk,28,'','Rango '+rk)} ${rk} o vicino</b></div></div>
      <button class="btn pri" data-act="hhgo" ${full||S.cash<up?'disabled':''}>Avvia la ricerca · ${eur(up)}</button>
      ${full?`<div class="sm warn">${hhMax()>1?'Ci sono già due ricerche in corso.':'C\'è già una ricerca in corso: con il direttore delle risorse umane se ne fanno due insieme.'}</div>`:S.cash<up?'<div class="sm bad">Non hai abbastanza soldi in cassa.</div>':''}</div>
      ${H.map(h=>{const tot=Math.max(1,h.end-h.day0), pc=clamp((S.day-h.day0)/tot,0,1); return `<div class="card"><div class="row"><span class="h3">Ricerca in corso</span><span class="pill">ancora ${wks(h.end-S.day)}</span></div>
-      <div class="row" style="justify-content:flex-start;gap:8px">${statBadge(h.k,h.min,20)}<span>almeno ${h.min} in ${statName(h.k)}</span></div><div class="bar"><i style="width:${Math.round(pc*100)}%;background:var(--accent)"></i></div></div>`;}).join('')}`;
+      <div class="row" style="justify-content:flex-start;gap:8px">${statBadge(h.k,h.min,20)}${h.k2?statBadge(h.k2,h.min2,20):''}<span>${hhReq(h)}</span></div><div class="bar"><i style="width:${Math.round(pc*100)}%;background:var(--accent)"></i></div></div>`;}).join('')}`;
   }
   return `<div class="wh-kpis c4">${tile('',kw('manager','In squadra'),hired.length,arr.length||cresc.length?[arr.length?`+${arr.length} in arrivo`:'',cresc.length?`${cresc.length} in crescita`:''].filter(Boolean).join(' · '):'manager e dirigenti')}${tile(cnt?'warn':'','Candidati',board.length+C.length,cnt?'una controproposta aspetta':'in cerca di lavoro')}${tile(H.length?'acc':'',kw('head_hunter','Head hunter'),H.length?Math.max(1,Math.round((Math.min(...H.map(h=>h.end))-S.day)/7)):'—',H.length?'settimane alla fine':'nessuna ricerca')}${tile('',kw('rango_manager','Stipendi'),eurS(hired.reduce((a,m)=>a+m.ral,0)),'l\'anno, in tutto')}</div>${tabs}${body}`;
  },
@@ -10700,8 +10711,10 @@ const ACT={
  negno(d){ const x=candById(d.id); delete negs()[d.id]; if(x&&x.src==='hh') dropCand(d.id); if(UI.offer) delete UI.offer[d.id]; renderAll(); },
  hhk(d){ UI.hh={...(UI.hh||{min:14}),k:d.k}; renderWin('manager'); },
  hhmin(d){ const h=UI.hh||(UI.hh={k:'op',min:14}); h.k=h.k||'op'; h.min=clamp((h.min||14)+(+d.v),MGR.minK,MGR.maxK); renderWin('manager'); },
- hhgo(){ const h=UI.hh||{}, k=h.k||'op', min=h.min||14, x=hhStart(k,min); if(!x) return;
-   toast(`L'head hunter cerca ${statName(k)} almeno ${min}: i profili arrivano tra ${wks(x.end-S.day)}`,'ok'); renderAll(); },
+ hhk2(d){ UI.hh={k:'op',min:14,...(UI.hh||{}),k2:d.k||null}; renderWin('manager'); },
+ hhmin2(d){ const h=UI.hh||(UI.hh={k:'op',min:14}); h.min2=clamp((h.min2||12)+(+d.v),MGR.minK,MGR.maxK); renderWin('manager'); },
+ hhgo(){ const h=UI.hh||{}, k=h.k||'op', min=h.min||14, k2=h.k2&&h.k2!==k?h.k2:null, x=hhStart(k,min,k2,k2?h.min2||12:null); if(!x) return;
+   toast(`L'head hunter cerca ${hhReq(x)}: i profili arrivano tra ${wks(x.end-S.day)}`,'ok'); renderAll(); },
  // nomina immediata del responsabile del customer service, senza trattativa: la usano solo i test
  hirecs(d){const m=S.managers.find(x=>x.id===d.id); if(!m) return; m.hired=true; m.raiseDay=S.day; m.unh=0; m.quit=null; m.wh=null; S.cs.resp=m.id; toast(`${m.name} entra in azienda e guida il customer service`,'ok'); renderAll();},
  setcs(d,el){const v=el.value||null; if(v){S.warehouses.forEach(w=>{if(w.mgr===v)w.mgr=null;}); Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===v)S.dirs[k]=null;}); depClear(v); const m=S.managers.find(x=>x.id===v); if(m){m.wh=null; toast(`${m.name} guida il customer service`,'ok');}} S.cs.resp=v; renderAll();},
@@ -11554,6 +11567,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.127',t:'Head hunter con due abilità',x:['All\'head hunter puoi chiedere anche una seconda abilità, col suo valore minimo: i tre profili le avranno tutte e due. La ricerca costa dal 30% al 60% in più e dura un po\' di più.']},
  {v:'0.126',t:'Candidati che non spariscono più',x:['I profili trovati dall\'head hunter restano 4 settimane, ma prima sparivano senza dire niente. Ora una settimana prima arriva un avviso giallo, nella scheda Candidati compare «scade tra…», e quando se ne vanno lo trovi tra le notizie del Manager.','Se un candidato dell\'head hunter firma con un\'azienda avversaria, adesso te lo dicono (prima spariva dalla lista).']},
  {v:'0.125',t:'Font nuovi',x:['Nuovi caratteri in tutto il gioco: titoli e numeri in Jersey 15, sempre in pixel art ma con un 5 che finalmente non sembra una S (prima «95,5%» si leggeva «9S,S%»). Il testo normale passa a Bricolage Grotesque, più caldo e con più personalità.']},
  {v:'0.124',t:'Tutorial sistemati',x:['I tutorial avanzato, Relazioni industriali e Reparto IT partono da un\'azienda più in forma: tutti e tre i magazzini hanno clienti, i conti sono più in ordine e i soci hanno dovuto metterci meno soldi. Prima, con i nuovi eventi, capitava di trovare uno o due magazzini vuoti.','All\'inizio di questi tutorial la mappa non mostra più il maltempo annunciato durante i due anni preparati, che non si poteva più decidere.']},
