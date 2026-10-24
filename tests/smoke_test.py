@@ -765,7 +765,7 @@ async def main():
           // offerta ridicola: si offende e sparisce
           const c=F.mktList()[0]; c.mn=0.9; F.negOffer(c.id,F.needOf(c)*0.6); for(let i=0;i<8&&S.negs[c.id];i++){clr(); F.step();} out.off=!F.mktList().some(p=>p.id===c.id)&&!S.managers.some(m=>m.id===c.id);
           // head hunter: metà parcella subito, tre profili con l'abilità chiesta
-          S.cash=400000; const fee=F.hhFee(16), h=F.hhStart('prec',16); out.paid=Math.abs(S.cash-(400000-Math.round(fee/2/500)*500))<1; out.second=F.hhStart('op',10)===null;
+          S.cash=400000; const fee=F.hhFee([['prec',16]]), h=F.hhStart([['prec',16]]); out.paid=Math.abs(S.cash-(400000-Math.round(fee/2/500)*500))<1; out.second=F.hhStart([['op',10]])===null;
           for(let i=0;i<120&&S.hh.length;i++){clr(); F.step();} const cs=S.cands.map(x=>x.p||S.managers.find(m=>m.id===x.ref));
           out.found=cs.length===3&&cs.every(p=>p.st.prec>=16); out.hhNote=S.notes.some(n=>n.title.includes('tre profili'));
           // firma tramite head hunter con controfferta: si lascia andare e il posto resta vuoto
@@ -775,13 +775,22 @@ async def main():
           out.cof=!!ev; if(ev){ F.ACT.note({id:ev.id}); const bt=document.querySelectorAll('#modal [data-act=evopt]'); bt[2].click(); for(let i=0;i<3;i++){clr(); F.step();} }
           out.gone=!S.managers.some(m=>m.id===q.id&&(m.hired||m.arr!=null));
           F.ACT.mtab({id:'hh'}); out.hhTab=!!document.querySelector('#win-manager [data-act=hhgo]');
-          // due abilità: costa di più, i profili le hanno tutte e due
-          S.cash=400000; F.ACT.hhk({k:'op'}); F.ACT.hhk2({k:'lead'}); for(let i=0;i<3;i++) F.ACT.hhmin2({v:1});
-          out.k2Btn=!!document.querySelector('#win-manager [data-act=hhmin2]'); out.fee2=F.hhFee(14,15)>F.hhFee(14);
-          F.ACT.hhgo(); const h2=S.hh[0]; out.k2=!!h2&&h2.k2==='lead'&&h2.min2===15;
-          for(let i=0;i<200&&S.hh.length;i++){clr(); F.step();} const c2=S.cands.filter(c=>c.k2).map(x=>x.p||S.managers.find(m=>m.id===x.ref));
-          out.found2=c2.length===3&&c2.every(p=>p.st.op>=14&&p.st.lead>=15);
-          F.ACT.hhk2({k:''}); F.ACT.hhk2({k:'lead'});
+          // più abilità: senza ricerche se ne sceglie una sola (toccarne un'altra la sostituisce)
+          S.cash=400000; const sel=()=>[...document.querySelectorAll('#win-manager .hh-t.on [data-act=hhk]')].map(b=>b.dataset.k);
+          F.ACT.hhk({k:'op'}); F.ACT.hhk({k:'lead'}); out.one=sel().join()==='lead'&&F.hhStart([['op',12],['lead',12]])===null;
+          // con Recruiting due abilità, tetto 34: il + si ferma, la ricerca costa di più
+          S.researched.recruiting=true; F.ACT.hhk({k:'op'}); for(let i=0;i<12;i++){ F.ACT.hhmin({k:'op',v:1}); F.ACT.hhmin({k:'lead',v:1}); }
+          const L2=F.hhUI(); out.two=sel().length===2&&F.hhSum(L2)===34&&!!document.querySelector('#win-manager [data-act=hhmin][data-v="1"][disabled]');
+          out.fee2=F.hhFee(L2)>F.hhFee(L2.slice(0,1))&&F.hhStart([['op',20],['lead',15]])===null;
+          F.ACT.hhgo(); const h2=S.hh[0]; out.k2=!!h2&&F.hhQ(h2).length===2;
+          for(let i=0;i<300&&S.hh.length;i++){clr(); F.step();} const c2=S.cands.filter(c=>c.k2&&!c.k3).map(x=>({p:x.p||S.managers.find(m=>m.id===x.ref),q:F.hhQ(x)}));
+          out.found2=c2.length===3&&c2.every(x=>x.q.every(([k,m])=>x.p.st[k]>=m));
+          // con la Rete di head hunter tre abilità, tetto 45
+          S.researched.hhrete=true; S.cash=400000; F.ACT.hhk({k:'prec'}); out.three=sel().length===3&&F.hhSum(F.hhUI())<=45;
+          const L3=[['op',16],['lead',15],['prec',14]]; out.cap3=F.hhStart([['op',16],['lead',15],['prec',15]])===null; const h3=F.hhStart(L3); out.k3=!!h3&&h3.k3==='prec';
+          for(let i=0;i<300&&S.hh.length;i++){clr(); F.step();} const c3=S.cands.filter(c=>c.k3).map(x=>x.p||S.managers.find(m=>m.id===x.ref));
+          out.found3=c3.length===3&&c3.every(p=>p.st.op>=16&&p.st.lead>=15&&p.st.prec>=14);
+          F.ACT.mtab({id:'cand'}); F.ACT.mtab({id:'hh'});
           return out;}""")
         assert all(r.values()), f'ricerca dei manager: {r}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_manager_hh.png'))

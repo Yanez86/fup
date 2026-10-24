@@ -243,6 +243,37 @@ tecnologia("hr", "org", { dopo: [grid(4, 5, `
   BBBBBB....
   BBBBBB....
   .BBBBB....`)
+// Recruiting: una persona sotto la lente d'ingrandimento (si cercano due abilità)
+tecnologia("recruiting", "org", { dopo: [grid(4, 3, `
+  .SSS..
+  SLLLS.
+  SLLLS.
+  SLLLS.
+  .SSSD.
+  ....DD
+  .....D`)] }, `
+  .NNNN.....
+  NNNNNN....
+  NFFFFN....
+  FKFFKF....
+  FKFFKF....
+  FFFFFF....
+  .FFFF.....
+  BBBBBB....
+  BBBBBB....
+  .BBBBB....`)
+// Rete di head hunter: il cacciatore di teste (giacca gialla) davanti ai due colleghi della rete (si cercano tre abilità)
+tecnologia("hhrete", "org", {}, `
+  NNN....NNN
+  FFF....FFF
+  FFFNNNNFFF
+  BBNNNNNNBB
+  BBFKFFKFBB
+  BBFFFFFFBB
+  BBBFFFFBBB
+  ..YYYYYY..
+  ..YYYYYY..
+  ..YYYYYY..`)
 // Struttura direzionale: la poltrona (rossa) da direttore
 tecnologia("direzione", "org", { mx: true, dopo: [grid(2, 4, `
   rrr
