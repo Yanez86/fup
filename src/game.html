@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="FUP">
 <link rel="apple-touch-icon" href="icona_180.png">
 <link rel="icon" type="image/png" href="{{ICON}}">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Rubik:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+15&family=Bricolage+Grotesque:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: mappa a tutto schermo con pan e zoom, barra risorse in alto, menu a sinistra, finestre fluttuanti trascinabili sopra. Look unico (pixel art chiara su mappa), senza tema scuro alternativo. */
 :root{
@@ -22,12 +22,12 @@
   --accent:#ff7a3d; --accent-d:#c8551f; --accent-l:#ffb07a;
   --ok:#2e9e48; --ok-d:#217a36; --ok-t:#23803a; --warn:#e8a317; --warn-d:#b97f0c; --warn-t:#9a6a00; --bad:#e0393e; --bad-d:#a8262a; --bad-t:#c62828;
   --yellow:#ffd23f; --sea:#1b64ad;
-  --f-disp:'Pixelify Sans', 'Courier New', monospace;
-  --f-body:'Rubik', 'Trebuchet MS', Arial, sans-serif;
+  --f-disp:'Jersey 15', 'Courier New', monospace;
+  --f-body:'Bricolage Grotesque', 'Trebuchet MS', Arial, sans-serif;
   color-scheme: light;
 }
 /* sfondo scuro come la barra e il menu: su iPhone si vede sotto la barra di stato e sotto il menu, dove la mappa non arriva */
-html{background:var(--ink);font-variant-ligatures:none}  /* Pixelify Sans unisce «fi» in un solo segno: «file» diventava «Ale» */
+html{background:var(--ink);font-variant-ligatures:none;font-synthesis:style}  /* niente legature (con il vecchio Pixelify «file» diventava «Ale»); Jersey 15 ha un solo peso: niente grassetto finto, che impasta i pixel */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}  /* Safari su iPhone ingrandisce il testo in orizzontale e a volte non lo rimette a posto tornando in verticale */
 html,body{height:100%}
 /* web app installata su iPhone (iOS 26): lo schermo «utile» risulta più corto dell'altezza della barra di stato e in fondo resta una banda vuota; allungando la pagina gli elementi fissi tornano fino al bordo */
@@ -8699,7 +8699,7 @@ const cityLL=n=>{const c=CITIES.find(x=>x[0]===n); return c?[c[1],c[2]]:null;};
 // centro di una zona (media dei capoluoghi) e km su strada, in media, da un magazzino ai suoi capoluoghi (come clientLog, solo andata)
 function zoneLL(z){ const cs=(ZONES[z]||ZONES.nordovest).cities.map(cityLL).filter(Boolean); return [cs.reduce((a,c)=>a+c[0],0)/cs.length,cs.reduce((a,c)=>a+c[1],0)/cs.length]; }
 function zoneKm(w,z){ const s=SITES[w.site], cs=(ZONES[z]||ZONES.nordovest).cities.map(cityLL).filter(Boolean); return cs.length?Math.round(cs.reduce((a,c)=>a+distKm(s.lon,s.lat,c[0],c[1]),0)/cs.length*1.3):0; }
-// etichetta a riquadro sulla mappa (giorni che mancano, km): ombra netta, bordo scuro, testo Pixelify
+// etichetta a riquadro sulla mappa (giorni che mancano, km): ombra netta, bordo scuro, testo pixel
 const chipW=(t,fs=13)=>Math.round(String(t).replace(/&[^;]+;/g,'x').length*fs*.52+14);
 function mapChip(x,y,t,bg=TPAL.K,fg='#fff',fs=13){ const w=chipW(t,fs), X=Math.round(x-w/2), Y=Math.round(y-11);
   return `<rect x="${X+2}" y="${Y+2}" width="${w}" height="20" fill="#0c131d" opacity=".45"/><rect x="${X}" y="${Y}" width="${w}" height="20" fill="${bg}" stroke="#16202e" stroke-width="2"/><text class="mchip" x="${Math.round(x)}" y="${Y+15}" font-size="${fs}" fill="${fg}" text-anchor="middle">${t}</text>`; }
@@ -11528,14 +11528,15 @@ function stepVisura(){
 function stampSvg(){const c='#c2273a';
   return `<svg width="150" height="150" viewBox="0 0 150 150"><defs><path id="tc" d="M75,75 m-52,0 a52,52 0 1,1 104,0 a52,52 0 1,1 -104,0"/></defs>
    <circle cx="75" cy="75" r="70" fill="none" stroke="${c}" stroke-width="5"/><circle cx="75" cy="75" r="40" fill="none" stroke="${c}" stroke-width="2"/>
-   <text font-family="Pixelify Sans, monospace" font-size="13" fill="${c}"><textPath href="#tc" textLength="318" lengthAdjust="spacing">CAMERA DI COMMERCIO ★ DEL NORD ★</textPath></text>
+   <text font-family="Jersey 15, monospace" font-size="13" fill="${c}"><textPath href="#tc" textLength="318" lengthAdjust="spacing">CAMERA DI COMMERCIO ★ DEL NORD ★</textPath></text>
    <rect x="31" y="63" width="88" height="24" fill="#fff" stroke="${c}" stroke-width="3"/>
-   <text x="75" y="81" text-anchor="middle" font-family="Pixelify Sans, monospace" font-weight="700" font-size="17" fill="${c}">ISCRITTA</text>
-   <text x="75" y="104" text-anchor="middle" font-family="Pixelify Sans, monospace" font-size="11" fill="${c}">02·01·2002</text></svg>`;}
+   <text x="75" y="81" text-anchor="middle" font-family="Jersey 15, monospace" font-weight="700" font-size="17" fill="${c}">ISCRITTA</text>
+   <text x="75" y="104" text-anchor="middle" font-family="Jersey 15, monospace" font-size="11" fill="${c}">02·01·2002</text></svg>`;}
 const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['#3dd6c4','#1f9e8f','#9cefe5'],['#9b6bff','#6f43cf','#c8adff']];
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.125',t:'Font nuovi',x:['Nuovi caratteri in tutto il gioco: titoli e numeri in Jersey 15, sempre in pixel art ma con un 5 che finalmente non sembra una S (prima «95,5%» si leggeva «9S,S%»). Il testo normale passa a Bricolage Grotesque, più caldo e con più personalità.']},
  {v:'0.124',t:'Tutorial sistemati',x:['I tutorial avanzato, Relazioni industriali e Reparto IT partono da un\'azienda più in forma: tutti e tre i magazzini hanno clienti, i conti sono più in ordine e i soci hanno dovuto metterci meno soldi. Prima, con i nuovi eventi, capitava di trovare uno o due magazzini vuoti.','All\'inizio di questi tutorial la mappa non mostra più il maltempo annunciato durante i due anni preparati, che non si poteva più decidere.']},
  {v:'0.123',t:'Calendario e maltempo su tutto il Nord',x:['Nuovo calendario da parete, omaggio del gommista: si apre toccando la data in alto o dal menu. Raccoglie tutte le date in arrivo (manager che arrivano, gare e contratti in scadenza, cantieri, traslochi, audit, ricerche, maltempo annunciato, decisioni da prendere, rate dei prestiti) e le ricorrenze, come i compleanni e l\'anniversario della prima bolla. Tocca una voce e si apre la finestra giusta.','Il maltempo ora si vede arrivare: la radio lo annuncia 3 o 4 giorni prima, la zona compare a scacchi sulla mappa e il giorno va nel calendario. Scegli prima cosa fare (anticipare i viaggi, montare le catene, mettere i sacchi di sabbia): gli effetti partono il giorno del maltempo.','Otto nuovi eventi meteo, così ogni angolo del Nord ha il suo: bora a Trieste, alluvione in Romagna, frana sulla statale 38 in Valtellina, neve sull\'A4 tra Torino e Milano, grandine tra Verona e Padova, gelicidio sui valichi dell\'Appennino, tempesta tra Nizza e Ventimiglia, nebbia nel Polesine.','Il maltempo pesante può rovinare i capannoni che stanno nella zona: pannelli solari, tetti, ribalte e merce bagnata. Gli edifici vecchi soffrono il doppio, quelli innovativi la metà; preparandoti in tempo i danni calano di molto.','L\'afa pesa secondo il capannone: nei moderni c\'è l\'aria condizionata, in montagna si sta freschi. La coda al Brennero per neve arriva solo d\'inverno.','Il compleanno dell\'azienda (al primo anno e poi ogni cinque) e i compleanni tondi del CEO diventano un evento: festa nel piazzale, cena con i clienti, il calendario aziendale con i magazzinieri in posa o una torta in mensa.']},
  {v:'0.122',t:'Testo fermo sul telefono',x:['Su iPhone, girando il telefono in orizzontale e poi di nuovo in verticale, il testo restava più grande del normale. Ora resta sempre della stessa misura.']},
