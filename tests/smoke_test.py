@@ -776,7 +776,7 @@ async def main():
           out.gone=!S.managers.some(m=>m.id===q.id&&(m.hired||m.arr!=null));
           F.ACT.mtab({id:'hh'}); out.hhTab=!!document.querySelector('#win-manager [data-act=hhgo]');
           // più abilità: senza ricerche se ne sceglie una sola (toccarne un'altra la sostituisce)
-          S.cash=400000; const sel=()=>[...document.querySelectorAll('#win-manager .hh-t.on [data-act=hhk]')].map(b=>b.dataset.k);
+          S.cash=400000; const sel=()=>[...document.querySelectorAll('#win-manager .hh-r.on [data-act=hhk]')].map(b=>b.dataset.k);
           F.ACT.hhk({k:'op'}); F.ACT.hhk({k:'lead'}); out.one=sel().join()==='lead'&&F.hhStart([['op',12],['lead',12]])===null;
           // con Recruiting due abilità, tetto 34: il + si ferma, la ricerca costa di più
           S.researched.recruiting=true; F.ACT.hhk({k:'op'}); for(let i=0;i<12;i++){ F.ACT.hhmin({k:'op',v:1}); F.ACT.hhmin({k:'lead',v:1}); }
@@ -786,7 +786,8 @@ async def main():
           for(let i=0;i<300&&S.hh.length;i++){clr(); F.step();} const c2=S.cands.filter(c=>c.k2&&!c.k3).map(x=>({p:x.p||S.managers.find(m=>m.id===x.ref),q:F.hhQ(x)}));
           out.found2=c2.length===3&&c2.every(x=>x.q.every(([k,m])=>x.p.st[k]>=m));
           // con la Rete di head hunter tre abilità, tetto 45
-          S.researched.hhrete=true; S.cash=400000; F.ACT.hhk({k:'prec'}); out.three=sel().length===3&&F.hhSum(F.hhUI())<=45;
+          S.researched.hhrete=true; S.cash=400000; F.ACT.hhmin({k:'prec',v:1}); const p8=F.hhUI().find(x=>x[0]==='prec'); F.ACT.hhmin({k:'prec',v:-1}); out.plusMinus=!!p8&&p8[1]===8&&sel().length===2;
+          F.ACT.hhk({k:'prec'}); out.three=sel().length===3&&F.hhSum(F.hhUI())<=45&&document.querySelector('#win-manager .hh-r.on .hh-v').textContent!=='—';
           const L3=[['op',16],['lead',15],['prec',14]]; out.cap3=F.hhStart([['op',16],['lead',15],['prec',15]])===null; const h3=F.hhStart(L3); out.k3=!!h3&&h3.k3==='prec';
           for(let i=0;i<300&&S.hh.length;i++){clr(); F.step();} const c3=S.cands.filter(c=>c.k3).map(x=>x.p||S.managers.find(m=>m.id===x.ref));
           out.found3=c3.length===3&&c3.every(p=>p.st.op>=16&&p.st.lead>=15&&p.st.prec>=14);

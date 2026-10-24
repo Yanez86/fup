@@ -590,7 +590,8 @@ table.t td .sw{display:inline-block;width:10px;height:10px;margin-right:6px;bord
 .ng .wh-step .ng-v{font:700 18px var(--f-disp);min-width:104px;text-align:center}
 .hh-k{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .hh-b{display:flex;align-items:center;gap:6px;justify-content:flex-start;padding:6px 8px;font-size:14px}
-.hh-t{display:flex;flex-direction:column;gap:4px;min-width:0}.hh-t .hh-b{width:100%}.hh-st{justify-content:center}
+.hh-rs{display:flex;flex-direction:column;gap:6px}.hh-r{display:flex;align-items:center;gap:8px}.hh-r .hh-b{flex:1 1 auto;min-width:0}.hh-r .hh-b span{flex:1;text-align:left}
+.hh-v{min-width:34px;padding:0 6px;text-align:center;font:20px var(--f-disp);background:#fff;border:2px solid var(--ink);color:var(--ink4)}.hh-r.on .hh-v{background:var(--sb);border-color:var(--sc);color:var(--ink)}
 .hh-b[aria-pressed="true"]{background:var(--yellow);box-shadow:inset 0 -3px 0 #c98a00}
 .hh-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px;background:#f4f7fa;border:2px solid var(--ink)}
 .hh-sum>div{display:flex;flex-direction:column;gap:2px}
@@ -9639,15 +9640,16 @@ const VIEWS={
   } else {
     const L=hhUI(), n=L.length, mx=hhMaxK(), sum=hhSum(L), cap=HH_CAP[n-1], canAdd=mx===1||n<mx&&sum+MGR.minK<=HH_CAP[n];
     const fee=hhFee(L), up=r500(fee/2), d=hhDays(L), full=H.length>=hhMax(), rk=rankAt(hhScore(L));
-    const tile=x=>{ const i=L.findIndex(y=>y[0]===x.k), on=i>=0, m=on?L[i][1]:0;
-      return `<div class="hh-t${on?' on':''}"><button class="btn hh-b" data-act="hhk" data-k="${x.k}" aria-pressed="${on}" ${!on&&!canAdd?'disabled':''}>${statIcon(x.k,20)}<span>${x.n}</span></button>${on?`<div class="wh-step hh-st"><button class="btn sm2" data-act="hhmin" data-k="${x.k}" data-v="-1" ${m<=MGR.minK?'disabled':''} aria-label="Minimo più basso in ${x.n}">−</button>${statBadge(x.k,m,20)}<button class="btn sm2" data-act="hhmin" data-k="${x.k}" data-v="1" ${m>=MGR.maxK||sum>=cap?'disabled':''} aria-label="Minimo più alto in ${x.n}">+</button></div>`:''}</div>`; };
+    // una riga per abilità: il nome col minimo chiesto nel suo badge (— se non è chiesta), − e + sempre a destra
+    const tile=x=>{ const i=L.findIndex(y=>y[0]===x.k), on=i>=0, m=on?L[i][1]:0, add=mx===1||canAdd;
+      return `<div class="hh-r${on?' on':''}" style="--sc:${x.c};--sb:${x.bg}"><button class="btn hh-b" data-act="hhk" data-k="${x.k}" aria-pressed="${on}" ${!on&&!canAdd&&mx>1?'disabled':''}>${statIcon(x.k,20)}<span>${x.n}</span><b class="hh-v">${on?m:'—'}</b></button><div class="wh-step"><button class="btn sm2" data-act="hhmin" data-k="${x.k}" data-v="-1" ${!on||m<=MGR.minK&&n===1?'disabled':''} aria-label="Minimo più basso in ${x.n}">−</button><button class="btn sm2" data-act="hhmin" data-k="${x.k}" data-v="1" ${on?(m>=MGR.maxK||sum>=cap?'disabled':''):(add?'':'disabled')} aria-label="Minimo più alto in ${x.n}">+</button></div></div>`; };
     const more=mx===1?`Per chiederne due insieme serve la ricerca ${kw('tech_recruiting','Recruiting')}.`:mx===2?`Con la ricerca ${kw('tech_hhrete','Rete di head hunter')} se ne chiedono tre.`:'';
-    const why=!canAdd&&mx>1?(n>=mx?`<div class="sm">Hai già ${n} abilità: tocca una di quelle scelte per toglierla.</div>`:`<div class="sm warn">Non restano punti per un'altra abilità: abbassa un minimo.</div>`):'';
+    const why=!canAdd&&mx>1?(n>=mx?`<div class="sm">Hai già ${n} abilità: tocca una di quelle scelte (o portala sotto 8 con −) per toglierla.</div>`:`<div class="sm warn">Non restano punti per un'altra abilità: abbassa un minimo.</div>`):'';
     body=`<div class="card"><div class="row"><span class="h3">${kw('head_hunter',HH_NAME)}</span><span class="sm">cacciatori di teste dal 1987</span></div>
-     <div class="sm">Tocca un'abilità per sceglierla e decidi il valore minimo con − e +: l'head hunter cerca tre profili e te li propone. Poi tocca a te trattare lo stipendio. Più alto è il minimo, più ci vuole e più costa.</div>
+     <div class="sm">Tocca un'abilità per sceglierla e decidi il valore minimo con − e +, che lo trovi scritto accanto al nome: l'head hunter cerca tre profili e te li propone. Poi tocca a te trattare lo stipendio. Più alto è il minimo, più ci vuole e più costa.</div>
      <div class="row"><span class="lab">Abilità richieste ${n} su ${mx}</span>${mx>1?`<span class="pill${sum>=cap?' warn':''}" data-tip="La somma dei minimi non può superare ${HH_CAP[1]} punti con due abilità e ${HH_CAP[2]} con tre: nessuno è un fuoriclasse in tutto.">Tetto: ${sum} punti su ${cap}</span>`:''}</div>
      ${more?`<div class="sm">${more}</div>`:''}
-     <div class="hh-k">${STATS.map(tile).join('')}</div>${why}
+     <div class="hh-rs">${STATS.map(tile).join('')}</div>${why}
      <div class="sm">Cerchi: ${hhReq(hhSet({},L))}.</div>
      <div class="hh-sum"><div><span class="sm">Tempo</span><b>circa ${wks(d)}</b></div><div><span class="sm">Parcella</span><b>${eur(up)} subito</b><span class="sm">+ ${eur(fee-up)} a ogni assunzione</span></div><div><span class="sm">Rango atteso</span><b>${medalSvg(rk,28,'','Rango '+rk)} ${rk} o vicino</b></div></div>
      <button class="btn pri" data-act="hhgo" ${full||S.cash<up?'disabled':''}>Avvia la ricerca · ${eur(up)}</button>
@@ -10733,8 +10735,12 @@ const ACT={
    else if(mx===1) L[0]=[d.k,L[0][1]];
    else if(L.length<mx){ const m=Math.min(12,HH_CAP[L.length]-hhSum(L)); if(m>=MGR.minK) L.push([d.k,m]); }
    UI.hh.l=L; renderWin('manager'); },
- hhmin(d){ const L=hhUI(), x=L.find(y=>y[0]===(d.k||L[0][0])); if(!x) return; const v=clamp(x[1]+(+d.v),MGR.minK,MGR.maxK);
-   if(v>x[1]&&hhSum(L)+v-x[1]>HH_CAP[L.length-1]) return; x[1]=v; renderWin('manager'); },
+ hhmin(d){ const L=hhUI(), mx=hhMaxK(), x=L.find(y=>y[0]===(d.k||L[0][0])), dv=+d.v;
+   if(!x){ if(dv<=0) return;   // + su un'abilità non chiesta: entra al minimo più basso (con una sola abilità possibile prende il posto dell'altra)
+     if(mx===1) L[0]=[d.k,MGR.minK]; else if(L.length<mx&&hhSum(L)+MGR.minK<=HH_CAP[L.length]) L.push([d.k,MGR.minK]); else return; }
+   else { const v=x[1]+dv; if(v<MGR.minK){ if(L.length>1) L.splice(L.indexOf(x),1); }
+     else if(v<=MGR.maxK&&(dv<0||hhSum(L)+dv<=HH_CAP[L.length-1])) x[1]=v; }
+   UI.hh.l=L; renderWin('manager'); },
  hhgo(){ const x=hhStart(hhUI()); if(!x) return;
    toast(`L'head hunter cerca ${hhReq(x)}: i profili arrivano tra ${wks(x.end-S.day)}`,'ok'); renderAll(); },
  // nomina immediata del responsabile del customer service, senza trattativa: la usano solo i test
@@ -11589,6 +11595,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.129',t:'Head hunter più comodo',x:['Nella scheda Head hunter le sei abilità sono una sotto l\'altra, ognuna con − e + sempre a destra e il minimo chiesto scritto accanto al nome. Il + su un\'abilità non chiesta la aggiunge, il − sotto 8 la toglie.']},
  {v:'0.128',t:'Head hunter: fino a tre abilità',x:['La scheda Head hunter ha un solo riquadro con le sei abilità: tocchi quella che ti serve e scegli il minimo con − e +.','Due nuove ricerche in Sviluppo aziendale, dopo l\'Ufficio del personale: «Recruiting» (15.000 €) permette di chiedere due abilità insieme, «Rete di head hunter» (35.000 €) tre. C\'è un tetto: la somma dei minimi non supera 34 punti con due abilità e 45 con tre. Ogni abilità in più costa dal 30% al 60% in più e allunga la ricerca.']},
  {v:'0.127',t:'Head hunter con due abilità',x:['All\'head hunter puoi chiedere anche una seconda abilità, col suo valore minimo: i tre profili le avranno tutte e due. La ricerca costa dal 30% al 60% in più e dura un po\' di più.']},
  {v:'0.126',t:'Candidati che non spariscono più',x:['I profili trovati dall\'head hunter restano 4 settimane, ma prima sparivano senza dire niente. Ora una settimana prima arriva un avviso giallo, nella scheda Candidati compare «scade tra…», e quando se ne vanno lo trovi tra le notizie del Manager.','Se un candidato dell\'head hunter firma con un\'azienda avversaria, adesso te lo dicono (prima spariva dalla lista).']},
