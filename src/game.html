@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it">
+<html lang="it" class="boot">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>FUP – Fino all'ultimo pallet</title>
@@ -87,7 +87,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 #top .wkn,#top .date,#top .clk,#top .paused{display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px;font-size:16px}
 #top .chip{min-width:88px;padding:0 10px}
 /* «In pausa» rosso; quando il tempo scorre diventa verde e ci passa un camioncino da sinistra a destra */
-#top .paused{position:relative;overflow:hidden}.paused .pz-trk{display:none}
+#top .paused{position:relative;overflow:hidden;color:inherit;cursor:pointer}.paused .pz-trk{display:none} #top .paused:disabled{cursor:default}
 #top .paused.run{background:#7fd88f;box-shadow:inset 0 -2px 0 #3e9e58}.paused.run .pz-t{visibility:hidden}
 .paused.run .pz-trk{display:block;position:absolute;left:-34px;top:50%;margin-top:-11px;animation:pz-trk 7s linear infinite}
 @keyframes pz-trk{0%{left:-34px;transform:translateY(0)}25%{transform:translateY(-1px)}50%{transform:translateY(0)}75%{transform:translateY(-1px)}100%{left:100%;transform:translateY(0)}}
@@ -834,39 +834,50 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .ceo-d .ceo-cl{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 @media (max-width:1000px){.ceos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:30px 12px 14px;margin:-16px -12px 0}.ceo{flex:0 0 min(78%,250px);scroll-snap-align:center}}
 
-/* Schermata introduttiva: il camioncino porta il pallet dell'icona */
+/* Schermata introduttiva (0.130): il parco logistico di giorno, i capannoni del gioco in fila e il camioncino che passa.
+   --k = ingrandimento intero dei disegni (introK()). Finché lo script non parte, <html class="boot"> mostra solo il cielo: la mappa non si vede mentre il gioco carica */
+html.boot,html.boot body{background:#5fb4f0} html.boot body>*:not(#intro){visibility:hidden}
 #intro:empty{display:none}
-#intro{position:fixed;inset:0;z-index:90;overflow:hidden;cursor:pointer;color:#fff3c4;display:flex;flex-direction:column;align-items:stretch;transition:opacity .5s;background:linear-gradient(#141d2b 0 25%,#1d2a3b 25% 55%,#24344a 55%)}
+#intro{--k:4;position:fixed;inset:0;z-index:90;overflow:hidden;cursor:pointer;color:#fff3c4;display:flex;flex-direction:column;background:#5fb4f0;transition:opacity .5s}
 #intro.out{opacity:0}
-#intro .road{position:relative;flex:1 0 30%;background:#2a3a50;border-top:6px solid #16202e;box-shadow:inset 0 6px 0 #4a5f7a;padding:min(26px,4vh) 16px 12px}
-#intro .road::after{content:'';position:absolute;left:0;right:0;bottom:22%;height:6px;background:repeating-linear-gradient(90deg,#ffd23f 0 36px,transparent 36px 72px);animation:introRoad .4s linear 6}
-#intro .lane::before{content:'';position:absolute;left:0;right:0;bottom:0;height:45%;background:#2a3a50;opacity:.7;clip-path:polygon(0 100%,0 60%,8% 20%,16% 55%,27% 10%,38% 50%,50% 0,61% 45%,72% 15%,84% 55%,93% 25%,100% 50%,100% 100%)}
-#intro .ttl{position:relative;flex:1 1 auto;display:flex;flex-direction:column;justify-content:flex-end;padding:16px 16px 18px;text-align:center;opacity:0;animation:introPop .5s 2s forwards}
-#intro h1{margin:0;font-family:var(--f-disp);font-size:min(clamp(56px,12vw,110px),14vh);line-height:.9;color:#ffd23f;text-shadow:6px 6px 0 #0c131d;letter-spacing:4px}
-#intro .sub{font-family:var(--f-disp);font-size:min(clamp(20px,4vw,30px),6vh);margin-top:6px}
-#intro .lane{position:relative;flex:none;width:100%;height:min(clamp(130px,24vw,230px),30vh);margin-bottom:-2px}
-#intro .truck{position:absolute;left:50%;bottom:0;height:100%;transform:translateX(-50%);animation:introIn 2.2s cubic-bezier(.2,.7,.3,1) forwards}
-#intro .truck svg{height:100%;width:auto;display:block;animation:introBump .18s steps(2) 12;filter:drop-shadow(6px 6px 0 rgba(12,19,29,.55))}
-#intro .puff{position:absolute;left:-2%;bottom:14%;width:5%;aspect-ratio:1;background:#c3d0dc;opacity:0;animation:introPuff .5s steps(3) 4}
-#intro.go .truck{animation:introOut .7s cubic-bezier(.6,0,.9,.4) forwards}
-#intro .bot{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:introPop .4s 2.4s forwards}
-#intro .bot .btn{font-size:20px;padding:12px 26px}
-#intro .ver{font-size:14px;color:#c3d0dc}
-#intro .cred{position:absolute;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));z-index:1;display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f-disp);font-size:16px;color:#fff3c4;opacity:0;animation:introPop .4s 2.6s forwards}
-.land #intro .cred{bottom:max(4px,env(safe-area-inset-bottom))} .land #intro .road::after{bottom:36px}
-#intro .wip{display:flex;align-items:center;gap:10px;max-width:420px;margin-top:6px;padding:8px 12px;background:#16202e;border:3px solid #ffd23f;box-shadow:4px 4px 0 #0c131d;font-size:14px;line-height:1.35;color:#fff3c4;text-align:left}
-#intro .wip b{color:#ffd23f}
-.land #intro .bot{flex-flow:row wrap;justify-content:center;gap:6px 14px} .land #intro .ver{order:3;flex-basis:100%;text-align:center}
-.land #intro .wip{margin-top:0;padding:4px 10px;font-size:12px;max-width:380px}
-#intro .cred svg{width:24px;height:28px;flex:none;filter:drop-shadow(2px 2px 0 #0c131d)}
-.land #intro .bot .btn{padding:8px 22px} .land #intro .ttl{padding-bottom:8px}
-@keyframes introIn{from{transform:translateX(calc(-50vw - 110%))}to{transform:translateX(-50%)}}
-@keyframes introOut{from{transform:translateX(-50%)}to{transform:translateX(60vw)}}
-@keyframes introBump{50%{transform:translateY(-3%)}}
-@keyframes introPuff{0%{opacity:.8;transform:translate(0,0)}100%{opacity:0;transform:translate(-120%,-60%) scale(1.6)}}
-@keyframes introRoad{to{background-position:-72px 0}}
+#intro .sky{position:relative;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:min(14px,2vh);padding:max(10px,env(safe-area-inset-top)) 16px 8px}
+#intro .logo{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:inherit;animation:introPop .6s .1s both}
+#intro h1{margin:0;padding-left:.06em;font-family:var(--f-disp);font-weight:400;font-size:clamp(60px,min(22vh,34vw),176px);line-height:.8;letter-spacing:.06em;color:var(--yellow);
+ text-shadow:-.03em 0 var(--ink),.03em 0 var(--ink),0 -.03em var(--ink),0 .03em var(--ink),-.03em -.03em var(--ink),.03em -.03em var(--ink),-.03em .03em var(--ink),.03em .03em var(--ink),.07em .07em 0 var(--ink)}
+#intro .sub{margin:0;padding:.16em .5em .24em;background:var(--ink);font-family:var(--f-disp);font-size:clamp(20px,min(4.6vh,7vw),34px);line-height:1;color:#fff3c4;box-shadow:.18em .18em 0 rgba(22,32,46,.35)}
+#intro .cloud{position:absolute;left:0;width:calc(24px*var(--k));height:calc(6px*var(--k));animation:introCloud 80s linear infinite}
+#intro .row{position:relative;flex:none;height:calc(72px*var(--k))}
+#intro .est5{position:absolute;left:50%;top:0;display:flex;transform:translateX(-50%)}
+#intro .est5 i{flex:none;width:calc(144px*var(--k));height:calc(72px*var(--k));background-repeat:no-repeat;background-size:calc(2304px*var(--k)) 100%;image-rendering:pixelated;animation:introEst 2s steps(16) infinite}
+#intro .est5 i:nth-child(2n){animation-delay:-.75s} #intro .est5 i:nth-child(3n){animation-delay:-1.25s}
+#intro .truck{position:absolute;left:0;bottom:calc(2px*var(--k));width:calc(56px*var(--k));height:calc(48px*var(--k));transform:translateX(-110%);animation:introDrive 11s .8s linear infinite}
+#intro .truck svg{width:100%;height:100%;display:block;animation:introBump .24s steps(2) infinite;filter:drop-shadow(calc(2px*var(--k)) calc(1px*var(--k)) 0 rgba(22,32,46,.35))}
+#intro .road{position:relative;flex:none;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:end;gap:12px 20px;padding:calc(20px + 1.5vh) 24px max(16px,env(safe-area-inset-bottom));background:#4a5f7a}
+#intro .road::before{content:'';position:absolute;left:0;right:0;top:8px;height:8px;background:repeating-linear-gradient(90deg,var(--yellow) 0 48px,transparent 48px 96px);animation:introRoad .8s linear infinite}
+#intro .bot{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:center;gap:8px;animation:introPop .4s .4s both}
+#intro .bot .btn{font-size:26px;padding:12px 30px 14px;color:var(--ink);border-width:3px;box-shadow:inset 0 -4px 0 var(--accent-d),inset 0 3px 0 var(--accent-l),4px 4px 0 var(--ink)}
+#intro .ver{font-size:14px;color:#fff3c4;text-align:center}
+#intro .wip{grid-column:1;grid-row:1;justify-self:start;display:flex;align-items:flex-end;gap:8px;animation:introPop .4s .6s both}
+#intro .wip svg{flex:none;width:60px;height:84px}
+#intro .wip p{margin:0 0 4px;max-width:300px;padding:6px 9px;background:var(--ink);border:3px solid var(--yellow);box-shadow:3px 3px 0 var(--ink);font-size:13px;line-height:1.35;text-align:left}
+#intro .wip b{color:var(--yellow)}
+#intro .cred{grid-column:3;grid-row:1;justify-self:end;display:flex;align-items:center;gap:8px;margin-bottom:4px;font-family:var(--f-disp);font-size:19px;animation:introPop .4s .7s both}
+#intro .cred svg{width:24px;height:28px;flex:none;filter:drop-shadow(2px 2px 0 var(--ink))}
+/* telefono in verticale e finestre strette: tutto in colonna; telefono in orizzontale: la riga del computer, più piccola */
+.mob:not(.land) #intro .road{display:flex;flex-direction:column;align-items:center;gap:10px;padding:26px 16px max(12px,env(safe-area-inset-bottom))}
+.mob:not(.land) #intro .bot{width:100%} .mob:not(.land) #intro .bot .btn{width:100%;max-width:340px}
+.mob #intro .wip svg{width:40px;height:56px} .mob:not(.land) #intro .wip p{max-width:none;font-size:12px}
+.mob #intro .cred{font-size:17px;margin:0}
+.land #intro .road{grid-template-columns:auto auto auto;justify-content:space-between;gap:8px 12px;padding:22px max(12px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.land #intro .bot{gap:4px} .land #intro .bot .btn{font-size:22px;padding:8px 22px 10px} .land #intro .ver{font-size:12px}
+.land #intro .wip p{max-width:200px;font-size:11px;padding:4px 7px} .land #intro .cred span{max-width:7em;line-height:1}
+@keyframes introEst{to{background-position:calc(-2304px*var(--k)) 0}}
+@keyframes introDrive{0%{transform:translateX(-110%)}60%,100%{transform:translateX(100vw)}}
+@keyframes introCloud{from{transform:translateX(-100%)}to{transform:translateX(100vw)}}
+@keyframes introBump{50%{transform:translateY(calc(-1px*var(--k)))}}
+@keyframes introRoad{to{background-position:-96px 0}}
 @keyframes introPop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){#intro *,#intro .truck svg{animation:none!important;opacity:1!important} #intro .truck{transform:translateX(-50%)!important}}
+@media (prefers-reduced-motion: reduce){#intro *,#intro .road::before{animation:none!important} #intro .truck{transform:translateX(calc(72vw - 50%))}}
 .news summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .news ul{margin:6px 0 0;padding-left:20px;line-height:1.45} .news h4{margin:10px 0 0;font-family:var(--f-disp);font-size:16px}
 /* schermata principale: insegna col camioncino, partite salvate, nuova partita, novità a tendina */
@@ -1276,7 +1287,7 @@ html,body{overscroll-behavior:none}
   <button class="optb" data-act="options" aria-label="Opzioni" title="Opzioni"><svg width="20" height="20" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="#16202e" d="M4 0h2v1h1v1h1v-1h1v1h1v1h-1v1h1v2h-1v1h1v1h-1v1h-1v-1h-1v1h-1v1h-2v-1h-1v-1h-1v1h-1v-1h-1v-1h1v-1h-1v-2h1v-1h-1v-1h1v-1h1v1h1v-1h1z"/><path fill="#d8e2ee" d="M4 1h2v1h1v1h1v4h-1v1h-1v1h-2v-1h-1v-1h-1v-4h1v-1h1z"/><path fill="#16202e" d="M4 4h2v2h-2z"/></svg></button>
   <div class="stats num" id="stats"></div>
   </div>
-  <span class="paused" id="paused" role="status"><span class="pz-t">In pausa</span><svg class="pz-trk" viewBox="0 0 16 10" width="32" height="20" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="0" width="10" height="8" fill="#16202e"/><rect x="1" y="1" width="8" height="5" fill="#f4f6f8"/><rect x="1" y="5" width="8" height="1" fill="#c9d3dd"/><rect x="9" y="2" width="6" height="6" fill="#16202e"/><rect x="10" y="3" width="4" height="4" fill="var(--accent)"/><rect x="10" y="6" width="4" height="1" fill="var(--accent-d)"/><rect x="12" y="3" width="2" height="2" fill="#9cd3f5"/><rect x="0" y="7" width="16" height="1" fill="#16202e"/><rect x="2" y="7" width="3" height="3" fill="#16202e"/><rect x="3" y="8" width="1" height="1" fill="#8a96a6"/><rect x="10" y="7" width="3" height="3" fill="#16202e"/><rect x="11" y="8" width="1" height="1" fill="#8a96a6"/></svg></span>
+  <button class="paused" id="paused" data-act="spdcycle" title="Pausa (spazio)"><span class="pz-t">In pausa</span><svg class="pz-trk" viewBox="0 0 16 10" width="32" height="20" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="0" width="10" height="8" fill="#16202e"/><rect x="1" y="1" width="8" height="5" fill="#f4f6f8"/><rect x="1" y="5" width="8" height="1" fill="#c9d3dd"/><rect x="9" y="2" width="6" height="6" fill="#16202e"/><rect x="10" y="3" width="4" height="4" fill="var(--accent)"/><rect x="10" y="6" width="4" height="1" fill="var(--accent-d)"/><rect x="12" y="3" width="2" height="2" fill="#9cd3f5"/><rect x="0" y="7" width="16" height="1" fill="#16202e"/><rect x="2" y="7" width="3" height="3" fill="#16202e"/><rect x="3" y="8" width="1" height="1" fill="#8a96a6"/><rect x="10" y="7" width="3" height="3" fill="#16202e"/><rect x="11" y="8" width="1" height="1" fill="#8a96a6"/></svg></button>
 </header>
 
 <nav id="dock" aria-label="Menu"></nav>
@@ -2455,7 +2466,7 @@ Panoramica: [[cassa]], utile e [[ricavi]] del mese scorso, [[reputazione]], clie
 
 I grafici si aggiornano alla fine di ogni mese, quando si chiudono i conti: ne servono almeno due per vedere una linea. I numeri di puntualità e accuratezza sono la media dei magazzini, non pesata sui volumi. Ogni riquadro si apre nell'enciclopedia.`);
 wk('tempo','basi','Tempo e ritmo',`Il tempo si conta a settimane. Per ora c'è un solo ritmo, Classica: pausa e una velocità, una settimana dura 7 secondi. I ritmi senza pausa torneranno con il gioco online.`,
-`Dietro le quinte il gioco ricalcola ogni giorno tutti i magazzini: [[puntualita]], [[accuratezza]], [[morale]], costi e ricavi. Ogni lunedì arriva il [[report]] della settimana, alla fine di ogni mese si chiudono i conti: [[soddisfazione]] dei clienti, [[penali]], [[conto|conto economico]] e prezzo del [[gasolio]]. Le durate (ricerche, assunzioni, cantieri, preavvisi) sono indicate in settimane; in alto ci sono il numero della settimana, il mese e l'anno.
+`Dietro le quinte il gioco ricalcola ogni giorno tutti i magazzini: [[puntualita]], [[accuratezza]], [[morale]], costi e ricavi. Ogni lunedì arriva il [[report]] della settimana, alla fine di ogni mese si chiudono i conti: [[soddisfazione]] dei clienti, [[penali]], [[conto|conto economico]] e prezzo del [[gasolio]]. Le durate (ricerche, assunzioni, cantieri, preavvisi) sono indicate in settimane; in alto ci sono il numero della settimana, il mese e l'anno. Per fermare il tempo o farlo ripartire ci sono i pulsanti II e › (sul telefono quello in basso, accanto al Menu), la barra spaziatrice e il riquadro in alto a destra: rosso con «In pausa» quando il gioco è fermo, verde col camioncino che passa quando il tempo scorre; un clic o un tocco lo cambia.
 
 Per ora si gioca solo in **Classica**: spazio (o il tasto 1) mette in pausa e fa ripartire il tempo, una settimana dura 7 secondi. Quando arriva un [[eventi|evento]] da decidere il tempo si ferma da solo finché non rispondi (si può togliere nelle Opzioni).
 
@@ -8662,7 +8673,7 @@ function initMapControls(){
   const up=e=>{ if(!pts.delete(e.pointerId)) return; mw.classList.remove('drag'); begin(); };
   mw.addEventListener('pointerup',up); mw.addEventListener('pointercancel',up);
   mw.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,view.s*(e.deltaY<0?1.15:1/1.15));},{passive:false});
-  addEventListener('resize',()=>{setMobile();fitMap();fitAllWins();renderNotes();});
+  addEventListener('resize',()=>{setMobile();fitMap();fitAllWins();renderNotes();introK();});
 }
 function renderMap(){
   const g=[], busy=mapBusy(), TM=tenMap(busy), AM=areaMap(busy);   // prima le puntine delle gare, poi le etichette delle zone
@@ -9024,7 +9035,7 @@ function renderTop(){
   if(cm){const m=modeOf(); ck.innerHTML=`<i></i>${MODES[m].n}${m==='persistente'&&HUM.clock?`<b class="sm" style="color:#c9d3dd">· domani tra ${clockLeft()}</b>`:''}`; ck.dataset.tip=`<div class='tt'>Tempo senza pausa: ${MODES[m].n}</div>${esc(MODES[m].d)} Se non rispondi a un evento entro due settimane, decide il tuo vice.`;}
   $('#coname').textContent=S.company.name; $('#cologo').innerHTML=coLogoSvg(S.company.logo,S.company.color,24);
   document.querySelectorAll('.spd button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===S.speed)));
-  {const pz=$('#paused'); pz.classList.toggle('run',S.speed!==0); pz.setAttribute('aria-label',S.speed?'Il tempo scorre':'In pausa');}
+  {const pz=$('#paused'); pz.classList.toggle('run',S.speed!==0); pz.disabled=cm; pz.title=cm?'':S.speed?'Pausa (spazio)':'Fai scorrere il tempo (spazio)'; pz.setAttribute('aria-label',cm?'Il tempo scorre senza pausa':S.speed?'Il tempo scorre: premi per la pausa':'In pausa: premi per far scorrere il tempo');}
   $('#pauseovl').hidden=S.speed!==0||!!S.over||cm;
   {const pb=$('#ppb'); pb.hidden=cm; pb.dataset.v=S.speed; pb.innerHTML=S.speed?PPB_PAUSE:PPB_PLAY; pb.setAttribute('aria-label',S.speed?'Il tempo scorre: tocca per la pausa':'In pausa: tocca per far scorrere il tempo');}
   const last=S.last?S.last.util:null;
@@ -11584,6 +11595,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.130',t:'Nuova schermata d\'avvio',x:['La schermata d\'avvio passa dalla notte al giorno: cielo azzurro con le nuvole, in fila i capannoni del gioco (vecchio, standard, moderno, frigorifero e innovativo) e il camioncino blu che passa. L\'avviso «lavori in corso» ora è un cartello stradale.','Mentre il gioco carica si vede solo il cielo: prima per un attimo compariva la mappa vuota.','Il riquadro in alto a destra (rosso «In pausa», verde col camioncino quando il tempo scorre) adesso è un pulsante: un clic o un tocco mette in pausa o fa ripartire il tempo.']},
  {v:'0.129',t:'Head hunter più comodo',x:['Nella scheda Head hunter le sei abilità sono una sotto l\'altra, ognuna con − e + sempre a destra e il minimo chiesto scritto accanto al nome. Il + su un\'abilità non chiesta la aggiunge, il − sotto 8 la toglie.']},
  {v:'0.128',t:'Head hunter: fino a tre abilità',x:['La scheda Head hunter ha un solo riquadro con le sei abilità: tocchi quella che ti serve e scegli il minimo con − e +.','Due nuove ricerche in Sviluppo aziendale, dopo l\'Ufficio del personale: «Recruiting» (15.000 €) permette di chiedere due abilità insieme, «Rete di head hunter» (35.000 €) tre. C\'è un tetto: la somma dei minimi non supera 34 punti con due abilità e 45 con tre. Ogni abilità in più costa dal 30% al 60% in più e allunga la ricerca.']},
  {v:'0.127',t:'Head hunter con due abilità',x:['All\'head hunter puoi chiedere anche una seconda abilità, col suo valore minimo: i tre profili le avranno tutte e due. La ricerca costa dal 30% al 60% in più e dura un po\' di più.']},
@@ -11734,18 +11746,27 @@ function introTruck(){let r='';const R=(x0,y0,x1,y1,c)=>{r+=`<rect x="${x0}" y="
   [10,44].forEach(x=>{R(x-2,40,x+2,47,K);R(x-3,41,x+3,46,K);R(x-1,42,x+1,45,TPAL.S);R(x,43,x,44,TPAL.D);});
   return `<svg viewBox="0 0 56 48" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
 // logo Happy Squid Inc. (lo stesso del sito): v viola, w bianco, k contorno
-// cartello di pericolo per l'avviso «lavori in corso» dello splash (12×12, contorno K, fascia scura y)
-const WIP_ICON=['.....KK.....','....KYYK....','....KYYK....','...KYKKYK...','...KYKKYK...','..KYYKKYYK..','..KYYKKYYK..','.KYYYKKYYYK.','.KYYYYYYYYK.','KyyyyKKyyyyK','KyyyyyyyyyyK','KKKKKKKKKKKK'];
 function squidLogo(){const P={v:'#9b6bff',w:'#fff',k:'#16202e'},G=['....vvvv....','...vvvvvv...','..vvvvvvvv..','.vvvvvvvvvv.','.vvvvvvvvvv.','.vwkvvvvwkv.','.vwkvvvvwkv.','.vvvkvvkvvv.','.vvvvkkvvvv.','vvvvvvvvvvvv','v.vv.vv.vv.v','v.v..vv..v.v','v..v.vv.v..v','.v..v..v..v.'];let r='';
   G.forEach((row,y)=>[...row].forEach((c,x)=>{if(P[c])r+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${P[c]}"/>`;}));
   return `<svg viewBox="0 0 12 14" shape-rendering="crispEdges" aria-hidden="true">${r}</svg>`;}
+// nuvoletta (24×6) e cartello «lavori in corso» (20×28) della schermata introduttiva, lettere di TPAL
+const INTRO_NUV=['......WWWWW.............','....WWWWWWWW..WWWW......','..WWWWWWWWWWWWWWWWWW....','.WWWWWWWWWWWWWWWWWWWWW..','WWWWWWWWWWWWWWWWWWWWWWWW','LLLLLLLLLLLLLLLLLLLLLLLL'];
+const INTRO_CART=['.........KK.........','........KYYK........','........KYYK........','.......KYYYYK.......','.......KYKKYK.......','......KYYKKYYK......','......KYYKKYYK......','.....KYYYKKYYYK.....','.....KYYYKKYYYK.....','....KYYYYKKYYYYK....','....KYYYYYYYYYYK....','...KYYYYYKKYYYYYK...','...KyyyyyKKyyyyyK...','..KyyyyyyyyyyyyyyK..','..KKKKKKKKKKKKKKKKK.',
+ '.........KK.........','.........sK.........','.........sK.........','.........sK.........','.........sK.........','.........sK.........','.........sK.........','.........sK.........','.........sK.........','.........sK.........','......KKKKKKKK......','......KRRRRRRK......','......KKKKKKKK......'];
+const pxSvgR=(rows,cls)=>`<svg class="${cls}" viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges" aria-hidden="true">${pxRects(pxGrid(rows))}</svg>`;
+// ingrandimento intero dei disegni dell'intro: i capannoni prendono poco più di un terzo dell'altezza
+function introK(){const el=$('#intro'); if(!el||!el.innerHTML) return;
+  el.style.setProperty('--k',Math.max(2,Math.min(6,Math.floor(innerHeight*.38/72),Math.floor(innerWidth/90))));}
 function showIntro(){
-  $('#intro').innerHTML=`<div class="ttl"><h1>FUP</h1><div class="sub">Fino all'ultimo pallet</div></div>
-   <div class="lane"><div class="truck"><div class="puff"></div>${introTruck()}</div></div>
-   <div class="road"><div class="bot"><button class="btn pri" data-act="introgo">${TOUCH?'Tocca':'Clicca'} per entrare</button><span class="ver">Versione ${VER} · ${esc(CHANGELOG[0].t)}</span>
-   <div class="wip">${pxSvg(WIP_ICON,24)}<span><b>Lavori in corso.</b> Il gioco è in sviluppo e non tutto funziona come dovrebbe… proprio come nelle vere logistiche.</span></div></div>
+  const nuv=(top,d)=>pxSvgR(INTRO_NUV,'cloud').replace('<svg ',`<svg style="top:${top};animation-delay:${d}s" `);
+  $('#intro').innerHTML=`<div class="sky">${nuv('12%',-12)}${nuv('46%',-40)}${nuv('26%',-64)}
+   <div class="logo"><h1>FUP</h1><p class="sub">Fino all'ultimo pallet</p></div></div>
+   <div class="row" aria-hidden="true"><div class="est5">${['vecchio1','standard1','moderno1','freddo1','innovativo1'].map(k=>SCENE['est_'+k]?`<i style="background-image:url(${SCENE['est_'+k]})"></i>`:'').join('')}</div>
+   <div class="truck">${introTruck()}</div></div>
+   <div class="road"><div class="bot"><button class="btn pri" data-act="introgo">${TOUCH?'Tocca':'Clicca'} per entrare</button><span class="ver">Versione ${VER} · ${esc(CHANGELOG[0].t)}</span></div>
+   <div class="wip">${pxSvgR(INTRO_CART,'cart')}<p><b>Lavori in corso.</b> Il gioco è in sviluppo e non tutto funziona come dovrebbe… proprio come nelle vere logistiche.</p></div>
    <div class="cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></div></div>`;
-  $('#intro').dataset.act='introgo';
+  $('#intro').dataset.act='introgo'; introK();
 }
 // carte della scelta: colore dell'abilità più forte, barre delle abilità, adesivo sulla carta scelta
 const topStat=st=>STATS.reduce((a,x)=>st[x.k]>st[a.k]?x:a,STATS[0]);
@@ -11994,7 +12015,7 @@ let lastSync=0; function syncTrucksMaybe(){if(S.day-lastSync>=7){lastSync=S.day;
 setMobile(); initMapControls(); cloudInit(); if(document.fonts) document.fonts.ready.then(layoutVars);
 const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot) hot.snapshot(()=>({S,uid}));
-function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
+function start(data){ if(data&&data.S){S=data.S;uid=data.uid||100;boot();} else{showStart();showIntro();} document.documentElement.classList.remove('boot'); fitMap(); requestAnimationFrame(loop); requestAnimationFrame(animTrucks); }
 if(hot&&hot.ready) hot.ready(start); else start(hot&&hot.data);
 window.__FUP={get S(){return S;},TIPF,calItems,calView,calNote,festa,pasqua,whInArea,meteoDanni,DANNI,afaK,annEvent,bdEvent,ANNI,CAL_C,itOn,itCost,itCeo,depFree,chronMiles,m40Prog,gdprStart,gdprOn,crusRisk,secMiss,frz,avvLive,WINS,POLICIES,genPerson,depAs,ingMag,ingPlan,ingMonth,ingMax,metOf,cantGg,ingTr,welBig,welWhy,welGg,ING,trEst,depRes,itAss,itSys,itNeed,itSupply,itCov,itLoad,itTarget,itTgt,itAff,itKoStart,itKoCands,itMonth,ITS,ITKO,sysObs,sysRec,updDue,avvCost,avvWhy,itFeeK,itFees,whSys,avvBusy,avvList,avvScore,avvProb,avvStart,avvBadOpts,AVV,DEP,DEPS,CONS,IT,depTeam,depOpen,depInn,techLine,lineProj,projs,innWhy,innOk,consSign,consStop,packApply,rentable,edilCls,techWeeks,DIR_ROLES,renderMap,AREE,areaShare,noteAlerts,TR,WV,ORD,trEst,trStart,trList,trDaily,trFx,trBusy,TR_EV,trEvShow,trEvDaily,trDelay,lsRent,lsLet,lsBack,leases,openWin,botMove,botUtil,trKmS,rivalFor,trDests,trClis,whEmpty,wvClose,wvPrice,wvBlock,ordCand,ordDay,ordDaily,DUR_RANK,durOf,INV,invScore,invFee,invTeam,invDaily,invDo,invBand,TUT_PREP,estOfSite,EST_SU,TUT,tutGo,tutStart,tutSteps,tutOn,DOT,WCLASS,EDIL,immFx,utenze,koStart,fuocoStart,koMonth,edilStart,edilDaily,dotStart,ristStart,siteOpen,rentable,whGara,instCost,evSnap,evEff,evApply,get UI(){return UI;},renderAll,SCENE,WSCN,estScena,EST_EL,SCN_EV,SCN_SRC,evScena,botThink,riUnionize,riOn,hdlTender,htPick,tavList,riPack,HDL,UNIONS,riTens,riCo,riW,hdlSet,hdlAvail,hdlInternal,riTavOpen,riSession,fascia,riWorld,riWorldDay,riTalpaFound,climaProg,WINS,lensL,mktList,negOffer,needOf,hhStart,hhUI,hhSum,hhQ,candById,signCand,MGR,mRank,mScore,ralOf,hhFee,cardsOff:()=>{UI.cardQ=[];hideCard();},get HUM(){return HUM;},step:stepWorld,stepOne:step,rivals,liveCo,withCo,newRival,checkWin,coValue,rev12,MODES,BOT_STYLE,catchUp,ageOf,people,gainTal,loseTal,staffLoad,planLoad,mod,fireEvent,newGame:(c,cc,cfg)=>{uid=1;newGame(c,'',COLORS[0][0],cc);HUM=S;S.cfg=cfg||{mode:'classica',win:{}};S.bots=[];packApply();},computeWH,bidEstimate,EVENTS,TECH,TREES,techIcon,clientLog,logoSvg,LOGO,STATS,statIcon,weekEnd,ACT,POLICIES,grievances,polOn,WIKI,rankOf,rankScore,TENDER_POOL,CEOS,save,KEY,SLOTS,slotKey,get slot(){return slot;},set slot(v){slot=v;},planNeed,csQual,csNeed,csEvent,csDaily,DRAMMI,CS,TALENTS,talMods,ccNew,ccCeo,ccLeft,ccErr,CO_LOGOS,ZONES,CINFO,ORIGINS,RANK_F,SITES,CITIES,newTender,freeZones,zoneW,certOk,fillSave,certAudit,certDaily,confOf,certState,coCertOk,AUD,QUAL,LINES,lineFor,lineStart,lineDaily,lineTender,certMiss,ispezione,csEvent,CRESC,cresStart,cresDone,cresDaily,B_STORY,debt,loanLimit,CL,CLOUD_IO,cloudSync,cloudUser,cloudFlush,cMeta,load,showStart};
 })();

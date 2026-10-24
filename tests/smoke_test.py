@@ -87,6 +87,7 @@ async def intro(pg, shot):
     # schermata introduttiva: il camioncino arriva, poi un tocco la chiude e resta la schermata iniziale
     await pg.wait_for_timeout(2900)
     await pg.screenshot(path=os.path.join(OUT, shot))
+    assert not await pg.evaluate("document.documentElement.classList.contains('boot')"), f'{shot}: copertura del caricamento rimasta accesa'
     assert await pg.evaluate(FITS, '#intro [data-act=introgo]'), f'{shot}: pulsante della schermata introduttiva fuori schermo'
     await pg.tap('#intro') if await pg.evaluate("navigator.maxTouchPoints>0") else await pg.click('#intro')
     await pg.wait_for_selector('#intro:empty', state='attached')
@@ -505,6 +506,10 @@ async def main():
         rc = await b.new_context(viewport={'width': 1440, 'height': 860}, reduced_motion='reduce'); rp = await rc.new_page(); await rp.goto('file://' + PAGE)
         assert not await rp.evaluate("document.documentElement.classList.contains('anim')"), 'con «riduci movimento» le animazioni devono partire spente'
         await rc.close()
+        # caricamento (0.130): prima che parta lo script si vede solo il cielo dello splash, non la mappa
+        nc = await b.new_context(viewport={'width': 1440, 'height': 860}, java_script_enabled=False); npg = await nc.new_page(); await npg.goto('file://' + PAGE)
+        assert await npg.evaluate("getComputedStyle(document.querySelector('#mapwrap')).visibility==='hidden'&&getComputedStyle(document.querySelector('#top')).visibility==='hidden'"), 'la mappa si vede mentre il gioco carica'
+        await nc.close()
         pg = await b.new_page(viewport={'width': 1440, 'height': 860})
         pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + PAGE)
@@ -591,6 +596,10 @@ async def main():
         bar = await pg.evaluate(BAR)
         assert bar['eq'] and bar['right'] and await pg.evaluate("document.querySelectorAll('#top .spd button').length") == 2, f'barra in alto {bar}'
         await pg.screenshot(path=os.path.join(OUT, 'shot_barra_pausa.png'), clip={'x': 0, 'y': 0, 'width': 1440, 'height': 120})
+        # il riquadro in alto a destra (rosso «In pausa», verde col camioncino) è un pulsante: un clic fa scorrere il tempo, un altro lo ferma
+        await pg.click('#paused'); sp1 = await pg.evaluate('window.__FUP.S.speed')
+        await pg.click('#paused'); sp2 = await pg.evaluate('window.__FUP.S.speed')
+        assert sp1 == 1 and sp2 == 0, f'pulsante della pausa in alto a destra: {sp1} {sp2}'
         # menu (0.69): 4 gruppi; su uno schermo grande parte largo, il pulsante in cima lo riduce a icone e la scelta resta
         m = await pg.evaluate("()=>{const d=document.querySelector('#dock'); return {wide:d.classList.contains('wide'), g:d.querySelectorAll('.dg').length, fit:d.getBoundingClientRect().bottom<=innerHeight, rows:[...d.querySelectorAll('[data-act=toggle] .dl small')].length};}")
         assert m['wide'] and m['g'] == 4 and m['fit'] and m['rows'] >= 10, f'menu largo: {m}'
