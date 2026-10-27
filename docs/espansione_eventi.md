@@ -168,6 +168,66 @@ Le scene pescate hanno anche i loro effetti (il Barolo da pagare, la cena gratis
 ### 6. e seguenti
 *(da dettare)*
 
+## Proposte di Claude (da approvare)
+Davide ha chiesto a Claude altre storie sullo stesso stile, anche a più puntate. Controllato che non ci siano già nel gioco base (che ha già, tra gli altri: il cane del capoturno, il gatto nero, il furto di gasolio, il parroco, il karaoke, la cena di Natale, il Superenalotto).
+Molte si agganciano alle altre storie: il mondo del pacchetto è uno solo, e le storie si incrociano.
+
+### A. Il bancale di nessuno (3 puntate)
+1. **All'inventario**: nella posizione 14-C-3 c'è un bancale avvolto nel film nero, senza etichetta, da almeno 11 mesi. Il WMS dice che lì non c'è niente. Risposte: lo apri / chiami i clienti uno per uno / lo lasci dov'è («prima o poi qualcuno lo reclama») / asta interna al buio tra i magazzinieri (morale +).
+2. **Dentro c'è…** (pescato): 2.000 paperelle di gomma; una Vespa del 1962; 40 forme di parmigiano stagionato 36 mesi; un flipper (finisce in mensa: morale +); scatoloni di videocassette di televendite; le carte di un'azienda fallita.
+3. **Il proprietario** (1-3 mesi dopo): si presenta un collezionista (se il bancale è intatto, ricompensa; se l'hai venduto, l'avvocato), oppure la Guardia di Finanza (merce di contrabbando: se l'hai aperto e segnalato, ringraziamenti; se l'hai tenuto, multa), oppure nessuno: dopo un anno è tuo, e finisce nella cronaca.
+- Scenetta nuova: i magazzinieri attorno al bancale nero, uno col taglierino.
+
+### B. Il fantasma della corsia 13 (2 puntate)
+1. **Il turno di notte non entra nella corsia 13**: le luci tremano, il lettore suona da solo, alle 3:12 qualcuno ha sentito una canzone di Sanremo del 1971. Più probabile nei capannoni vecchi e fatiscenti («una volta era una filanda»). Risposte: ci vai tu, di notte (serve Leadership) / l'elettricista (−500 €) / la troupe di «Misteri della Bassa» su TeleBassa (reputazione +2, ma il turno di notte ha più paura: morale −) / corsia chiusa (posti pallet −2%).
+2. **La verità** (2-4 settimane dopo), secondo cosa hai fatto: un barbagianni nel tetto (specie protetta: torna la volontaria degli Amici delle Zampe Bagnate); un ex magazziniere che dorme lì di notte perché ha perso la casa (lo assumi come guardiano?); il pickerista di TiccheTocc che gira una serie sul «magazzino infestato» (se la sua storia è aperta); il WMS che fa l'inventario di notte per un'impostazione sbagliata; oppure niente: il fantasma resta, e ogni anno si fa la festa di Halloween in banchina.
+- Scenetta nuova: la corsia buia, la torcia, un lenzuolo che fluttua.
+- Talento: **«Coraggio da turno di notte»** (Leadership +1; «Ha passato una notte nella corsia 13. Non dice cosa ha visto.»).
+
+### C. Il Gino non va in pensione (3 puntate)
+1. **Lunedì alle 5**: il Gino, carrellista da 41 anni, venerdì è andato in pensione con la torta. Lunedì alle 5 è al cancello col thermos: «A casa mia moglie mi fa pulire i vetri». Risposte: lo lasci fare, gratis (morale +3, ma non è assicurato) / contratto da consulente (−900 € al mese, accuratezza +0,5 nel magazzino) / istruttore dei carrellisti nuovi (imparano prima) / gentilmente a casa (morale −2).
+2. **Cosa succede dopo**: se lavora gratis, l'Ispettorato trova un pensionato sul muletto senza contratto (multa) oppure un piccolo incidente senza assicurazione; se è consulente o istruttore, i giovani lo chiamano «nonno» e l'accuratezza sale ancora; se l'hai mandato a casa, chiama la moglie: «Ridatemelo, non lo sopporto più».
+3. **Gli ottant'anni del Gino** (anni dopo, se è ancora con voi): festa in banchina con mezzo paese e il sindaco. Reputazione +2, morale +4.
+- Scenette: il piazzale all'alba (c'è già), la festa (c'è già).
+- Talento: il manager del magazzino può prendere **«Allievo del Gino»** (Operazioni +1; «Ha imparato a girare il muletto su una mattonella. Il Gino dice che ne bastava mezza.»).
+
+### D. Il Trofeo Forche d'Oro (3 puntate)
+1. **L'invito**: a primavera c'è il campionato italiano dei carrellisti, alla fiera di Bologna. Risposte: iscrivi il carrellista migliore (−1.500 € tra iscrizione e allenamenti, produttività un po' giù nel suo magazzino per un mese) / una squadra di tre (−4.000 €) / ti iscrivi tu (serve il talento «Patentino del muletto» o Operazioni alta) / non partecipi.
+2. **Le qualificazioni**: nello slalom tra i birilli si sceglie se rischiare (più veloce, ma i birilli cadono) o andare sul sicuro. Le probabilità salgono con le Operazioni del manager e con la Sicurezza muletti.
+3. **La finale**: vinci (reputazione +4, la coppa in banchina: morale + per molto tempo), arrivi secondo (reputazione +2), oppure squalificato per aver abbattuto la torre di bicchieri. Se in gara c'è anche il carrellista di un'avversaria, è lui il campione in carica.
+- Scenetta nuova: lo slalom col muletto tra i birilli, il pubblico sugli spalti.
+- Talento: **«Campione di muletto»** (Operazioni +1, Leadership +1) al CEO, se ha gareggiato e vinto.
+
+### E. Si gira! (3 puntate)
+1. **La proposta**: una casa di produzione vuole girare una settimana in un tuo magazzino per un giallo, «Il bancale insanguinato». Pagano 15.000 €. Risposte: tutta la settimana (+15.000 €, produttività −20% per una settimana) / solo di notte e nel fine settimana (+8.000 €) / sì, ma con una comparsata per il CEO (+8.000 €) / no.
+2. **Sul set** (pochi giorni dopo), un guaio pescato: l'attore protagonista vuole guidare il muletto «per essere credibile»; il regista vuole far esplodere un bancale di pomodori (di un cliente); le comparse sono i tuoi magazzinieri, che non tornano più al lavoro.
+3. **La prima** (un anno dopo): un successo (reputazione +3, gente che viene a fotografare il capannone), un disastro («il magazzino di quel film orrendo»: morale + per le risate), oppure il film finisce a un festival.
+- Scenetta nuova: il set davanti al capannone, luci, ciak, carrello della macchina da presa.
+- Talento: **«Ha fatto una comparsata»** (Negoziazione +1; «Tre secondi di film, di spalle. Lo riconosce solo sua madre. E lui, in ogni riunione.»).
+
+### F. La signora Pierina e il cicalino (3 puntate)
+1. **La lettera**: la vicina, signora Pierina, pensionata, scrive a penna (con copia al sindaco) per il «bip bip» dei camion in retromarcia alle 5 del mattino. Risposte: cicalini silenziosi e sensori (−3.000 €) / vai a trovarla con le paste (serve Negoziazione) / spieghi che il bip serve alla sicurezza / niente arrivi prima delle 7 (puntualità −1 per 3 mesi).
+2. **La raccolta firme** (se la ignori): nasce il comitato «Quiete in via dei Tigli», TeleBassa la intervista col binocolo in mano. Risposte: assemblea pubblica (Leadership o Negoziazione del CEO), barriera antirumore (−12.000 €), tiri dritto.
+3. **Il finale**: se tiri dritto, il Comune vieta i movimenti dalle 22 alle 6 (puntualità −2 per 6 mesi). Se invece l'hai conquistata con le paste, la signora Pierina diventa la migliore guardia del magazzino: di notte vede i ladri di gasolio e chiama i carabinieri. Da allora, ogni Natale le arriva il panettone.
+- Scenetta nuova: il balcone con la signora e il binocolo, il camion in retromarcia con il «BIP».
+- Talento: **«Diplomatico di condominio»** (Negoziazione +1) al CEO, se la conquista.
+
+### G. Dov'è finito Ottavio? (2 puntate)
+1. **Il bilico sparito**: Ottavio, autista con un carico per Verona, è sparito: telefono spento, GPS muto, dal cliente non è mai arrivato. Sei ore di ritardo. Risposte: denuncia ai carabinieri / aspetti fino a domani / chiami la moglie («Ah, allora non era da voi…») / mandi un altro camion col carico di riserva (si salva il cliente, ma costa).
+2. **Ricompare** (il giorno dopo), con una storia pescata: ha seguito il Giro d'Italia per tre tappe; è andato a Lourdes per un voto; si è addormentato in un'area di servizio col telefono scarico; si è innamorato della barista dell'autogrill di Fiorenzuola e vuole il trasferimento. Risposte: lo licenzi (e può partire la storia della porta) / richiamo / «ognuno ha il suo momento».
+- Scenetta: la strada (c'è già).
+
+### H. La scommessa (2 puntate, solo nelle partite con le avversarie)
+1. **Al convegno**: il CEO di un'avversaria ti sfida davanti a tutti: «Chi chiude l'anno con la puntualità più alta?». Risposte: in palio una cena per tutti i dipendenti del vincitore / chi perde guida il muletto in tutù nel magazzino dell'altro / 10.000 € in beneficenza / non accetti (sul Sole 24 Pallet: reputazione −1).
+2. **Il 31 dicembre**: vince chi ha davvero la puntualità più alta, con i numeri della partita. Se vinci: reputazione +2, morale +3. Se perdi: paghi, e il video del tutù gira su TiccheTocc.
+- Scenette: la trattoria (c'è già), la festa (c'è già).
+
+### I. Il formatore motivazionale (2 puntate)
+1. **La proposta**: il «dottor Massimo Potenziale», formatore motivazionale, propone una giornata per i manager. Risposte: camminata sui carboni ardenti (−6.000 €) / rafting sul Sesia (−4.000 €) / escape room (−1.500 €) / no, grazie.
+2. **Com'è andata**: sui carboni, tre vesciche e una pratica INAIL, ma chi ce l'ha fatta si sente invincibile; nel rafting si rovescia il gommone dei manager e il direttore commerciale perde il telefono con tutti i numeri dei clienti; nell'escape room ci mettono tre ore invece di una, e il magazzino aspetta.
+- Scenetta: la festa (c'è già), oppure una nuova.
+- Talento: **«Ha camminato sui carboni»** (Leadership +1, Precisione −1; «Dice che dopo i carboni un buyer non fa paura. Ha ancora le vesciche.»).
+
 ## Riepilogo
 
 ### Talenti nuovi
@@ -197,7 +257,9 @@ Ognuno vuole il suo disegno nelle icone (come tutti i talenti) e la sua voce nel
 Le scenette che esistono già e si possono riusare: magazzino, piazzale, ufficio, ufficio di notte, festa, sciopero, trattativa, ispezione, edicola, strada, trattoria, talento, pioggia, neve, nebbia, golf, ministero.
 
 ## Domande aperte per Davide
-Nessuna, per ora. Decisi con Davide: la lontra arriva in qualunque magazzino; il tiranno è solo un manager di magazzino; la porta sparisce anche quando si licenzia un manager; la cena nelle Langhe e i talenti proposti vanno bene così.
+- Quali proposte di Claude (A-I) tenere, quali cambiare e quali buttare.
+
+Già decisi con Davide: la lontra arriva in qualunque magazzino; il tiranno è solo un manager di magazzino; la porta sparisce anche quando si licenzia un manager; la cena nelle Langhe e i talenti proposti vanno bene così.
 
 ## Note per quando scriveremo il codice
 - Pacchetto in `PACKS` (con il suo `S.cfg`; id proposto `sh`), stemma `pk_sh` in `tools/loghi_pxl/pacchetti.px.js`, voce `shift_happens` nell'enciclopedia.
