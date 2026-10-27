@@ -2,7 +2,7 @@
 
 **Stato: raccolta delle idee.** Davide detta gli eventi uno alla volta, man mano che gli vengono in mente; qui si mettono in ordine e si completano con le proposte.
 **Niente codice** finché tutti gli eventi e gli elementi non sono chiari (decisione di Davide).
-Nome del pacchetto ancora da scegliere (proposte in fondo, tra le domande). I numeri sono una prima proposta, tarata su quelli degli eventi che esistono già (morale, reputazione, soldi).
+Nome del pacchetto ancora da scegliere (proposte in fondo, tra le domande; Davide ne vuole anche qualcuno in inglese). I numeri sono una prima proposta, tarata su quelli degli eventi che esistono già (morale, reputazione, soldi).
 
 ## L'idea in breve
 Un'espansione fatta solo di storie: niente meccaniche nuove da imparare, ma eventi più rari, più lunghi e più memorabili di quelli del gioco base.
@@ -14,10 +14,12 @@ Alcuni si chiudono subito; altri aprono una **storia a puntate**: la scelta di o
 3. **Lo stesso evento non può succedere due volte nella stessa partita.**
 4. **Alcuni eventi aprono una storia a puntate** (side story).
 5. **Talenti nuovi**, legati alle storie.
+6. **Ritmo**: in media una storia ogni 4-6 mesi, con un orologio separato da quello degli eventi base.
+7. **Il social network si chiama TiccheTocc**, anche nell'evento base dell'autista che balla sul cassone (oggi scritto col nome vero): lo cambiamo insieme al pacchetto.
 
-## Come funziona (proposta, da confermare)
+## Come funziona (proposta; il ritmo è deciso)
 - **Si accende nel passo «Pacchetti»**, come Relazioni industriali e Reparto IT. Spento, il gioco resta com'è. Serve uno stemma nuovo per il pacchetto.
-- **Ritmo**: le storie del pacchetto hanno un orologio tutto loro, più lento di quello degli eventi base (oggi uno ogni 30-55 giorni). Proposta: **in media una storia ogni 4-6 mesi**, mai a meno di 3 settimane da un altro evento. Le puntate successive di una storia non contano: arrivano quando devono.
+- **Ritmo**: le storie del pacchetto hanno un orologio tutto loro, più lento di quello degli eventi base (oggi uno ogni 30-55 giorni). **In media una storia ogni 4-6 mesi** (deciso), mai a meno di 3 settimane da un altro evento. Le puntate successive di una storia non contano: arrivano quando devono.
   In una partita di vent'anni sono 40-50 storie: tante quante dovremo scriverne per non restare a secco. Se finiscono, il pacchetto tace.
 - **Una volta per partita**: una storia uscita non torna più, nemmeno dopo anni.
 - **Puntate**: una risposta può lasciare un seguito, che arriva dopo un certo tempo solo se ha ancora senso (la persona è ancora in azienda, il magazzino esiste ancora). Il seguito **non si vede sul calendario**: è una sorpresa. Mentre la storia è aperta, le puntate possono cambiare secondo le scelte fatte prima.
@@ -48,11 +50,11 @@ Alcuni si chiudono subito; altri aprono una **storia a puntate**: la scelta di o
 - **Talento nuovo**: il manager del magazzino, se la lontra esce senza danni, può prendere **«Sussurratore di lontre»** (Leadership +1, Operazioni −1; «Da quella volta tiene una sardina in tasca. Per sicurezza.»).
 - **Scenetta**: dedicata, *la lontra in magazzino*: corsia tra gli scaffali, la lontra che corre tra i bancali, un magazziniere con la scopa che la insegue.
 
-### 2. Il pickerista famoso su Ticchetoc
-*Idea di Davide: un magazziniere diventa famoso su Ticchetoc, noto social network, raccontando la sua vita da pickerista. Nasce un problema di sicurezza, ma il suo morale alto porta tanta bella pubblicità all'azienda… fino a che.*
+### 2. Il pickerista famoso su TiccheTocc
+*Idea di Davide: un magazziniere diventa famoso su TiccheTocc, noto social network, raccontando la sua vita da pickerista. Nasce un problema di sicurezza, ma il suo morale alto porta tanta bella pubblicità all'azienda… fino a che.*
 
 - **Quando**: dal 2019 in poi (quando questi social sono esplosi anche in Italia), in un magazzino con magazzinieri assunti da noi.
-- **Nota**: nel gioco base c'è già un evento simile, l'autista che balla sul cassone «virale su TikTok». Questo è diverso (è una storia a puntate, ed è un magazziniere), ma il nome vero del social non rispetta la regola delle parodie: proposta di chiamarlo **Ticchetoc** anche nell'evento base.
+- **Nota**: nel gioco base c'è già un evento simile, l'autista che balla sul cassone «virale su TikTok». Questo è diverso (è una storia a puntate, ed è un magazziniere). Deciso: il social si chiama **TiccheTocc** anche nell'evento base, per rispettare la regola delle parodie.
 - **Il racconto**: «@pickerista_della_bassa» ha 400.000 follower. Racconta i suoi 18 km a turno, i clienti che ordinano 1 pezzo alla volta, il capoturno che fischia. Le candidature spontanee arrivano a pacchi. Però filma mentre lavora: telefono in mano sul transpallet, auricolari, una volta è salito sullo scaffale per l'inquadratura.
 - **Risposte**:
 
@@ -63,7 +65,7 @@ Alcuni si chiudono subito; altri aprono una **storia a puntate**: la scelta di o
 | **Diventa il volto dell'azienda** | −1.500 € (telefono nuovo e luci), reputazione +5, morale +3, assunzioni molto più veloci per un anno. Il rischio della puntata 2 è alto. |
 | **Lasci fare** | Reputazione +3. Il rischio resta quello di oggi. |
 
-- **«…fino a che»**, puntata 2 (2-6 mesi dopo), una tra queste (da scegliere con Davide; si possono tenere tutte e pescarne una):
+- **«…fino a che»**, puntata 2 (2-6 mesi dopo). Deciso: **si tengono tutti e cinque i finali** e il gioco ne pesca uno. La risposta di prima cambia le probabilità: col «volto dell'azienda» l'incidente, il video sul capo e lo sponsor sono più facili; con le «regole chiare» l'incidente quasi sparisce; coi «telefoni negli armadietti» resta solo «Lo portano via».
   1. **L'incidente in diretta**: cade dalla scala mentre filma. Infortunio, ispezione, e il video più visto della sua vita, per il motivo sbagliato.
   2. **La merce segreta**: in un video si vede l'etichetta di un prodotto che il cliente non ha ancora lanciato. Il cliente è furioso: soddisfazione giù e la clausola di riservatezza in mano agli avvocati.
   3. **Il video sul capo**: ormai è più famoso dell'azienda e pubblica un video ironico sul CEO (o sugli stipendi). Reputazione giù; col pacchetto Relazioni industriali, agitazione su.
@@ -115,7 +117,54 @@ Alcuni si chiudono subito; altri aprono una **storia a puntate**: la scelta di o
 - **Talenti**: nessuno per lui, che se ne va. Da decidere se serve.
 - **Scenetta**: dedicata, *la porta*: il piazzale, un omino che si allontana con la porta sulla schiena, il vano vuoto dietro.
 
-### 5. e seguenti
+### 5. La cena nelle Langhe
+*Idea di Davide: la cena aziendale nelle Langhe, che finisce con tutti ubriachi.*
+
+- **Quando**: ottobre o novembre, la stagione del tartufo e del vino nuovo (la cena di Natale c'è già nel gioco base, a dicembre). Dal secondo anno di gioco, con almeno due manager in azienda.
+- **Due puntate**: prima si organizza la cena, poi arriva «la mattina dopo». Come si organizza decide quanto è grave il dopo, ma la fine è sempre quella: tutti ubriachi.
+
+**Puntata 1, «La cena aziendale»**: il direttore del personale (o il CEO) porta tre preventivi. Le risposte:
+
+| Risposta | Effetto proposto |
+|---|---|
+| **Agriturismo a La Morra, vino della casa a volontà, pullman per tutti** | −45 € a persona, −1.200 € di pullman. Morale +4 per 2 mesi. Tutti tornano a casa sani e salvi. |
+| **Ristorante elegante ad Alba, tartufo e sommelier** | −110 € a persona. Morale +6 per 2 mesi, reputazione +1. Il sommelier, però, non smette mai di versare. |
+| **Agriturismo, ognuno con la sua macchina** | −45 € a persona. Morale +4 per 2 mesi. Rischio: al ritorno qualcuno viene fermato (puntata 3). |
+| **Quest'anno niente cena: si brinda in mensa, analcolico** | −8 € a persona, morale −2. Ma un carrellista ha portato la damigiana dello zio: si finisce ubriachi lo stesso, in mensa, di martedì. |
+
+**Puntata 2, «La mattina dopo»** (il giorno dopo la cena): il racconto mette insieme tre scene pescate da un elenco, scelte tra quelle che hanno senso nella partita. Per esempio:
+- il direttore commerciale ha promesso al buyer di un cliente, invitato all'ultimo, uno sconto del 15% «sulla parola» (apre la puntata 3);
+- un carrellista ha comprato all'asta della cantina un Barolo del 1978 con la carta aziendale: 2.400 €;
+- il CEO ha ballato sul tavolo, e qualcuno ha filmato (se la storia del pickerista su TiccheTocc è aperta, il video l'ha pubblicato lui);
+- il manager tiranno (se la sua storia è aperta) piange e abbraccia tutti: «Vi voglio bene, ragazzi»;
+- chi ha il talento «Re del karaoke» ha cantato «Romagna mia» undici volte; col pacchetto Relazioni industriali, in coro col delegato sindacale;
+- chi è «Vegano convinto» ha mangiato solo il pane e ha guidato il trenino attorno al pullman per quaranta minuti;
+- un magazziniere si è addormentato tra i filari: l'hanno trovato i vendemmiatori alle 7;
+- l'impiegata dell'amministrazione ha vinto a morra contro il proprietario dell'agriturismo: la cena è gratis;
+- alle 6, in banchina, c'erano solo in due.
+
+Le risposte:
+
+| Risposta | Effetto proposto |
+|---|---|
+| **«Quello che succede nelle Langhe resta nelle Langhe»** | Nessun costo, morale +2 in più. Il video del tavolo, se c'è, gira lo stesso. |
+| **Mezza giornata libera per tutti** | Puntualità −3 per un giorno in tutti i magazzini, morale +3. |
+| **Caffè doppio e tutti al lavoro alle 6** | Puntualità −1 e accuratezza −2 per 2 giorni (pallet sbagliati a raffica), morale −2. |
+| **Lettere di richiamo a chi ha esagerato** | Morale −4. Il conto del Barolo lo paga chi l'ha comprato. |
+
+Le scene pescate hanno anche i loro effetti (il Barolo da pagare, la cena gratis, il video del CEO: reputazione −1 o +1, a seconda di come la prende la gente).
+
+**Puntata 3** (solo se serve, 2-6 settimane dopo), una tra queste:
+- **«Il buyer si ricorda tutto»**: il cliente chiede lo sconto del 15% promesso alla cena. Lo concedi (soddisfazione +10, ricavi del contratto −15% fino al rinnovo) o fai finta di niente (soddisfazione −8).
+- **«Il palloncino»**: con le macchine, un autista è stato fermato al ritorno. Patente sospesa: un autista in meno per 3 mesi, e la cena finisce sul giornale (reputazione −2).
+
+- **Talenti nuovi**:
+  - **«Regge il vino»** (Negoziazione +2; «Al terzo bicchiere chiude i contratti. Al quinto li migliora.»): a chi è rimasto in piedi fino alla fine, un manager o il CEO.
+  - **«Ha ballato sul tavolo»** (Leadership −1; nel magazzino che guida morale +2; «Il video gira ancora nelle chat dei carrellisti. Quando entra in banchina, applaudono.»): a chi è finito nel video.
+  - **«Astemio»** (Precisione +1, Negoziazione −1; «Era l'unico sobrio. Ha visto tutto, e se lo ricorda.»): può uscire anche tra i candidati, solo col pacchetto.
+- **Scenetta**: dedicata, *la cena nelle Langhe*: una tavolata sotto il pergolato, le colline coi filari e le lucine della sera, i bicchieri che si alzano a tempo, uno che balla sul tavolo, il pullman in fondo. Per «la mattina dopo» la banchina vuota con due magazzinieri con gli occhiali da sole (nuova anche questa, oppure il magazzino che c'è già).
+
+### 6. e seguenti
 *(da dettare)*
 
 ## Riepilogo
@@ -125,9 +174,12 @@ Alcuni si chiudono subito; altri aprono una **storia a puntate**: la scelta di o
 | Talento | Da quale storia | Tipo | Effetto proposto |
 |---|---|---|---|
 | Sussurratore di lontre | La lontra | misto | Leadership +1, Operazioni −1 |
-| Influencer della banchina | Ticchetoc | misto | Negoziazione +2, Leadership +1, Precisione −2 |
+| Influencer della banchina | TiccheTocc | misto | Negoziazione +2, Leadership +1, Precisione −2 |
 | Tiranno da banchina | Il manager tiranno | negativo | Operazioni +2, Leadership −3; nel magazzino: produttività +5%, morale −6 |
 | Ha fatto il corso sulla rabbia | Il manager tiranno | positivo | Leadership +1 |
+| Regge il vino | La cena nelle Langhe | positivo | Negoziazione +2 |
+| Ha ballato sul tavolo | La cena nelle Langhe | misto | Leadership −1; nel magazzino: morale +2 |
+| Astemio | La cena nelle Langhe (e tra i candidati) | misto | Precisione +1, Negoziazione −1 |
 
 Ognuno vuole il suo disegno nelle icone (come tutti i talenti) e la sua voce nell'enciclopedia.
 
@@ -136,21 +188,20 @@ Ognuno vuole il suo disegno nelle icone (come tutti i talenti) e la sua voce nel
 | Evento | Scenetta |
 |---|---|
 | La lontra (tutte le puntate) | nuova: la lontra in magazzino |
-| Ticchetoc | nuova: il pickerista in diretta; l'incidente con l'ispezione che c'è già |
+| TiccheTocc | nuova: il pickerista in diretta; l'incidente con l'ispezione che c'è già |
 | Il manager tiranno | nuova: l'urlo (oppure l'ufficio che c'è già) |
 | La porta | nuova: la porta in spalla |
+| La cena nelle Langhe | nuova: la tavolata nelle Langhe; per la mattina dopo nuova (la banchina vuota) o il magazzino che c'è già |
 
 Le scenette che esistono già e si possono riusare: magazzino, piazzale, ufficio, ufficio di notte, festa, sciopero, trattativa, ispezione, edicola, strada, trattoria, talento, pioggia, neve, nebbia, golf, ministero.
 
 ## Domande aperte per Davide
-1. **Nome del pacchetto.** Proposte: «Storie di banchina», «Si dice in banchina», «Cronache dal piazzale».
-2. **Ritmo**: va bene una storia ogni 4-6 mesi, con un orologio separato dagli eventi base? Oppure le mettiamo nello stesso sorteggio degli eventi base?
-3. **La lontra**: solo lungo il Ticino e in Friuli, o in qualunque magazzino?
-4. **Ticchetoc**: quale «fino a che…» preferisci? Uno solo, o tutti e il gioco ne pesca uno?
-5. **Ticchetoc**: rinominiamo «TikTok» anche nell'evento base dell'autista?
-6. **Il manager tiranno**: solo chi guida un magazzino, o anche chi guida il customer service e i reparti?
-7. **La porta**: anche quando licenzi un manager?
-8. **Talenti**: vanno bene quelli proposti? Ne vuoi altri anche fuori dalle storie (che escono tra i candidati, solo col pacchetto)?
+1. **Nome del pacchetto.** Proposte in italiano: «Voci di corsia» (le voci di corridoio, ma tra le corsie del magazzino), «Pallet e pettegolezzi», «Fatti e misfatti», «Storie di banchina», «Cronache dal piazzale». In inglese, nello stile dei pacchetti Paradox: «Shift Happens» (il turno, *shift*, al posto di una parola meno educata), «Pallets & Perils», «Tales from the Dock».
+2. **La lontra**: solo lungo il Ticino e in Friuli, o in qualunque magazzino?
+3. **Il manager tiranno**: solo chi guida un magazzino, o anche chi guida il customer service e i reparti?
+4. **La porta**: anche quando licenzi un manager?
+5. **Cena nelle Langhe**: tre preventivi più la mensa vanno bene? Le scene della mattina dopo ti fanno ridere, o ne vuoi altre?
+6. **Talenti**: vanno bene quelli proposti? Ne vuoi altri anche fuori dalle storie (che escono tra i candidati, solo col pacchetto)?
 
 ## Note per quando scriveremo il codice
 - Pacchetto in `PACKS` (con il suo `S.cfg`), stemma `pk_<id>` in `tools/loghi_pxl/pacchetti.px.js`.
