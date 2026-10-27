@@ -4,6 +4,8 @@ una striscia di 16 fotogrammi 160x72 da 125 ms l'uno, che il gioco fa scorrere c
 build.py le incorpora tutte al posto di {{SCENE}}. Le scene che si chiamano prova_* o test_* restano fuori.
 Le scene el_* (elementi da mettere sopra un esterno di magazzino) sono trasparenti fuori dall'elemento: restano con la trasparenza.
 Gli esterni (est_*) e i loro strati (el_*) si disegnano su 160x72 ma si tagliano a x 8..151: nel gioco sono 144x72, un po' meno allungati.
+I pezzi dell'ingresso (hall_*, interno del magazzino della schermata principale) hanno misura libera e la trasparenza;
+se non si muovono restano un'immagine sola, altrimenti sono una striscia di 16 fotogrammi come le scene.
 Uso: python3 tools/scene_pxl/esporta.py            (tutti i file; toglie le scene che non esistono più)
      python3 tools/scene_pxl/esporta.py eventi.px.js  (solo quei file)"""
 import os, shutil, subprocess, sys
@@ -39,13 +41,17 @@ fatte = []
 for f in sorted(os.listdir(os.path.join(OUT, 'scenes'))):
     nome, ext = os.path.splitext(f)
     if ext != '.png' or nome.startswith(('prova', 'test')): continue
+    hall = nome.startswith('hall_')
+    if hall and not os.path.exists(os.path.join(OUT, 'scenes', nome + '.gif')):   # pezzo fermo: l'immagine così com'è
+        shutil.copy(os.path.join(OUT, 'scenes', f), os.path.join(DEST, f))
+        fatte.append(f'{nome} ({os.path.getsize(os.path.join(DEST, f)) // 1024 + 1} KB)'); continue
     if not os.path.exists(os.path.join(OUT, 'scenes', nome + '.gif')): sys.exit(f'{nome}: la scena non si muove (serve almeno una cosa animata)')
-    el = nome.startswith('el_')
+    el = nome.startswith('el_') or hall
     fr = frames(nome, 'RGBA' if el else 'RGB')
-    if len(fr) != N or fr[0].size != (W, H): sys.exit(f'{nome}: servono {N} fotogrammi da {MS} ms di {W}x{H}, ne ho {len(fr)} da {fr[0].size}')
-    if el or nome.startswith('est_'): fr = [x.crop((TAGLIO, 0, W - TAGLIO, H)) for x in fr]
-    w = fr[0].size[0]
-    st = Image.new('RGBA' if el else 'RGB', (w * N, H))
+    if len(fr) != N or (fr[0].size != (W, H) and not hall): sys.exit(f'{nome}: servono {N} fotogrammi da {MS} ms di {W}x{H}, ne ho {len(fr)} da {fr[0].size}')
+    if (el and not hall) or nome.startswith('est_'): fr = [x.crop((TAGLIO, 0, W - TAGLIO, H)) for x in fr]
+    w, h = fr[0].size
+    st = Image.new('RGBA' if el else 'RGB', (w * N, h))
     for i, x in enumerate(fr): st.paste(x, (w * i, 0))
     if el:   # elemento trasparente: PNG con la trasparenza, i pixel o sono pieni o non ci sono
         st.save(os.path.join(DEST, nome + '.png'), optimize=True)

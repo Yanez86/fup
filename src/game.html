@@ -878,20 +878,92 @@ html.boot,html.boot body{background:#5fb4f0} html.boot body>*:not(#intro){visibi
 @keyframes introRoad{to{background-position:-96px 0}}
 @keyframes introPop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion: reduce){#intro *,#intro .road::before{animation:none!important} #intro .truck{transform:translateX(calc(72vw - 50%))}}
-.news summary{cursor:pointer;font-weight:600;min-height:32px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.news ul{margin:6px 0 0;padding-left:20px;line-height:1.45} .news h4{margin:10px 0 0;font-family:var(--f-disp);font-size:16px}
-/* schermata principale: insegna col camioncino, partite salvate, nuova partita, novità a tendina */
-#start .box.home{max-width:780px}
-.hm-hero{position:relative;height:196px;background:var(--ink3);border-bottom:3px solid var(--ink2);overflow:hidden}
-.hm-bar{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;gap:8px;padding:7px 14px;background:var(--ink);color:var(--line);font-family:var(--f-disp);font-size:15px}
-.hm-ttl{position:absolute;left:28px;top:50px;display:flex;flex-direction:column;gap:6px}
-#start .hm-ttl h1{font-size:72px;font-weight:700;line-height:.9;color:#fff;letter-spacing:2px;text-shadow:4px 4px 0 var(--accent),7px 7px 0 var(--ink2)}
-.hm-ttl .sub{font-family:var(--f-disp);font-size:22px;color:var(--yellow);text-shadow:2px 2px 0 var(--ink2)}
-.hm-truck{position:absolute;right:64px;bottom:26px;width:168px;height:144px}.hm-truck svg{display:block;width:100%;height:100%}
-.hm-road{position:absolute;left:0;right:0;bottom:0;height:26px;border-top:3px solid var(--ink4);background:var(--ink) repeating-linear-gradient(90deg,var(--yellow) 0 24px,transparent 24px 48px) 0 50%/100% 4px no-repeat}
-.hm-b{padding:24px 28px 28px;display:flex;flex-direction:column;gap:18px}
-.hm-h{display:flex;align-items:center;gap:10px}.hm-h h2{margin:0;font-family:var(--f-disp);font-size:26px;font-weight:600}
-.hm-n{padding:1px 8px;background:var(--ink);color:#fff;font-family:var(--f-disp);font-size:15px}
+/* la serranda (0.131): al clic scende sulla schermata introduttiva e si rialza sull'interno del magazzino (ACT.introgo) */
+#intro.up{background:transparent;pointer-events:none;cursor:default}
+#intro .serr{position:absolute;inset:0;z-index:5;transform:translateY(-101%);box-shadow:0 calc(2px*var(--k)) 0 rgba(12,19,29,.35);
+  background:linear-gradient(var(--ink),var(--ink)) 0 100%/100% calc(2px*var(--k)) no-repeat,linear-gradient(#4a5f7a,#4a5f7a) 0 calc(100% - 2px*var(--k))/100% calc(5px*var(--k)) no-repeat,
+   repeating-linear-gradient(180deg,#e6eef3 0 calc(1px*var(--k)),#c3d0dc calc(1px*var(--k)) calc(5px*var(--k)),#8a96a6 calc(5px*var(--k)) calc(6px*var(--k)),#4a5f7a calc(6px*var(--k)) calc(7px*var(--k)))}
+#intro .serr::before{content:'1';position:absolute;left:50%;top:16%;width:calc(16px*var(--k));height:calc(16px*var(--k));transform:translateX(-50%);box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+  background:#fff;border:calc(1px*var(--k)) solid var(--ink);box-shadow:calc(1px*var(--k)) calc(1px*var(--k)) 0 rgba(12,19,29,.35);font-family:var(--f-disp);font-size:calc(14px*var(--k));line-height:1;color:var(--ink)}
+#intro .serr::after{content:'';position:absolute;left:50%;bottom:calc(9px*var(--k));width:calc(14px*var(--k));height:calc(3px*var(--k));transform:translateX(-50%);background:var(--ink);box-shadow:inset 0 calc(1px*var(--k)) 0 #8a96a6}
+#intro.go .serr{animation:serrDn .55s cubic-bezier(.55,0,1,.45) forwards}
+#intro.up .serr{animation:serrUp .6s cubic-bezier(.5,0,.75,0) forwards}
+@keyframes serrDn{0%{transform:translateY(-101%)}80%{transform:translateY(0)}90%{transform:translateY(calc(-2px*var(--k)))}100%{transform:translateY(0)}}
+@keyframes serrUp{from{transform:translateY(0)}to{transform:translateY(-101%)}}
+
+/* Schermata principale (0.131): l'interno del magazzino (.hall, pezzi hall_* a un ingrandimento intero --k, hallK()) resta dietro
+   a tutte le schermate prima della partita; nella principale i cartelli appesi (.hc) e i riquadri (.hm-pan) che si aprono sopra */
+#start .hall{position:fixed;inset:0;overflow:hidden;background:#7f95b0;pointer-events:none}
+#start .hall>*{position:absolute;display:block}
+#start .hall::after{content:'';position:absolute;inset:0;background:rgba(8,16,30,.62);transition:opacity .3s}
+#start.st-home .hall::after{opacity:0} #start.st-home.st-pan .hall::after{opacity:.8}
+.hall .h-sca,.hall .h-sof,.hall .h-pav,.hall .h-fr{image-rendering:pixelated;background-repeat:no-repeat}
+.hall .h-sca{left:0;right:0;top:0;bottom:calc(40px*var(--k));box-shadow:inset 0 0 0 100vmax rgba(22,32,46,.12);background-repeat:repeat;background-size:calc(160px*var(--k)) calc(72px*var(--k));background-position:50% 100%}
+.hall .h-sof{left:0;right:0;top:0;height:calc(27px*var(--k));background-repeat:repeat-x;background-size:calc(160px*var(--k)) 100%;background-position:50% 0}
+.hall .h-pav{left:0;right:0;bottom:0;height:calc(40px*var(--k));background-repeat:repeat-x;background-size:calc(160px*var(--k)) 100%;background-position:50% 0}
+.hall .h-fr{display:block;width:var(--w);height:var(--h);background-size:calc(var(--w)*16) 100%;animation:hallFr 2s steps(16) infinite}
+.hall .h-tra{--w:calc(37px*var(--k));--h:calc(26px*var(--k));left:max(3%,8px);bottom:calc(8px*var(--k))}
+.hall .h-can{--w:calc(15px*var(--k));--h:calc(14px*var(--k));right:max(6%,12px);bottom:calc(12px*var(--k));animation-delay:-.6s}
+.hall .h-mul{left:0;bottom:calc(4px*var(--k));transform:translateX(100vw);animation:hallDrive 19s 1.5s linear infinite}
+.hall .h-mul i{--w:calc(33px*var(--k));--h:calc(33px*var(--k))}
+@keyframes hallFr{to{background-position:calc(var(--w)*-16) 0}}
+@keyframes hallDrive{0%{transform:translateX(100vw)}60%,100%{transform:translateX(-100%)}}
+#start.st-home{padding:0}
+#start .st-in{position:relative}
+.hm{min-height:100vh;min-height:100dvh;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;padding:calc(17px*var(--k)) max(16px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.hm-st{--gap:18px;width:min(560px,100%);display:flex;flex-direction:column;gap:var(--gap);margin-top:calc(5px*var(--k))}
+.hm-tit{position:relative;align-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 28px 14px;background:var(--ink);border:3px solid var(--ink2);box-shadow:inset 0 0 0 3px var(--ink),inset 0 0 0 5px var(--yellow),5px 5px 0 rgba(12,19,29,.45)}
+#start .hm-tit h1{padding-left:.06em;font-size:64px;font-weight:400;line-height:.8;letter-spacing:.06em;color:var(--yellow);text-shadow:4px 4px 0 var(--accent-d)}
+.hm-tit .sub{font-family:var(--f-disp);font-size:22px;line-height:1;color:#fff3c4}
+.hm-tit::before,.hm-tit::after,.hc::before,.hc::after{content:'';position:absolute;bottom:100%;width:8px;height:calc(var(--gap) + 6px);margin-bottom:-3px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 6' shape-rendering='crispEdges'%3E%3Cpath fill='%2316202e' d='M1 0h2v1H1zM0 1h1v2H0zM3 1h1v2H3zM1 3h2v3H1z'/%3E%3Cpath fill='%238a96a6' d='M1 1h1v1H1zM2 4h1v1H2z'/%3E%3C/svg%3E") 0 0/8px 12px repeat-y;pointer-events:none}
+.hm-tit::before,.hm-tit::after{height:calc(5px*var(--k) + 3px)}
+html:not(.mob) .hm-tit::before,html:not(.mob) .hm-tit::after,html:not(.mob) .hc::before,html:not(.mob) .hc::after{width:12px;background-size:12px 18px}
+.hm-tit::before,.hc::before{left:14%} .hm-tit::after,.hc::after{right:14%}
+.hc{--bg:#217a36;--tx:#fff;position:relative;width:100%;min-height:78px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:10px 16px 10px 12px;background:var(--bg);color:var(--tx);border:3px solid var(--ink);
+  box-shadow:inset 0 0 0 3px var(--bg),inset 0 0 0 5px rgba(255,255,255,.85),5px 5px 0 rgba(12,19,29,.45);font-family:var(--f-body);font-size:15px;line-height:1.3;text-align:left;cursor:pointer;transition:transform .12s}
+.hc.pri{--bg:var(--accent);--tx:var(--ink)} .hc.blu{--bg:#1b64ad} .hc.tea{--bg:#146b61}
+@media (hover:hover){.hc:hover:not(:disabled){transform:translateY(-3px)}}
+.hc:active:not(:disabled){transform:translateY(1px)}
+.hc:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.hc:disabled{--bg:var(--ink4);cursor:not-allowed}.hc:disabled .hc-ic,.hc:disabled .hc-ar{opacity:.45}
+.hc-ic{flex:none;width:52px;height:52px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:#fff;border:3px solid var(--ink);overflow:hidden}
+.hc.blu .hc-ic{background:#bfe6ff;align-items:flex-start}.hc.blu .hc-ic img{margin-top:-1px}
+.hc-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.hc-t b{font-family:var(--f-disp);font-size:30px;font-weight:400;line-height:.9;letter-spacing:.02em}
+.hc-t>span{opacity:.92;overflow-wrap:anywhere}
+.hc-ar{flex:none;font-family:var(--f-disp);font-size:38px;line-height:1}
+.hc.big{min-height:112px;padding:12px 18px 12px 12px}
+.hc.big .hc-ic{width:80px;height:90px;background:var(--tint);align-items:flex-start;box-shadow:inset 0 -6px 0 rgba(22,32,46,.18)}.hc.big .hc-ic img{flex:none;margin-top:-6px}
+.hc.big .hc-t b{font-size:42px}
+.hc.big .hc-t>span{display:flex;flex-direction:column;gap:2px;opacity:1}.hc.big em{font-style:normal;font-family:var(--f-disp);font-size:23px;line-height:1}
+.hc.sm{min-height:62px;padding-top:7px;padding-bottom:7px}.hc.sm .hc-ic{width:44px;height:44px;margin:0 4px}.hc.sm .hc-t b{font-size:25px}
+.hc-bad{position:absolute;top:-13px;right:-13px;width:30px;height:30px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--bad);color:#fff;border:3px solid var(--ink);box-shadow:2px 2px 0 var(--ink);font-family:var(--f-disp);font-size:22px;line-height:1}
+.hm-ft{width:100%;margin-top:auto;padding-top:22px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hm-fl{display:flex;gap:8px;flex-wrap:wrap}
+.hm-sm{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:5px 12px;background:var(--panel);color:var(--ink);border:3px solid var(--ink);box-shadow:3px 3px 0 rgba(12,19,29,.45);font-family:var(--f-disp);font-size:20px;line-height:1;cursor:pointer}
+.hm-sm .nw-v{font-size:15px}
+.hm-cred{display:flex;align-items:center;gap:8px;padding:4px 8px;background:rgba(244,247,250,.85);font-family:var(--f-disp);font-size:18px;color:var(--ink)}.hm-cred svg{width:24px;height:28px;flex:none}
+.hm-pan{position:fixed;inset:0;z-index:3;overflow:auto;display:flex;padding:calc(20px + env(safe-area-inset-top,0px)) 16px 24px}
+.hm-pb{width:min(780px,100%);max-height:100%;margin:auto;display:flex;flex-direction:column;background:var(--panel);border:3px solid var(--ink2);box-shadow:inset 0 0 0 2px #fff,8px 8px 0 rgba(12,19,29,.6)}
+.anim .hm-pb.in{animation:hmIn .18s ease-out}
+@keyframes hmIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.hm-ph{flex:none;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;background:var(--ink);color:#fff}
+.hm-ph h2{flex:1;min-width:0;margin:0;font-family:var(--f-disp);font-size:28px;font-weight:400;line-height:1}
+.hm-x{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:4px 14px 4px 10px;background:var(--panel);color:var(--ink);border:3px solid var(--ink2);font-family:var(--f-disp);font-size:20px;line-height:1;cursor:pointer}.hm-x svg{transform:rotate(90deg)}
+.hm-pc{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:18px 20px 22px;display:flex;flex-direction:column;gap:14px}
+.hm-pb.novita .hm-pc{padding:8px 0 12px;gap:0}
+.hm-pf{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--muted)}.hm-pf .btn{display:inline-flex;align-items:center;gap:8px;min-height:44px}
+.hm-orn{display:flex;align-items:flex-end;gap:14px}.hm-orn img{flex:none;background:#bfe6ff;border:3px solid var(--ink);box-shadow:inset 0 -6px 0 #5fb4f0}
+.hm-orn p{margin:0 0 8px;padding:10px 12px;background:#fff;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);font-size:16px;line-height:1.45}
+.hm-tb{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.hm-tb .btn{min-width:0;min-height:64px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;padding:8px 14px;text-align:left}.hm-tb b{font-family:var(--f-disp);font-size:22px;font-weight:400;line-height:1}.hm-tb small{font-size:14px}
+.hm-app{margin:0;font-size:16px;line-height:1.5}
+/* schermi bassi del computer (1366×768, 1280×720): cartelli più compatti, così stanno sopra il pavimento */
+@media (max-height:820px){html:not(.mob) .hm-st{--gap:12px} html:not(.mob) .hm-tit{padding:8px 22px 10px} html:not(.mob) #start .hm-tit h1{font-size:48px} html:not(.mob) .hm-tit .sub{font-size:18px}
+ html:not(.mob) .hc{min-height:62px;padding:6px 14px 6px 10px;font-size:14px} html:not(.mob) .hc-ic{width:44px;height:44px} html:not(.mob) .hc-t b{font-size:26px}
+ html:not(.mob) .hc.big{min-height:92px} html:not(.mob) .hc.big .hc-ic{width:72px;height:78px} html:not(.mob) .hc.big .hc-ic img{margin-top:-9px} html:not(.mob) .hc.big .hc-t b{font-size:36px} html:not(.mob) .hc.big em{font-size:21px}
+ html:not(.mob) .hc.sm{min-height:54px} html:not(.mob) .hc.sm .hc-ic{width:40px;height:40px;margin:0 2px} html:not(.mob) .hc.sm .hc-t b{font-size:23px}}
+@media (prefers-reduced-motion: reduce){.hall .h-fr,.hall .h-mul{animation:none}.hall .h-mul{transform:translateX(56vw)}.hc{transition:none}}
 .sv{background:#fff;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2),3px 3px 0 var(--ink);padding:10px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
 .sv-pic{width:64px;height:64px;flex:none;background:var(--tint);border:2px solid var(--ink);overflow:hidden}.sv-pic img{display:block;margin:-6px 0 0 -16px}
 .sv-m{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:3px}
@@ -922,14 +994,6 @@ html.boot,html.boot body{background:#5fb4f0} html.boot body>*:not(#intro){visibi
 #start .btn.pri.sv-go{font-size:22px;font-weight:700;padding:8px 26px;min-height:52px;border-width:3px;box-shadow:inset 0 -4px 0 var(--accent-d),inset 0 3px 0 var(--accent-l),3px 3px 0 var(--ink)}
 .sv-go2{font-size:17px;font-weight:600;padding:8px 16px}
 .hm-empty{padding:20px;background:#fff;border:2px dashed var(--ink4);text-align:center;display:flex;flex-direction:column;gap:4px}.hm-empty b{font-family:var(--f-disp);font-size:20px}.hm-empty span{color:var(--muted)}
-.hm-new{width:100%;min-height:76px;padding:12px 18px;border:3px solid var(--ink);background:var(--yellow);box-shadow:inset 0 -5px 0 var(--warn-d),inset 0 3px 0 #ffe680,4px 4px 0 var(--ink);display:flex;align-items:center;gap:16px;text-align:left;color:var(--ink);font-family:var(--f-body);font-size:15px;cursor:pointer}
-.hm-new .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.hm-new b{font-family:var(--f-disp);font-size:26px;font-weight:700;line-height:1.05}
-.hm-plus{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--ink)}
-.hm-new .ar{font-family:var(--f-disp);font-size:32px;font-weight:700}
-.hm-new:disabled{background:var(--panel2);box-shadow:inset 0 -5px 0 var(--line),4px 4px 0 var(--ink);cursor:not-allowed}.hm-new:disabled .hm-plus,.hm-new:disabled .ar{opacity:.4}
-.hm-tut{background:#bfe6ff;box-shadow:inset 0 -5px 0 #5fb4f0,inset 0 3px 0 #e6f5ff,4px 4px 0 var(--ink)}
-.hm-orn{width:52px;height:60px;flex:none;align-self:flex-start;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid var(--ink)}.hm-tut.off .hm-orn{opacity:.4}
-.hm-tut{cursor:default;box-sizing:border-box;flex-wrap:wrap}.hm-tut.off{background:var(--panel2);box-shadow:inset 0 -5px 0 var(--line),4px 4px 0 var(--ink)}.hm-tut .hm-tb{flex:1 1 100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.hm-tut .hm-tb .btn{min-width:0;display:flex;flex-direction:column;align-items:flex-start;font-family:var(--f-disp);font-size:18px;padding:6px 12px;text-align:left}.hm-tut .hm-tb small{font-family:var(--f-body);font-size:13px}
 /* tutorial: il fumetto della dottoressa Ribalta (#tut) e il riquadro che lampeggia sulla cosa da toccare (#tuthi) */
 #tut{position:fixed;z-index:60;left:96px;bottom:16px;width:min(520px, calc(100vw - 32px));display:flex;gap:10px;align-items:flex-end;pointer-events:none}
 #tut:empty{display:none}
@@ -953,15 +1017,8 @@ html.boot,html.boot body{background:#5fb4f0} html.boot body>*:not(#intro){visibi
 .attest{display:flex;flex-direction:column;gap:8px;padding:16px 18px;background:#fffdf3;border:3px double var(--ink);text-align:center}
 .attest .at-h{font-family:var(--f-disp);font-size:24px;font-weight:700}.attest p{margin:4px 0;line-height:1.45}
 .attest .at-f{display:flex;align-items:center;justify-content:center;gap:10px}.attest .at-f img{background:#bfe6ff;border:2px solid var(--ink)}.attest .at-f i{font-family:var(--f-disp);font-size:20px;display:block}
-#start .news{padding:0;gap:0;box-shadow:inset 0 -3px 0 var(--panel2),3px 3px 0 var(--ink)}
-#start .news summary{list-style:none;min-height:56px;padding:10px 14px;gap:12px;flex-wrap:nowrap;font-weight:400}
-#start .news summary::-webkit-details-marker{display:none}
-.nw-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}.nw-h{display:flex;align-items:center;gap:8px}.nw-h b{font-family:var(--f-disp);font-size:20px;font-weight:600}
 .nw-v{padding:1px 7px;background:var(--accent);border:2px solid var(--ink);font-family:var(--f-disp);font-size:14px;font-weight:600}
-.nw-s{color:var(--muted)}
-.nw-ar{width:36px;height:36px;flex:none;box-sizing:border-box;background:var(--panel);border:2px solid var(--ink);display:flex;align-items:center;justify-content:center}
-.news[open] .nw-ar svg{transform:rotate(180deg)}
-.nw-l{border-top:2px solid var(--ink);max-height:340px;overflow-y:auto;padding:6px 0}
+.nw-l{display:flex;flex-direction:column}
 .nw-e{display:flex;gap:14px;padding:10px 16px}
 .nw-e .v{display:flex;flex-direction:column;align-items:center;gap:4px;flex:none;width:52px}
 .nw-e .v b{width:100%;box-sizing:border-box;padding:3px 0;text-align:center;background:var(--ink);color:#fff;border:2px solid var(--ink);font-family:var(--f-disp);font-size:15px;font-weight:600}
@@ -979,7 +1036,6 @@ html.boot,html.boot body{background:#5fb4f0} html.boot body>*:not(#intro){visibi
 .sv-pc{display:block}.sv-pc svg{display:block}.sv-pc.off{filter:grayscale(1);opacity:.4}
 .sv-cl{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:var(--muted)}.sv-cl.up svg{opacity:.4}.sv-cl.loc{padding:0 5px;border:2px solid var(--line)}
 .sv-ask.cl-x{background:#fff9e0;border-color:var(--warn-t)}
-.hm-cred{display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;color:var(--muted)}.hm-cred svg{width:24px;height:28px;flex:none}
 .ccbox{gap:10px}
 .lobby{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .lb-slot{gap:6px;border-width:3px}.lb-slot.off{opacity:.6}.lb-slot.me{background:#fff9ef}
@@ -1219,11 +1275,6 @@ html,body{overscroll-behavior:none}
 .mob #pauseovl span{font-size:30px;padding:6px 18px}
 .mob #start{padding:calc(10px + env(safe-area-inset-top, 0px) + var(--glass, 0px)) max(8px, env(safe-area-inset-right, 0px)) 16px max(8px, env(safe-area-inset-left, 0px))}
 .mob #start h1{font-size:34px}
-.mob .hm-hero{height:150px}.mob .hm-bar{font-size:13px;padding:5px 10px}.mob .hm-ttl{left:16px;top:36px;gap:4px}
-.mob #start .hm-ttl h1{font-size:54px;text-shadow:3px 3px 0 var(--accent),5px 5px 0 var(--ink2)}.mob .hm-ttl .sub{font-size:16px}
-.mob .hm-truck{right:12px;bottom:19px;width:112px;height:96px}
-.mob .hm-road{height:20px;background:var(--ink) repeating-linear-gradient(90deg,var(--yellow) 0 16px,transparent 16px 32px) 0 50%/100% 3px no-repeat}
-.mob .hm-b{padding:16px 12px 18px;gap:14px}.mob .hm-h h2{font-size:22px}
 .mob .sv{padding:10px;gap:10px}.mob .sv-pic{width:56px;height:56px}.mob .sv-pic img{margin:-8px 0 0 -20px}.mob .sv-m{flex-basis:200px}
 .mob .sv-co{font-size:18px}.mob .sv>.sv-act{flex:1 1 100%}.mob .sv-act .btn:not(.sv-del){flex:1}.mob .sv.top .sv-act .btn:not(.sv-go){flex:none}.mob .sv-act .btn{min-height:48px}.mob .sv-del{width:48px}
 .mob .sv.top{grid-template-columns:80px minmax(0,1fr);gap:12px;padding:12px}
@@ -1232,11 +1283,17 @@ html,body{overscroll-behavior:none}
 .mob .sv-bd{grid-column:1/3}.mob .sv-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.mob .sv-tile b{font-size:17px}
 .mob .sv-kpi{grid-template-columns:minmax(0,1fr)}.mob #start .btn.pri.sv-go{font-size:21px;padding:8px 14px}
 .mob .cl-a .btn{flex:1 1 auto;justify-content:center;min-height:48px}.mob .cl-p{margin-left:0;flex-basis:100%}
-.mob .hm-new{min-height:72px;padding:10px 12px;gap:12px;font-size:13px}.mob .hm-new b{font-size:22px}.mob .hm-new .ar{font-size:28px}
 .mob #tut{left:8px;right:8px;width:auto;bottom:calc(78px + env(safe-area-inset-bottom, 0px));gap:6px}
 .mob #tut.up{top:calc(var(--top-h, 56px) + 8px);bottom:auto}
 .mob #tut p{font-size:15px}.mob #tut .tut-b{padding:8px 10px 10px;gap:6px}.mob #tut .tut-b::before{display:none}
-.mob #start .news summary{padding:10px 12px;gap:10px}.mob .nw-p{display:none}.mob .nw-l{max-height:none}
+.mob #start.st-home{padding:0}.mob .hm{padding-top:calc(17px*var(--k) + env(safe-area-inset-top,0px))}
+.mob .hm-st{--gap:15px}.mob .hc{min-height:70px;gap:12px;padding:9px 12px 9px 10px;font-size:14px}.mob .hc-t b{font-size:27px}.mob .hc.big .hc-t b{font-size:36px}.mob .hc.big em{font-size:21px}.mob .hc-ar{font-size:32px}
+.mob #start .hm-tit h1{font-size:52px}.mob .hm-tit{padding:10px 22px 12px}.mob .hm-tit .sub{font-size:19px}
+.mob .hm-pan{padding:0}.mob .hm-pb{width:100%;height:100%;margin:0;border:0;box-shadow:none}.mob .hm-ph{padding-top:calc(8px + env(safe-area-inset-top,0px))}.mob .hm-ph h2{font-size:25px}
+.mob .hm-pc{padding:14px 12px 20px}.mob .hm-tb{grid-template-columns:minmax(0,1fr)}.mob .hm-orn p{font-size:15px}
+.land .hm-st{--gap:12px;width:min(760px,100%);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap) 14px}
+.land .hm-tit{grid-column:1/-1;flex-direction:row;align-items:baseline;gap:14px;padding:6px 18px 8px}.land #start .hm-tit h1{font-size:40px}.land .hc.big{grid-column:1/-1;min-height:84px}
+.land .hc{min-height:58px;padding:6px 10px 6px 8px}.land .hc-t b{font-size:23px}.land .hc-t>span{font-size:12px}.land .hc-ic{width:42px;height:42px}.land .hc.big .hc-ic{width:56px;height:64px}.land .hc.big .hc-ic img{width:48px;height:56px;margin-top:2px}
 .mob .nw-e{gap:10px;padding:8px 12px}.mob .nw-e .v{width:46px}.mob #start .nw-c ul{font-size:14px;padding-left:16px}
 .mob .ceos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:30px 12px 14px;margin:-16px -12px 0}
 .mob .ceo{flex:0 0 min(78%,250px);scroll-snap-align:center}
@@ -8673,7 +8730,7 @@ function initMapControls(){
   const up=e=>{ if(!pts.delete(e.pointerId)) return; mw.classList.remove('drag'); begin(); };
   mw.addEventListener('pointerup',up); mw.addEventListener('pointercancel',up);
   mw.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,view.s*(e.deltaY<0?1.15:1/1.15));},{passive:false});
-  addEventListener('resize',()=>{setMobile();fitMap();fitAllWins();renderNotes();introK();});
+  addEventListener('resize',()=>{setMobile();fitMap();fitAllWins();renderNotes();introK();hallK();});
 }
 function renderMap(){
   const g=[], busy=mapBusy(), TM=tenMap(busy), AM=areaMap(busy);   // prima le puntine delle gare, poi le etichette delle zone
@@ -10973,6 +11030,7 @@ document.addEventListener('input',e=>{if(e.target.closest('#start')){const al=$(
 document.addEventListener('pointerdown',e=>{if(e.target.closest('#win-gare input[type=range]'))UI.bidEditing=true;});
 document.addEventListener('pointerup',()=>{UI.bidEditing=false;});
 document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&startSel.pan&&$('#start').innerHTML){ACT.hmpan({p:''});return;}
   if(!S||$('#start').innerHTML||e.target.matches('input[type=text]'))return;
   if((e.key==='Enter'||e.key===' ')&&e.target.matches('.kw')){e.preventDefault();e.target.click();return;}
   if($('#modal').innerHTML) return;
@@ -11405,7 +11463,7 @@ Object.assign(ACT,{
 });
 /* ====================== AVVIO ====================== */
 {const b=$('.optb'); if(b&&ICONE.ui.opzioni) b.innerHTML=pxSvg(ICONE.ui.opzioni,32);}  // ingranaggio delle Opzioni
-let startSel={step:'home',slot:0,del:0,ceo:'gino',color:'#ff7a3d',name:'',claim:'',logo:'camion',cc:null,err:'',stamp:false,lb:null};
+let startSel={step:'home',pan:'',slot:0,del:0,ceo:'gino',color:'#ff7a3d',name:'',claim:'',logo:'camion',cc:null,err:'',stamp:false,lb:null};
 /* --- CEO creato dal giocatore: punti da distribuire tra abilità e talenti --- */
 const CC_PTS=58, CC_TRAITS=3, CC_IMGS=['cc1','cc2','cc3','cc4','cc5','cc6','cc7','cc8','cc9','cc10'];
 const ccNew=()=>({nome:'',cognome:'',nick:'',motto:'',eta:38,img:'cc1',base:'gino',st:{op:8,prec:8,neg:8,lead:8,amm:8,inn:8},edu:null,tal:[]});
@@ -11595,6 +11653,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.131',t:'Si entra in magazzino',x:['Dopo la schermata d\'avvio scende la serranda e, quando si rialza, sei dentro il magazzino: scaffali pieni di pallet, il muletto che passa, il magazziniere col transpallet e il cane del capoturno.','I comandi sono cartelli appesi al soffitto: Continua (ti porta subito nell\'ultima partita giocata), Nuova partita, Partite salvate, Tutorial e Online. Ogni cartello apre il suo riquadro; si chiude con «Chiudi» o col tasto Esc.','Se una partita ha due versioni diverse (sul dispositivo e online) compare un bollino rosso sui cartelli, così non passa inosservata.','Il magazzino resta dietro, un po\' in ombra, anche mentre crei il CEO e l\'azienda: la mappa compare solo quando la partita comincia.','Novità e «Installa come app» sono in basso a sinistra, sul pavimento.']},
  {v:'0.130',t:'Nuova schermata d\'avvio',x:['La schermata d\'avvio passa dalla notte al giorno: cielo azzurro con le nuvole, in fila i capannoni del gioco (vecchio, standard, moderno, frigorifero e innovativo) e il camioncino blu che passa. L\'avviso «lavori in corso» ora è un cartello stradale.','Mentre il gioco carica si vede solo il cielo: prima per un attimo compariva la mappa vuota.','Il riquadro in alto a destra (rosso «In pausa», verde col camioncino quando il tempo scorre) adesso è un pulsante: un clic o un tocco mette in pausa o fa ripartire il tempo.']},
  {v:'0.129',t:'Head hunter più comodo',x:['Nella scheda Head hunter le sei abilità sono una sotto l\'altra, ognuna con − e + sempre a destra e il minimo chiesto scritto accanto al nome. Il + su un\'abilità non chiesta la aggiunge, il − sotto 8 la toglie.']},
  {v:'0.128',t:'Head hunter: fino a tre abilità',x:['La scheda Head hunter ha un solo riquadro con le sei abilità: tocchi quella che ti serve e scegli il minimo con − e +.','Due nuove ricerche in Sviluppo aziendale, dopo l\'Ufficio del personale: «Recruiting» (15.000 €) permette di chiedere due abilità insieme, «Rete di head hunter» (35.000 €) tre. C\'è un tetto: la somma dei minimi non supera 34 punti con due abilità e 45 con tre. Ogni abilità in più costa dal 30% al 60% in più e allunga la ricerca.']},
@@ -11727,9 +11786,8 @@ const CHANGELOG=[
  {v:'0.1',t:'Primo pallet',x:['Prototipo giocabile: mappa del Nord-Ovest, gare, magazzini, tecnologie ed eventi.']},
 ];
 const VER=CHANGELOG[0].v;
-function newsCard(){
-  return `<details class="card news"><summary>${pxSvg(ICONE.menu.giornale,32)}<span class="nw-t"><span class="nw-h"><b>Novità</b><span class="nw-v">${VER}</span></span><span class="nw-s"><span class="nw-p">Ultimo aggiornamento: </span>${esc(CHANGELOG[0].t)}</span></span><span class="nw-ar">${pxSvg(ICONE.ui.giu,16)}</span></summary>
-   <div class="nw-l">${CHANGELOG.map((c,i)=>`<div class="nw-e"><div class="v"><b>${c.v}</b><i></i></div><div class="nw-c"><h4>${esc(c.t)}${i?'':'<span class="nw-new">NUOVO</span>'}</h4><ul>${c.x.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div>`).join('')}</div></details>`;}
+// elenco delle novità (riquadro «Novità» della schermata principale)
+const newsList=()=>`<div class="nw-l">${CHANGELOG.map((c,i)=>`<div class="nw-e"><div class="v"><b>${c.v}</b><i></i></div><div class="nw-c"><h4>${esc(c.t)}${i?'':'<span class="nw-new">NUOVO</span>'}</h4><ul>${c.x.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div>`).join('')}</div>`;
 /* --- schermata introduttiva: camioncino in pixel art (56x48) con il collo e il pallet dell'icona --- */
 function introTruck(){let r='';const R=(x0,y0,x1,y1,c)=>{r+=`<rect x="${x0}" y="${y0}" width="${x1-x0+1}" height="${y1-y0+1}" fill="${c}"/>`;};
   const K=TPAL.K,cab='#3d8fd6',cabD='#2a6aa8';
@@ -11843,20 +11901,64 @@ function cloudCard(){
     a=bt('clout','','Esci')+bt('clwipe','','Elimina dati online');}
   return `<div class="cl${CL.ask?' ask':''}"><div class="cl-h">${hmIc('nuvola',32)}<div class="cl-t"><b>${h}</b><span>${t}</span>${st?`<span class="cl-st">${st}</span>`:''}</div></div>
    <div class="cl-a">${a}${CL.ask?'':bt('svimport','carica','Carica da file')}<span class="cl-p">${kw('salvataggio_online','Come funziona')} · ${priv}</span></div></div>`;}
-function stepHome(){const L=[]; for(let n=1;n<=SLOTS;n++){const sv=load(n); if(sv&&sv.S&&sv.S.company) L.push(slotInfo(n,sv));}
-  L.sort((a,b)=>b.at-a.at); const full=L.length>=SLOTS;
-  return `<div class="hm-h">${hmIc('salva',32)}<h2>Partite salvate</h2><span class="hm-n" aria-label="${L.length} posti occupati su ${SLOTS}">${L.length}/${SLOTS}</span></div>
-   ${L.length?L.map((x,i)=>slotCard(x,!i)).join(''):'<div class="hm-empty"><b>Nessuna partita salvata</b><span>Il piazzale è vuoto: è il momento di scaricare il primo pallet.</span></div>'}
-   <button class="hm-new" data-act="newgame" ${full?'disabled':''}><span class="hm-plus">${hmIc('nuova',32)}</span><span class="t"><b>Crea nuova partita</b><span>${full?`Tutti e ${SLOTS} i posti sono occupati: cancella una partita per iniziarne un'altra.`:'Scegli il CEO, dai un nome all\'azienda e apri il primo magazzino a gennaio 2002.'}</span></span><span class="ar" aria-hidden="true">›</span></button>
-   <div class="hm-new hm-tut${full?' off':''}"><span class="hm-orn"><img class="px" src="${IMG.ornella_contenta}" alt="" width="48" height="56"></span><span class="t"><b>Tutorial</b><span>${full?`Per il tutorial serve un posto libero: cancella una partita.`:'La dottoressa Ornella Ribalta ti insegna il gioco, giocando.'}</span></span>
-    <span class="hm-tb">${[['base','Base','le prime cose · 15 minuti'],['avanzato','Avanzato','un\'azienda già grande · 20 minuti'],['ri','Relazioni industriali','sindacato e scioperi · 10 minuti'],['it','Reparto IT','reparti e avvii · 10 minuti']].map(([id,n,d])=>`<button class="btn" data-act="tutorial" data-id="${id}" ${full?'disabled':''}>${n}<small>${d}</small></button>`).join('')}</span></div>
-   ${cloudCard()}${newsCard()}<div class="hm-cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></div>`;}
+// i posti occupati, la partita giocata più di recente in cima
+function homeSaves(){const L=[]; for(let n=1;n<=SLOTS;n++){const sv=load(n); if(sv&&sv.S&&sv.S.company) L.push(slotInfo(n,sv));} return L.sort((a,b)=>b.at-a.at);}
+// l'interno del magazzino dietro la schermata principale e la creazione della partita: pezzi hall_* di tools/scene_pxl/magazzino.px.js,
+// messi insieme dal CSS (.hall) a un ingrandimento intero --k (hallK()); resta fermo mentre il contenuto di #start cambia
+function hallHtml(){const u=k=>SCENE['hall_'+k]?`url(${SCENE['hall_'+k]})`:'none';
+  return `<div class="hall" aria-hidden="true"><i class="h-sca" style="background-image:${u('scaffale')}"></i><i class="h-sof" style="background-image:${u('soffitto')}"></i><i class="h-pav" style="background-image:${u('pavimento')}"></i>
+   <i class="h-fr h-tra" style="background-image:${u('transpallet')}"></i><i class="h-fr h-can" style="background-image:${u('cane')}"></i><b class="h-mul"><i class="h-fr" style="background-image:${u('muletto')}"></i></b></div>`;}
+function hallK(){const st=$('#start'); if(st&&st.innerHTML) st.style.setProperty('--k',Math.max(2,Math.min(5,Math.floor(innerHeight/210),Math.floor(innerWidth/120))));}
+// riga dello stato del salvataggio online sul cartello «Online»
+function cloudLine(){const U=CL.user, mail=U&&(U.email||(U.user_metadata||{}).email);
+  if(!CL.sb) return 'Scarica una partita su file o ricaricala da un file.';
+  if(CL.wait) return 'Collegamento in corso…'; if(CL.busy) return 'Allineo le partite…'; if(CL.err) return esc(CL.err);
+  if(!U) return 'Entra per ritrovare le partite su tutti i dispositivi.';
+  if(CL.guest) return 'Online come ospite: collega Google per gli altri dispositivi.';
+  return `Online con ${esc(mail||'Google')}${CL.syncAt?` · allineate ${agoTxt(CL.syncAt)}`:''}.`;}
+// un cartello appeso: icona nel riquadro bianco a sinistra, titolo, riga sotto, bollino rosso se c'è qualcosa da decidere
+function hmSign(o){
+  return `<button class="hc${o.cls?' '+o.cls:''}" data-act="${o.act}"${o.data||''}${o.dis?' disabled':''}${o.style?` style="${o.style}"`:''}><span class="hc-ic">${o.ic}</span><span class="hc-t"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span>
+   ${o.bad?`<span class="hc-bad" role="img" aria-label="${o.bad}" data-tip="${o.bad}">!</span>`:''}<span class="hc-ar" aria-hidden="true">›</span></button>`;}
+const TUT_C=[['base','Base','le prime cose · 15 minuti'],['avanzato','Avanzato','un\'azienda già grande · 20 minuti'],['ri','Relazioni industriali','sindacato e scioperi · 10 minuti'],['it','Reparto IT','reparti e avvii · 10 minuti']];
+const HM_PAN={partite:['salva','Partite salvate'],tutorial:['enciclopedia','Tutorial'],online:['nuvola','Salvataggio online'],novita:['giornale','Novità'],app:['scarica','Installa come app']};
+// riquadro aperto sopra il magazzino da un cartello (startSel.pan); entra con l'animazione solo quando si apre (hmIn), non a ogni ridisegno
+let hmIn=false;
+function hmPanel(p,L){const full=L.length>=SLOTS, a=hmIn; let b=''; hmIn=false;
+  if(p==='partite') b=(L.length?L.map((x,i)=>slotCard(x,!i)).join(''):'<div class="hm-empty"><b>Nessuna partita salvata</b><span>Il piazzale è vuoto: è il momento di scaricare il primo pallet.</span></div>')
+    +`<div class="hm-pf"><span>${L.length} di ${SLOTS} posti occupati</span><button class="btn" data-act="svimport">${hmIc('carica',16)}Carica da file</button></div>`;
+  else if(p==='tutorial') b=`<div class="hm-orn"><img class="px" src="${IMG.ornella_contenta}" alt="La dottoressa Ornella Ribalta" width="96" height="112"><p>Sono la dottoressa <b>Ornella Ribalta</b>. Ogni corso è una partita a parte: tu giochi, io ti dico cosa guardare e perché. Si comincia dal Base.</p></div>
+    ${full?`<div class="sv-ask"><span>Per il tutorial serve un posto libero: cancella una partita dalle <b>Partite salvate</b>.</span></div>`:''}
+    <div class="hm-tb">${TUT_C.map(([id,n,d])=>`<button class="btn" data-act="tutorial" data-id="${id}" ${full?'disabled':''}><b>${n}</b><small>${d}</small></button>`).join('')}</div>`;
+  else if(p==='online') b=cloudCard();
+  else if(p==='novita') b=newsList();
+  else if(p==='app') b=`<p class="hm-app">Per giocare a schermo intero, anche senza rete: in Safari tocca <b>Condividi</b>, poi <b>Aggiungi alla schermata Home</b>.</p>`;
+  const [ic,t]=HM_PAN[p]||HM_PAN.partite;
+  return `<div class="hm-pan"><div class="hm-pb ${p}${a?' in':''}" role="dialog" aria-modal="true" aria-label="${t}"><div class="hm-ph">${hmIc(ic,32)}<h2>${t}</h2>${p==='novita'?`<span class="nw-v">${VER}</span>`:''}<button class="hm-x" data-act="hmpan" data-p="" aria-label="Chiudi e torna al magazzino">${pxSvg(ICONE.ui.giu,16)}<span>Chiudi</span></button></div><div class="hm-pc">${b}</div></div></div>`;}
+function stepHome(){const L=homeSaves(); if(startSel.pan==='partite'&&!L.length) startSel.pan='';   // cancellata l'ultima: si torna ai cartelli
+  const full=L.length>=SLOTS, x=L[0], nc=Object.keys(CL.clash||{}).length, C=x&&CL.clash[x.n],
+  ncl=nc?`${nc===1?'Una partita ha':nc+' partite hanno'} due versioni diverse: scegli quale tenere.`:'';
+  let h=`<div class="hm-st"><div class="hm-tit"><h1>FUP</h1><span class="sub">Fino all'ultimo pallet</span></div>`;
+  if(x) h+=hmSign({act:C?'hmpan':'continue',data:C?' data-p="partite"':` data-slot="${x.n}"`,cls:'pri big',style:`--tint:${x.tint}`,
+    ic:`<img class="px" src="${x.img}" alt="" width="96" height="112">`,t:x.s.over?'Rivedi':'Continua',
+    s:`<em>${esc(x.s.company.name)}</em><span>${esc(x.B.name)} · ${x.date}${x.last?` · giocata ${x.last}`:''}</span>`,bad:C?'Due versioni diverse di questa partita: scegli quale tenere':''});
+  h+=hmSign({act:'newgame',cls:x?'':'pri',ic:hmIc('nuova',32),t:'Nuova partita',dis:full,
+    s:full?`Tutti e ${SLOTS} i posti sono occupati: cancella una partita per iniziarne un'altra.`:'Scegli il CEO e apri il primo magazzino a gennaio 2002.'});
+  if(L.length) h+=hmSign({act:'hmpan',data:' data-p="partite"',cls:'sm',ic:hmIc('salva',32),t:'Partite salvate',s:`${L.length} di ${SLOTS} posti · continua, scarica o cancella`,bad:ncl});
+  h+=hmSign({act:'hmpan',data:' data-p="tutorial"',cls:'blu',ic:`<img class="px" src="${IMG.ornella_contenta}" alt="" width="48" height="56">`,t:'Tutorial',s:'La dottoressa Ribalta ti insegna a giocare: quattro corsi.'});
+  h+=hmSign({act:'hmpan',data:' data-p="online"',cls:'tea',ic:hmIc('nuvola',32),t:CL.sb?'Online':'Copia di sicurezza',s:cloudLine(),bad:ncl});
+  const app=STANDALONE||!location.protocol.startsWith('http')?'':installEvt?`<button class="hm-sm" data-act="installapp">${hmIc('scarica',16)}Installa come app</button>`:IOS?`<button class="hm-sm" data-act="hmpan" data-p="app">${hmIc('scarica',16)}Installa come app</button>`:'';
+  return h+`</div><div class="hm-ft"><span class="hm-fl"><button class="hm-sm" data-act="hmpan" data-p="novita">${pxSvg(ICONE.menu.giornale,16)}Novità <span class="nw-v">${VER}</span></button>${app}</span>
+   <span class="hm-cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></span></div>${startSel.pan?hmPanel(startSel.pan,L):''}`;}
 function showStart(){
-  setSpeedSafe(0); WIKI_ON=false; const k=startSel.step;
+  setSpeedSafe(0); WIKI_ON=false; const k=startSel.step, st=$('#start');
+  if(k!=='home') startSel.pan='';
+  if(!st.querySelector(':scope>.hall')){st.innerHTML=hallHtml()+'<div class="st-in"></div>';}
+  const box=st.querySelector(':scope>.st-in'), hm=k==='home'?stepHome():'';
+  st.classList.toggle('st-home',k==='home'); st.classList.toggle('st-pan',!!startSel.pan); hallK();
   if(k==='home'){
-    $('#start').innerHTML=`<div class="box home"><div class="hm-hero"><div class="hm-bar"><span>Versione ${VER}</span><span>Nord Italia · gennaio 2002</span></div>
-     <div class="hm-ttl"><h1>FUP</h1><div class="sub">Fino all'ultimo pallet</div></div><div class="hm-truck">${introTruck()}</div><div class="hm-road"></div></div><div class="hm-b">${stepHome()}</div></div>`;
-    if(lastStep!==k){$('#start').scrollTop=0;lastStep=k;} return;
+    box.innerHTML=`<div class="hm">${hm}</div>`;
+    if(lastStep!==k){st.scrollTop=0;lastStep=k;} return;
   }
   if(!startSel.lb) startSel.lb=lbDef();
   const body={scelta:stepScelta,cc1:stepCC1,cc2:stepCC2,cc3:stepCC3,cv:stepCV,az:stepAz,visura:stepVisura,lobby:stepLobby,pacchetti:stepPacchetti}[k]();
@@ -11864,10 +11966,10 @@ function showStart(){
     visura:startSel.stamp?nextBtn('Avanti: la partita'):`<button class="btn pri" data-act="stamp" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Timbra la visura</button>`,
     lobby:nextBtn('Avanti: i pacchetti'),
     pacchetti:`<button class="btn pri" data-act="startgame" style="font-size:18px;padding:10px 18px;flex:none;margin-left:auto">Inizia la partita ›</button>`}[k];
-  $('#start').innerHTML=`<div class="box"><div class="src"><span>FUP · versione ${VER}</span><span>Nord Italia, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
+  box.innerHTML=`<div class="box"><div class="src"><span>FUP · versione ${VER}</span><span>Nord Italia, gennaio 2002</span></div><div class="win-b" style="gap:14px;padding:18px">
    ${k!=='scelta'?stepper():''}${body}${stNav(next)}</div></div>`;
   if(k==='scelta'){const r=$('#start .ceos'),e=r&&r.querySelector('[aria-pressed=true]');if(e&&r.scrollWidth>r.clientWidth)r.scrollLeft=e.offsetLeft-(r.clientWidth-e.offsetWidth)/2;}
-  if(lastStep!==k){$('#start').scrollTop=0;lastStep=k;}
+  if(lastStep!==k){st.scrollTop=0;lastStep=k;}
 }
 let lastStep='';
 // web app: pulsante «Installa» (Chrome/Android) o istruzioni per iPhone, solo se il gioco non è già aperto come app
@@ -11894,7 +11996,15 @@ function stValid(k){const cc=startSel.cc;
   return '';}
 function stGo(to){if(!(startSel.step==='visura'&&to==='lobby'))startSel.stamp=false; startSel.step=to;startSel.err='';showStart();}
 Object.assign(ACT,{
- introgo(){const el=$('#intro');if(!el.innerHTML||el.classList.contains('go'))return;el.classList.add('go','out');setTimeout(()=>{el.innerHTML='';el.className='';delete el.dataset.act;const b=$('#start [data-act=continue],#start [data-act=newgame]');if(b)b.focus({preventScroll:true});},matchMedia('(prefers-reduced-motion: reduce)').matches?0:600);},
+ hmpan(d){const was=startSel.pan; startSel.pan=d.p||''; startSel.del=0; hmIn=!!startSel.pan; showStart();
+  const f=startSel.pan?$('#start .hm-x'):was&&$(`#start .hc[data-p=${was}]`); if(f) f.focus({preventScroll:true});},
+ // la serranda scende sulla schermata introduttiva, sotto resta il magazzino; si rialza e #intro si svuota (con «riduci movimento» subito)
+ introgo(){const el=$('#intro');if(!el.innerHTML||el.classList.contains('go'))return;
+  const end=()=>{el.innerHTML='';el.className='';delete el.dataset.act;const b=$('#start [data-act=continue],#start [data-act=newgame]');if(b)b.focus({preventScroll:true});};
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){el.classList.add('go','out');end();return;}
+  el.insertAdjacentHTML('beforeend','<div class="serr" aria-hidden="true"></div>');el.classList.add('go');
+  setTimeout(()=>{[...el.children].forEach(c=>{if(!c.classList.contains('serr'))c.remove();});el.classList.add('up');},650);
+  setTimeout(end,1300);},
  installapp(){if(!installEvt)return;startKeep();installEvt.prompt();installEvt.userChoice.finally(()=>{installEvt=null;showStart();});},
  pickceo(d){startKeep();startSel.ceo=d.id;startSel.err='';if(d.id==='custom'){if(!startSel.cc)startSel.cc=ccNew();stGo('cc1');return;}showStart();},
  pickcolor(d){startKeep();startSel.color=d.c;applyColor(d.c);showStart();},
@@ -11950,7 +12060,7 @@ Object.assign(ACT,{
 });
 function boot(){
   packApply();
-  $('#start').innerHTML=''; applyColor(S.company.color); WIKI_ON=true;
+  $('#start').innerHTML=''; startSel.pan=''; applyColor(S.company.color); WIKI_ON=true;
   Object.keys(UI.open).forEach(closeWin); UI={open:{},sel:{},tab:{},z:30,pos:{},bid:{},lens:UI.lens};
   view.init=0; fitMap(); renderMap(); S.warehouses.forEach(w=>w.kpi=computeWH(w)); syncTrucks(); renderAll();
   if(S.day===0&&!S.tut){ modalInfo('La Gazzetta del Muletto',`Benvenuto, ${ceo().name}`,`Hai un magazzino a ${S.warehouses[0].name} e un solo cliente, ${S.clients[0].name}. Con il magazzino quasi vuoto perdi soldi ogni mese: tieni d'occhio le Gare d'appalto, assumi in anticipo quando ne vinci una e controlla Puntualità e Accuratezza nel menu Magazzini. ${contMode()?`Il tempo scorre da solo e non si ferma (ritmo ${MODES[modeOf()].n}): se non rispondi a un evento entro due settimane, decide il tuo vice. ${rivals().length?`In gara ci sono anche ${rivals().map(b=>b.company.name).join(', ')}: li trovi in Classifica. `:''}`:rivals().length?`In gara ci sono anche ${rivals().map(b=>b.company.name).join(', ')}: li trovi in Classifica. `:''}${contMode()?'':TOUCH?'Tocca › in alto per far scorrere il tempo. ':'Premi spazio per far scorrere il tempo. '}${TOUCH?'Le parole sottolineate a puntini si spiegano con un tocco; toccale di nuovo per aprire l\'Enciclopedia.':'Le parole sottolineate a puntini si spiegano passandoci sopra; cliccale, o premi E, per aprire l\'Enciclopedia.'}`); }

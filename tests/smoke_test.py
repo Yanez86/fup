@@ -118,13 +118,17 @@ async def phone(b, w, h, name, errs):
     # schermata principale con due partite salvate (il terzo posto resta per la partita del test)
     await pg.evaluate(SEED); await pg.evaluate(f"localStorage.removeItem(window.__FUP.slotKey(3))"); await reload(pg)
     await intro(pg, f'shot_tel_{name}_intro.png')
-    assert await pg.evaluate("document.querySelectorAll('#start .sv').length") == 2, f'{name}: partite salvate mancanti'
+    # schermata principale (0.131): l'interno del magazzino coi cartelli appesi; ogni cartello apre il suo riquadro
+    assert await pg.evaluate("!!document.querySelector('#start .hall .h-sca')&&!!document.querySelector('#start .hc.big[data-act=continue][data-slot]')"), f'{name}: magazzino o cartello «Continua» mancante'
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: la schermata principale scorre di lato'
     assert await pg.evaluate("[...document.querySelectorAll('#start button')].filter(b=>b.offsetParent&&b.scrollWidth>b.clientWidth+1).map(b=>b.innerText.slice(0,30))") == [], f'{name}: testo fuori dai pulsanti della schermata principale'
-    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_avvio.png'), full_page=True)
-    await pg.tap('#start .news summary'); await pg.wait_for_timeout(100)
-    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_novita.png'), full_page=True)
-    await pg.tap('#start .news summary')
+    await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_principale.png'))
+    for pan in ('partite', 'tutorial', 'online', 'novita'):
+        await pg.tap(f'#start [data-act=hmpan][data-p={pan}]'); await pg.wait_for_selector('#start .hm-pan')
+        assert await pg.evaluate("document.documentElement.scrollWidth<=innerWidth&&[...document.querySelectorAll('#start .hm-pan button')].every(b=>!b.offsetParent||b.scrollWidth<=b.clientWidth+1)"), f'{name}: riquadro {pan} fuori misura'
+        if pan == 'partite': assert await pg.evaluate("document.querySelectorAll('#start .sv').length") == 2, f'{name}: partite salvate mancanti'
+        await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_principale_{pan}.png'))
+        await pg.tap('#start .hm-x'); await pg.wait_for_selector('#start .hm-pan', state='detached')
     # creazione del CEO e dell'azienda a passaggi: ogni schermata deve stare nella larghezza del telefono
     await pg.tap('[data-act=newgame]')
     await pg.tap('[data-act=pickceo][data-id=custom]')
@@ -414,6 +418,7 @@ async def tutorial(b, errs, mob, tid='base'):
     await pg.goto('file://' + PAGE)
     await (pg.tap if mob else pg.click)('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
     await pg.screenshot(path=os.path.join(OUT, f'shot_{name}_avvio.png'))
+    await (pg.tap if mob else pg.click)('#start .hc[data-p=tutorial]')
     await (pg.tap if mob else pg.click)(f'#start [data-act=tutorial][data-id={tid}]')
     if av:   # la partita preparata parte da due anni giocati in fretta, con la barra di avanzamento
         await pg.wait_for_selector('#tutprep'); await pg.screenshot(path=os.path.join(OUT, f'shot_{name}_preparazione.png'))
@@ -485,7 +490,7 @@ async def tutorial(b, errs, mob, tid='base'):
     assert await pg.evaluate("()=>!document.querySelector('#tut').innerHTML&&document.querySelector('#tuthi').hidden"), f'{name}: fumetto rimasto dopo la fine'
     if not mob:
         # saltare il tutorial (con conferma): la partita continua normale
-        await pg.evaluate('()=>window.__FUP.ACT.quitgame()'); await pg.click('#start [data-act=tutorial]'); await pg.wait_for_selector('#tut .tut-b')
+        await pg.evaluate('()=>window.__FUP.ACT.quitgame()'); await pg.click('#start .hc[data-p=tutorial]'); await pg.click('#start [data-act=tutorial]'); await pg.wait_for_selector('#tut .tut-b')
         await pg.click('#tut [data-act=tutskip]'); await pg.click('#modal [data-act=okgo]')
         r = await pg.evaluate("()=>{const S=window.__FUP.S;return {done:S.tut.done,ev:S.nextEvent<1e8,tut:!!document.querySelector('#tut').innerHTML}}")
         assert r == {'done': 2, 'ev': True, 'tut': False}, r
@@ -514,11 +519,14 @@ async def main():
         pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + PAGE)
         await intro(pg, 'shot_intro.png')
-        await pg.click('#start .news summary')
-        assert await pg.evaluate("document.querySelector('#start .news').open"), 'elenco delle novità non si apre'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_avvio.png'))
+        await pg.click('#start [data-act=hmpan][data-p=novita]')
+        assert await pg.evaluate("document.querySelectorAll('#start .hm-pan .nw-e').length>5"), 'elenco delle novità non si apre'
+        assert await pg.evaluate(FITS, '#start .hm-pb'), 'riquadro delle novità fuori schermo'
         await pg.screenshot(path=os.path.join(OUT, 'shot_novita.png'))
-        await pg.click('#start .news summary')
-        assert await pg.query_selector('#start .hm-empty') and await pg.evaluate("!document.querySelector('#start [data-act=newgame]').disabled"), 'schermata principale senza partite'
+        await pg.keyboard.press('Escape'); await pg.wait_for_selector('#start .hm-pan', state='detached')
+        hm = await pg.evaluate("({cont:!!document.querySelector('#start [data-act=continue]'), part:!!document.querySelector('#start .hc[data-p=partite]'), nuova:document.querySelector('#start .hc[data-act=newgame]').className, off:document.querySelector('#start [data-act=newgame]').disabled})")
+        assert hm == {'cont': False, 'part': False, 'nuova': 'hc pri', 'off': False}, f'schermata principale senza partite: {hm}'
         await pg.click('[data-act=newgame]')
         # i tooltip devono stare sopra a tutto: schermata iniziale (talenti dei CEO) e finestre aperte
         TIP_ON_TOP = '''(()=>{const t=document.querySelector('#tip'),r=t.getBoundingClientRect();t.style.pointerEvents='auto';const e=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);t.style.pointerEvents='';return !t.hidden&&!!e&&!!e.closest('#tip');})()'''
@@ -941,12 +949,16 @@ async def main():
           const S=F.S;let small=0,n=0;for(let i=0;i<300;i++){S.tenders=[];F.newTender();const t=S.tenders[0];n++;if(F.ZONES[t.zone].k==='prov'||F.ZONES[t.zone].k==='grp')small++;}
           return {bad,small:small/n,open:F.S.tenders.length};}''')
         assert not r['bad'] and r['small'] > 0.4, r
-        # scenette degli eventi: ogni evento ne ha una che esiste, ogni striscia è 16 fotogrammi da 160x72
+        # scenette degli eventi: ogni evento ne ha una che esiste, ogni striscia è 16 fotogrammi da 160x72 (144x72 gli esterni)
         r = await pg.evaluate('''async()=>{const F=window.__FUP,bad=[],ids=F.EVENTS.map(e=>e.id);
           F.EVENTS.forEach(e=>{const k=F.SCN_EV[e.id]||F.SCN_SRC[e.src]; if(!k||!F.SCENE[k]) bad.push(e.id+': scena '+k);});
           Object.keys(F.SCN_EV).forEach(id=>{if(!ids.includes(id)) bad.push('SCN_EV: evento '+id+' inesistente');});
           [...Object.values(F.SCN_EV),...Object.values(F.SCN_SRC)].forEach(k=>{if(!F.SCENE[k]) bad.push('scena mancante: '+k);});
-          for(const [k,src] of Object.entries(F.SCENE)){const im=new Image(); im.src=src; await im.decode(); if(im.naturalWidth!==(/^(est|el)_/.test(k)?2304:2560)||im.naturalHeight!==72) bad.push(k+': '+im.naturalWidth+'x'+im.naturalHeight);}
+          // i pezzi dell'interno del magazzino (hall_*, schermata principale) hanno le misure scritte nel CSS di .hall
+          const HALL={scaffale:[160,72],soffitto:[160,27],pavimento:[160,40],muletto:[33*16,33],transpallet:[37*16,26],cane:[15*16,14]};
+          for(const [k,src] of Object.entries(F.SCENE)){const im=new Image(); im.src=src; await im.decode(); const h=HALL[k.replace(/^hall_/,'')]||null, w=h?h[0]:/^(est|el)_/.test(k)?2304:2560;
+            if(k.startsWith('hall_')&&!h) bad.push(k+': pezzo nuovo, aggiungi le misure qui e in .hall');
+            if(im.naturalWidth!==w||im.naturalHeight!==(h?h[1]:72)) bad.push(k+': '+im.naturalWidth+'x'+im.naturalHeight);}
           return {bad,n:Object.keys(F.SCENE).length};}''')
         assert not r['bad'] and r['n'] >= 38, r
         # scene in cima alle finestre: Magazzini, Tecnologia, Reparti tecnici, Certificati e audit, Customer service, Direzione, Azienda e CEO (3× nelle finestre larghe, 2× nelle strette);
@@ -1726,26 +1738,31 @@ async def main():
         assert not await pg.query_selector('#start [data-act=continue]'), 'partita cancellata ancora nella schermata iniziale'
         await pg.evaluate('''()=>{const F=window.__FUP; F.newGame('gino'); F.save();}''')
         await reload(pg); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
-        await pg.click('#start [data-act=delask]'); await pg.screenshot(path=os.path.join(OUT, 'shot_cancella_avvio.png'))
-        await pg.click('#start [data-act=delno]'); await pg.wait_for_selector('#start [data-act=continue]')
+        await pg.click('#start .hc[data-p=partite]'); await pg.click('#start [data-act=delask]'); await pg.screenshot(path=os.path.join(OUT, 'shot_cancella_avvio.png'))
+        await pg.click('#start [data-act=delno]'); await pg.wait_for_selector('#start .hm-pan [data-act=continue]')
         await pg.click('#start [data-act=delask]'); await pg.click('#start [data-act=delsave]')
         assert not await pg.query_selector('#start [data-act=continue]') and await pg.evaluate('()=>!localStorage.getItem(window.__FUP.KEY)'), 'cancellazione dalla schermata iniziale'
+        assert not await pg.query_selector('#start .hm-pan'), 'riquadro delle partite rimasto aperto senza partite'
         # tre posti di salvataggio: l'ultima giocata in cima, con tre partite il pulsante per una nuova si spegne
         await pg.evaluate(SEED); await reload(pg); await pg.click('#intro'); await pg.wait_for_selector('#intro:empty', state='attached')
+        await pg.screenshot(path=os.path.join(OUT, 'shot_avvio_pieno.png'))
+        assert await pg.evaluate("document.querySelector('#start .hc.big').dataset.slot") == '2', '«Continua» deve portare all\'ultima partita giocata'
+        await pg.click('#start .hc[data-p=partite]')
         hm = await pg.evaluate("({n:document.querySelectorAll('#start .sv').length, top:document.querySelector('#start .sv.top .sv-co').innerText, full:document.querySelector('#start [data-act=newgame]').disabled})")
         assert hm == {'n': 3, 'top': 'Prova 2', 'full': True}, hm
-        await pg.screenshot(path=os.path.join(OUT, 'shot_avvio_partite.png'), full_page=True)
+        await pg.screenshot(path=os.path.join(OUT, 'shot_avvio_partite.png'))
         await pg.click('#start [data-act=delask][data-slot="3"]'); await pg.click('#start [data-act=delsave][data-slot="3"]')
         hm = await pg.evaluate("({n:document.querySelectorAll('#start .sv').length, full:document.querySelector('#start [data-act=newgame]').disabled, s3:localStorage.getItem(window.__FUP.slotKey(3))})")
         assert hm == {'n': 2, 'full': False, 's3': None}, hm
-        await pg.click('[data-act=newgame]'); assert await pg.query_selector('#start .ceos'), 'nuova partita senza scelta del CEO'
-        await pg.click('[data-act=stback]'); await pg.wait_for_selector('#start .sv.top')
-        await pg.click('#start [data-act=continue][data-slot="1"]'); await pg.evaluate(CLEAR)
+        await pg.click('#start .hm-x'); await pg.click('[data-act=newgame]'); assert await pg.query_selector('#start .ceos'), 'nuova partita senza scelta del CEO'
+        assert await pg.evaluate("!!document.querySelector('#start>.hall')&&!document.querySelector('#start').classList.contains('st-home')"), 'magazzino non scurito dietro la creazione della partita'
+        await pg.click('[data-act=stback]'); await pg.wait_for_selector('#start .hc[data-act=continue]')
+        await pg.click('#start .hc[data-p=partite]'); await pg.click('#start [data-act=continue][data-slot="1"]'); await pg.evaluate(CLEAR)
         r = await pg.evaluate('''()=>{const F=window.__FUP; F.S.company.name='Prova 1 bis'; F.save();
           const g=n=>{const v=JSON.parse(localStorage.getItem(F.slotKey(n))); return v&&v.S.company.name;}; return {slot:F.slot, s1:g(1), s2:g(2)};}''')
         assert r == {'slot': 1, 's1': 'Prova 1 bis', 's2': 'Prova 2'}, r
         await pg.evaluate('()=>window.__FUP.ACT.quitgame()')
-        assert await pg.inner_text('#start .sv.top .sv-co') == 'Prova 1 bis', 'la partita appena giocata deve andare in cima'
+        assert await pg.inner_text('#start .hc.big em') == 'Prova 1 bis', 'la partita appena giocata deve andare sul cartello «Continua»'
         # salvataggio online: archivio finto al posto di Supabase (il test non usa la rete)
         await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; for(let n=1;n<=F.SLOTS;n++) localStorage.removeItem(F.slotKey(n));
           window.DB={}; const D=window.DB, cp=o=>JSON.parse(JSON.stringify(o));
@@ -1755,12 +1772,13 @@ async def main():
             update:async(r,prev)=>{if(!D[r.slot]||D[r.slot].at!==prev) return []; D[r.slot]=cp(r); return [{slot:r.slot}];},
             put:async r=>{D[r.slot]=cp(r);}, del:async(n,max)=>{if(D[n]&&D[n].at<=max) delete D[n];}, wipe:async()=>{for(const k in D) delete D[k];}});
           F.slot=1; F.newGame('gino'); F.save(); F.ACT.quitgame();}''')
+        await pg.click('#start .hc[data-p=partite]')
         r = await pg.evaluate('''async()=>{const F=window.__FUP; F.cloudUser({id:'u1',email:'prova@example.com'}); await new Promise(r=>setTimeout(r,300));
           const up=Object.keys(DB).join()==='1'&&F.cMeta(1).cat===F.load(1).at;
           DB[1].at+=5000; DB[1].dati.at=DB[1].at; DB[1].dati.S.day=400; DB[1].giorno=400; DB[1].dev='telefono iOS'; await F.cloudSync();
           const down=F.load(1).S.day===400;
           const sv=F.load(1); sv.at+=100; sv.S.day=401; localStorage.setItem(F.slotKey(1),JSON.stringify(sv)); DB[1].at+=9000; DB[1].giorno=500; DB[1].dati.S.day=500; DB[1].dati.at=DB[1].at; await F.cloudSync();
-          const clash=!!F.CL.clash[1]&&!!document.querySelector('#start .cl-x [data-act=clkeep]');
+          const clash=!!F.CL.clash[1]&&!!document.querySelector('#start .cl-x [data-act=clkeep]')&&!!document.querySelector('#start .hc.big[data-act=hmpan] .hc-bad')&&!!document.querySelector('#start .hc[data-p=online] .hc-bad');
           return {up,down,clash};}''')
         assert r == {'up': True, 'down': True, 'clash': True}, r
         await pg.screenshot(path=os.path.join(OUT, 'shot_online_conflitto.png'))

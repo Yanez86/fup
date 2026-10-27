@@ -461,3 +461,79 @@ scene("trasloco", { w: SW, h: SH, bg: "S", world: { light: [-0.6, -1], ground: 6
     stamp("capoturno", 132, 67)),
   layer("sopra", stamp("gatto", 13, 46), ...filmato(141, 55, 9)),
 )
+
+// ================================================================ INGRESSO DEL GIOCO (hall_*)
+// L'interno del magazzino dietro i cartelli della schermata principale (showStart in src/game.html).
+// Non è una scenetta 160×72: sono pezzi di misura libera che il gioco mette insieme col CSS a un ingrandimento intero.
+// Soffitto e pavimento si ripetono in larghezza, lo scaffale in larghezza e in altezza (a partire dal pavimento);
+// muletto, transpallet e cane stanno sul pavimento. esporta.py li porta con la trasparenza, fermi se non si muovono.
+// prova_hall li mette insieme come nel gioco, per guardarli (non va nel gioco).
+const HW = 160                       // larghezza dei pezzi che si ripetono: quattro campate da 40
+const HL = 18                        // altezza di un livello dello scaffale (quattro livelli in un pezzo da 72)
+const HR = rng(31)
+// scaffalatura porta-pallet vista di fronte: montanti blu ogni 40, correnti arancioni con le etichette di ubicazione,
+// due pallet per vano; dietro il fondo in ombra. Qualche posto vuoto, perché lo scaffale non è mai pieno.
+function hallScaffale() {
+  const it = [rect(0, 0, HW, 72, "j")]
+  for (let l = 0; l < 4; l++) {
+    const yb = l * HL + 16
+    for (let v = 0; v < 4; v++) for (let p = 0; p < 2; p++) {
+      const x = v * 40 + 4 + p * 18
+      if (HR() < 0.16) { it.push(rect(x + 1, yb - 1, 14, 1, "s")); continue }   // posto vuoto: solo la polvere sul corrente
+      const tipo = SCATOLE[Math.floor(HR() * SCATOLE.length)], alto = 6 + Math.floor(HR() * 4)
+      it.push(...merce(x, yb - 12, tipo, alto))
+    }
+    it.push(rect(0, yb, HW, 2, "O"), hline(0, yb + 1, HW, "o"))
+    for (let v = 0; v < 4; v++) for (let p = 0; p < 2; p++) {
+      const x = v * 40 + 4 + p * 18 + 6
+      it.push(rect(x, yb, 4, 2, "W"), px(x + 1, yb + 1, "K"), px(x + 2, yb + 1, "K"))    // etichetta col codice a barre
+    }
+  }
+  for (let v = 0; v < 4; v++) {
+    const x = v * 40
+    it.push(rect(x, 0, 2, 72, "b"), vline(x, 0, 72, "B"), ...Array.from({ length: 12 }, (_, i) => px(x + 1, 3 + i * 6, "d")))
+  }
+  return it
+}
+scene("hall_scaffale", { w: HW, h: 72, wrap: true }, ...hallScaffale())
+
+// il soffitto: lamiera scura coi lucernari, la trave reticolare e le lampade a campana appese; sotto è trasparente
+function hallSoffitto() {
+  const it = [rect(0, 0, HW, 10, "d")]
+  ;[12, 92].forEach((x) => it.push(rect(x, 2, 36, 5, "L"), hline(x, 2, 36, "W"), hline(x, 6, 36, "B"), ...[12, 24].map((d) => vline(x + d, 2, 5, "D"))))
+  it.push(rect(0, 10, HW, 7, "_"), hline(0, 10, HW, "D"), hline(0, 16, HW, "D"), hline(0, 17, HW, "K"))   // correnti della trave
+  for (let x = 0; x < HW; x += 10) it.push(line(x, 11, x + 5, 15, "D"), line(x + 5, 15, x + 10, 11, "D"))
+  ;[20, 100].forEach((x) => it.push(vline(x, 18, 4, "K"), rect(x - 1, 21, 3, 1, "K"),
+    rect(x - 4, 22, 9, 3, "D"), hline(x - 3, 22, 7, "j"), hline(x - 4, 24, 9, "d"), rect(x - 3, 25, 7, 1, "i"), px(x, 25, "W")))
+  return it
+}
+scene("hall_soffitto", { w: HW, h: 27, wrap: "x" }, ...hallSoffitto())
+
+// il pavimento in cemento: l'ombra sotto lo scaffale, le strisce gialle della corsia, i giunti delle lastre
+scene("hall_pavimento", { w: HW, h: 40, bg: "S", wrap: "x" },
+  rect(0, 0, HW, 2, "s"), hline(0, 2, HW, "j"),
+  rect(0, 6, HW, 2, "Y"), rect(0, 35, HW, 2, "Y"),
+  ...[30, 110].map((x) => vline(x, 9, 25, "s")), ...[30, 110].map((x) => vline(x + 1, 9, 25, "W")))
+
+// il muletto che passa con un pallet di scatole sulle forche: ruote che girano, lampeggiante acceso
+anim("_muletto_va", { w: 31, h: 31, frames: LOOP, fps: FPS, outline: "K" },
+  stamp("__mulettista", 12, 4),
+  stamp("_muletto", 0, 3),
+  (c) => {
+    const y = 19
+    c.rect(0, y, 7, 1, "K"); c.rect(5, y - 6, 2, 6, "s")
+    c.rect(0, y - 2, 5, 2, "k"); c.hline(0, y - 1, 5, "N")
+    c.rect(0, y - 9, 5, 7, "k"); c.vline(2, y - 9, 7, "N"); c.hline(0, y - 9, 5, "q")
+  },
+  (c) => { const on = c.frame % 4 < 2; c.rect(15, 3, 3, 2, on ? "O" : "o"); if (on) { c.px(14, 2, "Y"); c.px(18, 2, "Y") } },
+  (c) => { const [dx, dy] = [[0, -2], [2, 0], [0, 2], [-2, 0]][c.frame % 4]; [13, 24].forEach((x) => c.px(x + dx, 27 + dy, "D")) })
+scene("hall_muletto", { w: 33, h: 33 }, stamp("_muletto_va", 0, 0))
+scene("hall_transpallet", { w: 37, h: 26 }, stamp("transpallet", 18, 25))
+scene("hall_cane", { w: 15, h: 14 }, stamp("cane", 7, 14))
+
+// prova: i pezzi messi insieme come nella schermata principale (a 1×)
+scene("prova_hall", { w: 320, h: 180, bg: "j" },
+  pattern("hall_scaffale", 0, -76, 320, 216),
+  pattern("hall_soffitto", 0, 0, 320, 27),
+  pattern("hall_pavimento", 0, 140, 320, 40),
+  stamp("transpallet", 60, 172), stamp("cane", 270, 172), stamp("_muletto_va", 170, 141))
