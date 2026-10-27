@@ -34,7 +34,7 @@ Alcuni si chiudono subito; altri aprono una **storia a puntate**: la scelta di o
 ### 1. La lontra in magazzino
 *Idea di Davide: una lontra entra in magazzino e bisogna decidere come cacciarla. Con la forza bruta si rischiano guai con la protezione animali, di cui fa parte una dipendente.*
 
-- **Dove**: un magazzino vicino a un fiume. La lontra in Italia è rara e protetta (è vero): la proposta è farla arrivare solo nei magazzini lungo il Ticino (Novara, Varese, Pavia, ovest di Milano) e in Friuli, dove è tornata davvero dall'Austria e dalla Slovenia. Così l'evento è anche un piccolo omaggio alla geografia reale.
+- **Dove**: in qualunque magazzino (deciso). La lontra in Italia è rara e protetta (è vero), quindi la sorpresa è doppia. Il racconto nomina il fiume più vicino al magazzino (Po, Ticino, Adda, Adige, Piave, Tagliamento…) o, se non ce n'è uno, «il canale dietro il piazzale».
 - **Il racconto**: alle 6 del mattino il primo carrellista trova una lontra tra i bancali, che fischia e non ha nessuna intenzione di andarsene. Il turno è fermo. Una magazziniera (nome e volto) fa la volontaria nell'associazione **«Amici delle Zampe Bagnate»** e ha già il telefono in mano.
 - **Risposte**:
 
@@ -78,7 +78,7 @@ Alcuni si chiudono subito; altri aprono una **storia a puntate**: la scelta di o
 ### 3. Il manager tiranno
 *Idea di Davide: un manager (solo i manager) va fuori di testa e comincia a vessare i collaboratori. Si può licenziare, redarguire, rimansionare, oppure va bene così perché fa lavorare tutti di più. Ma a che prezzo?*
 
-- **Chi**: un manager che guida un magazzino. Più probabile con chi ha già certi talenti (Stacanovista, Cronometro facile, Ha fatto il militare, Insonne, Esaurito); mai con Calma olimpica, Mentore o Meditazione quotidiana.
+- **Chi**: solo un manager che guida un magazzino (deciso). Più probabile con chi ha già certi talenti (Stacanovista, Cronometro facile, Ha fatto il militare, Insonne, Esaurito); mai con Calma olimpica, Mentore o Meditazione quotidiana.
 - **Il racconto**: da qualche settimana urla in banchina, manda vocali alle 5, ha tolto la pausa caffè e chiama i carrellisti per numero di matricola. La produttività è salita, il morale è a terra, e due magazzinieri hanno già chiesto il trasferimento.
 - **Risposte**:
 
@@ -103,7 +103,7 @@ Alcuni si chiudono subito; altri aprono una **storia a puntate**: la scelta di o
 ### 4. Il licenziato che si porta via la porta
 *Idea di Davide: hai licenziato un dipendente e lui se ne va portandosi via, letteralmente, la porta.*
 
-- **Quando**: pochi giorni dopo un licenziamento (di un dipendente; da decidere se anche di un manager). Non per la stessa persona del «licenziamento impugnato» che c'è già nel gioco base.
+- **Quando**: pochi giorni dopo un licenziamento, sia di un dipendente sia di un manager (deciso). Il manager si porta via la porta del suo ufficio, con la targhetta. Non per la stessa persona del «licenziamento impugnato» che c'è già nel gioco base.
 - **Il racconto**: la mattina dopo, l'ufficio del capoturno non ha più la porta. Cardini svitati con cura, nemmeno un graffio sul muro. La telecamera lo mostra uscire alle 18:12 con la porta in spalla, salutando la guardia. Al telefono è tranquillissimo: «L'ho montata io nel 2004. La porta è mia».
 - **Risposte**:
 
@@ -115,7 +115,7 @@ Alcuni si chiudono subito; altri aprono una **storia a puntate**: la scelta di o
 | **«Porte aperte», davvero** | Il vano resta vuoto. Morale +2 nel magazzino (trasparenza), precisione −0,5 per 2 mesi (rumore, distrazioni). Col pacchetto Relazioni industriali si può collegare alla policy «Porte aperte». |
 
 - **Puntata 2, «La porta in vendita»** (3-6 mesi dopo): la porta compare su un sito di annunci, «porta da ufficio, storica, con targhetta CAPOTURNO, 150 €». Ricomprarla e appenderla in mensa come un trofeo (−150 €, morale +3) / lasciar perdere. In alternativa: la porta ricompare montata da un'avversaria, che l'ha assunto.
-- **Talenti**: nessuno per lui, che se ne va. Da decidere se serve.
+- **Talenti**: nessuno, lui se ne va.
 - **Scenetta**: dedicata, *la porta*: il piazzale, un omino che si allontana con la porta sulla schiena, il vano vuoto dietro.
 
 ### 5. La cena nelle Langhe
@@ -197,11 +197,7 @@ Ognuno vuole il suo disegno nelle icone (come tutti i talenti) e la sua voce nel
 Le scenette che esistono già e si possono riusare: magazzino, piazzale, ufficio, ufficio di notte, festa, sciopero, trattativa, ispezione, edicola, strada, trattoria, talento, pioggia, neve, nebbia, golf, ministero.
 
 ## Domande aperte per Davide
-1. **La lontra**: solo lungo il Ticino e in Friuli, o in qualunque magazzino?
-2. **Il manager tiranno**: solo chi guida un magazzino, o anche chi guida il customer service e i reparti?
-3. **La porta**: anche quando licenzi un manager?
-4. **Cena nelle Langhe**: tre preventivi più la mensa vanno bene? Le scene della mattina dopo ti fanno ridere, o ne vuoi altre?
-5. **Talenti**: vanno bene quelli proposti? Ne vuoi altri anche fuori dalle storie (che escono tra i candidati, solo col pacchetto)?
+Nessuna, per ora. Decisi con Davide: la lontra arriva in qualunque magazzino; il tiranno è solo un manager di magazzino; la porta sparisce anche quando si licenzia un manager; la cena nelle Langhe e i talenti proposti vanno bene così.
 
 ## Note per quando scriveremo il codice
 - Pacchetto in `PACKS` (con il suo `S.cfg`; id proposto `sh`), stemma `pk_sh` in `tools/loghi_pxl/pacchetti.px.js`, voce `shift_happens` nell'enciclopedia.
