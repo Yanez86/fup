@@ -118,8 +118,8 @@ async def phone(b, w, h, name, errs):
     # schermata principale con due partite salvate (il terzo posto resta per la partita del test)
     await pg.evaluate(SEED); await pg.evaluate(f"localStorage.removeItem(window.__FUP.slotKey(3))"); await reload(pg)
     await intro(pg, f'shot_tel_{name}_intro.png')
-    # schermata principale (0.131): l'interno del magazzino coi cartelli appesi; ogni cartello apre il suo riquadro
-    assert await pg.evaluate("!!document.querySelector('#start .hall .h-sca')&&!!document.querySelector('#start .hc.big[data-act=continue][data-slot]')"), f'{name}: magazzino o cartello «Continua» mancante'
+    # schermata principale (0.131, tabellone dalla 0.132): l'interno del magazzino, l'insegna e il tabellone; ogni voce apre il suo riquadro
+    assert await pg.evaluate("!!document.querySelector('#start .hall .h-sca')&&!!document.querySelector('#start .hm-tab .hc.big.pri[data-act=continue][data-slot]')"), f'{name}: magazzino o voce «Continua» mancante'
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: la schermata principale scorre di lato'
     assert await pg.evaluate("[...document.querySelectorAll('#start button')].filter(b=>b.offsetParent&&b.scrollWidth>b.clientWidth+1).map(b=>b.innerText.slice(0,30))") == [], f'{name}: testo fuori dai pulsanti della schermata principale'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_principale.png'))
@@ -1307,6 +1307,7 @@ async def main():
           o.win=!!document.querySelector('#win-calendario .cal-g'); o.oggi=!!document.querySelector('#win-calendario .cal-c.oggi');
           o.anni=F.calItems(0,365*5+1).some(x=>x.c==='ric'&&x.t.includes('compie 5 anni')); o.bolla=S.log.some(x=>x.k==='bolla1');
           o.pasqua=F.festa(F.pasqua(2003))==='Pasqua'&&new Date(Date.UTC(2002,0,1)+F.pasqua(2003)*864e5).getUTCDate()===20;
+          const dd=new Date(Date.UTC(2002,0,1)+t.deadline*864e5); F.UI.sel.calM=[dd.getUTCFullYear(),dd.getUTCMonth()];   // la scadenza può cadere nel mese dopo
           F.ACT.calday({d:t.deadline}); const b=[...document.querySelectorAll('#win-calendario .cal-sel .cal-it')].find(x=>x.innerText.includes('Scade la gara'));
           o.gara=!!b; if(b) b.click(); o.apre=!!document.querySelector('#win-gare'); F.ACT.calm({v:1}); F.ACT.calm({v:1}); o.mese=document.querySelector('#win-calendario .cal-h b').innerText;
           F.ACT.calm({v:0}); return o;}""")
@@ -1672,10 +1673,14 @@ async def main():
           out.ev=!bad.length&&!S.leases.length&&b.skip===2; out.bad=bad; return out;}''')
         assert all(v for k, v in r.items() if k != 'bad'), f'affitto a un inquilino: {r}'
         await pg.evaluate("()=>{const F=window.__FUP,S=F.S; S.leases=[{id:'lsT',w:JSON.parse(JSON.stringify(S.warehouses[0])),by:'Palestra CrossPallet',amt:5200,from:S.day,until:S.day+60,bot:null}]; F.ACT.leases(); document.querySelector('#win-magazzini [data-act=lsback]').closest('.card').scrollIntoView({block:'center'});}")
-        await pg.evaluate("()=>{const F=window.__FUP; F.S.notes=[]; document.querySelector('#notecard')&&document.querySelector('#notecard').classList.add('out'); F.renderAll();}")
+        await pg.evaluate("()=>{const F=window.__FUP; F.S.notes=[]; F.S.speed=0; document.querySelector('#notecard')&&document.querySelector('#notecard').classList.add('out'); F.renderAll();}")
         await pg.wait_for_timeout(400)
-        card = await pg.evaluate_handle("()=>document.querySelector('#win-magazzini [data-act=lsback]').closest('.card')")
-        await card.as_element().screenshot(path=os.path.join(OUT, 'shot_capannoni_affittati.png'))
+        # in pausa la finestra non si ridisegna a ogni giorno; se capita lo stesso, il localizzatore ritrova la scheda e si riprova
+        for t in range(3):
+            try: await pg.locator('#win-magazzini .card:has([data-act=lsback])').last.screenshot(path=os.path.join(OUT, 'shot_capannoni_affittati.png')); break
+            except Exception:
+                if t == 2: raise
+                await pg.wait_for_timeout(200)
         # col pacchetto Relazioni industriali (0.105): trasloco oltre 40 km da un magazzino col sindacato = delocalizzazione; il tavolo con l'accordo
         # di trasferimento, firmato, raddoppia l'indennità; a fine trasloco il sindacato arriva nel magazzino nuovo con chi ha seguito
         r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; F.newGame('gino',null,{mode:'classica',ri:true}); const S=F.S; S.cash=3e6; S.speed=0;
@@ -1762,7 +1767,7 @@ async def main():
           const g=n=>{const v=JSON.parse(localStorage.getItem(F.slotKey(n))); return v&&v.S.company.name;}; return {slot:F.slot, s1:g(1), s2:g(2)};}''')
         assert r == {'slot': 1, 's1': 'Prova 1 bis', 's2': 'Prova 2'}, r
         await pg.evaluate('()=>window.__FUP.ACT.quitgame()')
-        assert await pg.inner_text('#start .hc.big em') == 'Prova 1 bis', 'la partita appena giocata deve andare sul cartello «Continua»'
+        assert await pg.inner_text('#start .hc.big em') == 'Prova 1 bis', 'la partita appena giocata deve andare sulla voce «Continua»'
         # salvataggio online: archivio finto al posto di Supabase (il test non usa la rete)
         await pg.evaluate('''()=>{const F=window.__FUP; document.querySelector('#modal').innerHTML=''; for(let n=1;n<=F.SLOTS;n++) localStorage.removeItem(F.slotKey(n));
           window.DB={}; const D=window.DB, cp=o=>JSON.parse(JSON.stringify(o));

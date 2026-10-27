@@ -898,7 +898,7 @@ html.boot,html.boot body{background:#5fb4f0} html.boot body>*:not(#intro){visibi
 #start .hall::after{content:'';position:absolute;inset:0;background:rgba(8,16,30,.62);transition:opacity .3s}
 #start.st-home .hall::after{opacity:0} #start.st-home.st-pan .hall::after{opacity:.8}
 .hall .h-sca,.hall .h-sof,.hall .h-pav,.hall .h-fr{image-rendering:pixelated;background-repeat:no-repeat}
-.hall .h-sca{left:0;right:0;top:0;bottom:calc(40px*var(--k));box-shadow:inset 0 0 0 100vmax rgba(22,32,46,.12);background-repeat:repeat;background-size:calc(160px*var(--k)) calc(72px*var(--k));background-position:50% 100%}
+.hall .h-sca{left:0;right:0;top:0;bottom:calc(40px*var(--k));box-shadow:inset 0 0 0 100vmax rgba(22,32,46,.25);background-repeat:repeat;background-size:calc(160px*var(--k)) calc(72px*var(--k));background-position:50% 100%}
 .hall .h-sof{left:0;right:0;top:0;height:calc(27px*var(--k));background-repeat:repeat-x;background-size:calc(160px*var(--k)) 100%;background-position:50% 0}
 .hall .h-pav{left:0;right:0;bottom:0;height:calc(40px*var(--k));background-repeat:repeat-x;background-size:calc(160px*var(--k)) 100%;background-position:50% 0}
 .hall .h-fr{display:block;width:var(--w);height:var(--h);background-size:calc(var(--w)*16) 100%;animation:hallFr 2s steps(16) infinite}
@@ -912,32 +912,35 @@ html.boot,html.boot body{background:#5fb4f0} html.boot body>*:not(#intro){visibi
 #start .st-in{position:relative}
 .hm{min-height:100vh;min-height:100dvh;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;padding:calc(17px*var(--k)) max(16px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
 .hm-st{--gap:18px;width:min(560px,100%);display:flex;flex-direction:column;gap:var(--gap);margin-top:calc(5px*var(--k))}
+/* l'insegna «FUP», appesa da sola come un cartellone, e sotto il tabellone bianco con le voci; il giallo solo sulla prima (Continua, o Nuova partita) */
 .hm-tit{position:relative;align-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 28px 14px;background:var(--ink);border:3px solid var(--ink2);box-shadow:inset 0 0 0 3px var(--ink),inset 0 0 0 5px var(--yellow),5px 5px 0 rgba(12,19,29,.45)}
 #start .hm-tit h1{padding-left:.06em;font-size:64px;font-weight:400;line-height:.8;letter-spacing:.06em;color:var(--yellow);text-shadow:4px 4px 0 var(--accent-d)}
 .hm-tit .sub{font-family:var(--f-disp);font-size:22px;line-height:1;color:#fff3c4}
-.hm-tit::before,.hm-tit::after,.hc::before,.hc::after{content:'';position:absolute;bottom:100%;width:8px;height:calc(var(--gap) + 6px);margin-bottom:-3px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 6' shape-rendering='crispEdges'%3E%3Cpath fill='%2316202e' d='M1 0h2v1H1zM0 1h1v2H0zM3 1h1v2H3zM1 3h2v3H1z'/%3E%3Cpath fill='%238a96a6' d='M1 1h1v1H1zM2 4h1v1H2z'/%3E%3C/svg%3E") 0 0/8px 12px repeat-y;pointer-events:none}
-.hm-tit::before,.hm-tit::after{height:calc(5px*var(--k) + 3px)}
-html:not(.mob) .hm-tit::before,html:not(.mob) .hm-tit::after,html:not(.mob) .hc::before,html:not(.mob) .hc::after{width:12px;background-size:12px 18px}
-.hm-tit::before,.hc::before{left:14%} .hm-tit::after,.hc::after{right:14%}
-.hc{--bg:#217a36;--tx:#fff;position:relative;width:100%;min-height:78px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:10px 16px 10px 12px;background:var(--bg);color:var(--tx);border:3px solid var(--ink);
-  box-shadow:inset 0 0 0 3px var(--bg),inset 0 0 0 5px rgba(255,255,255,.85),5px 5px 0 rgba(12,19,29,.45);font-family:var(--f-body);font-size:15px;line-height:1.3;text-align:left;cursor:pointer;transition:transform .12s}
-.hc.pri{--bg:var(--accent);--tx:var(--ink)} .hc.blu{--bg:#1b64ad} .hc.tea{--bg:#146b61}
-@media (hover:hover){.hc:hover:not(:disabled){transform:translateY(-3px)}}
-.hc:active:not(:disabled){transform:translateY(1px)}
-.hc:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
-.hc:disabled{--bg:var(--ink4);cursor:not-allowed}.hc:disabled .hc-ic,.hc:disabled .hc-ar{opacity:.45}
-.hc-ic{flex:none;width:52px;height:52px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:#fff;border:3px solid var(--ink);overflow:hidden}
-.hc.blu .hc-ic{background:#bfe6ff;align-items:flex-start}.hc.blu .hc-ic img{margin-top:-1px}
+.hm-tit::before,.hm-tit::after,.hm-tab::before,.hm-tab::after{content:'';position:absolute;bottom:100%;width:8px;height:calc(var(--gap) + 7px);margin-bottom:-4px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 6' shape-rendering='crispEdges'%3E%3Cpath fill='%2316202e' d='M1 0h2v1H1zM0 1h1v2H0zM3 1h1v2H3zM1 3h2v3H1z'/%3E%3Cpath fill='%238a96a6' d='M1 1h1v1H1zM2 4h1v1H2z'/%3E%3C/svg%3E") 0 0/8px 12px repeat-y;pointer-events:none}
+.hm-tit::before,.hm-tit::after{height:calc(5px*var(--k) + 3px);margin-bottom:-3px}
+html:not(.mob) .hm-tit::before,html:not(.mob) .hm-tit::after,html:not(.mob) .hm-tab::before,html:not(.mob) .hm-tab::after{width:12px;background-size:12px 18px}
+.hm-tit::before,.hm-tab::before{left:14%} .hm-tit::after,.hm-tab::after{right:14%}
+.hm-tab{position:relative;display:flex;flex-direction:column;padding:3px;background:var(--panel);border:4px solid var(--ink);box-shadow:inset 0 0 0 3px #fff,6px 6px 0 rgba(12,19,29,.45)}
+.hc{position:relative;width:100%;min-height:76px;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:10px 14px 10px 12px;background:transparent;color:var(--ink);border:0;border-bottom:2px dashed var(--line);
+  font-family:var(--f-body);font-size:15px;line-height:1.3;text-align:left;cursor:pointer}
+.hc:last-child{border-bottom:0}
+.hc.pri{background:var(--yellow);border-bottom:3px solid var(--ink);box-shadow:inset 0 -4px 0 #c98a00}
+@media (hover:hover){.hc:hover:not(:disabled){background:var(--panel2)}.hc.pri:hover:not(:disabled){background:#ffe680}}
+.hc:active:not(:disabled){background:var(--line)}.hc.pri:active:not(:disabled){background:#ffe680}
+.hc:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+.hc:disabled{color:var(--muted);cursor:not-allowed}.hc:disabled .hc-ic,.hc:disabled .hc-ar{opacity:.45}
+.hc-ic{flex:none;width:52px;height:52px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--panel2);border:2px solid var(--ink);overflow:hidden}
+.hc.tut .hc-ic{align-items:flex-start}
 .hc-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
 .hc-t b{font-family:var(--f-disp);font-size:30px;font-weight:400;line-height:.9;letter-spacing:.02em}
-.hc-t>span{opacity:.92;overflow-wrap:anywhere}
+.hc-t>span{color:var(--muted);overflow-wrap:anywhere}.hc.pri .hc-t>span{color:var(--ink)}
 .hc-ar{flex:none;font-family:var(--f-disp);font-size:38px;line-height:1}
-.hc.big{min-height:112px;padding:12px 18px 12px 12px}
-.hc.big .hc-ic{width:80px;height:90px;background:var(--tint);align-items:flex-start;box-shadow:inset 0 -6px 0 rgba(22,32,46,.18)}.hc.big .hc-ic img{flex:none;margin-top:-6px}
+.hc.big{min-height:112px;padding:12px 16px 12px 12px}
+.hc.big .hc-ic{width:80px;height:90px;background:var(--tint);border-width:3px;align-items:flex-start;box-shadow:inset 0 -6px 0 rgba(22,32,46,.18)}.hc.big .hc-ic img{flex:none;margin-top:-6px}
 .hc.big .hc-t b{font-size:42px}
-.hc.big .hc-t>span{display:flex;flex-direction:column;gap:2px;opacity:1}.hc.big em{font-style:normal;font-family:var(--f-disp);font-size:23px;line-height:1}
+.hc.big .hc-t>span{display:flex;flex-direction:column;gap:2px}.hc.big em{font-style:normal;font-family:var(--f-disp);font-size:23px;line-height:1}
 .hc.sm{min-height:62px;padding-top:7px;padding-bottom:7px}.hc.sm .hc-ic{width:44px;height:44px;margin:0 4px}.hc.sm .hc-t b{font-size:25px}
-.hc-bad{position:absolute;top:-13px;right:-13px;width:30px;height:30px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--bad);color:#fff;border:3px solid var(--ink);box-shadow:2px 2px 0 var(--ink);font-family:var(--f-disp);font-size:22px;line-height:1}
+.hc-bad{flex:none;width:30px;height:30px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--bad);color:#fff;border:3px solid var(--ink);box-shadow:2px 2px 0 var(--ink);font-family:var(--f-disp);font-size:22px;line-height:1}
 .hm-ft{width:100%;margin-top:auto;padding-top:22px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .hm-fl{display:flex;gap:8px;flex-wrap:wrap}
 .hm-sm{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:5px 12px;background:var(--panel);color:var(--ink);border:3px solid var(--ink);box-shadow:3px 3px 0 rgba(12,19,29,.45);font-family:var(--f-disp);font-size:20px;line-height:1;cursor:pointer}
@@ -963,7 +966,7 @@ html:not(.mob) .hm-tit::before,html:not(.mob) .hm-tit::after,html:not(.mob) .hc:
  html:not(.mob) .hc{min-height:62px;padding:6px 14px 6px 10px;font-size:14px} html:not(.mob) .hc-ic{width:44px;height:44px} html:not(.mob) .hc-t b{font-size:26px}
  html:not(.mob) .hc.big{min-height:92px} html:not(.mob) .hc.big .hc-ic{width:72px;height:78px} html:not(.mob) .hc.big .hc-ic img{margin-top:-9px} html:not(.mob) .hc.big .hc-t b{font-size:36px} html:not(.mob) .hc.big em{font-size:21px}
  html:not(.mob) .hc.sm{min-height:54px} html:not(.mob) .hc.sm .hc-ic{width:40px;height:40px;margin:0 2px} html:not(.mob) .hc.sm .hc-t b{font-size:23px}}
-@media (prefers-reduced-motion: reduce){.hall .h-fr,.hall .h-mul{animation:none}.hall .h-mul{transform:translateX(56vw)}.hc{transition:none}}
+@media (prefers-reduced-motion: reduce){.hall .h-fr,.hall .h-mul{animation:none}.hall .h-mul{transform:translateX(56vw)}}
 .sv{background:#fff;border:2px solid var(--ink);box-shadow:inset 0 -3px 0 var(--panel2),3px 3px 0 var(--ink);padding:10px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
 .sv-pic{width:64px;height:64px;flex:none;background:var(--tint);border:2px solid var(--ink);overflow:hidden}.sv-pic img{display:block;margin:-6px 0 0 -16px}
 .sv-m{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:3px}
@@ -1287,12 +1290,13 @@ html,body{overscroll-behavior:none}
 .mob #tut.up{top:calc(var(--top-h, 56px) + 8px);bottom:auto}
 .mob #tut p{font-size:15px}.mob #tut .tut-b{padding:8px 10px 10px;gap:6px}.mob #tut .tut-b::before{display:none}
 .mob #start.st-home{padding:0}.mob .hm{padding-top:calc(17px*var(--k) + env(safe-area-inset-top,0px))}
-.mob .hm-st{--gap:15px}.mob .hc{min-height:70px;gap:12px;padding:9px 12px 9px 10px;font-size:14px}.mob .hc-t b{font-size:27px}.mob .hc.big .hc-t b{font-size:36px}.mob .hc.big em{font-size:21px}.mob .hc-ar{font-size:32px}
+.mob .hm-st{--gap:15px}.mob .hc{min-height:70px;gap:12px;padding:9px 10px 9px 8px;font-size:14px}.mob .hc-t b{font-size:27px}.mob .hc.big .hc-t b{font-size:36px}.mob .hc.big em{font-size:21px}.mob .hc-ar{font-size:32px}
 .mob #start .hm-tit h1{font-size:52px}.mob .hm-tit{padding:10px 22px 12px}.mob .hm-tit .sub{font-size:19px}
 .mob .hm-pan{padding:0}.mob .hm-pb{width:100%;height:100%;margin:0;border:0;box-shadow:none}.mob .hm-ph{padding-top:calc(8px + env(safe-area-inset-top,0px))}.mob .hm-ph h2{font-size:25px}
 .mob .hm-pc{padding:14px 12px 20px}.mob .hm-tb{grid-template-columns:minmax(0,1fr)}.mob .hm-orn p{font-size:15px}
-.land .hm-st{--gap:12px;width:min(760px,100%);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap) 14px}
-.land .hm-tit{grid-column:1/-1;flex-direction:row;align-items:baseline;gap:14px;padding:6px 18px 8px}.land #start .hm-tit h1{font-size:40px}.land .hc.big{grid-column:1/-1;min-height:84px}
+.land .hm-st{--gap:12px;width:min(760px,100%)}.land .hm-tab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.land .hm-tab .hc{border-bottom:0;border-top:2px dashed var(--line)}.land .hm-tab .hc:first-child{border-top:0}.land .hm-tab .hc.pri{grid-column:1/-1;border-bottom:3px solid var(--ink)}.land .hm-tab .hc.pri+.hc,.land .hm-tab .hc.pri+.hc+.hc{border-top:0}
+.land .hm-tit{flex-direction:row;align-items:baseline;gap:14px;padding:6px 18px 8px}.land #start .hm-tit h1{font-size:40px}.land .hc.big{min-height:84px}
 .land .hc{min-height:58px;padding:6px 10px 6px 8px}.land .hc-t b{font-size:23px}.land .hc-t>span{font-size:12px}.land .hc-ic{width:42px;height:42px}.land .hc.big .hc-ic{width:56px;height:64px}.land .hc.big .hc-ic img{width:48px;height:56px;margin-top:2px}
 .mob .nw-e{gap:10px;padding:8px 12px}.mob .nw-e .v{width:46px}.mob #start .nw-c ul{font-size:14px;padding-left:16px}
 .mob .ceos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding:30px 12px 14px;margin:-16px -12px 0}
@@ -11653,6 +11657,7 @@ const COLORS=[['#ff7a3d','#c8551f','#ffb07a'],['#ff4f9a','#c22b6f','#ff9cc6'],['
 function applyColor(c){const t=COLORS.find(x=>x[0]===c)||COLORS[0];const r=document.documentElement.style;r.setProperty('--accent',t[0]);r.setProperty('--accent-d',t[1]);r.setProperty('--accent-l',t[2]);}
 /* --- Novità: un minimo di changelog, la versione più recente in cima --- */
 const CHANGELOG=[
+ {v:'0.132',t:'Ingresso più calmo',x:['L\'insegna «FUP» è appesa da sola, come un cartellone; sotto, un tabellone bianco con le voci: Continua, Nuova partita, Partite salvate, Tutorial e Online. Solo la prima è in giallo, così si vede subito da dove ripartire.','Gli scaffali del magazzino hanno quasi solo scatole di cartone e stanno un po\' in ombra: meno colori dietro, più facile leggere.']},
  {v:'0.131',t:'Si entra in magazzino',x:['Dopo la schermata d\'avvio scende la serranda e, quando si rialza, sei dentro il magazzino: scaffali pieni di pallet, il muletto che passa, il magazziniere col transpallet e il cane del capoturno.','I comandi sono cartelli appesi al soffitto: Continua (ti porta subito nell\'ultima partita giocata), Nuova partita, Partite salvate, Tutorial e Online. Ogni cartello apre il suo riquadro; si chiude con «Chiudi» o col tasto Esc.','Se una partita ha due versioni diverse (sul dispositivo e online) compare un bollino rosso sui cartelli, così non passa inosservata.','Il magazzino resta dietro, un po\' in ombra, anche mentre crei il CEO e l\'azienda: la mappa compare solo quando la partita comincia.','Novità e «Installa come app» sono in basso a sinistra, sul pavimento.']},
  {v:'0.130',t:'Nuova schermata d\'avvio',x:['La schermata d\'avvio passa dalla notte al giorno: cielo azzurro con le nuvole, in fila i capannoni del gioco (vecchio, standard, moderno, frigorifero e innovativo) e il camioncino blu che passa. L\'avviso «lavori in corso» ora è un cartello stradale.','Mentre il gioco carica si vede solo il cielo: prima per un attimo compariva la mappa vuota.','Il riquadro in alto a destra (rosso «In pausa», verde col camioncino quando il tempo scorre) adesso è un pulsante: un clic o un tocco mette in pausa o fa ripartire il tempo.']},
  {v:'0.129',t:'Head hunter più comodo',x:['Nella scheda Head hunter le sei abilità sono una sotto l\'altra, ognuna con − e + sempre a destra e il minimo chiesto scritto accanto al nome. Il + su un\'abilità non chiesta la aggiunge, il − sotto 8 la toglie.']},
@@ -11916,7 +11921,7 @@ function cloudLine(){const U=CL.user, mail=U&&(U.email||(U.user_metadata||{}).em
   if(!U) return 'Entra per ritrovare le partite su tutti i dispositivi.';
   if(CL.guest) return 'Online come ospite: collega Google per gli altri dispositivi.';
   return `Online con ${esc(mail||'Google')}${CL.syncAt?` · allineate ${agoTxt(CL.syncAt)}`:''}.`;}
-// un cartello appeso: icona nel riquadro bianco a sinistra, titolo, riga sotto, bollino rosso se c'è qualcosa da decidere
+// una voce del tabellone: icona nel riquadro a sinistra, titolo, riga sotto, bollino rosso se c'è qualcosa da decidere
 function hmSign(o){
   return `<button class="hc${o.cls?' '+o.cls:''}" data-act="${o.act}"${o.data||''}${o.dis?' disabled':''}${o.style?` style="${o.style}"`:''}><span class="hc-ic">${o.ic}</span><span class="hc-t"><b>${o.t}</b>${o.s?`<span>${o.s}</span>`:''}</span>
    ${o.bad?`<span class="hc-bad" role="img" aria-label="${o.bad}" data-tip="${o.bad}">!</span>`:''}<span class="hc-ar" aria-hidden="true">›</span></button>`;}
@@ -11938,17 +11943,17 @@ function hmPanel(p,L){const full=L.length>=SLOTS, a=hmIn; let b=''; hmIn=false;
 function stepHome(){const L=homeSaves(); if(startSel.pan==='partite'&&!L.length) startSel.pan='';   // cancellata l'ultima: si torna ai cartelli
   const full=L.length>=SLOTS, x=L[0], nc=Object.keys(CL.clash||{}).length, C=x&&CL.clash[x.n],
   ncl=nc?`${nc===1?'Una partita ha':nc+' partite hanno'} due versioni diverse: scegli quale tenere.`:'';
-  let h=`<div class="hm-st"><div class="hm-tit"><h1>FUP</h1><span class="sub">Fino all'ultimo pallet</span></div>`;
+  let h=`<div class="hm-st"><div class="hm-tit"><h1>FUP</h1><span class="sub">Fino all'ultimo pallet</span></div><div class="hm-tab">`;
   if(x) h+=hmSign({act:C?'hmpan':'continue',data:C?' data-p="partite"':` data-slot="${x.n}"`,cls:'pri big',style:`--tint:${x.tint}`,
     ic:`<img class="px" src="${x.img}" alt="" width="96" height="112">`,t:x.s.over?'Rivedi':'Continua',
     s:`<em>${esc(x.s.company.name)}</em><span>${esc(x.B.name)} · ${x.date}${x.last?` · giocata ${x.last}`:''}</span>`,bad:C?'Due versioni diverse di questa partita: scegli quale tenere':''});
   h+=hmSign({act:'newgame',cls:x?'':'pri',ic:hmIc('nuova',32),t:'Nuova partita',dis:full,
     s:full?`Tutti e ${SLOTS} i posti sono occupati: cancella una partita per iniziarne un'altra.`:'Scegli il CEO e apri il primo magazzino a gennaio 2002.'});
   if(L.length) h+=hmSign({act:'hmpan',data:' data-p="partite"',cls:'sm',ic:hmIc('salva',32),t:'Partite salvate',s:`${L.length} di ${SLOTS} posti · continua, scarica o cancella`,bad:ncl});
-  h+=hmSign({act:'hmpan',data:' data-p="tutorial"',cls:'blu',ic:`<img class="px" src="${IMG.ornella_contenta}" alt="" width="48" height="56">`,t:'Tutorial',s:'La dottoressa Ribalta ti insegna a giocare: quattro corsi.'});
-  h+=hmSign({act:'hmpan',data:' data-p="online"',cls:'tea',ic:hmIc('nuvola',32),t:CL.sb?'Online':'Copia di sicurezza',s:cloudLine(),bad:ncl});
+  h+=hmSign({act:'hmpan',data:' data-p="tutorial"',cls:'tut',ic:`<img class="px" src="${IMG.ornella_contenta}" alt="" width="48" height="56">`,t:'Tutorial',s:'La dottoressa Ribalta ti insegna a giocare: quattro corsi.'});
+  h+=hmSign({act:'hmpan',data:' data-p="online"',ic:hmIc('nuvola',32),t:CL.sb?'Online':'Copia di sicurezza',s:cloudLine(),bad:ncl});
   const app=STANDALONE||!location.protocol.startsWith('http')?'':installEvt?`<button class="hm-sm" data-act="installapp">${hmIc('scarica',16)}Installa come app</button>`:IOS?`<button class="hm-sm" data-act="hmpan" data-p="app">${hmIc('scarica',16)}Installa come app</button>`:'';
-  return h+`</div><div class="hm-ft"><span class="hm-fl"><button class="hm-sm" data-act="hmpan" data-p="novita">${pxSvg(ICONE.menu.giornale,16)}Novità <span class="nw-v">${VER}</span></button>${app}</span>
+  return h+`</div></div><div class="hm-ft"><span class="hm-fl"><button class="hm-sm" data-act="hmpan" data-p="novita">${pxSvg(ICONE.menu.giornale,16)}Novità <span class="nw-v">${VER}</span></button>${app}</span>
    <span class="hm-cred">${squidLogo()}<span>un gioco Happy Squid Inc.</span></span></div>${startSel.pan?hmPanel(startSel.pan,L):''}`;}
 function showStart(){
   setSpeedSafe(0); WIKI_ON=false; const k=startSel.step, st=$('#start');

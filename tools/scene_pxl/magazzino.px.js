@@ -471,8 +471,9 @@ scene("trasloco", { w: SW, h: SH, bg: "S", world: { light: [-0.6, -1], ground: 6
 const HW = 160                       // larghezza dei pezzi che si ripetono: quattro campate da 40
 const HL = 18                        // altezza di un livello dello scaffale (quattro livelli in un pezzo da 72)
 const HR = rng(31)
+const HSC = ["k", "k", "k", "k", "k", "k", "k", "B", "T"]   // quasi tutto cartone: dietro il tabellone lo scaffale deve stare calmo
 // scaffalatura porta-pallet vista di fronte: montanti blu ogni 40, correnti arancioni con le etichette di ubicazione,
-// due pallet per vano; dietro il fondo in ombra. Qualche posto vuoto, perché lo scaffale non è mai pieno.
+// due pallet per vano, quasi tutti di cartone; dietro il fondo in ombra. Qualche posto vuoto, perché lo scaffale non è mai pieno.
 function hallScaffale() {
   const it = [rect(0, 0, HW, 72, "j")]
   for (let l = 0; l < 4; l++) {
@@ -480,7 +481,7 @@ function hallScaffale() {
     for (let v = 0; v < 4; v++) for (let p = 0; p < 2; p++) {
       const x = v * 40 + 4 + p * 18
       if (HR() < 0.16) { it.push(rect(x + 1, yb - 1, 14, 1, "s")); continue }   // posto vuoto: solo la polvere sul corrente
-      const tipo = SCATOLE[Math.floor(HR() * SCATOLE.length)], alto = 6 + Math.floor(HR() * 4)
+      const tipo = HSC[Math.floor(HR() * HSC.length)], alto = 6 + Math.floor(HR() * 4)
       it.push(...merce(x, yb - 12, tipo, alto))
     }
     it.push(rect(0, yb, HW, 2, "O"), hline(0, yb + 1, HW, "o"))
