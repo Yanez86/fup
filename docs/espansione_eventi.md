@@ -1,8 +1,8 @@
-# Pacchetto di soli eventi (progetto)
+# Pacchetto «Shift Happens» (progetto)
 
 **Stato: raccolta delle idee.** Davide detta gli eventi uno alla volta, man mano che gli vengono in mente; qui si mettono in ordine e si completano con le proposte.
 **Niente codice** finché tutti gli eventi e gli elementi non sono chiari (decisione di Davide).
-Nome del pacchetto ancora da scegliere (proposte in fondo, tra le domande; Davide ne vuole anche qualcuno in inglese). I numeri sono una prima proposta, tarata su quelli degli eventi che esistono già (morale, reputazione, soldi).
+I numeri sono una prima proposta, tarata su quelli degli eventi che esistono già (morale, reputazione, soldi).
 
 ## L'idea in breve
 Un'espansione fatta solo di storie: niente meccaniche nuove da imparare, ma eventi più rari, più lunghi e più memorabili di quelli del gioco base.
@@ -14,8 +14,9 @@ Alcuni si chiudono subito; altri aprono una **storia a puntate**: la scelta di o
 3. **Lo stesso evento non può succedere due volte nella stessa partita.**
 4. **Alcuni eventi aprono una storia a puntate** (side story).
 5. **Talenti nuovi**, legati alle storie.
-6. **Ritmo**: in media una storia ogni 4-6 mesi, con un orologio separato da quello degli eventi base.
-7. **Il social network si chiama TiccheTocc**, anche nell'evento base dell'autista che balla sul cassone (oggi scritto col nome vero): lo cambiamo insieme al pacchetto.
+6. **Nome: «Shift Happens»** (il turno, *shift*, al posto di una parola meno educata). È il primo pacchetto col nome in inglese, nello stile dei pacchetti Paradox.
+7. **Ritmo**: in media una storia ogni 4-6 mesi, con un orologio separato da quello degli eventi base.
+8. **Il social network si chiama TiccheTocc**, anche nell'evento base dell'autista che balla sul cassone (oggi scritto col nome vero): lo cambiamo insieme al pacchetto.
 
 ## Come funziona (proposta; il ritmo è deciso)
 - **Si accende nel passo «Pacchetti»**, come Relazioni industriali e Reparto IT. Spento, il gioco resta com'è. Serve uno stemma nuovo per il pacchetto.
@@ -196,15 +197,14 @@ Ognuno vuole il suo disegno nelle icone (come tutti i talenti) e la sua voce nel
 Le scenette che esistono già e si possono riusare: magazzino, piazzale, ufficio, ufficio di notte, festa, sciopero, trattativa, ispezione, edicola, strada, trattoria, talento, pioggia, neve, nebbia, golf, ministero.
 
 ## Domande aperte per Davide
-1. **Nome del pacchetto.** Proposte in italiano: «Voci di corsia» (le voci di corridoio, ma tra le corsie del magazzino), «Pallet e pettegolezzi», «Fatti e misfatti», «Storie di banchina», «Cronache dal piazzale». In inglese, nello stile dei pacchetti Paradox: «Shift Happens» (il turno, *shift*, al posto di una parola meno educata), «Pallets & Perils», «Tales from the Dock».
-2. **La lontra**: solo lungo il Ticino e in Friuli, o in qualunque magazzino?
-3. **Il manager tiranno**: solo chi guida un magazzino, o anche chi guida il customer service e i reparti?
-4. **La porta**: anche quando licenzi un manager?
-5. **Cena nelle Langhe**: tre preventivi più la mensa vanno bene? Le scene della mattina dopo ti fanno ridere, o ne vuoi altre?
-6. **Talenti**: vanno bene quelli proposti? Ne vuoi altri anche fuori dalle storie (che escono tra i candidati, solo col pacchetto)?
+1. **La lontra**: solo lungo il Ticino e in Friuli, o in qualunque magazzino?
+2. **Il manager tiranno**: solo chi guida un magazzino, o anche chi guida il customer service e i reparti?
+3. **La porta**: anche quando licenzi un manager?
+4. **Cena nelle Langhe**: tre preventivi più la mensa vanno bene? Le scene della mattina dopo ti fanno ridere, o ne vuoi altre?
+5. **Talenti**: vanno bene quelli proposti? Ne vuoi altri anche fuori dalle storie (che escono tra i candidati, solo col pacchetto)?
 
 ## Note per quando scriveremo il codice
-- Pacchetto in `PACKS` (con il suo `S.cfg`), stemma `pk_<id>` in `tools/loghi_pxl/pacchetti.px.js`.
+- Pacchetto in `PACKS` (con il suo `S.cfg`; id proposto `sh`), stemma `pk_sh` in `tools/loghi_pxl/pacchetti.px.js`, voce `shift_happens` nell'enciclopedia.
 - Eventi con `once:true` e un orologio a parte accanto a `S.nextEvent`; le puntate sono eventi `solo:true` con un appuntamento salvato in `S` (come gli eventi dei traslochi `T.evs`) e la ricostruzione dei testi dopo un salvataggio (`restore`).
 - Protagonisti con nome come in `bSetup()` (talenti in banchina), riferimenti salvati per id.
 - Scenette nuove in un file nuovo `tools/scene_pxl/storie.px.js`, registrate in `SCN_EV`; il test già controlla che ogni evento abbia una scena che esiste.
