@@ -7,7 +7,8 @@
 
 pal({ K: "#16202e", W: "#ffffff", Y: "#ffd23f", O: "#ff7a3d", R: "#e0393e", G: "#2e9e48", B: "#5fb4f0", N: "#8a5f36", S: "#c3d0dc",
       D: "#4a5f7a", F: "#f2c79b", C: "#fff3c4", L: "#bfe6ff", M: "#6b3e1f",
-      y: "#c98a00", r: "#a8262a", b: "#2f7fd6", s: "#8a96a6", d: "#2a3a50", f: "#d9946a", i: "#ffe680", e: "#ff8a8d", k: "#c08a55" })
+      y: "#c98a00", r: "#a8262a", b: "#2f7fd6", s: "#8a96a6", d: "#2a3a50", f: "#d9946a", i: "#ffe680", e: "#ff8a8d", k: "#c08a55",
+      P: "#9b6bff", p: "#6f43cf", l: "#c8adff" })
 
 // ---- lo scudo: 30×30 prima del contorno (32×32 dopo) ----
 // forma base (dritto fino a metà, poi curve fino alla punta); ogni anello verso l'interno è la forma erosa di un pixel,
@@ -85,3 +86,19 @@ sprite("_reparti", { outline: "K", pivot: "center" }, `
   .....sss.....
   ...sssssss...`)
 sprite("pk_it", { w: 30, h: 30, outline: "K" }, ...shield("D", "d", "Y", "i"), stamp("_reparti", 15, 13))
+
+// Shift Happens: il fumetto con il punto esclamativo, quello degli imprevisti (e delle storie che tornano a bussare)
+sprite("_storie", { outline: "K", pivot: "center" }, `
+  .WWWWWWWWWWW.
+  WWWWWRRRWWWWW
+  WWWWWRRRWWWWW
+  WWWWWRRRWWWWW
+  WWWWWWRWWWWWW
+  WWWWWWRWWWWWW
+  WWWWWWWWWWWWW
+  WWWWWRRRWWWWW
+  .SSSSSSSSSSS.
+  ...SSS.......
+  ...SS........
+  ...S.........`)
+sprite("pk_sh", { w: 30, h: 30, outline: "K" }, ...shield("P", "p", "Y", "i"), stamp("_storie", 15, 13))
