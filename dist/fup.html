@@ -8309,6 +8309,8 @@ const SH_FIUMI=[['il Po',7.69,45.07],['il Po',8.6,45.08],['il Po',9.69,45.05],['
   ['l\'Adda',9.5,45.31],['l\'Adda',9.45,45.6],['l\'Adige',11.0,45.44],['l\'Adige',11.12,46.07],['l\'Adige',11.34,46.5],['il Piave',12.25,45.75],['il Tagliamento',12.97,45.92],['il Brenta',11.73,45.65],['l\'Isonzo',13.55,45.88],
   ['il Tanaro',8.62,44.91],['il Tanaro',8.02,44.7],['la Dora Baltea',7.87,45.47],['il Sesia',8.42,45.32],['il Mincio',10.79,45.16],['il Reno',11.3,44.52],['la Magra',9.95,44.12],['il Varo',7.2,43.72],['il Bisagno',8.95,44.42],
   ['il Serio',9.72,45.6],['il Lambro',9.27,45.45],['il Brembo',9.62,45.73],['il Bacchiglione',11.55,45.55],['il Savio',12.24,44.14],['la Secchia',10.92,44.65],['il Taro',10.2,44.85],['la Trebbia',9.6,44.95],['lo Stura',7.55,44.39]];
+// «da» + il nome del fiume con l'articolo: dal Po, dall'Adda, dalla Dora Baltea, dallo Stura
+const shDa=f=>f.startsWith('il ')?'dal '+f.slice(3):f.startsWith('lo ')?'dallo '+f.slice(3):f.startsWith('la ')?'dalla '+f.slice(3):f.startsWith('l\'')?'dall\''+f.slice(2):'da '+f;
 function shFiume(w){ const s=w&&SITES[w.site]; if(!s) return 'il canale dietro il piazzale'; let b=null,dm=18; SH_FIUMI.forEach(([n,lo,la])=>{const d=distKm(s.lon,s.lat,lo,la); if(d<dm){dm=d;b=n;}}); return b||'il canale dietro il piazzale'; }
 // licenziare un manager senza la finestra di conferma (le storie): come ACT.firemgr
 function shFireMgr(m){ if(!m||!m.hired) return; const c=m.ral/12*COEF; S.cash-=c; S.warehouses.forEach(w=>{if(w.mgr===m.id)w.mgr=null;}); Object.keys(S.dirs).forEach(k=>{if(S.dirs[k]===m.id)S.dirs[k]=null;});
@@ -8395,7 +8397,7 @@ const SH_ST=[
   go:x=>{ const t=shAmMgr().length&&(!shAmMag().length||Math.random()<0.5)?'mgr':'mag'; x.t=t;
     if(t==='mgr'){ const m=pick(shAmMgr()); x.mid=m.id; x.wh=m.wh; x.b=shNpc({age:clamp(ageOf(m)+rint(-6,4),23,58)}); }
     else { const w=pick(shAmMag()); x.wh=w.id; x.a=shNpc({age:rint(25,45)}); x.b=shNpc({age:rint(28,50)}); const co=pick(rivals().filter(c=>!c.over)), own=w.staff.autCE>0||w.staff.autB>0; if(co&&(!own||Math.random()<0.7)){ x.co=co.bot.id; x.cn=co.company.name; } }
-    shShow('amore_1',{wid:x.wh}); }}];
+    shShow('amore_1',shAmV()); }}];
 // il manager tiranno: chi guida un magazzino e non ha un talento della calma; con certi talenti è più probabile
 const SH_TIR=['Stacanovista','Cronometro facile','Ha fatto il militare','Insonne','Esaurito'], SH_CALMI=['Calma olimpica','Mentore','Meditazione quotidiana'];
 const shTirOk=m=>!!m.wh&&!m.quit&&!!whById(m.wh)&&!m.tal.some(t=>SH_CALMI.includes(t));
@@ -8408,7 +8410,7 @@ const shAmMag=()=>S.warehouses.filter(w=>shStaff(w,'pick')&&(w.staff.autCE>0||w.
 const SH_EV=[
  /* 1. La lontra in magazzino */
  {id:'lontra_1',st:'lontra',src:'La Gazzetta del Muletto',t:'Una lontra in magazzino',auto:1,
-  text:ev=>{const x=shX('lontra')||{}, v=shNm(ev.pid); return `Alle 6 del mattino il primo carrellista di ${shWn(ev)} apre il portone e si trova davanti una lontra. È risalita da ${x.fiume||'il canale dietro il piazzale'}, ha attraversato il piazzale e adesso sta tra i bancali della corsia 3: fischia, si rotola e non ha nessuna intenzione di andarsene. Il turno è fermo, i camion delle 7 aspettano. ${v}, magazziniera, fa la volontaria negli Amici delle Zampe Bagnate: ha già il telefono in mano e ti guarda come si guarda qualcuno di cui non ci si fida ancora.`;},
+  text:ev=>{const x=shX('lontra')||{}, v=shNm(ev.pid); return `Alle 6 del mattino il primo carrellista di ${shWn(ev)} apre il portone e si trova davanti una lontra. È risalita ${shDa(x.fiume||'il canale dietro il piazzale')}, ha attraversato il piazzale e adesso sta tra i bancali della corsia 3: fischia, si rotola e non ha nessuna intenzione di andarsene. Il turno è fermo, i camion delle 7 aspettano. ${v}, magazziniera, fa la volontaria negli Amici delle Zampe Bagnate: ha già il telefono in mano e ti guarda come si guarda qualcuno di cui non ci si fida ancora.`;},
   opts:ev=>{const v=shF(ev.pid), m=shMgr(ev.w), tal=()=>{ if(m&&m!==S.boss) tryTal(m,'Sussurratore di lontre',0.5,'La lontra di '+shWn(ev)); };
    return [
     shO('Scopa e transpallet','«Fuori di qui, abbiamo i camion in partenza.» Due magazzinieri e una scopa la accompagnano verso il portone, con decisione.','Il magazzino riparte subito',
@@ -8618,15 +8620,15 @@ const SH_EV=[
 ];
 // le risposte al manager tiranno (prima volta e ricaduta)
 const SH_TT={arm:{via:1},reg:{inc:0.3,seg:2,capo:1,via:2,sp:2},volto:{inc:3,seg:2,capo:3,via:1,sp:3},lib:{inc:2,seg:2,capo:2,via:2,sp:2}};
-function shTirOpts(ev,first){ const m=ev.p, w=ev.w, n=m?nm1(m):'il manager', bu=m?eur(m.ral/12*COEF):'', lead=dirStat('hr')!=null?dirStat('hr'):ceo().st.lead, risk=clamp(0.6-0.04*(lead-10),0.2,0.85);
+function shTirOpts(ev,first){ const m=ev.p, w=ev.w, n=m?nm1(m):'il manager', bu=m?eur(m.ral/12*COEF):'', lead=dirStat('hr')!=null?dirStat('hr'):ceo().st.lead, risk=clamp(0.6-0.04*(lead-10),0.2,0.85), f=m&&m.sx==='f', lo=f?'la':'lo', gli=f?'le':'gli';
   const L=[
-   shO(`Licenzi ${n}`,'Lo convochi, gli spieghi perché e gli chiedi il badge. Il magazzino resta senza guida finché non scegli qualcun altro.',`Buonuscita di ${bu}, morale +5 nel magazzino per 2 mesi`,
+   shO(`Licenzi ${n}`,`${lo[0].toUpperCase()+lo.slice(1)} convochi, ${gli} spieghi perché e ${gli} chiedi il badge. Il magazzino resta senza guida finché non scegli qualcun altro.`,`Buonuscita di ${bu}, morale +5 nel magazzino per 2 mesi`,
      'Il badge è rimasto sulla scrivania. In banchina, il giorno dopo, qualcuno ha rimesso la macchinetta del caffè al suo posto.',
      ()=>{ const i=shFireMgr(m); if(w) mod(w.id,{mor:5},60); if(i) shFired({...i,wh:w&&w.id},0.5); shEnd('tiranno',`Il manager tiranno di ${w?w.name:'magazzino'}: licenziato`); }),
    shO('Richiamo formale','Una lettera, un colloquio di un\'ora e un avvertimento: la prossima volta è l\'ultima.','Morale +2 nel magazzino per un mese',
      `${n} ha ascoltato in silenzio, poi ha detto «capito». In banchina, per un po', si è sentito solo il bip dei muletti.`,
      ()=>{ if(w) mod(w.id,{mor:2},30); if(first&&Math.random()<risk) shLater('tiranno_ric',rint(90,180),{mid:m&&m.id}); else shEnd('tiranno',`Il manager tiranno di ${w?w.name:'magazzino'}: un richiamo, e torna la calma`); }),
-   shO('Rimansionarlo','Lo togli dal magazzino e gli affidi i «progetti speciali»: un ufficio, un computer, nessuna squadra.','Morale +4 nel magazzino per 2 mesi; il magazzino resta senza guida; per un anno non può guidare un magazzino',
+   shO(`Rimansionar${lo}`,`${lo[0].toUpperCase()+lo.slice(1)} togli dal magazzino e ${gli} affidi i «progetti speciali»: un ufficio, un computer, nessuna squadra.`,'Morale +4 nel magazzino per 2 mesi; il magazzino resta senza guida; per un anno non può guidare un magazzino',
      `${n} ha portato nel nuovo ufficio la sua tazza e il cronometro. Il magazzino ha tirato un sospiro, poi ha cominciato a chiedersi chi sarà il prossimo.`,
      ()=>{ if(m){ if(w&&w.mgr===m.id) w.mgr=null; m.wh=null; m.shBan=S.day+365; if(Math.random()<0.25) m.quit={day:S.day+30,why:`Non ha mandato giù i «progetti speciali»: dopo un mese senza squadra, ${m.name} ha trovato un posto dalla concorrenza.`}; }
        if(w) mod(w.id,{mor:4},60); shEnd('tiranno',`Il manager tiranno di ${w?w.name:'magazzino'}: rimansionato ai progetti speciali`); }),
@@ -8634,7 +8636,7 @@ function shTirOpts(ev,first){ const m=ev.p, w=ev.w, n=m?nm1(m):'il manager', bu=
      'I numeri della settimana sono i migliori dell\'anno. In mensa, però, si mangia in silenzio.',
      ()=>{ if(w) mod(w.id,{prod:8,P:1,mor:-6},90); if(m) gainTal(m,'Tiranno da banchina','Va bene così'); const x=shX('tiranno'); if(x) x.ok=1; shLater('tiranno_prezzo',rint(60,150),{mid:m&&m.id}); })];
   if(first) L.splice(2,0,shO('Corso sulla gestione della rabbia','Dieci incontri il martedì sera, con uno psicologo del lavoro e un sacco da boxe.','−2.500 €, morale +2 nel magazzino per un mese',
-     `${n} è tornato dal primo incontro con un opuscolo e un'espressione nuova. Il sacco da boxe è finito in magazzino, vicino alla ribalta 2.`,
+     `${n} è tornat${f?'a':'o'} dal primo incontro con un opuscolo e un'espressione nuova. Il sacco da boxe è finito in magazzino, vicino alla ribalta 2.`,
      ()=>{ S.cash-=2500; if(w) mod(w.id,{mor:2},30); if(m) tryTal(m,'Ha fatto il corso sulla rabbia',0.5,'Il corso del martedì sera');
        if(Math.random()<risk/2) shLater('tiranno_ric',rint(90,180),{mid:m&&m.id}); else shEnd('tiranno',`Il manager tiranno di ${w?w.name:'magazzino'}: il corso sulla rabbia funziona`); }));
   return L; }
@@ -9051,13 +9053,13 @@ SH_EV.push(
   text:ev=>{const x=shX('amore')||{}, A=shAmA(), B=shAmB(), w=shWn(ev), langhe=shX('langhe')&&shX('langhe').end!=null;
     return x.t==='mgr'?`Li hanno visti insieme all'autogrill di Fiorenzuola alle 6 del mattino: ${A}, manager di ${w}, e ${B}, ${bMest('pick',shSx(x.b))} dello stesso magazzino.${langhe?' E alla cena nelle Langhe, a dire il vero, ballavano un lento.':''} In banchina non si parla d'altro, e qualcuno fa notare che i turni del mattino vanno sempre alla stessa persona.`
       :`Li hanno visti insieme all'autogrill di Fiorenzuola alle 6 del mattino: ${A}, ${bMest('pick',shSx(x.a))} a ${w}, e ${B}, ${x.co?`autista di ${x.cn}`:'uno dei nostri autisti'}.${langhe?' E alla cena nelle Langhe, a dire il vero, ballavano un lento.':''} ${x.co?'In banchina qualcuno si chiede di cosa parlino, oltre che d\'amore. Delle tariffe, magari.':'In banchina dicono che il suo camion viene sempre caricato per primo.'}`;},
-  opts:ev=>{const x=()=>shX('amore')||{}, m=x().mid?personById(x().mid):null, w=ev.w, go=(d)=>{ if(m) tryTal(m,'Innamorato perso',0.8,'Galeotto fu il bancale'); shLater('amore_2',d,{wid:x().wh}); };
+  opts:ev=>{const x=()=>shX('amore')||{}, m=x().mid?personById(x().mid):null, w=ev.w, go=(d)=>{ if(m) tryTal(m,'Innamorato perso',0.8,'Galeotto fu il bancale'); shLater('amore_2',d,shAmV()); };
    return [
     shO('Fai finta di niente','Sono affari loro. Basta che il lavoro vada avanti.','Morale −2 nel magazzino per 2 mesi',
       'Nessuno ne ha parlato in ufficio. In banchina, invece, hanno aperto un gruppo apposta nella chat del turno.',()=>{ if(w) mod(w.id,{mor:-2},60); go(rint(90,150)); }),
     shO('Chiedi trasparenza',x().t==='mgr'?'Gli chiedi di dichiarare la relazione: chi lavora sotto l\'altro passa a un altro capoturno.':'Gli chiedi di dichiarare la relazione, e niente chiacchiere di lavoro a cena.','Morale +1 nel magazzino per un mese',
       'Hanno firmato la dichiarazione insieme, ridendo. Il capoturno nuovo ha detto che, per lui, è uguale.',()=>{ x().trasp=1; x().lato=1; if(w) mod(w.id,{mor:1},30); go(rint(120,240)); }),
-    shO('Regola nuova: niente relazioni tra capo e sottoposto','Una regola scritta, uguale per tutti, nel regolamento aziendale.','Morale −3 in tutti i magazzini per 2 mesi',
+    shO(x().t==='mgr'?'Regola nuova: niente relazioni tra capo e sottoposto':'Regola nuova: niente fidanzamenti in turno',x().t==='mgr'?'Una regola scritta, uguale per tutti, nel regolamento aziendale.':'Una regola scritta: in turno si lavora, i fidanzamenti restano fuori dal cancello.','Morale −3 in tutti i magazzini per 2 mesi',
       'La regola è appesa in bacheca. I due, da quel giorno, arrivano al lavoro con dieci minuti di distanza. Uno dalla porta principale, uno dal piazzale.',()=>{ x().regola=1; mod('all',{mor:-3},60); go(rint(120,240)); }),
     shO('Trasferisci uno dei due','Lo decidi tu: chi lavora con chi, e dove.','Morale +2 nel magazzino per un mese',
       'Il trasferimento ha calmato il magazzino. I due, però, ti salutano un po\' meno, e un po\' più freddi.',()=>{ x().trasf=1; if(w) mod(w.id,{mor:2},30); if(m) m.unh=(m.unh||0)+10; go(rint(120,240)); })];}},
@@ -9065,7 +9067,7 @@ SH_EV.push(
   text:ev=>{const x=shX('amore')||{}, o=x.t==='mgr'?oa(personById(x.mid)):shG(S.sh.pp[x.a],'o','a');
     return `Al Gran Galà del Pallet d'Oro, a Milano, ${shAmA()} è arrivat${o} con ${shAmB()}${x.t==='mag'?', coi biglietti vinti alla lotteria aziendale':''}. La contessa Ludovica Bancalari di Sant'Agata, che da quarant'anni decide chi siede a quale tavolo, li ha fatti sedere al tavolo 31, vicino alle cucine. Il giorno dopo la Bolla mondana, la rubrica dei pettegolezzi del Sole 24 Pallet, scrive: «Il magazzino entra in sala da ballo. Ma senza smoking». Nel giro dei buyer importanti si ride.`;},
   opts:ev=>{const x=()=>shX('amore')||{}, m=x().mid?personById(x().mid):null, w=whById(x().wh), go=()=>{ const X=x(), riv=X.t==='mag'&&!!shRiv(X.co);
-      shLater('amore_3',rint(300,420),{wid:X.wh,k:shPick({proposta:3,crisi:X.regola?4:2,segreto:2,talpa:riv?(X.regola?5:3):0,promo:crescL().length<CRESC.max?2:0})}); };
+      shLater('amore_3',rint(300,420),{...shAmV(),k:shPick({proposta:3,crisi:X.regola?4:2,segreto:2,talpa:riv?(X.regola?5:3):0,promo:crescL().length<CRESC.max?2:0})}); };
    return [
     shO('Ti siedi al tavolo 31 con loro','Prendi il tuo segnaposto dal tavolo 2 e lo porti, davanti a tutti, al tavolo 31.','Gare delle committenti S e A −1 per un anno; morale +4 in tutti i magazzini per 2 mesi',
       'Al tavolo 31 si è riso più che al tavolo 2. La contessa ti ha guardato a lungo, poi ha preso un appunto.',()=>{ x().lato=1; mod('all',{naz:-1},365); mod('all',{mor:4},60); if(m) tryTal(m,'Chiacchierato',0.5,'La Bolla mondana'); go(); }),
@@ -9084,7 +9086,7 @@ SH_EV.push(
       segreto:`Colpo di scena: ${B} è ${shG(S.sh.pp[X.b],'figlio','figlia')} di ${ev.pres||'un signore molto riservato'}, presidente di ${ev.c?ev.c.name:ev.cn||'un grande cliente'}. Lavorava in incognito «per imparare il mestiere dal basso», idea del padre. La contessa Bancalari ha mandato un biglietto: li vuole al suo tavolo, al prossimo galà. In banchina, intanto, ci si guarda intorno: chi altro è in incognito?`,
       talpa:`L'amore era vero, ma ${X.cn||'l\'avversaria'} ne approfittava: nelle ultime tre gare ti ha battuto ogni volta di un euro. ${B} giura di non saperne niente; ${A} giura di non aver mai parlato di tariffe, «solo un po' di prezzi, a cena».`,
       promo:`${shNm(X.t==='mgr'?X.b:X.a)} è bravissim${shG(pb,'o','a')}: il capoturno l'ha segnalat${shG(pb,'o','a')} e l'ufficio del personale l'ha messo nella lista di chi può crescere. Con un anno di affiancamento potrebbe diventare manager. Un giorno, chissà, guiderà il magazzino dove si sono conosciuti.`})[ev.k]||'';},
-  opts:ev=>{const X=()=>shX('amore')||{}, m=X().mid?personById(X().mid):null, w=whById(X().wh), wed=()=>shLater('amore_4',rint(90,180),{wid:X().wh}), prop=()=>shLater('amore_3',rint(120,240),{wid:X().wh,k:'proposta'});
+  opts:ev=>{const X=()=>shX('amore')||{}, m=X().mid?personById(X().mid):null, w=whById(X().wh), wed=()=>shLater('amore_4',rint(90,180),shAmV()), prop=()=>shLater('amore_3',rint(120,240),{...shAmV(),k:'proposta'});
    return ({proposta:[
       shO('Un brindisi in banchina','Spumante, bicchieri di plastica e un discorso di trenta secondi.','−300 €, morale +3 nel magazzino per un mese'+(ev.tt?', reputazione +2':''),'Il brindisi è durato più del discorso. Il capoturno ha pianto, e ha dato la colpa alla polvere.',()=>{ S.cash-=300; if(w) mod(w.id,{mor:3},30); if(ev.tt) repUp(2); X().prop=1; wed(); }),
       shO('Un giorno di ferie per i due','Il pomeriggio libero, offerto dall\'azienda.','Morale +2 nel magazzino per un mese'+(ev.tt?', reputazione +2':''),'Sono andati a festeggiare sul lago. Hanno mandato una foto al turno, col cartello del muletto.',()=>{ if(w) mod(w.id,{mor:2},30); if(ev.tt) repUp(2); X().prop=1; wed(); })],
@@ -9092,7 +9094,7 @@ SH_EV.push(
       shO('Trasferisci uno dei due','Un altro reparto, un altro turno: si respira.','Morale +1 nel magazzino per un mese','Gli adesivi sono spariti dagli armadietti in una settimana. Uno è rimasto, sulla macchinetta del caffè.',()=>{ if(w) mod(w.id,{mor:1},30); if(m&&gainTal(m,'Cuore spezzato','Galeotto fu il bancale')) X().cuore={mid:m.id,d:S.day}; if(m) loseTal(m,'Innamorato perso'); shEnd('amore',`Galeotto fu il bancale: ${shAmA()} e ${shAmB()} si lasciano`); }),
       shO('Mediazione con un professionista','Uno psicologo del lavoro, tre incontri, e un tavolo neutro.','−1.500 €; puntualità −1 e accuratezza −1 nel magazzino per 2 mesi','Il professionista li ha fatti parlare. Non sono tornati insieme, ma si salutano.',()=>{ S.cash-=1500; if(w) mod(w.id,{P:-1,A:-1},60); if(m) loseTal(m,'Innamorato perso'); shEnd('amore',`Galeotto fu il bancale: ${shAmA()} e ${shAmB()} si lasciano, ma si salutano`); }),
       shO('Aspetti','Il tempo sistema tutto, dicono.','Puntualità −1 e accuratezza −1 nel magazzino per 6 mesi',
-        'Il magazzino ha imparato a lavorare in due tifoserie. Le macchinette del caffè, però, sono una sola.',()=>{ if(w) mod(w.id,{P:-1,A:-1},180); if(Math.random()<0.5){ toast('Dopo sei mesi tornano insieme, davanti alla macchinetta del caffè','ok'); shLater('amore_3',180,{wid:X().wh,k:'proposta'}); } else { if(m) loseTal(m,'Innamorato perso'); shEnd('amore',`Galeotto fu il bancale: ${shAmA()} e ${shAmB()} si lasciano`); } })],
+        'Il magazzino ha imparato a lavorare in due tifoserie. Le macchinette del caffè, però, sono una sola.',()=>{ if(w) mod(w.id,{P:-1,A:-1},180); if(Math.random()<0.5){ toast('Dopo sei mesi tornano insieme, davanti alla macchinetta del caffè','ok'); shLater('amore_3',180,{...shAmV(),k:'proposta'}); } else { if(m) loseTal(m,'Innamorato perso'); shEnd('amore',`Galeotto fu il bancale: ${shAmA()} e ${shAmB()} si lasciano`); } })],
      segreto:[
       shO('Li inviti a cena tu','Una cena a quattro: loro due, tu e il presidente.','−200 €; '+(ev.c?'soddisfazione +12':'una gara di quel cliente sarà più facile per un anno'),'Il presidente ha parlato tutta la sera di come ha cominciato lui, in banchina, nel 1971. Il conto l\'ha voluto pagare lui.',()=>{ S.cash-=200; shAmSeg(ev,12); prop(); }),
       shO('Fai finta di non sapere','Il segreto è loro: in azienda nessuno cambia niente.',ev.c?'Soddisfazione +10':'Una gara di quel cliente sarà più facile per un anno','Hai fatto finta di niente benissimo. Il presidente, invece, ti ha mandato un cesto natalizio enorme.',()=>{ shAmSeg(ev,10); prop(); })],
@@ -9110,7 +9112,7 @@ SH_EV.push(
  {id:'amore_4',st:'amore',src:'La Gazzetta del Muletto',t:'Il matrimonio in magazzino',auto:3,cond:()=>shAmOk(),drop:()=>shAmLost(),
   setup:v=>{ const g=shX('gino'); v.gino=g&&['cons','istr'].includes(g.r)&&g.wh===(shX('amore')||{}).wh?1:0; },
   text:ev=>`${shAmA()} e ${shAmB()} si sposano, e vogliono farlo in magazzino: tra la corsia 4 e la 5, con gli scaffali addobbati, i fiori sui bancali e il prete${ev.gino?', e il Gino che porta gli anelli sul muletto numero 3':''}. Ti hanno chiesto, timidamente, se l'azienda vuole fare qualcosa.`,
-  opts:ev=>{const X=()=>shX('amore')||{}, m=X().mid?personById(X().mid):null, w=whById(X().wh), sp=()=>{ if(m){ loseTal(m,'Innamorato perso'); gainTal(m,'Sposato in magazzino','Il matrimonio tra la corsia 4 e la 5'); } shLater('amore_5',rint(730,1460),{wid:X().wh}); };
+  opts:ev=>{const X=()=>shX('amore')||{}, m=X().mid?personById(X().mid):null, w=whById(X().wh), sp=()=>{ if(m){ loseTal(m,'Innamorato perso'); gainTal(m,'Sposato in magazzino','Il matrimonio tra la corsia 4 e la 5'); } shLater('amore_5',rint(730,1460),shAmV()); };
    return [
     shO('L\'azienda paga la festa','Rinfresco in mensa, musica in banchina e un fotografo vero.','−8.000 €, morale +6 in tutti i magazzini per 2 mesi, reputazione +2','Il bouquet l\'ha preso un carrellista, che è diventato rosso fino alle orecchie. La festa è finita alle 2, col muletto addobbato.',()=>{ S.cash-=8000; mod('all',{mor:6},60); repUp(2); sp(); }),
     shO('Fai da testimone','Il vestito buono, le fedi in tasca e un discorso da preparare.','Morale +4 nel magazzino per 2 mesi; un talento per il CEO','Il discorso è durato venti minuti. Hai pianto per primo, e nessuno te l\'ha fatto notare.',()=>{ if(w) mod(w.id,{mor:4},60); gainTal(S.boss,'Testimone di nozze',`Il matrimonio di ${shAmA()}`); sp(); },{req:()=>!!X().lato,reqT:'Essere stato dalla loro parte'}),
@@ -9141,8 +9143,10 @@ SH_EV.push(
 // la storia d'amore: i nomi (A = il manager o il magazziniere, B = l'altra persona), se possono ancora continuare, cosa succede se uno dei due se ne va
 const shAmA=()=>{const X=shX('amore')||{}; return X.t==='mgr'?((personById(X.mid)||{}).name||shNm(X.a)||''):shNm(X.a);};
 const shAmB=()=>{const X=shX('amore')||{}; return shNm(X.b);};
+// le variabili di ogni puntata: il magazzino e chi è coinvolto (il manager, o il magazziniere)
+const shAmV=()=>{const X=shX('amore')||{}; return {wid:X.wh,...(X.t==='mgr'?{mid:X.mid}:{pid:X.a})};};
 const shAmOk=()=>{const X=shX('amore')||{}; if(!whById(X.wh)) return false; if(X.t==='mgr'){ const m=personById(X.mid); return !!m&&m.hired&&!m.quit; } return true;};
-function shAmLost(){ const X=shX('amore'); if(!X||X.end!=null) return; if(X.t==='mgr'&&!X.a){ const m=personById(X.mid); if(m) X.a=shNpc({name:m.name,sx:m.sx,face:m.face==null?null:m.face,mimg:m.face==null?m.id:null}); } shLater('amore_5',rint(60,180),{wid:X.wh,k:'lontani'}); }
+function shAmLost(){ const X=shX('amore'); if(!X||X.end!=null) return; if(X.t==='mgr'&&!X.a){ const m=personById(X.mid); if(m) X.a=shNpc({name:m.name,sx:m.sx,face:m.face==null?null:m.face,mimg:m.face==null?m.id:null}); } shLater('amore_5',rint(60,180),{...shAmV(),k:'lontani'}); }
 function shAmSeg(ev,sat){ if(ev.c) ev.c.sat=clamp(ev.c.sat+sat,0,100); else if(ev.cn){ const X=shS(); X.bonus=X.bonus||{}; X.bonus[ev.cn]=S.day+365; } }
 
 const SH_EV_BY={}; SH_EV.forEach(d=>SH_EV_BY[d.id]=d);

@@ -1,7 +1,14 @@
 # Pacchetto «Shift Happens» (progetto)
 
-**Stato: raccolta delle idee.** Davide detta gli eventi uno alla volta, man mano che gli vengono in mente; qui si mettono in ordine e si completano con le proposte.
-**Niente codice** finché tutti gli eventi e gli elementi non sono chiari (decisione di Davide).
+**Stato: costruito sul ramo di lavoro nella versione 0.133, in revisione con Davide** (le regole esatte sono in `docs/design.md`, sezione «Pacchetto Shift Happens»). Davide ha chiesto di preparare tutto il pacchetto prima di pubblicarlo e di mandargli gli screenshot da rivedere: finché non dice di sì resta fuori da `main`.
+
+Differenze rispetto al progetto, decise durante la costruzione:
+- Il manager tiranno ha cinque risposte: il corso sulla gestione della rabbia è una risposta a sé, accanto al richiamo.
+- Lo sconto del buyer della cena nelle Langhe vale per un anno (non «fino al rinnovo»), come gli altri sconti a tempo del gioco.
+- La mattina dopo la cena ha una scenetta sua (la banchina vuota alle 6): le scenette nuove sono dodici.
+- Il pickerista di TiccheTocc che resta «cresce» come i talenti in banchina e alla promozione prende «Influencer della banchina».
+- La scommessa si chiude il 2 gennaio, quando ci sono i numeri dell'anno appena finito.
+- La porta parte nel 30% dei licenziamenti (50% quando il licenziato viene da un'altra storia: il tiranno, Ottavio, la talpa).
 I numeri sono una prima proposta, tarata su quelli degli eventi che esistono già (morale, reputazione, soldi).
 
 ## L'idea in breve

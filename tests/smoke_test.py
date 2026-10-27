@@ -160,6 +160,9 @@ async def phone(b, w, h, name, errs):
     # anche il pacchetto Reparto IT e Ingegneria parte acceso (dalla 0.119): in orizzontale si spengono tutti e due
     assert await pg.evaluate("document.querySelector('#start [data-act=lbpack][data-id=it]').getAttribute('aria-pressed')") == 'true', f'{name}: il pacchetto Reparto IT e Ingegneria deve partire acceso'
     if not ri: await pg.tap('[data-act=lbpack][data-id=it]')
+    # Shift Happens (0.133) parte acceso; qui si spegne sempre, perché le sue storie hanno le loro prove
+    assert await pg.evaluate("document.querySelector('#start [data-act=lbpack][data-id=sh]').getAttribute('aria-pressed')") == 'true', f'{name}: il pacchetto Shift Happens deve partire acceso'
+    await pg.tap('[data-act=lbpack][data-id=sh]')
     assert await pg.evaluate('document.documentElement.scrollWidth<=innerWidth'), f'{name}: i pacchetti scorrono di lato'
     await pg.screenshot(path=os.path.join(OUT, f'shot_tel_{name}_crea_pacchetti.png'), full_page=True)
     await pg.tap('[data-act=startgame]'); await pg.tap('[data-act=closemodal]')
@@ -581,14 +584,14 @@ async def main():
         await pg.click('[data-act=lbwin][data-id=reputazione]')
         await pg.screenshot(path=os.path.join(OUT, 'shot_crea_7_lobby.png'), full_page=True)
         await pg.click('[data-act=stnext]')
-        assert await pg.evaluate("document.querySelectorAll('#start .pk').length") == 3, 'passo Pacchetti: gioco base più le due espansioni'
+        assert await pg.evaluate("document.querySelectorAll('#start .pk').length") == 4, 'passo Pacchetti: gioco base più le tre espansioni'
         await pg.screenshot(path=os.path.join(OUT, 'shot_crea_8_pacchetti.png'), full_page=True)
         # i due pacchetti partono accesi; qui si spegne il Reparto IT, che ha le sue prove: con lui le tecnologie si avviano invece di installarsi subito
-        assert await pg.evaluate("[...document.querySelectorAll('#start [data-act=lbpack]')].map(b=>b.dataset.id+':'+b.getAttribute('aria-pressed')).sort().join()") == 'it:true,ri:true', 'i pacchetti devono partire accesi'
-        await pg.click('[data-act=lbpack][data-id=it]')
+        assert await pg.evaluate("[...document.querySelectorAll('#start [data-act=lbpack]')].map(b=>b.dataset.id+':'+b.getAttribute('aria-pressed')).sort().join()") == 'it:true,ri:true,sh:true', 'i pacchetti devono partire accesi'
+        await pg.click('[data-act=lbpack][data-id=it]'); await pg.click('[data-act=lbpack][data-id=sh]')   # Shift Happens ha le sue prove, più avanti
         await pg.click('[data-act=startgame]'); await pg.click('[data-act=closemodal]')
         lb = await pg.evaluate('()=>{const F=window.__FUP,H=F.HUM;return {n:H.bots.length,ids:H.bots.map(b=>b.bot.id),diff:H.bots.find(b=>b.bot.id==="edoardo").bot.diff,sty:Object.fromEntries(H.bots.map(b=>[b.bot.id,b.bot.style])),win:H.cfg.win,mode:H.cfg.mode,cols:[H.company.color,...H.bots.map(b=>b.company.color)]}}')
-        assert await pg.evaluate('()=>window.__FUP.HUM.cfg.ri===true&&window.__FUP.HUM.cfg.it===false'), 'pacchetti della partita principale'
+        assert await pg.evaluate('()=>window.__FUP.HUM.cfg.ri===true&&window.__FUP.HUM.cfg.it===false&&window.__FUP.HUM.cfg.sh===false'), 'pacchetti della partita principale'
         assert lb['n'] == 2 and 'gino' not in lb['ids'] and 'marco' not in lb['ids'] and lb['diff'] == 'spietato' and lb['sty'] == {'edoardo': 'standard', 'valeria': 'prezzo'}, lb
         assert lb['win']['reputazione'] and lb['mode'] == 'classica' and len(set(lb['cols'])) == 3, lb
         c = await pg.evaluate('()=>{const S=window.__FUP.S;return {id:S.ceoId,n:S.custom.name,tal:S.custom.tal,st:S.custom.st,co:S.company.name,logo:S.company.logo,claim:S.company.claim,nick:S.custom.nick,wh:S.warehouses[0].site,cl:S.clients[0].name}}')
@@ -1549,6 +1552,64 @@ async def main():
         await pg.evaluate("()=>{document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); window.__FUP.openWin('espansione');}"); await pg.wait_for_timeout(600)
         await pg.screenshot(path=os.path.join(OUT, 'shot_it_capannoni.png'))
         await pg.evaluate("()=>document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click())")
+        # Shift Happens (0.133): ogni puntata di ogni storia, in ogni variante, ha racconto, risposte col testo del risultato e una scenetta che esiste;
+        # si riapre uguale dopo un salvataggio; tutte le risposte girano senza errori. Poi: una storia esce una volta sola, una puntata fissata
+        # arriva anche dopo un salvataggio, la porta parte da un licenziamento, la scenetta giusta nella finestra dell'evento
+        r = await pg.evaluate('''()=>{const F=window.__FUP; document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); document.querySelector('#modal').innerHTML='';
+          F.newGame('gino',null,{mode:'classica',win:{},sh:true,ri:true,it:true}); F.HUM.bots=[F.newRival('valeria','#3dd6c4','camion','qualita','normale',0)];
+          const S=F.S, o={}, bad=[]; S.cash=3e6; S.nextEvent=1e9; F.shS().next=1e9; o.on=F.shOn();
+          S.warehouses.forEach(w=>Object.assign(w.staff,{pick:6,car:4,capo:2,imp:2,autB:2,autCE:3,fm:1}));
+          ['giorgio','federica','sara','luca'].forEach(id=>{ try{ F.ACT.hiremgr({id}); }catch(e){} }); const w=S.warehouses[0], m=F.people().find(p=>p.hired&&p!==S.boss);
+          if(m){ w.mgr=m.id; m.wh=w.id; }
+          for(let d=0;d<30;d++) F.step(); S.notes=(S.notes||[]).filter(n=>n.k!=='ev'); document.querySelector('#modal').innerHTML='';
+          const clr=()=>{ S.notes=(S.notes||[]).filter(n=>n.k!=='ev'); document.querySelector('#modal').innerHTML=''; };
+          F.SH_ST.forEach(s=>{ if(s.id==='porta') return; try{ F.shGo(s.id); }catch(e){ bad.push('inizio '+s.id+': '+e.message); } clr(); });
+          const X=S.sh.x; X.porta={d0:S.day,pid:F.shNpc({})};
+          const c=S.clients.find(c=>c.status==='attivo'), base={wid:w.id,pid:F.shNpc({}),mid:m&&m.id,cid:c&&c.id};
+          const VAR={tiranno_prezzo:['din','mob','capo','ri','gaz'],bancale_2:['paperelle','vespa','parmigiano','flipper','vhs','carte'],bancale_3:['coll','gdf'],fantasma_2:['barb','ospite','ticche','wms','niente'],
+            gino_2:['isp','inc','bene','casa'],set_2:['attore','pomodori','comparse'],set_3:['succ','dis','fest'],pierina_3:['div','sent'],ottavio_2:['giro','lourdes','sonno','amore'],
+            guru_2:['carboni','rafting','escape'],amore_3:['proposta','crisi','segreto','talpa','promo'],amore_5:['bebe','conc','proprio','sep','anniv','lontani']};
+          const EXTRA={langhe_2:[{t:'pullman'},{t:'alba'},{t:'auto'},{t:'mensa'}],porta_1:[{mg:0,role:'pick'},{mg:1}],porta_2:[{},{cn:'Rivale Srl',bn:'Tizio Caio'}],langhe_pall:[{r:'autCE'}],
+            scommessa_2:[{win:1,me:91.2,lui:88,y:2002},{win:0,me:85,lui:90.1,y:2002}]};
+          let n=0,nOpt=0; const st=new Set();
+          F.SH_EV.forEach(d=>{ st.add(d.st); (EXTRA[d.id]||(VAR[d.id]||[null]).map(k=>k?{k}:{})).forEach(vx=>{ const v={...base}, tag=d.id+(vx.k?':'+vx.k:vx.t?':'+vx.t:'');
+            try{ Object.assign(v,vx); if(d.setup) d.setup(v); Object.assign(v,vx); const b0=F.EVENTS.find(e=>e.id===d.id), ev=F.shBuild({...b0,...v}); n++;
+              if(!ev.text||ev.text.length<60||/undefined|NaN|null|\\[object/.test(ev.title+ev.text)) bad.push(tag+': racconto');
+              const k=ev.scn||F.SCN_EV[d.id]; if(!k||!F.SCENE[k]) bad.push(tag+': scena '+k);
+              if(!ev.opts.length) bad.push(tag+': nessuna risposta');
+              ev.opts.forEach((op,i)=>{ if(!op.t||!op.d||!op.r||typeof op.f!=='function'||/undefined|NaN|\\[object/.test(op.t+op.d+op.e+op.r)) bad.push(tag+' risposta '+i); });
+              const u=F.evUnpack(F.evPack(ev),ev.title,ev.src); if(!u||u.text!==ev.text) bad.push(tag+': dopo il salvataggio il racconto cambia');
+              ev.opts.forEach((op,i)=>{ const snap=JSON.stringify(S); nOpt++; try{ F.UI.evMsg=[]; const e2=F.shBuild({...b0,...v}); e2.opts[i].f.call(e2); }catch(e){ bad.push(tag+' risposta '+i+': '+e.message); } F.UI.evMsg=null;
+                const S2=JSON.parse(snap); Object.keys(S).forEach(k=>delete S[k]); Object.assign(S,S2); });
+            }catch(e){ bad.push(tag+': '+e.message); } }); });
+          o.n=n; o.nOpt=nOpt; o.storie=st.size; o.bad=bad.length?bad.slice(0,8).join(' | '):true;
+          // una volta sola: con tutte le storie già partite l'orologio non ne trova più nessuna
+          clr(); const X2=S.sh; X2.next=S.day; S.seen={}; S.nextEvent=S.day+100; const nx=Object.keys(X2.x).length; F.shDaily(); o.once=Object.keys(X2.x).length===nx&&X2.next===S.day+7&&!(S.notes||[]).some(n=>n.k==='ev');
+          return o;}''')
+        bad = r.pop('bad'); assert bad is True and all(r.values()) and r['storie'] == 15 and r['n'] >= 85, f'Shift Happens, le storie: {bad} {r}'
+        print('Shift Happens: puntate e varianti', r['n'], 'risposte provate', r['nOpt'])
+        r = await pg.evaluate('''()=>{const F=window.__FUP, s0=F.slot; F.slot=3; F.newGame('marco',null,{mode:'classica',win:{},sh:true}); const S=F.S, o={}; S.nextEvent=1e9; F.shS().next=1e9;
+          // una puntata fissata arriva anche dopo un salvataggio
+          const w=S.warehouses[0]; F.shS().x.lontra={d0:S.day,wh:w.id,vol:F.shNpc({sx:'f'})}; F.shLater('lontra_3',2,{wid:w.id,pid:S.sh.x.lontra.vol}); F.save(); F.load(3);
+          for(let i=0;i<3;i++) F.step(); const n=(F.S.notes||[]).find(x=>x.k==='ev'); o.saved=!!n&&n.title==='È tornata';
+          F.S.notes=[]; document.querySelector('#modal').innerHTML='';
+          // la porta parte da un licenziamento (con la probabilità forzata), e il licenziato è proprio lui
+          const S2=F.S, w2=S2.warehouses[0]; w2.staff.pick=Math.max(3,w2.staff.pick); const p0=F.SH.porta; F.SH.porta=1; F.fireOne(w2,'pick'); F.SH.porta=p0;
+          o.porta=!!S2.sh.x.porta&&S2.sh.q.some(q=>q.id==='porta_1');
+          // gli effetti a tempo del pacchetto: produttività e posti pallet
+          const k0=F.computeWH(w2).prod; F.mod(w2.id,{prod:10,cap:-5},30); const k1=F.computeWH(w2).prod; o.prod=k1>k0*1.05;
+          // l'autista virale del gioco base ora è su TiccheTocc
+          o.ticche=F.EVENTS.find(e=>e.id==='tiktok').title.includes('TiccheTocc');
+          // l'Astemio esce tra i candidati solo col pacchetto, gli altri talenti delle storie mai
+          o.tal=F.TALENTS['Astemio'].sh===1&&!F.TALENTS['Astemio'].uni&&F.TALENTS['Tiranno da banchina'].uni===1;
+          localStorage.removeItem(F.slotKey(3)); F.slot=s0;   // il posto 3 era solo per questa prova
+          return o;}''')
+        assert all(r.values()), f'Shift Happens, puntate e salvataggi: {r}'
+        await pg.evaluate("()=>{const F=window.__FUP,S=F.S; S.notes=[]; document.querySelector('#modal').innerHTML=''; const w=S.warehouses[0]; F.shS().x.lontra=F.shS().x.lontra||{d0:S.day,wh:w.id,fiume:'il Ticino',vol:F.shNpc({sx:'f'})}; F.shShow('lontra_1',{wid:w.id,pid:S.sh.x.lontra.vol}); const n=S.notes.find(x=>x.k==='ev'); F.ACT.note({id:n.id}); F.cardsOff();}")
+        await pg.wait_for_timeout(400)
+        assert await pg.evaluate("!!document.querySelector('#modal .ev-scn i')&&document.querySelector('#modal .ev-scn i').dataset.scena==='lontra'"), 'la lontra senza la sua scenetta'
+        await pg.screenshot(path=os.path.join(OUT, 'shot_sh_lontra.png'))
+        await pg.evaluate("()=>{document.querySelector('#modal').innerHTML=''; window.__FUP.S.notes=[];}")
         # traslochi (0.103): progetto a passi nella finestra del magazzino, conferma, un cliente che si rifiuta, giorni del trasloco,
         # stabilizzazione e fine; capannone vuoto restituito e venduto; ordinanza sul capannone fatiscente e cantiere d'ufficio
         await pg.evaluate('''()=>{const F=window.__FUP; document.querySelectorAll('#wins .win [data-act=close]').forEach(b=>b.click()); document.querySelector('#modal').innerHTML='';
