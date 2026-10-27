@@ -492,11 +492,7 @@ In tutto, per ora, 11 scenette nuove (12 con la mattina dopo della cena).
 Le scenette che esistono già e si possono riusare: magazzino, piazzale, ufficio, ufficio di notte, festa, sciopero, trattativa, ispezione, edicola, strada, trattoria, talento, pioggia, neve, nebbia, golf, ministero.
 
 ## Domande aperte per Davide
-1. **Galeotto fu il bancale**: una sola storia con due aperture (il gioco ne pesca una), o due storie diverse?
-2. **Galeotto fu il bancale**: vanno bene i colpi di scena del capitolo 3, in particolare il segreto (figlia o figlio di un grande cliente in incognito) e la talpa?
-3. **Galeotto fu il bancale**: la coppia esce a caso come gli altri personaggi, quindi può essere di qualunque tipo. Va bene?
-
-Già decisi con Davide: la lontra arriva in qualunque magazzino; il tiranno è solo un manager di magazzino; la porta sparisce anche quando si licenzia un manager; la cena nelle Langhe e i talenti proposti vanno bene così; le nove proposte di Claude (6-14) si tengono tutte.
+Nessuna, per ora. Già decisi con Davide: la lontra arriva in qualunque magazzino; il tiranno è solo un manager di magazzino; la porta sparisce anche quando si licenzia un manager; la cena nelle Langhe e i talenti proposti vanno bene così; le nove proposte di Claude (6-14) si tengono tutte; Galeotto fu il bancale è una storia sola con due aperture, coi colpi di scena del capitolo 3 così come sono (compresi il segreto e la talpa), e la coppia esce a caso come gli altri personaggi.
 
 ## Note per quando scriveremo il codice
 - Pacchetto in `PACKS` (con il suo `S.cfg`; id proposto `sh`), stemma `pk_sh` in `tools/loghi_pxl/pacchetti.px.js`, voce `shift_happens` nell'enciclopedia.
