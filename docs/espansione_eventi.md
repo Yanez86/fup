@@ -372,15 +372,72 @@ Le scene pescate hanno anche i loro effetti (il Barolo da pagare, la cena gratis
 - **Scenetta**: la festa (c'è già).
 - **Talento**: **«Ha camminato sui carboni»** (Leadership +1, Precisione −1; «Dice che dopo i carboni un buyer non fa paura. Ha ancora le vesciche.») a uno dei manager che ha camminato.
 
-### 15. e seguenti
+### 15. Galeotto fu il bancale
+*Idea di Davide: una storia d'amore tra un magazziniere e un autista, oppure tra un manager e una pickerista. Conflitto di interessi, i colleghi ne parlano male, l'alta società della supply chain disprezza i manager così. Una storia che va avanti per anni, con colpi di scena.*
+
+Il titolo viene da Dante («Galeotto fu il libro…»). È la storia più lunga del pacchetto: **5 capitoli in 3-6 anni**, un capitolo ogni 4-12 mesi. I capitoli non contano nell'orologio delle storie. Se uno dei due lascia l'azienda a metà, si salta all'epilogo.
+
+- **Chi sono i due**: nome e volto escono a caso come per gli altri personaggi (uomo o donna), quindi la coppia può essere di qualunque tipo. Due aperture possibili, il gioco ne pesca una tra quelle che hanno senso nella partita:
+  - **Il manager e la pickerista**: un manager che guida un magazzino (un personaggio vero della partita, con le sue abilità e i suoi talenti) e una persona del picking dello stesso magazzino. Il conflitto di interessi è nella gerarchia: è il suo capo.
+  - **Il magazziniere e l'autista**: un magazziniere e un autista. Se nella partita ci sono le avversarie, l'autista è di un'avversaria (Romeo e Giulietta della logistica); altrimenti è uno dei nostri, e il suo camion viene sempre caricato per primo.
+- **L'alta società della supply chain**: il giro dei convegni, dei galà e del circolo del golf, con la sua rubrica mondana sul Sole 24 Pallet, **«La Bolla mondana»**. La regina è la contessa **Ludovica Bancalari di Sant'Agata**, presidente onoraria dell'associazione dei logistici: ha sposato un armatore e da quarant'anni decide chi siede a quale tavolo.
+
+**Capitolo 1, «Le voci»**: li hanno visti insieme all'autogrill di Fiorenzuola alle 6 del mattino, e alla cena nelle Langhe (se c'è stata) ballavano un lento. In banchina non si parla d'altro; qualcuno dice che i turni del mattino vanno sempre alla stessa persona. Risposte:
+
+| Risposta | Effetto proposto |
+|---|---|
+| **Fai finta di niente** | Gratis. Le voci crescono: morale −2 nel magazzino finché la cosa non si chiarisce. Una lettera anonima arriva all'ufficio del personale (il capitolo 2 parte prima). |
+| **Chiedi trasparenza** | I due dichiarano la relazione; chi lavora sotto l'altro passa a un altro capoturno o a un altro magazzino. Morale +1: le regole valgono per tutti. La storia continua alla luce del sole. |
+| **Regola nuova: niente relazioni tra capo e sottoposto** | Morale −3 in tutti i magazzini (nessuno ama le regole sulla vita privata). I due si nascondono: i colpi di scena del capitolo 3 diventano più drammatici. |
+| **Trasferisci uno dei due** | Lo decidi tu: il magazzino si calma (morale +2), ma i due ce l'hanno con te. Il manager diventa più facile da portare via per la concorrenza. |
+
+Con l'apertura «magazziniere e autista di un'avversaria» c'è un'ansia in più: e se si parlassero delle tariffe?
+
+**Capitolo 2, «La Bolla mondana»** (4-8 mesi dopo): al Gran Galà del Pallet d'Oro a Milano, il manager arriva con la persona che ama (con l'altra apertura ci vanno il magazziniere e l'autista, coi biglietti vinti alla lotteria aziendale). La contessa Bancalari li fa sedere al tavolo 31, vicino alle cucine, e la Bolla mondana scrive: «Il magazzino entra in sala da ballo. Ma senza smoking». Nel giro dei buyer importanti si ride. Risposte:
+
+| Risposta | Effetto proposto |
+|---|---|
+| **Ti siedi al tavolo 31 con loro** | Reputazione −1 nell'alta società (gare delle committenti grandi, S e A, −1 per un anno), ma morale +4 in tutta l'azienda: il capo è uno di noi. |
+| **Consigli più discrezione** | Il manager ci resta male: Leadership −1. Una volta su tre comincia a guardare gli annunci della concorrenza. |
+| **Un ufficio stampa per farne una favola** | −4.000 €. La Bolla mondana cambia tono: «L'amore ai tempi del pallet». Reputazione +2. |
+| **Lettera di fuoco alla contessa** | Serve Negoziazione 13. Se va bene, la contessa si scusa e li invita al suo tavolo l'anno dopo; se va male, gare delle committenti S e A −2 per un anno. |
+
+**Capitolo 3, il colpo di scena** (circa un anno dopo), uno tra questi (alcuni solo con certe aperture):
+- **La proposta**: in banchina, davanti a tutto il turno, un muletto alza un bancale con un cartello: «Mi vuoi sposare?». Se la storia del pickerista di TiccheTocc è aperta, il video fa il giro d'Italia. Si va al capitolo 4.
+- **La crisi**: si lasciano, e lavorano ancora nello stesso magazzino. Non si parlano; il magazzino si divide in due tifoserie. Puntualità −1 e accuratezza −1 nel magazzino finché non decidi. Risposte: trasferisci uno dei due / mediazione con un professionista (−1.500 €) / aspetti (una volta su due, dopo sei mesi, tornano insieme davanti alle macchinette del caffè).
+- **Il segreto**: la persona del magazzino è figlia (o figlio) del presidente di un grande cliente, o di un'azienda che può diventarlo: lavorava in incognito «per imparare il mestiere dal basso», idea del padre. La contessa Bancalari li invita al suo tavolo. Soddisfazione +10 se è già un cliente, una gara facile se non lo è ancora. Gli altri magazzinieri, però, si chiedono chi altro è in incognito.
+- **La talpa** (solo con l'autista di un'avversaria): l'amore era vero, ma l'avversaria ne approfittava. Nelle ultime tre gare ti ha battuto ogni volta di un euro. Risposte: affronti la cosa (l'autista si licenzia dall'avversaria e viene da te, con un carico di informazioni) / licenzi il magazziniere (può partire la storia della porta) / doppio gioco: fai arrivare tariffe false all'avversaria (le prossime due gare sono più facili, ma se si scopre reputazione −3) / perdoni e cambi le password.
+- **La promozione**: la persona del picking è bravissima e diventa capoturno, poi manager (il percorso «In crescita» dei talenti in banchina). Adesso sono alla pari; un giorno, magari, sarà lei a guidare il magazzino di lui.
+
+**Capitolo 4, «Il matrimonio»** (dopo la proposta, qualche mese dopo): vogliono sposarsi in magazzino, tra la corsia 4 e la 5, con gli scaffali addobbati. Risposte: l'azienda paga la festa (−8.000 €, morale +6 in tutti i magazzini, reputazione +2) / fai da testimone (serve che il CEO sia stato dalla loro parte; morale +4, un talento per il CEO) / regali il viaggio di nozze (−5.000 €, ma partono a novembre, nel pieno del Black Friday: puntualità −2 nel magazzino per 2 settimane) / un biglietto di auguri e basta. Se il Gino è ancora con voi, porta gli anelli.
+
+**Capitolo 5, «Anni dopo»** (l'epilogo, 2-4 anni dopo), uno tra:
+- **Il bebè**: nasce un bambino e chiedono il congedo insieme. Se l'azienda ha l'asilo del welfare, il bambino lo inaugura (morale +3); altrimenti un mese difficile nel magazzino.
+- **La concorrenza**: un'avversaria offre un posto a tutti e due. Li trattieni con un aumento (stipendio del manager +15%) o li lasci andare con una festa d'addio.
+- **In proprio**: aprono una piccola azienda di trasporti e ti chiedono di lavorare per te da subvettori. Dici sì (puntualità +0,5 nel magazzino di prima: conoscono tutto) o no.
+- **La separazione**: si dividono tutto, anche il muletto a cui avevano dato un nome. Morale −2 nel magazzino per un mese; la Bolla mondana ci fa mezza pagina.
+- **Il decimo anniversario**: festa in mensa, la contessa Bancalari manda un biglietto (finalmente). Morale +3.
+
+La storia finisce nella cronaca: «2008-2014: Marco e Giulia, galeotto fu il bancale».
+
+- **Talenti nuovi**:
+  - **«Innamorato perso»** (Leadership +1, Precisione −1; «Firma le bolle con un cuoricino sulla i.»): al manager, finché la storia è nel pieno.
+  - **«Chiacchierato»** (gare delle committenti S e A −2 da CEO o direttore commerciale, Negoziazione −1; «Quando entra al circolo, le conversazioni si abbassano di un tono.»): a chi si siede al tavolo 31, se va male.
+  - **«Sposato in magazzino»** (Leadership +2; morale +2 nel magazzino che guida; «Si è sposato tra la corsia 4 e la 5. Il bouquet l'ha preso un carrellista.»).
+  - **«Cuore spezzato»** (Operazioni −1, Precisione −1; «Ascolta solo canzoni di Sanremo. Quelle tristi.»): dopo la crisi; se ne va da solo dopo un anno.
+  - **«Testimone di nozze»** (Leadership +1; «Ha fatto un discorso di venti minuti. Ha pianto lui per primo.»): al CEO, se fa da testimone.
+- **Scenette**: nuova, *la proposta*: il muletto che alza il cartello col cuore, il turno che applaude (anche per il matrimonio, con gli scaffali addobbati). Per la Bolla mondana l'edicola (c'è già), per il galà la festa (c'è già), per le voci il magazzino (c'è già).
+
+### 16. e seguenti
 *(da dettare)*
 
 ## Incroci tra le storie
 Le storie vivono nello stesso mondo, e a volte una entra nell'altra:
-- **La porta** può partire dopo il licenziamento del **manager tiranno** e di **Ottavio**.
+- **La porta** può partire dopo il licenziamento del **manager tiranno**, di **Ottavio** e del magazziniere della **talpa** (Galeotto fu il bancale).
 - La volontaria degli **Amici delle Zampe Bagnate** (la lontra) torna per il **barbagianni** della corsia 13.
 - Il pickerista di **TiccheTocc** pubblica il video del CEO alla **cena nelle Langhe**, gira la serie sul **fantasma della corsia 13** e il video del tutù della **scommessa**.
 - Il **manager tiranno** piange e abbraccia tutti alla **cena nelle Langhe**.
+- In **Galeotto fu il bancale** i due ballano un lento alla **cena nelle Langhe**, si vedono all'autogrill di Fiorenzuola (quello di **Ottavio**), il pickerista di **TiccheTocc** filma la proposta e il **Gino** porta gli anelli al matrimonio.
 - La **signora Pierina** ferma i ladri di gasolio del gioco base.
 
 ## Riepilogo
@@ -402,6 +459,11 @@ Le storie vivono nello stesso mondo, e a volte una entra nell'altra:
 | Ha fatto una comparsata | Si gira! | positivo | Negoziazione +1 |
 | Diplomatico di condominio | La signora Pierina e il cicalino | positivo | Negoziazione +1 |
 | Ha camminato sui carboni | Il formatore motivazionale | misto | Leadership +1, Precisione −1 |
+| Innamorato perso | Galeotto fu il bancale | misto | Leadership +1, Precisione −1 |
+| Chiacchierato | Galeotto fu il bancale | negativo | Negoziazione −1; da CEO o direttore commerciale: gare delle committenti S e A −2 |
+| Sposato in magazzino | Galeotto fu il bancale | positivo | Leadership +2; nel magazzino: morale +2 |
+| Cuore spezzato | Galeotto fu il bancale | negativo | Operazioni −1, Precisione −1 (sparisce dopo un anno) |
+| Testimone di nozze | Galeotto fu il bancale | positivo | Leadership +1 |
 
 Ognuno vuole il suo disegno nelle icone (come tutti i talenti) e la sua voce nell'enciclopedia.
 
@@ -423,13 +485,18 @@ Ognuno vuole il suo disegno nelle icone (come tutti i talenti) e la sua voce nel
 | Dov'è finito Ottavio? | la strada (c'è già) |
 | La scommessa | la trattoria e la festa (ci sono già) |
 | Il formatore motivazionale | la festa (c'è già) |
+| Galeotto fu il bancale | nuova: la proposta col muletto (anche per il matrimonio); magazzino, edicola e festa (ci sono già) |
 
-In tutto, per ora, 10 scenette nuove (11 con la mattina dopo della cena).
+In tutto, per ora, 11 scenette nuove (12 con la mattina dopo della cena).
 
 Le scenette che esistono già e si possono riusare: magazzino, piazzale, ufficio, ufficio di notte, festa, sciopero, trattativa, ispezione, edicola, strada, trattoria, talento, pioggia, neve, nebbia, golf, ministero.
 
 ## Domande aperte per Davide
-Nessuna, per ora. Già decisi con Davide: la lontra arriva in qualunque magazzino; il tiranno è solo un manager di magazzino; la porta sparisce anche quando si licenzia un manager; la cena nelle Langhe e i talenti proposti vanno bene così; le nove proposte di Claude (6-14) si tengono tutte.
+1. **Galeotto fu il bancale**: una sola storia con due aperture (il gioco ne pesca una), o due storie diverse?
+2. **Galeotto fu il bancale**: vanno bene i colpi di scena del capitolo 3, in particolare il segreto (figlia o figlio di un grande cliente in incognito) e la talpa?
+3. **Galeotto fu il bancale**: la coppia esce a caso come gli altri personaggi, quindi può essere di qualunque tipo. Va bene?
+
+Già decisi con Davide: la lontra arriva in qualunque magazzino; il tiranno è solo un manager di magazzino; la porta sparisce anche quando si licenzia un manager; la cena nelle Langhe e i talenti proposti vanno bene così; le nove proposte di Claude (6-14) si tengono tutte.
 
 ## Note per quando scriveremo il codice
 - Pacchetto in `PACKS` (con il suo `S.cfg`; id proposto `sh`), stemma `pk_sh` in `tools/loghi_pxl/pacchetti.px.js`, voce `shift_happens` nell'enciclopedia.
@@ -438,5 +505,5 @@ Nessuna, per ora. Già decisi con Davide: la lontra arriva in qualunque magazzin
 - Scenette nuove in un file nuovo `tools/scene_pxl/storie.px.js`, registrate in `SCN_EV`; il test già controlla che ogni evento abbia una scena che esiste.
 - Talenti con una marca del pacchetto (come `it:1`), disegni in `tools/icone_pxl/`, voci in `WIKI`; tappe in `chron()`.
 - Il test dovrà provare che una storia non esce due volte e che una puntata arriva anche dopo un salvataggio.
-- Alcune puntate arrivano molto dopo (gli 80 anni del Gino, anni dopo; la prima del film, un anno dopo): gli appuntamenti devono reggere a lungo e cadere da soli se la storia non ha più senso.
+- Alcune puntate arrivano molto dopo (gli 80 anni del Gino e l'epilogo di Galeotto fu il bancale, anni dopo; la prima del film, un anno dopo): gli appuntamenti devono reggere a lungo e cadere da soli se la storia non ha più senso.
 - La scommessa legge la puntualità media dell'anno del giocatore e dell'avversaria; il Trofeo può mettere in gara un'avversaria. Gli incroci tra le storie leggono quali storie sono aperte.
