@@ -1,6 +1,6 @@
 # Pacchetto «Shift Happens» (progetto)
 
-**Stato: costruito sul ramo di lavoro nella versione 0.133, in revisione con Davide** (le regole esatte sono in `docs/design.md`, sezione «Pacchetto Shift Happens»). Davide ha chiesto di preparare tutto il pacchetto prima di pubblicarlo e di mandargli gli screenshot da rivedere: finché non dice di sì resta fuori da `main`.
+**Stato: costruito nella versione 0.133, rivisto sugli screenshot e approvato da Davide** (le regole esatte sono in `docs/design.md`, sezione «Pacchetto Shift Happens»).
 
 Differenze rispetto al progetto, decise durante la costruzione:
 - Il manager tiranno ha cinque risposte: il corso sulla gestione della rabbia è una risposta a sé, accanto al richiamo.
